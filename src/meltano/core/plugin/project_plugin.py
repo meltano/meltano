@@ -1,9 +1,10 @@
 import copy
 import logging
+import sys
 from typing import Optional
 
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.utils import flatten, uniques_in
+from meltano.core.utils import expand_env_vars, flatten, uniques_in
 
 from .base import PluginDefinition, PluginRef, PluginType, Variant
 from .command import Command
@@ -214,3 +215,13 @@ class ProjectPlugin(PluginRef):
     def is_shadowing(self):
         """Return whether this plugin is shadowing a base plugin with the same name."""
         return not self.inherit_from
+
+    @property
+    def formatted_pip_url(self):
+        """Return the formatted version of the pip_url, expanding ${MELTANO__PYTHON_VERSION} to the major.minor version string of the current runtime."""
+        return expand_env_vars(
+            self.pip_url,
+            {
+                "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}"
+            },
+        )

@@ -22,6 +22,45 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [2456] cli command output assumes meltano.yml is the only config YAML - this is no longer guaranteed
 
 
+## 1.79.2 - (2021-09-07)
+---
+
+### Fixes
+
+- [#2922](https://gitlab.com/meltano/meltano/-/issues/2922) Fix error during installation of some plugins caused by a `setuptools` release. _Thanks, **[Maarten van Gijssel](https://gitlab.com/mvgijssel)**!_
+
+## 1.79.1 - (2021-08-17)
+---
+
+### Fixes
+
+- [#2893](https://gitlab.com/meltano/meltano/-/issues/2893) Fix error when invoking a target outside pipeline context
+- [#2627](https://gitlab.com/meltano/meltano/-/issues/2627) Invalidate catalog cache after reinstalling a tap
+
+
+## 1.79.0 - (2021-08-13)
+---
+
+### New
+
+- [#2545](https://gitlab.com/meltano/meltano/-/issues/2545) Add support for Python 3.9
+- [#2849](https://gitlab.com/meltano/meltano/-/issues/2849) Use dbt [`v0.20`](https://github.com/fishtown-analytics/dbt/releases/tag/v0.20.1) by default for new dbt installs
+- [#2576](https://gitlab.com/meltano/meltano/-/issues/2576) Use Airflow [v2.1](https://airflow.apache.org/docs/apache-airflow/2.1.0/changelog.html) by default for new Airflow installs
+- [#2871](https://gitlab.com/meltano/meltano/-/issues/2871) Add `discovery_url_auth` project setting to support authenticated retrieval of `discovery.yml`
+- [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
+- [#2860](https://gitlab.com/meltano/meltano/-/issues/2860) Allow commands to use alternate executables
+
+### Changes
+
+- [#2868](https://gitlab.com/meltano/meltano/-/issues/2868) Refactor to allow SingerTarget to inject a BookmarkWriter via a new PluginInvoker callback
+- [#2575](https://gitlab.com/meltano/meltano/-/issues/2575) Support version-specific pip constraint files by allowing the special var `${MELTANO__PYTHON_VERSION}` in plugin pip_url's (bumps `discovery.yml` version ([#2890](https://gitlab.com/meltano/meltano/-/issues/2890)) to signal the required upgrade)
+
+### Fixes
+
+- [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to be invoked at the same time by adding a UUID to config.json
+- [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`)
+
+
 ## 1.78.0 - (2021-07-15)
 ---
 
@@ -42,7 +81,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2758](https://gitlab.com/meltano/meltano/-/issues/2758) Fix misleading error message when calling `meltano invoke airflow <args>`
 - [#2826](https://gitlab.com/meltano/meltano/-/issues/2826) Make plugin installation serial during `meltano add ...`
 - [#2828](https://gitlab.com/meltano/meltano/-/issues/2828) Fix coroutine error when `python3-venv` is missing during plugin installation.
-- [#2855](https://gitlab.com/meltano/meltano/-/issues/2855) Allow `executable` to be overridden through plugin inheritance
 
 ### Breaks
 

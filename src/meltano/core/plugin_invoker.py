@@ -1,10 +1,14 @@
 import asyncio
 import copy
+import enum
 import logging
 import os
 import subprocess
 from contextlib import contextmanager
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
+
+from meltano.core.logging.utils import SubprocessOutputWriter
 
 from .error import Error, SubprocessError
 from .plugin import PluginRef
@@ -74,11 +78,19 @@ class UnknownCommandError(InvokerError):
 class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
+    class StdioSource(str, enum.Enum):  # noqa: WPS431
+        """Describes the available unix style std io sources."""
+
+        STDIN = "stdin"
+        STDOUT = "stdout"
+        STDERR = "stderr"
+
     def __init__(
         self,
         project: Project,
         plugin: ProjectPlugin,
         context: Optional[object] = None,
+        output_handlers: Optional[dict] = None,
         run_dir=None,
         config_dir=None,
         venv_service: VenvService = None,
@@ -89,6 +101,7 @@ class PluginInvoker:
         self.project = project
         self.plugin = plugin
         self.context = context
+        self.output_handlers = output_handlers
 
         self.venv_service: Optional[VenvService] = None
         if plugin.pip_url or venv_service:
@@ -161,32 +174,47 @@ class PluginInvoker:
         finally:
             self.cleanup()
 
-    def exec_path(self):
+    def exec_path(self, executable: Optional[str] = None) -> Union[str, Path]:
+        """
+        Return the absolute path to the executable.
+
+        Uses the plugin executable if none is specified.
+        """
+        executable = executable or self.plugin.executable
         if not self.venv_service:
-            if "/" not in self.plugin.executable.replace("\\", "/"):
+            if "/" not in executable.replace("\\", "/"):
                 # Expect executable on path
-                return self.plugin.executable
+                return executable
 
             # Return executable relative to project directory
-            return self.project.root.joinpath(self.plugin.executable)
+            return self.project.root.joinpath(executable)
 
         # Return executable within venv
-        return self.venv_service.exec_path(self.plugin.executable)
+        return self.venv_service.exec_path(executable)
 
     def exec_args(self, *args, command=None, env=None):
-        """Materialize the arguments to be passed to the executable."""
+        """Materialize the arguments to be passed to the executable.
+
+        Raises `UnknownCommandError` if requested command is not defined.
+        """
         env = env or {}
+        executable = self.exec_path()
         if command:
-            try:
-                plugin_args = self.plugin.all_commands[command].expanded_args(
-                    command, env
-                )
-            except KeyError as err:
-                raise UnknownCommandError(self.plugin, command) from err
+            command_config = self.find_command(command)
+            plugin_args = command_config.expanded_args(command, env)
+            if command_config.executable:
+                executable = self.exec_path(command_config.executable)
         else:
             plugin_args = self.plugin.exec_args(self)
 
-        return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
+        return [str(arg) for arg in (executable, *plugin_args, *args)]
+
+    def find_command(self, name):
+        """Find a Command by name. Raises `UnknownCommandError` if not defined."""
+        try:
+            return self.plugin.all_commands[name]
+        except KeyError as err:
+            raise UnknownCommandError(self.plugin, name) from err
 
     def env(self):
         env = {
@@ -259,3 +287,15 @@ class PluginInvoker:
         except ExecutableNotFoundError as err:
             # Unwrap FileNotFoundError
             raise err.__cause__
+
+    def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
+        """Append an output handler for a given stdio stream.
+
+        Args:
+            src: stdio source you'd like to subscribe, likely either 'stdout' or 'stderr'
+            handler: either a StreamWriter or an object matching the utils.SubprocessOutputWriter proto
+        """
+        if self.output_handlers:
+            self.output_handlers[src].append(handler)
+        else:
+            self.output_handlers = {src: [handler]}

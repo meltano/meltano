@@ -9,6 +9,8 @@ import sys
 from asyncio.subprocess import Process
 from collections import namedtuple
 from pathlib import Path
+from types import TracebackType
+from typing import Callable, Tuple, Type
 
 from .error import AsyncSubprocessError
 from .project import Project
@@ -28,6 +30,23 @@ NT = VenvSpecs(
     bin_dir="Scripts",
     site_packages_dir=os.path.join("Lib", "site-packages"),
 )
+
+
+def log_rmtree_error(
+    op: Callable,
+    path: Path,
+    exc_info: Tuple[Type[BaseException], BaseException, TracebackType],
+):
+    """Log an exception when shutil.rmtree fails.
+
+    Args:
+        op: OS operation that failed
+        path: Directory path
+        exc_info: Exception raised by shutil.rmtree
+    """
+    logger.debug(
+        "Failed to remove directory tree %s", path, exc_info=exc_info  # noqa: WPS323
+    )
 
 
 class VirtualEnv:
@@ -93,16 +112,25 @@ class VenvService:
         :raises: SubprocessError: if any of the commands fail.
         """
         self.clean()
+        self.clean_run_files()
         await self.create()
         await self.upgrade_pip()
         await asyncio.gather(*[self.install(pip_url) for pip_url in pip_urls])
 
+    def clean_run_files(self):
+        """Destroy cached configuration files, if they exist."""
+        shutil.rmtree(
+            self.project.run_dir(self.name, make_dirs=False), onerror=log_rmtree_error
+        )
+
     def clean(self):
         """Destroy the virtual environment, if it exists."""
         try:
-            shutil.rmtree(str(self.venv))
+            shutil.rmtree(self.venv.root)
             logger.debug(
-                f"Removed old virtual environment for '{self.namespace}/{self.name}'"
+                "Removed old virtual environment for '%s/%s'",  # noqa: WPS323
+                self.namespace,
+                self.name,
             )
         except FileNotFoundError:
             # If the VirtualEnv has never been created before do nothing
@@ -146,7 +174,7 @@ class VenvService:
                 "install",
                 "--upgrade",
                 "pip",
-                "setuptools",
+                "setuptools==57.5.0",
                 "wheel",
             )
         except AsyncSubprocessError as err:

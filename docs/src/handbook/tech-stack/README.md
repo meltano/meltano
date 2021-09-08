@@ -100,6 +100,12 @@ Connected to [Google Workspace](#google-workspace).
 Every team member has their own account.
 Main account details are in the `Executive` 1Password vault.
 
+## [Greenhouse](https://www.greenhouse.io/)
+
+Manage job applicants, our job board, and our hiring process.
+
+Every team member has their own account.
+
 ## [Instagram](https://www.instagram.com/)
 
 [`meltanodata`](https://www.instagram.com/meltanodata/) Instagram account.
@@ -127,8 +133,8 @@ Main account and credit card details are in the `Finance` 1Password vault.
 
 ## [NameCheap](https://www.namecheap.com/)
 
-Domain name registration for `meltanodata.com`.
-Domain name registration and DNS management for `singerhub.io`.
+Domain name registration for `meltanodata.com` and `meltano.dev`.
+Domain name registration and DNS management `singerhub.io`.
 
 Account details are in the `Engineering` 1Password vault.
 
@@ -240,7 +246,7 @@ Account details are in the `Engineering` 1Password vault.
 
 ## [Zendesk](https://meltano.zendesk.com/)
 
-Receives email sent to `hello@meltano.com`, which is used for most subscriptions and the occasional support email, and `security@meltano.com`.
+Receives email sent to `hello@meltano.com` and `security@meltano.com`.
 
 Select team members have their own account.
 

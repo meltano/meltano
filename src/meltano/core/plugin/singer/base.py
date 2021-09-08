@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from uuid import uuid4
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.db import project_engine
@@ -10,6 +11,11 @@ from meltano.core.utils import nest_object
 
 
 class SingerPlugin(BasePlugin):
+    def __init__(self, *args, **kwargs):
+        """Canonical class leads to  an error if the UUID is defined here directly. Also, This data attribute must be defined or we'll get errors from Canonical."""
+        super().__init__(*args, **kwargs)
+        self._instance_uuid: str = None
+
     def process_config(self, flat_config):
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
@@ -41,3 +47,10 @@ class SingerPlugin(BasePlugin):
         config_path = invoker.files["config"]
         config_path.unlink()
         logging.debug(f"Deleted configuration at {config_path}")
+
+    @property
+    def instance_uuid(self):
+        """Multiple processes running at the same time have a unique value to use."""
+        if not self._instance_uuid:
+            self._instance_uuid = str(uuid4())
+        return self._instance_uuid

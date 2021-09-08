@@ -12,7 +12,7 @@ members:
     linkedin: douwem
 - name: Taylor Murphy
   title: Head of Product & Data
-  location: Nashville, TN, USA 🇺🇸
+  location: Arlington, TX, USA 🇺🇸
   gravatar_hash: b4936f876b1093f90d7246b264084ddd
   social:
     gitlab: tayloramurphy
@@ -66,21 +66,26 @@ members:
   social:
     gitlab: kgpayne
     linkedin: k-g-payne
+- name: S. P.
+  title: Operations Analyst
+  location: CA, USA 🇺🇸
+  start_date: September 9, 2021
 openings:
-- title: Senior Backend Engineer
+- title: Head of Partnerships
   location: Anywhere, Remote 🌍
-  description: "Required: Python & data experience"
+  description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4088646004
+- title: Technical Marketing Manager
+  location: Anywhere, Remote 🌍
+  description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4075560004
 - title: Senior Frontend Engineer & UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
-- title: Senior Data Engineer
+  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
+- title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
-  description: "Use Meltano to build a world-class data platform"
-  description_url: https://docs.google.com/document/d/1cWBRnm8Bm729ew7TRLwkKbbc4U2NKHMx9rTuErh1Oos/edit
-- title: Remote Office Manager
-  location: US time zone, Remote 🌍
-  description: "Oversee and assist team with administrative and PeopleOps matters"
-  description_url: https://docs.google.com/document/d/16cOqKZJhPInBALjXPGS0QPyZx4h7l_NhiPkkFlIqEgI/edit
+  description: "Required: Python & data experience"
 ---
 
 # Introduction
@@ -195,7 +200,7 @@ In order of priority, our target personas are:
 
 ## Roadmap
 
-Meltano is developed completely in the open on GitLab: <https://gitlab.com/meltano/meltano>. Our [issue tracker](https://gitlab.com/meltano/meltano/-/issues), [epics](https://gitlab.com/groups/meltano/-/epics), and [weekly milestones](https://gitlab.com/groups/meltano/-/milestones) can be found there as well.
+Meltano is developed completely in the open on GitLab: <https://gitlab.com/meltano/meltano>. Our [issue tracker](https://gitlab.com/groups/meltano/-/issues), [epics](https://gitlab.com/groups/meltano/-/epics), and [weekly milestones](https://gitlab.com/groups/meltano/-/milestones) can be found there as well.
 
 To get an idea of what the team and community are currently working on, check out the upcoming milestone's [Development Flow board](https://gitlab.com/groups/meltano/-/boards/536761?scope=all&utf8=%E2%9C%93&milestone_title=%23upcoming).
 
@@ -205,44 +210,60 @@ Be aware that issue milestones serve more as a rough indication of relative prio
 since short-term priorities can change quickly in response to community feedback, and it's hard to predict how much progress can be made in a week.
 Also note that issues labeled `flow::To Do` have higher priority and are more likely to be completed in a given week than those labeled `flow::Triage`, which are often moved to the next milestone at the end of the week, with issues already scheduled for the next week pushed out to make room for them.
 
-Below you will found our current roadmap. As this projects out into the future it is subject to change based on feedback. Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
+Below you will found our current roadmap. 
+Each item should link to an Epic with the relevant issue linked to that epic.
+As this projects out into the future it is subject to change based on feedback. 
+Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
-#### July 2021
+Our focus for the rest of the year is going to mainly be in two categories: 
+* Improving the overall quality of the Singer ecosystem
+* Making Meltano the best data integration (ELT) tool on the market
 
-Our focus for July will be to launch Meltano Academy to enable the community to learn about Meltano faster, make MeltanoHub the single source of truth for Meltano, refactor Meltano to enable composable pipelines, and add Superset as an available analyzer.
-
-* [Meltano Academy](https://gitlab.com/meltano/meta/-/issues/63)
-* [MeltanoHub as SSOT for Meltano](https://gitlab.com/groups/meltano/-/epics/102)
-* [Composable Meltano Pipelines](https://gitlab.com/meltano/meltano/-/issues/2725 )
-* [Superset](https://gitlab.com/meltano/meltano/-/issues/2605)
-
-#### August 2021
-
-Our focus for August will be to expand our integrations for data quality and analysis. We will also work to add support for the fast sync / batch message type to enable higher throughput for extraction and loading.
-
-* [Fast Sync / Batch Messages](https://gitlab.com/meltano/meltano/-/issues/2364)
-* [Add validator plugin type - Great Expectations/dbt test](https://gitlab.com/meltano/meltano/-/issues/2454)
-* [Dagster](https://gitlab.com/meltano/meltano/-/issues/2393)
-* [Decentralized Management of MeltanoHub Connectors](https://gitlab.com/meltano/meta/-/issues/73)
+These efforts are the foundation of our larger vision to enable a full DataOps platform.
 
 #### September 2021
 
-Our focus for September will be to continue expanding integrations: adding orchestration options, notebooks integration, and out-of-the-box support for an OLAP Database.
+In September we aim to launch composable pipelines for Meltano, unlocking a more powerful ELT paradigm that what currently exists. 
+We will also integrate Great Expectations and `dbt test` as new validators which can be composed with the regular ELT tasks. 
+For the Singer ecosystem, we will finalize the work needed to make Meltano rely on MeltanoHub and release the first iteration of the BATCH message types in the Meltano SDK.
 
-* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
-* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
-* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
-* [Simple Cloud Deploys](https://gitlab.com/groups/meltano/-/epics/28)
+* Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
+* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725 )
+* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
+* Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2910)
+* Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
 #### 2021-Q4
 
-Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentailly start offering a SaaS deployment of Meltano.
+For the rest of the year, we have several key outcomes we're looking to achieve.
+We're still primarily aiming to improve the Singer ecosystem and make Meltano the best ELT platform on the market. 
+We're also building the future of Meltano as a DataOps platform by adding native environments, improving monitoring and observability with the tool, and by making deployment as easy as possible. 
+Underpinning all of this will be a focus on improving the developer experience by enhancing our documentation.
 
-* [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
-* [Initial conversion of MeltanoHub to dyanmic site](https://gitlab.com/groups/meltano/-/epics/101)
-* [Monitoring, observability, and data lineage](https://gitlab.com/groups/meltano/-/epics/93)
+* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/79)
+* Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
+* Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
+* Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
+* Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
+* Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
+* Monitoring, observability, and data lineage - [Epic](https://gitlab.com/groups/meltano/-/epics/93)
+* Add Dagster as an Orchestrator - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
+
+
+#### 2022-H1
+
+Next year will be continuing to make Meltano the best data integration tool on the market and Singer the best open source ecosystem.
+With this great foundation in place, we'll continue to invest in making Meltano the best DataOps platform on the market.
+This means focusing more on the user interface and on sell Meltano to paying customers.
+
 * [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
 * [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
+* [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
+* [Initial conversion of MeltanoHub to dynamic site](https://gitlab.com/groups/meltano/-/epics/101)
+* [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
+* [Jupyter Notebooks](https://gitlab.com/meltano/meltano/-/issues/2595)
+* [Git-provider Integrations](https://gitlab.com/groups/meltano/-/epics/92)
 
 ## Contributing
 
@@ -275,7 +296,7 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 ## Careers <a name="job-openings" />
 
-The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future!
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
 
 If our [mission](#mission) excites you, and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
 Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.

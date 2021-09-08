@@ -84,7 +84,7 @@ or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2
 ```bash
 # For these examples to work, ensure that:
 # - you are running Linux or macOS
-# - Python 3.6, 3.7 or 3.8 has been installed
+# - Python 3.6, 3.7, 3.8, or 3.9 has been installed
 python3 --version
 
 # Create directory for Meltano projects

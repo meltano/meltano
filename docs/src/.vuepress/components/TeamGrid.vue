@@ -10,7 +10,7 @@
 
         <strong>{{member.title}}</strong>
 
-        <ul class="social">
+        <ul v-if="member.social" class="social">
           <li v-if="member.social.linkedin" class="linkedin">
             <a :href="`https://linkedin.com/in/${member.social.linkedin}`" target="_blank">
               <LinkedInIcon />
