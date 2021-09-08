@@ -89,7 +89,7 @@ class SingerTarget(SingerPlugin):
         return {"state": "new_state.json"}
 
     @hook("before_invoke")
-    def setup_bookmark_writer_hook(
+    async def setup_bookmark_writer_hook(
         self, plugin_invoker: PluginInvoker, exec_args: List[str]
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.

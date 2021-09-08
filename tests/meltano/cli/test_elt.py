@@ -1,13 +1,9 @@
 import asyncio
 import json
-import logging
-import os
-from functools import partial
-from unittest import mock
 
 import pytest
 from asserts import assert_cli_runner
-from asynctest import CoroutineMock
+from asynctest import CoroutineMock, mock
 from meltano.cli import cli
 from meltano.core.job import Job, State
 from meltano.core.logging.utils import remove_ansi_escape_sequences
