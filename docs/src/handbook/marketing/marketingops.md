@@ -1,4 +1,5 @@
 ---
+title: "Marketing Ops"
 sidebarDepth: 2
 ---
 
@@ -18,6 +19,14 @@ WordPress has automatic updates enabled so that we always run the latest stable 
 #### Plugins
 
 Plugins are also automatically updated and typically update overnight. A ticket is automatically created in ZenDesk whenever plugins are updated.
+
+##### Jetpack
+
+You can configure the social media buttons that appear on posts [here](https://meltano.com/blog/wp-admin/options-general.php?page=sharing).
+
+##### Permalink Manager
+
+You can update the permalinks for a post through the post's settings or through this [list](https://meltano.com/blog/wp-admin/tools.php?page=permalink-manager).
 
 ### Troubleshooting
 

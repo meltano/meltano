@@ -1,4 +1,5 @@
 ---
+title: "Community"
 sidebarDepth: 2
 ---
 
