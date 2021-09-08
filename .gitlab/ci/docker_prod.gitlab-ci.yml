@@ -11,7 +11,7 @@
   variables:
     DOCKERFILE: docker/prod/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE
-    IMAGE_TAG: $CI_COMMIT_SHA-python$PYTHON_VERSION
+    IMAGE_TAG: $CI_COMMIT_SHA-python$PYTHON_IMAGE_VERSION
   before_script:
     - source .gitlab/ci/scripts/docker_build_before_script.sh
     - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA-python$PYTHON_IMAGE_VERSION"
@@ -47,8 +47,8 @@ meltano_edge:
   script:
     - source .gitlab/ci/scripts/docker_build_script.sh
 
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge-python$PYTHON_VERSION
-    - docker push $IMAGE_NAME:edge-python$PYTHON_VERSION
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge-python$PYTHON_IMAGE_VERSION
+    - docker push $IMAGE_NAME:edge-python$PYTHON_IMAGE_VERSION
 
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge || true'
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:edge || true'
@@ -66,11 +66,11 @@ meltano:
   script:
     - source .gitlab/ci/scripts/docker_build_script.sh
 
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_VERSION
-    - docker push $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_VERSION
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
+    - docker push $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
 
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest-python$PYTHON_VERSION
-    - docker push $IMAGE_NAME:latest-python$PYTHON_VERSION
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
+    - docker push $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
 
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG || true'
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:$CI_COMMIT_TAG || true'
