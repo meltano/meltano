@@ -410,6 +410,8 @@ Additionally, plugin names can be provided to only (re)install those specific pl
 
 Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
 
+Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
 
 ::: tip
@@ -449,6 +451,7 @@ meltano install models
 meltano install --include-related
 
 meltano install --parallelism=16
+meltano install --clean
 ```
 
 ## `invoke`

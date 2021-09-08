@@ -16,6 +16,11 @@ from .utils import CliError, add_related_plugins, install_plugins
 @click.argument("plugin_name", nargs=-1, required=False)
 @click.option("--include-related", is_flag=True)
 @click.option(
+    "--clean",
+    is_flag=True,
+    help="Completely reinstall a plugin rather than simply upgrading if necessary.",
+)
+@click.option(
     "--parallelism",
     "-p",
     type=click.INT,
@@ -23,7 +28,7 @@ from .utils import CliError, add_related_plugins, install_plugins
     help="Limit the number of plugins to install in parallel. Defaults to the number of cores.",
 )
 @pass_project(migrate=True)
-def install(project, plugin_type, plugin_name, include_related, parallelism):
+def install(project, plugin_type, plugin_name, include_related, clean, parallelism):
     """
     Installs all the dependencies of your project based on the meltano.yml file.
     Read more at https://www.meltano.com/docs/command-line-interface.html.
@@ -50,7 +55,7 @@ def install(project, plugin_type, plugin_name, include_related, parallelism):
 
     click.echo(f"Installing {len(plugins)} plugins...")
 
-    success = install_plugins(project, plugins, parallelism=parallelism)
+    success = install_plugins(project, plugins, parallelism=parallelism, clean=clean)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_install()
