@@ -20,6 +20,11 @@
     matrix:
       - PYTHON_VERSION: ["3.6", "3.7", "3.8", "3.9.6"]
 
+.parallel:python_image_version:
+  parallel:
+    matrix:
+      - PYTHON_IMAGE_VERSION: ["3.6", "3.7", "3.8", "3.9"]
+
 .parallel:image_tag_suffix:
   parallel:
     matrix:
