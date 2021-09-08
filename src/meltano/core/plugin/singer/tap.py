@@ -1,18 +1,22 @@
+"""SingerTap and supporting classes.
+
+This module contains the SingerTap class as well as a supporting methods.
+"""
+import asyncio
+import codecs
 import json
 import logging
 import shutil
-import subprocess
+import sys
 from hashlib import sha1
-from pathlib import Path
-from typing import Dict
 
 from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import JobFinder, Payload
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
-from meltano.core.plugin_invoker import InvokerError
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
-from meltano.core.utils import file_has_data, flatten, merge, truthy
+from meltano.core.utils import file_has_data, flatten, merge
 
 from . import PluginType, SingerPlugin
 from .catalog import (
@@ -130,16 +134,18 @@ class SingerTap(SingerPlugin):
         return {"output": "tap.out"}
 
     @hook("before_invoke")
-    def look_up_state_hook(self, plugin_invoker, exec_args=[]):
+    async def look_up_state_hook(self, plugin_invoker, exec_args=()):
+        """Look up state before being invoked."""
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
         try:
-            self.look_up_state(plugin_invoker, exec_args)
+            await self.look_up_state(plugin_invoker)
         except PluginLacksCapabilityError:
             pass
 
-    def look_up_state(self, plugin_invoker, exec_args=[]):
+    async def look_up_state(self, plugin_invoker):  # noqa: WPS231, WPS213
+        """Look up state, cleaning up and refreshing as needed."""
         if "state" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support incremental state"
@@ -209,16 +215,27 @@ class SingerTap(SingerPlugin):
             logger.warning("No state was found, complete import.")
 
     @hook("before_invoke")
-    def discover_catalog_hook(self, plugin_invoker, exec_args=[]):
+    async def discover_catalog_hook(self, plugin_invoker, exec_args=()):
+        """Before invoke hook to trigger catalog discovery for this tap.
+
+        Args:
+            plugin_invoker: The invocation handler of the plugin instance.
+            exec_args: List of subcommand/args that we where invoked with.
+        """
         if "--discover" in exec_args or "--help" in exec_args:
             return
 
         try:
-            self.discover_catalog(plugin_invoker, exec_args)
+            await self.discover_catalog(plugin_invoker)
         except PluginLacksCapabilityError:
             pass
 
-    def discover_catalog(self, plugin_invoker, exec_args=[]):
+    async def discover_catalog(self, plugin_invoker):  # noqa: WPS231
+        """Perform catalog discovery.
+
+        Args:
+            plugin_invoker: The invocation handler of the plugin instance.
+        """
         catalog_path = plugin_invoker.files["catalog"]
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
 
@@ -255,7 +272,7 @@ class SingerTap(SingerPlugin):
                     f"Could not find catalog file {custom_catalog_path}"
                 ) from err
         else:
-            self.run_discovery(plugin_invoker, catalog_path)
+            await self.run_discovery(plugin_invoker, catalog_path)
 
         # test for the result to be a valid catalog
         try:
@@ -268,22 +285,45 @@ class SingerTap(SingerPlugin):
                 f"Catalog discovery failed: invalid catalog: {err}"
             ) from err
 
-    def run_discovery(self, plugin_invoker, catalog_path):
+    async def run_discovery(self, plugin_invoker: PluginInvoker, catalog_path):
+        """Actually invoke tap discovery storing output.
+
+        Args:
+            plugin_invoker: The invocation handler of the plugin instance.
+            catalog_path: Where discovery output should be written.
+        """
+
+        async def _streamresp(  # noqa: WPS430
+            stream: asyncio.StreamReader, file_like_obj
+        ):
+            while not stream.at_eof():
+                data = await stream.readline()
+                file_like_obj.write(data)
+
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
             )
 
         try:
-            with catalog_path.open("w") as catalog:
-                result = plugin_invoker.invoke(
+            with catalog_path.open(mode="wb") as catalog:
+                handle = await plugin_invoker.invoke_async(
                     "--discover",
-                    stdout=catalog,
-                    stderr=subprocess.PIPE,
-                    universal_newlines=True,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    universal_newlines=False,
                 )
-                stdout, stderr = result.communicate()
-                exit_code = result.returncode
+                await asyncio.wait(
+                    [
+                        _streamresp(handle.stdout, catalog),
+                        _streamresp(
+                            codecs.getreader("ascii")(handle.stderr), sys.stderr
+                        ),
+                        handle.wait(),
+                    ],
+                    return_when=asyncio.ALL_COMPLETED,
+                )
+            exit_code = handle.returncode
         except Exception:
             catalog_path.unlink()
             raise
@@ -291,11 +331,12 @@ class SingerTap(SingerPlugin):
         if exit_code != 0:
             catalog_path.unlink()
             raise PluginExecutionError(
-                f"Catalog discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}: {stderr.rstrip()}"
+                f"Catalog discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}"
             )
 
     @hook("before_invoke")
-    def apply_catalog_rules_hook(self, plugin_invoker, exec_args=[]):
+    async def apply_catalog_rules_hook(self, plugin_invoker, exec_args=()):
+        """Apply catalog rules before invoke."""
         if "--discover" in exec_args or "--help" in exec_args:
             return
 

@@ -408,7 +408,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
                 plugins_service=plugins_service,
                 plugin_settings_service=settings,
             )
-            with invoker.prepared(db.session):
+            async with invoker.prepared(db.session):
                 process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
                 return await test_stream(process.stdout)
         except Exception as err:

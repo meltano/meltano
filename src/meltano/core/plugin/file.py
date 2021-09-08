@@ -112,12 +112,13 @@ class FilePlugin(BasePlugin):
         return self.write_files(project, self.files_to_update(project, paths_to_update))
 
     @hook("after_install")
-    def after_install(
+    async def after_install(
         self,
         installer: PluginInstallService,
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
     ):
+        """Trigger after install tasks."""
         project = installer.project
         plugins_service = installer.plugins_service
 

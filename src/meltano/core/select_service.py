@@ -36,19 +36,21 @@ class SelectService:
         )
         return plugin_settings_service.get("_select")
 
-    def load_catalog(self, session):
+    async def load_catalog(self, session):
+        """Load the catalog."""
         invoker = invoker_factory(
             self.project, self.extractor, plugins_service=self.plugins_service
         )
 
-        with invoker.prepared(session):
-            catalog_json = invoker.dump("catalog")
+        async with invoker.prepared(session):
+            catalog_json = await invoker.dump("catalog")
 
         return json.loads(catalog_json)
 
-    def list_all(self, session) -> ListSelectedExecutor:
+    async def list_all(self, session) -> ListSelectedExecutor:
+        """List all select."""
         try:
-            catalog = self.load_catalog(session)
+            catalog = await self.load_catalog(session)
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 f"Could not find catalog. Verify that the tap supports discovery mode and advertises the `discover` capability as well as either `catalog` or `properties`"

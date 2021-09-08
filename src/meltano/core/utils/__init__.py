@@ -60,6 +60,16 @@ def run_async(coro):
         loop.run_until_complete(loop.shutdown_asyncgens())
 
 
+def click_run_async(func):
+    """Small decorator to allow click invoked functions to leverage run_async and be declared as async."""
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):  # noqa: WPS430
+        return run_async(func(*args, **kwargs))
+
+    return wrapper
+
+
 # from https://github.com/jonathanj/compose/blob/master/compose.py
 def compose(*fs):
     """
