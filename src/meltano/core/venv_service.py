@@ -31,7 +31,7 @@ NT = VenvSpecs(
     site_packages_dir=os.path.join("Lib", "site-packages"),
 )
 
-PIP_PACKAGES = ("pip", "setuptools", "wheel")
+PIP_PACKAGES = ("pip", "setuptools==57.5.0", "wheel")
 
 
 class VirtualEnv:
@@ -189,6 +189,7 @@ class VenvService:
 
         try:
             return await self._pip_install(*PIP_PACKAGES, upgrade=True)
+
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 "Failed to upgrade pip to the latest version.", err.process

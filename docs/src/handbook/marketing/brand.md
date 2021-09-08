@@ -1,3 +1,8 @@
+---
+title: "Meltano Brand Kit"
+sidebarDepth: 2
+---
+
 ## Meltano Brand Kit
 
 ### Brand Personality
