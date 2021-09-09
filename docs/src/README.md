@@ -2,7 +2,7 @@
 home: true
 heroImage: /meltano-logo.svg
 metaTitle: "ELT tool for open source data integration with Meltano "
-description: Meltano is your one stop destination for data integration. Extract-load-transform pipelines in minutes, for free. Bring together best in class open source data tools in a single project repo:
+description: Meltano is your one stop destination for data integration. Extract-load-transform pipelines in minutes, for free. Bring together best in class open source data tools in a single project repo
 installation:
   primaryAction:
     text: Get started
