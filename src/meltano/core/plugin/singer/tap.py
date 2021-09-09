@@ -159,7 +159,9 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    async def look_up_state(self, plugin_invoker: PluginInvoker):  # noqa: WPS231, WPS213
+    async def look_up_state(  # noqa: WPS231, WPS213
+        self, plugin_invoker: PluginInvoker
+    ):
         """Look up state, cleaning up and refreshing as needed."""
         if "state" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
@@ -352,9 +354,7 @@ class SingerTap(SingerPlugin):
 
     @hook("before_invoke")
     async def apply_catalog_rules_hook(
-        self,
-        plugin_invoker: PluginInvoker,
-        exec_args: Tuple[str, ...] = ()
+        self, plugin_invoker: PluginInvoker, exec_args: Tuple[str, ...] = ()
     ):
         """Apply catalog rules before invoke."""
         # Apply only in sync mode (i.e. no args)
