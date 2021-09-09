@@ -10,7 +10,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin_test_service import PluginTestService
+from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -280,9 +280,8 @@ def list_settings(ctx, extras):
 @click.pass_context
 def test(ctx):
     """Test the configuration of a plugin."""
-    invoker: PluginInvoker = ctx.obj["invoker"]
-
-    plugin_test_service = PluginTestService(invoker)
+    invoker = ctx.obj["invoker"]
+    plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
     is_valid, detail = plugin_test_service.validate()
 
     if is_valid:

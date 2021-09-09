@@ -32,6 +32,17 @@ class PluginParentNotFoundError(Exception):
         )
 
 
+class PluginNotSupportedError(Exception):
+    """Base exception when a plugin is not supported for some operation."""
+
+    def __init__(self, plugin: PluginRef):
+        """Construct a PluginNotSupportedError instance."""
+        self.plugin = plugin
+
+    def __str__(self):
+        return f"Operation not supported for {self.plugin.type.descriptor} '{self.plugin.name}'"
+
+
 class PluginExecutionError(Exception):
     """Base exception for problems that stem from the execution of a plugin (sub-process)."""
 
