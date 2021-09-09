@@ -23,6 +23,8 @@ As described in the [Configuration guide](/docs/configuration.html#configuration
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
+If supported by the plugin, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
+
 ### Pipeline-specific configuration
 
 If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano elt`](/docs/command-line-interface.html#elt) execution environment using [environment variables](/docs/configuration.html#configuring-settings).
@@ -243,7 +245,7 @@ The output from debug mode will often be the first thing requested if you're ask
 
 ### Isolate the Connector
 
-If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`. 
+If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`.
 The [`invoke` command](/docs/command-line-interface.html#invoke) will run the executable with any specified arguments.
 
 ```bash
@@ -256,8 +258,8 @@ This command can also be run in debug mode for additional information.
 
 In cases where the tap is not loading any streams or it does not appear to be respecting the configured [`select`](/docs/command-line-interface.html#select) rules, you may need to validate the capabilities of the tap.
 
-In prior versions of the Singer spec, the `--properties` option was used instead of `--catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files). 
-If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap instead of `catalog`. 
+In prior versions of the Singer spec, the `--properties` option was used instead of `--catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files).
+If this is the case for a tap, ensure `properties` is set as a [capability](/docs/contributor-guide.html#taps-targets-development) for the tap instead of `catalog`.
 Then `meltano elt` will accept the catalog file and will pass it to the tap using the appropriate flag.
 
 ### Incremental Replication Not Running as Expected
@@ -266,11 +268,11 @@ If you're trying to run a pipeline with incremental replication using `meltano e
 
 ### Testing Specific Failing Streams
 
-When extracting several streams with a single tap, it may be challenging to debug a single failing stream. 
-In this case, it can be useful to run the tap with just the single stream selected. 
+When extracting several streams with a single tap, it may be challenging to debug a single failing stream.
+In this case, it can be useful to run the tap with just the single stream selected.
 
-Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt` with the [`--select` flag](/docs/command-line-interface.html#parameters-2). 
-This will run the pipeline with just that stream selected. 
+Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt` with the [`--select` flag](/docs/command-line-interface.html#parameters-2).
+This will run the pipeline with just that stream selected.
 
 You can also have `meltano invoke` select an individual stream by setting the [`select_filter` extra](/docs/plugins.html#select-filter-extra) as an environment variable:
 

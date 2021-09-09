@@ -98,6 +98,8 @@ When no explicit `--store` is specified, `meltano config <plugin> set` will auto
 - [`.env`](/docs/project.html#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
 - [`meltano.yml`](/docs/project.html#meltano-yml-project-file) otherwise.
 
+If supported by the plugin, its configuration can be tested using `meltano config <plugin> test`.
+
 ### How to use
 
 To manage the configuration of Meltano itself, specify `meltano` as the plugin name.
@@ -138,6 +140,9 @@ meltano config <plugin> reset
 meltano config <plugin> set --store=meltano_yml <name> <value> # set in `meltano.yml`
 meltano config <plugin> unset --store=dotenv <name> # unset in `.env`
 meltano config <plugin> reset --store=db # reset in system database
+
+# Test the plugin's current configuration, if supported.
+meltano config <plugin> test
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
