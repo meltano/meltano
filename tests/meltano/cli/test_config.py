@@ -54,3 +54,21 @@ class TestCliConfig:
             assert json_config["send_anonymous_usage_stats"] == False
             assert json_config["database_uri"] == engine_uri
             assert json_config["cli"]["log_level"] == "info"
+
+    @mock.patch("meltano.core.plugin_test_service.PluginInvoker.invoke")
+    def test_config_test(
+        self, mock_invoke, project, cli_runner, tap, project_plugins_service
+    ):
+        mock_invoke.return_value.poll.return_value = None
+        mock_invoke.return_value.stdout.readline.return_value = json.dumps(
+            {"type": "RECORD"}
+        )
+
+        with mock.patch(
+            "meltano.cli.config.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, ["config", tap.name, "test"])
+            assert_cli_runner(result)
+
+            assert "Plugin configuration is valid" in result.stdout
