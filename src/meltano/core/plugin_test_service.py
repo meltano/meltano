@@ -23,7 +23,6 @@ class PluginTestServiceFactory:
     def get_test_service(self):
         """Resolve a test service instance for a plugin type."""
         test_services = {PluginType.EXTRACTORS: ExtractorTestService}
-
         try:
             return test_services[self.plugin_invoker.plugin.type](self.plugin_invoker)
         except KeyError as err:

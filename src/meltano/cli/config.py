@@ -1,5 +1,4 @@
 import json
-import sys
 import tempfile
 from pathlib import Path
 
@@ -281,12 +280,14 @@ def list_settings(ctx, extras):
 def test(ctx):
     """Test the configuration of a plugin."""
     invoker = ctx.obj["invoker"]
+
+    if not invoker:
+        raise CliError("Testing of the Meltano project configuration is not supported")
+
     plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
     is_valid, detail = plugin_test_service.validate()
 
-    if is_valid:
-        click.secho("Plugin configuration is valid", fg="green")
-    else:
-        click.secho("Plugin configuration is invalid", fg="red")
-        click.secho(detail, fg="red")
-        sys.exit(1)
+    if not is_valid:
+        raise CliError("\n".join(("Plugin configuration is invalid", detail)))
+
+    click.secho("Plugin configuration is valid", fg="green")

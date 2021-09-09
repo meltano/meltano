@@ -72,3 +72,12 @@ class TestCliConfig:
             assert_cli_runner(result)
 
             assert "Plugin configuration is valid" in result.stdout
+
+    def test_config_meltano_test(self, project, cli_runner):
+        result = cli_runner.invoke(cli, ["config", "meltano", "test"])
+
+        assert result.exit_code == 1
+        assert (
+            str(result.exception)
+            == "Testing of the Meltano project configuration is not supported"
+        )
