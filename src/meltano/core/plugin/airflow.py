@@ -127,8 +127,11 @@ class Airflow(BasePlugin):
         logging.debug("Completed `airflow initdb`")
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker):
+    async def before_cleanup(self, invoker: PluginInvoker):
         """Delete the config file."""
         config_file = invoker.files["config"]
-        config_file.unlink()
+        try:
+            config_file.unlink()
+        except FileNotFoundError:
+            pass
         logging.debug(f"Deleted configuration at {config_file}")
