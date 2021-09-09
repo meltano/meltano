@@ -14,6 +14,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
+from meltano.core.utils import run_async
 
 from . import cli
 from .params import pass_project
@@ -280,12 +281,17 @@ def list_settings(ctx, extras):
 def test(ctx):
     """Test the configuration of a plugin."""
     invoker = ctx.obj["invoker"]
-
     if not invoker:
         raise CliError("Testing of the Meltano project configuration is not supported")
 
-    plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
-    is_valid, detail = plugin_test_service.validate()
+    session = ctx.obj["session"]
+
+    async def _validate(invoker, session):
+        async with invoker.prepared(session):
+            plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
+            return await plugin_test_service.validate()
+
+    is_valid, detail = run_async(_validate(invoker, session))
 
     if not is_valid:
         raise CliError("\n".join(("Plugin configuration is invalid", detail)))

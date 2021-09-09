@@ -4,6 +4,7 @@ from unittest import mock
 import dotenv
 import pytest
 from asserts import assert_cli_runner
+from asynctest import CoroutineMock, Mock
 from meltano.cli import cli
 
 
@@ -55,23 +56,29 @@ class TestCliConfig:
             assert json_config["database_uri"] == engine_uri
             assert json_config["cli"]["log_level"] == "info"
 
-    @mock.patch("meltano.core.plugin_test_service.PluginInvoker.invoke")
-    def test_config_test(
-        self, mock_invoke, project, cli_runner, tap, project_plugins_service
-    ):
-        mock_invoke.return_value.poll.return_value = None
-        mock_invoke.return_value.stdout.readline.return_value = json.dumps(
-            {"type": "RECORD"}
-        )
+    def test_config_test(self, project, cli_runner, tap, project_plugins_service):
+
+        mock_invoke = Mock()
+        mock_invoke.sterr.at_eof.side_effect = True
+        mock_invoke.stdout.at_eof.side_effect = (False, True)
+        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.returncode = 0
+        payload = json.dumps({"type": "RECORD"}).encode()
+        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
 
         with mock.patch(
-            "meltano.cli.config.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
-            result = cli_runner.invoke(cli, ["config", tap.name, "test"])
-            assert_cli_runner(result)
+            "meltano.core.plugin_test_service.PluginInvoker.invoke_async",
+            return_value=mock_invoke,
+        ) as mock_invoke:
+            with mock.patch(
+                "meltano.cli.config.ProjectPluginsService",
+                return_value=project_plugins_service,
+            ):
+                result = cli_runner.invoke(cli, ["config", tap.name, "test"])
+                assert mock_invoke.assert_called_once
+                assert_cli_runner(result)
 
-            assert "Plugin configuration is valid" in result.stdout
+                assert "Plugin configuration is valid" in result.stdout
 
     def test_config_meltano_test(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["config", "meltano", "test"])

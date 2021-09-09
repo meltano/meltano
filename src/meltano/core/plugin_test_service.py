@@ -1,9 +1,8 @@
 """Defines PluginTestService."""
-
+import asyncio.subprocess
 import json
 import logging
 from abc import ABC, abstractmethod
-from subprocess import PIPE, STDOUT
 from typing import Union
 
 from meltano.core.plugin.base import PluginType
@@ -45,19 +44,18 @@ class PluginTestService(ABC):
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    def validate(self) -> Union[bool, str]:
+    async def validate(self) -> Union[bool, str]:
         """Validate extractor configuration."""
         process = None
-        try:
-            process = self.plugin_invoker.invoke(
-                stdout=PIPE, stderr=STDOUT, universal_newlines=True
-            )
-        except Exception as exc:
-            return False, str(exc)
+
+        process = await self.plugin_invoker.invoke_async(
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
+        )
 
         last_line = None
-        while process.poll() is None:
-            line = process.stdout.readline().strip()
+        while not process.stdout.at_eof():
+            data = await process.stdout.readline()
+            line = data.decode("ascii").strip()
             if line:
                 logger.debug(line)
                 last_line = line
@@ -70,5 +68,7 @@ class ExtractorTestService(PluginTestService):
             if message_type == "RECORD":
                 process.terminate()
                 return True, None
+
+        await process.wait()
 
         return False, last_line if process.returncode else "No RECORD message received"
