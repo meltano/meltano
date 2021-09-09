@@ -64,11 +64,11 @@ class ExtractorTestService(PluginTestService):
                 last_line = line
 
             try:
-                message = json.loads(line)
-            except json.decoder.JSONDecodeError:
+                message_type = json.loads(line)["type"]
+            except (json.decoder.JSONDecodeError, KeyError):
                 continue
 
-            if message["type"] == "RECORD":
+            if message_type == "RECORD":
                 process.terminate()
                 return True, None
 
