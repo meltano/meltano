@@ -2,10 +2,38 @@ import json
 from unittest.mock import Mock, patch
 
 import pytest
-from meltano.core.plugin_test_service import ExtractorTestService
+from meltano.core.plugin.error import PluginNotSupportedError
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_test_service import (
+    ExtractorTestService,
+    PluginTestServiceFactory,
+)
 
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
 MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
+
+
+class TestPluginTestServiceFactory:
+    @pytest.fixture(autouse=True)
+    @patch("meltano.core.plugin_test_service.PluginInvoker")
+    def setup(self, mock_invoker):
+        self.mock_invoker = mock_invoker
+
+    def test_extractor_plugin(self, tap: ProjectPlugin):
+        self.mock_invoker.plugin = tap
+
+        test_service = PluginTestServiceFactory(self.mock_invoker).get_test_service()
+        assert isinstance(test_service, ExtractorTestService)
+
+    def test_loader_plugin(self, target: ProjectPlugin):
+        self.mock_invoker.plugin = target
+
+        with pytest.raises(PluginNotSupportedError) as err:
+            PluginTestServiceFactory(self.mock_invoker).get_test_service()
+            assert (
+                str(err.value)
+                == f"Operation not supported for {target.type.descriptor} '{target.name}'"
+            )
 
 
 class TestExtractorTestService:
