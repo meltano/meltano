@@ -5,7 +5,7 @@ import subprocess
 from distutils.version import StrictVersion
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.error import SubprocessError
+from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
 
@@ -61,25 +61,26 @@ class Airflow(BasePlugin):
             logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
     @hook("before_install")
-    def setup_env(self, *args, **kwargs):
-        # to make airflow installables without GPL dependency
+    async def setup_env(self, *args, **kwargs):
+        """Configure the env to make airflow installable without GPL deps."""
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
     @hook("before_configure")
-    def before_configure(self, invoker: AirflowInvoker, session):
+    async def before_configure(self, invoker: AirflowInvoker, session):  # noqa: WPS217
         """Keep the Airflow metadata database up-to-date."""
         # generate the default `airflow.cfg`
-        handle = invoker.invoke(
+        handle = await invoker.invoke_async(
             "--help",
             require_preparation=False,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
-        return_code = handle.wait()
+        return_code = await handle.wait()
 
         if return_code:
-            raise SubprocessError("Command `airflow --help` failed", process=handle)
+            raise AsyncSubprocessError(
+                "Command `airflow --help` failed", process=handle
+            )
 
         # Read and update airflow.cfg
         self.update_config_file(invoker)
@@ -87,38 +88,38 @@ class Airflow(BasePlugin):
         # we've changed the configuration here, so we need to call
         # prepare again on the invoker so it re-reads the configuration
         # for the Airflow plugin
-        invoker.prepare(session)
+        await invoker.prepare(session)
 
         # make sure we use correct db init
-        handle = invoker.invoke(
+        handle = await invoker.invoke_async(
             "version",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
-        return_code = handle.wait()
 
-        if return_code:
-            raise SubprocessError("Command `airflow version` failed", process=handle)
+        stdout, stderr = await handle.communicate()
 
-        version = handle.stdout.read()
+        if handle.returncode:
+            raise AsyncSubprocessError(
+                "Command `airflow version` failed", process=handle
+            )
 
+        version = stdout.decode()
         init_db_cmd = (
             ["initdb"]
             if StrictVersion(version) < StrictVersion("2.0.0")
             else ["db", "init"]
         )
 
-        handle = invoker.invoke(
+        handle = await invoker.invoke_async(
             *init_db_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True,
         )
-        initdb = handle.wait()
+        initdb = await handle.wait()
 
         if initdb:
-            raise SubprocessError(
+            raise AsyncSubprocessError(
                 "Airflow metadata database could not be initialized: `airflow initdb` failed",
                 handle,
             )
@@ -126,7 +127,11 @@ class Airflow(BasePlugin):
         logging.debug("Completed `airflow initdb`")
 
     @hook("before_cleanup")
-    def before_cleanup(self, invoker):
+    async def before_cleanup(self, invoker: PluginInvoker):
+        """Delete the config file."""
         config_file = invoker.files["config"]
-        config_file.unlink()
+        try:
+            config_file.unlink()
+        except FileNotFoundError:
+            pass
         logging.debug(f"Deleted configuration at {config_file}")

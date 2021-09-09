@@ -60,7 +60,7 @@ class DbtRunner(Runner):
     async def run(self, log=None):
         dbt = self.context.transformer_invoker()
 
-        with dbt.prepared(self.context.session):
+        async with dbt.prepared(self.context.session):
             await self.invoke(dbt, log=log, command="clean")
             await self.invoke(dbt, log=log, command="deps")
 

@@ -14,7 +14,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2897](https://gitlab.com/meltano/meltano/-/issues/2897) Refactor to move to asynchronous plugin executions and invocations
+
 ### Fixes
+
+- [#2573](https://gitlab.com/meltano/meltano/-/issues/2573) Fix misleading error about missing `airflow.cfg` instead of missing Airflow executable
 
 ### Breaks
 

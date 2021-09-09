@@ -1,5 +1,6 @@
 # noqa: D100,E800
 
+import asyncio
 import logging
 import shutil
 
@@ -390,16 +391,21 @@ def test_plugin_configuration(plugin_ref) -> Response:
         if validate_plugin_config(plugin, name, value, project, settings)
     }
     settings.config_override = PluginSettingsService.unredact(valid_config)
-    invoker = invoker_factory(
-        project,
-        plugin,
-        plugins_service=plugins_service,
-        plugin_settings_service=settings,
-    )
-    with invoker.prepared(db.session):
-        plugin_test_service = PluginTestService(invoker)
-        success, _detail = plugin_test_service.validate()
 
+    async def test_extractor():
+        invoker = invoker_factory(
+            project,
+            plugin,
+            plugins_service=plugins_service,
+            plugin_settings_service=settings,
+        )
+        async with invoker.prepared(db.session):
+            plugin_test_service = PluginTestService(invoker)
+            success, _detail = plugin_test_service.validate()
+            return success
+
+    loop = asyncio.get_event_loop()
+    success = loop.run_until_complete(test_extractor())
     return jsonify({"is_success": success}), 200
 
 

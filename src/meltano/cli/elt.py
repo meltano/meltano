@@ -21,7 +21,7 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.transform_add_service import TransformAddService
-from meltano.core.utils import run_async
+from meltano.core.utils import click_run_async
 
 from . import cli
 from .params import pass_project
@@ -82,7 +82,8 @@ def logs(*args, **kwargs):
     is_flag=True,
 )
 @pass_project(migrate=True)
-def elt(
+@click_run_async
+async def elt(
     project,
     extractor,
     loader,
@@ -132,9 +133,9 @@ def elt(
         )
 
         if dump:
-            dump_file(context_builder, dump)
+            await dump_file(context_builder, dump)
         else:
-            run_async(_run_job(project, job, session, context_builder, force=force))
+            await _run_job(project, job, session, context_builder, force=force)
     finally:
         session.close()
 
@@ -178,15 +179,16 @@ def _elt_context_builder(
     )
 
 
-def dump_file(context_builder, dumpable):
+async def dump_file(context_builder, dumpable):
+    """Dump the given dumpable for this pipeline."""
     elt_context = context_builder.context()
 
     try:
         plugin_type, file_id = DUMPABLES[dumpable]
         invoker = elt_context.invoker_for(plugin_type)
 
-        with invoker.prepared(elt_context.session):
-            content = invoker.dump(file_id)
+        async with invoker.prepared(elt_context.session):
+            content = await invoker.dump(file_id)
 
         print(content)
     except FileNotFoundError as err:

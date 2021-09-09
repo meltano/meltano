@@ -12,12 +12,14 @@ class TestSingerTarget:
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    def test_exec_args(self, subject, session, plugin_invoker_factory):
+    @pytest.mark.asyncio
+    async def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
-    def test_setup_bookmark_writer(
+    @pytest.mark.asyncio
+    async def test_setup_bookmark_writer(
         self, subject, session, plugin_invoker_factory, elt_context_builder
     ):
 
@@ -25,7 +27,7 @@ class TestSingerTarget:
 
         # test noop run outside of pipeline context
         invoker = plugin_invoker_factory(subject, context=None)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
             assert invoker.output_handlers is None
 
@@ -38,7 +40,7 @@ class TestSingerTarget:
         )
 
         invoker = plugin_invoker_factory(subject, context=elt_context)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
             assert invoker.output_handlers is None
 
@@ -51,7 +53,7 @@ class TestSingerTarget:
         )
 
         invoker = plugin_invoker_factory(subject, context=elt_context)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
             assert invoker.output_handlers is None
 
@@ -64,7 +66,7 @@ class TestSingerTarget:
         )
 
         invoker = plugin_invoker_factory(subject, context=elt_context)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
             assert len(invoker.output_handlers.get(invoker.StdioSource.STDOUT)) == 1
             assert (
@@ -83,7 +85,7 @@ class TestSingerTarget:
         )
 
         invoker = plugin_invoker_factory(subject, context=elt_context)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             subject.setup_bookmark_writer(invoker)
             assert len(invoker.output_handlers.get(invoker.StdioSource.STDOUT)) == 1
             assert (
