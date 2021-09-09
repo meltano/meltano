@@ -2,7 +2,6 @@ import asyncio
 import json
 
 import pytest
-
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
 from meltano.cli import cli
