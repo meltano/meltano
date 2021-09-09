@@ -1,7 +1,6 @@
 import asyncio
 import json
 from contextlib import contextmanager
-from typing import Callable
 from unittest import mock
 
 import pytest
@@ -9,42 +8,14 @@ from asynctest import CoroutineMock
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
-from meltano.core.plugin_invoker import PluginInvoker
 
 
 class TestSingerTap:
     @pytest.fixture(scope="class")
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
-
-    def test_invoke_triggers_discovery(
-        self,
-        subject: ProjectPlugin,
-        session,
-        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
-    ):
-        invoker = plugin_invoker_factory(subject)
-
-        with mock.patch.object(
-            SingerTap, "discover_catalog"
-        ) as discover_catalog, mock.patch.object(
-            SingerTap, "apply_catalog_rules"
-        ) as apply_catalog_rules, mock.patch(
-            "subprocess.Popen"
-        ):
-            with invoker.prepared(session):
-                # Modes other than sync don't trigger discovery or applying catalog rules
-                invoker.invoke("--some-tap-option")
-                discover_catalog.assert_not_called()
-                apply_catalog_rules.assert_not_called()
-
-                # Sync mode triggers discovery and applying catalog rules
-                invoker.invoke()
-                discover_catalog.assert_called_once()
-                apply_catalog_rules.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
