@@ -21,7 +21,11 @@ Meltano related news, logos, and how to get in touch.
 
 ## Additional images
 
-TK
+![Full image of Douwe Maan, Co-founder & CEO of Meltano](docs/src/.vuepress/public/images/home/press/douwe_maan_meltano_ceo_full.JPG){: .shadow.small}
+Douwe Maan, - Co-founder & CEO
+{: .note.text-center}
+
+
 
 ## CEO bio
 
