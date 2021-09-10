@@ -19,8 +19,17 @@
     name: python:${PYTHON_IMAGE_VERSION}
     entrypoint: [""]
 
-lint:
+lint_python:
   extends: .fast_test
+  parallel:
+    matrix:
+      # Lint only on 'primary' python version:
+      - PYTHON_IMAGE_VERSION: ["3.8"]
+  script:
+    - make show_lint_python
+
+lint_all:
+  extends: .test
   parallel:
     matrix:
       # Lint only on 'primary' python version:
