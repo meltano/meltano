@@ -80,7 +80,7 @@ lint:
 pytest_fast:
   extends:
     - .pytest_sqlite
-    - .pytest_fast
+    - .fast_test
   variables:
     PYTEST_MARKERS: not concurrent
 
