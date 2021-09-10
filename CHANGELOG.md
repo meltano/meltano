@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#2928](https://gitlab.com/meltano/meltano/-/issues/2928) Fix exception in tap discovery when tap produces IO on stderr
+- [#2928](https://gitlab.com/meltano/meltano/-/issues/2928) Fix tap discovery failure when tap produces IO on stderr
 
 ### Breaks
 
