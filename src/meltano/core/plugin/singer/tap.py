@@ -316,9 +316,11 @@ class SingerTap(SingerPlugin):
                 )
                 done, _ = await asyncio.wait(
                     [
-                        _streamresp(handle.stdout, catalog),
-                        _streamresp(handle.stderr, sys.stderr, write_str=True),
-                        handle.wait(),
+                        asyncio.create_task(_streamresp(handle.stdout, catalog)),
+                        asyncio.create_task(
+                            _streamresp(handle.stderr, sys.stderr, write_str=True)
+                        ),
+                        asyncio.create_task(handle.wait()),
                     ],
                     return_when=asyncio.ALL_COMPLETED,
                 )
