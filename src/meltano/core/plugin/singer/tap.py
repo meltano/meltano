@@ -31,6 +31,15 @@ from .catalog import (
 logger = logging.getLogger(__name__)
 
 
+async def _stream_redirect(
+    stream: asyncio.StreamReader, file_like_obj, write_str=False
+):
+    """Redirect stream to a file like obj."""
+    while not stream.at_eof():
+        data = await stream.readline()
+        file_like_obj.write(data.decode("ascii").rstrip() if write_str else data)
+
+
 def config_metadata_rules(config):
     flat_config = flatten(config, "dot")
 
@@ -291,16 +300,6 @@ class SingerTap(SingerPlugin):
             plugin_invoker: The invocation handler of the plugin instance.
             catalog_path: Where discovery output should be written.
         """
-
-        async def _streamresp(  # noqa: WPS430
-            stream: asyncio.StreamReader, file_like_obj, write_str=False
-        ):
-            while not stream.at_eof():
-                data = await stream.readline()
-                file_like_obj.write(
-                    data.decode("ascii").rstrip() if write_str else data
-                )
-
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
@@ -316,11 +315,11 @@ class SingerTap(SingerPlugin):
                 )
                 done, _ = await asyncio.wait(
                     [
-                        asyncio.create_task(_streamresp(handle.stdout, catalog)),
-                        asyncio.create_task(
-                            _streamresp(handle.stderr, sys.stderr, write_str=True)
+                        asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
+                        asyncio.ensure_future(
+                            _stream_redirect(handle.stderr, sys.stderr, write_str=True)
                         ),
-                        asyncio.create_task(handle.wait()),
+                        asyncio.ensure_future(handle.wait()),
                     ],
                     return_when=asyncio.ALL_COMPLETED,
                 )

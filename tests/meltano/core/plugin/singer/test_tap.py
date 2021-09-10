@@ -753,7 +753,7 @@ class TestSingerTap:
             assert not catalog_path.exists(), "Catalog should not be present."
 
     @pytest.mark.asyncio
-    async def test_run_discovery_catches_io_handler_exceptions(
+    async def test_run_discovery_handle_io_exceptions(
         self,
         plugin_invoker_factory,
         session,
