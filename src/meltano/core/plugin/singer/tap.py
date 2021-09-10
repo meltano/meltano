@@ -3,7 +3,6 @@
 This module contains the SingerTap class as well as a supporting methods.
 """
 import asyncio
-import codecs
 import json
 import logging
 import shutil
@@ -294,11 +293,13 @@ class SingerTap(SingerPlugin):
         """
 
         async def _streamresp(  # noqa: WPS430
-            stream: asyncio.StreamReader, file_like_obj
+            stream: asyncio.StreamReader, file_like_obj, write_str=False
         ):
             while not stream.at_eof():
                 data = await stream.readline()
-                file_like_obj.write(data)
+                file_like_obj.write(
+                    data.decode("ascii").rstrip() if write_str else data
+                )
 
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
@@ -313,16 +314,18 @@ class SingerTap(SingerPlugin):
                     stderr=asyncio.subprocess.PIPE,
                     universal_newlines=False,
                 )
-                await asyncio.wait(
+                done, _ = await asyncio.wait(
                     [
                         _streamresp(handle.stdout, catalog),
-                        _streamresp(
-                            codecs.getreader("ascii")(handle.stderr), sys.stderr
-                        ),
+                        _streamresp(handle.stderr, sys.stderr, write_str=True),
                         handle.wait(),
                     ],
                     return_when=asyncio.ALL_COMPLETED,
                 )
+                failed = [future for future in done if future.exception() is not None]
+                if failed:
+                    failed_future = failed.pop()
+                    raise failed_future.exception()
             exit_code = handle.returncode
         except Exception:
             catalog_path.unlink()
