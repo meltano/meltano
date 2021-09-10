@@ -3,7 +3,6 @@
 This module contains the SingerTap class as well as a supporting methods.
 """
 import asyncio
-import codecs
 import json
 import logging
 import shutil
@@ -30,6 +29,15 @@ from .catalog import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+async def _stream_redirect(
+    stream: asyncio.StreamReader, file_like_obj, write_str=False
+):
+    """Redirect stream to a file like obj."""
+    while not stream.at_eof():
+        data = await stream.readline()
+        file_like_obj.write(data.decode("ascii").rstrip() if write_str else data)
 
 
 def config_metadata_rules(config):
@@ -292,14 +300,6 @@ class SingerTap(SingerPlugin):
             plugin_invoker: The invocation handler of the plugin instance.
             catalog_path: Where discovery output should be written.
         """
-
-        async def _streamresp(  # noqa: WPS430
-            stream: asyncio.StreamReader, file_like_obj
-        ):
-            while not stream.at_eof():
-                data = await stream.readline()
-                file_like_obj.write(data)
-
         if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
@@ -313,16 +313,20 @@ class SingerTap(SingerPlugin):
                     stderr=asyncio.subprocess.PIPE,
                     universal_newlines=False,
                 )
-                await asyncio.wait(
+                done, _ = await asyncio.wait(
                     [
-                        _streamresp(handle.stdout, catalog),
-                        _streamresp(
-                            codecs.getreader("ascii")(handle.stderr), sys.stderr
+                        asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
+                        asyncio.ensure_future(
+                            _stream_redirect(handle.stderr, sys.stderr, write_str=True)
                         ),
-                        handle.wait(),
+                        asyncio.ensure_future(handle.wait()),
                     ],
                     return_when=asyncio.ALL_COMPLETED,
                 )
+                failed = [future for future in done if future.exception() is not None]
+                if failed:
+                    failed_future = failed.pop()
+                    raise failed_future.exception()
             exit_code = handle.returncode
         except Exception:
             catalog_path.unlink()

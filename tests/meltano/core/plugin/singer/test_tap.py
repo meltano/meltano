@@ -739,8 +739,9 @@ class TestSingerTap:
         process_mock.name = subject.name
         process_mock.wait = CoroutineMock(return_value=1)
         process_mock.returncode = 1
-        process_mock.sterr.at_eof.side_effect = True
-        process_mock.stdout.at_eof.side_effect = True
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stdout.at_eof.side_effect = (True, True)
         process_mock.stdout.readline = CoroutineMock(return_value=b"")
 
         invoker = plugin_invoker_factory(subject)
@@ -749,4 +750,33 @@ class TestSingerTap:
 
         with pytest.raises(PluginExecutionError, match="returned 1"):
             await subject.run_discovery(invoker, catalog_path)
-            assert not catalog_path.exists(), "Catalog should not be present."
+
+        assert not catalog_path.exists(), "Catalog should not be present."
+
+    @pytest.mark.asyncio
+    async def test_run_discovery_handle_io_exceptions(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.returncode = 0
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stdout.at_eof.side_effect = (False, True)
+        process_mock.stdout.readline.side_effect = Exception("mock readline exception")
+
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        catalog_path = invoker.files["catalog"]
+
+        with pytest.raises(Exception, match="mock readline exception"):
+            await subject.run_discovery(invoker, catalog_path)
+
+        assert not catalog_path.exists(), "Catalog should not be present."
