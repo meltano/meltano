@@ -25,7 +25,7 @@ Rotating `assignee`, on the morning of the release:
 
 1. [ ] Changelog updates and version bump:
     1. [ ] Check the [pending MRs](https://gitlab.com/meltano/meltano/-/merge_requests?sort=updated_desc) to make sure nothing expected is still waiting to be merged.
-    2. [ ] Create a new branch named `release/vX.Y.Z` and a corresponding MR with the `Release` MR template.
+    2. [ ] Create a [new branch](https://gitlab.com/meltano/meltano/-/branches/new) named `release/vX.Y.Z` and a corresponding MR with the `Release` MR template.
     3. An automated pipeline (linked to the branch prefix `release/v*`) will
     immediately and automatically bump the version and flush the changelog.
         - [ ] Check this box to confirm the automated changelog flush and version bump are correct.
