@@ -12,8 +12,15 @@
 
     - poetry install
 
-lint:
+.fast_test:
   extends: .test
+  needs: []
+  image:
+    name: python:${PYTHON_IMAGE_VERSION}
+    entrypoint: [""]
+
+lint:
+  extends: .fast_test
   parallel:
     matrix:
       # Lint only on 'primary' python version:
@@ -69,6 +76,13 @@ lint:
   tags:
     - concurrent
   when: manual
+
+pytest_fast:
+  extends:
+    - .pytest_sqlite
+    - .pytest_fast
+  variables:
+    PYTEST_MARKERS: not concurrent
 
 pytest_postgres:
   extends: .pytest_postgres
