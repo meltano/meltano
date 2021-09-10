@@ -739,8 +739,9 @@ class TestSingerTap:
         process_mock.name = subject.name
         process_mock.wait = CoroutineMock(return_value=1)
         process_mock.returncode = 1
-        process_mock.sterr.at_eof.side_effect = True
-        process_mock.stdout.at_eof.side_effect = True
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stdout.at_eof.side_effect = (False, False)
         process_mock.stdout.readline = CoroutineMock(return_value=b"")
 
         invoker = plugin_invoker_factory(subject)
