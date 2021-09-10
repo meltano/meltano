@@ -750,7 +750,8 @@ class TestSingerTap:
 
         with pytest.raises(PluginExecutionError, match="returned 1"):
             await subject.run_discovery(invoker, catalog_path)
-            assert not catalog_path.exists(), "Catalog should not be present."
+
+        assert not catalog_path.exists(), "Catalog should not be present."
 
     @pytest.mark.asyncio
     async def test_run_discovery_handle_io_exceptions(
@@ -777,4 +778,5 @@ class TestSingerTap:
 
         with pytest.raises(Exception, match="mock readline exception"):
             await subject.run_discovery(invoker, catalog_path)
-            assert not catalog_path.exists(), "Catalog should not be present."
+
+        assert not catalog_path.exists(), "Catalog should not be present."
