@@ -30,7 +30,6 @@ Rotating `assignee`, on the morning of the release:
     immediately and automatically bump the version and flush the changelog.
         - [ ] Check this box to confirm the automated changelog flush and version bump are correct.
         - You _do not_ need to wait for the CI pipeline. (An identical CI pipeline is already included in the below.)
-from `main` branch.
 2. [ ] [Cut a release tag](https://gitlab.com/meltano/meltano/-/tags/new) from your `release/vX.Y.Z` branch _(not from `main`)_ named `vX.Y.Z` with Message=`Release vX.Y.Z`
     1. In response to new tag creation, these steps are performed automatically in Gitlab pipelines:
         1. Abort if tag `vX.Y.Z` does not match output from `poetry version --short`
