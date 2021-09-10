@@ -313,7 +313,7 @@ class SingerTap(SingerPlugin):
                     stderr=asyncio.subprocess.PIPE,
                     universal_newlines=False,
                 )
-                await asyncio.wait(
+                done, _ = await asyncio.wait(
                     [
                         _streamresp(handle.stdout, catalog),
                         _streamresp(
@@ -323,6 +323,10 @@ class SingerTap(SingerPlugin):
                     ],
                     return_when=asyncio.ALL_COMPLETED,
                 )
+                failed = [future for future in done if future.exception() is not None]
+                if failed:
+                    failed_future = failed.pop()
+                    raise failed_future.exception()
             exit_code = handle.returncode
         except Exception:
             catalog_path.unlink()
