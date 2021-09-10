@@ -54,9 +54,9 @@ Rotating `assignee`, on the morning of the release:
 
 1. [ ] Post-release announcement steps:
     1. [ ] Post announcement to Meltano slack: `#announcements`
-    2. [ ] Cross-post (share) to `#sdk`
+    <!-- SDK only: 2. [ ] Cross-post (share) to `#sdk` -->
     3. Copy-paste to:
-       - [ ] `Singer` slack: `#meltano`, `#singer-sdk`
+       - [ ] `Singer` slack: `#meltano` <!-- SDK only: `#singer-sdk` -->
        - [ ] `dbt` slack: `#tools-meltano`
     4. [ ] Blog post
     5. [ ] Tweet the blog post
