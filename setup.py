@@ -57,7 +57,7 @@ install_requires = \
  'flask-executor>=0.9.2,<0.10.0',
  'flask-restful>=0.3.7,<0.4.0',
  'flask-sqlalchemy>=2.4.4,<3.0.0',
- 'flask>=1.1.2,<2.0.0',
+ 'flask>=1,<2',
  'flatten-dict>=0.1.0,<0.2.0',
  'gunicorn>=19.9.0,<20.0.0',
  'ipython>=7.5.0,<8.0.0',
@@ -80,7 +80,7 @@ install_requires = \
  'sqlalchemy>=1.3.19,<2.0.0',
  'sqlparse>=0.3.0,<0.4.0',
  'watchdog>=0.9.0,<0.10.0',
- 'werkzeug>=2.0.0,<3.0.0']
+ 'werkzeug>=1,<2']
 
 entry_points = \
 {'console_scripts': ['meltano = meltano.cli:main']}
