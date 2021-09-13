@@ -28,6 +28,7 @@ that are not supported yet.
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
 | [Datateer](https://www.datateer.com/) | United States: Denver, CO |
 | [Mashey](https://www.mashey.com/) | United States: Denver, CO |
+| [Mighty Digital](https://www.mighty.digital/) | Ukraine: Kyiv |
 | [Ryan-Miranda](https://www.ryan-miranda.com/) | United States: Pasadena, CA; Boston, MA |
 | [Scalefree](https://www.scalefree.com) | Germany: Hanover |
 | [Slalom](https://www.slalom.com/) | United States: [various](https://www.slalom.com/locations); Canada: Montréal, Toronto, Vancouver; United Kingdom: London, Manchester; Australia: Melbourne, Sydney; Japan: Tokyo |
