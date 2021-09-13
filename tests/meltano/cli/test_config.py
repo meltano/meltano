@@ -1,8 +1,6 @@
 import json
 from unittest import mock
 
-import dotenv
-import pytest
 from asserts import assert_cli_runner
 from asynctest import CoroutineMock, Mock
 from meltano.cli import cli
@@ -69,13 +67,13 @@ class TestCliConfig:
         with mock.patch(
             "meltano.core.plugin_test_service.PluginInvoker.invoke_async",
             return_value=mock_invoke,
-        ) as mock_invoke:
+        ) as mocked_invoke:
             with mock.patch(
                 "meltano.cli.config.ProjectPluginsService",
                 return_value=project_plugins_service,
             ):
                 result = cli_runner.invoke(cli, ["config", tap.name, "test"])
-                assert mock_invoke.assert_called_once
+                assert mocked_invoke.assert_called_once
                 assert_cli_runner(result)
 
                 assert "Plugin configuration is valid" in result.stdout

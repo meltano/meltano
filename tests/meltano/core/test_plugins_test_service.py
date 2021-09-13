@@ -1,7 +1,7 @@
 import json
-from unittest.mock import Mock, patch
 
 import pytest
+from asynctest import CoroutineMock, Mock, patch
 from meltano.core.plugin.error import PluginNotSupportedError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_test_service import (
@@ -41,103 +41,111 @@ class TestExtractorTestService:
     @patch("meltano.core.plugin_test_service.PluginInvoker")
     def setup(self, mock_invoker):
         self.mock_invoke = Mock()
+        self.mock_invoke.name = "utility-mock"
+        self.mock_invoke.wait = CoroutineMock(return_value=0)
+        self.mock_invoke.returncode = 0
         self.mock_invoker = mock_invoker
-        self.mock_invoker.invoke.return_value = self.mock_invoke
+        self.mock_invoker.invoke_async = CoroutineMock(return_value=self.mock_invoke)
 
-    def test_validate_success(self):
-        self.mock_invoke.poll.return_value = None
-        self.mock_invoke.stdout.readline.return_value = MOCK_RECORD_MESSAGE
-
-        is_valid, detail = ExtractorTestService(self.mock_invoker).validate()
-
-        assert is_valid
-        assert detail is None
-
-    def test_validate_success_ignore_non_json(self):
-        mock_output = [
-            "Not JSON",
-            MOCK_RECORD_MESSAGE,
-        ]
-
-        self.mock_invoke.poll.return_value = None
-        self.mock_invoke.stdout.readline.side_effect = mock_output
-
-        is_valid, detail = ExtractorTestService(self.mock_invoker).validate()
-
-        assert is_valid
-        assert detail is None
-
-    def test_validate_success_ignore_non_record_msg(self):
-        mock_output = [
-            json.dumps({"key": "value"}),
-            MOCK_RECORD_MESSAGE,
-        ]
-
-        self.mock_invoke.stdout.readline.side_effect = mock_output
-        self.mock_invoke.poll.return_value = None
-
-        is_valid, detail = ExtractorTestService(self.mock_invoker).validate()
-
-        assert is_valid
-        assert detail is None
-
-    def test_validate_success_stop_after_record_msg(self):
-        mock_output = [
-            MOCK_STATE_MESSAGE,
-            MOCK_RECORD_MESSAGE,
-            MOCK_RECORD_MESSAGE,
-        ]
-
-        self.mock_invoke.stdout.readline.side_effect = mock_output
-        self.mock_invoke.poll.return_value = None
-
-        is_valid, detail = ExtractorTestService(self.mock_invoker).validate()
-
-        assert is_valid
-        assert detail is None
-
-        first_record_message_index = mock_output.index(MOCK_RECORD_MESSAGE)
-        assert (
-            self.mock_invoke.stdout.readline.call_count
-            == first_record_message_index + 1
+    @pytest.mark.asyncio
+    async def test_validate_success(self):
+        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stdout.at_eof.side_effect = (False, True)
+        self.mock_invoke.stdout.readline = CoroutineMock(
+            return_value=b"%b" % MOCK_RECORD_MESSAGE.encode()
         )
 
-    def test_validate_failure_no_record_msg(self):
-        mock_output = [MOCK_STATE_MESSAGE]
+        is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
-        self.mock_invoke.returncode = 0
-        self.mock_invoke.stdout.readline.side_effect = mock_output
-        self.mock_invoke.poll.side_effect = [None for _ in mock_output] + [
-            self.mock_invoke.returncode
-        ]
+        assert is_valid
+        assert detail is None
 
-        is_valid, detail = ExtractorTestService(self.mock_invoker).validate()
+    @pytest.mark.asyncio
+    async def test_validate_success_ignore_non_json(self):
+        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
+        self.mock_invoke.stdout.readline = CoroutineMock(
+            side_effect=(b"Not JSON", b"%b" % MOCK_RECORD_MESSAGE.encode())
+        )
+
+        is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
+
+        assert is_valid
+        assert detail is None
+
+    @pytest.mark.asyncio
+    async def test_validate_success_ignore_non_record_msg(self):
+        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
+        self.mock_invoke.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
+
+        assert is_valid
+        assert detail is None
+
+    @pytest.mark.asyncio
+    async def test_validate_success_stop_after_record_msg(self):
+        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stdout.at_eof.side_effect = (False, False, False, True)
+        self.mock_invoke.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % MOCK_STATE_MESSAGE.encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
+
+        assert is_valid
+        assert detail is None
+
+        assert self.mock_invoke.stdout.readline.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_validate_failure_no_record_msg(self):
+        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stdout.at_eof.side_effect = (False, True)
+        self.mock_invoke.stdout.readline = CoroutineMock(
+            return_value=(b"%b" % MOCK_STATE_MESSAGE.encode())
+        )
+
+        is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert not is_valid
         assert "No RECORD message received" in detail
 
-    def test_validate_failure_subprocess_err(self):
-        mock_output = [
-            MOCK_STATE_MESSAGE,
-            "A subprocess error occurred",
-        ]
+    @pytest.mark.asyncio
+    async def test_validate_failure_subprocess_err(self):
+        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
+        self.mock_invoke.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % MOCK_STATE_MESSAGE.encode(),
+                b"A subprocess error occurred",
+            )
+        )
 
+        self.mock_invoke.wait = CoroutineMock(return_value=1)
         self.mock_invoke.returncode = 1
-        self.mock_invoke.stdout.readline.side_effect = mock_output
-        self.mock_invoke.poll.side_effect = [None for _ in mock_output] + [
-            self.mock_invoke.returncode
-        ]
 
-        is_valid, detail = ExtractorTestService(self.mock_invoker).validate()
+        is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert not is_valid
-        assert mock_output[-1] in detail
+        assert "A subprocess error occurred" in detail
 
-    def test_validate_failure_plugin_invoke_exception(self):
+    @pytest.mark.asyncio
+    async def test_validate_failure_plugin_invoke_exception(self):
         mock_exception = Exception("An exception occurred on plugin invocation")
-        self.mock_invoker.invoke.side_effect = mock_exception
+        self.mock_invoker.invoke_async.side_effect = mock_exception
 
-        is_valid, detail = ExtractorTestService(self.mock_invoker).validate()
+        is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert not is_valid
         assert str(mock_exception) in detail

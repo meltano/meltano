@@ -1,5 +1,5 @@
 """Defines PluginTestService."""
-import asyncio.subprocess
+import asyncio
 import json
 import logging
 from abc import ABC, abstractmethod
@@ -48,9 +48,12 @@ class ExtractorTestService(PluginTestService):
         """Validate extractor configuration."""
         process = None
 
-        process = await self.plugin_invoker.invoke_async(
-            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
-        )
+        try:
+            process = await self.plugin_invoker.invoke_async(
+                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
+            )
+        except Exception as exc:
+            return False, str(exc)
 
         last_line = None
         while not process.stdout.at_eof():

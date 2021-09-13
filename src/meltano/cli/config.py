@@ -53,7 +53,7 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
                 project, plugin, plugins_service=plugins_service
             )
             invoker = PluginInvoker(project, plugin)
-            invoker.prepare(session)
+            run_async(invoker.prepare(session))
         else:
             settings = ProjectSettingsService(
                 project, config_service=plugins_service.config_service
@@ -286,12 +286,12 @@ def test(ctx):
 
     session = ctx.obj["session"]
 
-    async def _validate(invoker, session):
+    async def _validate():  # noqa: WPS430
         async with invoker.prepared(session):
             plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
             return await plugin_test_service.validate()
 
-    is_valid, detail = run_async(_validate(invoker, session))
+    is_valid, detail = run_async(_validate())
 
     if not is_valid:
         raise CliError("\n".join(("Plugin configuration is invalid", detail)))
