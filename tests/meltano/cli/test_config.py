@@ -1,8 +1,7 @@
 import json
-from unittest import mock
 
 from asserts import assert_cli_runner
-from asynctest import CoroutineMock, Mock
+from asynctest import CoroutineMock, mock
 from meltano.cli import cli
 
 
@@ -56,7 +55,7 @@ class TestCliConfig:
 
     def test_config_test(self, project, cli_runner, tap, project_plugins_service):
 
-        mock_invoke = Mock()
+        mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
         mock_invoke.wait = CoroutineMock(return_value=0)
