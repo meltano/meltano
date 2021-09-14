@@ -3,7 +3,7 @@ import enum
 import logging
 import os
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from async_generator import asynccontextmanager
 from meltano.core.logging.utils import SubprocessOutputWriter
@@ -131,7 +131,8 @@ class PluginInvoker:
         return frozenset(self.plugin.capabilities)
 
     @property
-    def files(self):
+    def files(self) -> Dict[str, Path]:
+        """Get all config and output files of the plugin."""
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
 
         return {
@@ -238,16 +239,17 @@ class PluginInvoker:
 
         return env
 
-    def Popen_options(self):
+    def Popen_options(self) -> Dict[str, Any]:  # noqa: N802
+        """Get options for subprocess.Popen."""
         return {}
 
     @asynccontextmanager
     async def _invoke(
         self,
-        *args,
-        require_preparation=True,
-        env=None,
-        command=None,
+        *args: str,
+        require_preparation: bool = True,
+        env: Optional[Dict[str, Any]] = None,
+        command: Optional[str] = None,
         **kwargs,
     ):
         env = env or {}
@@ -281,11 +283,14 @@ class PluginInvoker:
                 env=popen_env,
             )
 
-    async def dump(self, file_id):
-        """Dump a given file id."""
+    async def dump(self, file_id: str) -> str:
+        """Dump a plugin file by id."""
         try:
-            async with self._invoke():
-                return self.files[file_id].read_text()
+            if file_id != "config":
+                async with self._invoke():
+                    return self.files[file_id].read_text()
+
+            return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:
             # Unwrap FileNotFoundError
             raise err.__cause__
