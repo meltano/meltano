@@ -43,7 +43,7 @@ Tutorials: https://meltano.com/tutorials/
 
 SUBSCRIBE for more videos: http://www.youtube.com/subscription_center?add_user=meltano
 
-Join Us On Slack: https://join.slack.com/t/meltano/shared_invite/zt-obgpdeba-7yrqKhwyMBfdHDXsZY8G7Q
+Join Us On Slack: https://meltano.com/slack
 Blog: https://meltano.com/blog/
 GitLab: https://gitlab.com/meltano/meltano
 Twitter: https://twitter.com/meltanodata
