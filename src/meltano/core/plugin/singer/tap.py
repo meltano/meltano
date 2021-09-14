@@ -149,7 +149,7 @@ class SingerTap(SingerPlugin):
         plugin_invoker: PluginInvoker,
         exec_args: Tuple[str, ...] = (),
     ):
-        """Look up state before being invoked."""
+        """Look up state before being invoked if in sync mode."""
         # Use state only in sync mode (i.e. no args)
         if exec_args:
             return
@@ -237,7 +237,7 @@ class SingerTap(SingerPlugin):
         plugin_invoker: PluginInvoker,
         exec_args: Tuple[str, ...] = (),
     ):
-        """Discover Singer catalog before invoking tap.
+        """Discover Singer catalog before invoking tap if in sync mode.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
@@ -356,7 +356,7 @@ class SingerTap(SingerPlugin):
     async def apply_catalog_rules_hook(
         self, plugin_invoker: PluginInvoker, exec_args: Tuple[str, ...] = ()
     ):
-        """Apply catalog rules before invoke."""
+        """Apply catalog rules before invoke if in sync mode."""
         # Apply only in sync mode (i.e. no args)
         if exec_args:
             return
