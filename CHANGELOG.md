@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2927](https://gitlab.com/meltano/meltano/-/issues/2927) Publish the local Kubernetes install as a file bundle
+
 ### Changes
 
 ### Fixes
