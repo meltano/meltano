@@ -309,6 +309,9 @@ def _(node: dict, executor, path=""):
     if re.search(r"streams\[\d+\]$", path):
         node_type = CatalogNode.STREAM
 
+#    if re.search(r"schema$", path):
+#        node_type = CatalogNode.STREAM
+
     if re.search(r"schema(\.properties\.\w*)+$", path):
         node_type = CatalogNode.PROPERTY
 
