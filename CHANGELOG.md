@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2930](https://gitlab.com/meltano/meltano/-/issues/2930) Update sqlfluff configuration to support DBT
+
 ### Fixes
 
 - [#2866](https://gitlab.com/meltano/meltano/-/issues/2866) Avoid running discovery when invoking a tap in a mode other than sync
