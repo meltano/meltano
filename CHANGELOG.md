@@ -36,6 +36,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2906](https://gitlab.com/meltano/meltano/-/issues/2906) Increase speed of `meltano install` for already installed plugins
+* [#2609](https://gitlab.com/meltano/meltano/-/issues/2609) Add `meltano config <plugin> test` command to test an extractor plugin's configuration
+* [#2906](https://gitlab.com/meltano/meltano/-/issues/2906) Increase speed of `meltano install` for already installed plugins
 
 ### Changes
 
