@@ -1,10 +1,9 @@
 import asyncio
 import json
 from contextlib import contextmanager
-from unittest import mock
 
 import pytest
-from asynctest import CoroutineMock
+from asynctest import CoroutineMock, mock
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
@@ -784,7 +783,7 @@ class TestSingerTap:
                 "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
             ):
                 await subject.run_discovery(invoker, catalog_path)
-                assert stream_mock.call_count == 1
+            assert stream_mock.call_count == 1
 
         with mock.patch(
             "meltano.core.plugin.singer.tap._stream_redirect"
@@ -793,8 +792,8 @@ class TestSingerTap:
                 "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
             ):
                 await subject.run_discovery(invoker, catalog_path)
-                assert stream_mock.call_count == 2
-                assert stream_mock.call_args[1]["write_str"] is True
+            assert stream_mock.call_count == 2
+            assert stream_mock.call_args[1]["write_str"] is True
 
     @pytest.mark.asyncio
     async def test_run_discovery_handle_io_exceptions(
