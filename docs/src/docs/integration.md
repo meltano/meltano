@@ -23,7 +23,7 @@ As described in the [Configuration guide](/docs/configuration.html#configuration
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
-If supported by the plugin, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
+If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
 
 ### Pipeline-specific configuration
 

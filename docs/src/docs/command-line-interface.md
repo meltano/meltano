@@ -98,7 +98,7 @@ When no explicit `--store` is specified, `meltano config <plugin> set` will auto
 - [`.env`](/docs/project.html#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
 - [`meltano.yml`](/docs/project.html#meltano-yml-project-file) otherwise.
 
-If supported by the plugin, its configuration can be tested using `meltano config <plugin> test`.
+If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
 
 ### How to use
 

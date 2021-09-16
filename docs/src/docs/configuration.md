@@ -16,7 +16,7 @@ If you're adding a [custom plugin](/docs/plugins.html#custom-plugins), on the ot
 
 You can use [`meltano config <plugin> list`](/docs/command-line-interface.html#config) to list all available settings for a plugin with their names, [environment variables](#environment-variables), and current values. [`meltano config <plugin>`](/docs/command-line-interface.html#config) will print the current configuration in JSON format.
 
-If supported by the plugin, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
+If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
 
 Meltano itself can be configured as well. To learn more, refer to the [Settings Reference](/docs/settings.html).
 
