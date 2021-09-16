@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.81.0 - (2021-09-16)
+---
+
+### New
+
 - [#2609](https://gitlab.com/meltano/meltano/-/issues/2609) Add `meltano config <plugin> test` command to test an extractor plugin's configuration. _Thanks, **[ReubenFrankel](https://gitlab.com/ReubenFrankel)**!_
 
 ### Changes
@@ -20,8 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#2866](https://gitlab.com/meltano/meltano/-/issues/2866) Avoid running discovery when invoking a tap in a mode other than sync
-
-### Breaks
 
 
 ## 1.80.1 - (2021-09-10)
