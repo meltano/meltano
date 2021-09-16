@@ -39,7 +39,7 @@ async def _stream_redirect(
     """Redirect stream to a file like obj."""
     while not stream.at_eof():
         data = await stream.readline()
-        file_like_obj.write(data.decode("ascii").rstrip() if write_str else data)
+        file_like_obj.write(data.decode("ascii") if write_str else data)
 
 
 def config_metadata_rules(config):
@@ -327,14 +327,20 @@ class SingerTap(SingerPlugin):
                     stderr=asyncio.subprocess.PIPE,
                     universal_newlines=False,
                 )
-                done, _ = await asyncio.wait(
-                    [
-                        asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
+
+                invoke_futures = [
+                    asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
+                    asyncio.ensure_future(handle.wait()),
+                ]
+                if logger.isEnabledFor(logging.DEBUG):
+                    invoke_futures.append(
                         asyncio.ensure_future(
                             _stream_redirect(handle.stderr, sys.stderr, write_str=True)
-                        ),
-                        asyncio.ensure_future(handle.wait()),
-                    ],
+                        )
+                    )
+
+                done, _ = await asyncio.wait(
+                    invoke_futures,
                     return_when=asyncio.ALL_COMPLETED,
                 )
                 failed = [future for future in done if future.exception() is not None]
