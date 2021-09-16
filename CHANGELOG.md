@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#2930](https://gitlab.com/meltano/meltano/-/issues/2930) Update sqlfluff configuration to support DBT
+- [#2930](https://gitlab.com/meltano/meltano/-/issues/2930) Update sqlfluff configuration to support DBT. _Thanks, **[Charles Julian Knight](https://gitlab.com/rabidaudio)**!_
 
 ### Fixes
 
