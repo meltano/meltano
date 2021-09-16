@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#2930](https://gitlab.com/meltano/meltano/-/issues/2930) Update sqlfluff configuration to support DBT
+- [#2681](https://gitlab.com/meltano/meltano/-/issues/2681) Optionally include discovery output in `meltano elt` output
 
 ### Fixes
 
