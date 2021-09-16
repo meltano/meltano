@@ -8,10 +8,13 @@ from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
+from meltano.core.utils import run_async
 
 from . import cli
 from .params import pass_project
@@ -49,13 +52,17 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
             settings = PluginSettingsService(
                 project, plugin, plugins_service=plugins_service
             )
+            invoker = PluginInvoker(project, plugin)
+            run_async(invoker.prepare(session))
         else:
             settings = ProjectSettingsService(
                 project, config_service=plugins_service.config_service
             )
+            invoker = None
 
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session
+        ctx.obj["invoker"] = invoker
 
         if ctx.invoked_subcommand is None:
             if format == "json":
@@ -267,3 +274,26 @@ def list_settings(ctx, extras):
         click.echo(
             f"To learn more about {settings.label} and its settings, visit {docs_url}"
         )
+
+
+@config.command("test")
+@click.pass_context
+def test(ctx):
+    """Test the configuration of a plugin."""
+    invoker = ctx.obj["invoker"]
+    if not invoker:
+        raise CliError("Testing of the Meltano project configuration is not supported")
+
+    session = ctx.obj["session"]
+
+    async def _validate():  # noqa: WPS430
+        async with invoker.prepared(session):
+            plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
+            return await plugin_test_service.validate()
+
+    is_valid, detail = run_async(_validate())
+
+    if not is_valid:
+        raise CliError("\n".join(("Plugin configuration is invalid", detail)))
+
+    click.secho("Plugin configuration is valid", fg="green")
