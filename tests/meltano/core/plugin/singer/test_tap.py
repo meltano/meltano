@@ -1,10 +1,9 @@
 import asyncio
 import json
 from contextlib import contextmanager
-from unittest import mock
 
 import pytest
-from asynctest import CoroutineMock
+from asynctest import CoroutineMock, mock
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
@@ -752,6 +751,47 @@ class TestSingerTap:
             await subject.run_discovery(invoker, catalog_path)
 
         assert not catalog_path.exists(), "Catalog should not be present."
+
+    @pytest.mark.asyncio
+    async def test_run_discovery_stderr_output(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        # we need to exit successfully to not trigger error handling
+        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.returncode = 0
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stdout.at_eof.side_effect = (True, True)
+        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        catalog_path = invoker.files["catalog"]
+
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
+        ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
+            await subject.run_discovery(invoker, catalog_path)
+
+            assert stream_mock.call_count == 1
+
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+        ), mock.patch(
+            "meltano.core.plugin.singer.tap._stream_redirect"
+        ) as stream_mock2:
+            await subject.run_discovery(invoker, catalog_path)
+
+            assert stream_mock2.call_count == 2
+            assert stream_mock2.call_args[1]["write_str"] is True
 
     @pytest.mark.asyncio
     async def test_run_discovery_handle_io_exceptions(
