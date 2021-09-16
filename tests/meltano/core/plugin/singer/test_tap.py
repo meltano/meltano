@@ -777,23 +777,21 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         with mock.patch(
-            "meltano.core.plugin.singer.tap._stream_redirect"
-        ) as stream_mock:
-            with mock.patch(
-                "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
-            ):
-                await subject.run_discovery(invoker, catalog_path)
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
+        ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
+            await subject.run_discovery(invoker, catalog_path)
+
             assert stream_mock.call_count == 1
 
         with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+        ), mock.patch(
             "meltano.core.plugin.singer.tap._stream_redirect"
-        ) as stream_mock:
-            with mock.patch(
-                "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
-            ):
-                await subject.run_discovery(invoker, catalog_path)
-            assert stream_mock.call_count == 2
-            assert stream_mock.call_args[1]["write_str"] is True
+        ) as stream_mock2:
+            await subject.run_discovery(invoker, catalog_path)
+
+            assert stream_mock2.call_count == 2
+            assert stream_mock2.call_args[1]["write_str"] is True
 
     @pytest.mark.asyncio
     async def test_run_discovery_handle_io_exceptions(
