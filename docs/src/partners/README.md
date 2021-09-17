@@ -24,6 +24,7 @@ that are not supported yet.
 | [Applied Labs](https://appliedlabs.io/) | United States: New York; Russia: Moscow; United Kingdom: London; Uzbekistan: Tashkent |
 | [Auto IDM](https://autoidm.com/) | United States: Michigan |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
+| [Brooklyn Data Co.](https://www.brooklyndata.co/) | United States, South America, Europe, Africa |
 | [Bytecode IO](https://bytecode.io/) | United States: Walnut Creek, CA |
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
 | [Datateer](https://www.datateer.com/) | United States: Denver, CO |
