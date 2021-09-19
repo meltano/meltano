@@ -286,12 +286,11 @@ Our values act as a guide in how we conduct day-to-day business, make decisions,
 
 ### Community
 
-We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere. We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano.
+We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere. We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano. We will always keep the interests of our open source users and contributors in mind as we continue to grow.
 
 ### Empathy
 
-We work with empathy in our hearts, recognizing we're not alone in this journey. 
-We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
+We work with empathy, recognizing we're not alone in this journey. We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions. 
 
 ### Sustainability
 
