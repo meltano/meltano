@@ -23,6 +23,7 @@ Asynchronous communication demonstrates consideration for team members across ti
 
 1. Always communicate with empathy and kindness. 
 1. Aim to respond to mentions other than FYIs within 3 business days. If you are unable to fulfill a specific request during that time, respond to the mention and indicate when you'll have an answer.
+1. If you're behind on responding to notifications and expect to miss a deadline for any new mentions (until you're caught up), please inform the team in the Kickoff, and ask that urgent requests be sent to you via Slack DM and include the issue/MR link.
 1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency. Also indicate whether something is a "must have" or "nice to have" when asking for collaboration. 
 1. Overcommunication can be appropriate. You can mention someone in an issue, but we all know that sometimes we can miss something, so if a request has stagnated, you can send someone a direct message as a gentle reminder. If you need something urgently, you can also send a Slack message to request that something is prioritized. 
 
