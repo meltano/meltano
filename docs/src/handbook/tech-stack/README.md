@@ -152,9 +152,27 @@ Account details are in the `Engineering` 1Password vault.
 
 ## [PTO by Roots](https://meltano.slack.com/apps/AELEX1TU3-pto-by-roots)
 
-Time-off tracking via Slack.
+[PTO by Roots](https://treehoppr.com/pto-ninja) allows employees and managers to coordinate time off seamlessly with intuitive Slack commands. PTO by Roots also reminds employees of their upcoming time off and helps them assign roles and tasks for co-workers, giving all parties involved greater alignment and peace of mind. Every team member has access through their [Slack](#slack) account (under Apps).
 
-Every team member has access through their [Slack](#slack) account.
+[PTO by Roots Training Video](https://vimeo.com/469045356)
+
+Please be aware that new team members' PTO by Roots accounts are activated and synced automatically once a day, so if you try to access PTO by Roots on your first day and receive an error message, please attempt to access PTO by Roots on Day 2. If you still receive an error message, let your assigned People Ops Specialist know in your onboarding issue.
+
+### How to access PTO by Roots
+
+You can find the Home Tab by visiting `Apps` in the menu bar within Slack, and search for or select PTO by Roots.  From the Home Tab you  can do the follwoing.
+
+* View your OOO dashboard to edit, add or remove OOO events. 
+* Modify your profile and calendar settings. 
+* Opt-in and out-put for reminders, including monthly messages prompting you to consider what PTO you may take this month.
+
+### Slack commands
+* `/pto-roots ooo` Create an OOO event.
+* `/pto-roots whosout` See upcoming OOO for everyone in the channel where this command is used.
+* `/pto-roots @username`  Check if a particular person is OOO and if they are, see which of your co-workers are covering for them.
+* `/pto-roots @usergroup See upcomming OOO for everyone on the particualr user group.
+* `/pto-roots feedback` This is your direct line to support. At any time, use this command to report bugs or share your thoughts on how the product can be improved or what’s working well.
+* `/pto-roots help` A top-level look at PTO by Roots items that you may need help with, and how to receive help.
 
 ## [PyPI](https://pypi.org/)
 
