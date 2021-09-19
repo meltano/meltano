@@ -4,7 +4,7 @@ sidebarDepth: 2
 
 ----
 
-## Table of contents
+# Operations Handbook
 
 [[_TOC_]]
 
