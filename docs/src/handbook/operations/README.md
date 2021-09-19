@@ -119,7 +119,7 @@ Team members should not use a Corporate Credit Card to purchase office equipment
 
 #### Setting up a home office for the first time?
 
-Meltano team memebrs are encouraged to create a comfortable, ergonomic workspace. Please do research to find a chair, desk, and other equipment that facilitate good posture and healthy habits.
+Meltano team members are encouraged to create a comfortable, ergonomic workspace. Please do research to find a chair, desk, and other equipment that facilitate good posture and healthy habits.
 
 #### Software
 
