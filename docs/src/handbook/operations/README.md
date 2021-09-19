@@ -6,7 +6,6 @@ sidebarDepth: 2
 
 # Operations Handbook
 
-[[_TOC_]]
 
 ----
 
