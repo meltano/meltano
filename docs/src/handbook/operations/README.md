@@ -47,14 +47,13 @@ Asynchronous communication demonstrates consideration for team members across ti
 
 ### Effective & responsible communication guidelines
 
-1. **Kindness Matters.** You are looking at a screen, but you are really talking to a person. If you wouldn't say it to a person's face, don't send it to them in a text message.
+1. **Kindness Matters.** You are looking at a screen, but you are really talking to a person. If you wouldn't say it to a person's face, don't send it to them in a text message. Everyone should be comfortable in their work environment.
 1. **Express Your Thoughts.** We live in different locations and often have very different perspectives. We want to know your thoughts, opinions, and feelings on things.
 1. **Own It.** If you say it or type it, own it. If it hurts the company or an individual, even unintentionally, we encourage you to look at things from other points of view and apologize easily.
 1. **Be a Role Model of our values.**
 1. **Feedback is Essential.** It is difficult to know what is appropriate in every one of our team members' countries. We encourage team members to give feedback and receive feedback in a considerate way.
 1. **Don't Underestimate a 1:1.** Asynchronous communication (e.g., via text) is helpful and necessary. In some cases (e.g., to clarify misunderstandings) it can be much more effective to jump on a Zoom video call.
 1. **Always Adhere to our Anti-Harassment Policy and Code of Conduct.**
-1. **Everyone should be comfortable in their work environment.**
 1. **Focus on what we can directly influence.** There are many factors we can't directly influence and we should avoid spending time discussing those things. 
 
 Embracing asynchronous communication and learning to use it effectively requires a mental shift. This can feel unusual or even uncomfortable for those who come from a colocated environment, where in-person meetings and communiques are the norm. Learn more about mastering the use of the written word in an all-remote setting.
