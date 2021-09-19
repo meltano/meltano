@@ -271,7 +271,7 @@ Please be aware that new team members' PTO by Roots accounts are activated and s
 * `/pto-roots ooo` Create an OOO event.
 * `/pto-roots whosout` See upcoming OOO for everyone in the channel where this command is used.
 * `/pto-roots @username`  Check if a particular person is OOO and if they are, see which of your co-workers are covering for them.
-* `/pto-roots @usergroup See upcomming OOO for everyone on the particualr user group.
+* `/pto-roots @usergroup` See upcoming OOO for everyone on the particular user group.
 * `/pto-roots feedback` This is your direct line to support. At any time, use this command to report bugs or share your thoughts on how the product can be improved or what’s working well.
 * `/pto-roots help` A top-level look at PTO by Roots items that you may need help with, and how to receive help.
 
