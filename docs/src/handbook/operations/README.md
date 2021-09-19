@@ -11,11 +11,13 @@ sidebarDepth: 2
 
 ## Communication
 
-We're an all-remote company that allows people to work from almost anywhere in the world, so it's important for us to practice clear communication in ways that help us stay connected and work more efficiently.
+We're an all-remote company that allows people to work from almost anywhere in the world, so it's important for us to practice clear communication in ways that help us stay connected and work more efficiently. We communicate respectfully and professionally at all times.
 
-To accomplish this, we use asynchronous communication as a starting point and stay as open and transparent as we can by communicating through public issues, merge requests, and Slack channels.
+To accomplish this, we use asynchronous communication as a starting point and stay as open and transparent as we can by communicating through public issues, merge requests, and Slack channels. 
 
-We also place an emphasis on ensuring that conclusions of offline conversations are written down. We communicate respectfully and professionally at all times.
+> Asynchronous communication is the practice of communicating and moving projects forward without requiring stakeholders to be available at the same time. 
+
+Asynchronous communication demonstrates consideration for team members across time zones and enables us to travel outside of our usual time zone or structure our day around commitments at home or in our community. We practice asynchronous communication by recording meetings, using GitLab Issues and Merge Requests rather than texts, calls, or Slack messages, and being sensitive to local holidays and vacation statuses. We also place an emphasis on ensuring that conclusions of offline conversations are written down. All of these actions ensure that team members are not pressured to be online outside of their working hours.
 
 ### In practice
 
