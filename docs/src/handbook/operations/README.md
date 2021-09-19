@@ -58,11 +58,7 @@ Asynchronous communication demonstrates consideration for team members across ti
 1. **All company data should be shareable by default**. Don't use a local text file, but rather leave comments on an issue.
 1. **Provide due dates or communicate your progress on tasks**. Answers like: "will do," 
 OK," "it is on my todo list" are not helpful. If it's a small request, it's better to spend 2 minutes to do the task to unblock someone. If it's a large request that requires a time investment, then communicate that to the other person so that they can either solve it in another way if your timeframe exceeds their needs.
-1. **Avoid creating private groups** for internal discussions:
-   1. It's disturbing (all users in the group get notified for each message).
-   1. It's not searchable.
-   1. It's not shareable: there is no way to add people in the group (and this often leads to multiple groups creation).
-   1. They don't have a subject, so everyone has to remember the topic of each private group based on the participants, or open the group again to read the content.
+1. **Avoid creating private groups** for internal discussions, unless a topic is confidential. We aim to be transparent, and private discussions are not searchable and easily documented.
 1. **Use [low-context communications](https://en.wikipedia.org/wiki/High-context_and_low-context_cultures)** by being explicit in your communications. We are a remote-only company, located all over the world. Provide as much context as possible to avoid confusion. Relatedly, we use [ubiquitous language](#ubiquitous-language) for communication efficiency.
 1. **Be careful not to lean too much into hypotheticals**. There is a tipping point in which it decreases value and no longer becomes constructive at helping everyone come into a unified decision.
 1. **Focus on what we can directly influence.** There are many factors we can't directly influence and we should avoid spending time discussing those things. 
@@ -72,11 +68,11 @@ OK," "it is on my todo list" are not helpful. If it's a small request, it's bett
 
 ### Everyone is a Moderator
 
-If you see something that concerns you in Slack, Issues, Merge Requests, Video, Emails or any other forum, we encourage you to respectfully say something directly to the individual in a 1:1 format. If you are not comfortable reaching out to the individual directly, please reach out to your direct manager or People Business Partner to discuss.
+If you see something that concerns you in Slack, Issues, Merge Requests, Video, Emails or any other forum, we encourage you to respectfully say something directly to the individual in a 1:1 format. If you are not comfortable reaching out to the individual directly, please reach out to your direct manager or the Operations Analyst to discuss.
 
 ## Financial operations
 
-Financial operations includes spending company money, guidelines, and the reimbursement policy. This section will be regularly updated.
+Financial operations includes spending company money, guidelines, and the reimbursement policy. 
 
 ### Spending company money
 
@@ -96,6 +92,20 @@ We expect Meltano team members to take responsibility to determine what they nee
 
 1. Purchases of at least $10 USD require a receipt.
 1. Employees should file expense reports in the same month that the purchase was made. Contractors should include receipts with their invoices.
+1. To be reimbursed for company expenses, please submit a report in [Expensify](/handbook/tech-stack/#expensify) (all team members). Non-US team members will also submit a report in Remote.
+
+#### US team member reimbursement process
+
+1. Upload receipts in Expensify and submit a report. Please use the appropriate tags/categories and include comments when appropriate. If a tag/category is missing, you may be asked to edit your report.
+1. Team members in the US will be automatically reimbursed through Expensify after their report is "final approved." 
+
+#### Non-US team member reimbursement process
+
+Although non-US team members will not receive reimbursement through Expensify, the company needs to have a single source of truth for expenses. So, all team members will need to use Expensify. You'll then submit an additional report in Remote to receive reimbursement.
+
+1. Upload receipts in Expensify and submit a report. Please use the appropriate tags/categories and include comments when appropriate. If a tag/category is missing, you may be asked to edit your report.
+1. Create an invoice in [Remote](/handbook/tech-stack/#remote). 
+1. The approved expense amount will be deposited in your account with your monthly salary.
 
 ### Office equipment and supplies
 
@@ -107,11 +117,11 @@ When reimbursing through Expensify please select "reimbursable" for the portion 
 
 Team members should not use a Corporate Credit Card to purchase office equipment for their personal workspace.  All office equipment purchases for a team member's personal workspace should be made on a personal credit card and expensed.
 
-#### <i class="fas fa-bullseye" id="biz-tech-icons"></i> Setting up a home office for the first time?
+#### Setting up a home office for the first time?
 
 Meltano team memebrs are encouraged to create a comfortable, ergonomic workspace. Please do research to find a chair, desk, and other equipment that facilitate good posture and healthy habits.
 
-#### <i class="fas fa-bullseye" id="biz-tech-icons"></i>  Software
+#### Software
 
 1. We do not issue Microsoft Office 365 licenses, as Meltano uses Google Workspace
    (Docs, Slides, Sheets, etc.) instead.
@@ -125,7 +135,7 @@ Meltano does not reimburse individual software subscriptions (e.g. Apple Music, 
 
 Certain types of individual subscriptions are reimbursable, such as VPN service. If you are uncertain whether a particular service is reimbursable, please contact the Operations Analyst.
 
-#### <i class="fas fa-bullseye" id="biz-tech-icons"></i> Hardware
+#### Hardware
 
 It is uncommon for you to need all of the items listed below. Please use your best judgement and buy them as you need them. If you wonder if something is common, feel free to ask your teammates.
 
