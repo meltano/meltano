@@ -22,12 +22,28 @@ Asynchronous communication demonstrates consideration for team members across ti
 ### In practice
 
 1. Always communicate with empathy and kindness. 
-1. **Please avoid using @here or @channel unless this is about something urgent and important.** 
-1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
-1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
 1. Aim to respond to mentions within 3 business days. If you are unabe to fulfill a specific request during that time, respond to the mention and indicate when you'll have an answer.
 1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency. Also indicate whether something is a "must have" or "nice to have" when asking for collaboration. 
-1. Don't hesitate to overcommunicate. You can mention someone in an issue, but we all know that sometimes we can miss something, so if you need something urgently (or if a request has stagnated), you can send someone a direct message as a gentle reminder. 
+1. Overcommunication can be appropriate. You can mention someone in an issue, but we all know that sometimes we can miss something, so if a request has stagnated, you can send someone a direct message as a gentle reminder. If you need something urgently, you can also send a Slack message to request that something is prioritized. 
+
+#### Slack guidelines
+
+1. **Please avoid using @here or @channel unless something is urgent and important.** 
+1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
+1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
+1. If decisions are made on Slack, please either paste a screenshot of the conversation in the relevant issue/MR or provide a summary of what was discussed.
+
+#### Issue and merge request guidelines
+
+1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
+1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
+1. Always remember that some people only work through GitLab TODOs, so if they're not directly mentioned, they will not receive a notification. 
+1. Be mindful that issues and MRs are public by default, and our communication in them can be viewed by our community. Please always consider how we present ourselves to the public.
+
+#### Email guidelines
+
+1. Email should only be used when communicating with external vendors or when discussing sensitive, confidential matters (e.g. PeopleOps or financial situations).
+1. Write `FYI` when you want someone to be aware of what's being discussed, but they're not required to take action.
 
 ### Effective & responsible communication guidelines
 
