@@ -194,7 +194,6 @@ We recommend either:
 #### Linux hardware
 
 Please only request a Linux laptop if you have experience with this operating system and its requirements, all others, select a MacBook.
-{: .alert .alert-info}
 
 We strongly encourage Macs, but we do allow Linux if you are capable of self-support and updates.
 
