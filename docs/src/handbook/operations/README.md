@@ -17,11 +17,10 @@ To accomplish this, we use asynchronous communication as a starting point and st
 
 > Asynchronous communication is the practice of communicating and moving projects forward without requiring stakeholders to be available at the same time. 
 
-Asynchronous communication demonstrates consideration for team members across time zones and enables us to travel outside of our usual time zone or structure our day around commitments at home or in our community. We practice asynchronous communication by recording meetings, using GitLab Issues and Merge Requests rather than texts, calls, or Slack messages, and being sensitive to local holidays and vacation statuses. We also place an emphasis on ensuring that conclusions of offline conversations are written down. All of these actions ensure that team members are not pressured to be online outside of their working hours.
+Asynchronous communication demonstrates consideration for team members across time zones and enables us to travel outside of our usual time zone or structure our day around commitments at home or in our community. We practice asynchronous communication by recording meetings, using GitLab Issues and Merge Requests rather than texts, calls, or Slack messages, and being sensitive to local holidays and vacation statuses. We also place an emphasis on ensuring that conclusions of offline conversations are written down. All of these actions ensure that team members are not pressured to be online outside of their working hours. Embracing asynchronous communication and learning to use it effectively requires a mental shift. This can feel unusual or even uncomfortable for those who come from a colocated environment, where in-person meetings and communiques are the norm. 
 
 ### In practice
-
-1. Always communicate with empathy and kindness. 
+ 
 1. Aim to respond to mentions other than FYIs within 3 business days. If you are unable to fulfill a specific request during that time, respond to the mention and indicate when you'll have an answer.
 1. If you're behind on responding to notifications and expect to miss a deadline for any new mentions (until you're caught up), please inform the team in the Kickoff, and ask that urgent requests be sent to you via Slack DM and include the issue/MR link.
 1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency. Also indicate whether something is a "must have" or "nice to have" when asking for collaboration. 
@@ -46,39 +45,30 @@ Asynchronous communication demonstrates consideration for team members across ti
 1. Email should only be used when communicating with external vendors or when discussing sensitive, confidential matters (e.g. PeopleOps or financial situations).
 1. Write `FYI` when you want someone to be aware of what's being discussed, but they're not required to take action.
 
-### Effective & responsible communication guidelines
-
-1. **Kindness matters.** You are looking at a screen, but you are really talking to a person. If you wouldn't say it to a person's face, don't send it to them in a text message. Everyone should be comfortable in their work environment.
-1. **Express your thoughts.** We live in different locations and often have very different perspectives. We want to know your thoughts, opinions, and feelings on things.
-1. **Own it.** If you say it or type it, own it. If it hurts the company or an individual, even unintentionally, we encourage you to look at things from other points of view and apologize easily.
-1. **Be a role model of our values.**
-1. **Feedback is Essential.** It is difficult to know what is appropriate in every one of our team members' countries. We encourage team members to give feedback and receive feedback in a considerate way.
-1. **Don't Underestimate a 1:1.** Asynchronous communication (e.g., via text) is helpful and necessary. In some cases (e.g., to clarify misunderstandings) it can be much more effective to jump on a Zoom video call.
-1. **Always adhere to our Anti-Harassment Policy and Code of Conduct.**
-1. **Focus on what we can directly influence.** There are many factors we can't directly influence and we should avoid spending time discussing those things. 
-
-Embracing asynchronous communication and learning to use it effectively requires a mental shift. This can feel unusual or even uncomfortable for those who come from a colocated environment, where in-person meetings and communiques are the norm. 
-
 ### Best practices
 
-1. All written communication happens in English, even when sent one on one, because sometimes you need to forward an email or chat.
-1. Use **asynchronous communication** when possible: merge requests or issues. 
-1. Discussion in issues or merge requests is preferred over everything else. If you need a response urgently, you can Slack someone with a link to your comment on an issue or merge request, asking them to respond there, however be aware that they still may not see it straight away. 
-1. You are not expected to be available all the time. There is no expectation to respond to messages outside of your planned working hours.
-1. Sometimes synchronous communication is the better option, but do not default to it. For example, a video call can clear things up quickly when you are blocked. 
-1. It is very OK to ask as many questions as you have. Please ask them so many people can answer them and many people see the answer. Use issues or public chat channels instead of direct messages or one-on-one emails.
-1. If the answer to a question isn't documented, please make a merge request to add it to the handbook in a place you have looked for it. It is great for the person who answered the question to see you leading by example to ensure that question only needs to be answered once. A merge request is the best way to say thanks for help.
-1. If you mention something (a merge request, issue, commit, webpage, comment, etc.) please include a link to it.
-1. All company data should be **shareable** by default. Don't use a local text file, but rather leave comments on an issue.
-1. When someone asks something, give back a deadline or that you did it. Answers like: 'will do', 'OK', 'it is on my todo list' are not helpful. If it is small it's better to spend 2 minutes and do the tasks so the other person can mentally forget about it. If it is large you need to figure out when you'll do it, by returning that information the other person might decide to solve it in another way if it takes too long.
-1. It is OK to bring an issue to someone's attention with a CC ("cc @user"), but CCs alone are not enough if specific action is needed from someone. The mentioned user may read the issue and take no further action. If you need something, please explicitly communicate your need along with @ mentioning who you need it from.
-1. Avoid creating private groups for internal discussions:
+1. **Kindness matters.** Always communicate with kindness and empahty. Everyone should be comfortable in their work environment.
+1. **All written communication happens in English**, even when sent one on one, because sometimes you need to forward an email or chat.
+1. **Own your actions**: If you say it or type it, own it. If it hurts the company or an individual, even unintentionally, we encourage you to look at things from other points of view and apologize easily.
+1. **You're not expected to be available all the time**. There is no expectation to respond to messages outside of your planned working hours.
+1. **Sometimes synchronous communication is the better option**, but do not default to it. For example, a video call can clear things up quickly when you are blocked. 
+1. **It's okay to ask as many questions as you have**. Please ask them so that team members can provide and view answers. Use issues or public chat channels instead of direct messages or emails.
+1. **Make merge requests to update the handbook with answers** to questions you've received.
+1. **Include links when you mention something** (e.g. a merge request, issue, commit, webpage, comment).
+1. **All company data should be shareable by default**. Don't use a local text file, but rather leave comments on an issue.
+1. **Provide due dates or communicate your progress on tasks**. Answers like: "will do," 
+OK," "it is on my todo list" are not helpful. If it's a small request, it's better to spend 2 minutes to do the task to unblock someone. If it's a large request that requires a time investment, then communicate that to the other person so that they can either solve it in another way if your timeframe exceeds their needs.
+1. **Avoid creating private groups** for internal discussions:
    1. It's disturbing (all users in the group get notified for each message).
    1. It's not searchable.
    1. It's not shareable: there is no way to add people in the group (and this often leads to multiple groups creation).
    1. They don't have a subject, so everyone has to remember the topic of each private group based on the participants, or open the group again to read the content.
-1. Use [low-context communications](https://en.wikipedia.org/wiki/High-context_and_low-context_cultures) by being explicit in your communications. We are a remote-only company, located all over the world. Provide as much context as possible to avoid confusion. Relatedly, we use [ubiquitous language](#ubiquitous-language) for communication efficiency.
-1. When discussing concepts, be careful not to lean too much into hypotheticals. There is a tipping point in which it decreases value and no longer becomes constructive at helping everyone come into a unified decision.
+1. **Use [low-context communications](https://en.wikipedia.org/wiki/High-context_and_low-context_cultures)** by being explicit in your communications. We are a remote-only company, located all over the world. Provide as much context as possible to avoid confusion. Relatedly, we use [ubiquitous language](#ubiquitous-language) for communication efficiency.
+1. **Be careful not to lean too much into hypotheticals**. There is a tipping point in which it decreases value and no longer becomes constructive at helping everyone come into a unified decision.
+1. **Focus on what we can directly influence.** There are many factors we can't directly influence and we should avoid spending time discussing those things. 
+1. **Always adhere to our Anti-Harassment Policy and Code of Conduct.**
+1. **Express your thoughts.** We live in different locations and often have very different perspectives. We want to know your thoughts, opinions, and feelings on things.
+1. **Feedback is Essential.** It's difficult to know what is appropriate in every one of our team members' countries. We encourage team members to give feedback and receive feedback in a considerate way.
 
 ### Everyone is a Moderator
 
