@@ -257,7 +257,7 @@ We recommend every team member takes a minimum 30 days off a year, and we have r
 * Minimum 15 days for victims of domestic violence
 * Minimum 15 days for burnout
 
-To log time off, team members should use PTO by Roots in Slack.
+To log time off, team members should use [PTO by Roots](/handbook/tech-stack/#pto-by-roots).
 
 #### PTO by Roots
 
