@@ -173,7 +173,7 @@ We use [GitLab](/handbook/tech-stack/#gitlab) for project management across the 
 
 As you work within GitLab, please be sure to follow these best practices:
 
-1. Directly mention (`@username`) the people you want to involve in a comment, especially the person you're replying to. Some people only work through GitLab todos, so if they're not directly mentioned, they will not see your comment.
+1. Directly mention (`@username`) the people you want to involve in a comment, especially the person you're replying to. Some people only work through GitLab todos (rather than email notifications), and therefore, they will only see responses to comments/threads if they're explicitly mentioned.
 1. If an issue is blocked or waiting for someone's action, the issue should be assigned to those individuals.
 1. Include all relevant information, including labels, milestones, due dates, and details. 
 1. Provide updates in a comment to document progress. 
