@@ -286,8 +286,7 @@ Our values act as a guide in how we conduct day-to-day business, make decisions,
 
 ### Community
 
-We work to build a more diverse and inclusive culture by hiring globally and creating a culture that supports team members everywhere. 
-We are part of a larger community and want to enable everyone to contribute.
+We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere. We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano.
 
 ### Empathy
 
