@@ -301,6 +301,7 @@ We work with a sustainable mindset so that we can continue to grow for years to 
 We believe in investing in our people, community, and products for the long term.
 We do this by putting family and friends first, by being wise with resources, and by not adopting a short-term point of view.
 Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options. 
+We should strive to be a net positive company that makes net positive actions.
 Every change should be towards making "the thing" a little bit better than the one that came before. 
 
 ### Accountability
@@ -319,7 +320,6 @@ Without trust, it's impossible to live our other values.
 
 We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community. 
 We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
-
 
 ## Careers <a name="job-openings" />
 
