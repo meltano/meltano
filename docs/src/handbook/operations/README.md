@@ -241,11 +241,11 @@ Shared calendars and meetings:
 
 ### Flexible working hours
 
-TK
+Because Meltano is a fully remote and distributed team, we don't have set working hours. Team members are encouraged to set their own work schedule, depending on their needs and working style. We understand that some people work best at certain times of the day, so please work when you're at your best. Also, if you need to take a break during the day, have a doctor's appointment, or need to pick up your kids, please feel empowered to readjust your schedule. Please note that there may be times when you'll need to adjust your schedule (e.g. a necessary synchronous meeting). 
 
 #### Taking breaks during the day
 
-TK
+Whether you go for a walk, take a nap, or watch your favorite show, you're enouraged to take breaks during the day. [Research](https://www.bbc.com/worklife/article/20190312-the-tiny-breaks-that-ease-your-body-and-reboot-your-brain) has found that taking breaks - even for a few minutes - improves productivity, creativity, and concentration. Don't ever feel guilty when you need time away from your computer. 
 
 ### Paid time off
 
