@@ -312,9 +312,11 @@ We're accountable for our mistakes, but we blamelessly recognize them and move f
 
 ### Transparency
 
-We work transparently because we believe in the value of open source and bringing others into the community. 
-We believe being transparent makes you honest which, in turn, builds trust. 
+Transparency cultivates honesty which, in turn, builds trust. 
 Without trust, it's impossible to live our other values.
+In practice, transparency can be seen in how we discuss decisions, document our work, and ecourage everyone to share their thoughts and provide feedback. 
+We work transparently, because we're passionate about involving our community in everything we're doing. 
+We strive to provide users with the same level of insight as our team members so that they're able to have full visibility in our work and contribute their perspectives, since anything we build will be better if we collaborate with the people who will use it.
 
 ### Iteration
 
