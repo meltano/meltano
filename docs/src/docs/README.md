@@ -301,6 +301,7 @@ We work with a sustainable mindset so that we can continue to grow for years to 
 We believe in investing in our people, community, and products for the long term.
 We do this by putting family and friends first, by being wise with resources, and by not adopting a short-term point of view.
 Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options. 
+Every change should be towards making "the thing" a little bit better than the one that came before. 
 
 ### Accountability
 
