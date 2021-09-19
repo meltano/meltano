@@ -123,7 +123,7 @@ Meltano team members are encouraged to create a comfortable, ergonomic workspace
 
 #### Software
 
-1. We do not issue Microsoft Office 365 licenses, as Meltano uses Google Workspace
+1. We do not issue Microsoft Office 365 licenses, as Meltano uses [Google Workspace](/handbook/tech-stack/#google-workspace)
    (Docs, Slides, Sheets, etc.) instead.
 
 ##### Individual subscriptions
