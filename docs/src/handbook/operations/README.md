@@ -335,6 +335,8 @@ In order to see who is out of your team, follow the steps below:
 
 ### Visiting grant
 
+**Note**: To keep team members and our communities safe, we've temporarily suspended the visiting grant until travel is less of a risk around the world. We'll provide updates to team members and will regularly review this policy over the course of the pandemic.
+
 Meltano is an all-remote company with team members all over the world. If you want to visit other team members to get to know them, Meltano will assist with travel expenses (e.g. flights, trains, parking, car rental, and ground transportation to/from airport) for a total of up to $150 for every team member that you visit. Please note lodging is excluded. To be clearer, if you meet 2 team members during your visit, the maximum limit of your visiting grant could be $300 ($150*2). You don't need to work on the same project or team. We'd like you to get to know each other and your roles at Meltano, so we encourage you to discuss work for at least part of the time you're meeting.
 
 Please note: The visiting grant applies to transportation costs and not other expenses related to travel (e.g. lodging, food). It may be acceptable to cover a meal, however, if the meeting is pre-announced to other people in the region to encourage as many of them to attend as possible.
