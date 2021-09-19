@@ -167,6 +167,17 @@ Shared calendars and meetings:
 - External Meetings: Meetings with users and partners
 - Time Off: All-day events for periods team members will not be working
 
+## GitLab workflow best practices
+
+We use [GitLab](/handbook/tech-stack/#gitlab) for project management across the organization. Whether you work in engineering or marketing, GitLab will be the central tool for collaboration and delivery. To ensure end-to-end visibility and asynchronous communication, we use epics, issues, and merge requests to organize our work. 
+
+As you work within GitLab, please be sure to follow these best practices:
+
+1. Directly mention (`@username`) the people you want to involve in a comment, especially the person you're replying to. Some people only work through GitLab todos, so if they're not directly mentioned, they will not see your comment.
+1. If an issue is blocked or waiting for someone's action, the issue should be assigned to those individuals.
+1. Include all relevant information, including labels, milestones, due dates, and details. 
+1. Provide updates in a comment to document progress. 
+
 ## Benefits and perks
 
 * Unlimited PTO with minimums
