@@ -286,22 +286,27 @@ Our values act as a guide in how we conduct day-to-day business, make decisions,
 
 ### Community
 
-We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere. We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano. We will always keep the interests of our open source users and contributors in mind as we continue to grow.
+We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere. 
+We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano. 
+We will always keep the interests of our open source users and contributors in mind as we continue to grow.
 
 ### Empathy
 
-We work with empathy, recognizing we're not alone in this journey. We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions. 
+We work with empathy, recognizing we're not alone in this journey. 
+We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions. 
 
 ### Sustainability
 
-We work with a sustainable mindset so that we can be here for years to come. 
+We work with a sustainable mindset so that we can continue to grow for years to come. 
 We believe in investing in our people, community, and products for the long term.
-We do this by putting family and friends first, by being wise with resources, and by not have a short-term mindset.
+We do this by putting family and friends first, by being wise with resources, and by not adopting a short-term point of view.
+Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options. 
 
 ### Accountability
 
-We work knowing we have a responsibility to ourselves, our colleagues, and our community to do our best and hold our selves and each other to a high standard. 
-We're accountable for our mistakes, but we blamelessly recognize them and move forward together towards a better tomorrow.
+We have a responsibility to ourselves, our teammates, and our community to do our best.
+We hold ourselves and each other to high standards, and we're responsibile for our work, words, and actions. 
+We're accountable for our mistakes, but we blamelessly recognize them and move forward together. 
 
 ### Transparency
 
