@@ -296,7 +296,7 @@ We work with empathy, recognizing we're not alone in this journey. We bring kind
 
 We work with a sustainable mindset so that we can be here for years to come. 
 We believe in investing in our people, community, and products for the long term.
-We do this by putting family first, by being wise with resources, and by not have a short-term mindset.
+We do this by putting family and friends first, by being wise with resources, and by not have a short-term mindset.
 
 ### Accountability
 
