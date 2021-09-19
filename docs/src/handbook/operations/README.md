@@ -17,7 +17,7 @@ To accomplish this, we use asynchronous communication as a starting point and st
 
 We also place an emphasis on ensuring that conclusions of offline conversations are written down. We communicate respectfully and professionally at all times.
 
-## In practice
+### In practice
 
 1. Always communicate with empathy and kindness. 
 1. **Please avoid using @here or @channel unless this is about something urgent and important.** 
@@ -27,7 +27,7 @@ We also place an emphasis on ensuring that conclusions of offline conversations 
 1. Use direct language when communicating. If you want someone to take action, directly tell them what's required, and when you need an answer, and whether there is urgency. Also indicate whether something is a "must have" or "nice to have" when asking for collaboration. 
 1. Don't hesitate to overcommunicate. You can mention someone in an issue, but we all know that sometimes we can miss something, so if you need something urgently (or if a request has stagnated), you can send someone a direct message as a gentle reminder. 
 
-## Effective & responsible communication guidelines
+### Effective & responsible communication guidelines
 
 1. **Kindness Matters.** You are looking at a screen, but you are really talking to a person. If you wouldn't say it to a person's face, don't send it to them in a text message.
 1. **Express Your Thoughts.** We live in different locations and often have very different perspectives. We want to know your thoughts, opinions, and feelings on things.
@@ -41,7 +41,7 @@ We also place an emphasis on ensuring that conclusions of offline conversations 
 
 Embracing asynchronous communication and learning to use it effectively requires a mental shift. This can feel unusual or even uncomfortable for those who come from a colocated environment, where in-person meetings and communiques are the norm. Learn more about mastering the use of the written word in an all-remote setting.
 
-## Best practices
+### Best practices
 
 1. All written communication happens in English, even when sent one on one, because sometimes you need to forward an email or chat.
 1. Use **asynchronous communication** when possible: merge requests or issues. 
@@ -62,23 +62,19 @@ Embracing asynchronous communication and learning to use it effectively requires
 1. Use [low-context communications](https://en.wikipedia.org/wiki/High-context_and_low-context_cultures) by being explicit in your communications. We are a remote-only company, located all over the world. Provide as much context as possible to avoid confusion. Relatedly, we use [ubiquitous language](#ubiquitous-language) for communication efficiency.
 1. When discussing concepts, be careful not to lean too much into hypotheticals. There is a tipping point in which it decreases value and no longer becomes constructive at helping everyone come into a unified decision.
 
-## Everyone is a Moderator
+### Everyone is a Moderator
 
 If you see something that concerns you in Slack, Issues, Merge Requests, Video, Emails or any other forum, we encourage you to respectfully say something directly to the individual in a 1:1 format. If you are not comfortable reaching out to the individual directly, please reach out to your direct manager or People Business Partner to discuss.
 
-
-
-
-
-# Financial operations
+## Financial operations
 
 Financial operations includes spending company money, guidelines, and the reimbursement policy. This section will be regularly updated.
 
-## Spending company money
+### Spending company money
 
 We expect Meltano team members to take responsibility to determine what they need to purchase or expense in order to do their jobs effectively. We don't want you to have to wait with getting the items that you need to get your job done. You most likely know better than anyone else what the items are that you need to be successful in your job.
 
-## Guidelines
+### Guidelines
 
 1. Spend company money like it is your **own** money, but please make decisions with the company's best interest in mind.
 1. You don't have to [ask permission](https://m.signalvnoise.com/if-you-ask-for-my-permission-you-wont-have-my-permission-9d8bb4f9c940) before making purchases **in the interest of the company**. When in doubt, do **inform** your manager prior to the purchase, or as soon as possible after the purchase.
@@ -88,12 +84,12 @@ We expect Meltano team members to take responsibility to determine what they nee
 1. Any non-company expenses should not be paid with a company credit card.
 1. If team members submit expenses for reimbursement for personal purchases that are not covered in the expense policy, this is a violation of our Code of Business Conduct & Ethics.
 
-## Reimbursement policy
+### Reimbursement policy
 
 1. Purchases of at least $10 USD require a receipt.
 1. Employees should file expense reports in the same month that the purchase was made. Contractors should include receipts with their invoices.
 
-## Office equipment and supplies
+### Office equipment and supplies
 
 The company will reimburse for the following items if you **need it for work or use it mainly for business**, and local law allows us to pay for it without incurring payroll taxes. Please keep in mind that while the amounts below are guidelines and not strict limits, any purchase (other than a laptop) that will cost Meltano $1000 USD per item (or over) will require prior approval from your manager.
 
@@ -103,25 +99,25 @@ When reimbursing through Expensify please select "reimbursable" for the portion 
 
 Team members should not use a Corporate Credit Card to purchase office equipment for their personal workspace.  All office equipment purchases for a team member's personal workspace should be made on a personal credit card and expensed.
 
-### <i class="fas fa-bullseye" id="biz-tech-icons"></i> Setting up a home office for the first time?
+#### <i class="fas fa-bullseye" id="biz-tech-icons"></i> Setting up a home office for the first time?
 
 Meltano team memebrs are encouraged to create a comfortable, ergonomic workspace. Please do research to find a chair, desk, and other equipment that facilitate good posture and healthy habits.
 
-### <i class="fas fa-bullseye" id="biz-tech-icons"></i>  Software
+#### <i class="fas fa-bullseye" id="biz-tech-icons"></i>  Software
 
 1. We do not issue Microsoft Office 365 licenses, as Meltano uses Google Workspace
    (Docs, Slides, Sheets, etc.) instead.
 1. For security related software, refer to the section on laptop configuration.
 
-#### Individual subscriptions
+##### Individual subscriptions
 
 Meltano does not reimburse individual software subscriptions (e.g. Apple Music, Krisp, etc.).
 
-##### Subscription exceptions
+###### Subscription exceptions
 
 Certain types of individual subscriptions are reimbursable, such as VPN service. If you are uncertain whether a particular service is reimbursable, please contact the Operations Analyst.
 
-### <i class="fas fa-bullseye" id="biz-tech-icons"></i> Hardware
+#### <i class="fas fa-bullseye" id="biz-tech-icons"></i> Hardware
 
 It is uncommon for you to need all of the items listed below. Please use your best judgement and buy them as you need them. If you wonder if something is common, feel free to ask your teammates.
 
@@ -152,13 +148,13 @@ If you wish to go over the recommended reimbursement, this is an exception and s
 
 The technology price guidelines are based on acquiring products in the United States. Meltano understands prices may vary based on location. If the product cost is higher in your location, confirm that an equivalent product in the United States would be within the above price guidance.  
 
-# Tools and technology
+## Tools and technology
 
-## Tech stack
+### Tech stack
 
 View the [complete list](/handbook/tech-stack) of our tech stack. 
 
-## Laptop configurations
+### Laptop configurations
 
 Meltano approves the use of Apple and Linux operating systems, Windows is prohibited. The prohibition on Microsoft Windows is for the following reasons:
 
@@ -171,7 +167,7 @@ Meltano approves the use of Apple and Linux operating systems, Windows is prohib
 
 Apple hardware is the common choice for most Meltano team members, but if you are comfortable using and self-supporting yourself with Linux (Ubuntu usually) you may also choose from the Dell builds below.
 
-### Apple Hardware
+#### Apple Hardware
 
 We recommend either:
 
@@ -179,7 +175,7 @@ We recommend either:
 
 1. (MacBook Pro) - [13” / 512gig SSD / 16gigs RAM / i5 CPU](https://www.apple.com/shop/buy-mac/macbook-pro/13-inch-space-gray-1.4ghz-quad-core-processor-with-turbo-boost-up-to-3.9ghz-256gb)
 
-### Linux hardware
+#### Linux hardware
 
 Please only request a Linux laptop if you have experience with this operating system and its requirements, all others, select a MacBook.
 {: .alert .alert-info}
@@ -206,7 +202,7 @@ The reasons for using Dell for a Linux laptop are as follows:
 
 - To date, all of Dell's security issues have involved their use of Windows, not their hardware.
 
-## Calendars
+### Calendars
 
 Shared calendars and meetings:
 - [Community Meetings](https://calendar.google.com/calendar/u/1?cid=Y18wMWNqNDhoYTRoMTk5Y3RqZWZpODV0OWRnY0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t): Meetings open to the community
@@ -217,7 +213,7 @@ Shared calendars and meetings:
 - External Meetings: Meetings with users and partners
 - Time Off: All-day events for periods team members will not be working
 
-# Benefits and perks
+## Benefits and perks
 
 * Unlimited PTO with minimums
 * Professional development support and budget
@@ -228,15 +224,15 @@ Shared calendars and meetings:
 * Flexible working hours
 * Access to world class founders, investors and mentors
 
-## Flexible working hours
+### Flexible working hours
 
 TK
 
-### Taking breaks during the day
+#### Taking breaks during the day
 
 TK
 
-## Paid time off
+### Paid time off
 
 Meltano has an unlimited time off policy, and we encourage team members to take the time they need to rest and recharge. 
 
@@ -248,7 +244,7 @@ We recommend every team member takes a minimum 30 days off a year, and we have r
 
 To log time off, team members should use PTO by Roots in Slack.
 
-### PTO by Roots
+#### PTO by Roots
 
 [PTO by Roots](https://treehoppr.com/pto-ninja) allows employees and managers to coordinate time off seamlessly with intuitive Slack commands. PTO by Roots also reminds employees of their upcoming time off and helps them assign roles and tasks for co-workers, giving all parties involved greater alignment and peace of mind.
 
@@ -256,7 +252,7 @@ To log time off, team members should use PTO by Roots in Slack.
 
 Please be aware that new team members' PTO by Roots accounts are activated and synced automatically once a day, so if you try to access PTO by Roots on your first day and receive an error message, please attempt to access PTO by Roots on Day 2. If you still receive an error message, let your assigned People Ops Specialist know in your onboarding issue.
 
-#### Slack Commands
+##### Slack Commands
 * `/pto-roots ooo` Create an OOO event.
 * `/pto-roots whosout` See upcoming OOO for everyone in the channel where this command is used.
 * `/pto-roots @username`  Check if a particular person is OOO and if they are, see which of your co-workers are covering for them.
@@ -264,7 +260,7 @@ Please be aware that new team members' PTO by Roots accounts are activated and s
 * `/pto-roots feedback` This is your direct line to support. At any time, use this command to report bugs or share your thoughts on how the product can be improved or what’s working well.
 * `/pto-roots help` A top-level look at PTO by Roots items that you may need help with, and how to receive help.
 
-#### Home Tab
+##### Home Tab
 
 You can find the Home Tab by visiting `Apps` in the menu bar within Slack, and search for or select PTO by Roots.  From the Home Tab you  can do the follwoing.
 
@@ -272,17 +268,17 @@ You can find the Home Tab by visiting `Apps` in the menu bar within Slack, and s
 * Modify your profile and calendar settings. 
 * Opt-in and out-put for reminders, including monthly messages prompting you to consider what PTO you may take this month.
 
-#### Additional Features
+##### Additional Features
 
-##### Google Calendar Sync
+###### Google Calendar Sync
 
 PTO by Roots allows you to sync time off requests with your Google Calendar.
 
-##### Automatic Status + Do Not Disturb Updates
+###### Automatic Status + Do Not Disturb Updates
 
 PTO by Roots can automatically set your OOO status in Slack and apply “Do Not Disturb” settings while you’re away. You must add these permissions individually.
 
-##### Roles and task handoffs
+###### Roles and task handoffs
 
 PTO by Roots provides an experience that allows you to set roles and tasks for co-workers while
 you’re away. Accepted roles then become a part of a Slack away message that appears as
@@ -291,7 +287,7 @@ co-workers try to tag you in discussions while you’re OOO.
 Before assigning a `#channel` to a role, please ask for permission to do so in that channel.
 Especially in large channels and during popular vacation times, PTO's role reminders could create a lot of noise, so some teams may recommend against them until there is an option to allow turning off the PTO notifications.
 
-##### Bulk add holidays
+###### Bulk add holidays
 
 You can bulk add holidays based on your region and then modify them manually if needed. Any Public Holidays added to PTO by Roots in your dashboard will not auto-set an OOO event for you, you will still need to create an OOO event if observing that holiday. To add a Public Holiday, follow the below instructions.
 
@@ -300,7 +296,7 @@ You can bulk add holidays based on your region and then modify them manually if 
 * Choose the desired year
 * Click on `Bulk Add By Region`
 
-##### Monthly reminder to consider taking PTO
+###### Monthly reminder to consider taking PTO
 
 We get it — life gets busy. So busy, in fact, that you may need a little nudge to consider taking time off to recharge. PTO by Roots allows you to subscribe (and unsubscribe) to a monthly prompt, sent on the first *working* day of each month, reminding you to pause and think about time away from work and prioritizing mental health.
 
@@ -311,7 +307,7 @@ To subscribe or unsubscribe, follow the below instructions:
 * Beneath your name and profile, you'll see a line that says "Send me a monthly reminder about taking time off." Click the **Subscribe** button to trigger the notification, which will begin on the first *working* day (e.g. not a weekend or a public holiday) in the month following your subscription.
 * To unsubscribe, revisit PTO by Roots within Slack Apps and click the button that says **Unsubscribe**.
 
-##### Checking "Who's Out?"
+###### Checking "Who's Out?"
 
 In order to see who is out of your team, follow the steps below:
 
@@ -319,7 +315,7 @@ In order to see who is out of your team, follow the steps below:
 * In the `Home` section, select `Who's Out?` from the dropdown list
 * Click `new search` to view who is out by `#channel`, `@usergroup`, or `@username`
 
-## Visiting grant
+### Visiting grant
 
 Meltano is an all-remote company with team members all over the world. If you want to visit other team members to get to know them, Meltano will assist with travel expenses (e.g. flights, trains, parking, car rental, and ground transportation to/from airport) for a total of up to $150 for every team member that you visit. Please note lodging is excluded. To be clearer, if you meet 2 team members during your visit, the maximum limit of your visiting grant could be $300 ($150*2). You don't need to work on the same project or team. We'd like you to get to know each other and your roles at Meltano, so we encourage you to discuss work for at least part of the time you're meeting.
 
@@ -329,18 +325,16 @@ To claim the grant, include a line item on your expense report or invoice along 
 
 The visiting grant is inspired by Douwe's trip around the world during his time at GitLab. Douwe met [49 colleagues in 20 cities, in 14 countries, on five continents, in 6 months](/blog/2017/01/31/around-the-world-in-6-releases/). 
 
-### Significant life event grant
+#### Significant life event grant
 
 Recognizing that team members may wish to share significant events in each other's lives, such as weddings or civil partnerships, Meltano will assist with travel expenses to attend these events. This grant works the same way as the, except the reimbursement limit is $300 per team member you visit at an event.
 
-## Family and Friends Day
+### Family and Friends Day
 
 Inspired by GitLab's Family and Friends Day, Meltano has made Family and Friends Day a regular part of the culture. On these days, we will close the doors to the Meltano virtual office, reschedule all meetings, and have a publicly visible shutdown. Taking the day off is strongly encouraged if your role allows it. If you are on call or need to work during the scheduled Friends and Family Day, please select another day that works best for your schedule.
 
-### Upcoming Family and Friends Days
+#### Upcoming Family and Friends Days
 
-* 2021-08-20 - The first Meltano Family & Friends Day!
-* 2021-09-17
 * 2021-10-15
 * 2021-11-24
 
@@ -350,8 +344,8 @@ Meltano team members should mark these days off using PTO by Roots.
 In line with our Paid Time Off policy, we encourage Meltano team members to continue to take additional days off, as needed. 
 Family and Friends Day is a reminder to do this.
 
-# Business operations
+## Business operations
 
-## Calendar quarters
+### Calendar quarters
 
 Use calendar quarters (e.g. 2021-Q4) rather than fiscal quarters (e.g. FY22-Q4) when discussing time. 
