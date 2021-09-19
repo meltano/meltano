@@ -257,78 +257,7 @@ We recommend every team member takes a minimum 30 days off a year, and we have r
 * Minimum 15 days for victims of domestic violence
 * Minimum 15 days for burnout
 
-To log time off, team members should use [PTO by Roots](/handbook/tech-stack/#pto-by-roots).
-
-#### PTO by Roots
-
-[PTO by Roots](https://treehoppr.com/pto-ninja) allows employees and managers to coordinate time off seamlessly with intuitive Slack commands. PTO by Roots also reminds employees of their upcoming time off and helps them assign roles and tasks for co-workers, giving all parties involved greater alignment and peace of mind.
-
-[PTO by Roots Training Video](https://vimeo.com/469045356)
-
-Please be aware that new team members' PTO by Roots accounts are activated and synced automatically once a day, so if you try to access PTO by Roots on your first day and receive an error message, please attempt to access PTO by Roots on Day 2. If you still receive an error message, let your assigned People Ops Specialist know in your onboarding issue.
-
-##### Slack Commands
-* `/pto-roots ooo` Create an OOO event.
-* `/pto-roots whosout` See upcoming OOO for everyone in the channel where this command is used.
-* `/pto-roots @username`  Check if a particular person is OOO and if they are, see which of your co-workers are covering for them.
-* `/pto-roots @usergroup` See upcoming OOO for everyone on the particular user group.
-* `/pto-roots feedback` This is your direct line to support. At any time, use this command to report bugs or share your thoughts on how the product can be improved or what’s working well.
-* `/pto-roots help` A top-level look at PTO by Roots items that you may need help with, and how to receive help.
-
-##### Home Tab
-
-You can find the Home Tab by visiting `Apps` in the menu bar within Slack, and search for or select PTO by Roots.  From the Home Tab you  can do the follwoing.
-
-* View your OOO dashboard to edit, add or remove OOO events. 
-* Modify your profile and calendar settings. 
-* Opt-in and out-put for reminders, including monthly messages prompting you to consider what PTO you may take this month.
-
-##### Additional Features
-
-###### Google Calendar Sync
-
-PTO by Roots allows you to sync time off requests with your Google Calendar.
-
-###### Automatic Status + Do Not Disturb Updates
-
-PTO by Roots can automatically set your OOO status in Slack and apply “Do Not Disturb” settings while you’re away. You must add these permissions individually.
-
-###### Roles and task handoffs
-
-PTO by Roots provides an experience that allows you to set roles and tasks for co-workers while
-you’re away. Accepted roles then become a part of a Slack away message that appears as
-co-workers try to tag you in discussions while you’re OOO.
-
-Before assigning a `#channel` to a role, please ask for permission to do so in that channel.
-Especially in large channels and during popular vacation times, PTO's role reminders could create a lot of noise, so some teams may recommend against them until there is an option to allow turning off the PTO notifications.
-
-###### Bulk add holidays
-
-You can bulk add holidays based on your region and then modify them manually if needed. Any Public Holidays added to PTO by Roots in your dashboard will not auto-set an OOO event for you, you will still need to create an OOO event if observing that holiday. To add a Public Holiday, follow the below instructions.
-
-* Visit `Apps` in the menu bar within Slack, and search for or select PTO by Roots
-* Choose `Holidays` from the dropdown menu
-* Choose the desired year
-* Click on `Bulk Add By Region`
-
-###### Monthly reminder to consider taking PTO
-
-We get it — life gets busy. So busy, in fact, that you may need a little nudge to consider taking time off to recharge. PTO by Roots allows you to subscribe (and unsubscribe) to a monthly prompt, sent on the first *working* day of each month, reminding you to pause and think about time away from work and prioritizing mental health.
-
-To subscribe or unsubscribe, follow the below instructions:
-
-* Visit `Apps` in the menu bar within Slack, and search for or select PTO by Roots
-* Select `Profile` from the dropdown
-* Beneath your name and profile, you'll see a line that says "Send me a monthly reminder about taking time off." Click the **Subscribe** button to trigger the notification, which will begin on the first *working* day (e.g. not a weekend or a public holiday) in the month following your subscription.
-* To unsubscribe, revisit PTO by Roots within Slack Apps and click the button that says **Unsubscribe**.
-
-###### Checking "Who's Out?"
-
-In order to see who is out of your team, follow the steps below:
-
-* Go to the PTO by Roots application in Slack
-* In the `Home` section, select `Who's Out?` from the dropdown list
-* Click `new search` to view who is out by `#channel`, `@usergroup`, or `@username`
+To log time off, team members should use [PTO by Roots](/handbook/tech-stack/#pto-by-roots) in Slack (under Apps).
 
 ### Visiting grant
 
@@ -340,7 +269,7 @@ Please note: The visiting grant applies to transportation costs and not other ex
 
 To claim the grant, include a line item on your expense report or invoice along with the receipt of your flights, trains, and/or transportation to/from the airport with a list of the team members you visited. The expense report may be submitted during the first month of travel or up to 3 months after your trip has concluded. That said, if it's more frugal to book and expense your travel further in advance, please do so.
 
-The visiting grant is inspired by Douwe's trip around the world during his time at GitLab. Douwe met [49 colleagues in 20 cities, in 14 countries, on five continents, in 6 months](/blog/2017/01/31/around-the-world-in-6-releases/). 
+The visiting grant is inspired by Douwe's trip around the world during his time at GitLab. Douwe met [49 colleagues in 20 cities, in 14 countries, on five continents, in 6 months](https://about.gitlab.com/blog/2017/01/31/around-the-world-in-6-releases/). 
 
 #### Significant life event grant
 
