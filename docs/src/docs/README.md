@@ -237,7 +237,7 @@ We will also add Dagster as a supported orchestrator out-of-the-box.
 
 #### 2021-Q4
 
-Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentailly start offering a SaaS deployment of Meltano.
+Our focus for Q4 will be on creating a compelling monitoring, observability, and data lineage featureset. We also aim to improve our integration with git providers, begin the conversion of MeltanoHub to a dynamic site, improve the UI of Meltano, and potentially start offering a SaaS deployment of Meltano.
 
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 * [Prefect](https://gitlab.com/meltano/meltano/-/issues/2668)
@@ -307,14 +307,14 @@ Every change should be towards making "the thing" a little bit better than the o
 ### Accountability
 
 We have a responsibility to ourselves, our teammates, and our community to do our best.
-We hold ourselves and each other to high standards, and we're responsibile for our work, words, and actions. 
+We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions. 
 We're accountable for our mistakes, but we blamelessly recognize them and move forward together. 
 
 ### Transparency
 
 Transparency cultivates honesty which, in turn, builds trust. 
 Without trust, it's impossible to live our other values.
-In practice, transparency can be seen in how we discuss decisions, document our work, and ecourage everyone to share their thoughts and provide feedback. 
+In practice, transparency can be seen in how we discuss decisions, document our work, and encourage everyone to share their thoughts and provide feedback. 
 We work transparently, because we're passionate about involving our community in everything we're doing. 
 We strive to provide users with the same level of insight as our team members so that they're able to have full visibility in our work and contribute their perspectives, since anything we build will be better if we collaborate with the people who will use it.
 
@@ -322,6 +322,7 @@ We strive to provide users with the same level of insight as our team members so
 
 We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community. 
 We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
+In practice, we ship minimum viable changes, and we continually seek to improve ourselves. 
 
 ## Careers <a name="job-openings" />
 
