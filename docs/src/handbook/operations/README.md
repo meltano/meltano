@@ -51,7 +51,7 @@ Asynchronous communication demonstrates consideration for team members across ti
 1. **Express Your Thoughts.** We live in different locations and often have very different perspectives. We want to know your thoughts, opinions, and feelings on things.
 1. **Own It.** If you say it or type it, own it. If it hurts the company or an individual, even unintentionally, we encourage you to look at things from other points of view and apologize easily.
 1. **Be a Role Model of our values.**
-1. **Feedback is Essential.** It is difficult to know what is appropriate in every one of our team members 60+ countries. We encourage team members to give feedback and receive feedback in a considerate way.
+1. **Feedback is Essential.** It is difficult to know what is appropriate in every one of our team members' countries. We encourage team members to give feedback and receive feedback in a considerate way.
 1. **Don't Underestimate a 1:1.** Asynchronous communication (e.g., via text) is helpful and necessary. In some cases (e.g., to clarify misunderstandings) it can be much more effective to jump on a Zoom video call.
 1. **Always Adhere to our Anti-Harassment Policy and Code of Conduct.**
 1. **Everyone should be comfortable in their work environment.**
