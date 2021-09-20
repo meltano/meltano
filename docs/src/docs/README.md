@@ -230,7 +230,7 @@ For the Singer ecosystem, we will finalize the work needed to make Meltano rely 
 * Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
 * Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725)
 * MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
-* Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2927)
+* Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/124) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2927)
 * Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
 #### 2021-Q4
@@ -241,7 +241,7 @@ We're also building the future of Meltano as a DataOps platform by adding native
 Underpinning all of this will be a focus on improving the developer experience by enhancing our documentation.
 
 * Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
-* Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/79)
+* Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/124)
 * Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
 * Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
 * Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
