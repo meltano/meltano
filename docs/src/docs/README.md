@@ -233,8 +233,6 @@ For the Singer ecosystem, we will finalize the work needed to make Meltano rely 
 * Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/79) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2927)
 * Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
-### October 2021
-
 #### 2021-Q4
 
 For the rest of the year, we have several key outcomes we're looking to achieve.
