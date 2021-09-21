@@ -16,6 +16,8 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 [`meltano config meltano set <setting> <value>`](/docs/command-line-interface.html#config), which is used in the examples below, will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
+If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
+
 ## Plugin settings
 
 For plugin settings, refer to the specific plugin's documentation

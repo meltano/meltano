@@ -14,7 +14,7 @@ Meltano and [Singer](https://www.singer.io/) are [popular with data consultants]
 If you lack the time and/or expertise to do so yourself, they can help you
 [set up](/docs/getting-started.html) your pipelines, deploy them to [production](/docs/production.html),
 [improve](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin) existing Singer taps and targets to fit your use case,
-and [build new ones](/tutorials/create-a-custom-extractor.html) for any [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targest)
+and [build new ones](/tutorials/create-a-custom-extractor.html) for any [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targets)
 that are not supported yet.
 
 | Consultancy | Locations |
@@ -24,10 +24,12 @@ that are not supported yet.
 | [Applied Labs](https://appliedlabs.io/) | United States: New York; Russia: Moscow; United Kingdom: London; Uzbekistan: Tashkent |
 | [Auto IDM](https://autoidm.com/) | United States: Michigan |
 | [b.telligent](https://www.btelligent.com/) | Germany: Berlin, Düsseldorf, Frankfurt, Hamburg, Hannover |
+| [Brooklyn Data Co.](https://www.brooklyndata.co/) | United States, South America, Europe, Africa |
 | [Bytecode IO](https://bytecode.io/) | United States: Walnut Creek, CA |
 | [Commencis](https://www.commencis.com/) | Turkey: Istanbul; United Kingdom: London |
 | [Datateer](https://www.datateer.com/) | United States: Denver, CO |
 | [Mashey](https://www.mashey.com/) | United States: Denver, CO |
+| [Mighty Digital](https://www.mighty.digital/) | Ukraine: Kyiv |
 | [Ryan-Miranda](https://www.ryan-miranda.com/) | United States: Pasadena, CA; Boston, MA |
 | [Scalefree](https://www.scalefree.com) | Germany: Hanover |
 | [Slalom](https://www.slalom.com/) | United States: [various](https://www.slalom.com/locations); Canada: Montréal, Toronto, Vancouver; United Kingdom: London, Manchester; Australia: Melbourne, Sydney; Japan: Tokyo |
@@ -43,7 +45,7 @@ If you have experience with Meltano and Singer, you can add your company to this
 ## Data products
 
 Meltano is a great fit for data products that want to let their users directly connect their own sources to the platform,
-since connectors for many [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targest) are already available,
+since connectors for many [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targets) are already available,
 new connectors can be created easily, and connectors and pipelines can be configured programmatically.
 
 These are some of the tools powered by Meltano:

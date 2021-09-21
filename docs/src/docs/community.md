@@ -10,7 +10,9 @@ We aim to build Meltano with the support of the community and we want everyone t
 
 ### Code of Conduct
 
-Everyone interacting in dbt Slack, codebase, issue trackers, and mailing lists are expected to follow the [PyPA Code of Conduct][conduct]. If you are unable to abide by the code of conduct set forth here, we encourage you not to participate in the community.
+Everyone interacting in Slack, codebases, issue trackers, mailing lists, events, or other Meltano activities is expected to follow [this code of conduct][psfconduct]. If you are unable to abide by the code of conduct set forth here, we encourage you not to participate in the community. If you see a violation please notify us by messaging `@Amanda Folson` on Slack.
+
+**Note:** We previously adopted the [PyPA Code of Conduct][conduct] but as of [PEP 609][pep609] PyPA uses the [PSF Code of Conduct][psfconduct].
 
 ### Contributor Guide
 
@@ -20,15 +22,7 @@ We welcome contributions to the project! Please review our [Contributor Guide](/
 
 We have Demo Days every other week on Friday at 9 AM Pacific (16:00 UTC). Join us on Zoom to share and hear updates from community members and the Meltano team about how they've been using Meltano. We also have the #demo-day Slack channel for planning and discussion.
 
-Our next demo days are:
-
-* 2021-06-04
-* 2021-06-18
-* 2021-07-02
-* 2021-07-16
-* 2021-07-30
-
-Use [this link][gcal] to view the full events calendar. View past office hours in our [YouTube Playlist][demodayplaylist].
+Use [this link][gcal] to view the full events calendar. View past Demo Days in our [YouTube Playlist][demodayplaylist].
 
 ### Guidelines
 
@@ -51,6 +45,8 @@ View past office hours in our [YouTube Playlist][officehoursplaylist].
 Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 1000 community members. You can ask any questions you may have in here, or just chat with fellow users.
 
 [conduct]: https://www.pypa.io/en/latest/code-of-conduct/
+[pep609]: https://www.python.org/dev/peps/pep-0609/
+[psfconduct]: https://www.python.org/psf/conduct/
 [officehoursplaylist]: https://www.youtube.com/playlist?list=PLO0YrxtDbWAtuuubcEz7mnCHoGfIf8voT
 [demodayplaylist]: https://www.youtube.com/playlist?list=PLO0YrxtDbWAuLRElrtwFI5PwlAEMUi0AD
 [gcal]: https://calendar.google.com/calendar/embed?src=c_01cj48ha4h199ctjefi85t9dgc%40group.calendar.google.com
