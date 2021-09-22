@@ -1,13 +1,20 @@
 import logging
 import sys
+from typing import Tuple
 
 import click
 from meltano.core.db import project_engine
-from meltano.core.error import SubprocessError
+from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import UnknownCommandError, invoker_factory
+from meltano.core.plugin_invoker import (
+    PluginInvoker,
+    UnknownCommandError,
+    invoker_factory,
+)
+from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import run_async
 
 from . import cli
 from .params import pass_project
@@ -35,7 +42,14 @@ logger = logging.getLogger(__name__)
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @pass_project(migrate=True)
-def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
+def invoke(
+    project: Project,
+    plugin_type: str,
+    dump: str,
+    list_commands: bool,
+    plugin_name: str,
+    plugin_args: Tuple[str, ...],
+):
     """Invoke the plugin's executable with specified arguments."""
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -55,21 +69,30 @@ def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
         do_list_commands(plugin)
         return
 
+    invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
+    exit_code = run_async(
+        _invoke(invoker, project, plugin_name, plugin_args, session, dump, command_name)
+    )
+    sys.exit(exit_code)
+
+
+async def _invoke(
+    invoker, project, plugin_name, plugin_args, session, dump, command_name
+):
     try:
-        invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             if dump:
-                dump_file(invoker, dump)
+                await dump_file(invoker, dump)
                 exit_code = 0
             else:
-                handle = invoker.invoke(*plugin_args, command=command_name)
+                handle = await invoker.invoke_async(*plugin_args, command=command_name)
                 with propagate_stop_signals(handle):
-                    exit_code = handle.wait()
+                    exit_code = await handle.wait()
 
     except UnknownCommandError as err:
         raise click.BadArgumentUsage(err) from err
-    except SubprocessError as err:
-        logger.error(err.stderr)
+    except AsyncSubprocessError as err:
+        logger.error(await err.stderr)
         raise
     finally:
         session.close()
@@ -79,7 +102,7 @@ def invoke(project, plugin_type, dump, list_commands, plugin_name, plugin_args):
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )
 
-    sys.exit(exit_code)
+    return exit_code
 
 
 def do_list_commands(plugin):
@@ -100,9 +123,10 @@ def do_list_commands(plugin):
         click.echo(desc)
 
 
-def dump_file(invoker, file_id):
+async def dump_file(invoker: PluginInvoker, file_id: str):
+    """Dump file."""
     try:
-        content = invoker.dump(file_id)
+        content = await invoker.dump(file_id)
         print(content)
     except FileNotFoundError as err:
         raise CliError(f"Could not find {file_id}") from err

@@ -213,12 +213,13 @@ class DashboardPlugin(BasePlugin):
     __plugin_type__ = PluginType.DASHBOARDS
 
     @hook("after_install")
-    def after_install(
+    async def after_install(
         self,
         installer: PluginInstallService,
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
     ):
+        """Trigger after install tasks like importing records."""
         project = installer.project
 
         if reason in (PluginInstallReason.ADD, PluginInstallReason.UPGRADE):

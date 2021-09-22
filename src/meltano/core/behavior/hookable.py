@@ -1,8 +1,13 @@
-import contextlib
-import io
+"""
+Hookable class and supporting functions, classes, and decorators.
+
+This module contains the Hookable class which allows for implementation of a classic before/after hook pattern. Allowing
+you to register functions to be called before or after given trigger.
+"""
 import logging
 from collections import OrderedDict
-from typing import Iterator, Tuple
+
+from async_generator import asynccontextmanager
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +62,20 @@ class HookObject(metaclass=Hookable):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @contextlib.contextmanager
-    def trigger_hooks(self, hook_name, *args, **kwargs):
+    @asynccontextmanager
+    async def trigger_hooks(self, hook_name, *args, **kwargs):
+        """
+        Trigger all registered before and after functions for a given hook - yielding to the caller in between.
+
+        Args:
+            hook_name: The hook who's registered functions that should be triggered
+
+        Yields: None
+
+        Examples:
+            async with self.obj.trigger_hooks("cleanup", self):
+                doStuff()
+        """
         try:
             already_triggering = hook_name in self._triggering_hooks
         except AttributeError:
@@ -67,16 +84,17 @@ class HookObject(metaclass=Hookable):
 
         if not already_triggering:
             self._triggering_hooks.add(hook_name)
-            self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
+            await self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
 
         yield
 
         if not already_triggering:
-            self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
+            await self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
             self._triggering_hooks.remove(hook_name)
 
     @classmethod
-    def trigger(cls, target, hook_name, *args, **kwargs):
+    async def trigger(cls, target, hook_name, *args, **kwargs):
+        """Trigger a registered hook function."""
         hooks = [
             hook
             for hook_cls in reversed(cls.__mro__)
@@ -86,7 +104,7 @@ class HookObject(metaclass=Hookable):
 
         for hook_func in hooks:
             try:
-                hook_func(target, *args, **kwargs)
+                await hook_func(target, *args, **kwargs)
             except Exception as err:
                 if hook_func.__hook__.can_fail:
                     logger.debug(str(err), exc_info=True)

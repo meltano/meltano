@@ -98,6 +98,8 @@ When no explicit `--store` is specified, `meltano config <plugin> set` will auto
 - [`.env`](/docs/project.html#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
 - [`meltano.yml`](/docs/project.html#meltano-yml-project-file) otherwise.
 
+If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/docs/command-line-interface.html#config).
+
 ### How to use
 
 To manage the configuration of Meltano itself, specify `meltano` as the plugin name.
@@ -138,6 +140,9 @@ meltano config <plugin> reset
 meltano config <plugin> set --store=meltano_yml <name> <value> # set in `meltano.yml`
 meltano config <plugin> unset --store=dotenv <name> # unset in `.env`
 meltano config <plugin> reset --store=db # reset in system database
+
+# Test the plugin's current configuration, if supported.
+meltano config <plugin> test
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
@@ -410,6 +415,8 @@ Additionally, plugin names can be provided to only (re)install those specific pl
 
 Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
 
+Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
 
 ::: tip
@@ -449,6 +456,7 @@ meltano install models
 meltano install --include-related
 
 meltano install --parallelism=16
+meltano install --clean
 ```
 
 ## `invoke`

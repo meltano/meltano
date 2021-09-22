@@ -1,3 +1,8 @@
+---
+title: "Content Marketing"
+sidebarDepth: 2
+---
+
 # Content Marketing
 
 ## Tools
@@ -35,6 +40,8 @@ coming soon
 * **What content performs well**
   * photos and text, suggest using tags (to expand reach) and hashtags, around 3 is optimal (use keywords you want to be associated with)
   * Provide a call to action
+
+**Note:** LinkedIn's API requires apps and integrations to re-authorize every 60 days. Sprout Social will ask us to re-authorize the LinkedIn connection before it expires. Check the "Warnings" tab on the right side menu to re-authorize.
 
 #### Facebook <a name="facebook"></a>
 * **What do we use it for?**

@@ -14,8 +14,59 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2881](https://gitlab.com/meltano/meltano/-/issues/2881) Send CLI error messages to `stderr`.
+
 ### Breaks
 
+
+## 1.81.0 - (2021-09-16)
+---
+
+### New
+
+- [#2609](https://gitlab.com/meltano/meltano/-/issues/2609) Add `meltano config <plugin> test` command to test an extractor plugin's configuration. _Thanks, **[ReubenFrankel](https://gitlab.com/ReubenFrankel)**!_
+
+### Changes
+
+- [#2930](https://gitlab.com/meltano/meltano/-/issues/2930) Update sqlfluff configuration to support DBT. _Thanks, **[Charles Julian Knight](https://gitlab.com/rabidaudio)**!_
+- [#2681](https://gitlab.com/meltano/meltano/-/issues/2681) Now includes discovery log output when running `meltano elt` with `--log-level=debug`
+
+### Fixes
+
+- [#2866](https://gitlab.com/meltano/meltano/-/issues/2866) Avoid running discovery when invoking a tap in a mode other than sync
+
+
+## 1.80.1 - (2021-09-10)
+---
+
+### Fixes
+
+- [#2928](https://gitlab.com/meltano/meltano/-/issues/2928) Fix tap discovery failure when tap produces IO on stderr
+
+
+## 1.80.0 - (2021-09-09)
+---
+
+### New
+
+- [#2906](https://gitlab.com/meltano/meltano/-/issues/2906) Increase speed of `meltano install` for already installed plugins
+* [#2906](https://gitlab.com/meltano/meltano/-/issues/2906) Increase speed of `meltano install` for already installed plugins
+
+### Changes
+
+- [#2897](https://gitlab.com/meltano/meltano/-/issues/2897) Refactor to move to asynchronous plugin executions and invocations
+
+### Fixes
+
+- [#2573](https://gitlab.com/meltano/meltano/-/issues/2573) Fix misleading error about missing `airflow.cfg` instead of missing Airflow executable
+
+
+## 1.79.2 - (2021-09-07)
+---
+
+### Fixes
+
+- [#2922](https://gitlab.com/meltano/meltano/-/issues/2922) Fix error during installation of some plugins caused by a `setuptools` release. _Thanks, **[Maarten van Gijssel](https://gitlab.com/mvgijssel)**!_
 
 ## 1.79.1 - (2021-08-17)
 ---

@@ -1,13 +1,13 @@
+import asyncio
 import json
-from contextlib import contextmanager
-from unittest.mock import Mock, patch
 
 import pytest
-import yaml
+from asynctest import CoroutineMock, Mock, patch
+from click.testing import CliRunner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -20,14 +20,12 @@ def project_tap_mock(project_add_service):
 @pytest.mark.usefixtures("project_tap_mock")
 class TestCliInvoke:
     @pytest.fixture
-    def process_mock(self):
+    def mock_invoke(self, utility, plugin_invoker_factory):
+
         process_mock = Mock()
-        process_mock.wait.return_value = 0
+        process_mock.name = "utility-mock"
+        process_mock.wait = CoroutineMock(return_value=0)
 
-        return process_mock
-
-    @pytest.fixture
-    def mock_invoke(self, process_mock, utility, plugin_invoker_factory):
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
         ), patch(
@@ -35,10 +33,12 @@ class TestCliInvoke:
             return_value=plugin_invoker_factory,
         ), patch.object(
             ProjectPluginsService, "find_plugin", return_value=utility
-        ), patch(
-            "subprocess.Popen", return_value=process_mock
-        ) as invoke:
-            yield invoke
+        ), patch.object(
+            asyncio,
+            "create_subprocess_exec",
+            return_value=process_mock,
+        ) as invoke_async:
+            yield invoke_async
 
     def test_invoke(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(cli, ["invoke", "utility-mock"])
@@ -46,7 +46,6 @@ class TestCliInvoke:
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
         args, kwargs = mock_invoke.call_args
-        args = args[0]
         assert args[0].endswith("utility-mock")
         assert isinstance(kwargs, dict)
 
@@ -55,7 +54,7 @@ class TestCliInvoke:
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
-        args = mock_invoke.call_args[0][0]
+        args = mock_invoke.call_args[0]
         assert args[0].endswith("utility-mock")
         assert args[1] == "--help"
 
@@ -67,9 +66,9 @@ class TestCliInvoke:
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
 
-        args = mock_invoke.call_args[0][0]
+        args = mock_invoke.call_args[0]
         assert args[0].endswith("utility-mock")
-        assert args[1:] == ["--option", "arg"]
+        assert args[1:] == ("--option", "arg")
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
@@ -79,34 +78,74 @@ class TestCliInvoke:
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
         mock_invoke.assert_called_once()
 
-        args = mock_invoke.call_args[0][0]
+        args = mock_invoke.call_args[0]
         assert args[0].endswith("utility-mock")
-        assert args[1:] == ["--option", "arg", "--verbose"]
+        assert args[1:] == ("--option", "arg", "--verbose")
 
     def test_invoke_exit_code(
-        self, cli_runner, tap, process_mock, project_plugins_service
+        self, cli_runner, tap, project_plugins_service, plugin_invoker_factory, utility
     ):
-        process_mock.wait.return_value = 2
+        process_mock = Mock()
+        process_mock.name = "utility-mock"
+        process_mock.wait = CoroutineMock(return_value=2)
 
-        invoker_mock = Mock()
-        invoker_mock.invoke.return_value = process_mock
+        with patch.object(
+            GoogleAnalyticsTracker, "track_data", return_value=None
+        ), patch(
+            "meltano.core.plugin_invoker.invoker_factory",
+            return_value=plugin_invoker_factory,
+        ), patch.object(
+            ProjectPluginsService, "find_plugin", return_value=utility
+        ), patch.object(
+            asyncio,
+            "create_subprocess_exec",
+            return_value=process_mock,
+        ):
+            basic = cli_runner.invoke(cli, ["invoke", tap.name])
+            assert basic.exit_code == 2
 
-        @contextmanager
-        def prepared(session):
-            yield
-
-        invoker_mock.prepared = prepared
-
+    def test_invoke_triggers(
+        self,
+        cli_runner: CliRunner,
+        project_plugins_service: ProjectPluginsService,
+        tap: ProjectPlugin,
+    ):
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
         ), patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
-        ), patch(
-            "meltano.cli.invoke.invoker_factory", return_value=invoker_mock
-        ):
-            basic = cli_runner.invoke(cli, ["invoke", tap.name])
-            assert basic.exit_code == 2
+        ), patch.object(
+            SingerTap, "discover_catalog"
+        ) as discover_catalog, patch.object(
+            SingerTap, "apply_catalog_rules"
+        ) as apply_catalog_rules, patch.object(
+            SingerTap, "look_up_state"
+        ) as look_up_state:
+
+            # Modes other than sync don't trigger discovery or applying catalog rules
+            cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
+            assert discover_catalog.call_count == 0
+            assert apply_catalog_rules.call_count == 0
+            assert look_up_state.call_count == 0
+
+            # Dumping config doesn't trigger discovery or applying catalog rules
+            cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
+            assert discover_catalog.call_count == 0
+            assert apply_catalog_rules.call_count == 0
+            assert look_up_state.call_count == 0
+
+            # Sync mode triggers discovery and applying catalog rules
+            cli_runner.invoke(cli, ["invoke", tap.name])
+            assert discover_catalog.call_count == 1
+            assert apply_catalog_rules.call_count == 1
+            assert look_up_state.call_count == 1
+
+            # Dumping catalog triggers discovery and applying catalog rules
+            cli_runner.invoke(cli, ["invoke", "--dump", "catalog", tap.name])
+            assert discover_catalog.call_count == 2
+            assert apply_catalog_rules.call_count == 2
+            assert look_up_state.call_count == 2
 
     def test_invoke_dump_config(
         self, cli_runner, tap, project_plugins_service, plugin_settings_service_factory

@@ -104,7 +104,7 @@ Main account details are in the `Executive` 1Password vault.
 
 Manage job applicants, our job board, and our hiring process.
 
-Select team members have their own account.
+Every team member has their own account.
 
 ## [Instagram](https://www.instagram.com/)
 
@@ -152,9 +152,9 @@ Account details are in the `Engineering` 1Password vault.
 
 ## [PTO by Roots](https://meltano.slack.com/apps/AELEX1TU3-pto-by-roots)
 
-Time-off tracking via Slack.
+[PTO by Roots](https://www.tryroots.io/pto) allows employees and managers to coordinate time off seamlessly with intuitive Slack commands. PTO by Roots also reminds employees of their upcoming time off and helps them assign roles and tasks for co-workers, giving all parties involved greater alignment and peace of mind. 
 
-Every team member has access through their [Slack](#slack) account.
+Every team member has access through their [Slack](#slack) account (under Apps).
 
 ## [PyPI](https://pypi.org/)
 

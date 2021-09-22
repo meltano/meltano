@@ -90,7 +90,8 @@ class TestSingerRunner:
         target = process_mock_factory(target)
         return target
 
-    def test_prepare_job(
+    @pytest.mark.asyncio
+    async def test_prepare_job(
         self,
         session,
         subject,
@@ -103,13 +104,13 @@ class TestSingerRunner:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
-        with tap_invoker.prepared(session):
+        async with tap_invoker.prepared(session):
             for name in tap.config_files.keys():
                 assert tap_invoker.files[name].exists()
 
         assert not tap_invoker.files["config"].exists()
 
-        with target_invoker.prepared(session):
+        async with target_invoker.prepared(session):
             for name in target.config_files.keys():
                 assert target_invoker.files[name].exists()
 
@@ -130,7 +131,9 @@ class TestSingerRunner:
     ):
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
-        with tap_invoker.prepared(session), target_invoker.prepared(session):
+        async with tap_invoker.prepared(  # noqa: WPS316
+            session
+        ), target_invoker.prepared(session):
             invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
             with mock.patch.object(
                 PluginInvoker, "invoke_async", new=invoke_async

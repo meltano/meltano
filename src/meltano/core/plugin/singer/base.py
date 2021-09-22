@@ -34,7 +34,8 @@ class SingerPlugin(BasePlugin):
         return processed_config
 
     @hook("before_configure")
-    def before_configure(self, invoker, session):
+    async def before_configure(self, invoker, session):
+        """Create configuration file."""
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
             config = invoker.plugin_config_processed
@@ -43,7 +44,8 @@ class SingerPlugin(BasePlugin):
         logging.debug(f"Created configuration at {config_path}")
 
     @hook("before_cleanup")
-    def before_cleanup(self, invoker):
+    async def before_cleanup(self, invoker):
+        """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()
         logging.debug(f"Deleted configuration at {config_path}")

@@ -1,13 +1,9 @@
 import asyncio
 import json
-import logging
-import os
-from functools import partial
-from unittest import mock
 
 import pytest
 from asserts import assert_cli_runner
-from asynctest import CoroutineMock
+from asynctest import CoroutineMock, mock
 from meltano.cli import cli
 from meltano.core.job import Job, State
 from meltano.core.logging.utils import remove_ansi_escape_sequences
@@ -538,6 +534,10 @@ class TestCliEltScratchpadOne:
                 result.stdout,
                 "meltano     | Running extract & load...\n",
                 "meltano     | The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
+            )
+
+            assert_lines(
+                result.stderr,
                 "meltano     | ELT could not be completed: Output line length limit exceeded\n",
             )
 

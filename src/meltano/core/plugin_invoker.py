@@ -1,16 +1,14 @@
 import asyncio
-import copy
 import enum
 import logging
 import os
-import subprocess
-from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
+from async_generator import asynccontextmanager
 from meltano.core.logging.utils import SubprocessOutputWriter
 
-from .error import Error, SubprocessError
+from .error import Error
 from .plugin import PluginRef
 from .plugin.config_service import PluginConfigService
 from .plugin.project_plugin import ProjectPlugin
@@ -133,7 +131,8 @@ class PluginInvoker:
         return frozenset(self.plugin.capabilities)
 
     @property
-    def files(self):
+    def files(self) -> Dict[str, Path]:
+        """Get all config and output files of the plugin."""
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
 
         return {
@@ -141,7 +140,8 @@ class PluginInvoker:
             for _key, filename in plugin_files.items()
         }
 
-    def prepare(self, session):
+    async def prepare(self, session):
+        """Prepare plugin config."""
         self.plugin_config = self.settings_service.as_dict(
             extras=False, session=session
         )
@@ -153,26 +153,28 @@ class PluginInvoker:
         )
         self.plugin_config_env = self.settings_service.as_env(session=session)
 
-        with self.plugin.trigger_hooks("configure", self, session):
+        async with self.plugin.trigger_hooks("configure", self, session):
             self.plugin_config_service.configure()
             self._prepared = True
 
-    def cleanup(self):
+    async def cleanup(self):
+        """Reset the plugin config."""
         self.plugin_config = {}
         self.plugin_config_processed = {}
         self.plugin_config_extras = {}
         self.plugin_config_env = {}
 
-        with self.plugin.trigger_hooks("cleanup", self):
+        async with self.plugin.trigger_hooks("cleanup", self):
             self._prepared = False
 
-    @contextmanager
-    def prepared(self, session):
+    @asynccontextmanager
+    async def prepared(self, session):
+        """Context manager that prepares plugin config , yielding to the caller, and then resetting the config."""
         try:
-            self.prepare(session)
+            await self.prepare(session)
             yield
         finally:
-            self.cleanup()
+            await self.cleanup()
 
     def exec_path(self, executable: Optional[str] = None) -> Union[str, Path]:
         """
@@ -237,16 +239,17 @@ class PluginInvoker:
 
         return env
 
-    def Popen_options(self):
+    def Popen_options(self) -> Dict[str, Any]:  # noqa: N802
+        """Get options for subprocess.Popen."""
         return {}
 
-    @contextmanager
-    def _invoke(
+    @asynccontextmanager
+    async def _invoke(
         self,
-        *args,
-        require_preparation=True,
-        env=None,
-        command=None,
+        *args: str,
+        require_preparation: bool = True,
+        env: Optional[Dict[str, Any]] = None,
+        command: Optional[str] = None,
         **kwargs,
     ):
         env = env or {}
@@ -254,7 +257,7 @@ class PluginInvoker:
         if require_preparation and not self._prepared:
             raise InvokerNotPreparedError()
 
-        with self.plugin.trigger_hooks("invoke", self, args):
+        async with self.plugin.trigger_hooks("invoke", self, args):
             popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
@@ -268,22 +271,26 @@ class PluginInvoker:
                     self.plugin, self.plugin.executable
                 ) from err
 
-    def invoke(self, *args, **kwargs):
-        with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):
-            return subprocess.Popen(popen_args, **popen_options, env=popen_env)
-
     async def invoke_async(self, *args, **kwargs):
-        with self._invoke(*args, **kwargs) as (popen_args, popen_options, popen_env):
+        async with self._invoke(*args, **kwargs) as (
+            popen_args,
+            popen_options,
+            popen_env,
+        ):
             return await asyncio.create_subprocess_exec(
                 *popen_args,
                 **popen_options,
                 env=popen_env,
             )
 
-    def dump(self, file_id):
+    async def dump(self, file_id: str) -> str:
+        """Dump a plugin file by id."""
         try:
-            with self._invoke():
-                return self.files[file_id].read_text()
+            if file_id != "config":
+                async with self._invoke():
+                    return self.files[file_id].read_text()
+
+            return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:
             # Unwrap FileNotFoundError
             raise err.__cause__

@@ -2335,7 +2335,7 @@ transformers:
     namespace: dbt
     docs: https://meltano.com/docs/transforms.html
     repo: https://github.com/fishtown-analytics/dbt
-    pip_url: dbt~=0.20
+    pip_url: dbt==0.20.2
     settings:
       - name: project_dir
         value: $MELTANO_PROJECT_ROOT/transform
@@ -2577,8 +2577,8 @@ files:
 utilities:
   - name: sqlfluff
     namespace: sqlfluff
-    pip_url: sqlfluff
+    pip_url: sqlfluff[dbt]
     commands:
       lint:
-        args: lint transform/models
+        args: lint
         description: Lint SQL in transform models

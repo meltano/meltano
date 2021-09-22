@@ -1,13 +1,14 @@
+import asyncio
 import json
 from contextlib import contextmanager
-from unittest import mock
 
 import pytest
+from asynctest import CoroutineMock, mock
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
-from meltano.core.plugin_invoker import PluginInvoker
 
 
 class TestSingerTap:
@@ -15,9 +16,10 @@ class TestSingerTap:
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
-    def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
+    @pytest.mark.asyncio
+    async def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
         invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
             # when `catalog` has data
@@ -40,15 +42,16 @@ class TestSingerTap:
                 invoker.files["state"],
             ]
 
-    def test_cleanup(self, subject, session, plugin_invoker_factory):
+    @pytest.mark.asyncio
+    async def test_cleanup(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             assert invoker.files["config"].exists()
 
         assert not invoker.files["config"].exists()
 
     @pytest.mark.asyncio
-    async def test_look_up_state(
+    async def test_look_up_state(  # noqa: WPS213, WPS217
         self,
         subject,
         project,
@@ -74,9 +77,9 @@ class TestSingerTap:
             yield new_job
             new_job.save(session)
 
-        def assert_state(state):
-            with invoker.prepared(session):
-                subject.look_up_state(invoker, [])
+        async def assert_state(state):
+            async with invoker.prepared(session):
+                await subject.look_up_state(invoker)
 
             if state:
                 assert invoker.files["state"].exists()
@@ -85,20 +88,20 @@ class TestSingerTap:
                 assert not invoker.files["state"].exists()
 
         # No state by default
-        assert_state(None)
+        await assert_state(None)
 
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
             job.payload_flags = Payload.STATE
 
-        assert_state(None)
+        await assert_state(None)
 
         # Successful jobs without state are not considered
         with create_job() as job:
             job.success()
 
-        assert_state(None)
+        await assert_state(None)
 
         # Successful jobs with incomplete state are considered
         with create_job() as job:
@@ -106,7 +109,7 @@ class TestSingerTap:
             job.payload_flags = Payload.INCOMPLETE_STATE
             job.success()
 
-        assert_state({"incomplete_success": True})
+        await assert_state({"incomplete_success": True})
 
         # Successful jobs with state are considered
         with create_job() as job:
@@ -114,20 +117,20 @@ class TestSingerTap:
             job.payload_flags = Payload.STATE
             job.success()
 
-        assert_state({"success": True})
+        await assert_state({"success": True})
 
         # Running jobs with state are not considered
         with create_job() as job:
             job.payload["singer_state"] = {"success": True}
             job.payload_flags = Payload.STATE
 
-        assert_state({"success": True})
+        await assert_state({"success": True})
 
         # Failed jobs without state are not considered
         with create_job() as job:
             job.fail("Whoops")
 
-        assert_state({"success": True})
+        await assert_state({"success": True})
 
         # Failed jobs with state are considered
         with create_job() as job:
@@ -135,7 +138,7 @@ class TestSingerTap:
             job.payload_flags = Payload.STATE
             job.fail("Whoops")
 
-        assert_state({"failed": True})
+        await assert_state({"failed": True})
 
         # Successful jobs with incomplete state are considered
         with create_job() as job:
@@ -144,7 +147,7 @@ class TestSingerTap:
             job.success()
 
         # Incomplete state is merged into complete state
-        assert_state({"failed": True, "success": True})
+        await assert_state({"failed": True, "success": True})
 
         # Failed jobs with incomplete state are considered
         with create_job() as job:
@@ -153,7 +156,7 @@ class TestSingerTap:
             job.fail("Whoops")
 
         # Incomplete state is merged into complete state
-        assert_state({"failed": True, "success": True, "failed_again": True})
+        await assert_state({"failed": True, "success": True, "failed_again": True})
 
         # Custom state takes precedence
         custom_state_filename = "custom_state.json"
@@ -164,77 +167,66 @@ class TestSingerTap:
             invoker.settings_service.config_override, "_state", custom_state_filename
         )
 
-        assert_state({"custom": True})
+        await assert_state({"custom": True})
 
         # With a full refresh, no state is considered
         elt_context.full_refresh = True
-        assert_state(None)
+        await assert_state(None)
 
-    def test_discover_catalog(self, session, plugin_invoker_factory, subject):
+    @pytest.mark.asyncio
+    async def test_discover_catalog(  # noqa: WPS213
+        self, session, plugin_invoker_factory, subject
+    ):
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
         catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
-        def mock_discovery():
-            catalog_path.open("w").write('{"discovered": true}')
-            return ("", "")
+        def mock_discovery(*args, **kwargs):
+            future = asyncio.Future()
+            future.set_result(catalog_path.open("w").write('{"discovered": true}'))
+            return future
 
-        process_mock = mock.Mock()
-        process_mock.communicate = mock_discovery
-        process_mock.returncode = 0
-
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
+                SingerTap, "run_discovery", side_effect=mock_discovery
+            ) as mocked_run_discovery:
+                await subject.discover_catalog(invoker)
 
-                assert invoke.called_with(["--discover"])
+                assert mocked_run_discovery.called
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert not catalog_cache_key_path.exists()
+                # If there is no cache key, discovery is invoked again
+                mocked_run_discovery.reset_mock()
+                await subject.discover_catalog(invoker)
 
-            # If there is no cache key, discovery is invoked again
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-                assert invoke.called_with(["--discover"])
+                # Apply catalog rules to store the cache key
+                subject.apply_catalog_rules(invoker)
+                assert catalog_cache_key_path.exists()
 
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert not catalog_cache_key_path.exists()
+                # If the cache key hasn't changed, discovery isn't invoked again
+                mocked_run_discovery.reset_mock()
+                await subject.discover_catalog(invoker)
 
-            # Apply catalog rules to store the cache key
-            subject.apply_catalog_rules(invoker, [])
-            assert catalog_cache_key_path.exists()
+                mocked_run_discovery.assert_not_called()
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert catalog_cache_key_path.exists()
 
-            # If the cache key hasn't changed, discovery isn't invoked again
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
+                # If the cache key no longer matches, discovery is invoked again
+                mocked_run_discovery.reset_mock()
+                catalog_cache_key_path.write_text("bogus")
+                await subject.discover_catalog(invoker)
 
-                invoke.assert_not_called()
+                assert mocked_run_discovery.called
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert catalog_cache_key_path.exists()
-
-            # If the cache key no longer matches, discovery is invoked again
-            catalog_cache_key_path.write_text("bogus")
-
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke:
-                subject.discover_catalog(invoker, [])
-
-                assert invoke.called_with(["--discover"])
-
-            assert json.loads(catalog_path.read_text()) == {"discovered": True}
-            assert not catalog_cache_key_path.exists()
-
-    def test_discover_catalog_custom(
+    @pytest.mark.asyncio
+    async def test_discover_catalog_custom(
         self, project, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -249,28 +241,15 @@ class TestSingerTap:
             custom_catalog_filename,
         )
 
-        with invoker.prepared(session):
-            subject.discover_catalog(invoker, [])
+        async with invoker.prepared(session):
+            await subject.discover_catalog(invoker)
 
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
-    def test_discover_catalog_fails(self, session, plugin_invoker_factory, subject):
-        process_mock = mock.Mock()
-        process_mock.communicate.return_value = ("", "")
-        process_mock.returncode = 1  # something went wrong
-
-        invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
-            with mock.patch.object(
-                PluginInvoker, "invoke", return_value=process_mock
-            ) as invoke, pytest.raises(PluginExecutionError, match="returned 1"):
-                subject.discover_catalog(invoker, [])
-
-                assert not invoker.files[
-                    "catalog"
-                ].exists(), "Catalog should not be present."
-
-    def test_apply_select(self, session, plugin_invoker_factory, subject, monkeypatch):
+    @pytest.mark.asyncio
+    async def test_apply_select(  # noqa: WPS213
+        self, session, plugin_invoker_factory, subject, monkeypatch
+    ):
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
@@ -299,7 +278,7 @@ class TestSingerTap:
         ):
             reset_catalog()
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
             # When `select` isn't set in meltano.yml or discovery.yml, select all
@@ -319,7 +298,7 @@ class TestSingerTap:
                 ["UniqueEntitiesName.name"],
             )
             invoker.settings_service._setting_defs = None
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
             # When `select` is set in discovery.yml, use the selection
@@ -337,7 +316,7 @@ class TestSingerTap:
                 invoker.plugin.extras, "select", ["UniqueEntitiesName.code"]
             )
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
             # `select` set in meltano.yml takes precedence over discovery.yml
@@ -348,7 +327,8 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "code"], "selected", True],
             )
 
-    def test_apply_catalog_rules(
+    @pytest.mark.asyncio
+    async def test_apply_catalog_rules(  # noqa: WPS213
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -426,7 +406,7 @@ class TestSingerTap:
             # Pretend `config` is set in meltano.yml
             monkeypatch.setattr(invoker.plugin, "config", config)
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
                 cache_key = invoker.plugin.catalog_cache_key(invoker)
@@ -489,7 +469,7 @@ class TestSingerTap:
             config_override = invoker.settings_service.config_override
             monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
                 cache_key = invoker.plugin.catalog_cache_key(invoker)
@@ -510,7 +490,8 @@ class TestSingerTap:
             assert not catalog_cache_key_path.exists()
             assert cache_key is None
 
-    def test_apply_catalog_rules_select_filter(
+    @pytest.mark.asyncio
+    async def test_apply_catalog_rules_select_filter(  # noqa: WPS217, WPS213
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
@@ -551,13 +532,13 @@ class TestSingerTap:
             ]
         }
 
-        def selected_properties():
+        async def selected_properties():
             catalog_path = invoker.files["catalog"]
 
             with catalog_path.open("w") as catalog_file:
                 json.dump(base_catalog, catalog_file)
 
-            with invoker.prepared(session):
+            async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker, [])
 
             with catalog_path.open() as catalog_file:
@@ -575,7 +556,7 @@ class TestSingerTap:
         )
 
         # `one` is always included because it has `inclusion: automatic`
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "three": {"one", "three"},
             "five": {"one", "two", "three"},
@@ -583,91 +564,93 @@ class TestSingerTap:
 
         # Simple inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["three"])
-        assert selected_properties() == {"three": {"one", "three"}}
+        assert await selected_properties() == {"three": {"one", "three"}}
 
         # Simple exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!three"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "five": {"one", "two", "three"},
         }
 
         # Wildcard inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["t*"])
-        assert selected_properties() == {"three": {"one", "three"}}
+        assert await selected_properties() == {"three": {"one", "three"}}
 
         # Wildcard exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!t*"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "five": {"one", "two", "three"},
         }
 
         # Multiple inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["three", "five"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "three": {"one", "three"},
             "five": {"one", "two", "three"},
         }
 
         # Multiple exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!three", "!five"])
-        assert selected_properties() == {"one": {"one"}}
+        assert await selected_properties() == {"one": {"one"}}
 
         # Multiple wildcard inclusion
         monkeypatch.setitem(config_override, "_select_filter", ["t*", "f*"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "three": {"one", "three"},
             "five": {"one", "two", "three"},
         }
 
         # Multiple wildcard exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["!t*", "!f*"])
-        assert selected_properties() == {"one": {"one"}}
+        assert await selected_properties() == {"one": {"one"}}
 
         # Mixed inclusion and exclusion
         monkeypatch.setitem(config_override, "_select_filter", ["*e", "!*ee"])
-        assert selected_properties() == {
+        assert await selected_properties() == {
             "one": {"one"},
             "five": {"one", "two", "three"},
         }
 
-    def test_apply_catalog_rules_invalid(
+    @pytest.mark.asyncio
+    async def test_apply_catalog_rules_invalid(
         self, session, plugin_invoker_factory, subject
     ):
         invoker = plugin_invoker_factory(subject)
-        with invoker.prepared(session):
+        async with invoker.prepared(session):
             invoker.files["catalog"].open("w").write("this is invalid json")
 
             with pytest.raises(PluginExecutionError, match=r"invalid"):
                 subject.apply_catalog_rules(invoker, [])
 
-    def test_catalog_cache_key(
+    @pytest.mark.asyncio
+    async def test_catalog_cache_key(  # noqa: WPS217
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
         invoker = plugin_invoker_factory(subject)
         config_override = invoker.settings_service.config_override
 
-        def cache_key():
-            with invoker.prepared(session):
+        async def cache_key():
+            async with invoker.prepared(session):
                 return subject.catalog_cache_key(invoker)
 
         # No key if _catalog is set
         monkeypatch.setitem(config_override, "_catalog", "catalog.json")
-        assert cache_key() is None
+        assert await cache_key() is None
 
         # Key is set if _catalog is not set
         monkeypatch.setitem(config_override, "_catalog", None)
-        key = cache_key()
+        key = await cache_key()
         assert key is not None
 
         # Key doesn't change if nothing has changed
-        assert cache_key() == key
+        assert await cache_key() == key
 
         # Key changes if config changes
         monkeypatch.setitem(config_override, "test", "foo")
 
-        new_key = cache_key()
+        new_key = await cache_key()
         assert new_key != key
         key = new_key
 
@@ -676,7 +659,7 @@ class TestSingerTap:
             config_override, "_schema", {"stream": {"property": {"type": "string"}}}
         )
 
-        new_key = cache_key()
+        new_key = await cache_key()
         assert new_key != key
         key = new_key
 
@@ -687,18 +670,153 @@ class TestSingerTap:
             {"stream": {"property": {"is-replication-key": True}}},
         )
 
-        new_key = cache_key()
+        new_key = await cache_key()
         assert new_key != key
         key = new_key
 
         # Key does not change if _select changes
         monkeypatch.setitem(config_override, "_select", ["stream"])
-        assert cache_key() == key
+        assert await cache_key() == key
 
         # Key does not change if _select_filter changes
         monkeypatch.setitem(config_override, "_select_filter", ["stream"])
-        assert cache_key() == key
+        assert await cache_key() == key
 
         # No key if pip_url is editable
         monkeypatch.setattr(invoker.plugin, "pip_url", "-e local")
-        assert cache_key() is None
+        assert await cache_key() is None
+
+    @pytest.mark.asyncio
+    async def test_run_discovery(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.returncode = 0
+        process_mock.sterr.at_eof.side_effect = (
+            True  # no output so return eof immediately
+        )
+
+        process_mock.stdout.at_eof.side_effect = (
+            False,
+            True,
+        )  # first check needs to be false so loop starts read, after 1 line, we'll return true
+        process_mock.stdout.readline = CoroutineMock(
+            return_value=b'{"discovered": true}\n'
+        )
+
+        invoke_async = CoroutineMock(return_value=process_mock)
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = invoke_async
+        catalog_path = invoker.files["catalog"]
+
+        await subject.run_discovery(invoker, catalog_path)
+        assert invoke_async.called_with(["--discover"])
+
+        with catalog_path.open("r") as catalog_file:
+            resp = json.load(catalog_file)
+            assert resp["discovered"]
+
+    @pytest.mark.asyncio
+    async def test_run_discovery_failure(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        process_mock.wait = CoroutineMock(return_value=1)
+        process_mock.returncode = 1
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stdout.at_eof.side_effect = (True, True)
+        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        catalog_path = invoker.files["catalog"]
+
+        with pytest.raises(PluginExecutionError, match="returned 1"):
+            await subject.run_discovery(invoker, catalog_path)
+
+        assert not catalog_path.exists(), "Catalog should not be present."
+
+    @pytest.mark.asyncio
+    async def test_run_discovery_stderr_output(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        # we need to exit successfully to not trigger error handling
+        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.returncode = 0
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stdout.at_eof.side_effect = (True, True)
+        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        catalog_path = invoker.files["catalog"]
+
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
+        ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
+            await subject.run_discovery(invoker, catalog_path)
+
+            assert stream_mock.call_count == 1
+
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+        ), mock.patch(
+            "meltano.core.plugin.singer.tap._stream_redirect"
+        ) as stream_mock2:
+            await subject.run_discovery(invoker, catalog_path)
+
+            assert stream_mock2.call_count == 2
+            assert stream_mock2.call_args[1]["write_str"] is True
+
+    @pytest.mark.asyncio
+    async def test_run_discovery_handle_io_exceptions(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.returncode = 0
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stdout.at_eof.side_effect = (False, True)
+        process_mock.stdout.readline.side_effect = Exception("mock readline exception")
+
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        catalog_path = invoker.files["catalog"]
+
+        with pytest.raises(Exception, match="mock readline exception"):
+            await subject.run_discovery(invoker, catalog_path)
+
+        assert not catalog_path.exists(), "Catalog should not be present."

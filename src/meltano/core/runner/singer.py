@@ -219,15 +219,16 @@ class SingerRunner(Runner):
         if self.context.dry_run:
             return self.dry_run(tap, target)
 
-        with tap.prepared(self.context.session), target.prepared(self.context.session):
-            await self.invoke(
-                tap,
-                target,
-                extractor_log=extractor_log,
-                loader_log=loader_log,
-                extractor_out=extractor_out,
-                loader_out=loader_out,
-            )
+        async with tap.prepared(self.context.session):
+            async with target.prepared(self.context.session):
+                await self.invoke(
+                    tap,
+                    target,
+                    extractor_log=extractor_log,
+                    loader_log=loader_log,
+                    extractor_out=extractor_out,
+                    loader_out=loader_out,
+                )
 
     def _handle_tap_line_length_limit_error(
         self,

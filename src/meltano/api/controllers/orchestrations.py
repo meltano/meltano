@@ -1,5 +1,6 @@
+# noqa: D100,E800
+
 import asyncio
-import json
 import logging
 import shutil
 
@@ -29,6 +30,7 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.plugin_test_service import PluginTestService
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
@@ -390,41 +392,20 @@ def test_plugin_configuration(plugin_ref) -> Response:
     }
     settings.config_override = PluginSettingsService.unredact(valid_config)
 
-    async def test_stream(tap_stream) -> bool:
-        while not tap_stream.at_eof():
-            message = await tap_stream.readline()
-            json_dict = json.loads(message)
-            if json_dict["type"] == "RECORD":
-                return True
-
-        return False
-
     async def test_extractor():
-        process = None
-        try:
-            invoker = invoker_factory(
-                project,
-                plugin,
-                plugins_service=plugins_service,
-                plugin_settings_service=settings,
-            )
-            with invoker.prepared(db.session):
-                process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
-                return await test_stream(process.stdout)
-        except Exception as err:
-            logging.debug(err)
-            # if anything happens, this is not successful
-            return False
-        finally:
-            try:
-                if process:
-                    psutil.Process(process.pid).terminate()
-            except Exception as err:
-                logging.debug(err)
+        invoker = invoker_factory(
+            project,
+            plugin,
+            plugins_service=plugins_service,
+            plugin_settings_service=settings,
+        )
+        async with invoker.prepared(db.session):
+            plugin_test_service = PluginTestService(invoker)
+            success, _detail = plugin_test_service.validate()
+            return success
 
     loop = asyncio.get_event_loop()
     success = loop.run_until_complete(test_extractor())
-
     return jsonify({"is_success": success}), 200
 
 
