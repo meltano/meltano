@@ -7,267 +7,268 @@ extractors:
     label: Google Ads
     description: Advertising Platform
     namespace: tap_adwords
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/adwords.html'
-    repo: https://gitlab.com/meltano/tap-adwords
-    pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
-    capabilities:
-      - properties
-      - discover
-      - state
-    select:
-      - campaigns.*
-      - ad_groups.*
-      - ads.*
-      - accounts.*
-      - KEYWORDS_PERFORMANCE_REPORT.customerID
-      - KEYWORDS_PERFORMANCE_REPORT.account
-      - KEYWORDS_PERFORMANCE_REPORT.currency
-      - KEYWORDS_PERFORMANCE_REPORT.timeZone
-      - KEYWORDS_PERFORMANCE_REPORT.clientName
-      - KEYWORDS_PERFORMANCE_REPORT.campaign
-      - KEYWORDS_PERFORMANCE_REPORT.campaignID
-      - KEYWORDS_PERFORMANCE_REPORT.campaignState
-      - KEYWORDS_PERFORMANCE_REPORT.adGroup
-      - KEYWORDS_PERFORMANCE_REPORT.adGroupID
-      - KEYWORDS_PERFORMANCE_REPORT.adGroupState
-      - KEYWORDS_PERFORMANCE_REPORT.day
-      - KEYWORDS_PERFORMANCE_REPORT.network
-      - KEYWORDS_PERFORMANCE_REPORT.device
-      - KEYWORDS_PERFORMANCE_REPORT.clicks
-      - KEYWORDS_PERFORMANCE_REPORT.cost
-      - KEYWORDS_PERFORMANCE_REPORT.impressions
-      - KEYWORDS_PERFORMANCE_REPORT.interactions
-      - KEYWORDS_PERFORMANCE_REPORT.engagements
-      - KEYWORDS_PERFORMANCE_REPORT.conversions
-      - KEYWORDS_PERFORMANCE_REPORT.allConv
-      - KEYWORDS_PERFORMANCE_REPORT.views
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImpressions
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImpr
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableCost
-      - KEYWORDS_PERFORMANCE_REPORT.gmailClicksToWebsite
-      - KEYWORDS_PERFORMANCE_REPORT.gmailSaves
-      - KEYWORDS_PERFORMANCE_REPORT.gmailForwards
-      - KEYWORDS_PERFORMANCE_REPORT.keywordID
-      - KEYWORDS_PERFORMANCE_REPORT.keyword
-      - KEYWORDS_PERFORMANCE_REPORT.keywordState
-      - KEYWORDS_PERFORMANCE_REPORT.criterionServingStatus
-      - KEYWORDS_PERFORMANCE_REPORT.destinationURL
-      - KEYWORDS_PERFORMANCE_REPORT.matchType
-      - KEYWORDS_PERFORMANCE_REPORT.topOfPageCPC
-      - KEYWORDS_PERFORMANCE_REPORT.firstPageCPC
-      - KEYWORDS_PERFORMANCE_REPORT.imprAbsTop
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewAvgCPM
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableCTR
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
-      - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
-      - KEYWORDS_PERFORMANCE_REPORT.allConvRate
-      - KEYWORDS_PERFORMANCE_REPORT.allConvValue
-      - KEYWORDS_PERFORMANCE_REPORT.avgCost
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPC
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPE
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPM
-      - KEYWORDS_PERFORMANCE_REPORT.avgCPV
-      - KEYWORDS_PERFORMANCE_REPORT.avgPosition
-      - KEYWORDS_PERFORMANCE_REPORT.convRate
-      - KEYWORDS_PERFORMANCE_REPORT.totalConvValue
-      - KEYWORDS_PERFORMANCE_REPORT.costAllConv
-      - KEYWORDS_PERFORMANCE_REPORT.costConv
-      - KEYWORDS_PERFORMANCE_REPORT.costConvCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.crossDeviceConv
-      - KEYWORDS_PERFORMANCE_REPORT.ctr
-      - KEYWORDS_PERFORMANCE_REPORT.conversionsCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.convValueCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.engagementRate
-      - KEYWORDS_PERFORMANCE_REPORT.interactionRate
-      - KEYWORDS_PERFORMANCE_REPORT.interactionTypes
-      - KEYWORDS_PERFORMANCE_REPORT.imprTop
-      - KEYWORDS_PERFORMANCE_REPORT.valueAllConv
-      - KEYWORDS_PERFORMANCE_REPORT.valueConv
-      - KEYWORDS_PERFORMANCE_REPORT.valueConvCurrentModel
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo100
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo25
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo50
-      - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo75
-      - KEYWORDS_PERFORMANCE_REPORT.viewRate
-      - KEYWORDS_PERFORMANCE_REPORT.viewThroughConv
-      - KEYWORDS_PERFORMANCE_REPORT.searchAbsTopIS
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISBudget
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISBudget
-      - KEYWORDS_PERFORMANCE_REPORT.searchExactMatchIS
-      - KEYWORDS_PERFORMANCE_REPORT.searchImprShare
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISRank
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostISRank
-      - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISRank
-      - KEYWORDS_PERFORMANCE_REPORT.searchTopIS
-      - AD_PERFORMANCE_REPORT.customerID
-      - AD_PERFORMANCE_REPORT.account
-      - AD_PERFORMANCE_REPORT.currency
-      - AD_PERFORMANCE_REPORT.timeZone
-      - AD_PERFORMANCE_REPORT.clientName
-      - AD_PERFORMANCE_REPORT.campaign
-      - AD_PERFORMANCE_REPORT.campaignID
-      - AD_PERFORMANCE_REPORT.campaignState
-      - AD_PERFORMANCE_REPORT.adGroup
-      - AD_PERFORMANCE_REPORT.adGroupID
-      - AD_PERFORMANCE_REPORT.adGroupState
-      - AD_PERFORMANCE_REPORT.day
-      - AD_PERFORMANCE_REPORT.network
-      - AD_PERFORMANCE_REPORT.device
-      - AD_PERFORMANCE_REPORT.clicks
-      - AD_PERFORMANCE_REPORT.cost
-      - AD_PERFORMANCE_REPORT.impressions
-      - AD_PERFORMANCE_REPORT.interactions
-      - AD_PERFORMANCE_REPORT.engagements
-      - AD_PERFORMANCE_REPORT.conversions
-      - AD_PERFORMANCE_REPORT.allConv
-      - AD_PERFORMANCE_REPORT.views
-      - AD_PERFORMANCE_REPORT.activeViewViewableImpressions
-      - AD_PERFORMANCE_REPORT.activeViewMeasurableImpr
-      - AD_PERFORMANCE_REPORT.activeViewMeasurableCost
-      - AD_PERFORMANCE_REPORT.gmailClicksToWebsite
-      - AD_PERFORMANCE_REPORT.gmailSaves
-      - AD_PERFORMANCE_REPORT.gmailForwards
-      - AD_PERFORMANCE_REPORT.adID
-      - AD_PERFORMANCE_REPORT.adState
-      - AD_PERFORMANCE_REPORT.approvalStatus
-      - AD_PERFORMANCE_REPORT.adType
-      - AD_PERFORMANCE_REPORT.adStrength
-      - AD_PERFORMANCE_REPORT.autoAppliedAdSuggestion
-      - AD_PERFORMANCE_REPORT.ad
-      - AD_PERFORMANCE_REPORT.descriptionLine1
-      - AD_PERFORMANCE_REPORT.descriptionLine2
-      - AD_PERFORMANCE_REPORT.finalURL
-      - AD_PERFORMANCE_REPORT.displayURL
-      - AD_PERFORMANCE_REPORT.description
-      - AD_PERFORMANCE_REPORT.headline1
-      - AD_PERFORMANCE_REPORT.headline2
-      - AD_PERFORMANCE_REPORT.path1
-      - AD_PERFORMANCE_REPORT.businessName
-      - AD_PERFORMANCE_REPORT.callToActionTextResponsive
-      - AD_PERFORMANCE_REPORT.shortHeadline
-      - AD_PERFORMANCE_REPORT.longHeadline
-      - AD_PERFORMANCE_REPORT.promotionTextResponsive
-      - AD_PERFORMANCE_REPORT.responsiveSearchAdPath1
-      - AD_PERFORMANCE_REPORT.responsiveSearchAdHeadlines
-      - AD_PERFORMANCE_REPORT.responsiveSearchAdDescriptions
-      - AD_PERFORMANCE_REPORT.gmailAdBusinessName
-      - AD_PERFORMANCE_REPORT.gmailAdHeadline
-      - AD_PERFORMANCE_REPORT.gmailAdDescription
-      - AD_PERFORMANCE_REPORT.imageAdName
-      - AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay
-      - AD_PERFORMANCE_REPORT.imprAbsTop
-      - AD_PERFORMANCE_REPORT.activeViewAvgCPM
-      - AD_PERFORMANCE_REPORT.activeViewViewableCTR
-      - AD_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
-      - AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
-      - AD_PERFORMANCE_REPORT.allConvRate
-      - AD_PERFORMANCE_REPORT.allConvValue
-      - AD_PERFORMANCE_REPORT.avgCost
-      - AD_PERFORMANCE_REPORT.avgCPC
-      - AD_PERFORMANCE_REPORT.avgCPE
-      - AD_PERFORMANCE_REPORT.avgCPM
-      - AD_PERFORMANCE_REPORT.avgCPV
-      - AD_PERFORMANCE_REPORT.avgPosition
-      - AD_PERFORMANCE_REPORT.convRate
-      - AD_PERFORMANCE_REPORT.totalConvValue
-      - AD_PERFORMANCE_REPORT.costAllConv
-      - AD_PERFORMANCE_REPORT.costConv
-      - AD_PERFORMANCE_REPORT.costConvCurrentModel
-      - AD_PERFORMANCE_REPORT.crossDeviceConv
-      - AD_PERFORMANCE_REPORT.ctr
-      - AD_PERFORMANCE_REPORT.conversionsCurrentModel
-      - AD_PERFORMANCE_REPORT.convValueCurrentModel
-      - AD_PERFORMANCE_REPORT.engagementRate
-      - AD_PERFORMANCE_REPORT.interactionRate
-      - AD_PERFORMANCE_REPORT.interactionTypes
-      - AD_PERFORMANCE_REPORT.imprTop
-      - AD_PERFORMANCE_REPORT.valueAllConv
-      - AD_PERFORMANCE_REPORT.valueConv
-      - AD_PERFORMANCE_REPORT.valueConvCurrentModel
-      - AD_PERFORMANCE_REPORT.videoPlayedTo100
-      - AD_PERFORMANCE_REPORT.videoPlayedTo25
-      - AD_PERFORMANCE_REPORT.videoPlayedTo50
-      - AD_PERFORMANCE_REPORT.videoPlayedTo75
-      - AD_PERFORMANCE_REPORT.viewRate
-      - AD_PERFORMANCE_REPORT.viewThroughConv
-    settings_group_validation:
-      - ['developer_token', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'user_agent', 'customer_ids', 'start_date']
-    settings:
-      - name: developer_token
-        env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
-        kind: password
-        label: Developer Token
-        description: Your Developer Token for Google AdWord Application
-        placeholder: Ex. *****************
-      - name: oauth_client_id
-        env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-        kind: password
-        label: OAuth Client ID
-        description: Your Google OAuth Client ID
-        placeholder: Ex. 123456789012345.apps.googleusercontent.com
-      - name: oauth_client_secret
-        env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
-        kind: password
-        label: OAuth Client Secret
-        description: Your Google OAuth Client Secret
-        placeholder: Ex. *****************
-
-      - name: refresh_token
-        kind: oauth
-        oauth:
-          # https://oauth.svc.meltanodata.com/google-adwords/
-          provider: google-adwords
-        label: Access Token
-        description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
-        placeholder: Ex. *****************
-      - name: customer_ids
-        label: Account ID(s)
-        placeholder: Ex. 1234567890,1234567891,1234567892
-        description: A comma-separated list of Ad Account IDs to replicate data from
-
-      - name: start_date
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-      - name: end_date
-        kind: date_iso8601
-        description: Date up to when historical data will be extracted.
-      - name: user_agent
-        value: tap-adwords via Meltano
-        label: User Agent for your OAuth Client
-        placeholder: Ex. tap-adwords via Meltano <user@example.com>
-        description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
-
-      - name: conversion_window_days
-        kind: integer
-        value: 0
-        label: Conversion Window Days
-        description: How many Days before the Start Date to fetch data for Performance Reports
-      - name: primary_keys
-        kind: object
-        value:
-          KEYWORDS_PERFORMANCE_REPORT:
-            - customerID
-            - campaignID
-            - adGroupID
-            - keywordID
-            - day
-            - network
-            - device
-          AD_PERFORMANCE_REPORT:
-            - customerID
-            - campaignID
-            - adGroupID
-            - adID
-            - day
-            - network
-            - device
-        label: Primary Keys
-        description: Primary Keys for the selected Entities (Streams)
+    variants: 
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/adwords.html'
+      repo: https://gitlab.com/meltano/tap-adwords
+      pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
+      capabilities:
+        - properties
+        - discover
+        - state
+      select:
+        - campaigns.*
+        - ad_groups.*
+        - ads.*
+        - accounts.*
+        - KEYWORDS_PERFORMANCE_REPORT.customerID
+        - KEYWORDS_PERFORMANCE_REPORT.account
+        - KEYWORDS_PERFORMANCE_REPORT.currency
+        - KEYWORDS_PERFORMANCE_REPORT.timeZone
+        - KEYWORDS_PERFORMANCE_REPORT.clientName
+        - KEYWORDS_PERFORMANCE_REPORT.campaign
+        - KEYWORDS_PERFORMANCE_REPORT.campaignID
+        - KEYWORDS_PERFORMANCE_REPORT.campaignState
+        - KEYWORDS_PERFORMANCE_REPORT.adGroup
+        - KEYWORDS_PERFORMANCE_REPORT.adGroupID
+        - KEYWORDS_PERFORMANCE_REPORT.adGroupState
+        - KEYWORDS_PERFORMANCE_REPORT.day
+        - KEYWORDS_PERFORMANCE_REPORT.network
+        - KEYWORDS_PERFORMANCE_REPORT.device
+        - KEYWORDS_PERFORMANCE_REPORT.clicks
+        - KEYWORDS_PERFORMANCE_REPORT.cost
+        - KEYWORDS_PERFORMANCE_REPORT.impressions
+        - KEYWORDS_PERFORMANCE_REPORT.interactions
+        - KEYWORDS_PERFORMANCE_REPORT.engagements
+        - KEYWORDS_PERFORMANCE_REPORT.conversions
+        - KEYWORDS_PERFORMANCE_REPORT.allConv
+        - KEYWORDS_PERFORMANCE_REPORT.views
+        - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImpressions
+        - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImpr
+        - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableCost
+        - KEYWORDS_PERFORMANCE_REPORT.gmailClicksToWebsite
+        - KEYWORDS_PERFORMANCE_REPORT.gmailSaves
+        - KEYWORDS_PERFORMANCE_REPORT.gmailForwards
+        - KEYWORDS_PERFORMANCE_REPORT.keywordID
+        - KEYWORDS_PERFORMANCE_REPORT.keyword
+        - KEYWORDS_PERFORMANCE_REPORT.keywordState
+        - KEYWORDS_PERFORMANCE_REPORT.criterionServingStatus
+        - KEYWORDS_PERFORMANCE_REPORT.destinationURL
+        - KEYWORDS_PERFORMANCE_REPORT.matchType
+        - KEYWORDS_PERFORMANCE_REPORT.topOfPageCPC
+        - KEYWORDS_PERFORMANCE_REPORT.firstPageCPC
+        - KEYWORDS_PERFORMANCE_REPORT.imprAbsTop
+        - KEYWORDS_PERFORMANCE_REPORT.activeViewAvgCPM
+        - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableCTR
+        - KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
+        - KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
+        - KEYWORDS_PERFORMANCE_REPORT.allConvRate
+        - KEYWORDS_PERFORMANCE_REPORT.allConvValue
+        - KEYWORDS_PERFORMANCE_REPORT.avgCost
+        - KEYWORDS_PERFORMANCE_REPORT.avgCPC
+        - KEYWORDS_PERFORMANCE_REPORT.avgCPE
+        - KEYWORDS_PERFORMANCE_REPORT.avgCPM
+        - KEYWORDS_PERFORMANCE_REPORT.avgCPV
+        - KEYWORDS_PERFORMANCE_REPORT.avgPosition
+        - KEYWORDS_PERFORMANCE_REPORT.convRate
+        - KEYWORDS_PERFORMANCE_REPORT.totalConvValue
+        - KEYWORDS_PERFORMANCE_REPORT.costAllConv
+        - KEYWORDS_PERFORMANCE_REPORT.costConv
+        - KEYWORDS_PERFORMANCE_REPORT.costConvCurrentModel
+        - KEYWORDS_PERFORMANCE_REPORT.crossDeviceConv
+        - KEYWORDS_PERFORMANCE_REPORT.ctr
+        - KEYWORDS_PERFORMANCE_REPORT.conversionsCurrentModel
+        - KEYWORDS_PERFORMANCE_REPORT.convValueCurrentModel
+        - KEYWORDS_PERFORMANCE_REPORT.engagementRate
+        - KEYWORDS_PERFORMANCE_REPORT.interactionRate
+        - KEYWORDS_PERFORMANCE_REPORT.interactionTypes
+        - KEYWORDS_PERFORMANCE_REPORT.imprTop
+        - KEYWORDS_PERFORMANCE_REPORT.valueAllConv
+        - KEYWORDS_PERFORMANCE_REPORT.valueConv
+        - KEYWORDS_PERFORMANCE_REPORT.valueConvCurrentModel
+        - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo100
+        - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo25
+        - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo50
+        - KEYWORDS_PERFORMANCE_REPORT.videoPlayedTo75
+        - KEYWORDS_PERFORMANCE_REPORT.viewRate
+        - KEYWORDS_PERFORMANCE_REPORT.viewThroughConv
+        - KEYWORDS_PERFORMANCE_REPORT.searchAbsTopIS
+        - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISBudget
+        - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISBudget
+        - KEYWORDS_PERFORMANCE_REPORT.searchExactMatchIS
+        - KEYWORDS_PERFORMANCE_REPORT.searchImprShare
+        - KEYWORDS_PERFORMANCE_REPORT.searchLostAbsTopISRank
+        - KEYWORDS_PERFORMANCE_REPORT.searchLostISRank
+        - KEYWORDS_PERFORMANCE_REPORT.searchLostTopISRank
+        - KEYWORDS_PERFORMANCE_REPORT.searchTopIS
+        - AD_PERFORMANCE_REPORT.customerID
+        - AD_PERFORMANCE_REPORT.account
+        - AD_PERFORMANCE_REPORT.currency
+        - AD_PERFORMANCE_REPORT.timeZone
+        - AD_PERFORMANCE_REPORT.clientName
+        - AD_PERFORMANCE_REPORT.campaign
+        - AD_PERFORMANCE_REPORT.campaignID
+        - AD_PERFORMANCE_REPORT.campaignState
+        - AD_PERFORMANCE_REPORT.adGroup
+        - AD_PERFORMANCE_REPORT.adGroupID
+        - AD_PERFORMANCE_REPORT.adGroupState
+        - AD_PERFORMANCE_REPORT.day
+        - AD_PERFORMANCE_REPORT.network
+        - AD_PERFORMANCE_REPORT.device
+        - AD_PERFORMANCE_REPORT.clicks
+        - AD_PERFORMANCE_REPORT.cost
+        - AD_PERFORMANCE_REPORT.impressions
+        - AD_PERFORMANCE_REPORT.interactions
+        - AD_PERFORMANCE_REPORT.engagements
+        - AD_PERFORMANCE_REPORT.conversions
+        - AD_PERFORMANCE_REPORT.allConv
+        - AD_PERFORMANCE_REPORT.views
+        - AD_PERFORMANCE_REPORT.activeViewViewableImpressions
+        - AD_PERFORMANCE_REPORT.activeViewMeasurableImpr
+        - AD_PERFORMANCE_REPORT.activeViewMeasurableCost
+        - AD_PERFORMANCE_REPORT.gmailClicksToWebsite
+        - AD_PERFORMANCE_REPORT.gmailSaves
+        - AD_PERFORMANCE_REPORT.gmailForwards
+        - AD_PERFORMANCE_REPORT.adID
+        - AD_PERFORMANCE_REPORT.adState
+        - AD_PERFORMANCE_REPORT.approvalStatus
+        - AD_PERFORMANCE_REPORT.adType
+        - AD_PERFORMANCE_REPORT.adStrength
+        - AD_PERFORMANCE_REPORT.autoAppliedAdSuggestion
+        - AD_PERFORMANCE_REPORT.ad
+        - AD_PERFORMANCE_REPORT.descriptionLine1
+        - AD_PERFORMANCE_REPORT.descriptionLine2
+        - AD_PERFORMANCE_REPORT.finalURL
+        - AD_PERFORMANCE_REPORT.displayURL
+        - AD_PERFORMANCE_REPORT.description
+        - AD_PERFORMANCE_REPORT.headline1
+        - AD_PERFORMANCE_REPORT.headline2
+        - AD_PERFORMANCE_REPORT.path1
+        - AD_PERFORMANCE_REPORT.businessName
+        - AD_PERFORMANCE_REPORT.callToActionTextResponsive
+        - AD_PERFORMANCE_REPORT.shortHeadline
+        - AD_PERFORMANCE_REPORT.longHeadline
+        - AD_PERFORMANCE_REPORT.promotionTextResponsive
+        - AD_PERFORMANCE_REPORT.responsiveSearchAdPath1
+        - AD_PERFORMANCE_REPORT.responsiveSearchAdHeadlines
+        - AD_PERFORMANCE_REPORT.responsiveSearchAdDescriptions
+        - AD_PERFORMANCE_REPORT.gmailAdBusinessName
+        - AD_PERFORMANCE_REPORT.gmailAdHeadline
+        - AD_PERFORMANCE_REPORT.gmailAdDescription
+        - AD_PERFORMANCE_REPORT.imageAdName
+        - AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay
+        - AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay
+        - AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay
+        - AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay
+        - AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay
+        - AD_PERFORMANCE_REPORT.imprAbsTop
+        - AD_PERFORMANCE_REPORT.activeViewAvgCPM
+        - AD_PERFORMANCE_REPORT.activeViewViewableCTR
+        - AD_PERFORMANCE_REPORT.activeViewMeasurableImprImpr
+        - AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr
+        - AD_PERFORMANCE_REPORT.allConvRate
+        - AD_PERFORMANCE_REPORT.allConvValue
+        - AD_PERFORMANCE_REPORT.avgCost
+        - AD_PERFORMANCE_REPORT.avgCPC
+        - AD_PERFORMANCE_REPORT.avgCPE
+        - AD_PERFORMANCE_REPORT.avgCPM
+        - AD_PERFORMANCE_REPORT.avgCPV
+        - AD_PERFORMANCE_REPORT.avgPosition
+        - AD_PERFORMANCE_REPORT.convRate
+        - AD_PERFORMANCE_REPORT.totalConvValue
+        - AD_PERFORMANCE_REPORT.costAllConv
+        - AD_PERFORMANCE_REPORT.costConv
+        - AD_PERFORMANCE_REPORT.costConvCurrentModel
+        - AD_PERFORMANCE_REPORT.crossDeviceConv
+        - AD_PERFORMANCE_REPORT.ctr
+        - AD_PERFORMANCE_REPORT.conversionsCurrentModel
+        - AD_PERFORMANCE_REPORT.convValueCurrentModel
+        - AD_PERFORMANCE_REPORT.engagementRate
+        - AD_PERFORMANCE_REPORT.interactionRate
+        - AD_PERFORMANCE_REPORT.interactionTypes
+        - AD_PERFORMANCE_REPORT.imprTop
+        - AD_PERFORMANCE_REPORT.valueAllConv
+        - AD_PERFORMANCE_REPORT.valueConv
+        - AD_PERFORMANCE_REPORT.valueConvCurrentModel
+        - AD_PERFORMANCE_REPORT.videoPlayedTo100
+        - AD_PERFORMANCE_REPORT.videoPlayedTo25
+        - AD_PERFORMANCE_REPORT.videoPlayedTo50
+        - AD_PERFORMANCE_REPORT.videoPlayedTo75
+        - AD_PERFORMANCE_REPORT.viewRate
+        - AD_PERFORMANCE_REPORT.viewThroughConv
+      settings_group_validation:
+        - ['developer_token', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'user_agent', 'customer_ids', 'start_date']
+      settings:
+        - name: developer_token
+          env: OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
+          kind: password
+          label: Developer Token
+          description: Your Developer Token for Google AdWord Application
+          placeholder: Ex. *****************
+        - name: oauth_client_id
+          env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
+          kind: password
+          label: OAuth Client ID
+          description: Your Google OAuth Client ID
+          placeholder: Ex. 123456789012345.apps.googleusercontent.com
+        - name: oauth_client_secret
+          env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
+          kind: password
+          label: OAuth Client Secret
+          description: Your Google OAuth Client Secret
+          placeholder: Ex. *****************
+  
+        - name: refresh_token
+          kind: oauth
+          oauth:
+            # https://oauth.svc.meltanodata.com/google-adwords/
+            provider: google-adwords
+          label: Access Token
+          description: The Refresh Token generated through the OAuth flow run using your OAuth Client and your Developer Token
+          placeholder: Ex. *****************
+        - name: customer_ids
+          label: Account ID(s)
+          placeholder: Ex. 1234567890,1234567891,1234567892
+          description: A comma-separated list of Ad Account IDs to replicate data from
+  
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        - name: end_date
+          kind: date_iso8601
+          description: Date up to when historical data will be extracted.
+        - name: user_agent
+          value: tap-adwords via Meltano
+          label: User Agent for your OAuth Client
+          placeholder: Ex. tap-adwords via Meltano <user@example.com>
+          description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
+  
+        - name: conversion_window_days
+          kind: integer
+          value: 0
+          label: Conversion Window Days
+          description: How many Days before the Start Date to fetch data for Performance Reports
+        - name: primary_keys
+          kind: object
+          value:
+            KEYWORDS_PERFORMANCE_REPORT:
+              - customerID
+              - campaignID
+              - adGroupID
+              - keywordID
+              - day
+              - network
+              - device
+            AD_PERFORMANCE_REPORT:
+              - customerID
+              - campaignID
+              - adGroupID
+              - adID
+              - day
+              - network
+              - device
+          label: Primary Keys
+          description: Primary Keys for the selected Entities (Streams)
   - name: tap-ask-nicely
     description: Customer Experience Platform
     label: AskNicely
@@ -296,377 +297,384 @@ extractors:
     label: BigQuery
     description: BigQuery data warehouse extractor
     namespace: tap_bigquery
-    variant: anelendata
-    docs: https://hub.meltano.com/extractors/bigquery.html
-    repo: https://github.com/anelendata/tap-bigquery
-    pip_url: tap-bigquery
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings_group_validation:
-      - ['streams', 'start_datetime', 'credentials_path']
-    settings:
-      - name: streams
-        kind: array
-        description: Array holding objects describing streams (tables) to extract, with `name`, `table`, `columns`, `datetime_key`, and `filters` keys. See docs for details.
-      - name: credentials_path
-        # The tap doesn't know this setting, but will read the GOOGLE_APPLICATION_CREDENTIALS env var.
-        env_aliases: [GOOGLE_APPLICATION_CREDENTIALS]
-        value: $MELTANO_PROJECT_ROOT/client_secrets.json
-        description: Fully qualified path to `client_secrets.json` for your service account.
-      - name: start_datetime
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-      - name: end_datetime
-        kind: date_iso8601
-        description: Date up to when historical data will be extracted.
-      - name: limit
-        kind: integer
-        description: Limits the number of records returned in each stream, applied as a limit in the query.
-      - name: start_always_inclusive
-        kind: boolean
-        value: true
-        description: When replicating incrementally, disable to only select records whose `datetime_key` is greater than the maximum value replicated in the last run, by excluding records whose timestamps match exactly. This could cause records to be missed that were created after the last run finished, but during the same second and with the same timestamp.
+    variants: 
+    - name: anelendata
+      docs: https://hub.meltano.com/extractors/bigquery.html
+      repo: https://github.com/anelendata/tap-bigquery
+      pip_url: tap-bigquery
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings_group_validation:
+        - ['streams', 'start_datetime', 'credentials_path']
+      settings:
+        - name: streams
+          kind: array
+          description: Array holding objects describing streams (tables) to extract, with `name`, `table`, `columns`, `datetime_key`, and `filters` keys. See docs for details.
+        - name: credentials_path
+          # The tap doesn't know this setting, but will read the GOOGLE_APPLICATION_CREDENTIALS env var.
+          env_aliases: [GOOGLE_APPLICATION_CREDENTIALS]
+          value: $MELTANO_PROJECT_ROOT/client_secrets.json
+          description: Fully qualified path to `client_secrets.json` for your service account.
+        - name: start_datetime
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        - name: end_datetime
+          kind: date_iso8601
+          description: Date up to when historical data will be extracted.
+        - name: limit
+          kind: integer
+          description: Limits the number of records returned in each stream, applied as a limit in the query.
+        - name: start_always_inclusive
+          kind: boolean
+          value: true
+          description: When replicating incrementally, disable to only select records whose `datetime_key` is greater than the maximum value replicated in the last run, by excluding records whose timestamps match exactly. This could cause records to be missed that were created after the last run finished, but during the same second and with the same timestamp.
   - name: tap-bing-ads
     label: Bing Ads
     description: Advertising Platform
     namespace: tap_bing_ads
-    variant: singer-io
-    docs: 'https://hub.meltano.com/extractors/bing-ads.html'
-    repo: https://github.com/singer-io/tap-bing-ads
-    pip_url: tap-bing-ads
-    capabilities:
-      - catalog
-      - discover
-      - state
-    metadata:
-      ad_group_performance_report:
-        AbsoluteTopImpressionSharePercent:
-          inclusion: available
-          selected: false
-        AbsoluteTopImpressionRatePercent:
-          inclusion: available
-          selected: false
-        AbsoluteTopImpressionShareLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        AbsoluteTopImpressionShareLostToRankPercent:
-          inclusion: available
-          selected: false
-        AudienceImpressionLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        AudienceImpressionLostToRankPercent:
-          inclusion: available
-          selected: false
-        AudienceImpressionSharePercent:
-          inclusion: available
-          selected: false
-        ClickSharePercent:
-          inclusion: available
-          selected: false
-        ExactMatchImpressionSharePercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToAdRelevancePercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToBidPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToExpectedCtrPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToRankPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToRankAggPercent:
-          inclusion: available
-          selected: false
-        ImpressionSharePercent:
-          inclusion: available
-          selected: false
-        TopImpressionRatePercent:
-          inclusion: available
-          selected: false
-        TopImpressionShareLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        TopImpressionShareLostToRankPercent:
-          inclusion: available
-          selected: false
-        TopImpressionSharePercent:
-          inclusion: available
-          selected: false
-      campaign_performance_report:
-        AbsoluteTopImpressionSharePercent:
-          inclusion: available
-          selected: false
-        AbsoluteTopImpressionRatePercent:
-          inclusion: available
-          selected: false
-        AbsoluteTopImpressionShareLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        AbsoluteTopImpressionShareLostToRankPercent:
-          inclusion: available
-          selected: false
-        AudienceImpressionLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        AudienceImpressionLostToRankPercent:
-          inclusion: available
-          selected: false
-        AudienceImpressionSharePercent:
-          inclusion: available
-          selected: false
-        ClickSharePercent:
-          inclusion: available
-          selected: false
-        ExactMatchImpressionSharePercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToAdRelevancePercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToBidPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToExpectedCtrPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToRankPercent:
-          inclusion: available
-          selected: false
-        ImpressionLostToRankAggPercent:
-          inclusion: available
-          selected: false
-        ImpressionSharePercent:
-          inclusion: available
-          selected: false
-        TopImpressionRatePercent:
-          inclusion: available
-          selected: false
-        TopImpressionShareLostToBudgetPercent:
-          inclusion: available
-          selected: false
-        TopImpressionShareLostToRankPercent:
-          inclusion: available
-          selected: false
-        TopImpressionSharePercent:
-          inclusion: available
-          selected: false
-    settings_group_validation:
-      - ['customer_id', 'account_ids', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'developer_token', 'start_date']
-    settings:
-      - name: developer_token
-        env: OAUTH_BING_ADS_DEVELOPER_TOKEN
-        kind: password
-      - name: oauth_client_id
-        env: OAUTH_BING_ADS_CLIENT_ID
-        label: OAuth Client ID
-        kind: password
-      - name: oauth_client_secret
-        env: OAUTH_BING_ADS_CLIENT_SECRET
-        label: OAuth Client Secret
-        kind: password
-      - name: refresh_token
-        kind: password
-
-      - name: customer_id
-        label: Customer ID
-      - name: account_ids
-        label: Account ID(s)
-      - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        kind: date_iso8601
+    variants:
+    - name: singer-io
+      docs: 'https://hub.meltano.com/extractors/bing-ads.html'
+      repo: https://github.com/singer-io/tap-bing-ads
+      pip_url: tap-bing-ads
+      capabilities:
+        - catalog
+        - discover
+        - state
+      metadata:
+        ad_group_performance_report:
+          AbsoluteTopImpressionSharePercent:
+            inclusion: available
+            selected: false
+          AbsoluteTopImpressionRatePercent:
+            inclusion: available
+            selected: false
+          AbsoluteTopImpressionShareLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          AbsoluteTopImpressionShareLostToRankPercent:
+            inclusion: available
+            selected: false
+          AudienceImpressionLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          AudienceImpressionLostToRankPercent:
+            inclusion: available
+            selected: false
+          AudienceImpressionSharePercent:
+            inclusion: available
+            selected: false
+          ClickSharePercent:
+            inclusion: available
+            selected: false
+          ExactMatchImpressionSharePercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToAdRelevancePercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToBidPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToExpectedCtrPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToRankPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToRankAggPercent:
+            inclusion: available
+            selected: false
+          ImpressionSharePercent:
+            inclusion: available
+            selected: false
+          TopImpressionRatePercent:
+            inclusion: available
+            selected: false
+          TopImpressionShareLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          TopImpressionShareLostToRankPercent:
+            inclusion: available
+            selected: false
+          TopImpressionSharePercent:
+            inclusion: available
+            selected: false
+        campaign_performance_report:
+          AbsoluteTopImpressionSharePercent:
+            inclusion: available
+            selected: false
+          AbsoluteTopImpressionRatePercent:
+            inclusion: available
+            selected: false
+          AbsoluteTopImpressionShareLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          AbsoluteTopImpressionShareLostToRankPercent:
+            inclusion: available
+            selected: false
+          AudienceImpressionLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          AudienceImpressionLostToRankPercent:
+            inclusion: available
+            selected: false
+          AudienceImpressionSharePercent:
+            inclusion: available
+            selected: false
+          ClickSharePercent:
+            inclusion: available
+            selected: false
+          ExactMatchImpressionSharePercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToAdRelevancePercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToBidPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToExpectedCtrPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToRankPercent:
+            inclusion: available
+            selected: false
+          ImpressionLostToRankAggPercent:
+            inclusion: available
+            selected: false
+          ImpressionSharePercent:
+            inclusion: available
+            selected: false
+          TopImpressionRatePercent:
+            inclusion: available
+            selected: false
+          TopImpressionShareLostToBudgetPercent:
+            inclusion: available
+            selected: false
+          TopImpressionShareLostToRankPercent:
+            inclusion: available
+            selected: false
+          TopImpressionSharePercent:
+            inclusion: available
+            selected: false
+      settings_group_validation:
+        - ['customer_id', 'account_ids', 'oauth_client_id', 'oauth_client_secret', 'refresh_token', 'developer_token', 'start_date']
+      settings:
+        - name: developer_token
+          env: OAUTH_BING_ADS_DEVELOPER_TOKEN
+          kind: password
+        - name: oauth_client_id
+          env: OAUTH_BING_ADS_CLIENT_ID
+          label: OAuth Client ID
+          kind: password
+        - name: oauth_client_secret
+          env: OAUTH_BING_ADS_CLIENT_SECRET
+          label: OAuth Client Secret
+          kind: password
+        - name: refresh_token
+          kind: password
+  
+        - name: customer_id
+          label: Customer ID
+        - name: account_ids
+          label: Account ID(s)
+        - name: start_date
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+          kind: date_iso8601
   - name: tap-chargebee
     namespace: tap_chargebee
     label: Chargebee
     description: Subscription billing software
-    variant: hotgluexyz
-    docs: https://hub.meltano.com/extractors/chargebee.html
-    repo: https://github.com/hotgluexyz/tap-chargebee
-    pip_url: git+https://github.com/hotgluexyz/tap-chargebee.git
-    capabilities:
-    - catalog
-    - discover
-    - state
-    settings_group_validation:
-    - - api_key
-      - site
-      - product_catalog
-      - start_date
-    settings:
-    - name: api_key
-      label: API Key
-      kind: password
-    - name: site
-      label: Chargebee Site
-    - name: product_catalog
-      label: Chargebee Product Catalog
-    - name: start_date
-      kind: date_iso8601
-      description: Determines how much historical data will be extracted. Please be
-        aware that the larger the time period and amount of data, the longer the initial
-        extraction can be expected to take.
-    - name: select_fields_by_default
-      kind: boolean
-      value: true
-      description: Select by default any new fields discovered in Quickbooks objects
-    - name: state_message_threshold
-      kind: integer
-      value: 1000
-      description: Generate a STATE message every N records
-    - name: max_workers
-      kind: integer
-      value: 8
-      label: Maximum number of threads to use
+    variants:
+    - name: hotgluexyz
+      docs: https://hub.meltano.com/extractors/chargebee.html
+      repo: https://github.com/hotgluexyz/tap-chargebee
+      pip_url: git+https://github.com/hotgluexyz/tap-chargebee.git
+      capabilities:
+      - catalog
+      - discover
+      - state
+      settings_group_validation:
+      - - api_key
+        - site
+        - product_catalog
+        - start_date
+      settings:
+      - name: api_key
+        label: API Key
+        kind: password
+      - name: site
+        label: Chargebee Site
+      - name: product_catalog
+        label: Chargebee Product Catalog
+      - name: start_date
+        kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be
+          aware that the larger the time period and amount of data, the longer the initial
+          extraction can be expected to take.
+      - name: select_fields_by_default
+        kind: boolean
+        value: true
+        description: Select by default any new fields discovered in Quickbooks objects
+      - name: state_message_threshold
+        kind: integer
+        value: 1000
+        description: Generate a STATE message every N records
+      - name: max_workers
+        kind: integer
+        value: 8
+        label: Maximum number of threads to use
   - name: tap-csv
     label: Comma Separated Values (CSV)
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/csv.html'
-    repo: https://gitlab.com/meltano/tap-csv
-    pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
-    capabilities:
-      - discover
-      - state
-    settings_group_validation:
-      - ['files']
-      - ['csv_files_definition']
-    settings:
-      - name: files
-        kind: array
-        description: Array of objects with `entity`, `file`, and `keys` keys
-      - name: csv_files_definition
-        env: TAP_CSV_FILES_DEFINITION
-        label: CSV Files Definition
-        description: Project-relative path to JSON file holding array of objects with `entity`, `file`, and `keys` keys
-        placeholder: Ex. files-def.json
-        documentation: https://gitlab.com/meltano/tap-csv#run
+    variants:
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/csv.html'
+      repo: https://gitlab.com/meltano/tap-csv
+      pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
+      capabilities:
+        - discover
+        - state
+      settings_group_validation:
+        - ['files']
+        - ['csv_files_definition']
+      settings:
+        - name: files
+          kind: array
+          description: Array of objects with `entity`, `file`, and `keys` keys
+        - name: csv_files_definition
+          env: TAP_CSV_FILES_DEFINITION
+          label: CSV Files Definition
+          description: Project-relative path to JSON file holding array of objects with `entity`, `file`, and `keys` keys
+          placeholder: Ex. files-def.json
+          documentation: https://gitlab.com/meltano/tap-csv#run
   - name: tap-facebook
     label: Facebook Ads
     description: Advertising Platform
     namespace: tap_facebook
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/facebook.html'
-    repo: https://gitlab.com/meltano/tap-facebook
-    pip_url: 'git+https://gitlab.com/meltano/tap-facebook.git'
-    capabilities:
-      - properties
-      - discover
-      - state
-    settings_group_validation:
-      - ['account_id', 'access_token', 'start_date']
-    settings:
-      - name: account_id
-        label: Account ID
-        placeholder: Ex. 123456789012345
-        description: Your Facebook Ads Account ID
-      - name: access_token
-        label: Access Token
-        placeholder: Ex. *****************
-        description: User Token generated by Facebook OAuth handshake
-        kind: oauth
-        oauth:
-          provider: facebook
-      - name: start_date
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-      - name: end_date
-        kind: date_iso8601
-        description: Date up to when historical data will be extracted.
-      - name: insights_buffer_days
-        kind: integer
-        value: 0
-        label: Ads Insights Buffer Days
-        description: How many Days before the Start Date to fetch Ads Insights for
+    variants:
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/facebook.html'
+      repo: https://gitlab.com/meltano/tap-facebook
+      pip_url: 'git+https://gitlab.com/meltano/tap-facebook.git'
+      capabilities:
+        - properties
+        - discover
+        - state
+      settings_group_validation:
+        - ['account_id', 'access_token', 'start_date']
+      settings:
+        - name: account_id
+          label: Account ID
+          placeholder: Ex. 123456789012345
+          description: Your Facebook Ads Account ID
+        - name: access_token
+          label: Access Token
+          placeholder: Ex. *****************
+          description: User Token generated by Facebook OAuth handshake
+          kind: oauth
+          oauth:
+            provider: facebook
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        - name: end_date
+          kind: date_iso8601
+          description: Date up to when historical data will be extracted.
+        - name: insights_buffer_days
+          kind: integer
+          value: 0
+          label: Ads Insights Buffer Days
+          description: How many Days before the Start Date to fetch Ads Insights for
   - name: tap-fastly
     label: Fastly
     description: Edge cloud computing services provider
     namespace: tap_fastly
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/fastly.html'
-    repo: https://gitlab.com/meltano/tap-fastly
-    pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: api_token
-        label: API Token
-        kind: password
-        placeholder: Ex. *****************
-      - name: start_date
-        label: Start Date
-        kind: date_iso8601
+    variants:
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/fastly.html'
+      repo: https://gitlab.com/meltano/tap-fastly
+      pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: api_token
+          label: API Token
+          kind: password
+          placeholder: Ex. *****************
+        - name: start_date
+          label: Start Date
+          kind: date_iso8601
   - name: tap-gitlab
     label: GitLab
     description: Single application for the entire DevOps lifecycle
     namespace: tap_gitlab
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/gitlab.html'
-    repo: https://gitlab.com/meltano/tap-gitlab
-    pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings_group_validation:
-      - ['api_url', 'groups', 'start_date']
-      - ['api_url', 'projects', 'start_date']
-    settings:
-      - name: api_url
-        label: GitLab Instance
-        value: 'https://gitlab.com'
-        description: GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.
-        protected: true
-      - name: private_token
-        env_aliases: [GITLAB_API_TOKEN]
-        kind: password
-        value: ""
-        label: Access Token
-        description: GitLab personal access token or other API token.
-        placeholder: Ex. *****************
-      - name: groups
-        env_aliases: [GITLAB_API_GROUPS]
-        value: ''
-        label: Groups
-        description: Space-separated names of groups to extract data from. Leave empty and provide a project name if you'd like to pull data from a project in a personal user namespace.
-        placeholder: Ex. my-organization
-      - name: projects
-        env_aliases: [GITLAB_API_PROJECTS]
-        value: ''
-        label: Project
-        description: Space-separated `namespace/project` paths of projects to extract data from. Leave empty and provide a group name to extract data from all group projects.
-        placeholder: Ex. my-organization/project-1
-      - name: ultimate_license
-        env_aliases: [GITLAB_API_ULTIMATE_LICENSE]
-        kind: boolean
-        value: false
-        description: Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
-      - name: fetch_merge_request_commits
-        kind: boolean
-        value: false
-        description: For each Merge Request, also fetch the MR's commits and create the join table `merge_request_commits` with the Merge Request and related Commit IDs. This can slow down extraction considerably because of the many API calls required.
-      - name: fetch_pipelines_extended
-        kind: boolean
-        value: false
-        description: For every Pipeline, also fetch extended details of each of these pipelines. This can slow down extraction considerably because of the many API calls required.
-      - name: start_date
-        env_aliases: [GITLAB_API_START_DATE]
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+    variants: 
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/gitlab.html'
+      repo: https://gitlab.com/meltano/tap-gitlab
+      pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings_group_validation:
+        - ['api_url', 'groups', 'start_date']
+        - ['api_url', 'projects', 'start_date']
+      settings:
+        - name: api_url
+          label: GitLab Instance
+          value: 'https://gitlab.com'
+          description: GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.
+          protected: true
+        - name: private_token
+          env_aliases: [GITLAB_API_TOKEN]
+          kind: password
+          value: ""
+          label: Access Token
+          description: GitLab personal access token or other API token.
+          placeholder: Ex. *****************
+        - name: groups
+          env_aliases: [GITLAB_API_GROUPS]
+          value: ''
+          label: Groups
+          description: Space-separated names of groups to extract data from. Leave empty and provide a project name if you'd like to pull data from a project in a personal user namespace.
+          placeholder: Ex. my-organization
+        - name: projects
+          env_aliases: [GITLAB_API_PROJECTS]
+          value: ''
+          label: Project
+          description: Space-separated `namespace/project` paths of projects to extract data from. Leave empty and provide a group name to extract data from all group projects.
+          placeholder: Ex. my-organization/project-1
+        - name: ultimate_license
+          env_aliases: [GITLAB_API_ULTIMATE_LICENSE]
+          kind: boolean
+          value: false
+          description: Enable to pull in extra data (like Epics, Epic Issues and other entities) only available to GitLab Ultimate and GitLab.com Gold accounts.
+        - name: fetch_merge_request_commits
+          kind: boolean
+          value: false
+          description: For each Merge Request, also fetch the MR's commits and create the join table `merge_request_commits` with the Merge Request and related Commit IDs. This can slow down extraction considerably because of the many API calls required.
+        - name: fetch_pipelines_extended
+          kind: boolean
+          value: false
+          description: For every Pipeline, also fetch extended details of each of these pipelines. This can slow down extraction considerably because of the many API calls required.
+        - name: start_date
+          env_aliases: [GITLAB_API_START_DATE]
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   - name: tap-github
     description: Code hosting platform
     label: GitHub
@@ -700,57 +708,58 @@ extractors:
     label: Google Analytics
     description: App and website analytics platform hosted by Google
     namespace: tap_google_analytics
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/google-analytics.html'
-    repo: https://gitlab.com/meltano/tap-google-analytics
-    pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
-    capabilities:
-      - catalog
-      - discover
-    settings_group_validation:
-      - ['key_file_location', 'view_id', 'start_date']
-      - ['oauth_credentials.client_id', 'oauth_credentials.client_secret', 'oauth_credentials.access_token', 'oauth_credentials.refresh_token', 'view_id', 'start_date']
-    settings:
-      - name: key_file_location
-        env_aliases: [GOOGLE_ANALYTICS_API_CLIENT_SECRETS]
-        kind: file
-        value: $MELTANO_PROJECT_ROOT/client_secrets.json
-        label: Client Secrets
-        placeholder: Ex. client_secrets.json
-      - name: oauth_credentials.client_id
-        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID]
-        kind: password
-        label: OAuth Client ID
-      - name: oauth_credentials.client_secret
-        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET]
-        kind: password
-        label: OAuth Client Secret
-      - name: oauth_credentials.access_token
-        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN]
-        kind: password
-        label: OAuth Access Token
-      - name: oauth_credentials.refresh_token
-        env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN]
-        kind: password
-        label: OAuth Refresh Token
-
-      - name: view_id
-        env_aliases: [GOOGLE_ANALYTICS_API_VIEW_ID]
-        label: View ID
-        placeholder: Ex. 198343027
-      - name: reports
-        env_aliases: [GOOGLE_ANALYTICS_API_REPORTS]
-        label: Reports
-        placeholder: Ex. my_report_definition.json
-
-      - name: start_date
-        env_aliases: [GOOGLE_ANALYTICS_API_START_DATE]
-        kind: date_iso8601
-        description: This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-      - name: end_date
-        env_aliases: [GOOGLE_ANALYTICS_API_END_DATE]
-        kind: date_iso8601
-        description: Date up to when historical data will be extracted.
+    variants:
+    - name:  meltano
+      docs: 'https://hub.meltano.com/extractors/google-analytics.html'
+      repo: https://gitlab.com/meltano/tap-google-analytics
+      pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
+      capabilities:
+        - catalog
+        - discover
+      settings_group_validation:
+        - ['key_file_location', 'view_id', 'start_date']
+        - ['oauth_credentials.client_id', 'oauth_credentials.client_secret', 'oauth_credentials.access_token', 'oauth_credentials.refresh_token', 'view_id', 'start_date']
+      settings:
+        - name: key_file_location
+          env_aliases: [GOOGLE_ANALYTICS_API_CLIENT_SECRETS]
+          kind: file
+          value: $MELTANO_PROJECT_ROOT/client_secrets.json
+          label: Client Secrets
+          placeholder: Ex. client_secrets.json
+        - name: oauth_credentials.client_id
+          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID]
+          kind: password
+          label: OAuth Client ID
+        - name: oauth_credentials.client_secret
+          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET]
+          kind: password
+          label: OAuth Client Secret
+        - name: oauth_credentials.access_token
+          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN]
+          kind: password
+          label: OAuth Access Token
+        - name: oauth_credentials.refresh_token
+          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN]
+          kind: password
+          label: OAuth Refresh Token
+  
+        - name: view_id
+          env_aliases: [GOOGLE_ANALYTICS_API_VIEW_ID]
+          label: View ID
+          placeholder: Ex. 198343027
+        - name: reports
+          env_aliases: [GOOGLE_ANALYTICS_API_REPORTS]
+          label: Reports
+          placeholder: Ex. my_report_definition.json
+  
+        - name: start_date
+          env_aliases: [GOOGLE_ANALYTICS_API_START_DATE]
+          kind: date_iso8601
+          description: This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        - name: end_date
+          env_aliases: [GOOGLE_ANALYTICS_API_END_DATE]
+          kind: date_iso8601
+          description: Date up to when historical data will be extracted.
   - name: tap-google-sheets
     description: Cloud Spreadsheets
     label: Google Sheets
@@ -834,51 +843,52 @@ extractors:
     namespace: tap_intacct
     label: Sage Intacct
     description: Financial management software
-    variant: hotgluexyz
-    docs: https://hub.meltano.com/extractors/intacct.html
-    repo: https://github.com/hotgluexyz/tap-intacct
-    pip_url: git+https://github.com/hotgluexyz/tap-intacct.git
-    capabilities:
-    - catalog
-    - discover
-    - state
-    settings_group_validation:
-    - - company_id
-      - sender_id
-      - sender_password
-      - user_id
-      - user_password
-      - start_date
-    settings:
-    - name: company_id
-      label: Company Id
-    - name: sender_id
-      label: Intacct Sender Id
-    - name: sender_password
-      label: Intacct Sender Password
-      kind: password
-    - name: user_id
-      label: Intacct User Id
-    - name: user_password
-      label: Intacct User Password
-      kind: password
-    - name: start_date
-      kind: date_iso8601
-      description: Determines how much historical data will be extracted. Please be
-        aware that the larger the time period and amount of data, the longer the initial
-        extraction can be expected to take.
-    - name: select_fields_by_default
-      kind: boolean
-      value: true
-      description: Select by default any new fields discovered in Quickbooks objects
-    - name: state_message_threshold
-      kind: integer
-      value: 1000
-      description: Generate a STATE message every N records
-    - name: max_workers
-      kind: integer
-      value: 8
-      label: Maximum number of threads to use
+    variants:
+    - name: hotgluexyz
+      docs: https://hub.meltano.com/extractors/intacct.html
+      repo: https://github.com/hotgluexyz/tap-intacct
+      pip_url: git+https://github.com/hotgluexyz/tap-intacct.git
+      capabilities:
+      - catalog
+      - discover
+      - state
+      settings_group_validation:
+      - - company_id
+        - sender_id
+        - sender_password
+        - user_id
+        - user_password
+        - start_date
+      settings:
+      - name: company_id
+        label: Company Id
+      - name: sender_id
+        label: Intacct Sender Id
+      - name: sender_password
+        label: Intacct Sender Password
+        kind: password
+      - name: user_id
+        label: Intacct User Id
+      - name: user_password
+        label: Intacct User Password
+        kind: password
+      - name: start_date
+        kind: date_iso8601
+        description: Determines how much historical data will be extracted. Please be
+          aware that the larger the time period and amount of data, the longer the initial
+          extraction can be expected to take.
+      - name: select_fields_by_default
+        kind: boolean
+        value: true
+        description: Select by default any new fields discovered in Quickbooks objects
+      - name: state_message_threshold
+        kind: integer
+        value: 1000
+        description: Generate a STATE message every N records
+      - name: max_workers
+        kind: integer
+        value: 8
+        label: Maximum number of threads to use
   - name: tap-jira
     description: Issue and Project Tracking Software
     label: Jira
@@ -936,101 +946,104 @@ extractors:
     label: Marketo
     description: Marketing automation for account-based marketing
     namespace: tap_marketo
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/marketo.html'
-    repo: https://gitlab.com/meltano/tap-marketo
-    pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
-    capabilities: []
-    settings:
-      - name: endpoint
-      - name: identity
-      - name: client_id
-        label: Client ID
-      - name: client_secret
-        kind: password
-      - name: start_date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        kind: date_iso8601
+    variants:
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/marketo.html'
+      repo: https://gitlab.com/meltano/tap-marketo
+      pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
+      capabilities: []
+      settings:
+        - name: endpoint
+        - name: identity
+        - name: client_id
+          label: Client ID
+        - name: client_secret
+          kind: password
+        - name: start_date
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+          kind: date_iso8601
   - name: tap-mongodb
     label: MongoDB
     description: General purpose, document-based, distributed database
     namespace: tap_mongodb
-    variant: singer-io
-    docs: 'https://hub.meltano.com/extractors/mongodb.html'
-    repo: https://github.com/singer-io/tap-mongodb
-    pip_url: tap-mongodb
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings_group_validation:
-      - ['host', 'port', 'user', 'password', 'database']
-    settings:
-      - name: host
-        label: Host URL
-        value: localhost
-      - name: port
-        kind: integer
-        value: 27017
-      - name: user
-      - name: password
-        kind: password
-      - name: database
-        label: Database Name
-      - name: replica_set
-      - name: ssl
-        kind: boolean
-        value: false
-        value_post_processor: stringify
-        label: SSL
-      - name: verify_mode
-        kind: boolean
-        value: true
-        value_post_processor: stringify
-        description: SSL Verify Mode
-      - name: include_schemas_in_destination_stream_name
-        kind: boolean
-        value: false
-        description: Forces the stream names to take the form `<database_name>_<collection_name>` instead of `<collection_name>`
+    variants:
+    - name: singer-io
+      docs: 'https://hub.meltano.com/extractors/mongodb.html'
+      repo: https://github.com/singer-io/tap-mongodb
+      pip_url: tap-mongodb
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings_group_validation:
+        - ['host', 'port', 'user', 'password', 'database']
+      settings:
+        - name: host
+          label: Host URL
+          value: localhost
+        - name: port
+          kind: integer
+          value: 27017
+        - name: user
+        - name: password
+          kind: password
+        - name: database
+          label: Database Name
+        - name: replica_set
+        - name: ssl
+          kind: boolean
+          value: false
+          value_post_processor: stringify
+          label: SSL
+        - name: verify_mode
+          kind: boolean
+          value: true
+          value_post_processor: stringify
+          description: SSL Verify Mode
+        - name: include_schemas_in_destination_stream_name
+          kind: boolean
+          value: false
+          description: Forces the stream names to take the form `<database_name>_<collection_name>` instead of `<collection_name>`
   - name: tap-mysql
     label: MySQL / MariaDB
     description: MySQL / MariaDB database extractor
     namespace: tap_mysql
-    variant: transferwise
-    docs: https://hub.meltano.com/extractors/mysql.html
-    repo: https://github.com/transferwise/pipelinewise-tap-mysql
-    pip_url: pipelinewise-tap-mysql
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings_group_validation:
-      - ['host', 'port', 'user', 'password']
-    settings:
-      - name: host
-        value: localhost
-      - name: port
-        kind: integer
-        value: 3306
-      - name: user
-      - name: password
-        kind: password
-      - name: database
-      - name: ssl
-        kind: boolean
-        value: false
-        value_post_processor: stringify
-
-      - name: filter_dbs
-        description: Comma separated list of schemas to extract tables only from particular schemas and to improve data extraction performance
-      - name: session_sqls
-        kind: array
-        value:
-          - SET @@session.time_zone="+0:00"
-          - SET @@session.wait_timeout=28800
-          - SET @@session.net_read_timeout=3600
-          - SET @@session.innodb_lock_wait_timeout=3600
-        description: List of SQL commands to run when a connection made. This allows to set session variables dynamically, like timeouts.
+    variants:
+    - name: transferwise
+      docs: https://hub.meltano.com/extractors/mysql.html
+      repo: https://github.com/transferwise/pipelinewise-tap-mysql
+      pip_url: pipelinewise-tap-mysql
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings_group_validation:
+        - ['host', 'port', 'user', 'password']
+      settings:
+        - name: host
+          value: localhost
+        - name: port
+          kind: integer
+          value: 3306
+        - name: user
+        - name: password
+          kind: password
+        - name: database
+        - name: ssl
+          kind: boolean
+          value: false
+          value_post_processor: stringify
+  
+        - name: filter_dbs
+          description: Comma separated list of schemas to extract tables only from particular schemas and to improve data extraction performance
+        - name: session_sqls
+          kind: array
+          value:
+            - SET @@session.time_zone="+0:00"
+            - SET @@session.wait_timeout=28800
+            - SET @@session.net_read_timeout=3600
+            - SET @@session.innodb_lock_wait_timeout=3600
+          description: List of SQL commands to run when a connection made. This allows to set session variables dynamically, like timeouts.
   - name: tap-pendo
     description: Product Experience and Digital Adoption Solutions
     label: Pendo
@@ -1080,148 +1093,201 @@ extractors:
     label: PostgreSQL
     description: PostgreSQL database extractor
     namespace: tap_postgres
-    variant: transferwise
-    docs: https://hub.meltano.com/extractors/postgres.html
-    repo: https://github.com/transferwise/pipelinewise-tap-postgres
-    pip_url: pipelinewise-tap-postgres
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings_group_validation:
-      - ['host', 'port', 'user', 'password', 'dbname']
-    settings:
-      - name: host
-        value: localhost
-        description: PostgreSQL host
-      - name: port
-        kind: integer
-        value: 5432
-        description: PostgreSQL port
-      - name: user
-        description: PostgreSQL user
-      - name: password
-        kind: password
-        description: PostgreSQL password
-      - name: dbname
-        description: PostgreSQL database name
-      - name: ssl
-        kind: boolean
-        value: false
-        value_post_processor: stringify
-        description: Using SSL via postgres `sslmode='require'` option. If the server does not accept SSL connections or the client certificate is not recognized the connection will fail
-
-      - name: filter_schemas
-        description: Scan only the specified comma-separated schemas to improve the performance of data extraction
-      - name: default_replication_method
-        kind: options
-        options:
-          - label: Log-based Incremental Replication
-            value: LOG_BASED
-          - label: Key-based Incremental Replication
-            value: INCREMENTAL
-          - label: Full Table Replication
-            value: FULL_TABLE
-      - name: max_run_seconds
-        kind: integer
-        value: 43200
-        description: Stop running the tap after certain number of seconds
-      - name: logical_poll_total_seconds
-        kind: integer
-        value: 10800
-        description: Stop running the tap when no data received from wal after certain number of seconds
-      - name: break_at_end_lsn
-        kind: boolean
-        value: true
-        description: Stop running the tap if the newly received lsn is after the max lsn that was detected when the tap started
+    variants:
+    - name: transferwise
+      docs: https://hub.meltano.com/extractors/postgres.html
+      repo: https://github.com/transferwise/pipelinewise-tap-postgres
+      pip_url: pipelinewise-tap-postgres
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings_group_validation:
+        - ['host', 'port', 'user', 'password', 'dbname']
+      settings:
+        - name: host
+          value: localhost
+          description: PostgreSQL host
+        - name: port
+          kind: integer
+          value: 5432
+          description: PostgreSQL port
+        - name: user
+          description: PostgreSQL user
+        - name: password
+          kind: password
+          description: PostgreSQL password
+        - name: dbname
+          description: PostgreSQL database name
+        - name: ssl
+          kind: boolean
+          value: false
+          value_post_processor: stringify
+          description: Using SSL via postgres `sslmode='require'` option. If the server does not accept SSL connections or the client certificate is not recognized the connection will fail
+  
+        - name: filter_schemas
+          description: Scan only the specified comma-separated schemas to improve the performance of data extraction
+        - name: default_replication_method
+          kind: options
+          options:
+            - label: Log-based Incremental Replication
+              value: LOG_BASED
+            - label: Key-based Incremental Replication
+              value: INCREMENTAL
+            - label: Full Table Replication
+              value: FULL_TABLE
+        - name: max_run_seconds
+          kind: integer
+          value: 43200
+          description: Stop running the tap after certain number of seconds
+        - name: logical_poll_total_seconds
+          kind: integer
+          value: 10800
+          description: Stop running the tap when no data received from wal after certain number of seconds
+        - name: break_at_end_lsn
+          kind: boolean
+          value: true
+          description: Stop running the tap if the newly received lsn is after the max lsn that was detected when the tap started
   - name: tap-recharge
     label: ReCharge
     description: Subscription payments platform
     namespace: tap_recharge
-    variant: singer-io
-    docs: 'https://hub.meltano.com/extractors/recharge.html'
-    repo: https://github.com/singer-io/tap-recharge
-    pip_url: tap-recharge==1.0.3
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: access_token
-        kind: password
-        description: Private API Token
-        placeholder: Ex. 1a2b3c4d5e6f
-      - name: start_date
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-      - name: user_agent
-        value: tap-recharge via Meltano
-        description: User agent to send to ReCharge along with API requests. Typically includes name of integration and an email address you can be reached at
-        placeholder: Ex. tap-recharge via Meltano <user@example.com>
+    variants:
+    - name: singer-io
+      docs: 'https://hub.meltano.com/extractors/recharge.html'
+      repo: https://github.com/singer-io/tap-recharge
+      pip_url: tap-recharge==1.0.3
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: access_token
+          kind: password
+          description: Private API Token
+          placeholder: Ex. 1a2b3c4d5e6f
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        - name: user_agent
+          value: tap-recharge via Meltano
+          description: User agent to send to ReCharge along with API requests. Typically includes name of integration and an email address you can be reached at
+          placeholder: Ex. tap-recharge via Meltano <user@example.com>
   - name: tap-salesforce
     label: Salesforce
     description: Customer-relationship management & customer success platform
     namespace: tap_salesforce
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/salesforce.html'
-    repo: https://gitlab.com/meltano/tap-salesforce
-    pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
-    capabilities:
-      - properties
+    variants:
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/salesforce.html'
+      repo: https://gitlab.com/meltano/tap-salesforce
+      pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
+      capabilities:
+        - properties
+        - discover
+        - state
+      select:
+        - Lead.*
+        - Contact.*
+        - User.*
+        - OpportunityHistory.*
+        - Account.*
+        - Opportunity.*
+      settings_group_validation:
+        - ['username', 'password', 'security_token', 'start_date']
+        - ['client_id', 'client_secret', 'refresh_token', 'start_date']
+      settings:
+        - name: username
+          placeholder: Ex. me@my-organization.com
+        - name: password
+          kind: password
+          label: Password
+          placeholder: Ex. *****************
+        - name: security_token
+          kind: password
+          label: Security Token
+          placeholder: Ex. *****************
+          description: Your Salesforce Account access token
+          documentation: https://hub.meltano.com/extractors/salesforce.html#salesforce-setup
+  
+        - name: client_id
+          label: Client ID
+        - name: client_secret
+          kind: password
+        - name: refresh_token
+          kind: password
+  
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+  
+        - name: is_sandbox
+          kind: boolean
+          value: false
+          description: Use Salesforce Sandbox
+        - name: api_type
+          value: REST
+          kind: options
+          options:
+            - label: REST
+              value: REST
+            - label: BULK
+              value: BULK
+          label: API Type
+        - name: select_fields_by_default
+          kind: boolean
+          value: true
+          description: Select by default any new fields discovered in Salesforce objects
+        - name: state_message_threshold
+          kind: integer
+          value: 1000
+          description: Generate a STATE message every N records
+        - name: max_workers
+          kind: integer
+          value: 8
+          label: Maximum number of threads to use
+  - name: tap-quickbooks
+    namespace: tap_quickbooks
+    label: Quickbooks
+    description: Accounting management platform
+    variants:
+    - name: hotgluexyz
+      docs: https://hub.meltano.com/extractors/quickbooks.html
+      repo: https://github.com/hotgluexyz/tap-quickbooks
+      pip_url: git+https://github.com/hotgluexyz/tap-quickbooks.git
+      capabilities:
+      - catalog
       - discover
       - state
-    select:
-      - Lead.*
-      - Contact.*
-      - User.*
-      - OpportunityHistory.*
-      - Account.*
-      - Opportunity.*
-    settings_group_validation:
-      - ['username', 'password', 'security_token', 'start_date']
-      - ['client_id', 'client_secret', 'refresh_token', 'start_date']
-    settings:
-      - name: username
-        placeholder: Ex. me@my-organization.com
-      - name: password
-        kind: password
-        label: Password
-        placeholder: Ex. *****************
-      - name: security_token
-        kind: password
-        label: Security Token
-        placeholder: Ex. *****************
-        description: Your Salesforce Account access token
-        documentation: https://hub.meltano.com/extractors/salesforce.html#salesforce-setup
-
+      settings_group_validation:
+      - - client_id
+        - client_secret
+        - refresh_token
+        - realmId
+        - start_date
+      settings:
+      - name: realmId
+        label: Realm ID
       - name: client_id
+        kind: password
         label: Client ID
       - name: client_secret
         kind: password
       - name: refresh_token
         kind: password
-
       - name: start_date
         kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-
+        description: Determines how much historical data will be extracted. Please be
+          aware that the larger the time period and amount of data, the longer the initial
+          extraction can be expected to take.
       - name: is_sandbox
         kind: boolean
         value: false
-        description: Use Salesforce Sandbox
-      - name: api_type
-        value: REST
-        kind: options
-        options:
-          - label: REST
-            value: REST
-          - label: BULK
-            value: BULK
-        label: API Type
+        description: Use Quickbooks Sandbox
       - name: select_fields_by_default
         kind: boolean
         value: true
-        description: Select by default any new fields discovered in Salesforce objects
+        description: Select by default any new fields discovered in Quickbooks objects
       - name: state_message_threshold
         kind: integer
         value: 1000
@@ -1230,176 +1296,133 @@ extractors:
         kind: integer
         value: 8
         label: Maximum number of threads to use
-  - name: tap-quickbooks
-    namespace: tap_quickbooks
-    label: Quickbooks
-    description: Accounting management platform
-    variant: hotgluexyz
-    docs: https://hub.meltano.com/extractors/quickbooks.html
-    repo: https://github.com/hotgluexyz/tap-quickbooks
-    pip_url: git+https://github.com/hotgluexyz/tap-quickbooks.git
-    capabilities:
-    - catalog
-    - discover
-    - state
-    settings_group_validation:
-    - - client_id
-      - client_secret
-      - refresh_token
-      - realmId
-      - start_date
-    settings:
-    - name: realmId
-      label: Realm ID
-    - name: client_id
-      kind: password
-      label: Client ID
-    - name: client_secret
-      kind: password
-    - name: refresh_token
-      kind: password
-    - name: start_date
-      kind: date_iso8601
-      description: Determines how much historical data will be extracted. Please be
-        aware that the larger the time period and amount of data, the longer the initial
-        extraction can be expected to take.
-    - name: is_sandbox
-      kind: boolean
-      value: false
-      description: Use Quickbooks Sandbox
-    - name: select_fields_by_default
-      kind: boolean
-      value: true
-      description: Select by default any new fields discovered in Quickbooks objects
-    - name: state_message_threshold
-      kind: integer
-      value: 1000
-      description: Generate a STATE message every N records
-    - name: max_workers
-      kind: integer
-      value: 8
-      label: Maximum number of threads to use
   - name: tap-shopify
     label: Shopify
     description: Ecommerce platform
     namespace: tap_shopify
-    variant: singer-io
-    docs: 'https://hub.meltano.com/extractors/shopify.html'
-    repo: https://github.com/singer-io/tap-shopify
-    pip_url: tap-shopify
-    capabilities:
-      - catalog
-      - discover
-      - state
-    select:
-      # Select everything except for `metafields.*`.
-      # Selecting `*.*` and `!metafields.*` doesn't work because `*.*` takes
-      # precedence at the stream level, so we would still get `metafields.id`
-      # and `metafields.updated_at` since these are `inclusion: available`
-      - abandoned_checkouts.*
-      - collects.*
-      - custom_collections.*
-      - customers.*
-      - order_refunds.*
-      - orders.*
-      - products.*
-      - transactions.*
-    settings:
-      - name: shop
-        label: Store Subdomain
-        placeholder: Ex. my-first-store
-      - name: api_key
-        kind: password
-        label: Private App API Password
-        placeholder: Ex. shppa_1a2b3c4d5e6f
-      - name: start_date
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+    variants:
+    - name: singer-io
+      docs: 'https://hub.meltano.com/extractors/shopify.html'
+      repo: https://github.com/singer-io/tap-shopify
+      pip_url: tap-shopify
+      capabilities:
+        - catalog
+        - discover
+        - state
+      select:
+        # Select everything except for `metafields.*`.
+        # Selecting `*.*` and `!metafields.*` doesn't work because `*.*` takes
+        # precedence at the stream level, so we would still get `metafields.id`
+        # and `metafields.updated_at` since these are `inclusion: available`
+        - abandoned_checkouts.*
+        - collects.*
+        - custom_collections.*
+        - customers.*
+        - order_refunds.*
+        - orders.*
+        - products.*
+        - transactions.*
+      settings:
+        - name: shop
+          label: Store Subdomain
+          placeholder: Ex. my-first-store
+        - name: api_key
+          kind: password
+          label: Private App API Password
+          placeholder: Ex. shppa_1a2b3c4d5e6f
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   - name: tap-slack
     label: Slack
     description: Team communication tool
     namespace: tap_slack
-    docs: 'https://hub.meltano.com/extractors/slack.html'
-    repo: https://github.com/Mashey/tap-slack
-    pip_url: git+https://github.com/Mashey/tap-slack.git
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: api_token
-        kind: password
-        label: API Token
-        documentation: https://slack.com/help/articles/215770388-Create-and-regenerate-API-tokens
-      - name: start_date
-        kind: date_iso8601
-        label: Sync Start Date
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-      - name: channels
-        labels: Channels to Sync
-        kind: array
-        description: By default the tap will sync all channels it has been invited to, but this can be overriden to limit it ot specific channels. Note this needs to be channel ID, not the name, as recommended by the Slack API. To get the ID for a channel, either use the Slack API or find it in the URL.
-        placeholder: Ex. ["abc123", "def456"]
-      - name: private_channels
-        label: Join Private Channels
-        kind: boolean
-        value: true
-        description: Specifies whether to sync private channels or not. Default is true.
-      - name: join_public_channels
-        label: Join Public Channels
-        kind: boolean
-        value: false
-        description: Specifies whether to have the tap auto-join all public channels in your ogranziation. Default is false.
-      - name: archived_channels
-        label: Sync Archived Channels
-        kind: boolean
-        value: false
-        description: Specifies whether the tap will sync archived channels or not. Note that a bot cannot join an archived channel, so unless the bot was added to the channel prior to it being archived it will not be able to sync the data from that channel. Default is false.
-      - name: date_window_size
-        label: Date Window Size
-        kind: integer
-        value: 7
-        description: Specifies the window size for syncing certain streams (messages, files, threads). The default is 7 days.
+    variants:
+    - name: mashey
+      docs: 'https://hub.meltano.com/extractors/slack.html'
+      repo: https://github.com/Mashey/tap-slack
+      pip_url: git+https://github.com/Mashey/tap-slack.git
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: api_token
+          kind: password
+          label: API Token
+          documentation: https://slack.com/help/articles/215770388-Create-and-regenerate-API-tokens
+        - name: start_date
+          kind: date_iso8601
+          label: Sync Start Date
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        - name: channels
+          labels: Channels to Sync
+          kind: array
+          description: By default the tap will sync all channels it has been invited to, but this can be overriden to limit it ot specific channels. Note this needs to be channel ID, not the name, as recommended by the Slack API. To get the ID for a channel, either use the Slack API or find it in the URL.
+          placeholder: Ex. ["abc123", "def456"]
+        - name: private_channels
+          label: Join Private Channels
+          kind: boolean
+          value: true
+          description: Specifies whether to sync private channels or not. Default is true.
+        - name: join_public_channels
+          label: Join Public Channels
+          kind: boolean
+          value: false
+          description: Specifies whether to have the tap auto-join all public channels in your ogranziation. Default is false.
+        - name: archived_channels
+          label: Sync Archived Channels
+          kind: boolean
+          value: false
+          description: Specifies whether the tap will sync archived channels or not. Note that a bot cannot join an archived channel, so unless the bot was added to the channel prior to it being archived it will not be able to sync the data from that channel. Default is false.
+        - name: date_window_size
+          label: Date Window Size
+          kind: integer
+          value: 7
+          description: Specifies the window size for syncing certain streams (messages, files, threads). The default is 7 days.
   - name: tap-spreadsheets-anywhere
     label: Spreadsheets Anywhere
     description: Data extractor for CSV and Excel files from any smart_open supported transport (S3, SFTP, localhost, etc...)
     namespace: tap_spreadsheets_anywhere
-    docs: 'https://hub.meltano.com/extractors/spreadsheets-anywhere.html'
-    repo: https://github.com/ets/tap-spreadsheets-anywhere
-    pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: tables
-        kind: array
-        description: An array holding json objects that each describe a set of targeted source files. See docs for details.
+    variants:
+    - name: ets
+      docs: 'https://hub.meltano.com/extractors/spreadsheets-anywhere.html'
+      repo: https://github.com/ets/tap-spreadsheets-anywhere
+      pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: tables
+          kind: array
+          description: An array holding json objects that each describe a set of targeted source files. See docs for details.
   - name: tap-stripe
     label: Stripe
     description: Online payment processing for internet businesses
     namespace: tap_stripe
-    variant: meltano
-    docs: 'https://hub.meltano.com/extractors/stripe.html'
-    repo: https://github.com/meltano/tap-stripe
-    pip_url: 'git+https://github.com/meltano/tap-stripe.git'
-    capabilities:
-      - catalog
-      - discover
-      - state
-    settings:
-      - name: account_id
-        env_aliases: [STRIPE_ACCOUNT_ID]
-        label: Account ID
-        placeholder: Ex. acct_1a2b3c4d5e
-      - name: client_secret
-        env_aliases: [STRIPE_API_KEY]
-        kind: password
-        label: Secret API Key
-        placeholder: Ex. sk_live_1a2b3c4d5e
-      - name: start_date
-        kind: date_iso8601
-        description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+    variants:
+    - name: meltano
+      docs: 'https://hub.meltano.com/extractors/stripe.html'
+      repo: https://github.com/meltano/tap-stripe
+      pip_url: 'git+https://github.com/meltano/tap-stripe.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: account_id
+          env_aliases: [STRIPE_ACCOUNT_ID]
+          label: Account ID
+          placeholder: Ex. acct_1a2b3c4d5e
+        - name: client_secret
+          env_aliases: [STRIPE_API_KEY]
+          kind: password
+          label: Secret API Key
+          placeholder: Ex. sk_live_1a2b3c4d5e
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   - name: tap-twilio
     description: Cloud communications platform as a service
     label: Twilio
@@ -1465,7 +1488,8 @@ extractors:
 
           - name: access_token
             kind: password
-            description: OAuth Access Token
+            description: To use OAuth, you will need to fetch an `access_token` from a configured
+        Zendesk integration.
             documentation: https://support.zendesk.com/hc/en-us/articles/203663836
 
           - name: subdomain
@@ -1512,92 +1536,95 @@ extractors:
     label: Zoom
     description: Video conferencing software
     namespace: tap_zoom
-    variant: mashey
-    docs: 'https://hub.meltano.com/extractors/zoom.html'
-    repo: https://github.com/mashey/tap-zoom
-    pip_url: 'git+https://github.com/mashey/tap-zoom.git'
-    capabilities:
-      - catalog
-      - discover
-    settings_group_validation:
-      - ['jwt']
-      - ['client_id', 'client_secret', 'refresh_token']
-    settings:
-      - name: jwt
-        kind: password
-        label: JSON Web Token
-        documentation: https://marketplace.zoom.us/docs/guides/auth/jwt
-      - name: client_id
-        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
-      - name: client_secret
-        kind: password
-        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
-      - name: refresh_token
-        kind: password
-        documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+    variants:
+    - name: mashey
+      docs: 'https://hub.meltano.com/extractors/zoom.html'
+      repo: https://github.com/mashey/tap-zoom
+      pip_url: 'git+https://github.com/mashey/tap-zoom.git'
+      capabilities:
+        - catalog
+        - discover
+      settings_group_validation:
+        - ['jwt']
+        - ['client_id', 'client_secret', 'refresh_token']
+      settings:
+        - name: jwt
+          kind: password
+          label: JSON Web Token
+          documentation: https://marketplace.zoom.us/docs/guides/auth/jwt
+        - name: client_id
+          documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+        - name: client_secret
+          kind: password
+          documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+        - name: refresh_token
+          kind: password
+          documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
 
   # Hidden taps:
   - name: tap-carbon-intensity
     label: Carbon Emissions Intensity
     description: National Grid ESO's Carbon Emissions Intensity API
     namespace: tap_carbon
-    variant: meltano
-    hidden: true
-    repo: https://gitlab.com/meltano/tap-carbon-intensity
-    pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity.git'
-    capabilities:
-      - discover
+    variants:
+    - name: meltano
+      hidden: true
+      repo: https://gitlab.com/meltano/tap-carbon-intensity
+      pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity.git'
+      capabilities:
+        - discover
 loaders:
   - name: target-bigquery
     label: BigQuery
     description: BigQuery loader
     namespace: target_bigquery
-    variant: adswerve
-    docs: https://hub.meltano.com/loaders/bigquery.html
-    repo: https://github.com/adswerve/target-bigquery
-    pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
-    dialect: bigquery
-    target_schema: $TARGET_BIGQUERY_DATASET_ID
-    settings_group_validation:
-      - ['project_id', 'dataset_id', 'location', 'credentials_path']
-    settings:
-      - name: project_id
-        description: BigQuery project
-      - name: dataset_id
-        description: BigQuery dataset
-        value: $MELTANO_EXTRACT__LOAD_SCHEMA
-      - name: location
-        description: Dataset location
-        value: US
-      - name: credentials_path
-        # The target doesn't know this setting, but will read the GOOGLE_APPLICATION_CREDENTIALS env var.
-        env_aliases: [GOOGLE_APPLICATION_CREDENTIALS]
-        value: $MELTANO_PROJECT_ROOT/client_secrets.json
-        description: Fully qualified path to `client_secrets.json` for your service account.
-      - name: validate_records
-        description: Validate records
-        kind: boolean
-        value: false
-      - name: add_metadata_columns
-        description: Add `_time_extracted` and `_time_loaded` metadata columns
-        kind: boolean
-        value: false
-      - name: replication_method
-        description: Replication method, `append` or `truncate`
-        kind: options
-        options:
-          - label: Append
-            value: append
-          - label: Truncate
-            value: truncate
-        value: append
-      - name: table_prefix
-        description: Add prefix to table name
-      - name: table_suffix
-        description: Add suffix to table name
-      - name: max_cache
-        description: Maximum cache size in MB
-        value: 50
+    variants:
+    - name: adswerve
+      docs: https://hub.meltano.com/loaders/bigquery.html
+      repo: https://github.com/adswerve/target-bigquery
+      pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
+      dialect: bigquery
+      target_schema: $TARGET_BIGQUERY_DATASET_ID
+      settings_group_validation:
+        - ['project_id', 'dataset_id', 'location', 'credentials_path']
+      settings:
+        - name: project_id
+          description: BigQuery project
+        - name: dataset_id
+          description: BigQuery dataset
+          value: $MELTANO_EXTRACT__LOAD_SCHEMA
+        - name: location
+          description: Dataset location
+          value: US
+        - name: credentials_path
+          # The target doesn't know this setting, but will read the GOOGLE_APPLICATION_CREDENTIALS env var.
+          env_aliases: [GOOGLE_APPLICATION_CREDENTIALS]
+          value: $MELTANO_PROJECT_ROOT/client_secrets.json
+          description: Fully qualified path to `client_secrets.json` for your service account.
+        - name: validate_records
+          description: Validate records
+          kind: boolean
+          value: false
+        - name: add_metadata_columns
+          description: Add `_time_extracted` and `_time_loaded` metadata columns
+          kind: boolean
+          value: false
+        - name: replication_method
+          description: Replication method, `append` or `truncate`
+          kind: options
+          options:
+            - label: Append
+              value: append
+            - label: Truncate
+              value: truncate
+          value: append
+        - name: table_prefix
+          description: Add prefix to table name
+        - name: table_suffix
+          description: Add suffix to table name
+        - name: max_cache
+          description: Maximum cache size in MB
+          value: 50
   - name: target-csv
     label: Comma Separated Values (CSV)
     description: CSV loader
@@ -1667,19 +1694,20 @@ loaders:
     label: JSON Lines (JSONL)
     description: JSONL loader
     namespace: target_jsonl
-    variant: andyh1203
-    docs: https://hub.meltano.com/loaders/jsonl.html
-    repo: https://github.com/andyh1203/target-jsonl
-    pip_url: target-jsonl
-    settings:
-      - name: destination_path
-        description: Sets the destination path the JSONL files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write JSONL files to the project root, set an empty string (`""`).
-        value: output
-      - name: do_timestamp_file
-        kind: boolean
-        label: Include timestamp in file names
-        description: Specifies if the files should get timestamped
-        value: false
+    variants:
+    - name: andyh1203
+      docs: https://hub.meltano.com/loaders/jsonl.html
+      repo: https://github.com/andyh1203/target-jsonl
+      pip_url: target-jsonl
+      settings:
+        - name: destination_path
+          description: Sets the destination path the JSONL files are written to, relative to the project root. The directory needs to exist already, it will not be created automatically. To write JSONL files to the project root, set an empty string (`""`).
+          value: output
+        - name: do_timestamp_file
+          kind: boolean
+          label: Include timestamp in file names
+          description: Specifies if the files should get timestamped
+          value: false
   - name: target-postgres
     label: PostgreSQL
     description: PostgreSQL database loader
@@ -2167,169 +2195,171 @@ loaders:
     label: SQLite
     description: SQLite database loader
     namespace: target_sqlite
-    variant: meltano
-    docs: 'https://hub.meltano.com/loaders/sqlite.html'
-    repo: https://gitlab.com/meltano/target-sqlite
-    pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
-    dialect: sqlite
-    settings_group_validation:
-      - ['batch_size']
-    settings:
-      - name: database
-        label: Database Name
-        description: Name of the SQLite database file to be used or created, relative to the project root. The `.db` extension is optional and will be added automatically when omitted.
-        value: warehouse
-        env_aliases: [SQLITE_DATABASE]
-      - name: batch_size
-        kind: integer
-        value: 50
-        description: How many records are sent to SQLite at a time?
-      - name: timestamp_column
-        value: '__loaded_at'
-        description: Name of the column used for recording the timestamp when Data are loaded to SQLite.
+    variants:
+    - name: meltano
+      docs: 'https://hub.meltano.com/loaders/sqlite.html'
+      repo: https://gitlab.com/meltano/target-sqlite
+      pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
+      dialect: sqlite
+      settings_group_validation:
+        - ['batch_size']
+      settings:
+        - name: database
+          label: Database Name
+          description: Name of the SQLite database file to be used or created, relative to the project root. The `.db` extension is optional and will be added automatically when omitted.
+          value: warehouse
+          env_aliases: [SQLITE_DATABASE]
+        - name: batch_size
+          kind: integer
+          value: 50
+          description: How many records are sent to SQLite at a time?
+        - name: timestamp_column
+          value: '__loaded_at'
+          description: Name of the column used for recording the timestamp when Data are loaded to SQLite.
   - name: target-redshift
     label: Amazon Redshift
     description: Amazon Redshift loader
     namespace: target_redshift
-    variant: transferwise
-    repo: https://github.com/transferwise/pipelinewise-target-redshift
-    docs: https://hub.meltano.com/loaders/redshift.html
-    pip_url: pipelinewise-target-redshift
-    executable: target-redshift
-    capabilities:
-      - catalog
-      - discover
-      - state
-    dialect: redshift
-    target_schema: $TARGET_REDSHIFT_SCHEMA
-    settings_group_validation:
-      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_profile']
-      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_access_key_id', 'aws_secret_access_key']
-      - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_session_token']
-    settings:
-    - name: host
-      description: Redshift host
-    - name: port
-      kind: integer
-      value: 5439
-      description: Redshift port
-    - name: dbname
-      label: Database Name
-      description: Redshift database name
-    - name: user
-      label: User name
-      description: Redshift user name
-    - name: password
-      kind: password
-      description: Redshift password
-    - name: s3_bucket
-      label: S3 Bucket name
-      description: AWS S3 bucket name
-    - name: default_target_schema
-      env_aliases: [TARGET_REDSHIFT_SCHEMA]
-      value: $MELTANO_EXTRACT__LOAD_SCHEMA
-      description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
-
-    # Optional settings
-    - name: aws_profile
-      label: AWS profile name
-      env_aliases: [AWS_PROFILE]
-      description: AWS profile name for profile based authentication. If not provided, AWS_PROFILE environment variable will be used.
-    - name: aws_access_key_id
-      kind: password
-      label: AWS S3 Access Key ID
-      env_aliases: [AWS_ACCESS_KEY_ID]
-      description: S3 Access Key Id. Used for S3 and Redshift copy operations. If not provided, AWS_ACCESS_KEY_ID environment variable will be used.
-    - name: aws_secret_access_key
-      label: AWS S3 Secret Access Key
-      kind: password
-      env_aliases: [AWS_SECRET_ACCESS_KEY]
-      description: S3 Secret Access Key. Used for S3 and Redshift copy operations. If not provided, AWS_SECRET_ACCESS_KEY environment variable will be used.
-    - name: aws_session_token
-      label: AWS S3 Session Token
-      kind: password
-      env_aliases: [AWS_SESSION_TOKEN]
-      description: S3 AWS STS token for temporary credentials. If not provided, AWS_SESSION_TOKEN environment variable will be used.
-    - name: aws_redshift_copy_role_arn
-      label: AWS Redshift COPY role ARN
-      description: AWS Role ARN to be used for the Redshift COPY operation. Used instead of the given AWS keys for the COPY operation if provided - the keys are still used for other S3 operations
-    - name: s3_acl
-      label: AWS S3 ACL
-      description: S3 Object ACL
-    - name: s3_key_prefix
-      label: S3 Key Prefix
-      description: A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket. Default(None)
-    - name: copy_options
-      label: COPY options
-      value: EMPTYASNULL BLANKSASNULL TRIMBLANKS TRUNCATECOLUMNS TIMEFORMAT 'auto' COMPUPDATE OFF STATUPDATE OFF
-      description: >
-        Parameters to use in the COPY command when loading data to Redshift. Some basic file formatting parameters are fixed values and not recommended overriding them by custom values. They are like: `CSV GZIP DELIMITER ',' REMOVEQUOTES ESCAPE`.
-    - name: batch_size_rows
-      kind: integer
-      value: 100000
-      description: Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Redshift.
-    - name: flush_all_streams
-      kind: boolean
-      value: false
-      description: Flush and load every stream into Redshift when one batch is full. Warning - This may trigger the COPY command to use files with low number of records, and may cause performance problems.
-    - name: parallelism
-      kind: integer
-      value: 0
-      description: The number of threads used to flush tables. 0 will create a thread for each stream, up to parallelism_max. -1 will create a thread for each CPU core. Any other positive number will create that number of threads, up to parallelism_max.
-    - name: max_parallelism
-      kind: integer
-      value: 16
-      description: Max number of parallel threads to use when flushing tables.
-    - name: default_target_schema_select_permissions
-      description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific list of users or groups. If schema_mapping is not defined then every stream sent by the tap is granted accordingly.
-    - name: schema_mapping
-      kind: object
-      description: Useful if you want to load multiple streams from one tap to multiple Redshift schemas. If the tap sends the stream_id in <schema_name>-<table_name> format then this option overwrites the default_target_schema value. Note, that using schema_mapping you can overwrite the default_target_schema_select_permissions value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
-    - name: disable_table_cache
-      kind: boolean
-      value: false
-      description: By default the connector caches the available table structures in Redshift at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With disable_table_cache option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.
-    - name: add_metadata_columns
-      kind: boolean
-      value: false
-      description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in redshift etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix _SDC_. The metadata columns are documented at https://transferwise.github.io/pipelinewise/data_structure/sdc-columns.html. Enabling metadata columns will flag the deleted rows by setting the _SDC_DELETED_AT metadata column. Without the add_metadata_columns option the deleted rows from singer taps will not be recongisable in Redshift.
-    - name: hard_delete
-      kind: boolean
-      value: false
-      description: When hard_delete option is true then DELETE SQL commands will be performed in Redshift to delete rows in tables. It's achieved by continuously checking the _SDC_DELETED_AT metadata column sent by the singer tap. Due to deleting rows requires metadata columns, hard_delete option automatically enables the add_metadata_columns option as well.
-    - name: data_flattening_max_level
-      kind: integer
-      value: 0
-      description: Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off.
-    - name: primary_key_required
-      kind: boolean
-      value: true
-      description: Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined.
-    - name: validate_records
-      kind: boolean
-      value: false
-      description: Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Redshift. Enabling this option will detect invalid records earlier but could cause performance degradation.
-    - name: skip_updates
-      kind: boolean
-      value: false
-      description: Do not update existing records when Primary Key is defined. Useful to improve performance when records are immutable, e.g. events
-    - name: compression
-      kind: options
-      options:
-        - label: None
-          value: ""
-        - label: gzip
-          value: gzip
-        - label: bzip2
-          value: bzip2
-      description: The compression method to use when writing files to S3 and running Redshift COPY.
-    - name: slices
-      kind: integer
-      value: 1
-      description: The number of slices to split files into prior to running COPY on Redshift. This should be set to the number of Redshift slices. The number of slices per node depends on the node size of the cluster - run SELECT COUNT(DISTINCT slice) slices FROM stv_slices to calculate this. Defaults to 1.
-    - name: temp_dir
-      label: Temp directory
-      description: "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages."
+    variants:
+    - name: transferwise
+      repo: https://github.com/transferwise/pipelinewise-target-redshift
+      docs: https://hub.meltano.com/loaders/redshift.html
+      pip_url: pipelinewise-target-redshift
+      executable: target-redshift
+      capabilities:
+        - catalog
+        - discover
+        - state
+      dialect: redshift
+      target_schema: $TARGET_REDSHIFT_SCHEMA
+      settings_group_validation:
+        - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_profile']
+        - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_access_key_id', 'aws_secret_access_key']
+        - ['host', 'port', 'user', 'password', 'dbname', 's3_bucket', 'default_target_schema', 'aws_session_token']
+      settings:
+      - name: host
+        description: Redshift host
+      - name: port
+        kind: integer
+        value: 5439
+        description: Redshift port
+      - name: dbname
+        label: Database Name
+        description: Redshift database name
+      - name: user
+        label: User name
+        description: Redshift user name
+      - name: password
+        kind: password
+        description: Redshift password
+      - name: s3_bucket
+        label: S3 Bucket name
+        description: AWS S3 bucket name
+      - name: default_target_schema
+        env_aliases: [TARGET_REDSHIFT_SCHEMA]
+        value: $MELTANO_EXTRACT__LOAD_SCHEMA
+        description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
+  
+      # Optional settings
+      - name: aws_profile
+        label: AWS profile name
+        env_aliases: [AWS_PROFILE]
+        description: AWS profile name for profile based authentication. If not provided, AWS_PROFILE environment variable will be used.
+      - name: aws_access_key_id
+        kind: password
+        label: AWS S3 Access Key ID
+        env_aliases: [AWS_ACCESS_KEY_ID]
+        description: S3 Access Key Id. Used for S3 and Redshift copy operations. If not provided, AWS_ACCESS_KEY_ID environment variable will be used.
+      - name: aws_secret_access_key
+        label: AWS S3 Secret Access Key
+        kind: password
+        env_aliases: [AWS_SECRET_ACCESS_KEY]
+        description: S3 Secret Access Key. Used for S3 and Redshift copy operations. If not provided, AWS_SECRET_ACCESS_KEY environment variable will be used.
+      - name: aws_session_token
+        label: AWS S3 Session Token
+        kind: password
+        env_aliases: [AWS_SESSION_TOKEN]
+        description: S3 AWS STS token for temporary credentials. If not provided, AWS_SESSION_TOKEN environment variable will be used.
+      - name: aws_redshift_copy_role_arn
+        label: AWS Redshift COPY role ARN
+        description: AWS Role ARN to be used for the Redshift COPY operation. Used instead of the given AWS keys for the COPY operation if provided - the keys are still used for other S3 operations
+      - name: s3_acl
+        label: AWS S3 ACL
+        description: S3 Object ACL
+      - name: s3_key_prefix
+        label: S3 Key Prefix
+        description: A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket. Default(None)
+      - name: copy_options
+        label: COPY options
+        value: EMPTYASNULL BLANKSASNULL TRIMBLANKS TRUNCATECOLUMNS TIMEFORMAT 'auto' COMPUPDATE OFF STATUPDATE OFF
+        description: >
+          Parameters to use in the COPY command when loading data to Redshift. Some basic file formatting parameters are fixed values and not recommended overriding them by custom values. They are like: `CSV GZIP DELIMITER ',' REMOVEQUOTES ESCAPE`.
+      - name: batch_size_rows
+        kind: integer
+        value: 100000
+        description: Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Redshift.
+      - name: flush_all_streams
+        kind: boolean
+        value: false
+        description: Flush and load every stream into Redshift when one batch is full. Warning - This may trigger the COPY command to use files with low number of records, and may cause performance problems.
+      - name: parallelism
+        kind: integer
+        value: 0
+        description: The number of threads used to flush tables. 0 will create a thread for each stream, up to parallelism_max. -1 will create a thread for each CPU core. Any other positive number will create that number of threads, up to parallelism_max.
+      - name: max_parallelism
+        kind: integer
+        value: 16
+        description: Max number of parallel threads to use when flushing tables.
+      - name: default_target_schema_select_permissions
+        description: Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific list of users or groups. If schema_mapping is not defined then every stream sent by the tap is granted accordingly.
+      - name: schema_mapping
+        kind: object
+        description: Useful if you want to load multiple streams from one tap to multiple Redshift schemas. If the tap sends the stream_id in <schema_name>-<table_name> format then this option overwrites the default_target_schema value. Note, that using schema_mapping you can overwrite the default_target_schema_select_permissions value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.
+      - name: disable_table_cache
+        kind: boolean
+        value: false
+        description: By default the connector caches the available table structures in Redshift at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With disable_table_cache option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.
+      - name: add_metadata_columns
+        kind: boolean
+        value: false
+        description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in redshift etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix _SDC_. The metadata columns are documented at https://transferwise.github.io/pipelinewise/data_structure/sdc-columns.html. Enabling metadata columns will flag the deleted rows by setting the _SDC_DELETED_AT metadata column. Without the add_metadata_columns option the deleted rows from singer taps will not be recongisable in Redshift.
+      - name: hard_delete
+        kind: boolean
+        value: false
+        description: When hard_delete option is true then DELETE SQL commands will be performed in Redshift to delete rows in tables. It's achieved by continuously checking the _SDC_DELETED_AT metadata column sent by the singer tap. Due to deleting rows requires metadata columns, hard_delete option automatically enables the add_metadata_columns option as well.
+      - name: data_flattening_max_level
+        kind: integer
+        value: 0
+        description: Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off.
+      - name: primary_key_required
+        kind: boolean
+        value: true
+        description: Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined.
+      - name: validate_records
+        kind: boolean
+        value: false
+        description: Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Redshift. Enabling this option will detect invalid records earlier but could cause performance degradation.
+      - name: skip_updates
+        kind: boolean
+        value: false
+        description: Do not update existing records when Primary Key is defined. Useful to improve performance when records are immutable, e.g. events
+      - name: compression
+        kind: options
+        options:
+          - label: None
+            value: ""
+          - label: gzip
+            value: gzip
+          - label: bzip2
+            value: bzip2
+        description: The compression method to use when writing files to S3 and running Redshift COPY.
+      - name: slices
+        kind: integer
+        value: 1
+        description: The number of slices to split files into prior to running COPY on Redshift. This should be set to the number of Redshift slices. The number of slices per node depends on the node size of the cluster - run SELECT COUNT(DISTINCT slice) slices FROM stv_slices to calculate this. Defaults to 1.
+      - name: temp_dir
+        label: Temp directory
+        description: "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages."
 transformers:
   - name: dbt
     namespace: dbt
