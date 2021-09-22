@@ -1488,8 +1488,7 @@ extractors:
 
           - name: access_token
             kind: password
-            description: To use OAuth, you will need to fetch an `access_token` from a configured
-        Zendesk integration.
+            description: To use OAuth, you will need to fetch an `access_token` from a configured Zendesk integration.
             documentation: https://support.zendesk.com/hc/en-us/articles/203663836
 
           - name: subdomain
