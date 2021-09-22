@@ -1478,15 +1478,19 @@ extractors:
           - ['access_token', 'subdomain', 'start_date']
         settings:
           - name: email
+            label: Email
             kind: email
             placeholder: Ex. me@my-organization.com
+            description: This is the email you use to login to your Zendesk dashboard. For API Authentication, `/token` is automatically appended to the email address and is not required in the configuration.
           - name: api_token
             kind: password
             label: API Token
             placeholder: Ex. *****************
+            description: You can use the API Token authentication which can be generated from the Zendesk Admin page.
             documentation: https://support.zendesk.com/hc/en-us/articles/226022787-Generating-a-new-API-token-
 
           - name: access_token
+            label: Access Token
             kind: password
             description: To use OAuth, you will need to fetch an `access_token` from a configured Zendesk integration.
             documentation: https://support.zendesk.com/hc/en-us/articles/203663836
@@ -1494,8 +1498,11 @@ extractors:
           - name: subdomain
             label: Zendesk Subdomain
             placeholder: Ex. my-subdomain.zendesk.com
+            description: >
+              When visiting your Zendesk instance, the URL is structured as follows: `SUBDOMAIN.zendesk.com`. For example, if the URL is `meltano.zendesk.com`, then the subdomain is `meltano`.
             documentation: https://support.zendesk.com/hc/en-us/articles/221682747-Where-can-I-find-my-Zendesk-subdomain-
           - name: start_date
+            label: Start Date
             kind: date_iso8601
             description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
       - name: singer-io
