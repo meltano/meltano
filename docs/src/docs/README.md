@@ -223,35 +223,28 @@ These efforts are the foundation of our larger vision to enable a full DataOps p
 
 #### September 2021
 
-In September we aim to launch composable pipelines for Meltano, unlocking a more powerful ELT paradigm that what currently exists. 
-We will also integrate Great Expectations and `dbt test` as new validators which can be composed with the regular ELT tasks. 
-For the Singer ecosystem, we will finalize the work needed to make Meltano rely on MeltanoHub and release the first iteration of the BATCH message types in the Meltano SDK.
-
 * Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
 * Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725)
 * MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
 * Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/124) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2927)
 * Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
-### October
+### October 2021
 
-* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725)
+* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116)
+  * Stream Maps [Issue](https://gitlab.com/meltano/meltano/-/issues/2300)
+  * `meltano run` [Issue](https://gitlab.com/meltano/meltano/-/issues/2301)
 * Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/124)
 * Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
-* Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
+* Native Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
 
-### November
-
-* dbt support improvements
-  * "there should be no question on how to run all or part of dbt"
-  * ties in w/ environments
+### November 2021
 
 * Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
-  - More discussion, plan for november
 * Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
 * Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
 
-### December
+### December 2021
 
 * Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
 * Monitoring, observability, and data lineage - [Epic](https://gitlab.com/groups/meltano/-/epics/93)
