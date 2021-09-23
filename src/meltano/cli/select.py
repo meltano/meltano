@@ -46,6 +46,8 @@ def selection_mark(selection):
 @click.argument("attributes_filter", default="*")
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
+@click.option("--rm", is_flag=True)
+@click.option("--remove", is_flag=True)
 @click.option("--exclude", is_flag=True)
 @pass_project(migrate=True)
 @click_run_async
@@ -54,8 +56,17 @@ async def select(project, extractor, entities_filter, attributes_filter, **flags
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])
+        elif flags["rm"] or flags["remove"]:
+            update(
+                project,
+                extractor,
+                entities_filter,
+                attributes_filter,
+                exclude=flags["exclude"],
+                remove=True,
+            )
         else:
-            add(
+            update(
                 project,
                 extractor,
                 entities_filter,
@@ -74,16 +85,15 @@ async def select(project, extractor, entities_filter, attributes_filter, **flags
         raise CliError(f"Cannot list the selected attributes: {err}") from err
 
 
-def add(project, extractor, entities_filter, attributes_filter, exclude=False):
-    """Add an new select pattern to a specific extractor."""
+def update(
+    project, extractor, entities_filter, attributes_filter, exclude=False, remove=False
+):
+    """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
-    select_service.select(entities_filter, attributes_filter, exclude)
-
-
-def remove(project, extractor, entities_filter, attributes_filter, exclude=False):
-    """Remove an existing select pattern from a specific extractor."""
-    select_service = SelectService(project, extractor)
-    select_service.remove(entities_filter, attributes_filter, exclude)
+    if not remove:
+        select_service.select(entities_filter, attributes_filter, exclude)
+    else:
+        select_service.remove(entities_filter, attributes_filter, exclude)
 
 
 async def show(project, extractor, show_all=False):

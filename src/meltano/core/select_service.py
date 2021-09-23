@@ -2,7 +2,6 @@ import json
 import logging
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -63,7 +62,7 @@ class SelectService:
 
         return list_all
 
-    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:
+    def _get_pattern_string(self, entities_filter, attributes_filter, exclude) -> str:
         """Return a select pattern in string form."""
         exclude = "!" if exclude else ""
         return f"{exclude}{entities_filter}.{attributes_filter}"
