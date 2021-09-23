@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2647](https://gitlab.com/meltano/meltano/-/issues/2647) Extend `meltano select` with flag to remove rules.
+
 ### Changes
 
 ### Fixes
