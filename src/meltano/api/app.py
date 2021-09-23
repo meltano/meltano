@@ -19,7 +19,7 @@ from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.oauth.app import create_app as create_oauth_service
-from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 setup_logging()
 
