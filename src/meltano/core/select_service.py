@@ -28,7 +28,7 @@ class SelectService:
 
     @property
     def extractor(self) -> ProjectPlugin:
-        """Retrieved extractor ProjectPlugin object referenced by name during init."""
+        """Retrieve extractor ProjectPlugin object."""
         return self._extractor
 
     @property
