@@ -41,7 +41,7 @@ class TestCliSelect:
             json_config = json.loads(result.stdout)
             assert "mock.*" in json_config["_select"]
             # remove select pattern
-            _ = cli_runner.invoke(cli, ["select", "--rm", tap.name, "mock", "*"])
+            _ = cli_runner.invoke(cli, ["select", tap.name, "--rm", "mock", "*"])
             assert_cli_runner(_)
             result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
             assert_cli_runner(result)
