@@ -2,7 +2,9 @@ import json
 import logging
 
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
@@ -26,7 +28,7 @@ class SelectService:
         )
 
     @property
-    def extractor(self):
+    def extractor(self) -> ProjectPlugin:
         return self._extractor
 
     @property
@@ -61,14 +63,25 @@ class SelectService:
 
         return list_all
 
-    def select(self, entities_filter, attributes_filter, exclude=False):
+    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:
+        """Return a select pattern in string form."""
         exclude = "!" if exclude else ""
-        pattern = f"{exclude}{entities_filter}.{attributes_filter}"
+        return f"{exclude}{entities_filter}.{attributes_filter}"
 
+    def select(self, entities_filter, attributes_filter, exclude=False):
+        """Add a new select pattern."""
+        pattern = self._get_pattern_string(entities_filter, attributes_filter, exclude)
         plugin = self.extractor
-
         select = plugin.extras.get("select", [])
         select.append(pattern)
         plugin.extras["select"] = select
+        self.plugins_service.update_plugin(plugin)
 
+    def remove(self, entities_filter, attributes_filter, exclude=False):
+        """Remove a select pattern."""
+        pattern = self._get_pattern_string(entities_filter, attributes_filter, exclude)
+        plugin = self.extractor
+        select = plugin.extras.get("select", [])
+        select.remove(pattern)
+        plugin.extras["select"] = select
         self.plugins_service.update_plugin(plugin)

@@ -75,8 +75,15 @@ async def select(project, extractor, entities_filter, attributes_filter, **flags
 
 
 def add(project, extractor, entities_filter, attributes_filter, exclude=False):
+    """Add an new select pattern to a specific extractor."""
     select_service = SelectService(project, extractor)
     select_service.select(entities_filter, attributes_filter, exclude)
+
+
+def remove(project, extractor, entities_filter, attributes_filter, exclude=False):
+    """Remove an existing select pattern from a specific extractor."""
+    select_service = SelectService(project, extractor)
+    select_service.remove(entities_filter, attributes_filter, exclude)
 
 
 async def show(project, extractor, show_all=False):
