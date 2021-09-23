@@ -90,10 +90,10 @@ def update(
 ):
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
-    if not remove:
-        select_service.select(entities_filter, attributes_filter, exclude)
-    else:
+    if remove:
         select_service.remove(entities_filter, attributes_filter, exclude)
+    else:
+        select_service.select(entities_filter, attributes_filter, exclude)
 
 
 async def show(project, extractor, show_all=False):

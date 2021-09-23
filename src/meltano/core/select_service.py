@@ -28,6 +28,7 @@ class SelectService:
 
     @property
     def extractor(self) -> ProjectPlugin:
+        """Retrieved extractor ProjectPlugin object referenced by name during init."""
         return self._extractor
 
     @property
@@ -62,25 +63,29 @@ class SelectService:
 
         return list_all
 
+    def select(self, entities_filter, attributes_filter, exclude=False):
+        """Add a new select pattern."""
+        return self.update(entities_filter, attributes_filter, exclude)
+
+    def remove(self, entities_filter, attributes_filter, exclude=False):
+        """Remove a select pattern."""
+        return self.update(entities_filter, attributes_filter, exclude, remove=True)
+
+    def update(self, entities_filter, attributes_filter, exclude, remove=False):
+        """Update plugins' select patterns."""
+        plugin = self.extractor
+        this_pattern = self._get_pattern_string(
+            entities_filter, attributes_filter, exclude
+        )
+        patterns = plugin.extras.get("select", [])
+        if remove:
+            patterns.remove(this_pattern)
+        else:
+            patterns.append(this_pattern)
+        plugin.extras["select"] = patterns
+        self.plugins_service.update_plugin(plugin)
+
     def _get_pattern_string(self, entities_filter, attributes_filter, exclude) -> str:
         """Return a select pattern in string form."""
         exclude = "!" if exclude else ""
         return f"{exclude}{entities_filter}.{attributes_filter}"
-
-    def select(self, entities_filter, attributes_filter, exclude=False):
-        """Add a new select pattern."""
-        pattern = self._get_pattern_string(entities_filter, attributes_filter, exclude)
-        plugin = self.extractor
-        select = plugin.extras.get("select", [])
-        select.append(pattern)
-        plugin.extras["select"] = select
-        self.plugins_service.update_plugin(plugin)
-
-    def remove(self, entities_filter, attributes_filter, exclude=False):
-        """Remove a select pattern."""
-        pattern = self._get_pattern_string(entities_filter, attributes_filter, exclude)
-        plugin = self.extractor
-        select = plugin.extras.get("select", [])
-        select.remove(pattern)
-        plugin.extras["select"] = select
-        self.plugins_service.update_plugin(plugin)

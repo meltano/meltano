@@ -12,18 +12,19 @@ class TestCliSelect:
         with mock.patch(
             "meltano.core.select_service.ProjectPluginsService",
             return_value=project_plugins_service,
-        ), mock.patch(
-            "meltano.cli.config.ProjectPluginsService",
-            return_value=project_plugins_service,
         ):
-            # add select pattern
-            _ = cli_runner.invoke(cli, ["select", tap.name, "mock", "*"])
-            assert_cli_runner(_)
-            result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
-            assert_cli_runner(result)
-            # verify pattern was added
-            json_config = json.loads(result.stdout)
-            assert "mock.*" in json_config["_select"]
+            with mock.patch(
+                "meltano.cli.config.ProjectPluginsService",
+                return_value=project_plugins_service,
+            ):
+                # add select pattern
+                result = cli_runner.invoke(cli, ["select", tap.name, "mock", "*"])
+                assert_cli_runner(result)
+                result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
+                assert_cli_runner(result)
+                # verify pattern was added
+                json_config = json.loads(result.stdout)
+                assert "mock.*" in json_config["_select"]
 
     def test_remove_select_pattern(
         self, project, cli_runner, tap, project_plugins_service
@@ -31,20 +32,23 @@ class TestCliSelect:
         with mock.patch(
             "meltano.core.select_service.ProjectPluginsService",
             return_value=project_plugins_service,
-        ), mock.patch(
-            "meltano.cli.config.ProjectPluginsService",
-            return_value=project_plugins_service,
         ):
-            # check select pattern exists (this may not be necessary?)
-            result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
-            assert_cli_runner(result)
-            json_config = json.loads(result.stdout)
-            assert "mock.*" in json_config["_select"]
-            # remove select pattern
-            _ = cli_runner.invoke(cli, ["select", tap.name, "--rm", "mock", "*"])
-            assert_cli_runner(_)
-            result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
-            assert_cli_runner(result)
-            # verify select pattern removed
-            json_config = json.loads(result.stdout)
-            assert "mock.*" not in json_config["_select"]
+            with mock.patch(
+                "meltano.cli.config.ProjectPluginsService",
+                return_value=project_plugins_service,
+            ):
+                # check select pattern exists (this may not be necessary?)
+                result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
+                assert_cli_runner(result)
+                json_config = json.loads(result.stdout)
+                assert "mock.*" in json_config["_select"]
+                # remove select pattern
+                result = cli_runner.invoke(
+                    cli, ["select", tap.name, "--rm", "mock", "*"]
+                )
+                assert_cli_runner(result)
+                result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
+                assert_cli_runner(result)
+                # verify select pattern removed
+                json_config = json.loads(result.stdout)
+                assert "mock.*" not in json_config["_select"]
