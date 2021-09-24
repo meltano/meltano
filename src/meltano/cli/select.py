@@ -56,15 +56,6 @@ async def select(project, extractor, entities_filter, attributes_filter, **flags
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])
-        elif flags["rm"] or flags["remove"]:
-            update(
-                project,
-                extractor,
-                entities_filter,
-                attributes_filter,
-                exclude=flags["exclude"],
-                remove=True,
-            )
         else:
             update(
                 project,
@@ -72,6 +63,7 @@ async def select(project, extractor, entities_filter, attributes_filter, **flags
                 entities_filter,
                 attributes_filter,
                 exclude=flags["exclude"],
+                remove=flags["remove"],
             )
 
         tracker = GoogleAnalyticsTracker(project)
