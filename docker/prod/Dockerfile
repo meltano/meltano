@@ -6,6 +6,10 @@ WORKDIR /meltano
 # building the code
 COPY . .
 
+# Disabeling experimental.new-installer to solve hanging in CI
+# as per https://github.com/python-poetry/poetry/issues/3352
+ENV POETRY_EXPERIMENTAL_NEW_INSTALLER False
+
 RUN poetry install && make sdist
 
 FROM $BASE_IMAGE as runtime
