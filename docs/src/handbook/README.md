@@ -25,9 +25,11 @@ We're an all-remote company that allows people to work from almost anywhere in t
 
 To accomplish this, we use asynchronous communication as a starting point and stay as open and transparent as we can by communicating through public issues, merge requests, and Slack channels. 
 
-> Asynchronous communication is the practice of communicating and moving projects forward without requiring stakeholders to be available at the same time. 
+### Asynchronous communication
 
-Asynchronous communication demonstrates consideration for team members across time zones and enables us to travel outside of our usual time zone or structure our day around commitments at home or in our community. We practice asynchronous communication by recording meetings, using GitLab Issues and Merge Requests rather than texts, calls, or Slack messages, and being sensitive to local holidays and vacation statuses. We also place an emphasis on ensuring that conclusions of conversations outside of the issue tracker (i.e. Slack and impromptu Zoom calls) arewritten down: If it's not in the issue, it didn't happen. All of these actions ensure that team members are not pressured to be online outside of their working hours. Embracing asynchronous communication and learning to use it effectively requires a mental shift. This can feel unusual or even uncomfortable for those who come from a colocated environment, where in-person meetings and communiques are the norm. 
+Asynchronous communication is the practice of communicating and moving projects forward without requiring stakeholders to be available at the same time. 
+
+Asynchronous communication demonstrates consideration for team members across time zones and enables us to travel outside of our usual time zone or structure our day around commitments at home or in our community. We practice asynchronous communication by recording meetings, using GitLab Issues and Merge Requests rather than texts, calls, or Slack messages, and being sensitive to local holidays and vacation statuses. We also place an emphasis on ensuring that conclusions of conversations outside of the issue tracker (i.e. Slack and impromptu Zoom calls) are written down: If it's not in the issue, it didn't happen. All of these actions ensure that team members are not pressured to be online outside of their working hours. Embracing asynchronous communication and learning to use it effectively requires a mental shift. This can feel unusual or even uncomfortable for those who come from a colocated environment, where in-person meetings and communiques are the norm. 
 
 ### In practice
  
@@ -48,7 +50,7 @@ Asynchronous communication demonstrates consideration for team members across ti
 1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
 1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
 1. Always remember that some people only work through GitLab TODOs, so if they're not directly mentioned, they will not receive a notification. 
-1. Be mindful that issues and MRs are public by default, and our communication in them can be viewed by our community. Please always consider how we present ourselves to the public.
+1. Be mindful that most issues and MRs are public by default (unless the project is private or the issue confidential), and our communication in them can be viewed by our community. Please always consider how we present ourselves to the public.
 
 #### Email guidelines
 
@@ -61,7 +63,7 @@ Asynchronous communication demonstrates consideration for team members across ti
 1. **All written communication happens in English**, even when sent one on one, because sometimes you need to forward an email or chat.
 1. **Own your actions**: If you say it or type it, own it. If it hurts the company or an individual, even unintentionally, we encourage you to look at things from other points of view and apologize easily.
 1. **You're not expected to be available all the time**. There is no expectation to respond to messages outside of your planned working hours.
-1. **Sometimes synchronous communication is the better option**, but do not default to it. For example, a video call can clear things up quickly when you are blocked. 
+1. **Sometimes synchronous communication is the better option**, but do not default to it. For example, a video call can clear things up quickly when you are blocked or when an asynchronous conversation isn't resolved after a few rounds of back-and-forth. 
 1. **It's okay to ask as many questions as you have**. Please ask them so that team members can provide and view answers. Use issues or public chat channels instead of direct messages or emails.
 1. **Make merge requests to update the handbook with answers** to questions you've received.
 1. **Include links when you mention something** (e.g. a merge request, issue, commit, webpage, comment).
