@@ -63,14 +63,6 @@ class SelectService:
 
         return list_all
 
-    def select(self, entities_filter, attributes_filter, exclude=False):
-        """Add a new select pattern."""
-        return self.update(entities_filter, attributes_filter, exclude)
-
-    def remove(self, entities_filter, attributes_filter, exclude=False):
-        """Remove a select pattern."""
-        return self.update(entities_filter, attributes_filter, exclude, remove=True)
-
     def update(self, entities_filter, attributes_filter, exclude, remove=False):
         """Update plugins' select patterns."""
         plugin = self.extractor
