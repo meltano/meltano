@@ -2,6 +2,7 @@ import fnmatch
 import json
 import logging
 import os
+from typing import Dict
 
 import click
 from meltano.core.db import project_engine
@@ -50,7 +51,9 @@ def selection_mark(selection):
 @click.option("--exclude", is_flag=True)
 @pass_project(migrate=True)
 @click_run_async
-async def select(project, extractor, entities_filter, attributes_filter, **flags: Dict[str, bool]):
+async def select(
+    project, extractor, entities_filter, attributes_filter, **flags: Dict[str, bool]
+):
     """Execute the meltano select command."""
     try:
         if flags["list"]:

@@ -85,7 +85,8 @@ class SelectService:
         plugin.extras["select"] = patterns
         self.plugins_service.update_plugin(plugin)
 
-    def _get_pattern_string(self, entities_filter, attributes_filter, exclude) -> str:
+    @staticmethod
+    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:
         """Return a select pattern in string form."""
         exclude = "!" if exclude else ""
         return f"{exclude}{entities_filter}.{attributes_filter}"
