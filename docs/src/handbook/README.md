@@ -49,7 +49,7 @@ Asynchronous communication demonstrates consideration for team members across ti
 
 1. Use `FYI @username` when you want someone to be aware of what's being discussed, but they're not required to take action.
 1. Use `@username` when you want someone to take a specific action, such as contributing to the discussion or answering a question.
-1. Always remember that some people only work through GitLab TODOs, so if they're not directly mentioned, they will not receive a notification. 
+1. Directly mention (`@username`) the people you want to involve in a comment, especially the person you're replying to. Some people only work through GitLab TODOs (rather than email notifications) and will only see responses to comments and threads if they're explicitly mentioned.
 1. Be mindful that most issues and MRs are public by default (unless the project is private or the issue confidential), and our communication in them can be viewed by our community. Please always consider how we present ourselves to the public.
 
 #### Email guidelines
