@@ -8,7 +8,7 @@ COPY . .
 
 # Disabeling experimental.new-installer to solve hanging in CI
 # as per https://github.com/python-poetry/poetry/issues/3352
-ENV POETRY_EXPERIMENTAL_NEW_INSTALLER False
+ENV POETRY_EXPERIMENTAL_NEW_INSTALLER false
 
 RUN poetry install && make sdist
 
