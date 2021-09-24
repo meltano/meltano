@@ -323,7 +323,7 @@ Every change should be towards making "the thing" a little bit better than the o
 
 We have a responsibility to ourselves, our teammates, and our community to do our best.
 We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions. 
-We're accountable for our mistakes, but we blamelessly recognize them and move forward together. 
+We're accountable for our mistakes, but we focus on learning from them and move forward together. 
 
 ### Transparency
 
