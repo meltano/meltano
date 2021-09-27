@@ -66,9 +66,6 @@ members:
   social:
     gitlab: kgpayne
     linkedin: k-g-payne
-- name: S. P.
-  title: Operations Analyst
-  location: CA, USA 🇺🇸
 - name: Pat Nadolny
   title: Senior Data Engineer
   location: Brooklyn, NY, USA 🇺🇸
@@ -76,6 +73,9 @@ members:
   social:
     gitlab: pnadolny13
     linkedin: patnadolny
+- name: S. P.
+  title: Operations Analyst
+  location: CA, USA 🇺🇸
 openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
