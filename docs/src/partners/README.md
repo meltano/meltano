@@ -14,7 +14,7 @@ Meltano and [Singer](https://www.singer.io/) are [popular with data consultants]
 If you lack the time and/or expertise to do so yourself, they can help you
 [set up](/docs/getting-started.html) your pipelines, deploy them to [production](/docs/production.html),
 [improve](/docs/plugin-management.html#using-a-custom-fork-of-a-plugin) existing Singer taps and targets to fit your use case,
-and [build new ones](/tutorials/create-a-custom-extractor.html) for any [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targest)
+and [build new ones](/tutorials/create-a-custom-extractor.html) for any [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targets)
 that are not supported yet.
 
 | Consultancy | Locations |
@@ -45,7 +45,7 @@ If you have experience with Meltano and Singer, you can add your company to this
 ## Data products
 
 Meltano is a great fit for data products that want to let their users directly connect their own sources to the platform,
-since connectors for many [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targest) are already available,
+since connectors for many [taps](https://hub.meltano.com/singer/taps) and [targets](https://hub.meltano.com/singer/targets) are already available,
 new connectors can be created easily, and connectors and pipelines can be configured programmatically.
 
 These are some of the tools powered by Meltano:

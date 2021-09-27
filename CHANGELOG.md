@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2782](https://gitlab.com/meltano/meltano/-/issues/2782) Switches all extractors and loaders in discovery.yml to `variants` syntax
+
 ### Fixes
 
 - [#2881](https://gitlab.com/meltano/meltano/-/issues/2881) Send CLI error messages to `stderr`.

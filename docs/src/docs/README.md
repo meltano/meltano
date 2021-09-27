@@ -69,7 +69,6 @@ members:
 - name: S. P.
   title: Operations Analyst
   location: CA, USA 🇺🇸
-  start_date: September 9, 2021
 openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
@@ -223,30 +222,30 @@ These efforts are the foundation of our larger vision to enable a full DataOps p
 
 #### September 2021
 
-In September we aim to launch composable pipelines for Meltano, unlocking a more powerful ELT paradigm that what currently exists. 
-We will also integrate Great Expectations and `dbt test` as new validators which can be composed with the regular ELT tasks. 
-For the Singer ecosystem, we will finalize the work needed to make Meltano rely on MeltanoHub and release the first iteration of the BATCH message types in the Meltano SDK.
-
 * Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
 * Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725)
 * MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
 * Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/124) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2927)
 * Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
-#### 2021-Q4
+### October 2021
 
-For the rest of the year, we have several key outcomes we're looking to achieve.
-We're still primarily aiming to improve the Singer ecosystem and make Meltano the best ELT platform on the market. 
-We're also building the future of Meltano as a DataOps platform by adding native environments, improving monitoring and observability with the tool, and by making deployment as easy as possible. 
-Underpinning all of this will be a focus on improving the developer experience by enhancing our documentation.
-
-* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116)
+  * Stream Maps [Issue](https://gitlab.com/meltano/meltano/-/issues/2300)
+  * `meltano run` [Issue](https://gitlab.com/meltano/meltano/-/issues/2301)
 * Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/124)
-* Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
-* Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
-* Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
 * Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
-* Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
+* Native Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
+
+### November 2021
+
+* Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
+* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
+* Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
+
+### December 2021
+
+* Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
 * Monitoring, observability, and data lineage - [Epic](https://gitlab.com/groups/meltano/-/epics/93)
 * Add Dagster as an Orchestrator - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
 
@@ -293,6 +292,52 @@ Meltano is built by an all-remote team of {{$frontmatter.members.length}} and a 
 If you'd like to join the team, check out the [career opportunities](#careers) below!
 
 <TeamGrid :members="$frontmatter.members" />
+
+## Values
+
+Meltano's core values are community, empathy, sustainability, accountability, transparency, and iteration. 
+
+Our values act as a guide in how we conduct day-to-day business, make decisions, hire, and build our product. While we use these values as our compass, we adjust them based on lessons we've learned and our experiences using them in practice. Anyone can suggest improvements to our values - from team members to internet friends - and we're always open to growing and learning.
+
+### Community
+
+We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere. 
+We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano. 
+We will always keep the interests of our open source users and contributors in mind as we continue to grow.
+
+### Empathy
+
+We work with empathy, recognizing we're not alone in this journey. 
+We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions. 
+
+### Sustainability
+
+We work with a sustainable mindset so that we can continue to grow for years to come. 
+We believe in investing in our people, community, and products for the long term.
+We do this by putting family and friends first, by being wise with resources, and by not adopting a short-term point of view.
+Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options. 
+We should strive to be a net positive company that makes net positive actions.
+Every change should be towards making "the thing" a little bit better than the one that came before. 
+
+### Accountability
+
+We have a responsibility to ourselves, our teammates, and our community to do our best.
+We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions. 
+We're accountable for our mistakes, but we blamelessly recognize them and move forward together. 
+
+### Transparency
+
+Transparency cultivates honesty which, in turn, builds trust. 
+Without trust, it's impossible to live our other values.
+In practice, transparency can be seen in how we discuss decisions, document our work, and encourage everyone to share their thoughts and provide feedback. 
+We work transparently, because we're passionate about involving our community in everything we're doing. 
+We strive to provide users with the same level of insight as our team members so that they're able to have full visibility in our work and contribute their perspectives, since anything we build will be better if we collaborate with the people who will use it.
+
+### Iteration
+
+We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community. 
+We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
+In practice, we ship minimum viable changes, and we continually seek to improve ourselves. 
 
 ## Careers <a name="job-openings" />
 
