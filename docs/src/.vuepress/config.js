@@ -199,14 +199,6 @@ module.exports = {
     sidebar: {
       "/docs": docsSidebar,
       "/tutorials": docsSidebar,
-      "/handbook": [
-        "/handbook/",
-        "/handbook/engineering/",
-        "/handbook/marketing/",
-        "/handbook/product/",
-        "/handbook/tech-stack/",
-        "/handbook/resources/",
-      ],
     },
     logo: "/meltano-logo-with-text.svg",
     lastUpdated: "Last Updated",
