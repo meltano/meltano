@@ -47,7 +47,6 @@ const docsSidebar = [
       "/docs/community",
       "/docs/contributor-guide",
       "/docs/responsible-disclosure",
-      "/handbook/",
     ],
   },
 ];
