@@ -69,6 +69,13 @@ members:
 - name: S. P.
   title: Operations Analyst
   location: CA, USA 🇺🇸
+- name: Pat Nadolny
+  title: Senior Data Engineer
+  location: Brooklyn, NY, USA 🇺🇸
+  gravatar_hash: aa4b6175db043b7bfe3177cdc18318c9
+  social:
+    gitlab: pnadolny13
+    linkedin: patnadolny
 openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
