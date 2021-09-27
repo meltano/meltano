@@ -43,7 +43,7 @@ We expect Meltano team members to take responsibility to determine what they nee
 Although non-US team members will not receive reimbursement through Expensify, the company needs to have a single source of truth for expenses. So, all team members will need to use Expensify. You'll then submit an additional report in Remote to receive reimbursement.
 
 1. Upload receipts in Expensify and submit a report. Please use the appropriate tags/categories and include comments when appropriate. If a tag/category is missing, you may be asked to edit your report.
-1. Create an invoice in [Remote](/handbook/tech-stack/#remote). 
+1. Once the Expensify report is approved, create an expense in [Remote](/handbook/tech-stack/#remote) referencing the Expensify report number and matching its full amount. 
 1. The approved expense amount will be deposited in your account with your monthly salary.
 
 ### Office equipment and supplies
