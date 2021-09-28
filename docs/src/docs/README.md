@@ -61,11 +61,17 @@ members:
 - name: Ken Payne
   title: Backend Engineer
   location: London, UK 🇬🇧
-  start_date: August 23, 2021
   gravatar_hash: 778b432070eba884662a752b184dac7b
   social:
     gitlab: kgpayne
     linkedin: k-g-payne
+- name: Pat Nadolny
+  title: Senior Data Engineer
+  location: Brooklyn, NY, USA 🇺🇸
+  gravatar_hash: aa4b6175db043b7bfe3177cdc18318c9
+  social:
+    gitlab: pnadolny13
+    linkedin: patnadolny
 - name: S. P.
   title: Operations Analyst
   location: CA, USA 🇺🇸
@@ -209,12 +215,12 @@ Be aware that issue milestones serve more as a rough indication of relative prio
 since short-term priorities can change quickly in response to community feedback, and it's hard to predict how much progress can be made in a week.
 Also note that issues labeled `flow::To Do` have higher priority and are more likely to be completed in a given week than those labeled `flow::Triage`, which are often moved to the next milestone at the end of the week, with issues already scheduled for the next week pushed out to make room for them.
 
-Below you will found our current roadmap. 
+Below you will found our current roadmap.
 Each item should link to an Epic with the relevant issue linked to that epic.
-As this projects out into the future it is subject to change based on feedback. 
+As this projects out into the future it is subject to change based on feedback.
 Don't see something you want on the roadmap? [Make an issue](https://gitlab.com/meltano/meltano/-/issues) and let us know!
 
-Our focus for the rest of the year is going to mainly be in two categories: 
+Our focus for the rest of the year is going to mainly be in two categories:
 * Improving the overall quality of the Singer ecosystem
 * Making Meltano the best data integration (ELT) tool on the market
 
@@ -295,49 +301,49 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 ## Values
 
-Meltano's core values are community, empathy, sustainability, accountability, transparency, and iteration. 
+Meltano's core values are community, empathy, sustainability, accountability, transparency, and iteration.
 
 Our values act as a guide in how we conduct day-to-day business, make decisions, hire, and build our product. While we use these values as our compass, we adjust them based on lessons we've learned and our experiences using them in practice. Anyone can suggest improvements to our values - from team members to internet friends - and we're always open to growing and learning.
 
 ### Community
 
-We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere. 
-We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano. 
+We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere.
+We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano.
 We will always keep the interests of our open source users and contributors in mind as we continue to grow.
 
 ### Empathy
 
-We work with empathy, recognizing we're not alone in this journey. 
-We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions. 
+We work with empathy, recognizing we're not alone in this journey.
+We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
 
 ### Sustainability
 
-We work with a sustainable mindset so that we can continue to grow for years to come. 
+We work with a sustainable mindset so that we can continue to grow for years to come.
 We believe in investing in our people, community, and products for the long term.
 We do this by putting family and friends first, by being wise with resources, and by not adopting a short-term point of view.
-Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options. 
+Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options.
 We should strive to be a net positive company that makes net positive actions.
-Every change should be towards making "the thing" a little bit better than the one that came before. 
+Every change should be towards making "the thing" a little bit better than the one that came before.
 
 ### Accountability
 
 We have a responsibility to ourselves, our teammates, and our community to do our best.
-We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions. 
-We're accountable for our mistakes, but we focus on learning from them and move forward together. 
+We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions.
+We're accountable for our mistakes, but we focus on learning from them and move forward together.
 
 ### Transparency
 
-Transparency cultivates honesty which, in turn, builds trust. 
+Transparency cultivates honesty which, in turn, builds trust.
 Without trust, it's impossible to live our other values.
-In practice, transparency can be seen in how we discuss decisions, document our work, and encourage everyone to share their thoughts and provide feedback. 
-We work transparently, because we're passionate about involving our community in everything we're doing. 
+In practice, transparency can be seen in how we discuss decisions, document our work, and encourage everyone to share their thoughts and provide feedback.
+We work transparently, because we're passionate about involving our community in everything we're doing.
 We strive to provide users with the same level of insight as our team members so that they're able to have full visibility in our work and contribute their perspectives, since anything we build will be better if we collaborate with the people who will use it.
 
 ### Iteration
 
-We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community. 
+We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community.
 We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
-In practice, we ship minimum viable changes, and we continually seek to improve ourselves. 
+In practice, we ship minimum viable changes, and we continually seek to improve ourselves.
 
 ## Careers <a name="job-openings" />
 
