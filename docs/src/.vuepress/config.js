@@ -47,6 +47,7 @@ const docsSidebar = [
       "/docs/community",
       "/docs/contributor-guide",
       "/docs/responsible-disclosure",
+      ["https://handbook.meltano.com/", "Company Handbook"],
     ],
   },
 ];
