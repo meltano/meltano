@@ -27,17 +27,6 @@ logger = logging.getLogger(__name__)
 
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
 PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
-PLUGIN_TYPE_NAMES = [
-    "extractors",
-    "loaders",
-    "transforms",
-    "models",
-    "dashboards",
-    "orchestrators",
-    "transformers",
-    "files",
-    "utilities",
-]
 
 
 class ProjectNotFound(Error):
@@ -82,9 +71,9 @@ def deep_merge(parent: dict, children: List[dict]) -> dict:
 class ProjectFiles:
     """Interface for working with multiple project yaml files."""
 
-    def __init__(self, root: Path, meltano_file: Path):
+    def __init__(self, root: Path, meltano_file_path: Path):
         self.root = root.resolve()
-        self.meltanofile = meltano_file
+        self._meltano_file_path = meltano_file_path
         self._plugin_file_map = {}
         # Empty properties for lazy-loading later
         self._meltanofile = None
@@ -110,14 +99,15 @@ class ProjectFiles:
     def _resolve_include_paths(self, include_path_patterns: List[str]) -> List[Path]:
         """Return a list of paths from a list of glob pattern strings."""
         include_paths = []
-        for pattern in include_path_patterns:
-            for path_name in glob.iglob(pattern):
-                path = Path(path_name)
-                if self._is_valid_include_path(path):
-                    include_paths.append(path)
-        # never include meltano.yml
-        if self.meltanofile in include_paths:
-            include_paths.remove(self.meltanofile)
+        if include_path_patterns:
+            for pattern in include_path_patterns:
+                for path_name in glob.iglob(pattern):
+                    path = Path(path_name)
+                    if self._is_valid_include_path(path):
+                        include_paths.append(path)
+            # never include meltano.yml
+            if self.meltanofile in include_paths:
+                include_paths.remove(self.meltanofile)
         return include_paths
 
     def _add_to_index(self, key: tuple, include_path: Path) -> None:
@@ -169,19 +159,19 @@ class ProjectFiles:
 
     @property
     def meltanofile(self):
-        if not self._meltanofile:
-            self._meltanofile = yaml.safe_load(self.root.joinpath("meltano.yml"))
+        if self._meltanofile is None:
+            self._meltanofile = yaml.safe_load(self._meltano_file_path.open())
         return self._meltanofile
 
     @property
     def include_paths(self) -> List[Path]:
         """A list of paths derived from glob patterns defined in the meltanofile."""
-        if not self._include_paths:
+        if self._include_paths is None:
             include_path_patterns = self.meltanofile.get('include_paths')
             self._include_paths = self._resolve_include_paths(include_path_patterns)
         return self._include_paths
 
-    def load(self, safe=True) -> dict:
+    def load(self) -> dict:
         """Load all project files into a single dict representation."""
         # load individual file dicts
         included_file_contents = self._load_included_files()
@@ -206,6 +196,7 @@ class Project(Versioned):
     def __init__(self, root: Union[Path, str]):
         self.root = Path(root).resolve()
         self.readonly = False
+        self._project_files = None
         self.__meltano_ip_lock = None
 
     @property
@@ -295,10 +286,18 @@ class Project(Versioned):
         return project
 
     @property
+    def project_files(self):
+        if self._project_files is None:
+            self._project_files = ProjectFiles(
+                root=self.root, meltano_file_path=self.meltanofile
+            )
+        return self._project_files
+
+    @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
         with self._meltano_rw_lock.read_lock():
-            MeltanoFile.parse(self.project_files.load())
+            return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
     def meltano_update(self):
@@ -342,14 +341,6 @@ class Project(Versioned):
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
-
-    @property
-    def project_files(self):
-        if not self._project_files:
-            self._project_files = ProjectFiles(
-                root=self.root, meltano_file=self.meltanofile
-            )
-        return self._project_files
 
     @property
     def dotenv(self):
