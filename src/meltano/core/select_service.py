@@ -3,6 +3,7 @@ import logging
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
@@ -26,7 +27,8 @@ class SelectService:
         )
 
     @property
-    def extractor(self):
+    def extractor(self) -> ProjectPlugin:
+        """Retrieve extractor ProjectPlugin object."""
         return self._extractor
 
     @property
@@ -61,14 +63,22 @@ class SelectService:
 
         return list_all
 
-    def select(self, entities_filter, attributes_filter, exclude=False):
-        exclude = "!" if exclude else ""
-        pattern = f"{exclude}{entities_filter}.{attributes_filter}"
-
+    def update(self, entities_filter, attributes_filter, exclude, remove=False):
+        """Update plugins' select patterns."""
         plugin = self.extractor
-
-        select = plugin.extras.get("select", [])
-        select.append(pattern)
-        plugin.extras["select"] = select
-
+        this_pattern = self._get_pattern_string(
+            entities_filter, attributes_filter, exclude
+        )
+        patterns = plugin.extras.get("select", [])
+        if remove:
+            patterns.remove(this_pattern)
+        else:
+            patterns.append(this_pattern)
+        plugin.extras["select"] = patterns
         self.plugins_service.update_plugin(plugin)
+
+    @staticmethod
+    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:
+        """Return a select pattern in string form."""
+        exclude = "!" if exclude else ""
+        return f"{exclude}{entities_filter}.{attributes_filter}"
