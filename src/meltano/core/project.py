@@ -76,7 +76,7 @@ class ProjectFiles:
         self._meltano_file_path = meltano_file_path
         self._plugin_file_map = {}
         # Empty properties for lazy-loading later
-        self._meltanofile = None
+        self._meltano = None
         self._include_paths = None
 
     def _is_valid_include_path(self, file_path: Path) -> bool:
@@ -106,8 +106,8 @@ class ProjectFiles:
                     if self._is_valid_include_path(path):
                         include_paths.append(path)
             # never include meltano.yml
-            if self.meltanofile in include_paths:
-                include_paths.remove(self.meltanofile)
+            if self._meltano_file_path in include_paths:
+                include_paths.remove(self._meltano_file_path)
         return include_paths
 
     def _add_to_index(self, key: tuple, include_path: Path) -> None:
@@ -158,16 +158,16 @@ class ProjectFiles:
         return included_file_contents
 
     @property
-    def meltanofile(self):
-        if self._meltanofile is None:
-            self._meltanofile = yaml.safe_load(self._meltano_file_path.open())
-        return self._meltanofile
+    def meltano(self):
+        if self._meltano is None:
+            self._meltano = yaml.safe_load(self._meltano_file_path.open())
+        return self._meltano
 
     @property
     def include_paths(self) -> List[Path]:
         """A list of paths derived from glob patterns defined in the meltanofile."""
         if self._include_paths is None:
-            include_path_patterns = self.meltanofile.get('include_paths')
+            include_path_patterns = self.meltano.get('include_paths')
             self._include_paths = self._resolve_include_paths(include_path_patterns)
         return self._include_paths
 
@@ -176,7 +176,7 @@ class ProjectFiles:
         # load individual file dicts
         included_file_contents = self._load_included_files()
         # combine into a single dict
-        meltano_config = deep_merge(self.meltanofile, included_file_contents)
+        meltano_config = deep_merge(self.meltano, included_file_contents)
         # TODO: validate schema?
         return meltano_config
 
