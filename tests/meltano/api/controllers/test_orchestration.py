@@ -1,7 +1,10 @@
-from unittest import mock
+import json
 
 import pytest
-from flask import url_for
+from asynctest import CoroutineMock, mock
+from flask import Flask, url_for
+from flask.testing import FlaskClient
+from flask.wrappers import Response
 from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
 
 
@@ -119,3 +122,65 @@ class TestOrchestration:
                 "hidden", session=session
             ) == (42, SettingValueStore.DEFAULT)
             assert "hidden" not in config
+
+    @mock.patch("meltano.core.plugin_test_service.PluginInvoker.invoke_async")
+    @mock.patch("meltano.api.controllers.orchestrations.ProjectPluginsService")
+    def test_test_plugin_configuration_success(
+        self,
+        mock_project_plugins_service,
+        mock_invoke_async,
+        app: Flask,
+        api: FlaskClient,
+        tap,
+        project_plugins_service,
+    ):
+
+        mock_project_plugins_service.return_value = project_plugins_service
+
+        mock_invoke = mock.Mock()
+        mock_invoke.sterr.at_eof.side_effect = True
+        mock_invoke.stdout.at_eof.side_effect = (False, True)
+        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.returncode = 0
+        payload = json.dumps({"type": "RECORD"}).encode()
+        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
+
+        mock_invoke_async.return_value = mock_invoke
+
+        with app.test_request_context():
+            url = url_for("orchestrations.test_plugin_configuration", plugin_ref=tap)
+            res: Response = api.post(url, json={})
+
+        assert res.status_code == 200
+        assert res.json["is_success"]
+
+    @mock.patch("meltano.core.plugin_test_service.PluginInvoker.invoke_async")
+    @mock.patch("meltano.api.controllers.orchestrations.ProjectPluginsService")
+    def test_test_plugin_configuration_failure(
+        self,
+        mock_project_plugins_service,
+        mock_invoke_async,
+        app: Flask,
+        api: FlaskClient,
+        tap,
+        project_plugins_service,
+    ):
+
+        mock_project_plugins_service.return_value = project_plugins_service
+
+        mock_invoke = mock.Mock()
+        mock_invoke.sterr.at_eof.side_effect = True
+        mock_invoke.stdout.at_eof.side_effect = (False, True)
+        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.returncode = 0
+        payload = b"test"
+        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
+
+        mock_invoke_async.return_value = mock_invoke
+
+        with app.test_request_context():
+            url = url_for("orchestrations.test_plugin_configuration", plugin_ref=tap)
+            res: Response = api.post(url, json={})
+
+        assert res.status_code == 200
+        assert not res.json["is_success"]
