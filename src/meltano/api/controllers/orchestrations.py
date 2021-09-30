@@ -30,7 +30,7 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.plugin_test_service import PluginTestService
+from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
@@ -400,7 +400,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
             plugin_settings_service=settings,
         )
         async with invoker.prepared(db.session):
-            plugin_test_service = PluginTestService(invoker)
+            plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
             success, _detail = plugin_test_service.validate()
             return success
 
