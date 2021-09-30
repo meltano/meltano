@@ -401,7 +401,7 @@ def test_plugin_configuration(plugin_ref) -> Response:
         )
         async with invoker.prepared(db.session):
             plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
-            success, _detail = plugin_test_service.validate()
+            success, _detail = await plugin_test_service.validate()
             return success
 
     loop = asyncio.get_event_loop()
