@@ -600,6 +600,8 @@ Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
+Use `--rm` or `--remove` to remove previously added select patterns.
+
 ### Examples
 
 ```bash
@@ -646,6 +648,15 @@ Selected attributes:
     [automatic] tags.name
     [automatic] tags.project_id
     [selected ] tags.target
+```
+
+Remove patterns (`--rm` or `--remove`):
+
+```bash
+# Remove previously added select patterns
+meltano select tap-gitlab --rm tags "*"
+meltano select tap-gitlab --rm --exclude "*" "*_url"
+meltano select tap-gitlab --rm commits id
 ```
 
 ::: tip
