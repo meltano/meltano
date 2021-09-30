@@ -10,13 +10,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2647](https://gitlab.com/meltano/meltano/-/issues/2647) Extend `meltano select` with flag to remove rules.
-
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.83.0 - (2021-09-30)
+---
+
+### New
+
+- [#2647](https://gitlab.com/meltano/meltano/-/issues/2647) Extend `meltano select` with flag to remove rules.
 
 
 ## 1.82.0 - (2021-09-23)
