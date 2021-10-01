@@ -166,6 +166,9 @@ homepage_sample_code:
     #   --volume $(pwd)/output:/project/output \
     #   meltano-demo-project:dev \
     #   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+  after_script:
+    - echo "If this pipeline failed due to Gitlab API returning a non-2xx status code you can try rerunning this job."
+    - echo "If the failure persists or you're encountering another error feel free reach out via Gitlab or Slack."
 
   artifacts:
     paths:
@@ -284,6 +287,9 @@ getting_started_sample_code:
 
     # meltano invoke airflow webserver
     # meltano invoke airflow webserver -D
+  after_script:
+    - echo "If this pipeline failed due to Gitlab API returning a non-2xx status code you can try rerunning this job."
+    - echo "If the failure persists or you're encountering another error feel free reach out via Gitlab or Slack."
 
   artifacts:
     paths:
