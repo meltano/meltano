@@ -23,6 +23,7 @@ class Schedule(NameEq, Canonical):
         transform: str = None,
         interval: str = None,
         start_date: datetime = None,
+        cron_interval: str = None,
         env={},
     ):
         super().__init__()
@@ -34,11 +35,18 @@ class Schedule(NameEq, Canonical):
         self.transform = transform
         self.interval = interval
         self.start_date = start_date
+        self.cron_interval = cron_interval
         self.env = env
 
     @property
     def cron_interval(self):
-        return CRON_INTERVALS.get(self.interval, self.interval)
+        if self._cron_interval is None:
+            return CRON_INTERVALS.get(self.interval, self.interval)
+        return self._cron_interval
+
+    @cron_interval.setter
+    def cron_interval(self, value):
+        self._cron_interval = value
 
     @property
     def elt_args(self):
