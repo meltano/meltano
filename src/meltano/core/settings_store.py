@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from copy import deepcopy
 from enum import Enum
-from typing import List
+from typing import Any, Dict, List
 
 import dotenv
 import sqlalchemy
@@ -28,6 +28,7 @@ class SettingValueStore(str, Enum):
     MELTANO_YML = "meltano_yml"
     DB = "db"
     INHERITED = "inherited"
+    MELTANO_ENV = "meltano_env"
     DEFAULT = "default"
     AUTO = "auto"
 
@@ -50,6 +51,7 @@ class SettingValueStore(str, Enum):
             self.DEFAULT: DefaultStoreManager,
             self.INHERITED: InheritedStoreManager,
             self.AUTO: AutoStoreManager,
+            self.MELTANO_ENV: MeltanoEnvStoreManager,
         }
         return managers[self]
 
@@ -342,6 +344,29 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         # This is not quite the right place for this, but we need to create
         # setting defs for missing keys again when `meltano.yml` changes
         self.settings_service._setting_defs = None
+
+
+class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
+    """Configuration stored in an environment within `meltano.yml`."""
+
+    @property
+    def flat_config(self) -> Dict[str, Any]:
+        """Get dictionary of flattened configuration."""
+        if self._flat_config is None:
+            self._flat_config = self.settings_service.environment_config
+        return self._flat_config
+
+    def set(self, name: str, path: List[str], value, setting_def=None):
+        """TODO: Implement this."""
+        raise NotImplementedError
+
+    def unset(self, name: str, path: List[str], setting_def=None):
+        """TODO: Implement this."""
+        raise NotImplementedError
+
+    def reset(self):
+        """TODO: Implement this."""
+        raise NotImplementedError
 
 
 class DbStoreManager(SettingsStoreManager):

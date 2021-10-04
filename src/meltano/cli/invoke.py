@@ -17,6 +17,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import run_async
 
 from . import cli
+from .environment import environment_option
 from .params import pass_project
 from .utils import CliError, propagate_stop_signals
 
@@ -41,6 +42,7 @@ logger = logging.getLogger(__name__)
 )
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
+@environment_option
 @pass_project(migrate=True)
 def invoke(
     project: Project,
@@ -49,6 +51,7 @@ def invoke(
     list_commands: bool,
     plugin_name: str,
     plugin_args: Tuple[str, ...],
+    environment: str = None,
 ):
     """Invoke the plugin's executable with specified arguments."""
     try:
@@ -69,7 +72,12 @@ def invoke(
         do_list_commands(plugin)
         return
 
-    invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
+    invoker = invoker_factory(
+        project,
+        plugin,
+        plugins_service=plugins_service,
+        environment=environment,
+    )
     exit_code = run_async(
         _invoke(invoker, project, plugin_name, plugin_args, session, dump, command_name)
     )

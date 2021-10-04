@@ -13,10 +13,12 @@ from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.settings_service import SettingValueStore, StoreNotSupportedError
+from meltano.core.settings_service import SettingValueStore
+from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.utils import run_async
 
 from . import cli
+from .environment import environment_option
 from .params import pass_project
 from .utils import CliError
 
@@ -26,11 +28,26 @@ from .utils import CliError
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
 )
 @click.argument("plugin_name")
-@click.option("--format", type=click.Choice(["json", "env"]), default="json")
+@click.option(
+    "--format",
+    "config_format",
+    type=click.Choice(["json", "env"]),
+    default="json",
+)
 @click.option("--extras", is_flag=True)
 @pass_project(migrate=True)
+@environment_option
 @click.pass_context
-def config(ctx, project, plugin_type, plugin_name, format, extras):
+def config(  # noqa: WPS231
+    ctx,
+    project: Project,
+    plugin_type: str,
+    plugin_name: str,
+    config_format: str,
+    extras: bool,
+    environment: str,
+):
+    """Display Meltano or plugin configuration."""
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     plugins_service = ProjectPluginsService(project)
@@ -50,7 +67,10 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
     try:
         if plugin:
             settings = PluginSettingsService(
-                project, plugin, plugins_service=plugins_service
+                project,
+                plugin,
+                plugins_service=plugins_service,
+                environment=environment,
             )
             invoker = PluginInvoker(project, plugin)
             run_async(invoker.prepare(session))
@@ -65,13 +85,13 @@ def config(ctx, project, plugin_type, plugin_name, format, extras):
         ctx.obj["invoker"] = invoker
 
         if ctx.invoked_subcommand is None:
-            if format == "json":
+            if config_format == "json":
                 process = extras is not True
                 config = settings.as_dict(
                     extras=extras, process=process, session=session
                 )
                 print(json.dumps(config, indent=2))
-            elif format == "env":
+            elif config_format == "env":
                 env = settings.as_env(extras=extras, session=session)
 
                 with tempfile.NamedTemporaryFile() as temp_dotenv:

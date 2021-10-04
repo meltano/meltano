@@ -7,12 +7,13 @@ from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Dict, Union
+from typing import Optional, Union
 
 import fasteners
 import yaml
 from atomicwrites import atomic_write
 from dotenv import dotenv_values
+from meltano.core.environment import Environment
 from meltano.core.plugin.base import PluginRef
 from werkzeug.utils import secure_filename
 
@@ -158,7 +159,7 @@ class Project(Versioned):
         return project
 
     @property
-    def meltano(self) -> Dict:
+    def meltano(self) -> MeltanoFile:
         """Return a copy of the current meltano config"""
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
@@ -216,6 +217,26 @@ class Project(Versioned):
     @property
     def dotenv_env(self):
         return dotenv_values(self.dotenv)
+
+    def get_environment(
+        self,
+        name: Optional[str] = None,
+    ) -> Optional[Environment]:
+        """Retrieve an environment configuration.
+
+        Args:
+            name: Name of the environment. Defaults to None.
+
+        Raises:
+            EnvironmentNotFound: If the named environment is not present in `meltano.yml`.
+
+        Returns:
+            Environment.
+        """
+        if name is None:
+            return None
+
+        return Environment.find(self.meltano.environments, name)
 
     @contextmanager
     def dotenv_update(self):

@@ -95,6 +95,7 @@ class PluginInvoker:
         plugins_service: ProjectPluginsService = None,
         plugin_config_service: PluginConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
+        environment: str = None,
     ):
         self.project = project
         self.plugin = plugin
@@ -116,7 +117,10 @@ class PluginInvoker:
 
         self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.settings_service = plugin_settings_service or PluginSettingsService(
-            project, plugin, plugins_service=self.plugins_service
+            project,
+            plugin,
+            plugins_service=self.plugins_service,
+            environment=environment,
         )
 
         self._prepared = False

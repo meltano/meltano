@@ -58,6 +58,11 @@ class ProjectSettingsService(SettingsService):
         """Return current configuration in `meltano.yml`."""
         return self.config_service.current_config
 
+    @property
+    def environment_config(self):
+        """Return current configuration in `meltano.yml`."""
+        return {}
+
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`."""
         self.config_service.update_config(config)
