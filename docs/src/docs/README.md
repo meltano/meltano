@@ -299,25 +299,15 @@ Meltano's core values are community, empathy, sustainability, accountability, tr
 
 Our values act as a guide in how we conduct day-to-day business, make decisions, hire, and build our product. While we use these values as our compass, we adjust them based on lessons we've learned and our experiences using them in practice. Anyone can suggest improvements to our values - from team members to internet friends - and we're always open to growing and learning.
 
-### Community
-
-We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere.
-We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano.
-We will always keep the interests of our open source users and contributors in mind as we continue to grow.
-
-### Empathy
-
-We work with empathy, recognizing we're not alone in this journey.
-We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
-
-### Sustainability
-
-We work with a sustainable mindset so that we can continue to grow for years to come.
-We believe in investing in our people, community, and products for the long term.
-We do this by putting family and friends first, by being wise with resources, and by not adopting a short-term point of view.
-Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options.
-We should strive to be a net positive company that makes net positive actions.
-Every change should be towards making "the thing" a little bit better than the one that came before.
+### Ambition 
+We have high aspirations and the drive to get accomplish them. We want those inspired and motivated by our mission and future journey to team up to help us realize these goals. To us ambition comes in many forms and from many different backgrounds, but some commonalities we look for are:
+resilience in the face of setbacks 
+* Resilience in the face of setbacks 
+* Continual learning
+* A strong sense of purpose and priorities 
+* Passion 
+* Perseverance 
+* Calculated risk taking
 
 ### Accountability
 
@@ -338,6 +328,26 @@ We strive to provide users with the same level of insight as our team members so
 We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community.
 We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
 In practice, we ship minimum viable changes, and we continually seek to improve ourselves.
+
+### Community
+
+We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere.
+We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano.
+We will always keep the interests of our open source users and contributors in mind as we continue to grow.
+
+### Empathy
+
+We work with empathy, recognizing we're not alone in this journey.
+We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
+
+### Sustainability
+
+We work with a sustainable mindset so that we can continue to grow for years to come.
+We believe in investing in our people, community, and products for the long term.
+We do this by putting family and friends first, by being wise with resources, and by not adopting a short-term point of view.
+Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options.
+We should strive to be a net positive company that makes net positive actions.
+Every change should be towards making "the thing" a little bit better than the one that came before.
 
 ## Careers <a name="job-openings" />
 
