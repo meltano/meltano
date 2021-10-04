@@ -226,22 +226,16 @@ Our focus for the rest of the year is going to mainly be in two categories:
 
 These efforts are the foundation of our larger vision to enable a full DataOps platform.
 
-#### September 2021
-
-* Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
-* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725)
-* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
-* Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/124) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2927)
-* Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
 
 ### October 2021
 
 * Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116)
-  * Stream Maps [Issue](https://gitlab.com/meltano/meltano/-/issues/2300)
   * `meltano run` [Issue](https://gitlab.com/meltano/meltano/-/issues/2301)
+  * Stream Maps [Issue](https://gitlab.com/meltano/meltano/-/issues/2300)
 * Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/124)
-* Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
 * Native Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
+* Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
+* Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
 
 ### November 2021
 
@@ -256,7 +250,7 @@ These efforts are the foundation of our larger vision to enable a full DataOps p
 * Add Dagster as an Orchestrator - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
 
 
-#### 2022-H1
+### 2022-H1
 
 Next year will be continuing to make Meltano the best data integration tool on the market and Singer the best open source ecosystem.
 With this great foundation in place, we'll continue to invest in making Meltano the best DataOps platform on the market.
