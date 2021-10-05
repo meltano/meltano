@@ -5,35 +5,14 @@ export default {
         return {
             logos: [
                 {
-                    url: '/meltano-logo.svg',
-                    alt: 'Meltano Logo (Color)',
+                    url: '/Meltano-Melty-Logo.png',
+                    alt: 'Meltano Logo (Purple)',
                     label: 'Meltano Logo'
                 },
                 {
-                    url: '/meltano-logo-black.svg',
-                    alt: 'Meltano Logo (Black)',
-                    label: 'Meltano Logo (Black)'
-                },
-                {
-                    url: '/meltano-logo-white.svg',
-                    alt: 'Meltano Logo (White)',
-                    label: 'Meltano Logo (White)',
-                    theme: 'dark'
-                },
-                {
-                    url: '/meltano-logo-with-text.svg',
-                    alt: 'Meltano Logo with Text',
-                    label: 'Meltano Logo with Text',
-                },
-                {
-                    url: '/meltano-logo-with-text-black.svg',
-                    alt: 'Meltano Logo with Text (Black)',
-                    label: 'Meltano Logo with Text (Black)',
-                },
-                {
-                    url: '/meltano-logo-with-text-white.svg',
-                    alt: 'Meltano Logo with Text (White)',
-                    label: 'Meltano Logo with Text (White)',
+                    url: '/Meltano-Melty-Logo.png',
+                    alt: 'Meltano Logo (Purple)',
+                    label: 'Meltano Logo',
                     theme: 'dark'
                 }
             ]
