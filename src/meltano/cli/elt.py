@@ -213,6 +213,7 @@ async def _run_job(project, job, session, context_builder, force=False):
         with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
             output_logger = OutputLogger(log_file)
 
+            context_builder = context_builder.with_base_output_logger(output_logger)
             await _run_elt(project, context_builder, output_logger)
 
 

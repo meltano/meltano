@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppress
+from typing import IO, Optional
 
 import click
 from async_generator import asynccontextmanager
@@ -18,26 +19,64 @@ class OutputLogger:
 
         self.outs = {}
         self._max_name_length = None
+        self._max_subtask_name_length = None
 
-    def out(self, name, stream=None, color=None):
+    def out(
+        self, name: str, subtask_name: Optional[str] = None, stream=None, color=None
+    ):
+        """Obtain an Out instance for use as a logger or use for output capture.
+
+        Args:
+            name: name of this Out instance and to use in the name field.
+            subtask_name: subtask name to use for the subtask field.
+            stream: stream you wish to write too.
+            color: colorize/format output to provided color.
+
+        Returns:
+            An Out instance that will log anything written in to a
+            file as well as to the provided stream.
+        """
         if stream in (None, sys.stderr):
             stream = self.stderr
         elif stream is sys.stdout:
             stream = self.stdout
 
-        out = Out(self, name, file=self.file, stream=stream, color=color)
+        if subtask_name is None:
+            subtask_name = "main"
+
+        out = Out(
+            self,
+            name,
+            file=self.file,
+            stream=stream,
+            color=color,
+            subtask_name=subtask_name,
+        )
         self.outs[name] = out
         self._max_name_length = None
+        self._max_subtask_name_length = None
 
         return out
 
     @property
-    def max_name_length(self):
+    def max_name_length(self) -> int:
+        """Return the current max length of the name field."""
         if self._max_name_length is None:
             name_lengths = [len(name) for name in self.outs.keys()]
             self._max_name_length = max(name_lengths, default=0)
 
         return self._max_name_length
+
+    @property
+    def max_subtask_name_length(self) -> int:
+        """Return the current max length of the subtask field."""
+        if self._max_subtask_name_length is None:
+            name_lengths = [
+                len(out.subtask_name) for out in self.outs.values() if out.subtask_name
+            ]
+            self._max_subtask_name_length = max(name_lengths, default=0)
+
+        return self._max_subtask_name_length
 
 
 class LineWriter:
@@ -77,15 +116,34 @@ class FileDescriptorWriter:
         return self.__out.isatty()
 
 
-class Out:
+class Out:  # noqa: WPS230
     """
     Simple Out class to log anything written in a stream to a file
      and then also write it to the stream.
     """
 
-    def __init__(self, output_logger, name, file, stream, color="white"):
+    def __init__(
+        self,
+        output_logger: OutputLogger,
+        name: str,
+        file: IO,
+        stream: IO,
+        color: Optional[str] = "white",
+        subtask_name: Optional[str] = "",
+    ):
+        """Log anything written in a stream to a file and then also write it to the stream.
+
+        Args:
+            output_logger: the OutputLogger to use.
+            name: name of this Out instance and to use in the name field.
+            file: file object to write to.
+            stream: stream object to write to.
+            color: colorize/format output to provided color.
+            subtask_name: subtask name to use for the subtask field.
+        """
         self.output_logger = output_logger
         self.name = name
+        self.subtask_name = subtask_name
         self.color = color
 
         self.file = file
@@ -94,7 +152,9 @@ class Out:
         self.last_line = ""
 
         self._prefix = None
+        self._subtask_field = ""
         self._max_name_length = None
+        self._max_subtask_name_length = None
 
     @property
     def prefix(self):
@@ -107,6 +167,20 @@ class Out:
             self._prefix = click.style(f"{padded_name} | ", fg=self.color)
 
         return self._prefix
+
+    @property
+    def subtask_field(self) -> str:
+        """Return the formatted subtask_field."""
+        max_subtask_name_length = self.output_logger.max_subtask_name_length
+        if (  # noqa: WPS337 - conflicts with black
+            self._subtask_field is None
+            or self._max_subtask_name_length != max_subtask_name_length
+        ):
+            padding = max(max_subtask_name_length, 6)
+            padded_subtask_name = self.subtask_name.ljust(padding)
+            self._subtask_field = click.style(f"{padded_subtask_name} | ")
+
+        return self._subtask_field
 
     @contextmanager
     def line_writer(self):
@@ -171,7 +245,7 @@ class Out:
     def writeline(self, line):
         self.last_line = line
 
-        click.echo(self.prefix + line, nl=False, file=self)
+        click.echo(self.prefix + self.subtask_field + line, nl=False, file=self)
         self.flush()
 
     def write(self, data):

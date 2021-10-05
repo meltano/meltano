@@ -139,21 +139,21 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | No state was found, complete import.\n",
-                "meltano     | Incremental state has been updated at",  # followed by timestamp
-                "meltano     | Extract & load complete!\n",
-                "meltano     | Transformation skipped.\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | No state was found, complete import.\n",
+                "meltano     | main   | Incremental state has been updated at",  # followed by timestamp
+                "meltano     | main   | Extract & load complete!\n",
+                "meltano     | main   | Transformation skipped.\n",
             )
 
             assert_lines(
                 result.stderr,
-                "tap-mock    | Starting\n",
-                "tap-mock    | Running\n",
-                "tap-mock    | Done\n",
-                "target-mock | Starting\n",
-                "target-mock | Running\n",
-                "target-mock | Done\n",
+                "tap-mock    | main   | Starting\n",
+                "tap-mock    | main   | Running\n",
+                "tap-mock    | main   | Done\n",
+                "target-mock | main   | Starting\n",
+                "target-mock | main   | Running\n",
+                "target-mock | main   | Done\n",
             )
 
         job_logging_service.delete_all_logs(job_id)
@@ -168,8 +168,8 @@ class TestCliEltScratchpadOne:
             assert result.exception == exc
 
             lines = [
-                "meltano     | Running extract & load...\n",
-                "meltano     | This is a grave danger.\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | This is a grave danger.\n",
                 "Traceback",
                 "Exception: This is a grave danger.\n",
             ]
@@ -218,33 +218,33 @@ class TestCliEltScratchpadOne:
             assert_cli_runner(result)
 
             stdout_lines = [
-                "meltano           | INFO Running extract & load...\n",
-                "meltano           | DEBUG Created configuration at",  # followed by path
-                "meltano           | DEBUG Could not find tap.properties.json in",  # followed by path
-                "meltano           | DEBUG Could not find state.json in",  # followed by path
-                "meltano           | DEBUG Created configuration at",  # followed by path
-                "meltano           | WARNING No state was found, complete import.\n",
-                "meltano           | INFO Incremental state has been updated at",  # followed by timestamp
-                "meltano           | DEBUG Incremental state: {'line': 1}\n",
-                "meltano           | DEBUG Incremental state: {'line': 2}\n",
-                "meltano           | DEBUG Incremental state: {'line': 3}\n",
-                "meltano           | INFO Extract & load complete!\n",
-                "meltano           | INFO Transformation skipped.\n",
+                "meltano           | main   | INFO Running extract & load...\n",
+                "meltano           | main   | DEBUG Created configuration at",  # followed by path
+                "meltano           | main   | DEBUG Could not find tap.properties.json in",  # followed by path
+                "meltano           | main   | DEBUG Could not find state.json in",  # followed by path
+                "meltano           | main   | DEBUG Created configuration at",  # followed by path
+                "meltano           | main   | WARNING No state was found, complete import.\n",
+                "meltano           | main   | INFO Incremental state has been updated at",  # followed by timestamp
+                "meltano           | main   | DEBUG Incremental state: {'line': 1}\n",
+                "meltano           | main   | DEBUG Incremental state: {'line': 2}\n",
+                "meltano           | main   | DEBUG Incremental state: {'line': 3}\n",
+                "meltano           | main   | INFO Extract & load complete!\n",
+                "meltano           | main   | INFO Transformation skipped.\n",
             ]
 
             stderr_lines = [
-                "tap-mock          | Starting\n",
-                "tap-mock          | Running\n",
-                "tap-mock (out)    | SCHEMA\n",
-                "tap-mock (out)    | RECORD\n",
-                "tap-mock (out)    | STATE\n",
-                "tap-mock          | Done\n",
-                "target-mock       | Starting\n",
-                "target-mock       | Running\n",
-                'target-mock (out) | {"line": 1}\n',
-                'target-mock (out) | {"line": 2}\n',
-                'target-mock (out) | {"line": 3}\n',
-                "target-mock       | Done\n",
+                "tap-mock          | main   | Starting\n",
+                "tap-mock          | main   | Running\n",
+                "tap-mock (out)    | main   | SCHEMA\n",
+                "tap-mock (out)    | main   | RECORD\n",
+                "tap-mock (out)    | main   | STATE\n",
+                "tap-mock          | main   | Done\n",
+                "target-mock       | main   | Starting\n",
+                "target-mock       | main   | Running\n",
+                'target-mock (out) | main   | {"line": 1}\n',
+                'target-mock (out) | main   | {"line": 2}\n',
+                'target-mock (out) | main   | {"line": 3}\n',
+                "target-mock       | main   | Done\n",
             ]
 
             assert_lines(result.stdout, *stdout_lines)
@@ -295,17 +295,17 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | Extraction failed (1): Failure\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | Extraction failed (1): Failure\n",
             )
             assert_lines(
                 result.stderr,
-                "tap-mock    | Starting\n",
-                "tap-mock    | Running\n",
-                "tap-mock    | Failure\n",
-                "target-mock | Starting\n",
-                "target-mock | Running\n",
-                "target-mock | Done\n",
+                "tap-mock    | main   | Starting\n",
+                "tap-mock    | main   | Running\n",
+                "tap-mock    | main   | Failure\n",
+                "target-mock | main   | Starting\n",
+                "target-mock | main   | Running\n",
+                "target-mock | main   | Done\n",
             )
 
     @pytest.mark.backend("sqlite")
@@ -363,17 +363,17 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | Loading failed (1): Failure\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | Loading failed (1): Failure\n",
             )
             assert_lines(
                 result.stderr,
-                "tap-mock    | Starting\n",
-                "tap-mock    | Running\n",
-                "tap-mock    | Done\n",
-                "target-mock | Starting\n",
-                "target-mock | Running\n",
-                "target-mock | Failure\n",
+                "tap-mock    | main   | Starting\n",
+                "tap-mock    | main   | Running\n",
+                "tap-mock    | main   | Done\n",
+                "target-mock | main   | Starting\n",
+                "target-mock | main   | Running\n",
+                "target-mock | main   | Failure\n",
             )
 
     @pytest.mark.backend("sqlite")
@@ -412,17 +412,17 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | Loading failed (1): Failure\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | Loading failed (1): Failure\n",
             )
             assert_lines(
                 result.stderr,
-                "tap-mock    | Starting\n",
-                "tap-mock    | Running\n",
-                "tap-mock    | Done\n",
-                "target-mock | Starting\n",
-                "target-mock | Running\n",
-                "target-mock | Failure\n",
+                "tap-mock    | main   | Starting\n",
+                "tap-mock    | main   | Running\n",
+                "tap-mock    | main   | Done\n",
+                "target-mock | main   | Starting\n",
+                "target-mock | main   | Running\n",
+                "target-mock | main   | Failure\n",
             )
 
     @pytest.mark.backend("sqlite")
@@ -468,18 +468,18 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | Extraction failed (1): Failure\n",
-                "meltano     | Loading failed (1): Failure\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | Extraction failed (1): Failure\n",
+                "meltano     | main   | Loading failed (1): Failure\n",
             )
             assert_lines(
                 result.stderr,
-                "tap-mock    | Starting\n",
-                "tap-mock    | Running\n",
-                "tap-mock    | Failure\n",
-                "target-mock | Starting\n",
-                "target-mock | Running\n",
-                "target-mock | Failure\n",
+                "tap-mock    | main   | Starting\n",
+                "tap-mock    | main   | Running\n",
+                "tap-mock    | main   | Failure\n",
+                "target-mock | main   | Starting\n",
+                "target-mock | main   | Running\n",
+                "target-mock | main   | Failure\n",
             )
 
     @pytest.mark.backend("sqlite")
@@ -532,13 +532,13 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
             )
 
             assert_lines(
                 result.stderr,
-                "meltano     | ELT could not be completed: Output line length limit exceeded\n",
+                "meltano     | main   | ELT could not be completed: Output line length limit exceeded\n",
             )
 
     @pytest.mark.backend("sqlite")
@@ -580,8 +580,8 @@ class TestCliEltScratchpadOne:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | Failed to read from target stderr.\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | Failed to read from target stderr.\n",
             )
 
     def test_elt_already_running(
@@ -792,23 +792,23 @@ class TestCliEltScratchpadTwo:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | Extract & load complete!\n",
-                "meltano     | Running transformation...\n",
-                "meltano     | Transformation complete!\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | Extract & load complete!\n",
+                "meltano     | main   | Running transformation...\n",
+                "meltano     | main   | Transformation complete!\n",
             )
 
             assert_lines(
                 result.stderr,
-                "tap-mock    | Starting\n",
-                "tap-mock    | Running\n",
-                "tap-mock    | Done\n",
-                "target-mock | Starting\n",
-                "target-mock | Running\n",
-                "target-mock | Done\n",
-                "dbt         | Starting\n",
-                "dbt         | Running\n",
-                "dbt         | Done\n",
+                "tap-mock    | main   | Starting\n",
+                "tap-mock    | main   | Running\n",
+                "tap-mock    | main   | Done\n",
+                "target-mock | main   | Starting\n",
+                "target-mock | main   | Running\n",
+                "target-mock | main   | Done\n",
+                "dbt         | main   | Starting\n",
+                "dbt         | main   | Running\n",
+                "dbt         | main   | Done\n",
             )
 
     @pytest.mark.backend("sqlite")
@@ -862,23 +862,23 @@ class TestCliEltScratchpadTwo:
 
             assert_lines(
                 result.stdout,
-                "meltano     | Running extract & load...\n",
-                "meltano     | Extract & load complete!\n",
-                "meltano     | Running transformation...\n",
-                "meltano     | Transformation failed (1): Failure\n",
+                "meltano     | main   | Running extract & load...\n",
+                "meltano     | main   | Extract & load complete!\n",
+                "meltano     | main   | Running transformation...\n",
+                "meltano     | main   | Transformation failed (1): Failure\n",
             )
 
             assert_lines(
                 result.stderr,
-                "tap-mock    | Starting\n",
-                "tap-mock    | Running\n",
-                "tap-mock    | Done\n",
-                "target-mock | Starting\n",
-                "target-mock | Running\n",
-                "target-mock | Done\n",
-                "dbt         | Starting\n",
-                "dbt         | Running\n",
-                "dbt         | Failure\n",
+                "tap-mock    | main   | Starting\n",
+                "tap-mock    | main   | Running\n",
+                "tap-mock    | main   | Done\n",
+                "target-mock | main   | Starting\n",
+                "target-mock | main   | Running\n",
+                "target-mock | main   | Done\n",
+                "dbt         | main   | Starting\n",
+                "dbt         | main   | Running\n",
+                "dbt         | main   | Failure\n",
             )
 
 
@@ -911,9 +911,9 @@ class TestCliEltScratchpadThree:
 
             assert_lines(
                 result.output,
-                "meltano | Extract & load skipped.\n",
-                "meltano | Running transformation...\n",
-                "meltano | Transformation complete!\n",
+                "meltano | main   | Extract & load skipped.\n",
+                "meltano | main   | Running transformation...\n",
+                "meltano | main   | Transformation complete!\n",
             )
 
     @pytest.mark.backend("sqlite")
@@ -945,7 +945,7 @@ class TestCliEltScratchpadThree:
 
             assert_lines(
                 result.output,
-                "meltano | Extract & load skipped.\n",
-                "meltano | Running transformation...\n",
-                "meltano | Transformation complete!\n",
+                "meltano | main   | Extract & load skipped.\n",
+                "meltano | main   | Running transformation...\n",
+                "meltano | main   | Transformation complete!\n",
             )
