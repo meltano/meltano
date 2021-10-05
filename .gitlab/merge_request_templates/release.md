@@ -11,6 +11,6 @@
 
 -----------------------------------
 
-Ref: https://meltano.com/handbook/engineering/#release-process
+Ref: https://handbook.meltano.com/engineering/#release-process
 
 /label ~Release ~"flow::Doing"

@@ -2,7 +2,7 @@
   <div>
     <header class="banner">
       <p>
-        <a href="https://www.opensourcedatastack.com/">Join us on September 28th - 30th for the Open Source Data Stack event. Free to attend, register now!</a>
+        <a href="https://www.eventbrite.com/e/tap-toberfest-with-meltano-tickets-172357424697">Join us Oct 14th - 21st for Tap-toberfest. Free to participate, register now!</a>
       </p>
     </header>
 
