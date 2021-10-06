@@ -9,6 +9,21 @@ export default {
                     alt: 'Meltano Logo (Purple)',
                     label: 'Meltano Logo'
                 },
+                                {
+                    url: 'Meltano-Melty-logo-stacked.png',
+                    alt: 'Meltano Logo (Purple)',
+                    label: 'Meltano Logo'
+                },
+                {
+                    url: 'Meltano-Melty-logo-stacked-black.svg',
+                    alt: 'Meltano Logo (Purple)',
+                    label: 'Meltano Logo'
+                },
+                {
+                    url: 'Meltano-Melty-logo-black.svg',
+                    alt: 'Meltano Logo (Purple)',
+                    label: 'Meltano Logo'
+                },
                 {
                     url: '/Meltano-Melty-Logo.png',
                     alt: 'Meltano Logo (Purple)',
