@@ -20,7 +20,7 @@ export default {
                     label: 'Meltano Logo'
                 },
                 {
-                    url: 'Meltano-Melty-logo-black.svg',
+                    url: '/Meltano-Melty-logo-black.svg',
                     alt: 'Meltano Logo (Purple)',
                     label: 'Meltano Logo'
                 },
