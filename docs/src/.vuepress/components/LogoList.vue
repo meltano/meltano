@@ -5,31 +5,37 @@ export default {
         return {
             logos: [
                 {
-                    url: '/Meltano-Melty-Logo.png',
+                    url: '/Meltano-Melty-logo.svg',
                     alt: 'Meltano Logo (Purple)',
-                    label: 'Meltano Logo'
-                },
-                                {
-                    url: '/Meltano-Melty-logo-stacked.png',
-                    alt: 'Meltano Logo (Purple)',
-                    label: 'Meltano Logo'
-                },
-                {
-                    url: '/Meltano-Melty-logo-stacked-black.svg',
-                    alt: 'Meltano Logo (Purple)',
-                    label: 'Meltano Logo'
+                    label: 'Meltano Logo with Text (Purple)',
                 },
                 {
                     url: '/Meltano-Melty-logo-black.svg',
-                    alt: 'Meltano Logo (Purple)',
-                    label: 'Meltano Logo'
+                    alt: 'Meltano Logo (Black)',
+                    label: 'Meltano Logo with Text (Black)',
                 },
                 {
-                    url: '/Meltano-Melty-Logo.png',
+                    url: '/Meltano-Melty-logo-white.svg',
+                    alt: 'Meltano Logo (White)',
+                    label: 'Meltano Logo with Text (White)',
+                    theme: 'dark',
+                },
+                {
+                    url: '/Meltano-Melty-logo-stacked.svg',
                     alt: 'Meltano Logo (Purple)',
-                    label: 'Meltano Logo',
-                    theme: 'dark'
-                }
+                    label: 'Meltano Logo (Purple)',
+                },
+                {
+                    url: '/Meltano-Melty-logo-stacked-black.svg',
+                    alt: 'Meltano Logo (Black)',
+                    label: 'Meltano Logo (Black)',
+                },
+                {
+                    url: '/Meltano-Melty-logo-stacked-white.svg',
+                    alt: 'Meltano Logo (White)',
+                    label: 'Meltano Logo (White)',
+                    theme: 'dark',
+                },
             ]
         }
     }
