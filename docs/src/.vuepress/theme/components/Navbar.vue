@@ -32,7 +32,7 @@ export default {
     .site-name
       position absolute
       left 0
-      width 130px // width of logo
+      width 131px // width of logo
       font-size 0
 
 .theme-container.no-navbar
