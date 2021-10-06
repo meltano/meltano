@@ -27,7 +27,7 @@ Before you can get started with Meltano and the [`meltano` CLI](/docs/command-li
 
 ### Local installation
 
-If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6, 3.7 or 3.8 installed,
+If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6, 3.7, 3.8 or 3.9 installed,
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
 inside the directory that will hold your [Meltano projects](/docs/project.html).
 
