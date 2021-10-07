@@ -1,2 +1,2 @@
 # Managed by bumpversion
-__version__ = "1.83.0"  # noqa: WPS410
+__version__ = "1.84.0"  # noqa: WPS410
