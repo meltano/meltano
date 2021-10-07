@@ -200,7 +200,7 @@ module.exports = {
       "/docs": docsSidebar,
       "/tutorials": docsSidebar,
     },
-    logo: "/meltano-logo.png",
+    logo: "/meltano-logo-with-text.svg",
     lastUpdated: "Last Updated",
     docsDir: "docs/src",
     docsRepo: "https://gitlab.com/meltano/meltano",
