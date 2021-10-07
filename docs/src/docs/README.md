@@ -295,7 +295,7 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 ## Values
 
-Meltano's core values are community, empathy, sustainability, accountability, transparency, and iteration.
+Meltano's core values are ambition, accountability, transparency, iteration, community, empathy, and sustainability.
 
 Our values act as a guide in how we conduct day-to-day business, make decisions, hire, and build our product. While we use these values as our compass, we adjust them based on lessons we've learned and our experiences using them in practice. Anyone can suggest improvements to our values - from team members to internet friends - and we're always open to growing and learning.
 
