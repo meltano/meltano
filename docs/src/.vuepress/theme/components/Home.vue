@@ -11,7 +11,7 @@
             class="nav-link action-button"
           >
             <img
-              src="/meltano-logo-white.svg"
+              src="/melty-icon-white.png"
               width="25"
               height="25"
               style="vertical-align: text-bottom;"
