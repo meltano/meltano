@@ -351,6 +351,12 @@ Sustainability plays a role in all aspects of our business - from hiring and dev
 We should strive to be a net positive company that makes net positive actions.
 Every change should be towards making "the thing" a little bit better than the one that came before.
 
+### Our values together
+
+We view our values as supporting each other.
+We are **ambitious** and we hold ourselves and each other **accountable** for our goals and results. 
+We achieve our goals by working **transparently** and building towards them **iteratively**.
+We do all of this by bringing **empathy** to everything we do so that we can build with the **community** in a **sustainable** manner for years to come.
 ## Careers <a name="job-openings" />
 
 The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
