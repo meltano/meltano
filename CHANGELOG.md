@@ -10,9 +10,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [2363](https://gitlab.com/meltano/meltano/-/merge_requests/2363), [2360](https://gitlab.com/meltano/meltano/-/merge_requests/2360) Small branding and logo updates throughout - and introducing Melty to the community!
+
 ### Changes
 
 ### Fixes
+
+- [2349](https://gitlab.com/meltano/meltano/-/merge_requests/2349) Fixes test extractor API endpoint to work with new PluginTestService. _Thanks, **[ReubenFrankel](https://gitlab.com/ReubenFrankel)**!_
 
 ### Breaks
 
