@@ -35,4 +35,4 @@ In 2021, Douwe spun Meltano out of GitLab as an independent startup and raised $
 
 Passionate about remote working, Douwe spent six months traveling the world, visiting and working with 49 colleagues in 14 countries on 5 continents. Douwe currently lives in Mexico City with his delightful wife, whom he met on his trip around the world, and their two cats.
 
-## [Exec and Team Photos](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/.vuepress/public/images/press-images)
+### [Exec and Team Photos](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/.vuepress/public/images/press-images)
