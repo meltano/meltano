@@ -91,6 +91,10 @@ openings:
 - title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
   description: "Required: Python & data experience"
+- title: Senior UI/UX Designer
+  location: Anywhere, Remote 🌍
+  description: "Make the Meltano and Singer ecosystems beautiful and a joy to use"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4147449004
 ---
 
 # Introduction
