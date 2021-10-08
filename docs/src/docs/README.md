@@ -84,7 +84,7 @@ openings:
   location: Anywhere, Remote 🌍
   description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
   description_url: https://boards.greenhouse.io/meltano/jobs/4075560004
-- title: Senior Frontend Engineer & UI/UX Designer
+- title: Senior Frontend Engineer
   location: Anywhere, Remote 🌍
   description: "Nice to have: Vue.js experience"
   description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
