@@ -299,20 +299,25 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 ## Values
 
-Meltano's core values are community, empathy, sustainability, accountability, transparency, and iteration.
+Meltano's core values are empathy, community, sustainability, transparency, iteration, ambition, and accountability.
+
+We view our values as supporting each other.
+We build a strong foundation by bringing **empathy** to everything we do so that we can build with the **community** in a **sustainable** manner for years to come.
+With this foundation, we work **transparently** and **iteratively** to achieve our goals.
+Our goals are **ambitious** and we hold ourselves and each other **accountable** for our results.
 
 Our values act as a guide in how we conduct day-to-day business, make decisions, hire, and build our product. While we use these values as our compass, we adjust them based on lessons we've learned and our experiences using them in practice. Anyone can suggest improvements to our values - from team members to internet friends - and we're always open to growing and learning.
+
+### Empathy
+
+We work with empathy, recognizing we're not alone in this journey.
+We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
 
 ### Community
 
 We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere.
 We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano.
 We will always keep the interests of our open source users and contributors in mind as we continue to grow.
-
-### Empathy
-
-We work with empathy, recognizing we're not alone in this journey.
-We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
 
 ### Sustainability
 
@@ -322,12 +327,6 @@ We do this by putting family and friends first, by being wise with resources, an
 Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options.
 We should strive to be a net positive company that makes net positive actions.
 Every change should be towards making "the thing" a little bit better than the one that came before.
-
-### Accountability
-
-We have a responsibility to ourselves, our teammates, and our community to do our best.
-We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions.
-We're accountable for our mistakes, but we focus on learning from them and move forward together.
 
 ### Transparency
 
@@ -342,6 +341,25 @@ We strive to provide users with the same level of insight as our team members so
 We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community.
 We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
 In practice, we ship minimum viable changes, and we continually seek to improve ourselves.
+
+### Ambition 
+
+We have high aspirations and the drive to exceed them. 
+We want to collaborate with those who are inspired and motivated by our mission. 
+We’re determined to realize our goals and achieve strong results in everything we set out to accomplish. 
+To us, ambition means:
+* Resilience in the face of setbacks 
+* Continual learning
+* A strong sense of purpose and priorities 
+* Passion 
+* Perseverance 
+* Calculated risk taking
+
+### Accountability
+
+We have a responsibility to ourselves, our teammates, and our community to do our best.
+We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions.
+We're accountable for our mistakes, but we focus on learning from them and move forward together.
 
 ## Careers <a name="job-openings" />
 
