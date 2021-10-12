@@ -78,19 +78,40 @@ members:
 openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
-  description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
+  description: "Build relationships with data consultancies, SaaS vendors, and open source software maintainers"
   description_url: https://boards.greenhouse.io/meltano/jobs/4088646004
 - title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
-  description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
+  description: "Deliver strategies and programs to improve the community experience and build engagement"
   description_url: https://boards.greenhouse.io/meltano/jobs/4075560004
-- title: Senior Frontend Engineer
+- title: Content Marketing Manager
   location: Anywhere, Remote 🌍
-  description: "Nice to have: Vue.js experience"
-  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
+  description: ""
+  description_url: https://boards.greenhouse.io/meltano/jobs/4144713004
+- title: DataOps Evangelist
+  location: Anywhere, Remote 🌍
+  description: ""
+  description_url: https://boards.greenhouse.io/meltano/jobs/4148045004
 - title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
-  description: "Required: Python & data experience"
+  description: "Build Meltano and help our users reach the full potential of their data."
+  description_url: https://boards.greenhouse.io/meltano/jobs/4117149004
+- title: Senior Backend Engineer
+  location: Anywhere, Remote 🌍
+  description: "Build Meltano and help our users reach the full potential of their data."
+  description_url: https://boards.greenhouse.io/meltano/jobs/4117149004
+- title: Backend Engineer
+  location: Anywhere, Remote 🌍
+  description: "Build Meltano and help our users reach the full potential of their data."
+  description_url: https://boards.greenhouse.io/meltano/jobs/4148049004
+- title: Backend Engineer
+  location: Anywhere, Remote 🌍
+  description: "Build Meltano and help our users reach the full potential of their data."
+  description_url: https://boards.greenhouse.io/meltano/jobs/4148049004
+- title: Senior Frontend Engineer
+  location: Anywhere, Remote 🌍
+  description: "Build an elegant, powerful, and responsive frontend experience for DataOps developers."
+  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
 - title: Senior UI/UX Designer
   location: Anywhere, Remote 🌍
   description: "Make the Meltano and Singer ecosystems beautiful and a joy to use"
