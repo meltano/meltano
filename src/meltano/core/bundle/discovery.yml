@@ -599,9 +599,9 @@ extractors:
         - name: include_deleted
           kind: boolean
           label: Include Deleted Objects
-          description: Determines if it should filter out deleted objects or not.
+          description: Determines if it should include deleted objects or not.
     - name: meltano
-      docs: 'https://hub.meltano.com/extractors/facebook.html'
+      docs: 'https://hub.meltano.com/extractors/facebook--meltano.html'
       repo: https://gitlab.com/meltano/tap-facebook
       pip_url: 'git+https://gitlab.com/meltano/tap-facebook.git'
       capabilities:
@@ -636,11 +636,11 @@ extractors:
         - name: include_deleted
           kind: boolean
           label: Include Deleted
-          description: Determines if it should filter out deleted objects or not.
+          description: Determines if it should include deleted objects or not.
         - name: result_return_limit
           kind: integer
           label: Include Deleted Objects
-          description: Determines if it should filter out deleted objects or not.
+          description: How many results should each request be limited to.
   - name: tap-fastly
     label: Fastly
     description: Edge cloud computing services provider
