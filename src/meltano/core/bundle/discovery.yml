@@ -639,7 +639,7 @@ extractors:
           description: Determines if it should include deleted objects or not.
         - name: result_return_limit
           kind: integer
-          label: Include Deleted Objects
+          label: Result Return Limit
           description: How many results should each request be limited to.
   - name: tap-fastly
     label: Fastly
