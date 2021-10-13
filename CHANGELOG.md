@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2966](https://gitlab.com/meltano/meltano/-/issues/2966) Set `singer-io` as the default tap-adwords extractor.
+
+
 ### Changes
 
 ### Fixes
