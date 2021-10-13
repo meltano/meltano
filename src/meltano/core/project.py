@@ -12,7 +12,6 @@ from typing import Dict, Union, List
 
 import fasteners
 import yaml
-from atomicwrites import atomic_write
 from dotenv import dotenv_values
 from meltano.core.plugin.base import PluginRef
 from werkzeug.utils import secure_filename
@@ -20,6 +19,7 @@ from werkzeug.utils import secure_filename
 from .behavior.versioned import Versioned
 from .error import Error
 from .meltano_file import MeltanoFile
+from .project_files import ProjectFiles
 from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
@@ -51,134 +51,6 @@ def walk_parent_directories():
         if parent_directory == directory:
             return
         directory = parent_directory
-
-
-def deep_merge(parent: dict, children: List[dict]) -> dict:
-    """Deep merge a list of child dicts with a given parent."""
-    for child in children:
-        for key, value in child.items():
-            if isinstance(value, dict):
-                # get node or create one
-                node = parent.setdefault(key, {})
-                deep_merge(value, node)
-            elif isinstance(value, list):
-                parent[key].extend(value)
-            else:
-                parent[key] = value
-    return parent
-
-
-class ProjectFiles:
-    """Interface for working with multiple project yaml files."""
-
-    def __init__(self, root: Path, meltano_file_path: Path):
-        self.root = root.resolve()
-        self._meltano_file_path = meltano_file_path
-        self._plugin_file_map = {}
-        # Empty properties for lazy-loading later
-        self._meltano = None
-        self._include_paths = None
-
-    def _is_valid_include_path(self, file_path: Path) -> bool:
-        """Determine if given path is a valid `include_paths` file."""
-        # Enforce relative paths
-        if file_path.is_absolute():
-            logger.critical(
-                f"Included path '{file_path}' is not relative to the project root."
-            )
-            raise Exception("Invalid Included Path")
-        # Verify path is a file
-        if not (file_path.is_file() and file_path.exists()):
-            logger.critical(
-                f"Included path '{file_path}' not found."
-            )
-            raise Exception("Invalid Included Path")
-        # checks passed
-        return True
-
-    def _resolve_include_paths(self, include_path_patterns: List[str]) -> List[Path]:
-        """Return a list of paths from a list of glob pattern strings."""
-        include_paths = []
-        if include_path_patterns:
-            for pattern in include_path_patterns:
-                for path_name in glob.iglob(pattern):
-                    path = Path(path_name)
-                    if self._is_valid_include_path(path):
-                        include_paths.append(path)
-            # never include meltano.yml
-            if self._meltano_file_path in include_paths:
-                include_paths.remove(self._meltano_file_path)
-        return include_paths
-
-    def _add_to_index(self, key: tuple, include_path: Path) -> None:
-        """Add a new key:path to the `_plugin_file_map`."""
-        if key not in self._plugin_file_map.keys():
-            self._plugin_file_map[key] = include_path
-        else:
-            key_path_string = ':'.join(key)
-            existing_key_file_path = self._plugin_file_map.get(key)
-            logger.critical(
-                f'Plugin with path "{key_path_string}" already added in file {existing_key_file_path}.'
-            )
-            raise Exception("Duplicate plugin name found.")
-
-    def _index_file(self, include_file_path: Path, include_file_contents: dict) -> None:
-        """Populate map of plugins/schedules to their respective files.
-
-        This allows us to know exactly which plugin is configured where when we come to update plugins.
-        """
-        # index plugins
-        plugins = include_file_contents.get('plugins', {})
-        for plugin_type, plugins in plugins.items():
-            for plugin in plugins:
-                plugin_key = ('plugins', plugin_type, plugin['name'])
-                self._add_to_index(key=plugin_key, include_path=include_file_path)
-        # index schedules
-        schedules = include_file_contents.get('schedules', {})
-        for schedule in schedules:
-            schedule_key = ('schedules', schedule['name'])
-            self._add_to_index(key=schedule_key, include_path=include_file_path)
-
-    def _load_included_files(self):
-        """Read and index included files."""
-        included_file_contents = []
-        for path in self.include_paths:
-            try:
-                with path.open() as file:
-                    contents = yaml.safe_load(file)
-                    # TODO: validate dict schema
-                    self._index_plugins(contents)
-                    included_file_contents.append(contents)
-            except yaml.YAMLError as exc:
-                logger.critical(
-                    f"Error while parsing YAML file: {path}"
-                    f"{exc}"
-                )
-                raise exc
-        return included_file_contents
-
-    @property
-    def meltano(self):
-        if self._meltano is None:
-            self._meltano = yaml.safe_load(self._meltano_file_path.open())
-        return self._meltano
-
-    @property
-    def include_paths(self) -> List[Path]:
-        """A list of paths derived from glob patterns defined in the meltanofile."""
-        if self._include_paths is None:
-            include_path_patterns = self.meltano.get('include_paths')
-            self._include_paths = self._resolve_include_paths(include_path_patterns)
-        return self._include_paths
-
-    def load(self) -> dict:
-        """Load all project files into a single dict representation."""
-        # load individual file dicts
-        included_file_contents = self._load_included_files()
-        # combine into a single dict
-        meltano_config = deep_merge(self.meltano, included_file_contents)
-        # TODO: validate schema?
-        return meltano_config
 
 
 class Project(Versioned):
@@ -313,16 +185,12 @@ class Project(Versioned):
         with self._meltano_rw_lock.write_lock(), \
             self._meltano_ip_lock:
 
-            with self.meltanofile.open() as meltanofile:
-                # read the latest version
-                meltano_update = MeltanoFile.parse(yaml.safe_load(meltanofile))
+            meltano_update = MeltanoFile.parse(self.project_files.load())
 
             yield meltano_update
 
             try:
-                with atomic_write(self.meltanofile, overwrite=True) as meltanofile:
-                    # update if everything is fine
-                    yaml.dump(meltano_update, meltanofile, default_flow_style=False, sort_keys=False)
+                self.project_files.update(meltano_update.canonical())
             except Exception as err:
                 logger.critical(f"Could not update meltano.yml: {err}")
                 raise
