@@ -66,9 +66,9 @@ def format_and_assert_lines(full_set: str, search_set: str, *lines):
     """Format and assert that lines are present in log output.
 
     Args:
-        full_set: The raw string holding the full output set to use for determining output formatting
-        search_set: The raw string holding the subset of the output we should assert against
-        lines: The lines you expect to present in the search set, formatted as tuple holding name, task, and message fields
+        full_set: The raw string holding the full output set to use for determining output formatting.
+        search_set: The raw string holding the subset of the output we should assert against.
+        lines: The lines you expect to be present in the search set, formatted as tuple holding name, task, and message fields.
 
     """
     longest_name, longest_task = _longest_fields(full_set)
