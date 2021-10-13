@@ -7,6 +7,8 @@ import json
 import logging
 import shutil
 import sys
+from asyncio import Task
+from asyncio.streams import StreamReader
 from hashlib import sha1
 from pathlib import Path
 from typing import Tuple
@@ -40,6 +42,21 @@ async def _stream_redirect(
     while not stream.at_eof():
         data = await stream.readline()
         file_like_obj.write(data.decode("ascii") if write_str else data)
+
+
+def _debug_logging_handler(
+    name: str, plugin_invoker: PluginInvoker, stderr: StreamReader
+) -> Task:
+    if not plugin_invoker.context or not plugin_invoker.context.base_output_logger:
+        return asyncio.ensure_future(
+            _stream_redirect(stderr, sys.stderr, write_str=True)
+        )
+
+    out = plugin_invoker.context.base_output_logger.out(
+        name, color="yellow", subtask_name="discovery"
+    )
+    with out.line_writer() as outerr:
+        return asyncio.ensure_future(_stream_redirect(stderr, outerr, write_str=True))
 
 
 def config_metadata_rules(config):
@@ -332,11 +349,10 @@ class SingerTap(SingerPlugin):
                     asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
                     asyncio.ensure_future(handle.wait()),
                 ]
-                if logger.isEnabledFor(logging.DEBUG):
+
+                if logger.isEnabledFor(logging.DEBUG) and handle.stderr:
                     invoke_futures.append(
-                        asyncio.ensure_future(
-                            _stream_redirect(handle.stderr, sys.stderr, write_str=True)
-                        )
+                        _debug_logging_handler(self.name, plugin_invoker, handle.stderr)
                     )
 
                 done, _ = await asyncio.wait(
