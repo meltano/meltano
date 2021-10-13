@@ -1,5 +1,6 @@
 import asyncio
 import json
+from typing import List, Tuple
 
 import pytest
 from asserts import assert_cli_runner
@@ -22,7 +23,6 @@ def assert_lines(output, *lines):
 
 
 def _extract_name_and_task(line: str) -> (str, str):
-
     expected_prefixes = ("meltano", "tap", "target", "dbt")
     # theres a lot of trash in the output that will throw off formatting attempts so try to only look
     # for log lines that are explicitly meltano.
@@ -62,13 +62,15 @@ def _longest_fields(full_set: str) -> (int, int):
     return longest_name, longest_task
 
 
-def format_and_assert_lines(full_set: str, search_set: str, *lines):
+def format_and_assert_lines(
+    full_set: str, search_set: str, lines: List[Tuple[str, str, str]]
+):
     """Format and assert that lines are present in log output.
 
     Args:
         full_set: The raw string holding the full output set to use for determining output formatting.
         search_set: The raw string holding the subset of the output we should assert against.
-        lines: The lines you expect to be present in the search set, formatted as tuple holding name, task, and message fields.
+        lines: The lines you expect to be present in the search set, formatted as a tuple of the name, task, and message fields.
 
     """
     longest_name, longest_task = _longest_fields(full_set)
@@ -197,29 +199,33 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                ("meltano", "elt", "No state was found, complete import.\n"),
-                (
-                    "meltano",
-                    "elt",
-                    "Incremental state has been updated at",
-                ),  # followed by timestamp
-                ("meltano", "elt", "Extract & load complete!\n"),
-                ("meltano", "elt", "Transformation skipped.\n"),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    ("meltano", "elt", "No state was found, complete import.\n"),
+                    (
+                        "meltano",
+                        "elt",
+                        "Incremental state has been updated at",
+                    ),  # followed by timestamp
+                    ("meltano", "elt", "Extract & load complete!\n"),
+                    ("meltano", "elt", "Transformation skipped.\n"),
+                ],
             )
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock", "extractor", "Done\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock", "loader", "Done\n"),
+                [
+                    ("tap-mock", "extractor", "Starting\n"),
+                    ("tap-mock", "extractor", "Running\n"),
+                    ("tap-mock", "extractor", "Done\n"),
+                    ("target-mock", "loader", "Starting\n"),
+                    ("target-mock", "loader", "Running\n"),
+                    ("target-mock", "loader", "Done\n"),
+                ],
             )
 
         job_logging_service.delete_all_logs(job_id)
@@ -333,15 +339,15 @@ class TestCliEltScratchpadOne:
                 ("target-mock", "loader", "Done\n"),
             ]
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
-                result.stdout + result.stderr, result.stdout, *stdout_lines
+            format_and_assert_lines(
+                result.stdout + result.stderr, result.stdout, stdout_lines
             )
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
-                result.stdout + result.stderr, result.stderr, *stderr_lines
+            format_and_assert_lines(
+                result.stdout + result.stderr, result.stderr, stderr_lines
             )
 
             log = job_logging_service.get_latest_log(job_id)
-            format_and_assert_lines(log, log, *stdout_lines, *stderr_lines)
+            format_and_assert_lines(log, log, stdout_lines + stderr_lines)
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
@@ -377,21 +383,25 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Extractor failed" in str(result.exception)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                ("meltano", "elt", "Extraction failed (1): Failure\n"),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    ("meltano", "elt", "Extraction failed (1): Failure\n"),
+                ],
             )
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock", "extractor", "Failure\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock", "loader", "Done\n"),
+                [
+                    ("tap-mock", "extractor", "Starting\n"),
+                    ("tap-mock", "extractor", "Running\n"),
+                    ("tap-mock", "extractor", "Failure\n"),
+                    ("target-mock", "loader", "Starting\n"),
+                    ("target-mock", "loader", "Running\n"),
+                    ("target-mock", "loader", "Done\n"),
+                ],
             )
 
     @pytest.mark.backend("sqlite")
@@ -447,22 +457,26 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                ("meltano", "elt", "Loading failed (1): Failure\n"),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    ("meltano", "elt", "Loading failed (1): Failure\n"),
+                ],
             )
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock", "extractor", "Done\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock", "loader", "Failure\n"),
+                [
+                    ("tap-mock", "extractor", "Starting\n"),
+                    ("tap-mock", "extractor", "Running\n"),
+                    ("tap-mock", "extractor", "Done\n"),
+                    ("target-mock", "loader", "Starting\n"),
+                    ("target-mock", "loader", "Running\n"),
+                    ("target-mock", "loader", "Failure\n"),
+                ],
             )
 
     @pytest.mark.backend("sqlite")
@@ -499,21 +513,25 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                ("meltano", "elt", "Loading failed (1): Failure\n"),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    ("meltano", "elt", "Loading failed (1): Failure\n"),
+                ],
             )
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock", "extractor", "Done\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock", "loader", "Failure\n"),
+                [
+                    ("tap-mock", "extractor", "Starting\n"),
+                    ("tap-mock", "extractor", "Running\n"),
+                    ("tap-mock", "extractor", "Done\n"),
+                    ("target-mock", "loader", "Starting\n"),
+                    ("target-mock", "loader", "Running\n"),
+                    ("target-mock", "loader", "Failure\n"),
+                ],
             )
 
     @pytest.mark.backend("sqlite")
@@ -557,22 +575,26 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Extractor and loader failed" in str(result.exception)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                ("meltano", "elt", "Extraction failed (1): Failure\n"),
-                ("meltano", "elt", "Loading failed (1): Failure\n"),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    ("meltano", "elt", "Extraction failed (1): Failure\n"),
+                    ("meltano", "elt", "Loading failed (1): Failure\n"),
+                ],
             )
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock", "extractor", "Failure\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock", "loader", "Failure\n"),
+                [
+                    ("tap-mock", "extractor", "Starting\n"),
+                    ("tap-mock", "extractor", "Running\n"),
+                    ("tap-mock", "extractor", "Failure\n"),
+                    ("target-mock", "loader", "Starting\n"),
+                    ("target-mock", "loader", "Running\n"),
+                    ("target-mock", "loader", "Failure\n"),
+                ],
             )
 
     @pytest.mark.backend("sqlite")
@@ -623,25 +645,29 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Output line length limit exceeded" in str(result.exception)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                (
-                    "meltano",
-                    "elt",
-                    "The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
-                ),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    (
+                        "meltano",
+                        "elt",
+                        "The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
+                    ),
+                ],
             )
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                (
-                    "meltano",
-                    "elt",
-                    "ELT could not be completed: Output line length limit exceeded\n",
-                ),
+                [
+                    (
+                        "meltano",
+                        "elt",
+                        "ELT could not be completed: Output line length limit exceeded\n",
+                    )
+                ],
             )
 
     @pytest.mark.backend("sqlite")
@@ -893,27 +919,31 @@ class TestCliEltScratchpadTwo:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                ("meltano", "elt", "Extract & load complete!\n"),
-                ("meltano", "elt", "Running transformation...\n"),
-                ("meltano", "elt", "Transformation complete!\n"),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    ("meltano", "elt", "Extract & load complete!\n"),
+                    ("meltano", "elt", "Running transformation...\n"),
+                    ("meltano", "elt", "Transformation complete!\n"),
+                ],
             )
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock", "extractor", "Done\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock", "loader", "Done\n"),
-                ("dbt", "main", "Starting\n"),
-                ("dbt", "main", "Running\n"),
-                ("dbt", "main", "Done\n"),
+                [
+                    ("tap-mock", "extractor", "Starting\n"),
+                    ("tap-mock", "extractor", "Running\n"),
+                    ("tap-mock", "extractor", "Done\n"),
+                    ("target-mock", "loader", "Starting\n"),
+                    ("target-mock", "loader", "Running\n"),
+                    ("target-mock", "loader", "Done\n"),
+                    ("dbt", "main", "Starting\n"),
+                    ("dbt", "main", "Running\n"),
+                    ("dbt", "main", "Done\n"),
+                ],
             )
 
     @pytest.mark.backend("sqlite")
@@ -965,27 +995,31 @@ class TestCliEltScratchpadTwo:
             assert result.exit_code == 1
             assert "`dbt run` failed" in str(result.exception)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Running extract & load...\n"),
-                ("meltano", "elt", "Extract & load complete!\n"),
-                ("meltano", "elt", "Running transformation...\n"),
-                ("meltano", "elt", "Transformation failed (1): Failure\n"),
+                [
+                    ("meltano", "elt", "Running extract & load...\n"),
+                    ("meltano", "elt", "Extract & load complete!\n"),
+                    ("meltano", "elt", "Running transformation...\n"),
+                    ("meltano", "elt", "Transformation failed (1): Failure\n"),
+                ],
             )
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stderr,
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock", "extractor", "Done\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock", "loader", "Done\n"),
-                ("dbt", "main", "Starting\n"),
-                ("dbt", "main", "Running\n"),
-                ("dbt", "main", "Failure\n"),
+                [
+                    ("tap-mock", "extractor", "Starting\n"),
+                    ("tap-mock", "extractor", "Running\n"),
+                    ("tap-mock", "extractor", "Done\n"),
+                    ("target-mock", "loader", "Starting\n"),
+                    ("target-mock", "loader", "Running\n"),
+                    ("target-mock", "loader", "Done\n"),
+                    ("dbt", "main", "Starting\n"),
+                    ("dbt", "main", "Running\n"),
+                    ("dbt", "main", "Failure\n"),
+                ],
             )
 
 
@@ -1016,12 +1050,14 @@ class TestCliEltScratchpadThree:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Extract & load skipped.\n"),
-                ("meltano", "elt", "Running transformation...\n"),
-                ("meltano", "elt", "Transformation complete!\n"),
+                [
+                    ("meltano", "elt", "Extract & load skipped.\n"),
+                    ("meltano", "elt", "Running transformation...\n"),
+                    ("meltano", "elt", "Transformation complete!\n"),
+                ],
             )
 
     @pytest.mark.backend("sqlite")
@@ -1051,10 +1087,12 @@ class TestCliEltScratchpadThree:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            format_and_assert_lines(  # noqa: WPS317 - https://github.com/wemake-services/wemake-python-styleguide/issues/454
+            format_and_assert_lines(
                 result.stdout + result.stderr,
                 result.stdout,
-                ("meltano", "elt", "Extract & load skipped.\n"),
-                ("meltano", "elt", "Running transformation...\n"),
-                ("meltano", "elt", "Transformation complete!\n"),
+                [
+                    ("meltano", "elt", "Extract & load skipped.\n"),
+                    ("meltano", "elt", "Running transformation...\n"),
+                    ("meltano", "elt", "Transformation complete!\n"),
+                ],
             )
