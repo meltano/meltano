@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2986](https://gitlab.com/meltano/meltano/-/issues/2986) Set `transferwise` as the default target-snowflake loader.
+
+
 ### Changes
 
 ### Fixes
