@@ -1,5 +1,6 @@
 import glob
 import yaml
+import pytest
 import logging
 
 from pathlib import Path
@@ -23,16 +24,6 @@ def deep_merge(parent: dict, children: List[dict]) -> dict:
             else:
                 parent[key] = value
     return parent
-
-
-def deep_set(d: dict, keys: list, value) -> dict:
-    """Deep set dictionary key."""
-    dd = d
-    latest = keys.pop()
-    for k in keys:
-        dd = dd.setdefault(k, {})
-    dd[latest] = value
-    return d
 
 
 class ProjectFiles:
@@ -79,15 +70,15 @@ class ProjectFiles:
 
     def _add_to_index(self, key: tuple, include_path: Path) -> None:
         """Add a new key:path to the `_plugin_file_map`."""
-        if key not in self._plugin_file_map.keys():
-            self._plugin_file_map[key] = str(include_path)
-        else:
+        if key in self._plugin_file_map:
             key_path_string = ':'.join(key)
             existing_key_file_path = self._plugin_file_map.get(key)
             logger.critical(
                 f'Plugin with path "{key_path_string}" already added in file {existing_key_file_path}.'
             )
             raise Exception("Duplicate plugin name found.")
+        else:
+            self._plugin_file_map[key] = str(include_path)
 
     def _index_file(self, include_file_path: Path, include_file_contents: dict) -> None:
         """Populate map of plugins/schedules to their respective files.
@@ -147,22 +138,36 @@ class ProjectFiles:
         # TODO: validate schema?
         return meltano_config
 
-    def _recurse_config_dict(self, config, parent_key=None):
+    def _split_config_dict(self, config:dict):
         file_dicts = {}
         for key, value in config.items():
-            if parent_key is None:
-                index_key = (key, )
-            else:
-                index_key = (parent_key, key)
-            if index_key in self._plugin_file_map:
-                file = self._plugin_file_map.get(index_key)
+            if key == 'plugins':
+                for plugin_type, plugins in value.items():
+                    plugin_type = str(plugin_type)
+                    for plugin in plugins:
+                        key = ('plugins', plugin_type, plugin.get('name'))
+                        file = self._plugin_file_map.get(key, str(self._meltano_file_path))
+                        if not file in file_dicts:
+                            file_dicts[file] = {}
+                        if not 'plugins' in file_dicts[file]:
+                            file_dicts[file]['plugins'] = {}
+                        if not plugin_type in file_dicts[file]['plugins']:
+                            file_dicts[file]['plugins'][plugin_type] = []
+                        file_dicts[file]['plugins'][plugin_type].append(plugin)
+            elif key == 'schedules':
+                for schedule in value:
+                    key = ('schedules', schedule['name'])
+                    file = self._plugin_file_map.get(key, str(self._meltano_file_path))
+                    if not file in file_dicts:
+                        file_dicts[file] = {}
+                    if not 'schedules' in file_dicts[file]:
+                        file_dicts[file]['schedules'] = []
+                    file_dicts[file]['schedules'].append(schedule)
             else:
                 file = str(self._meltano_file_path)
-            keys = [file] + list(index_key)
-            file_dicts = deep_set(file_dicts, keys, value)
-            if isinstance(value, dict):
-                child_file_dicts = self._recurse_config_dict(value, parent_key=key)
-                file_dicts = deep_merge(file_dicts, [child_file_dicts])
+                if not file in file_dicts:
+                    file_dicts[file] = {}
+                file_dicts[file][key] = value
         return file_dicts
 
     def update(self, meltano_config: dict):
@@ -171,7 +176,7 @@ class ProjectFiles:
         # for each key in meltano_config
         #     if key in ['plugins', 'schedules']:
         #          write to specifc file
-        file_dicts = self._recurse_config_dict(meltano_config)
+        file_dicts = self._split_config_dict(meltano_config)
         for file_path, contents in file_dicts.items():
             with atomic_write(file_path, overwrite=True) as f:
                 yaml.dump(contents, f, default_flow_style=False, sort_keys=False)

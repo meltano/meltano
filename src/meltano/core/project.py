@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import glob
+import pytest
 import threading
 from contextlib import contextmanager
 from copy import deepcopy
@@ -169,6 +170,7 @@ class Project(Versioned):
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
         with self._meltano_rw_lock.read_lock():
+            mf = MeltanoFile.parse(self.project_files.load())
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
@@ -185,12 +187,12 @@ class Project(Versioned):
         with self._meltano_rw_lock.write_lock(), \
             self._meltano_ip_lock:
 
-            meltano_update = MeltanoFile.parse(self.project_files.load())
+            meltano_config = MeltanoFile.parse(self.project_files.load())
 
-            yield meltano_update
+            yield meltano_config
 
             try:
-                self.project_files.update(meltano_update.canonical())
+                meltano_config = self.project_files.update(meltano_config.canonical())
             except Exception as err:
                 logger.critical(f"Could not update meltano.yml: {err}")
                 raise
