@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2964](https://gitlab.com/meltano/meltano/-/issues/2964) Set `singer-io` as the default tap-facebook extractor.
+
+
 ### Changes
 
 ### Fixes
