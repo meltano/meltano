@@ -1959,7 +1959,7 @@ loaders:
         repo: https://github.com/transferwise/pipelinewise-target-snowflake
         pip_url: pipelinewise-target-snowflake
         settings_group_validation:
-          - ['account', 'dbname', 'user', 'password', 'warehouse', 'file_format']
+          - ['account', 'dbname', 'user', 'password', 'warehouse', 'file_format', 'default_target_schema']
         settings:
           - name: account
             label: Account
