@@ -180,4 +180,6 @@ class ProjectFiles:
         for file_path, contents in file_dicts.items():
             with atomic_write(file_path, overwrite=True) as f:
                 yaml.dump(contents, f, default_flow_style=False, sort_keys=False)
+        # reset project file cache
+        self._meltano = None
         return meltano_config
