@@ -170,7 +170,6 @@ class Project(Versioned):
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
         with self._meltano_rw_lock.read_lock():
-            mf = MeltanoFile.parse(self.project_files.load())
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager

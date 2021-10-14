@@ -10,6 +10,11 @@ from typing import Dict, Union, List
 
 logger = logging.getLogger(__name__)
 
+BLANK_SUBFILE = {
+    'plugins': {},
+    'schedules': []
+}
+
 
 def deep_merge(parent: dict, children: List[dict]) -> dict:
     """Deep merge a list of child dicts with a given parent."""
@@ -33,9 +38,6 @@ class ProjectFiles:
         self.root = root.resolve()
         self._meltano_file_path = meltano_file_path
         self._plugin_file_map = {}
-        # Empty properties for lazy-loading later
-        self._meltano = None
-        self._include_paths = None
 
     def _is_valid_include_path(self, file_path: Path) -> bool:
         """Determine if given path is a valid `include_paths` file."""
@@ -117,17 +119,14 @@ class ProjectFiles:
 
     @property
     def meltano(self):
-        if self._meltano is None:
-            self._meltano = yaml.safe_load(self._meltano_file_path.open())
-        return self._meltano
+        return yaml.safe_load(self._meltano_file_path.open())
 
     @property
     def include_paths(self) -> List[Path]:
         """A list of paths derived from glob patterns defined in the meltanofile."""
-        if self._include_paths is None:
-            include_path_patterns = self.meltano.get('include_paths')
-            self._include_paths = self._resolve_include_paths(include_path_patterns)
-        return self._include_paths
+        include_path_patterns = self.meltano.get('include_paths')
+        include_paths = self._resolve_include_paths(include_path_patterns)
+        return include_paths
 
     def load(self) -> dict:
         """Load all project files into a single dict representation."""
@@ -172,14 +171,14 @@ class ProjectFiles:
 
     def update(self, meltano_config: dict):
         """Update config by overriding current config with new, changed config."""
-        # Reverse of the above
-        # for each key in meltano_config
-        #     if key in ['plugins', 'schedules']:
-        #          write to specifc file
+        # construct individual dicts per file
         file_dicts = self._split_config_dict(meltano_config)
         for file_path, contents in file_dicts.items():
             with atomic_write(file_path, overwrite=True) as f:
                 yaml.dump(contents, f, default_flow_style=False, sort_keys=False)
-        # reset project file cache
-        self._meltano = None
+        # write blank entities for those no longer in use (i.e. contained config on load, but not on save)
+        unused_files = [f for f in self.include_paths if str(f) not in file_dicts]
+        for file_path in unused_files:
+            with atomic_write(file_path, overwrite=True) as f:
+                yaml.dump(BLANK_SUBFILE, f, default_flow_style=False, sort_keys=False)
         return meltano_config
