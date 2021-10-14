@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 import glob
-import pytest
 import threading
 from contextlib import contextmanager
 from copy import deepcopy

@@ -1,6 +1,5 @@
 import glob
 import yaml
-import pytest
 import logging
 
 from pathlib import Path
