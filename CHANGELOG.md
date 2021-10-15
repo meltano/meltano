@@ -10,13 +10,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
 - [#2986](https://gitlab.com/meltano/meltano/-/issues/2986) Set `transferwise` as the default target-snowflake loader.
 - [#2966](https://gitlab.com/meltano/meltano/-/issues/2966) Set `singer-io` as the default tap-adwords extractor.
 - [#2964](https://gitlab.com/meltano/meltano/-/issues/2964) Set `singer-io` as the default tap-facebook extractor.
-
-- [#2963](https://gitlab.com/meltano/meltano/-/issues/2963) Set `MeltanoLabs` as the default tap-csv extractor.
-
-### Changes
+- [#2963](https://gitlab.com/meltano/meltano/-/issues/2963) Set `meltanolabs` as the default tap-csv extractor.
 
 ### Fixes
 
