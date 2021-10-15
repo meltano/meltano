@@ -538,12 +538,13 @@ extractors:
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
     variants:
-    - name: meltano
+    - name: MeltanoLabs
       docs: 'https://hub.meltano.com/extractors/csv.html'
-      repo: https://gitlab.com/meltano/tap-csv
-      pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
+      repo: https://github.com/MeltanoLabs/tap-csv
+      pip_url: 'git+https://github.com/MeltanoLabs/tap-csv.git'
       capabilities:
         - discover
+        - catalog
         - state
       settings_group_validation:
         - ['files']
@@ -551,13 +552,13 @@ extractors:
       settings:
         - name: files
           kind: array
-          description: Array of objects with `entity`, `file`, and `keys` keys
+          description: Array of objects with `entity`, `path`, and `keys` keys
         - name: csv_files_definition
           env: TAP_CSV_FILES_DEFINITION
           label: CSV Files Definition
-          description: Project-relative path to JSON file holding array of objects with `entity`, `file`, and `keys` keys
+          description: Project-relative path to JSON file holding array of objects with `entity`, `path`, and `keys` keys
           placeholder: Ex. files-def.json
-          documentation: https://gitlab.com/meltano/tap-csv#run
+          documentation: https://github.com/MeltanoLabs/tap-csv#settings
   - name: tap-facebook
     label: Facebook Ads
     description: Advertising Platform
