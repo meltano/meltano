@@ -100,7 +100,12 @@ class ELTContext:
 
 
 class ELTContextBuilder:
-    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
+    def __init__(
+        self,
+        project: Project,
+        plugins_service: ProjectPluginsService = None,
+        environment: str = None,
+    ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
 
@@ -119,6 +124,8 @@ class ELTContextBuilder:
         self._catalog = None
         self._state = None
         self._base_output_logger = None
+
+        self._environment = environment
 
     def with_session(self, session):
         self._session = session
@@ -192,7 +199,24 @@ class ELTContextBuilder:
         """
         self._base_output_logger = base_output_logger
 
-    def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
+    def plugin_context(
+        self,
+        plugin_ref: PluginRef,
+        env: dict = None,
+        config: dict = None,
+        environment: str = None,
+    ) -> PluginContext:
+        """Create context object for a plugin.
+
+        Args:
+            plugin_ref: Plugin reference object.
+            env: Environment override dictionary. Defaults to None.
+            config: Plugin configuration override dictionary. Defaults to None.
+            environment: Environment name. Defaults to None.
+
+        Returns:
+            A new `PluginContext` object.
+        """
         plugin = self.plugins_service.get_plugin(plugin_ref)
 
         return PluginContext(
@@ -203,6 +227,7 @@ class ELTContextBuilder:
                 plugins_service=self.plugins_service,
                 env_override=env,
                 config_override=config,
+                environment=environment,
             ),
             session=self._session,
         )
@@ -220,25 +245,41 @@ class ELTContextBuilder:
             if self._state:
                 config["_state"] = self._state
 
-            extractor = self.plugin_context(self._extractor, config=config)
+            extractor = self.plugin_context(
+                self._extractor,
+                config=config,
+                environment=self._environment,
+            )
 
             env.update(extractor.env)
 
         loader = None
         if self._loader:
-            loader = self.plugin_context(self._loader, env=env.copy())
+            loader = self.plugin_context(
+                self._loader,
+                env=env.copy(),
+                environment=self._environment,
+            )
 
             env.update(loader.env)
 
         transform = None
         if self._transform:
-            transform = self.plugin_context(self._transform, env=env.copy())
+            transform = self.plugin_context(
+                self._transform,
+                env=env.copy(),
+                environment=self._environment,
+            )
 
             env.update(transform.env)
 
         transformer = None
         if self._transformer:
-            transformer = self.plugin_context(self._transformer, env=env.copy())
+            transformer = self.plugin_context(
+                self._transformer,
+                env=env.copy(),
+                environment=self._environment,
+            )
 
         return ELTContext(
             self.project,

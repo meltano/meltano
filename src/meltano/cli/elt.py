@@ -24,6 +24,7 @@ from meltano.core.transform_add_service import TransformAddService
 from meltano.core.utils import click_run_async
 
 from . import cli
+from .environment import environment_option
 from .params import pass_project
 from .utils import CliError
 
@@ -81,6 +82,7 @@ def logs(*args, **kwargs):
     help="Force a new run even when a pipeline with the same Job ID is already running",
     is_flag=True,
 )
+@environment_option
 @pass_project(migrate=True)
 @click_run_async
 async def elt(
@@ -97,6 +99,7 @@ async def elt(
     dump,
     job_id,
     force,
+    environment: str,
 ):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
@@ -130,6 +133,7 @@ async def elt(
             catalog=catalog,
             state=state,
             plugins_service=plugins_service,
+            environment=environment,
         )
 
         if dump:
@@ -156,6 +160,7 @@ def _elt_context_builder(
     catalog=None,
     state=None,
     plugins_service=None,
+    environment: str = None,
 ):
     transform_name = None
     if transform != "skip":
@@ -164,7 +169,11 @@ def _elt_context_builder(
         )
 
     return (
-        ELTContextBuilder(project, plugins_service=plugins_service)
+        ELTContextBuilder(  # noqa: WPS221
+            project,
+            plugins_service=plugins_service,
+            environment=environment,
+        )
         .with_session(session)
         .with_job(job)
         .with_extractor(extractor)
