@@ -20,6 +20,7 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_plugins_service import (
     PluginAlreadyAddedException,
@@ -400,6 +401,29 @@ def project(test_dir, project_init_service):
     os.chdir(project.root)
 
     yield project
+
+    # clean-up
+    Project.deactivate()
+    os.chdir(test_dir)
+    shutil.rmtree(project.root)
+    logging.debug(f"Cleaned project at {project.root}")
+
+
+@pytest.fixture(scope="class")
+def project_files(test_dir, project_init_service):
+    project = project_init_service.init(add_discovery=True)
+    logging.debug(f"Created new project at {project.root}")
+
+    current_dir = Path(__file__).parent
+    multifile_project_root = current_dir.joinpath("multifile_project/")
+
+    os.remove(project.meltanofile)
+    shutil.copytree(multifile_project_root, project.root, dirs_exist_ok=True)
+
+    # cd into the new project root
+    os.chdir(project.root)
+
+    yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
 
     # clean-up
     Project.deactivate()

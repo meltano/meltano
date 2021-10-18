@@ -2,13 +2,12 @@ import errno
 import logging
 import os
 import sys
-import glob
 import threading
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Dict, Union, List
+from typing import Dict, Union
 
 import fasteners
 import yaml

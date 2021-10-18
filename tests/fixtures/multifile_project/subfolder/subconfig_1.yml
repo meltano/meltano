@@ -1,0 +1,13 @@
+plugins:
+  extractors:
+    - name: tap-subconfig-1-yml
+
+  loaders:
+    - name: target-subconfig-1-yml
+
+schedules:
+  - name: test-subconfig-1-yml
+    extractor: tap-subconfig-1-yml
+    loader: target-subconfig-1-yml
+    transform: skip
+    interval: '@once'

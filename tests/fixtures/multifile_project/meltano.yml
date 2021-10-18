@@ -1,0 +1,20 @@
+version: 1
+
+include_paths:
+  - './subconfig_[0-9].yml'
+  - './*/subconfig_[0-9].yml'
+  - './*/**/subconfig_[0-9].yml'
+
+plugins:
+  extractors:
+    - name: tap-meltano-yml
+
+  loaders:
+    - name: target-meltano-yml
+
+schedules:
+  - name: test-meltano-yml
+    extractor: tap-meltano-yml
+    loader: target-meltano-yml
+    transform: skip
+    interval: '@once'
