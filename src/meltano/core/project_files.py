@@ -98,7 +98,8 @@ class ProjectFiles:
                     contents = yaml.safe_load(file)
                     # TODO: validate dict schema
                     self._index_file(
-                        include_file_path=path, include_file_contents=contents)
+                        include_file_path=path, include_file_contents=contents
+                    )
                     included_file_contents.append(contents)
             except yaml.YAMLError as exc:
                 logger.critical(f"Error while parsing YAML file: {path} \n {exc}")
@@ -128,7 +129,7 @@ class ProjectFiles:
         # TODO: validate schema?
         return meltano_config
 
-    def _split_config_dict(self, config:dict):
+    def _split_config_dict(self, config: dict):
         file_dicts = {}
         for key, value in config.items():
             if key == "plugins":
@@ -136,14 +137,18 @@ class ProjectFiles:
                     plugin_type = str(plugin_type)
                     for plugin in plugins:
                         key = ("plugins", plugin_type, plugin.get("name"))
-                        file = self._plugin_file_map.get(key, str(self._meltano_file_path))
+                        file = self._plugin_file_map.get(
+                            key, str(self._meltano_file_path)
+                        )
                         if not file in file_dicts:
                             file_dicts[file] = {}
                         if not "plugins" in file_dicts[file]:
                             file_dicts[file]["plugins"] = {}
                         if not plugin_type in file_dicts[file]["plugins"]:
                             file_dicts[file]["plugins"][plugin_type] = []
-                        if not plugin["name"] in [p["name"] for p in file_dicts[file]["plugins"][plugin_type]]:
+                        if not plugin["name"] in [
+                            p["name"] for p in file_dicts[file]["plugins"][plugin_type]
+                        ]:
                             file_dicts[file]["plugins"][plugin_type].append(plugin)
             elif key == "schedules":
                 for schedule in value:
@@ -153,7 +158,9 @@ class ProjectFiles:
                         file_dicts[file] = {}
                     if not "schedules" in file_dicts[file]:
                         file_dicts[file]["schedules"] = []
-                    if not schedule["name"] in [s["name"] for s in file_dicts[file]["schedules"]]:
+                    if not schedule["name"] in [
+                        s["name"] for s in file_dicts[file]["schedules"]
+                    ]:
                         file_dicts[file]["schedules"].append(schedule)
             else:
                 file = str(self._meltano_file_path)
