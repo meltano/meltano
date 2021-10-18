@@ -626,10 +626,10 @@ extractors:
     description: Single application for the entire DevOps lifecycle
     namespace: tap_gitlab
     variants: 
-    - name: meltano
+    - name: meltanolabs
       docs: 'https://hub.meltano.com/extractors/gitlab.html'
-      repo: https://gitlab.com/meltano/tap-gitlab
-      pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
+      repo: https://github.com/MeltanoLabs/tap-gitlab
+      pip_url: 'git+https://github.com/MeltanoLabs/tap-gitlab.git'
       capabilities:
         - catalog
         - discover

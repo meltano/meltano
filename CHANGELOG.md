@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2965](https://gitlab.com/meltano/meltano/-/issues/2965) Set `meltanolabs` as the default tap-gitlab extractor.
+
 ### Fixes
 
 ### Breaks
