@@ -1,6 +1,8 @@
 import json
 import logging
+from typing import Union
 
+from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -23,13 +25,23 @@ class SelectService:
     ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
-        self._extractor = self.plugins_service.find_plugin(
-            extractor, PluginType.EXTRACTORS
-        )
-        self._environment = environment
+
+        self._environment = project.get_environment(environment)
+
+        if self._environment is not None:
+            self._extractor = self._environment.get_plugin_config(
+                PluginType.EXTRACTORS,
+                extractor,
+            )
+        else:
+            self._extractor = self.plugins_service.find_plugin(
+                extractor, PluginType.EXTRACTORS
+            )
+
+        self._environment_name = environment
 
     @property
-    def extractor(self) -> ProjectPlugin:
+    def extractor(self) -> Union[ProjectPlugin, EnvironmentPluginConfig]:
         """Retrieve extractor ProjectPlugin object."""
         return self._extractor
 
@@ -39,7 +51,7 @@ class SelectService:
             self.project,
             self.extractor,
             plugins_service=self.plugins_service,
-            environment=self._environment,
+            environment=self._environment_name,
         )
         return plugin_settings_service.get("_select")
 
@@ -83,7 +95,14 @@ class SelectService:
         else:
             patterns.append(this_pattern)
         plugin.extras["select"] = patterns
-        self.plugins_service.update_plugin(plugin)
+
+        if isinstance(plugin, ProjectPlugin):
+            self.plugins_service.update_plugin(plugin)
+        else:
+            self.plugins_service.update_environment_plugin(
+                plugin,
+                self._environment,
+            )
 
     @staticmethod
     def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:

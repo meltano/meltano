@@ -78,6 +78,7 @@ async def select(
                 attributes_filter,
                 exclude=flags["exclude"],
                 remove=flags["remove"],
+                environment=environment,
             )
 
         tracker = GoogleAnalyticsTracker(project)
@@ -92,10 +93,16 @@ async def select(
 
 
 def update(
-    project, extractor, entities_filter, attributes_filter, exclude=False, remove=False
+    project,
+    extractor,
+    entities_filter,
+    attributes_filter,
+    exclude=False,
+    remove=False,
+    environment=None,
 ):
     """Update select pattern for a specific extractor."""
-    select_service = SelectService(project, extractor)
+    select_service = SelectService(project, extractor, environment=environment)
     select_service.update(entities_filter, attributes_filter, exclude, remove)
 
 
