@@ -328,7 +328,6 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
     ```
 
-
 1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
 
     ```bash
@@ -548,7 +547,7 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
       ```
 
       ::: tip
-        Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any trouble while installing, refer to [MeltanoHub](https://hub.meltano.com/) for more help troubleshooting or join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink> to ask questions.
+        Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any issues while installing, refer to [MeltanoHub](https://hub.meltano.com/) for more help troubleshooting or join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink> to ask questions.
       :::
       This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
 
@@ -560,7 +559,7 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
           pip_url: singer-target-postgres
       ```
 
-    You can now continue to step 4.
+      You can now continue to step 4.
 
     - If a loader is **not yet discoverable**, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, e.g. `Singer target BigQuery`.
 
@@ -865,7 +864,7 @@ Once your raw data has arrived in your data warehouse, its schema will likely ne
 
 To help you realize this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
 
-*To learn about data transformation, refer to the [Data Transformation (T) guide](/docs/transforms.html).*
+To learn about data transformation, refer to the [Data Transformation (T) guide](/docs/transforms.html).
 
 1. To install the DBT transformer to your project run:
 
@@ -890,12 +889,12 @@ To help you realize this, Meltano supports transformation using [`dbt`](https://
           - name: tags
     ```
 
-    The organization of your dbt project is up to you but if you'd like to run a specific set of models as part of a Meltano ELT pipeline it can be done via `meltano elt tap target --transform=run` which requires the model directory to match the extractor's name using snake_case (i.e. tap_gitlab) so it can automatically find you models. Running as part of a pipeline allows Meltano to simplify some dbt configuration by inferring some of your dbt settings based on your tap and target.
+    The organization of your dbt project is up to you but if you'd like to run a specific set of models as part of a Meltano ELT pipeline it can be done via `meltano elt tap target --transform=run` which requires the model directory to match the extractor's name using snake_case (i.e. tap_gitlab) so it can automatically find your models. Running as part of a pipeline allows Meltano to simplify dbt configuration by inferring some of your settings based on the pipeline tap and target.
     
     See more in the [Data Transformation (T) guide - transform in your ELT pipeline](/docs/transforms.html#transform-in-your-elt-pipeline).
 
 1. Then add a model file with your SQL transformation logic.
-  For example the dbt model SQL below generates a table with new merge requests in the last day `/transform/models/tap_gitlab/commits_last_7d.sql`.
+  For example the dbt model SQL below generates a table with new commits in the last 7 days `/transform/models/tap_gitlab/commits_last_7d.sql`.
 
     ```sql
     {{
@@ -934,6 +933,8 @@ To help you realize this, Meltano supports transformation using [`dbt`](https://
   export DBT_SOURCE_SCHEMA="public"
   meltano invoke dbt:run
   ```
+
+  For this example we just used environment variables to set the dbt configurations but they can be defined as settings in your meltano.yml using `meltano config dbt set <setting> <setting_value>`.
 
   After your transform run is complete you should see a new table named after your model `warehouse.analytics.commits_last_7d` in your target.
 

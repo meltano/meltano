@@ -66,7 +66,7 @@ meltano invoke dbt:<command>
 meltano invoke dbt:run --models tap_gitlab.*
 ```
 
-Again, this runs all dbt models in the `/transforms/tap-gitlab/` directory.
+Again, this runs all dbt models in the `/transforms/models/tap_gitlab/` directory.
 
 The downside of running directly vs in a pipeline is that Meltano can't infer anything about how dbt should run so more settings might need to be explictly set by the user. This includes target dialet `DBT_TARGET`, source schema `DBT_SOURCE_SCHEMA` , target schema`DBT_TARGET_SCHEMA`, and models `DBT_MODELS`.
 
@@ -75,7 +75,7 @@ See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) fr
 ### Adding a Transform to your Meltano Project
 
 Once the dbt transformer has been installed in your Meltano project you will see the `/transform` directory populated with dbt artifacts.
-If you chose to use the `--transform run` option in an ELT pipeline, its importatnt to note that Meltano uses the convention that the transform has the same namespace as the extractor in its pipeline, except with snake_case (tap-gitlab -> tap_gitlab).
+If you chose to use the `--transform run` option in an ELT pipeline, its important to note that Meltano uses the convention that the transform has the same namespace as the extractor in its pipeline, except with snake_case (tap-gitlab -> tap_gitlab).
 For instance, all you need to do is start writing your dbt models in the appropriate `/transform/models/<tap_name>/` directory.
 
 See the [dbt documentation](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for more details on writing models.
