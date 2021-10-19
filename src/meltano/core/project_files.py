@@ -55,9 +55,8 @@ class ProjectFiles:  # noqa: WPS214
 
     def load(self) -> dict:
         """Load all project files into a single dict representation."""
-        # load individual file dicts
+        self._meltano = None  # meltano file may have changed in another process, so reset our cache
         included_file_contents = self._load_included_files()
-        # combine into a single dict
         return deep_merge(copy.deepcopy(self.meltano), included_file_contents)
 
     def update(self, meltano_config: dict):

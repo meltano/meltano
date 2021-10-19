@@ -23,7 +23,7 @@ def update(payload):
 
     with project.meltano_update() as meltano:
         for k, v in payload.items():
-            meltano.extras[k] = v
+            setattr(meltano, k, v)
 
 
 class IndefiniteThread(threading.Thread):
