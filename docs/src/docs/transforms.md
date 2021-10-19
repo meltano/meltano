@@ -18,6 +18,9 @@ After dbt is installed you can change the default configurations using environme
 
 ```bash
 meltano config dbt set target <target>
+
+# For example:
+meltano config dbt set target postgres
 ```
 
 For more details, [pipeline environment variables](/docs/integration.html#pipeline-environment-variables) and [dbt transform settings](https://hub.meltano.com/transformers/dbt#settings).
@@ -32,6 +35,9 @@ When `melatno elt` runs with the `--transform run` option, Meltano uses the conv
 As an example, assume that the following command runs:
 
 ```bash
+meltano elt <tap> <target> --transform run
+
+# For example:
 meltano elt tap-gitlab target-postgres --transform run
 ```
 
@@ -54,6 +60,9 @@ Users might choose this approach if they want to replicate data from many source
 For example, to run the same transforms as the tap-gitlab `--transform=run` example above, the following command can be run:
 
 ```bash
+meltano invoke dbt:<command>
+
+# For example:
 meltano invoke dbt:run --models tap_gitlab.*
 ```
 
