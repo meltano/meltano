@@ -349,24 +349,14 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     """Configuration stored in an environment within `meltano.yml`."""
 
+    label = "`meltano_env`"
+
     @property
     def flat_config(self) -> Dict[str, Any]:
         """Get dictionary of flattened configuration."""
         if self._flat_config is None:
             self._flat_config = self.settings_service.environment_config
         return self._flat_config
-
-    def set(self, name: str, path: List[str], value, setting_def=None):
-        """TODO: Implement this."""
-        raise NotImplementedError
-
-    def unset(self, name: str, path: List[str], setting_def=None):
-        """TODO: Implement this."""
-        raise NotImplementedError
-
-    def reset(self):
-        """TODO: Implement this."""
-        raise NotImplementedError
 
 
 class DbStoreManager(SettingsStoreManager):

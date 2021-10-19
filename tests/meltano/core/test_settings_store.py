@@ -334,10 +334,9 @@ class TestAutoStoreManager:
         set_value_store("from_dotenv", Store.DOTENV)
         set_value_store("from_meltano_yml", Store.MELTANO_YML)
         set_value_store("from_db", Store.DB)
-        set_value_store("from_meltano_env", Store.MELTANO_ENV)
 
         metadata = subject.unset("regular", ["regular"])
-        assert metadata["store"] == Store.MELTANO_ENV
+        assert metadata["store"] == Store.DB
         assert_value_source("from_default", Store.DEFAULT)
 
         assert_value_source("from_dotenv", Store.DOTENV, name="password")
