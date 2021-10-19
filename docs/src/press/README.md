@@ -14,7 +14,7 @@ Meltano related news, logos, and how to get in touch.
 - [**GitLab to create tool for data teams**](https://sdtimes.com/data/gitlab-to-create-tool-for-data-teams/)
 - [**Hey, data teams - We're working on a tool just for you**](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/)
 - [**Hacker News discussion**](https://news.ycombinator.com/item?id=17667399)
-- [2021 Best of Open Source Software Awards](https://www.globenewswire.com/news-release/2021/10/18/2315816/0/en/2021-Best-of-Open-Source-Software-Awards-Identify-the-Most-Groundbreaking-Products-Available-to-Developers-and-IT-Organizations.html)
+- [**2021 Best of Open Source Software Awards**](https://www.globenewswire.com/news-release/2021/10/18/2315816/0/en/2021-Best-of-Open-Source-Software-Awards-Identify-the-Most-Groundbreaking-Products-Available-to-Developers-and-IT-Organizations.html)
 
 ## Get in Touch
 
