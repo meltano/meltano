@@ -4,13 +4,10 @@ import os
 import sys
 import threading
 from contextlib import contextmanager
-from copy import deepcopy
-from functools import wraps
 from pathlib import Path
 from typing import Dict, Union
 
 import fasteners
-import yaml
 from dotenv import dotenv_values
 from meltano.core.plugin.base import PluginRef
 from werkzeug.utils import secure_filename
@@ -158,6 +155,7 @@ class Project(Versioned):
 
     @property
     def project_files(self):
+        """Return a singleton ProjectFiles file manager instance."""
         if self._project_files is None:
             self._project_files = ProjectFiles(
                 root=self.root, meltano_file_path=self.meltanofile
