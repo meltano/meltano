@@ -19,12 +19,14 @@ class SelectService:
         project: Project,
         extractor: str,
         plugins_service: ProjectPluginsService = None,
+        environment: str = None,
     ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
         self._extractor = self.plugins_service.find_plugin(
             extractor, PluginType.EXTRACTORS
         )
+        self._environment = environment
 
     @property
     def extractor(self) -> ProjectPlugin:
@@ -34,14 +36,20 @@ class SelectService:
     @property
     def current_select(self):
         plugin_settings_service = PluginSettingsService(
-            self.project, self.extractor, plugins_service=self.plugins_service
+            self.project,
+            self.extractor,
+            plugins_service=self.plugins_service,
+            environment=self._environment,
         )
         return plugin_settings_service.get("_select")
 
     async def load_catalog(self, session):
         """Load the catalog."""
         invoker = invoker_factory(
-            self.project, self.extractor, plugins_service=self.plugins_service
+            self.project,
+            self.extractor,
+            plugins_service=self.plugins_service,
+            environment=self._environment,
         )
 
         async with invoker.prepared(session):

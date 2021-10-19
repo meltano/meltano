@@ -14,6 +14,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
 
 from . import cli
+from .environment import environment_option
 from .params import pass_project
 from .utils import CliError
 
@@ -45,6 +46,7 @@ def selection_mark(selection):
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")
+@environment_option
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
 @click.option("--rm", "--remove", "remove", is_flag=True)
@@ -52,12 +54,22 @@ def selection_mark(selection):
 @pass_project(migrate=True)
 @click_run_async
 async def select(
-    project, extractor, entities_filter, attributes_filter, **flags: Dict[str, bool]
+    project,
+    extractor,
+    entities_filter,
+    attributes_filter,
+    environment,
+    **flags: Dict[str, bool],
 ):
     """Execute the meltano select command."""
     try:
         if flags["list"]:
-            await show(project, extractor, show_all=flags["all"])
+            await show(
+                project,
+                extractor,
+                show_all=flags["all"],
+                environment=environment,
+            )
         else:
             update(
                 project,
@@ -87,10 +99,10 @@ def update(
     select_service.update(entities_filter, attributes_filter, exclude, remove)
 
 
-async def show(project, extractor, show_all=False):
+async def show(project, extractor, show_all=False, environment=None):
     """Show selected."""
     _, Session = project_engine(project)
-    select_service = SelectService(project, extractor)
+    select_service = SelectService(project, extractor, environment=environment)
 
     session = Session()
     try:
