@@ -194,7 +194,7 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
 
       You can now continue to step 4.
 
-    - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking [Singer's index of taps](https://www.singer.io/#taps) and/or doing a web search for `Singer tap <data source>`, e.g. `Singer tap COVID-19`.
+    - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking out [MeltanoHub for Singer](https://hub.meltano.com/singer/), which is the best place to find and explore existing Singer taps and targets.
 
 1. Depending on the result, pick your next step:
 
@@ -297,12 +297,16 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
 
 1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
 
+      ::: tip
+      See [MeltanoHub for details](https://hub.meltano.com/extractors/gitlab#private-token) on how to get a GitLab `private_token` for this tutorial.
+      :::
+
     ```bash
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
-    meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+    meltano config tap-gitlab set projects "meltano/meltano meltano/sdk"
+    meltano config tap-gitlab set start_date 2021-10-01T00:00:00Z
     meltano config tap-gitlab set private_token my_private_token
     ```
 
@@ -323,6 +327,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     ```bash
     export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
     ```
+
 
 1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/docs/command-line-interface.html#config):
 
@@ -615,6 +620,7 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
     but an error message related to missing configuration or an unimplemented `--help` flag
     would also confirm that Meltano can invoke the plugin's executable.
 
+    Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any trouble while installing, refer to [MeltanoHub](https://hub.meltano.com/) for more help or join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink> to ask questions. 
 ### Configure the loader
 
 Chances are that the loader you just added to your project will require some amount of [configuration](/docs/configuration.html) before it can start loading data.
@@ -840,7 +846,68 @@ Once your raw data has arrived in your data warehouse, its schema will likely ne
 
 To help you realize this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
 
-To learn about data transformation, refer to the [Data Transformation (T) guide](/docs/transforms.html).
+*To learn about data transformation, refer to the [Data Transformation (T) guide](/docs/transforms.html).*
+
+1. To install the DBT transformer to your project run:
+
+    ```bash
+    meltano add transformer dbt
+    ```
+
+1. Once dbt has been installed in your Meltano project you will see the `/transform` directory populated with dbt artifacts.
+    All you need to do is start writing your dbt models in the `/transform/models` directory.
+    This usually consists of a `source.yml` file defining the source tables you will be referencing inside your dbt models.
+    For example the yaml below configures dbt sources from the postgres tables where our tap-gitlab ELT job output to.
+
+    ```yaml
+    config-version: 2
+    version: 2
+    sources:
+      - name: tap-gitlab
+        database: postgres
+        tables:
+          - name: projects
+          - name: branches
+          - name: merge_requests
+          - name: issues
+          ...
+    ```
+
+    The organization of your dbt project is up to you but if you'd like to run a specific set of models as part of a Meltano ELT pipeline it can be done via `meltano elt tap target --transform=run` which automatically looks for a model directory with the name of your extractor (i.e. tap-gitlab) and is able to infer dbt settings based on your pipeline, see [Data Transform guide](/docs/transforms.html#running-a-transform-in-meltano) for more details.
+    So in this case you could put all of your models in `/transform/models/tap-gitlab/`.
+
+1. Then add a model file with your SQL transformation logic.
+  For example the dbt model SQL below generates a table with new merge requests in the last day `merge_requests_last_7d.sql`.
+
+    ```sql
+    {{
+      config(
+        materialized='table'
+      )
+    }}
+
+    select *
+    from {{ source('tap_gitlab', 'merge_requests') }}
+    where created_at::data >= current_date - interval '7 days'
+
+    ```
+
+1. Run your dbt models, either using a pipeline transform:
+
+  ```bash
+  meltano elt <tap-name> <target-name> --transform=run
+  ```
+
+  Or directly using the `meltano invoke`:
+
+  ```bash
+  meltano invoke dbt:run
+  ```
+
+  See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) from other supported dbt commands.
+
+
+  After your transform run is complete you should see a new table named after your model (i.e. `merge_requests_last_7d`) in the target schema you configured.
 
 ### Containerize your project
 
