@@ -11,7 +11,7 @@ from atomicwrites import atomic_write
 
 logger = logging.getLogger(__name__)
 
-BLANK_SUBFILE = {"plugins": {}, "schedules": []}
+BLANK_SUBFILE = {"plugins": {}, "schedules": []}  # noqa: WPS407
 
 
 def deep_merge(parent: dict, children: List[dict]) -> dict:
@@ -29,7 +29,7 @@ def deep_merge(parent: dict, children: List[dict]) -> dict:
     return parent
 
 
-class ProjectFiles:
+class ProjectFiles:  # noqa: WPS214
     """Interface for working with multiple project yaml files."""
 
     def __init__(self, root: Path, meltano_file_path: Path):
@@ -107,7 +107,7 @@ class ProjectFiles:
             )
             raise Exception("Duplicate plugin name found.")
         else:
-            self._plugin_file_map[key] = str(include_path)
+            self._plugin_file_map.update({key: str(include_path)})
 
     def _index_file(self, include_file_path: Path, include_file_contents: dict) -> None:
         """Populate map of plugins/schedules to their respective files.
@@ -149,14 +149,14 @@ class ProjectFiles:
         file_dict = file_dicts.setdefault(file, {})
         plugins_dict = file_dict.setdefault("plugins", {})
         plugins = plugins_dict.setdefault(plugin_type, [])
-        if plugin["name"] not in set((plg["name"] for plg in plugins)):
+        if plugin["name"] not in {plg["name"] for plg in plugins}:
             plugins.append(plugin)
 
     @staticmethod
     def _add_schedule(file_dicts, file, schedule):
         file_dict = file_dicts.setdefault(file, {})
         schedules = file_dict.setdefault("schedules", [])
-        if schedule["name"] not in set((scd["name"] for scd in schedules)):
+        if schedule["name"] not in {scd["name"] for scd in schedules}:
             schedules.append(schedule)
 
     def _add_plugins(self, file_dicts, all_plugins):

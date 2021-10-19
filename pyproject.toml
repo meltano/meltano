@@ -221,6 +221,9 @@ wemake-python-styleguide = ["-WPS601"] # Class attributes can be used as instanc
 [tool.flakehell.exceptions."**/__init__.py"]
 pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the module namespace
 
+[tool.flakehell.exceptions."src/meltano/core/project_files.py"]
+wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
