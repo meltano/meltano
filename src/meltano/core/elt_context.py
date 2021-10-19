@@ -184,19 +184,13 @@ class ELTContextBuilder:
 
         return self
 
-    def with_base_output_logger(
-        self, base_output_logger: OutputLogger
-    ) -> "ELTContextBuilder":
+    def set_base_output_logger(self, base_output_logger: OutputLogger):
         """Set the base output logger for use in this ELTContext.
 
         Args:
             base_output_logger: The OutputLogger to use.
-        Returns:
-            self: The modified ELTContextBuilder.
         """
         self._base_output_logger = base_output_logger
-
-        return self
 
     def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
         plugin = self.plugins_service.get_plugin(plugin_ref)
