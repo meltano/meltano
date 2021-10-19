@@ -411,7 +411,7 @@ def project(test_dir, project_init_service):
 
 @pytest.fixture(scope="class")
 def project_files(test_dir):
-    project_init_service = ProjectInitService('a_multifile_meltano_project')
+    project_init_service = ProjectInitService("a_multifile_meltano_project")
     project = project_init_service.init(add_discovery=False)
     logging.debug(f"Created new project at {project.root}")
 
