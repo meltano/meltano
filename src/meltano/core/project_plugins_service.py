@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from typing import Iterable, List, Optional
 
 import yaml
+from meltano.core.environment import Environment, EnvironmentPluginConfig
 from meltano.core.utils import NotFound, find_named
 
 from .config_service import ConfigService
@@ -50,6 +51,12 @@ class ProjectPluginsService:
             yield meltano_yml.plugins
 
         self._current_plugins = None
+
+    @contextmanager
+    def update_environments(self):
+        """Update Meltano environments in `meltano.yml`."""
+        with self.config_service.update_meltano_yml() as meltano_yml:
+            yield meltano_yml.environments
 
     def add_to_file(self, plugin: ProjectPlugin):
         if not plugin.should_add_to_file():
@@ -190,6 +197,31 @@ class ProjectPluginsService:
             plugins[plugin.type][idx] = plugin
 
             return outdated
+
+    def update_environment_plugin(
+        self,
+        plugin: EnvironmentPluginConfig,
+        environment: Environment,
+    ):
+        """Update a plugin configuration inside a Meltano environment."""
+        environments: List[Environment]
+        with self.update_environments() as environments:
+            # find the proper environment to update
+            env_idx, _ = next(
+                (idx, env) for idx, env in enumerate(environments) if env == environment
+            )
+
+            # find the proper plugin to update
+            p_idx, p_outdated = next(
+                (idx, plg)
+                for idx, plg in enumerate(environment.config.plugins[plugin.type])
+                if plg == plugin
+            )
+
+            active_environment = environments[env_idx]
+            active_environment.config.plugins[plugin.type][p_idx] = plugin
+
+            return p_outdated
 
     def get_parent(self, plugin: ProjectPlugin):
         """Get plugin's parent plugin."""

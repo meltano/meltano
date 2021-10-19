@@ -20,6 +20,7 @@ class DummySettingsService(SettingsService):
         super().__init__(*args, **kwargs)
 
         self.__meltano_yml_config = {}
+        self._meltano_environment_config = {}
         self.__definitions = [
             SettingDefinition("regular", aliases=["basic"], value="from_default"),
             SettingDefinition("password", kind=SettingKind.PASSWORD),
@@ -54,6 +55,9 @@ class DummySettingsService(SettingsService):
     def update_meltano_yml_config(self, config):
         self.__meltano_yml_config = config
 
+    def update_meltano_environment_config(self, config):
+        self._meltano_environment_config = config
+
     @property
     def inherited_settings_service(self):
         return self._inherited_settings
@@ -63,7 +67,7 @@ class DummySettingsService(SettingsService):
 
     @property
     def environment_config(self) -> dict:
-        return {}
+        return self.__meltano_environment_config
 
 
 @pytest.fixture()

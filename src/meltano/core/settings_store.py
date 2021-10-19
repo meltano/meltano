@@ -8,10 +8,11 @@ from typing import Any, Dict, List
 import dotenv
 import sqlalchemy
 
+from .environment import NoActiveEnvironment
 from .error import Error
 from .project import ProjectReadonly
 from .setting import Setting
-from .setting_definition import SettingMissingError
+from .setting_definition import SettingDefinition, SettingMissingError
 from .utils import pop_at_path, set_at_path
 
 logger = logging.getLogger(__name__)
@@ -351,12 +352,46 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
 
     label = "`meltano_env`"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ensure_supported()
+
     @property
     def flat_config(self) -> Dict[str, Any]:
         """Get dictionary of flattened configuration."""
         if self._flat_config is None:
             self._flat_config = self.settings_service.environment_config
         return self._flat_config
+
+    def ensure_supported(self, method="get"):
+        """Ensure project is not read-only and an environment is active.
+
+        Args:
+            method: Setting method (get, set, etc.)
+
+        Raises:
+            StoreNotSupportedError: if the project is read-only or
+            no environment is active.
+        """
+        super().ensure_supported(method)
+        if self.settings_service.environment is None:
+            raise StoreNotSupportedError(NoActiveEnvironment())
+
+    @contextmanager
+    def update_config(self):
+        config = deepcopy(self.settings_service.environment_config)
+        yield config
+
+        try:
+            self.settings_service.update_meltano_environment_config(config)
+        except ProjectReadonly as err:
+            raise StoreNotSupportedError(err)
+
+        self._flat_config = None
+
+        # This is not quite the right place for this, but we need to create
+        # setting defs for missing keys again when `meltano.yml` changes
+        self.settings_service._setting_defs = None
 
 
 class DbStoreManager(SettingsStoreManager):
@@ -524,7 +559,15 @@ class AutoStoreManager(SettingsStoreManager):
 
         self._managers = {}
 
-    def manager_for(self, store):
+    def manager_for(self, store: SettingValueStore) -> SettingsStoreManager:
+        """Get setting store manager for this a value store.
+
+        Args:
+            store: A setting value store.
+
+        Returns:
+            Setting store manager.
+        """
         if not self.cache or store not in self._managers:
             self._managers[store] = store.manager(**self._kwargs)
         return self._managers[store]
@@ -541,10 +584,27 @@ class AutoStoreManager(SettingsStoreManager):
         stores.remove(SettingValueStore.AUTO)
         return stores
 
-    def auto_store(self, name, source, setting_def=None):
+    # TODO: Refactor this function to reduce complexity
+    def auto_store(  # noqa: WPS231
+        self,
+        name: str,
+        source: SettingValueStore,
+        setting_def: SettingDefinition = None,
+    ):
+        """Get first valid setting value store for a setting.
+
+        Args:
+            name: Setting name.
+            source: Default setting value store.
+            setting_def: Setting definition (kind, etc.). Defaults to None.
+        """
         setting_def = setting_def or self.find_setting(name)
 
-        store = source
+        store: SettingValueStore = source
+
+        prefer_dotenv = (
+            setting_def and (setting_def.is_redacted or setting_def.env_specific)
+        ) or source is SettingValueStore.ENV
 
         tried = set()
         while True:
@@ -555,10 +615,9 @@ class AutoStoreManager(SettingsStoreManager):
             except StoreNotSupportedError:
                 tried.add(store)
 
-                prefer_dotenv = (
-                    setting_def
-                    and (setting_def.is_redacted or setting_def.env_specific)
-                ) or source is SettingValueStore.ENV
+                if SettingValueStore.MELTANO_ENV not in tried and not prefer_dotenv:
+                    store = SettingValueStore.MELTANO_ENV
+                    continue
 
                 if SettingValueStore.MELTANO_YML not in tried and not prefer_dotenv:
                     store = SettingValueStore.MELTANO_YML

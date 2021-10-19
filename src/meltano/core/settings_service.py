@@ -100,6 +100,11 @@ class SettingsService(ABC):
         pass
 
     @abstractmethod
+    def update_meltano_environment_config(self, config: dict):
+        """Update environment configuration in `meltano.yml`."""
+        pass
+
+    @abstractmethod
     def process_config(self):
         """Process configuration dictionary to be used downstream."""
         pass

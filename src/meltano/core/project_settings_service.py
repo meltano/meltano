@@ -67,6 +67,10 @@ class ProjectSettingsService(SettingsService):
         """Update configuration in `meltano.yml`."""
         self.config_service.update_config(config)
 
+    def update_meltano_environment_config(self, config: dict):
+        """Update environment configuration in `meltano.yml`."""
+        self.config_service.update_environment_config(config)
+
     def process_config(self, config):
         """Process configuration dictionary for presentation in `meltano config meltano`."""
         return nest_object(config)
