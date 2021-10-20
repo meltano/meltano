@@ -1316,8 +1316,24 @@ extractors:
     description: Marketing automation for account-based marketing
     namespace: tap_marketo
     variants:
-    - name: meltano
+    - name: singer-io
       docs: 'https://hub.meltano.com/extractors/marketo.html'
+      repo: https://github.com/singer-io/tap-marketo
+      pip_url: 'git+https://github.com/singer-io/tap-marketo .git'
+      capabilities: []
+      settings:
+        - name: endpoint
+          label: Endpoint
+        - name: client_id
+          label: Client ID
+        - name: client_secret
+          kind: password
+          label: Password
+        - name: start_date
+          label: Start Date
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+          kind: date_iso8601
+    - name: meltano
       repo: https://gitlab.com/meltano/tap-marketo
       pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
       capabilities: []
@@ -1547,8 +1563,58 @@ extractors:
     description: Customer-relationship management & customer success platform
     namespace: tap_salesforce
     variants:
-    - name: meltano
+    - name: singer-io
       docs: 'https://hub.meltano.com/extractors/salesforce.html'
+      repo: https://github.com/singer-io/tap-salesforce
+      pip_url: 'git+https://github.com/singer-io/tap-salesforce.git'
+      capabilities:
+        - properties
+        - discover
+        - state
+      select:
+        - Lead.*
+        - Contact.*
+        - User.*
+        - OpportunityHistory.*
+        - Account.*
+        - Opportunity.*
+      settings_group_validation:
+        - ['client_id', 'client_secret', 'refresh_token', 'start_date', 'api_type', 'select_fields_by_default']
+      settings:
+        - name: client_id
+          label: Client ID
+        - name: client_secret
+          kind: password
+        - name: refresh_token
+          kind: password
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        - name: api_type
+          value: REST
+          kind: options
+          options:
+            - label: REST
+              value: REST
+            - label: BULK
+              value: BULK
+          label: API Type
+        - name: select_fields_by_default
+          kind: boolean
+          value: true
+          description: Select by default any new fields discovered in Salesforce objects
+
+        # Optional
+        - name: quota_percent_total
+          kind: integer
+          description: Maximum percentage of total REST quota used across all Salesforce Applications.
+        - name: quota_percent_per_run
+          kind: integer
+          description: Maximum percentage of total REST quota used across all Salesforce Applications, per run.
+        - name: is_sandbox
+          kind: boolean
+          description: Use Salesforce Sandbox
+    - name: meltano
       repo: https://gitlab.com/meltano/tap-salesforce
       pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
       capabilities:
@@ -1771,8 +1837,49 @@ extractors:
     description: Online payment processing for internet businesses
     namespace: tap_stripe
     variants:
-    - name: meltano
+    - name: singer-io
       docs: 'https://hub.meltano.com/extractors/stripe.html'
+      repo: https://github.com/singer-io/tap-stripe
+      pip_url: 'git+https://github.com/singer-io/tap-stripe.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: account_id
+          env_aliases: [STRIPE_ACCOUNT_ID]
+          label: Account ID
+          placeholder: Ex. acct_1a2b3c4d5e
+        - name: client_secret
+          env_aliases: [STRIPE_API_KEY]
+          kind: password
+          label: Secret API Key
+          placeholder: Ex. sk_live_1a2b3c4d5e
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+    - name: prratek
+      repo: https://github.com/prratek/tap-stripe
+      pip_url: 'git+https://github.com/prratek/tap-stripe.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: api_key
+          env_aliases: [STRIPE_API_KEY]
+          kind: password
+          label: Secret API Key
+          placeholder: Ex. sk_live_1a2b3c4d5e
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        # Optional
+        - name: account_id
+          env_aliases: [STRIPE_ACCOUNT_ID]
+          label: Account ID
+          placeholder: Ex. acct_1a2b3c4d5e
+    - name: meltano
       repo: https://github.com/meltano/tap-stripe
       pip_url: 'git+https://github.com/meltano/tap-stripe.git'
       capabilities:
