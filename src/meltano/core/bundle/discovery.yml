@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-version: 19
+version: 20
 
 extractors:
   - name: tap-adwords
@@ -3028,6 +3028,10 @@ files:
     pip_url: git+https://gitlab.com/meltano/files-dbt.git@config-version-2
     update:
       transform/profile/profiles.yml: true
+  - name: dagster
+    namespace: dagster
+    repo: https://github.com/siilats/files-dagster
+    pip_url: git+https://github.com/siilats/files-dagster.git
   - name: docker
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
