@@ -22,8 +22,8 @@ class OutputLogger:
         self._max_subtask_name_length = None
 
     def out(
-        self, name: str, subtask_name: Optional[str] = None, stream=None, color=None
-    ):
+        self, name: str, subtask_name: Optional[str] = "main", stream=None, color=None
+    ) -> "Out":
         """Obtain an Out instance for use as a logger or use for output capture.
 
         Args:
@@ -40,9 +40,6 @@ class OutputLogger:
             stream = self.stderr
         elif stream is sys.stdout:
             stream = self.stdout
-
-        if subtask_name is None:
-            subtask_name = "main"
 
         out = Out(
             self,
@@ -62,7 +59,7 @@ class OutputLogger:
     def max_name_length(self) -> int:
         """Return the current max length of the name field."""
         if self._max_name_length is None:
-            name_lengths = [len(name) for name in self.outs.keys()]
+            name_lengths = (len(name) for name in self.outs.keys())
             self._max_name_length = max(name_lengths, default=0)
 
         return self._max_name_length
@@ -71,9 +68,9 @@ class OutputLogger:
     def max_subtask_name_length(self) -> int:
         """Return the current max length of the subtask field."""
         if self._max_subtask_name_length is None:
-            name_lengths = [
+            name_lengths = (
                 len(out.subtask_name) for out in self.outs.values() if out.subtask_name
-            ]
+            )
             self._max_subtask_name_length = max(name_lengths, default=0)
 
         return self._max_subtask_name_length
