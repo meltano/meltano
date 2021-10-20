@@ -47,6 +47,7 @@ async def _stream_redirect(
 def _debug_logging_handler(
     name: str, plugin_invoker: PluginInvoker, stderr: StreamReader
 ) -> Task:
+    """Route debug log lines to stderr or an OutputLogger if one is present in our invocation context."""
     if not plugin_invoker.context or not plugin_invoker.context.base_output_logger:
         return asyncio.ensure_future(
             _stream_redirect(stderr, sys.stderr, write_str=True)
