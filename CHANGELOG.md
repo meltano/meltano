@@ -21,6 +21,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#2997](https://gitlab.com/meltano/meltano/-/issues/2997) Bump required version of `jsonschema`.
+
 ### Breaks
 
 
