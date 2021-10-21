@@ -213,13 +213,16 @@ async def _run_job(project, job, session, context_builder, force=False):
         with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
             output_logger = OutputLogger(log_file)
 
+            context_builder.set_base_output_logger(output_logger)
             await _run_elt(project, context_builder, output_logger)
 
 
 @asynccontextmanager
 async def _redirect_output(output_logger):
-    meltano_stdout = output_logger.out("meltano", stream=sys.stdout, color="blue")
-    meltano_stderr = output_logger.out("meltano", color="blue")
+    meltano_stdout = output_logger.out(
+        "meltano", "elt", stream=sys.stdout, color="blue"
+    )
+    meltano_stderr = output_logger.out("meltano", "elt", color="blue")
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
         async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():
@@ -252,8 +255,8 @@ async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS2
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
-    extractor_log = output_logger.out(extractor, color="yellow")
-    loader_log = output_logger.out(loader, color="green")
+    extractor_log = output_logger.out(extractor, "extractor", color="yellow")
+    loader_log = output_logger.out(loader, "loader", color="green")
 
     @contextmanager
     def nullcontext():
@@ -262,8 +265,12 @@ async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS2
     extractor_out_writer = nullcontext
     loader_out_writer = nullcontext
     if logger.getEffectiveLevel() == logging.DEBUG:
-        extractor_out = output_logger.out(f"{extractor} (out)", color="bright_yellow")
-        loader_out = output_logger.out(f"{loader} (out)", color="bright_green")
+        extractor_out = output_logger.out(
+            f"{extractor} (out)", "extractor", color="bright_yellow"
+        )
+        loader_out = output_logger.out(
+            f"{loader} (out)", "loader", color="bright_green"
+        )
 
         extractor_out_writer = extractor_out.line_writer
         loader_out_writer = loader_out.line_writer

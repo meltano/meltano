@@ -2,6 +2,7 @@ from collections import namedtuple
 from typing import Optional
 
 from meltano.core.job import Job
+from meltano.core.logging.output_logger import OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import invoker_factory
@@ -44,6 +45,7 @@ class ELTContext:
         catalog: Optional[str] = None,
         state: Optional[str] = None,
         plugins_service: ProjectPluginsService = None,
+        base_output_logger: Optional[OutputLogger] = None,
     ):
         self.project = project
         self.job = job
@@ -62,6 +64,7 @@ class ELTContext:
         self.state = state
 
         self.plugins_service = plugins_service or ProjectPluginsService(project)
+        self.base_output_logger = base_output_logger
 
     @property
     def elt_run_dir(self):
@@ -115,6 +118,7 @@ class ELTContextBuilder:
         self._select_filter = None
         self._catalog = None
         self._state = None
+        self._base_output_logger = None
 
     def with_session(self, session):
         self._session = session
@@ -180,6 +184,14 @@ class ELTContextBuilder:
 
         return self
 
+    def set_base_output_logger(self, base_output_logger: OutputLogger):
+        """Set the base output logger for use in this ELTContext.
+
+        Args:
+            base_output_logger: The OutputLogger to use.
+        """
+        self._base_output_logger = base_output_logger
+
     def plugin_context(self, plugin_ref: PluginRef, env={}, config={}):
         plugin = self.plugins_service.get_plugin(plugin_ref)
 
@@ -243,4 +255,5 @@ class ELTContextBuilder:
             catalog=self._catalog,
             state=self._state,
             plugins_service=self.plugins_service,
+            base_output_logger=self._base_output_logger,
         )
