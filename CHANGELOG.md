@@ -16,8 +16,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2966](https://gitlab.com/meltano/meltano/-/issues/2966) Set `singer-io` as the default tap-adwords extractor.
 - [#2964](https://gitlab.com/meltano/meltano/-/issues/2964) Set `singer-io` as the default tap-facebook extractor.
 - [#2963](https://gitlab.com/meltano/meltano/-/issues/2963) Set `meltanolabs` as the default tap-csv extractor.
-
 - [#2965](https://gitlab.com/meltano/meltano/-/issues/2965) Set `meltanolabs` as the default tap-gitlab extractor.
+- [#2968](https://gitlab.com/meltano/meltano/-/issues/2968) Set `singer-io` as the default tap-marketo extractor.
+- [#2970](https://gitlab.com/meltano/meltano/-/issues/2970) Set `singer-io` as the default tap-stripe extractor.
+- [#2969](https://gitlab.com/meltano/meltano/-/issues/2969) Set `singer-io` as the default tap-salesforce extractor.
+- [#2971](https://gitlab.com/meltano/meltano/-/issues/2971) Set `meltanolabs` as the default target-sqlite loader.
+
 
 ### Fixes
 
