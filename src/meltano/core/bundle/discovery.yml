@@ -1319,7 +1319,7 @@ extractors:
     - name: singer-io
       docs: 'https://hub.meltano.com/extractors/marketo.html'
       repo: https://github.com/singer-io/tap-marketo
-      pip_url: 'git+https://github.com/singer-io/tap-marketo .git'
+      pip_url: 'git+https://github.com/singer-io/tap-marketo.git'
       capabilities: []
       settings:
         - name: endpoint
