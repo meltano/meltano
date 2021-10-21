@@ -2006,7 +2006,46 @@ extractors:
         - name: refresh_token
           kind: password
           documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
-
+  - name: tap-solarvista
+    label: Solarvista Live
+    description: Solarvista Live is a Field Service Management platform to manage, plan, and mobilise your engineers.
+    namespace: tap_solarvista
+    variants:
+    - name: matatika
+      docs: 'https://hub.meltano.com/extractors/solarvista.html'
+      repo: https://github.com/Matatika/tap-solarvista
+      pip_url: git+https://github.com/Matatika/tap-solarvista.git
+      capabilities:
+        - state
+        - catalog
+        - discover
+      settings_group_validation:
+        - - start_date
+          - clientId
+          - code
+          - account
+      settings:
+        - name: datasources
+          env_aliases:
+            - TAP_SOLARVISTA_DATASOURCES
+          label: Datasources
+        - name: account
+          env_aliases:
+            - TAP_SOLARVISTA_ACCOUNT
+          label: Account
+        - name: clientId
+          env_aliases:
+            - TAP_SOLARVISTA_CLIENTID
+          label: Client ID
+        - name: code
+          env_aliases:
+            - TAP_SOLARVISTA_CODE
+          label: Code
+        - name: start_date
+          env_aliases:
+            - TAP_SOLARVISTA_START_DATE
+          label: Start Date
+          kind: date_iso8601
   # Hidden taps:
   - name: tap-carbon-intensity
     label: Carbon Emissions Intensity
