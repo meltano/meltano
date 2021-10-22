@@ -228,9 +228,6 @@ class Project(Versioned):
 
         Raises:
             EnvironmentNotFound: If the named environment is not present in `meltano.yml`.
-
-        Returns:
-            Environment.
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
 
