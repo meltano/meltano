@@ -72,7 +72,14 @@ class SelectService:
 
     def update(self, entities_filter, attributes_filter, exclude, remove=False):
         """Update plugins' select patterns."""
-        plugin = self.extractor
+        plugin: Union[ProjectPlugin, EnvironmentPluginConfig]
+        if self.project.active_environment is None:
+            plugin = self.extractor
+        else:
+            plugin = self.project.active_environment.get_plugin_config(
+                self.extractor.type, self.extractor.name
+            )
+
         this_pattern = self._get_pattern_string(
             entities_filter, attributes_filter, exclude
         )
@@ -83,13 +90,10 @@ class SelectService:
             patterns.append(this_pattern)
         plugin.extras["select"] = patterns
 
-        if isinstance(plugin, ProjectPlugin):
+        if self.project.active_environment is None:
             self.plugins_service.update_plugin(plugin)
         else:
-            self.plugins_service.update_environment_plugin(
-                plugin,
-                self._environment,
-            )
+            self.plugins_service.update_environment_plugin(plugin)
 
     @staticmethod
     def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:

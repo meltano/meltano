@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 @environment_option
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
-def cli(ctx, log_level: str, verbose: int, environment: str):
+def cli(ctx, log_level: str, verbose: int, environment: str):  # noqa: WPS231
     """
     Get help at https://www.meltano.com/docs/command-line-interface.html
     """
