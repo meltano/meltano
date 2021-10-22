@@ -43,6 +43,7 @@ def cli(ctx, log_level: str, verbose: int, environment: str):  # noqa: WPS231
 
         if environment is not None:
             project.activate_environment(environment)
+            logger.debug("Environment '%s' is active", environment)
 
         ctx.obj["project"] = project
     except ProjectNotFound as err:

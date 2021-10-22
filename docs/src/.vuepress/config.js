@@ -8,7 +8,7 @@ const docsSidebar = [
     title: "Concepts",
     collapsable: false,
     sidebarDepth: 2,
-    children: ["/docs/project", "/docs/plugins"],
+    children: ["/docs/project", "/docs/plugins", "/docs/environments"],
   },
   {
     title: "Guide",

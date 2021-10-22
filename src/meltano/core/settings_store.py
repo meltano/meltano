@@ -350,7 +350,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     """Configuration stored in an environment within `meltano.yml`."""
 
-    label = "`meltano_env`"
+    label = "`meltano_environment`"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
