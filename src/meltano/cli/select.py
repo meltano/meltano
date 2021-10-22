@@ -61,11 +61,7 @@ async def select(
     """Execute the meltano select command."""
     try:
         if flags["list"]:
-            await show(
-                project,
-                extractor,
-                show_all=flags["all"],
-            )
+            await show(project, extractor, show_all=flags["all"])
         else:
             update(
                 project,
@@ -88,12 +84,7 @@ async def select(
 
 
 def update(
-    project,
-    extractor,
-    entities_filter,
-    attributes_filter,
-    exclude=False,
-    remove=False,
+    project, extractor, entities_filter, attributes_filter, exclude=False, remove=False
 ):
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)

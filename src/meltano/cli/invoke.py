@@ -69,11 +69,7 @@ def invoke(
         do_list_commands(plugin)
         return
 
-    invoker = invoker_factory(
-        project,
-        plugin,
-        plugins_service=plugins_service,
-    )
+    invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
     exit_code = run_async(
         _invoke(invoker, project, plugin_name, plugin_args, session, dump, command_name)
     )

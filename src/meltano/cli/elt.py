@@ -164,10 +164,7 @@ def _elt_context_builder(
         )
 
     return (
-        ELTContextBuilder(  # noqa: WPS221
-            project,
-            plugins_service=plugins_service,
-        )
+        ELTContextBuilder(project, plugins_service=plugins_service)  # noqa: WPS221
         .with_session(session)
         .with_job(job)
         .with_extractor(extractor)
