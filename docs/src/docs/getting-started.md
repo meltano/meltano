@@ -873,7 +873,10 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
     ```
 
 1. Once dbt has been installed in your Meltano project you will see the `/transform` directory populated with dbt artifacts.
-    All you need to do is start writing your dbt models in the `/transform/models` directory.
+    These artifacts are installed via the [dbt file bundle](https://gitlab.com/meltano/files-dbt/).
+    For more about file bundles, refer to the [Plugin File bundles](https://meltano.com/docs/plugins.html#file-bundles).
+    
+    Now all you need to do is start writing your dbt models in the `/transform/models` directory.
     This usually consists of a `source.yml` file defining the source tables you will be referencing inside your dbt models.
     
     For example the `/transform/models/tap_gitlab/source.yml` below configures dbt sources from the postgres tables where our tap-gitlab ELT job output to.
