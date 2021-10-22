@@ -2026,26 +2026,22 @@ extractors:
           - account
       settings:
         - name: datasources
-          env_aliases:
-            - TAP_SOLARVISTA_DATASOURCES
           label: Datasources
+          description: The Datasources to sync from Solarvista. Leave list blank to use the default list of Datasources.
+          kind: array
         - name: account
-          env_aliases:
-            - TAP_SOLARVISTA_ACCOUNT
           label: Account
+          description: The AccountId for your Solarvista account.
         - name: clientId
-          env_aliases:
-            - TAP_SOLARVISTA_CLIENTID
           label: Client ID
+          description: Your Solarvista Client ID to create your access token and credentials.
         - name: code
-          env_aliases:
-            - TAP_SOLARVISTA_CODE
-          label: Code
+          label: Authorization Code
+          description: Your API authorization code retrieved using your account id, client id, and access token.
         - name: start_date
-          env_aliases:
-            - TAP_SOLARVISTA_START_DATE
           label: Start Date
           kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
   # Hidden taps:
   - name: tap-carbon-intensity
     label: Carbon Emissions Intensity
