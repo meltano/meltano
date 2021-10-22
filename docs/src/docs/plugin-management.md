@@ -360,7 +360,7 @@ by default, you'll need to explicitly run [`meltano install`](/docs/command-line
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
 to install (or update) all plugins specified in your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
-To (re)install a specific plugin in your project, use [`meltano install <type> <name>`](/docs/command-line-interface.html#install), e.g. `meltano install extractor tap-gitlab`.
+To install a specific plugin in your project, use [`meltano install <type> <name>`](/docs/command-line-interface.html#install), e.g. `meltano install extractor tap-gitlab`. Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
 ## Pinning a plugin to a specific version
 
