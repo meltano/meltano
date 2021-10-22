@@ -12,14 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class ConfigService:
-    def __init__(self, project: Project, use_cache=True, environment: str = None):
+    def __init__(self, project: Project, use_cache=True):
         """Create a new project configuration service."""
         self.project = project
 
         self._settings = None
         self._current_meltano_yml = None
         self._use_cache = use_cache
-        self._environment = environment
 
     @property
     def settings(self):
@@ -53,8 +52,7 @@ class ConfigService:
 
     def update_environment_config(self, config):
         """Update configuration in an environment."""
-        environment = self.project.get_environment(self._environment)
-        environment.config.extras = config
+        self.project.active_environment.config.extras = config
 
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)

@@ -21,24 +21,13 @@ class SelectService:
         project: Project,
         extractor: str,
         plugins_service: ProjectPluginsService = None,
-        environment: str = None,
     ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
 
-        self._environment = project.get_environment(environment)
-
-        if self._environment is not None:
-            self._extractor = self._environment.get_plugin_config(
-                PluginType.EXTRACTORS,
-                extractor,
-            )
-        else:
-            self._extractor = self.plugins_service.find_plugin(
-                extractor, PluginType.EXTRACTORS
-            )
-
-        self._environment_name = environment
+        self._extractor = self.plugins_service.find_plugin(
+            extractor, PluginType.EXTRACTORS
+        )
 
     @property
     def extractor(self) -> Union[ProjectPlugin, EnvironmentPluginConfig]:
@@ -51,7 +40,6 @@ class SelectService:
             self.project,
             self.extractor,
             plugins_service=self.plugins_service,
-            environment=self._environment_name,
         )
         return plugin_settings_service.get("_select")
 
@@ -61,7 +49,6 @@ class SelectService:
             self.project,
             self.extractor,
             plugins_service=self.plugins_service,
-            environment=self._environment,
         )
 
         async with invoker.prepared(session):

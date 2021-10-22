@@ -18,7 +18,6 @@ from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.utils import run_async
 
 from . import cli
-from .environment import environment_option
 from .params import pass_project
 from .utils import CliError
 
@@ -36,7 +35,6 @@ from .utils import CliError
 )
 @click.option("--extras", is_flag=True)
 @pass_project(migrate=True)
-@environment_option
 @click.pass_context
 def config(  # noqa: WPS231
     ctx,
@@ -45,7 +43,6 @@ def config(  # noqa: WPS231
     plugin_name: str,
     config_format: str,
     extras: bool,
-    environment: str,
 ):
     """Display Meltano or plugin configuration."""
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
@@ -70,7 +67,6 @@ def config(  # noqa: WPS231
                 project,
                 plugin,
                 plugins_service=plugins_service,
-                environment=environment,
             )
             invoker = PluginInvoker(project, plugin)
             run_async(invoker.prepare(session))

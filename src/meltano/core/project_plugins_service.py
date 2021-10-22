@@ -198,13 +198,11 @@ class ProjectPluginsService:
 
             return outdated
 
-    def update_environment_plugin(
-        self,
-        plugin: EnvironmentPluginConfig,
-        environment: Environment,
-    ):
+    def update_environment_plugin(self, plugin: EnvironmentPluginConfig) -> None:
         """Update a plugin configuration inside a Meltano environment."""
         environments: List[Environment]
+        environment = self.project.active_environment
+
         with self.update_environments() as environments:
             # find the proper environment to update
             env_idx, _ = next(

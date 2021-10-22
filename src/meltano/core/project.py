@@ -72,6 +72,8 @@ class Project(Versioned):
 
         self.__meltano_ip_lock = None
 
+        self.active_environment: Optional[Environment] = None
+
     @property
     def _meltano_ip_lock(self):
         if self.__meltano_ip_lock is None:
@@ -218,10 +220,7 @@ class Project(Versioned):
     def dotenv_env(self):
         return dotenv_values(self.dotenv)
 
-    def get_environment(
-        self,
-        name: Optional[str] = None,
-    ) -> Optional[Environment]:
+    def activate_environment(self, name: str) -> None:
         """Retrieve an environment configuration.
 
         Args:
@@ -233,10 +232,7 @@ class Project(Versioned):
         Returns:
             Environment.
         """
-        if name is None:
-            return None
-
-        return Environment.find(self.meltano.environments, name)
+        self.active_environment = Environment.find(self.meltano.environments, name)
 
     @contextmanager
     def dotenv_update(self):

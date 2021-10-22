@@ -43,8 +43,9 @@ class PluginSettingsService(SettingsService):
         }
 
         self._inherited_settings_service = None
-        if self.environment:
-            self.environment_plugin_config = self.environment.get_plugin_config(
+        if self.project.active_environment:
+            environment = self.project.active_environment
+            self.environment_plugin_config = environment.get_plugin_config(
                 self.plugin.type,
                 self.plugin.name,
             )
@@ -96,10 +97,7 @@ class PluginSettingsService(SettingsService):
     def update_meltano_environment_config(self, config_with_extras: Dict[str, Any]):
         """Update environment configuration in `meltano.yml`."""
         self.environment_plugin_config.config_with_extras = config_with_extras
-        self.plugins_service.update_environment_plugin(
-            self.environment_plugin_config,
-            self.environment,
-        )
+        self.plugins_service.update_environment_plugin(self.environment_plugin_config)
 
     @property
     def inherited_settings_service(self):

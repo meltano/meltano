@@ -104,7 +104,6 @@ class ELTContextBuilder:
         self,
         project: Project,
         plugins_service: ProjectPluginsService = None,
-        environment: str = None,
     ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
@@ -124,8 +123,6 @@ class ELTContextBuilder:
         self._catalog = None
         self._state = None
         self._base_output_logger = None
-
-        self._environment = environment
 
     def with_session(self, session):
         self._session = session
@@ -204,7 +201,6 @@ class ELTContextBuilder:
         plugin_ref: PluginRef,
         env: dict = None,
         config: dict = None,
-        environment: str = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
@@ -212,7 +208,6 @@ class ELTContextBuilder:
             plugin_ref: Plugin reference object.
             env: Environment override dictionary. Defaults to None.
             config: Plugin configuration override dictionary. Defaults to None.
-            environment: Environment name. Defaults to None.
 
         Returns:
             A new `PluginContext` object.
@@ -227,7 +222,6 @@ class ELTContextBuilder:
                 plugins_service=self.plugins_service,
                 env_override=env,
                 config_override=config,
-                environment=environment,
             ),
             session=self._session,
         )
@@ -248,7 +242,6 @@ class ELTContextBuilder:
             extractor = self.plugin_context(
                 self._extractor,
                 config=config,
-                environment=self._environment,
             )
 
             env.update(extractor.env)
@@ -258,7 +251,6 @@ class ELTContextBuilder:
             loader = self.plugin_context(
                 self._loader,
                 env=env.copy(),
-                environment=self._environment,
             )
 
             env.update(loader.env)
@@ -268,7 +260,6 @@ class ELTContextBuilder:
             transform = self.plugin_context(
                 self._transform,
                 env=env.copy(),
-                environment=self._environment,
             )
 
             env.update(transform.env)
@@ -278,7 +269,6 @@ class ELTContextBuilder:
             transformer = self.plugin_context(
                 self._transformer,
                 env=env.copy(),
-                environment=self._environment,
             )
 
         return ELTContext(

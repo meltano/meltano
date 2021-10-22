@@ -374,7 +374,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             no environment is active.
         """
         super().ensure_supported(method)
-        if self.settings_service.environment is None:
+        if self.settings_service.project.active_environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
 
     @contextmanager

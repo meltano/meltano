@@ -29,7 +29,6 @@ class SettingsService(ABC):
         show_hidden: bool = True,
         env_override: dict = None,
         config_override: dict = None,
-        environment: str = None,
     ):
         """Create a new settings service object.
 
@@ -48,7 +47,6 @@ class SettingsService(ABC):
         self.config_override = config_override or {}
 
         self._setting_defs = None
-        self.environment = self.project.get_environment(environment)
 
     @property
     @abstractmethod
