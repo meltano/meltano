@@ -5,6 +5,12 @@ lastUpdatedSignificantly: 2020-04-30
 
 # Data Analysis
 
+::: warning
+The Explore and Dashboard navigation tabs in the Meltano UI are no longer enabled by default due to Meltano's new direction towards supporting analysis plugins (i.e. Lightdash, Superset, etc.).
+
+For current users of these tabs, they can be re-enabled by setting the environment variable `MELTANO_UI_ANALYSIS=true`.
+:::
+
 If you haven't already, install Meltano and create your first project by following the [Getting Started guide](/docs/getting-started.html). You can come back here before adding an extractor and loader using the CLI, and use the UI instead.
 
 ## Start Meltano UI
