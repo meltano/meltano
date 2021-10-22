@@ -8,7 +8,7 @@ configuration, models, packages, etc in order to run the transformations. A tran
 To learn more about the dbt Transformer package, please see the
 [dbt plugin](https://hub.meltano.com/transformers/dbt) documentation on [Meltano Hub](https://hub.meltano.com).
 
-To install the DBT transformer to your project run:
+To install the dbt transformer to your project run:
 
 ```bash
 meltano add transformer dbt
@@ -104,7 +104,7 @@ Some users chose to install the existing transform plugins as a starting point t
 
 When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml`, and loaded for usage the next time dbt runs.
 
-_**Note:** You do not have to use `transform` plugin packages in order to use DBT. Many teams instead choose to create their own custom transformations._
+_**Note:** You do not have to use `transform` plugin packages in order to use dbt. Many teams instead choose to create their own custom transformations._
 
 For more information on how to build your own dbt models or to customize your project directly, see the [dbt docs](https://docs.getdbt.com/).
 

@@ -866,7 +866,7 @@ To help you realize this, Meltano supports transformation using [`dbt`](https://
 
 To learn about data transformation, refer to the [Data Transformation (T) guide](/docs/transforms.html).
 
-1. To install the DBT transformer to your project run:
+1. To install the dbt transformer to your project run:
 
     ```bash
     meltano add transformer dbt
