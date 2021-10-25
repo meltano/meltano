@@ -1,5 +1,3 @@
-# noqa: WPS440, WPS441
-
 from contextlib import contextmanager
 from unittest import mock
 
