@@ -188,8 +188,8 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
       plugins:
         extractors:
         - name: tap-gitlab
-          variant: meltano
-          pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+          variant: meltanolabs
+          pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
       ```
 
       You can now continue to step 4.
@@ -316,10 +316,10 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     plugins:
       extractors:
       - name: tap-gitlab
-        variant: meltano
+        variant: meltanolabs
         config:
-          projects: meltano/meltano meltano/tap-gitlab
-          start_date: '2020-10-01T00:00:00Z'
+          projects: meltano/meltano meltano/sdk
+          start_date: '2021-10-01T00:00:00Z'
     ```
 
     Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
@@ -344,11 +344,11 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
       "api_url": "https://gitlab.com",
       "private_token": "my_private_token",
       "groups": "",
-      "projects": "meltano/meltano meltano/tap-gitlab",
+      "projects": "meltano/meltano meltano/sdk",
       "ultimate_license": false,
       "fetch_merge_request_commits": false,
       "fetch_pipelines_extended": false,
-      "start_date": "2020-10-01T00:00:00Z"
+      "start_date": "2021-10-01T00:00:00Z"
     }
     ```
 
@@ -411,12 +411,12 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
       extractors:
       - name: tap-gitlab
         select:
-        - tags.*
         - commits.id
         - commits.project_id
         - commits.created_at
         - commits.author_name
         - commits.message
+        - tags.*
         - '!*.*_url'
     ```
 
@@ -539,11 +539,12 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
       ```bash
       meltano add loader <plugin name>
 
-      # For example:
-      meltano add loader target-postgres
-
-      # If you have a preference for a non-default variant, select it using `--variant`:
+      # For this example, we'll use the transferwise non-default
+      # variant, selected using `--variant`:
       meltano add loader target-postgres --variant=transferwise
+
+      # Or if you just want the default variant you can use this:
+      meltano add loader target-postgres
       ```
 
       ::: tip
@@ -555,8 +556,8 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
       plugins:
         loaders:
         - name: target-postgres
-          variant: datamill-co
-          pip_url: singer-target-postgres
+          variant: transferwise
+          pip_url: pipelinewise-target-postgres
       ```
 
       You can now continue to step 4.
@@ -666,10 +667,10 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     # For example:
     meltano config target-postgres set postgres_host localhost
     meltano config target-postgres set postgres_port 5432
-    meltano config target-postgres set postgres_username meltano
-    meltano config target-postgres set postgres_password meltano
-    meltano config target-postgres set postgres_database warehouse
-    meltano config target-postgres set postgres_schema public
+    meltano config target-postgres set user meltano
+    meltano config target-postgres set password meltano
+    meltano config target-postgres set dbname warehouse
+    meltano config target-postgres set default_target_schema public
     ```
 
     ::: tip
@@ -710,12 +711,24 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
 
     ```json
     {
+      "host": "localhost",
+      "port": 5432,
+      "user": "meltano",
+      "password": "meltano",
+      "dbname": "warehouse",
+      "ssl": "false",
+      "default_target_schema": "public",
+      "batch_size_rows": 100000,
+      "flush_all_streams": false,
+      "parallelism": 0,
+      "parallelism_max": 16,
+      "add_metadata_columns": false,
+      "hard_delete": false,
+      "data_flattening_max_level": 0,
+      "primary_key_required": true,
+      "validate_records": false,
       "postgres_host": "localhost",
-      "postgres_port": 5432,
-      "postgres_username": "meltano",
-      "postgres_password": "meltano",
-      "postgres_database": "warehouse",
-      "postgres_schema": "public"
+      "postgres_port": 5432
     }
     ```
 
@@ -734,7 +747,7 @@ meltano elt <extractor> <loader> --job_id=<pipeline name>
 meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 ```
 
-If everything was configured correctly, you should now see your data flow from your source into your destination!
+If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
 
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/docs/command-line-interface.html#debugging) to get some more insight into what's going on behind the scenes.
 If that doesn't get you closer to a solution, learn how to [get help with your issue](/docs/getting-help.md).
@@ -881,6 +894,15 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
     
     For example the `/transform/models/tap_gitlab/source.yml` below configures dbt sources from the postgres tables where our tap-gitlab ELT job output to.
 
+    Create and navigate to the `/transform/models/tap_gitlab` directory to hold your dbt models:
+
+    ```bash
+    mkdir ./transform/models/tap_gitlab
+    touch  ./transform/models/tap_gitlab/source.yml
+    ```
+
+    Add the following content to your new `source.yml` file:
+
     ```yaml
     config-version: 2
     version: 2
@@ -898,6 +920,14 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
 
 1. Then add a model file with your SQL transformation logic.
   For example the dbt model SQL below generates a table with new commits in the last 7 days `/transform/models/tap_gitlab/commits_last_7d.sql`.
+
+    Create your model file:
+
+    ```bash
+    touch  ./transform/models/tap_gitlab/commits_last_7d.sql
+    ```
+
+    Add the following content to your new `commits_last_7d.sql` file:
 
     ```sql
     {{
