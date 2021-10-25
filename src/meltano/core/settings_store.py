@@ -584,8 +584,7 @@ class AutoStoreManager(SettingsStoreManager):
         stores.remove(SettingValueStore.AUTO)
         return stores
 
-    # TODO: Refactor this function to reduce complexity
-    def auto_store(  # noqa: WPS231
+    def auto_store(  # noqa: WPS231 # Too complex
         self,
         name: str,
         source: SettingValueStore,
