@@ -50,11 +50,12 @@ environments:
 To use an environment, you can pass the option `--environment=<ENV>` to the CLI command, or set the `MELTANO_ENVIRONMENT=<ENV>` variable.
 
 ```shell
-# Using env vars
-MELTANO_ENVIRONMENT=dev meltano elt tap-github target-sqlite
-
 # Using the CLI option
 meltano --environment=dev elt tap-github target-sqlite
+
+# Using env vars
+export MELTANO_ENVIRONMENT=dev
+meltano elt tap-github target-sqlite
 ```
 
 ## Example
