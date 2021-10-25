@@ -44,6 +44,9 @@ class SettingsService(ABC):
         self.show_hidden = show_hidden
 
         self.env_override = env_override or {}
+        if self.project.active_environment:
+            self.env_override.update(**self.project.active_environment.env)
+
         self.config_override = config_override or {}
 
         self._setting_defs = None

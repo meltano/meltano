@@ -102,17 +102,20 @@ class Environment(NameEq, Canonical):
         self,
         name: str,
         config: dict = None,
+        env: dict = None,
     ) -> None:
         """Create a new environment object.
 
         Args:
             name: Environment name. Must be unique. Defaults to None.
             config: Dictionary with environment configuration.
+            env: Optional override environment values.
         """
         super().__init__()
 
         self.name = name
         self.config = EnvironmentConfig(**(config or {}))
+        self.env = env or {}
 
     @classmethod
     def find(cls: Type[T], objects: Iterable[T], name: str) -> T:
