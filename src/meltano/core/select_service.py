@@ -1,9 +1,8 @@
 import json
 import logging
-from typing import Union
 
-from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -24,13 +23,12 @@ class SelectService:
     ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
-
         self._extractor = self.plugins_service.find_plugin(
             extractor, PluginType.EXTRACTORS
         )
 
     @property
-    def extractor(self) -> Union[ProjectPlugin, EnvironmentPluginConfig]:
+    def extractor(self) -> ProjectPlugin:
         """Retrieve extractor ProjectPlugin object."""
         return self._extractor
 
@@ -72,7 +70,8 @@ class SelectService:
 
     def update(self, entities_filter, attributes_filter, exclude, remove=False):
         """Update plugins' select patterns."""
-        plugin: Union[ProjectPlugin, EnvironmentPluginConfig]
+        plugin: PluginRef
+
         if self.project.active_environment is None:
             plugin = self.extractor
         else:
