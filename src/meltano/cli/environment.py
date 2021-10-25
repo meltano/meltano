@@ -5,5 +5,5 @@ import click
 environment_option = click.option(
     "--environment",
     envvar="MELTANO_ENVIRONMENT",
-    help="Meltano environment",
+    help="Meltano environment name",
 )
