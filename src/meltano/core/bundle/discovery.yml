@@ -2037,6 +2037,7 @@ extractors:
           description: Your Solarvista Client ID to create your access token and credentials.
         - name: code
           label: Authorization Code
+          kind: password
           description: Your API authorization code retrieved using your account id, client id, and access token.
         - name: start_date
           label: Start Date
