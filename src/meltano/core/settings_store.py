@@ -24,7 +24,7 @@ class StoreNotSupportedError(Error):
 
 class SettingValueStore(str, Enum):
     CONFIG_OVERRIDE = "config_override"
-    MELTANO_ENV = "meltano_env"
+    MELTANO_ENV = "meltano_environment"
     ENV = "env"
     DOTENV = "dotenv"
     MELTANO_YML = "meltano_yml"
