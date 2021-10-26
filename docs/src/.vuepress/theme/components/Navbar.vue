@@ -1,14 +1,4 @@
-<template>
-  <div>
-    <header class="banner">
-      <p>
-        <a href="https://www.eventbrite.com/e/tap-toberfest-with-meltano-tickets-172357424697">Join us Oct 14th - 21st for Tap-toberfest. Free to participate, register now!</a>
-      </p>
-    </header>
 
-    <ParentNavbar @toggle-sidebar="$emit('toggle-sidebar')" />
-  </div>
-</template>
 
 <script>
 import ParentNavbar from '@parent-theme/components/Navbar.vue'
