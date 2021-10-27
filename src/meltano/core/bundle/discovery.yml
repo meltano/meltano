@@ -1563,65 +1563,8 @@ extractors:
     description: Customer-relationship management & customer success platform
     namespace: tap_salesforce
     variants:
-    - name: singer-io
-      docs: 'https://hub.meltano.com/extractors/salesforce.html'
-      repo: https://github.com/singer-io/tap-salesforce
-      pip_url: 'git+https://github.com/singer-io/tap-salesforce.git'
-      capabilities:
-        - properties
-        - discover
-        - state
-      select:
-        - Lead.*
-        - Contact.*
-        - User.*
-        - OpportunityHistory.*
-        - Account.*
-        - Opportunity.*
-      settings_group_validation:
-        - ['client_id', 'client_secret', 'refresh_token', 'start_date', 'api_type', 'select_fields_by_default']
-      settings:
-        - name: client_id
-          label: Client ID
-        - name: client_secret
-          label: Client Secret
-          kind: password
-        - name: refresh_token
-          kind: password
-          label: Refresh Token
-        - name: start_date
-          label: Start Date
-          kind: date_iso8601
-          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-        - name: api_type
-          value: REST
-          kind: options
-          options:
-            - label: REST
-              value: REST
-            - label: BULK
-              value: BULK
-          label: API Type
-        - name: select_fields_by_default
-          label: Select Fields By Default
-          kind: boolean
-          value: true
-          description: Select by default any new fields discovered in Salesforce objects
-
-        # Optional
-        - name: quota_percent_total
-          label: Quota Percent Total
-          kind: integer
-          description: Maximum percentage of total REST quota used across all Salesforce Applications.
-        - name: quota_percent_per_run
-          label: Quota Percent Per Run
-          kind: integer
-          description: Maximum percentage of total REST quota used across all Salesforce Applications, per run.
-        - name: is_sandbox
-          label: Is Sandbox
-          kind: boolean
-          description: Use Salesforce Sandbox
     - name: meltano
+      docs: 'https://hub.meltano.com/extractors/salesforce.html'
       repo: https://gitlab.com/meltano/tap-salesforce
       pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
       capabilities:
