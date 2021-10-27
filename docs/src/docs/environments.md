@@ -29,6 +29,8 @@ environments:
           dbname: prod
           warehouse: prod_wh
           batch_size_rows: 100000
+  env:
+    SOME_PROD_ONLY_SETTING: abc
 - name: dev
   config:
     plugins:
@@ -79,6 +81,40 @@ $ meltano --environment=dev config target-snowflake
   "warehouse": "dev_wh",
   "batch_size_rows": 1000
 }
+```
+
+## Commands with support for `--environment`
+
+### [`config`](/docs/command-line-interface#config)
+
+To add, update or remove plugin configuration from an environment defined in `meltano.yml`:
+
+```shell
+meltano --environment=<ENVIRONMENT> config <plugin>
+```
+
+### [`elt`](/docs/command-line-interface#elt)
+
+To run an ELT pipeline with configuration taken preferably from an Environment:
+
+```shell
+meltano --environment=<ENVIRONMENT> elt <extractor> <loader>
+```
+
+### [`invoke`](/docs/command-line-interface#invoke)
+
+Invoke a plugin pipeline with configuration taken preferably from an Environment:
+
+```shell
+meltano --environment=<ENVIRONMENT> invoke <plugin>
+```
+
+### [`select`](/docs/command-line-interface#select)
+
+Manage select patterns for an extractor within an Environment:
+
+```shell
+meltano --environment=<ENVIRONMENT> select <tap_name>
 ```
 
 ## Incremental adoption
