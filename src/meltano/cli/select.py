@@ -52,7 +52,11 @@ def selection_mark(selection):
 @pass_project(migrate=True)
 @click_run_async
 async def select(
-    project, extractor, entities_filter, attributes_filter, **flags: Dict[str, bool]
+    project,
+    extractor,
+    entities_filter,
+    attributes_filter,
+    **flags: Dict[str, bool],
 ):
     """Execute the meltano select command."""
     try:

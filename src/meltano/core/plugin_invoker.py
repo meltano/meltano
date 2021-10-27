@@ -116,7 +116,9 @@ class PluginInvoker:
 
         self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.settings_service = plugin_settings_service or PluginSettingsService(
-            project, plugin, plugins_service=self.plugins_service
+            project,
+            plugin,
+            plugins_service=self.plugins_service,
         )
 
         self._prepared = False
