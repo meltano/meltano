@@ -2,7 +2,7 @@
 description: Environments allow data teams to manage different sets of configurations for extractors, loaders and plugins.
 ---
 
-# Environments - DRAFT
+# Environments
 
 As part of Meltano's vision to enable data teams to operate with best practices, __Environments__ allows
 you to define custom layers of configuration within your project. That way, You can run the same commands against multiple environments,
