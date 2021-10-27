@@ -808,10 +808,11 @@ class TestSingerTap:
 
             assert stream_mock3.call_count == 2
             assert stream_mock3.call_args[1]["write_str"] is True
-            assert (
-                invoker.invoke_async.call_args_list[0].kwargs["stderr"]
-                is subprocess.DEVNULL
-            )
+
+            subprocess_stderr = invoker.invoke_async.call_args_list[0].kwargs[
+                "stderr"
+            ]  # noqa: WPS219
+            assert subprocess_stderr is subprocess.DEVNULL
 
         discovery_logger.setLevel(original_level)
 
