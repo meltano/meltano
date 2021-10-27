@@ -1316,8 +1316,24 @@ extractors:
     description: Marketing automation for account-based marketing
     namespace: tap_marketo
     variants:
-    - name: meltano
+    - name: singer-io
       docs: 'https://hub.meltano.com/extractors/marketo.html'
+      repo: https://github.com/singer-io/tap-marketo
+      pip_url: 'git+https://github.com/singer-io/tap-marketo.git'
+      capabilities: []
+      settings:
+        - name: endpoint
+          label: Endpoint
+        - name: client_id
+          label: Client ID
+        - name: client_secret
+          kind: password
+          label: Client Secret
+        - name: start_date
+          label: Start Date
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+          kind: date_iso8601
+    - name: meltano
       repo: https://gitlab.com/meltano/tap-marketo
       pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
       capabilities: []
@@ -1771,8 +1787,57 @@ extractors:
     description: Online payment processing for internet businesses
     namespace: tap_stripe
     variants:
-    - name: meltano
+    - name: singer-io
       docs: 'https://hub.meltano.com/extractors/stripe.html'
+      repo: https://github.com/singer-io/tap-stripe
+      pip_url: 'git+https://github.com/singer-io/tap-stripe.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings_group_validation:
+      - - account_id
+        - client_secret
+        - start_date
+      settings:
+        - name: account_id
+          env_aliases: [STRIPE_ACCOUNT_ID]
+          label: Account ID
+          placeholder: Ex. acct_1a2b3c4d5e
+        - name: client_secret
+          env_aliases: [STRIPE_API_KEY]
+          kind: password
+          label: Secret API Key
+          placeholder: Ex. sk_live_1a2b3c4d5e
+        - name: start_date
+          label: Start Date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+    - name: prratek
+      repo: https://github.com/prratek/tap-stripe
+      pip_url: 'git+https://github.com/prratek/tap-stripe.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings_group_validation:
+      - - api_key
+        - start_date
+      settings:
+        - name: api_key
+          env_aliases: [STRIPE_API_KEY]
+          kind: password
+          label: Secret API Key
+          placeholder: Ex. sk_live_1a2b3c4d5e
+        - name: start_date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
+        # Optional
+        - name: account_id
+          env_aliases: [STRIPE_ACCOUNT_ID]
+          label: Account ID
+          placeholder: Ex. acct_1a2b3c4d5e
+    - name: meltano
       repo: https://github.com/meltano/tap-stripe
       pip_url: 'git+https://github.com/meltano/tap-stripe.git'
       capabilities:
@@ -2632,8 +2697,29 @@ loaders:
     description: SQLite database loader
     namespace: target_sqlite
     variants:
-    - name: meltano
+    - name: meltanolabs
       docs: 'https://hub.meltano.com/loaders/sqlite.html'
+      repo: https://github.com/MeltanoLabs/target-sqlite
+      pip_url: 'git+https://github.com/MeltanoLabs/target-sqlite.git'
+      dialect: sqlite
+      settings_group_validation:
+        - ['batch_size']
+      settings:
+        - name: database
+          label: Database Name
+          description: Name of the SQLite database file to be used or created, relative to the project root. The `.db` extension is optional and will be added automatically when omitted.
+          value: warehouse
+          env_aliases: [SQLITE_DATABASE]
+        - name: batch_size
+          label: Batch Size
+          kind: integer
+          value: 50
+          description: How many records are sent to SQLite at a time?
+        - name: timestamp_column
+          label: Timestamp Column
+          value: '__loaded_at'
+          description: Name of the column used for recording the timestamp when Data are loaded to SQLite.
+    - name: meltano
       repo: https://gitlab.com/meltano/target-sqlite
       pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
       dialect: sqlite
