@@ -339,13 +339,20 @@ class SingerTap(SingerPlugin):
 
         try:
             with catalog_path.open(mode="wb") as catalog:
+
+                # since we're using subproccess wait() - we need to ensure that that stderr's  buffer
+                # is drained regardless of whether or not we want the output.
+                if logger.isEnabledFor(logging.DEBUG):
+                    stderr_dst = asyncio.subprocess.PIPE
+                else:
+                    stderr_dst = asyncio.subprocess.DEVNULL
+
                 handle = await plugin_invoker.invoke_async(
                     "--discover",
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
+                    stderr=stderr_dst,
                     universal_newlines=False,
                 )
-
                 invoke_futures = [
                     asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
                     asyncio.ensure_future(handle.wait()),
