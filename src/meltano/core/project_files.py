@@ -16,17 +16,22 @@ BLANK_SUBFILE = {"plugins": {}, "schedules": []}  # noqa: WPS407
 
 def deep_merge(parent: dict, children: List[dict]) -> dict:
     """Deep merge a list of child dicts with a given parent."""
+    base = copy.deepcopy(parent)
     for child in children:
         for key, value in child.items():
             if isinstance(value, dict):
                 # get node or create one
-                node = parent.setdefault(key, {})
-                parent[key] = deep_merge(node, [value])
+                node = base.setdefault(key, {})
+                base[key] = deep_merge(node, [value])
             elif isinstance(value, list):
-                parent[key].extend(value)
+                base[key].extend(value)
             else:
-                parent[key] = value
-    return parent
+                base[key] = value
+    return base
+
+
+class InvalidIncludePath(Exception):
+    """Occurs when an included file path matches a provided pattern but is not a valid config file."""
 
 
 class ProjectFiles:  # noqa: WPS214
@@ -55,45 +60,48 @@ class ProjectFiles:  # noqa: WPS214
 
     def load(self) -> dict:
         """Load all project files into a single dict representation."""
-        self._meltano = (
-            None  # meltano file may have changed in another process, so reset our cache
-        )
+        # meltano file may have changed in another process, so reset cache first
+        self.reset_cache()
         included_file_contents = self._load_included_files()
-        return deep_merge(copy.deepcopy(self.meltano), included_file_contents)
+        return deep_merge(self.meltano, included_file_contents)
 
     def update(self, meltano_config: dict):
-        """Update config by overriding current config with new, changed config."""
-        # construct individual dicts per file
+        """Update config by overriding current config with new, changed config.
+
+        Note: `.update()` will write blank entities for those no longer in use (i.e. contained config on load, but not on save).
+        """
         file_dicts = self._split_config_dict(meltano_config)
         for file_path, contents in file_dicts.items():
             self._write_file(file_path, contents)
-        # write blank entities for those no longer in use (i.e. contained config on load, but not on save)
+
         unused_files = [fl for fl in self.include_paths if str(fl) not in file_dicts]
         for unused_file_path in unused_files:
             self._write_file(unused_file_path, BLANK_SUBFILE)
-        # reset cache
-        self._meltano = None
+        self.reset_cache()
         return meltano_config
 
-    def _is_valid_include_path(self, file_path: Path) -> bool:
+    def reset_cache(self):
+        """Reset cached view of the meltano.yml file."""
+        self._meltano = None
+
+    def _is_valid_include_path(self, file_path: Path):
         """Determine if given path is a valid `include_paths` file."""
-        # Verify path is a file
         if not (file_path.is_file() and file_path.exists()):
-            logger.critical(f"Included path '{file_path}' not found.")
-            raise Exception("Invalid Included Path")
-        # checks passed
-        return True
+            raise InvalidIncludePath(f"Included path '{file_path}' not found.")
 
     def _resolve_include_paths(self, include_path_patterns: List[str]) -> List[Path]:
-        """Return a list of paths from a list of glob pattern strings."""
+        """Return a list of paths from a list of glob pattern strings, not including `meltano.yml` (even if it is matched by a pattern)."""
         include_paths = []
         for pattern in include_path_patterns:
             for path_name in glob.iglob(pattern):
                 path = Path(path_name)
                 path = path.resolve()
-                if self._is_valid_include_path(path):
-                    include_paths.append(path)
-            # never include meltano.yml
+                try:
+                    self._is_valid_include_path(path)
+                except InvalidIncludePath as err:
+                    logger.critical(f"Include path '{path}' is invalid: \n {err}")
+                    raise err
+                include_paths.append(path)
             if self._meltano_file_path in include_paths:
                 include_paths.remove(self._meltano_file_path)
         return include_paths
@@ -135,7 +143,7 @@ class ProjectFiles:  # noqa: WPS214
             try:
                 with path.open() as file:
                     contents = yaml.safe_load(file)
-                    # TODO: validate dict schema
+                    # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
                     self._index_file(
                         include_file_path=path, include_file_contents=contents
                     )
