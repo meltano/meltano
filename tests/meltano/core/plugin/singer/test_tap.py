@@ -1,5 +1,7 @@
 import asyncio
 import json
+import logging
+import subprocess
 from contextlib import contextmanager
 
 import pytest
@@ -792,6 +794,25 @@ class TestSingerTap:
 
             assert stream_mock2.call_count == 2
             assert stream_mock2.call_args[1]["write_str"] is True
+
+        # ensure stderr is redirected to devnull if we don't need it
+        discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")
+        original_level = discovery_logger.getEffectiveLevel()
+        discovery_logger.setLevel(logging.INFO)
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+        ), mock.patch(
+            "meltano.core.plugin.singer.tap._stream_redirect"
+        ) as stream_mock3:
+            await subject.run_discovery(invoker, catalog_path)
+
+            assert stream_mock3.call_count == 2
+            assert stream_mock3.call_args[1]["write_str"] is True
+
+            call_kwargs = invoker.invoke_async.call_args_list[0][1]
+            assert call_kwargs.get("stderr") is subprocess.DEVNULL
+
+        discovery_logger.setLevel(original_level)
 
     @pytest.mark.asyncio
     async def test_run_discovery_handle_io_exceptions(
