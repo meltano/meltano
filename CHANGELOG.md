@@ -32,7 +32,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [2339](https://gitlab.com/meltano/meltano/-/merge_requests/2339) Update `elt` log format to include subtask field. Lines are now prefixed with `<name> | <subtask>` which may cause issues with existing log parsers.
 - [#2968](https://gitlab.com/meltano/meltano/-/issues/2968) Set `singer-io` as the default tap-marketo extractor.
 - [#2970](https://gitlab.com/meltano/meltano/-/issues/2970) Set `singer-io` as the default tap-stripe extractor.
-- [#2969](https://gitlab.com/meltano/meltano/-/issues/2969) Set `singer-io` as the default tap-salesforce extractor.
+- [#2969](https://gitlab.com/meltano/meltano/-/issues/2969) Set `meltanolabs` as the default tap-salesforce extractor.
 - [#2971](https://gitlab.com/meltano/meltano/-/issues/2971) Set `meltanolabs` as the default target-sqlite loader.
 
 
