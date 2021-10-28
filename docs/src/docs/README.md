@@ -121,7 +121,7 @@ This page covers the project's [Mission](#mission), [Focus](#focus), [Roadmap](#
 
 To find guides and references on other topics, use the Table of Contents in the sidebar.
 
-## Mission & Vision {#mission}
+## Mission
 
 Our mission is to enable everyone to realize the full potential of their data.
 
