@@ -14,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#3027](https://gitlab.com/meltano/meltano/-/issues/3027) Fixes an issue where elt invocation could hang if the tap produced large amounts of error output during discovery.
-
 ### Breaks
+
+
+## 1.85.1 - (2021-10-28)
+---
+
+### Fixes
+
+- [#3027](https://gitlab.com/meltano/meltano/-/issues/3027) Fixes an issue where elt invocation could hang if the tap produced large amounts of error output during discovery.
 
 
 ## 1.85.0 - (2021-10-21)
