@@ -17,8 +17,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
-## 1.85.1 - (2021-10-28)
+## 1.86.0 - (2021-10-28)
 ---
+
+### New
+
+- [#2869](https://gitlab.com/meltano/meltano/-/issues/2869) Introduce top-level "Environments" within `meltano.yml`
+
+
+### Changes
+
+- [#2968](https://gitlab.com/meltano/meltano/-/issues/2968) Set `singer-io` as the default tap-marketo extractor.
+- [#2970](https://gitlab.com/meltano/meltano/-/issues/2970) Set `singer-io` as the default tap-stripe extractor.
+- [#2971](https://gitlab.com/meltano/meltano/-/issues/2971) Set `meltanolabs` as the default target-sqlite loader.
 
 ### Fixes
 
@@ -36,10 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2963](https://gitlab.com/meltano/meltano/-/issues/2963) Set `meltanolabs` as the default tap-csv extractor.
 - [#2965](https://gitlab.com/meltano/meltano/-/issues/2965) Set `meltanolabs` as the default tap-gitlab extractor.
 - [2339](https://gitlab.com/meltano/meltano/-/merge_requests/2339) Update `elt` log format to include subtask field. Lines are now prefixed with `<name> | <subtask>` which may cause issues with existing log parsers.
-- [#2968](https://gitlab.com/meltano/meltano/-/issues/2968) Set `singer-io` as the default tap-marketo extractor.
-- [#2970](https://gitlab.com/meltano/meltano/-/issues/2970) Set `singer-io` as the default tap-stripe extractor.
-- [#2969](https://gitlab.com/meltano/meltano/-/issues/2969) Set `singer-io` as the default tap-salesforce extractor.
-- [#2971](https://gitlab.com/meltano/meltano/-/issues/2971) Set `meltanolabs` as the default target-sqlite loader.
 
 
 ### Fixes
@@ -54,7 +61,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2357](https://gitlab.com/meltano/meltano/-/merge_requests/2357) Use dbt [`v0.21.0`](https://github.com/dbt-labs/dbt/releases/tag/v0.21.0) by default for new dbt installs
 - [2363](https://gitlab.com/meltano/meltano/-/merge_requests/2363), [2360](https://gitlab.com/meltano/meltano/-/merge_requests/2360) Small branding and logo updates throughout - and introducing Melty to the community!
-- [#2869](https://gitlab.com/meltano/meltano/-/issues/2869) Introduce top-level "Environments" within `meltano.yml`
 
 
 ### Fixes
