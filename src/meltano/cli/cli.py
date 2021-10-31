@@ -16,16 +16,22 @@ logger = logging.getLogger(__name__)
 
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
+@click.option("--log-config", type=str)
 @click.option("-v", "--verbose", count=True)
 @environment_option
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
-def cli(ctx, log_level: str, verbose: int, environment: str):  # noqa: WPS231
+def cli(
+    ctx, log_level: str, log_config: str, verbose: int, environment: str
+):  # noqa: WPS231
     """
     Get help at https://www.meltano.com/docs/command-line-interface.html
     """
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level
+
+    if log_config:
+        ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.ensure_object(dict)
     ctx.obj["verbosity"] = verbose

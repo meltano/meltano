@@ -2,10 +2,13 @@ import asyncio
 import logging
 import os
 import re
-import sys
 from contextlib import suppress
-from typing import Optional
+from logging import config as logging_config
+from typing import Dict, Optional
 
+import structlog
+import yaml
+from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
 from meltano.core.project_settings_service import ProjectSettingsService
 
 try:
@@ -27,8 +30,80 @@ FORMAT = (
 )
 
 
-def parse_log_level(log_level):
+def parse_log_level(log_level: Dict[str, int]) -> int:
+    """Parse a level descriptor into an logging level."""
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
+
+
+def _logging_config(
+    config_file: Optional[str] = None, override_log_level: Optional[str] = None
+) -> None:
+    log_level = DEFAULT_LEVEL.upper()
+    if override_log_level:
+        log_level = override_log_level.upper()
+
+    if config_file and os.path.exists(config_file):
+        with open(config_file) as cf:
+            config = yaml.safe_load(cf.read())
+            logging_config.dictConfig(config)
+            logging.debug(f"Loaded custom logging config. [{config_file}]")
+            if override_log_level:
+                logging.warning(
+                    "Custom logging config present, ignoring override log level provided."
+                )
+            return
+
+    logging_config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {
+                "default": {
+                    "format": FORMAT,
+                },
+                "plain": {
+                    "()": structlog.stdlib.ProcessorFormatter,
+                    "processor": structlog.dev.ConsoleRenderer(colors=False),
+                    "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+                },
+                "colored": {
+                    "()": structlog.stdlib.ProcessorFormatter,
+                    "processor": structlog.dev.ConsoleRenderer(colors=True),
+                    "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+                },
+            },
+            "handlers": {
+                "console": {
+                    "class": "logging.StreamHandler",
+                    "level": log_level,
+                    "formatter": "colored",
+                    "stream": "ext://sys.stderr",
+                },
+            },
+            "loggers": {
+                "": {
+                    "handlers": ["console"],
+                    "level": log_level,
+                    "propagate": True,
+                },
+            },
+        }
+    )
+    logging.debug("Loaded default logging config.")
+
+    structlog.configure(
+        processors=[
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            TIMESTAMPER,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
 
 
 def setup_logging(project=None, log_level=DEFAULT_LEVEL):
@@ -40,13 +115,15 @@ def setup_logging(project=None, log_level=DEFAULT_LEVEL):
         root.removeHandler(h)
         h.close()
 
+    log_level = None
+    log_config = None
+
     if project:
         settings_service = ProjectSettingsService(project)
+        log_config = settings_service.get("cli.log_config")
         log_level = settings_service.get("cli.log_level")
 
-    logging.basicConfig(
-        stream=sys.stderr, format=FORMAT, level=parse_log_level(log_level)
-    )
+    _logging_config(config_file=log_config, override_log_level=log_level)
 
 
 def remove_ansi_escape_sequences(line):

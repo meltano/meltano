@@ -6,8 +6,10 @@ from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppres
 from typing import IO, Optional
 
 import click
+import structlog
 from async_generator import asynccontextmanager
 
+from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from .utils import capture_subprocess_output, remove_ansi_escape_sequences
 
 
@@ -148,6 +150,8 @@ class Out:  # noqa: WPS230
 
         self.last_line = ""
 
+        self._log: structlog.stdlib.BoundLogger = structlog.get_logger()
+
         self._prefix = None
         self._subtask_field = ""
         self._max_name_length = None
@@ -188,19 +192,30 @@ class Out:  # noqa: WPS230
         logger = logging.getLogger()
         original_log_handlers = logger.handlers
 
-        line_writer = LineWriter(self)
-        handler = logging.StreamHandler(line_writer)
+        # TODO: remove me before final mr
+        if os.environ.get("FLAG_LEGACY_LOG") == "True":
+            logger.debug("using legacy logging config")
+            line_writer = LineWriter(self)
+            handler = logging.StreamHandler(line_writer)
 
-        if not format:
-            if logger.getEffectiveLevel() == logging.DEBUG:
-                format = "%(levelname)s %(message)s"
-            else:
-                format = "%(message)s"
+            if not format:
+                if logger.getEffectiveLevel() == logging.DEBUG:
+                    format = "%(levelname)s %(message)s"
+                else:
+                    format = "%(message)s"
 
-        formatter = logging.Formatter(fmt=format)
-        handler.setFormatter(formatter)
-
-        logger.handlers = [handler]
+            formatter = logging.Formatter(fmt=format)
+            handler.setFormatter(formatter)
+            logger.handlers = [handler]
+        else:
+            logger.debug("using new logging config")
+            formatter = structlog.stdlib.ProcessorFormatter(
+                processor=structlog.dev.ConsoleRenderer(colors=False),
+                foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
+            )
+            handler = logging.FileHandler(self.file.name)
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
         try:
             yield
@@ -242,7 +257,11 @@ class Out:  # noqa: WPS230
     def writeline(self, line):
         self.last_line = line
 
-        click.echo(self.prefix + self.subtask_field + line, nl=False, file=self)
+        # TODO: remove me before final mr
+        if os.environ.get("FLAG_LEGACY_LOG") == "True":
+            click.echo(self.prefix + self.subtask_field + line, nl=False, file=self)
+        else:
+            self._log.info("output", msg=line, source=self.name, type=self.subtask_name)
         self.flush()
 
     def write(self, data):
