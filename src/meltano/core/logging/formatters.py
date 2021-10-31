@@ -8,10 +8,12 @@ from structlog.types import Processor
 TIMESTAMPER = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S")  # noqa: WPS323
 
 LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
-    # Add the log level and a timestamp to the event_dict if the log entry
-    # is not from structlog.
-    structlog.stdlib.add_log_level,
-    TIMESTAMPER,
+    [
+        # Add the log level and a timestamp to the event_dict if the log entry
+        # is not from structlog.
+        structlog.stdlib.add_log_level,
+        TIMESTAMPER,
+    ]
 )
 
 
