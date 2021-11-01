@@ -54,14 +54,6 @@ def _logging_config(
             "version": 1,
             "disable_existing_loggers": False,
             "formatters": {
-                "default": {
-                    "format": FORMAT,
-                },
-                "plain": {
-                    "()": structlog.stdlib.ProcessorFormatter,
-                    "processor": structlog.dev.ConsoleRenderer(colors=False),
-                    "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
-                },
                 "colored": {
                     "()": structlog.stdlib.ProcessorFormatter,
                     "processor": structlog.dev.ConsoleRenderer(colors=True),

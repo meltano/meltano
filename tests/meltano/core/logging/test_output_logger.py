@@ -1,11 +1,13 @@
-import io
+import json
 import logging
 import sys
 import tempfile
-from pathlib import Path
+from unittest import mock
 
 import pytest
-from meltano.core.logging.output_logger import OutputLogger
+import structlog
+from meltano.core.logging.output_logger import Out, OutputLogger
+from structlog.testing import LogCapture
 
 
 def assert_lines(output, *lines):
@@ -16,37 +18,86 @@ def assert_lines(output, *lines):
 class TestOutputLogger:
     @pytest.fixture
     def log(self, tmp_path):
-        return tempfile.TemporaryFile(mode="w+", dir=tmp_path)
-        # return io.StringIO()
+        return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
     @pytest.fixture
     def subject(self, log):
-        return OutputLogger(log)
+        return OutputLogger(log.name)
+
+    @pytest.fixture(name="log_output")
+    def fixture_log_output(self):
+        return LogCapture()
+
+    @pytest.fixture(autouse=True)
+    def fixture_configure_structlog(self, log_output):
+        structlog.configure(
+            processors=[log_output],
+            logger_factory=structlog.stdlib.LoggerFactory(),
+            wrapper_class=structlog.stdlib.BoundLogger,
+        )
+
+    @pytest.fixture(name="redirect_handler")
+    def redirect_handler(self, subject: OutputLogger) -> logging.Handler:
+        formatter = structlog.stdlib.ProcessorFormatter(
+            processor=structlog.processors.JSONRenderer(),  # use a json renderer so output is easier to verify
+        )
+        handler = logging.FileHandler(subject.file)
+        handler.setFormatter(formatter)
+        return handler
 
     @pytest.mark.asyncio
-    async def test_out(self, log, subject):
+    async def test_stdio_capture(self, log, subject, log_output):
+
         stdout_out = subject.out("stdout")
         stderr_out = subject.out("stderr")
-        logging_out = subject.out("logging")
-        writer_out = subject.out("writer")
-        line_writer_out = subject.out("lwriter")
-        basic_out = subject.out("basic")
-        subtask_out = subject.out("basic", subtask_name="subtask")
 
         async with stdout_out.redirect_stdout():
             sys.stdout.write("STD")
             sys.stdout.write("OUT\n")
             print("STDOUT 2")
 
+        assert_lines(
+            log_output.entries,
+            {
+                "name": "stdout",
+                "subtask": "main",
+                "event": "STDOUT",
+                "log_level": "info",
+            },
+            {
+                "name": "stdout",
+                "subtask": "main",
+                "event": "STDOUT 2",
+                "log_level": "info",
+            },
+        )
+
         async with stderr_out.redirect_stderr():
             sys.stderr.write("STD")
             sys.stderr.write("ERR\n")
             print("STDERR 2", file=sys.stderr)
 
-        with logging_out.redirect_logging():
-            logging.info("info")
-            logging.warning("warning")
-            logging.error("error")
+        assert_lines(
+            log_output.entries,
+            {
+                "name": "stderr",
+                "subtask": "main",
+                "event": "STDERR",
+                "log_level": "info",
+            },
+            {
+                "name": "stderr",
+                "subtask": "main",
+                "event": "STDERR 2",
+                "log_level": "info",
+            },
+        )
+
+    @pytest.mark.asyncio
+    async def test_out_writers(self, log, subject, log_output):
+        writer_out = subject.out("writer")
+        line_writer_out = subject.out("lwriter")
+        basic_out = subject.out("basic")
 
         async with writer_out.writer() as writer:
             writer.write("WRI")
@@ -60,46 +111,92 @@ class TestOutputLogger:
         basic_out.writeline("LINE\n")
         basic_out.writeline("LINE 2\n")
 
-        subtask_out.writeline("LINE\n")
-
-        # read from the beginning
-        log.seek(0)
-        log_content = log.read()
-
         assert_lines(
-            log_content,
-            "stdout  | main    | STDOUT\n",
-            "stdout  | main    | STDOUT 2\n",
-            "stderr  | main    | STDERR\n",
-            "stderr  | main    | STDERR 2\n",
-            "logging | main    | INFO info\n",
-            "logging | main    | WARNING warning\n",
-            "logging | main    | ERROR error\n",
-            "writer  | main    | WRITER\n",
-            "writer  | main    | WRITER 2\n",
-            "lwriter | main    | LINE\n",
-            "lwriter | main    | LINE 2\n",
-            "basic   | main    | LINE\n",
-            "basic   | main    | LINE 2\n",
-            "basic   | subtask | LINE\n",
+            log_output.entries,
+            {
+                "name": "writer",
+                "subtask": "main",
+                "event": "WRITER",
+                "log_level": "info",
+            },
+            {
+                "name": "writer",
+                "subtask": "main",
+                "event": "WRITER 2",
+                "log_level": "info",
+            },
+            {
+                "name": "lwriter",
+                "subtask": "main",
+                "event": "LINE",
+                "log_level": "info",
+            },
+            {
+                "name": "lwriter",
+                "subtask": "main",
+                "event": "LINE 2",
+                "log_level": "info",
+            },
+            {"name": "basic", "subtask": "main", "event": "LINE", "log_level": "info"},
+            {
+                "name": "basic",
+                "subtask": "main",
+                "event": "LINE 2",
+                "log_level": "info",
+            },
         )
 
-    def test_logging_exception(self, log, subject):
+    @pytest.mark.asyncio
+    async def test_set_subtask(self, log, subject, log_output):
+        subtask_out = subject.out("basic", subtask_name="subtask_test")
+
+        subtask_out.writeline("LINE\n")
+        assert_lines(
+            log_output.entries,
+            {
+                "name": "basic",
+                "subtask": "subtask_test",
+                "event": "LINE",
+                "log_level": "info",
+            },
+        )
+
+    @pytest.mark.asyncio
+    async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
+        logging_out = subject.out("logging")
+
+        with mock.patch.object(Out, "_redirect_log_handler", redirect_handler):
+            with logging_out.redirect_logging():
+                logging.info("info")
+                logging.warning("warning")
+                logging.error("error")
+
+        with open(subject.file) as logf:
+            log_file_contents = [json.loads(line) for line in logf.readlines()]
+
+        assert_lines(
+            log_file_contents,
+            {"event": "info"},
+            {"event": "warning"},
+            {"event": "error"},
+        )
+
+    def test_logging_exception(self, log, subject, redirect_handler):
         logging_out = subject.out("logging")
 
         # it raises logs unhandled exceptions
         exception = Exception("exception")
 
         with pytest.raises(Exception) as exc:
-            with logging_out.redirect_logging():
-                raise exception
+            with mock.patch.object(Out, "_redirect_log_handler", redirect_handler):
+                with logging_out.redirect_logging():
+                    raise exception
 
         # make sure it let the exception through
         assert exc.value is exception
 
-        # read from the beginning
-        log.seek(0)
-        log_content = log.read()
+        log_content = json.loads(log.read())
 
         # make sure the exception is logged
-        assert "logging | main   | ERROR exception" in log_content
+        assert log_content.get("event") == "exception"
+        assert log_content.get("exc_info")

@@ -103,18 +103,21 @@ class Out:  # noqa: WPS230
     def line_writer(self):
         yield LineWriter(self)
 
-    @contextmanager
-    def redirect_logging(self, ignore_errors=()):
-        """Redirect log entries to a temporarily added file handler."""
-        logger = logging.getLogger()
+    @property
+    def _redirect_log_handler(self) -> logging.Handler:
         formatter = structlog.stdlib.ProcessorFormatter(
             processor=structlog.dev.ConsoleRenderer(colors=False),
             foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
         )
         handler = logging.FileHandler(self.file)
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        return handler
 
+    @contextmanager
+    def redirect_logging(self, ignore_errors=()):
+        """Redirect log entries to a temporarily added file handler."""
+        logger = logging.getLogger()
+        logger.addHandler(self._redirect_log_handler)
         try:
             yield
         except (KeyboardInterrupt, asyncio.CancelledError, *ignore_errors):
@@ -123,7 +126,7 @@ class Out:  # noqa: WPS230
             logger.error(str(err), exc_info=True)
             raise
         finally:
-            logger.removeHandler(handler)
+            logger.removeHandler(self._redirect_log_handler)
 
     @asynccontextmanager
     async def writer(self):
