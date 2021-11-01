@@ -92,12 +92,12 @@ class Out:  # noqa: WPS230
             subtask_name: subtask name to use for the subtask field.
         """
         self.output_logger = output_logger
-        self.name = name
         self.logger = logger
-
+        self.name = name
         self.subtask_name = subtask_name
-
         self.file = file
+
+        self.last_line = ""
 
     @contextmanager
     def line_writer(self):
@@ -153,6 +153,7 @@ class Out:  # noqa: WPS230
                 yield
 
     def writeline(self, line: str) -> None:
+        self.last_line = line
         """Write a line to the underlying structured logger, cleaning up any dangling control chars."""
         self.logger.info(line.rstrip(), name=self.name, subtask=self.subtask_name)
 

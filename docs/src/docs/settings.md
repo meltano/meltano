@@ -309,12 +309,6 @@ handlers:
     filename: /var/log/meltano.log
     formatter: json
 
-loggers:
-  etl_cmd:
-    level: DEBUG
-    propagate: no
-    handlers: [console, file]
-
 root:
   level: DEBUG
   propagate: yes

@@ -47,10 +47,6 @@ def _logging_config(
             config = yaml.safe_load(cf.read())
             logging_config.dictConfig(config)
             logging.debug(f"Loaded custom logging config. [{config_file}]")
-            if override_log_level:
-                logging.warning(
-                    "Custom logging config present, ignoring override log level provided."
-                )
             return
 
     logging_config.dictConfig(

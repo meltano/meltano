@@ -207,7 +207,10 @@ async def _run_job(project, job, session, context_builder, force=False):
 
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
-        await _run_elt(project, context_builder, output_logger)
+
+        log = logger.bind(name="meltano")
+
+        await _run_elt(log, context_builder, output_logger)
 
 
 @asynccontextmanager
@@ -223,25 +226,26 @@ async def _redirect_output(output_logger):
                 raise
 
 
-async def _run_elt(project, context_builder, output_logger):
+async def _run_elt(log, context_builder, output_logger):
     async with _redirect_output(output_logger):
         try:
             elt_context = context_builder.context()
 
             if not elt_context.only_transform:
-                await _run_extract_load(elt_context, output_logger)
+                await _run_extract_load(log, elt_context, output_logger)
             else:
-                logger.info("Extract & load skipped.")
+                log.info("Extract & load skipped.")
 
             if elt_context.transformer:
-                await _run_transform(elt_context, output_logger)
+                await _run_transform(log, elt_context, output_logger)
             else:
-                logger.info("Transformation skipped.")
+                log.info("Transformation skipped.")
         except RunnerError as err:
             raise CliError(f"ELT could not be completed: {err}") from err
 
 
-async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS231
+async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa: WPS231
+
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -261,7 +265,9 @@ async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS2
         extractor_out_writer = extractor_out.line_writer
         loader_out_writer = loader_out.line_writer
 
-    logger.info("Running extract & load...")
+    log.info(
+        "Running extract & load...",
+    )
 
     singer_runner = SingerRunner(elt_context)
     try:
@@ -278,30 +284,26 @@ async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS2
         try:
             code = err.exitcodes[PluginType.EXTRACTORS]
             message = extractor_log.last_line.rstrip() or "(see above)"
-            logger.error(
-                f"{click.style(f'Extraction failed ({code}):', fg='red')} {message}"
-            )
+            log.error("Extraction failed", code=code, message=message)
         except KeyError:
             pass
 
         try:
             code = err.exitcodes[PluginType.LOADERS]
             message = loader_log.last_line.rstrip() or "(see above)"
-            logger.error(
-                f"{click.style(f'Loading failed ({code}):', fg='red')} {message}"
-            )
+            log.error("Loading failed", code=code, message=message)
         except KeyError:
             pass
 
         raise
 
-    logger.info("Extract & load complete!")
+    log.info("Extract & load complete!")
 
 
-async def _run_transform(elt_context, output_logger, **kwargs):
+async def _run_transform(log, elt_context, output_logger, **kwargs):
     transformer_log = output_logger.out(elt_context.transformer.name, "transformer")
 
-    logger.info("Running transformation...")
+    log.info("Running transformation...")
 
     dbt_runner = DbtRunner(elt_context)
     try:
@@ -311,15 +313,13 @@ async def _run_transform(elt_context, output_logger, **kwargs):
         try:
             code = err.exitcodes[PluginType.TRANSFORMERS]
             message = transformer_log.last_line.rstrip() or "(see above)"
-            logger.error(
-                f"{click.style(f'Transformation failed ({code}):', fg='red')} {message}"
-            )
+            log.error("Transformation failed", code=code, message=message)
         except KeyError:
             pass
 
         raise
 
-    logger.info("Transformation complete!")
+    log.info("Transformation complete!")
 
 
 def _find_transform_for_extractor(extractor: str, plugins_service):
