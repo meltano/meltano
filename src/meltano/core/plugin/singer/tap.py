@@ -53,9 +53,7 @@ def _debug_logging_handler(
             _stream_redirect(stderr, sys.stderr, write_str=True)
         )
 
-    out = plugin_invoker.context.base_output_logger.out(
-        name, color="yellow", subtask_name="discovery"
-    )
+    out = plugin_invoker.context.base_output_logger.out(name, subtask_name="discovery")
     with out.line_writer() as outerr:
         return asyncio.ensure_future(_stream_redirect(stderr, outerr, write_str=True))
 
