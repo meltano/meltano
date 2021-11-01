@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @environment_option
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
-def cli(
+def cli(  # noqa: WPS231
     ctx, log_level: str, log_config: str, verbose: int, environment: str
 ):  # noqa: WPS231
     """
