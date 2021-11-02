@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppress
-from typing import IO, Optional
 
 import structlog
 from async_generator import asynccontextmanager
@@ -20,14 +19,11 @@ class OutputLogger:
 
         self.outs = {}
 
-    def out(
-        self, name: str, subtask_name: Optional[str] = "main", logger=None
-    ) -> "Out":
+    def out(self, name: str, logger=None) -> "Out":
         """Obtain an Out instance for use as a logger or use for output capture.
 
         Args:
             name: name of this Out instance and to use in the name field.
-            subtask_name: subtask name to use for the subtask field.
             logger: logger to temporarily add a handler too.
 
         Returns:
@@ -42,7 +38,6 @@ class OutputLogger:
             name,
             logger=logger,
             file=self.file,
-            subtask_name=subtask_name,
         )
         self.outs[name] = out
         return out
@@ -79,8 +74,7 @@ class Out:  # noqa: WPS230
         output_logger: OutputLogger,
         name: str,
         logger: structlog.stdlib.BoundLogger,
-        file: IO,
-        subtask_name: Optional[str] = "",
+        file: str,
     ):
         """Log anything written in a stream.
 
@@ -88,13 +82,11 @@ class Out:  # noqa: WPS230
             output_logger: the OutputLogger to use.
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
-            file: file object to write to.
-            subtask_name: subtask name to use for the subtask field.
+            file: file to associate with the FileHandler to log to.
         """
         self.output_logger = output_logger
         self.logger = logger
         self.name = name
-        self.subtask_name = subtask_name
         self.file = file
 
         self.last_line = ""
@@ -158,7 +150,7 @@ class Out:  # noqa: WPS230
     def writeline(self, line: str) -> None:
         """Write a line to the underlying structured logger, cleaning up any dangling control chars."""
         self.last_line = line
-        self.logger.info(line.rstrip(), name=self.name, subtask=self.subtask_name)
+        self.logger.info(line.rstrip(), name=self.name)
 
     async def _read_from_fd(self, read_fd):
         # Since we're redirecting our own stdout and stderr output,

@@ -13,6 +13,7 @@ from hashlib import sha1
 from pathlib import Path
 from typing import Tuple
 
+import structlog
 from jsonschema import Draft4Validator
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import JobFinder, Payload
@@ -32,7 +33,7 @@ from .catalog import (
     select_metadata_rules,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 async def _stream_redirect(
@@ -53,7 +54,9 @@ def _debug_logging_handler(
             _stream_redirect(stderr, sys.stderr, write_str=True)
         )
 
-    out = plugin_invoker.context.base_output_logger.out(name, subtask_name="discovery")
+    out = plugin_invoker.context.base_output_logger.out(
+        name, logger.bind(type="discovery", stdio="stderr")
+    )
     with out.line_writer() as outerr:
         return asyncio.ensure_future(_stream_redirect(stderr, outerr, write_str=True))
 

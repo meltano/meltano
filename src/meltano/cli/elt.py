@@ -208,17 +208,19 @@ async def _run_job(project, job, session, context_builder, force=False):
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
 
-        log = logger.bind(name="meltano")
+        log = logger.bind(name="meltano", run_id=str(job.run_id))
 
         await _run_elt(log, context_builder, output_logger)
 
 
 @asynccontextmanager
-async def _redirect_output(output_logger):
-    meltano_io = output_logger.out("meltano", "elt")
+async def _redirect_output(log, output_logger):
 
-    with meltano_io.redirect_logging(ignore_errors=(CliError,)):
-        async with meltano_io.redirect_stdout(), meltano_io.redirect_stderr():  # noqa: WPS316
+    meltano_stdout = output_logger.out("meltano", log.bind(stdio="stdout", type="elt"))
+    meltano_stderr = output_logger.out("meltano", log.bind(stdio="stderr", type="elt"))
+
+    with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
+        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():  # noqa: WPS316
             try:
                 yield
             except CliError as err:
@@ -227,7 +229,7 @@ async def _redirect_output(output_logger):
 
 
 async def _run_elt(log, context_builder, output_logger):
-    async with _redirect_output(output_logger):
+    async with _redirect_output(log, output_logger):
         try:
             elt_context = context_builder.context()
 
@@ -249,8 +251,10 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
-    extractor_log = output_logger.out(extractor, "extractor")
-    loader_log = output_logger.out(loader, "loader")
+    stderr_log = logger.bind(run_id=str(elt_context.job.run_id), stdio="stderr")
+
+    extractor_log = output_logger.out(extractor, stderr_log.bind(type="extractor"))
+    loader_log = output_logger.out(loader, stderr_log.bind(type="loader"))
 
     @contextmanager
     def nullcontext():
@@ -259,8 +263,13 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     extractor_out_writer = nullcontext
     loader_out_writer = nullcontext
     if logger.getEffectiveLevel() == logging.DEBUG:
-        extractor_out = output_logger.out(f"{extractor} (out)", "extractor")
-        loader_out = output_logger.out(f"{loader} (out)", "loader")
+        stdout_log = logger.bind(run_id=str(elt_context.job.run_id), stdio="stdout")
+        extractor_out = output_logger.out(
+            f"{extractor} (out)", stdout_log.bind(type="extractor")
+        )
+        loader_out = output_logger.out(
+            f"{loader} (out)", stdout_log.bind(type="loader")
+        )
 
         extractor_out_writer = extractor_out.line_writer
         loader_out_writer = loader_out.line_writer
@@ -301,7 +310,14 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
 
 async def _run_transform(log, elt_context, output_logger, **kwargs):
-    transformer_log = output_logger.out(elt_context.transformer.name, "transformer")
+
+    stderr_log = logger.bind(
+        job_id=str(elt_context.job.run_id),
+        stdio="stderr",
+        type="transformer",
+    )
+
+    transformer_log = output_logger.out(elt_context.transformer.name, stderr_log)
 
     log.info("Running transformation...")
 

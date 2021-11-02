@@ -60,13 +60,11 @@ class TestOutputLogger:
             log_output.entries,
             {
                 "name": "stdout",
-                "subtask": "main",
                 "event": "STDOUT",
                 "log_level": "info",
             },
             {
                 "name": "stdout",
-                "subtask": "main",
                 "event": "STDOUT 2",
                 "log_level": "info",
             },
@@ -81,13 +79,11 @@ class TestOutputLogger:
             log_output.entries,
             {
                 "name": "stderr",
-                "subtask": "main",
                 "event": "STDERR",
                 "log_level": "info",
             },
             {
                 "name": "stderr",
-                "subtask": "main",
                 "event": "STDERR 2",
                 "log_level": "info",
             },
@@ -115,49 +111,45 @@ class TestOutputLogger:
             log_output.entries,
             {
                 "name": "writer",
-                "subtask": "main",
                 "event": "WRITER",
                 "log_level": "info",
             },
             {
                 "name": "writer",
-                "subtask": "main",
                 "event": "WRITER 2",
                 "log_level": "info",
             },
             {
                 "name": "lwriter",
-                "subtask": "main",
                 "event": "LINE",
                 "log_level": "info",
             },
             {
                 "name": "lwriter",
-                "subtask": "main",
                 "event": "LINE 2",
                 "log_level": "info",
             },
-            {"name": "basic", "subtask": "main", "event": "LINE", "log_level": "info"},
+            {"name": "basic", "event": "LINE", "log_level": "info"},
             {
                 "name": "basic",
-                "subtask": "main",
                 "event": "LINE 2",
                 "log_level": "info",
             },
         )
 
     @pytest.mark.asyncio
-    async def test_set_subtask(self, log, subject, log_output):
-        subtask_out = subject.out("basic", subtask_name="subtask_test")
+    async def test_set_custom_logger(self, log, subject, log_output):
+        logger = structlog.getLogger()
+        out = subject.out("basic", logger.bind(is_test=True))
 
-        subtask_out.writeline("LINE\n")
+        out.writeline("LINE\n")
         assert_lines(
             log_output.entries,
             {
                 "name": "basic",
-                "subtask": "subtask_test",
                 "event": "LINE",
                 "log_level": "info",
+                "is_test": True,
             },
         )
 
