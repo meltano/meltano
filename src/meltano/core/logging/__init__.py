@@ -6,9 +6,4 @@ from .job_logging_service import (
     SizeThresholdJobLogException,
 )
 from .output_logger import OutputLogger
-from .utils import (
-    LEVELS,
-    capture_subprocess_output,
-    remove_ansi_escape_sequences,
-    setup_logging,
-)
+from .utils import DEFAULT_LEVEL, LEVELS, capture_subprocess_output, setup_logging

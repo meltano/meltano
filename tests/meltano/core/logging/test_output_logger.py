@@ -157,7 +157,7 @@ class TestOutputLogger:
     async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
         logging_out = subject.out("logging")
 
-        with mock.patch.object(Out, "_redirect_log_handler", redirect_handler):
+        with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
             with logging_out.redirect_logging():
                 logging.info("info")
                 logging.warning("warning")
@@ -180,7 +180,7 @@ class TestOutputLogger:
         exception = Exception("exception")
 
         with pytest.raises(Exception) as exc:
-            with mock.patch.object(Out, "_redirect_log_handler", redirect_handler):
+            with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
                 with logging_out.redirect_logging():
                     raise exception
 

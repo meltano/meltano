@@ -1,13 +1,12 @@
 import asyncio
 import logging
-import os
-import re
 from contextlib import suppress
 from logging import config as logging_config
 from typing import Dict, Optional
 
 import structlog
 import yaml
+from coverage.annotate import os
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -36,6 +35,13 @@ def parse_log_level(log_level: Dict[str, int]) -> int:
 
 
 def read_config(config_file: Optional[str] = None) -> dict:
+    """Read a logging config yaml from disk.
+
+    Args:
+        config_file: path to the config file to read.
+    Returns:
+        dict: parsed yaml config
+    """
     if config_file and os.path.exists(config_file):
         with open(config_file) as cf:
             return yaml.safe_load(cf.read())
@@ -43,11 +49,15 @@ def read_config(config_file: Optional[str] = None) -> dict:
         return None
 
 
-def default_config(override_log_level: Optional[str] = None) -> dict:
-    log_level = DEFAULT_LEVEL.upper()
-    if override_log_level:
-        log_level = override_log_level.upper()
-    config = {
+def default_config(log_level: str) -> dict:
+    """Generate a default logging config.
+
+    Args:
+        log_level: set log levels to provided level.
+    Returns:
+         dict: logging config suitable for use with logging.config.dictConfig
+    """
+    return {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
@@ -60,7 +70,7 @@ def default_config(override_log_level: Optional[str] = None) -> dict:
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "level": log_level,
+                "level": log_level.upper(),
                 "formatter": "colored",
                 "stream": "ext://sys.stderr",
             },
@@ -68,12 +78,11 @@ def default_config(override_log_level: Optional[str] = None) -> dict:
         "loggers": {
             "": {
                 "handlers": ["console"],
-                "level": log_level,
+                "level": log_level.upper(),
                 "propagate": True,
             },
         },
     }
-    return config
 
 
 def setup_logging(project=None, log_level=DEFAULT_LEVEL):
@@ -85,7 +94,7 @@ def setup_logging(project=None, log_level=DEFAULT_LEVEL):
         root.removeHandler(h)
         h.close()
 
-    log_level = None
+    log_level = DEFAULT_LEVEL.upper()
     log_config = None
 
     if project:
@@ -108,15 +117,6 @@ def setup_logging(project=None, log_level=DEFAULT_LEVEL):
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
-
-
-def remove_ansi_escape_sequences(line):
-    """
-    Remove ANSI escape sequences that are used for adding colors in
-     terminals, so that only the text is logged in a file
-    """
-    ansi_escape = re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]")
-    return ansi_escape.sub("", line)
 
 
 class SubprocessOutputWriter(Protocol):

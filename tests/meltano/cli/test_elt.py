@@ -403,8 +403,7 @@ class TestCliEltScratchpadOne:
             full_result = result.stdout + result.stderr
 
             # we already test the redirect handler in test_output_logger, so we'll just verify that the # of lines matches
-            # -1 because the the full output captures the `Using selector: KqueueSelector`, while the job log doesn't (since it inits after)
-            assert len(log) == len(full_result.splitlines()) - 1
+            assert len(log) == len(full_result.splitlines())
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)

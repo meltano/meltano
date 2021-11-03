@@ -99,12 +99,13 @@ class Out:  # noqa: WPS230
 
         self.last_line = ""
 
-    @contextmanager
-    def line_writer(self):
-        yield LineWriter(self)
-
     @property
-    def _redirect_log_handler(self) -> logging.Handler:
+    def redirect_log_handler(self) -> logging.Handler:
+        """Configure a logging.Handler suitable for redirecting logs too.
+
+        Returns:
+            logging.FileHandler using an uncolorized console formatter
+        """
         formatter = structlog.stdlib.ProcessorFormatter(
             processor=structlog.dev.ConsoleRenderer(colors=False),
             foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
@@ -114,10 +115,14 @@ class Out:  # noqa: WPS230
         return handler
 
     @contextmanager
+    def line_writer(self):
+        yield LineWriter(self)
+
+    @contextmanager
     def redirect_logging(self, ignore_errors=()):
         """Redirect log entries to a temporarily added file handler."""
         logger = logging.getLogger()
-        logger.addHandler(self._redirect_log_handler)
+        logger.addHandler(self.redirect_log_handler)
         try:
             yield
         except (KeyboardInterrupt, asyncio.CancelledError, *ignore_errors):
@@ -126,7 +131,7 @@ class Out:  # noqa: WPS230
             logger.error(str(err), exc_info=True)
             raise
         finally:
-            logger.removeHandler(self._redirect_log_handler)
+            logger.removeHandler(self.redirect_log_handler)
 
     @asynccontextmanager
     async def writer(self):
