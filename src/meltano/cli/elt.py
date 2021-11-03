@@ -216,8 +216,12 @@ async def _run_job(project, job, session, context_builder, force=False):
 @asynccontextmanager
 async def _redirect_output(log, output_logger):
 
-    meltano_stdout = output_logger.out("meltano", log.bind(stdio="stdout", type="elt"))
-    meltano_stderr = output_logger.out("meltano", log.bind(stdio="stderr", type="elt"))
+    meltano_stdout = output_logger.out(
+        "meltano", log.bind(stdio="stdout", cmd_type="elt")
+    )
+    meltano_stderr = output_logger.out(
+        "meltano", log.bind(stdio="stderr", cmd_type="elt")
+    )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
         async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():  # noqa: WPS316
@@ -253,8 +257,8 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     stderr_log = logger.bind(run_id=str(elt_context.job.run_id), stdio="stderr")
 
-    extractor_log = output_logger.out(extractor, stderr_log.bind(type="extractor"))
-    loader_log = output_logger.out(loader, stderr_log.bind(type="loader"))
+    extractor_log = output_logger.out(extractor, stderr_log.bind(cmd_type="extractor"))
+    loader_log = output_logger.out(loader, stderr_log.bind(cmd_type="loader"))
 
     @contextmanager
     def nullcontext():
@@ -265,10 +269,10 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(run_id=str(elt_context.job.run_id), stdio="stdout")
         extractor_out = output_logger.out(
-            f"{extractor} (out)", stdout_log.bind(type="extractor"), logging.DEBUG
+            f"{extractor} (out)", stdout_log.bind(cmd_type="extractor"), logging.DEBUG
         )
         loader_out = output_logger.out(
-            f"{loader} (out)", stdout_log.bind(type="loader"), logging.DEBUG
+            f"{loader} (out)", stdout_log.bind(cmd_type="loader"), logging.DEBUG
         )
 
         extractor_out_writer = extractor_out.line_writer
@@ -314,7 +318,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
         stdio="stderr",
-        type="transformer",
+        cmd_type="transformer",
     )
 
     transformer_log = output_logger.out(elt_context.transformer.name, stderr_log)

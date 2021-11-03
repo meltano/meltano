@@ -27,7 +27,7 @@ class LogEntry:
         level: Optional[str] = None,
         stdio: Optional[str] = None,
     ):
-        """Logentries is a simple support class for searching a json formatted log for entries based.
+        """Logentries is a simple support class for checking whether a log entry is in a list of dicts.
 
         Args:
             name: contents of the name field field to search for (or None if it should not be set)
@@ -38,7 +38,7 @@ class LogEntry:
         """
         self.name = name
         self.cmd_type = cmd_type
-        self.event = event.rstrip("\n")
+        self.event = event
         self.level = level
         self.stdio = stdio
 
@@ -52,7 +52,7 @@ class LogEntry:
 
             matches = (
                 line.get("name") == self.name
-                and line.get("type") == self.cmd_type
+                and line.get("cmd_type") == self.cmd_type
                 and line.get("event").startswith(self.event)
                 and line.get("level") == self.level
             )
@@ -248,27 +248,27 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                     LogEntry(
-                        None, None, "No state was found, complete import.\n", "warning"
+                        None, None, "No state was found, complete import.", "warning"
                     ),
                     LogEntry(
                         None, None, "Incremental state has been updated at", "info"
                     ),
-                    LogEntry("meltano", None, "Extract & load complete!\n", "info"),
-                    LogEntry("meltano", None, "Transformation skipped.\n", "info"),
+                    LogEntry("meltano", None, "Extract & load complete!", "info"),
+                    LogEntry("meltano", None, "Transformation skipped.", "info"),
                 ],
             )
 
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("tap-mock", "extractor", "Starting\n", "info"),
-                    LogEntry("tap-mock", "extractor", "Running\n", "info"),
-                    LogEntry("tap-mock", "extractor", "Done\n", "info"),
-                    LogEntry("target-mock", "loader", "Starting\n", "info"),
-                    LogEntry("target-mock", "loader", "Running\n", "info"),
-                    LogEntry("target-mock", "loader", "Done\n", "info"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info"),
+                    LogEntry("tap-mock", "extractor", "Running", "info"),
+                    LogEntry("tap-mock", "extractor", "Done", "info"),
+                    LogEntry("target-mock", "loader", "Starting", "info"),
+                    LogEntry("target-mock", "loader", "Running", "info"),
+                    LogEntry("target-mock", "loader", "Done", "info"),
                 ],
             )
 
@@ -284,8 +284,8 @@ class TestCliEltScratchpadOne:
             assert result.exception == exc
 
             lines = [
-                LogEntry("meltano", None, "Running extract & load...\n", "info"),
-                LogEntry(None, None, "This is a grave danger.\n", "error"),
+                LogEntry("meltano", None, "Running extract & load...", "info"),
+                LogEntry(None, None, "This is a grave danger.", "error"),
             ]
             assert_log_lines(result.stderr, lines)
             assert exception_logged(result.stderr, exc)
@@ -337,7 +337,7 @@ class TestCliEltScratchpadOne:
             assert_cli_runner(result)
 
             lines = [
-                LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                LogEntry("meltano", None, "Running extract & load...", "info"),
                 LogEntry(
                     None, None, "Created configuration at", "debug"
                 ),  # followed by path
@@ -350,60 +350,61 @@ class TestCliEltScratchpadOne:
                 LogEntry(
                     None, None, "Created configuration at", "debug"
                 ),  # followed by path
-                LogEntry(
-                    None, None, "No state was found, complete import.\n", "warning"
-                ),
+                LogEntry(None, None, "No state was found, complete import.", "warning"),
                 LogEntry(
                     None, None, "Incremental state has been updated at", "info"
                 ),  # followed by timestamp
                 LogEntry(
                     None,
                     None,
-                    "Incremental state: {'line': 1}\n",
+                    "Incremental state: {'line': 1}",
                     "debug",
                 ),
                 LogEntry(
                     None,
                     None,
-                    "Incremental state: {'line': 2}\n",
+                    "Incremental state: {'line': 2}",
                     "debug",
                 ),
                 LogEntry(
                     None,
                     None,
-                    "Incremental state: {'line': 3}\n",
+                    "Incremental state: {'line': 3}",
                     "debug",
                 ),
-                LogEntry("meltano", None, "Extract & load complete!\n", "info"),
-                LogEntry("meltano", None, "Transformation skipped.\n", "info"),
-                LogEntry("tap-mock", "extractor", "Starting\n", "info", "stderr"),
-                LogEntry("tap-mock", "extractor", "Running\n", "info", "stderr"),
-                LogEntry("tap-mock (out)", "extractor", "SCHEMA\n", "debug", "stdout"),
-                LogEntry("tap-mock (out)", "extractor", "RECORD\n", "debug", "stdout"),
-                LogEntry("tap-mock (out)", "extractor", "STATE\n", "debug", "stdout"),
-                LogEntry("tap-mock", "extractor", "Done\n", "info", "stderr"),
-                LogEntry("target-mock", "loader", "Starting\n", "info", "stderr"),
-                LogEntry("target-mock", "loader", "Running\n", "info", "stderr"),
+                LogEntry("meltano", None, "Extract & load complete!", "info"),
+                LogEntry("meltano", None, "Transformation skipped.", "info"),
+                LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                LogEntry("tap-mock (out)", "extractor", "SCHEMA", "debug", "stdout"),
+                LogEntry("tap-mock (out)", "extractor", "RECORD", "debug", "stdout"),
+                LogEntry("tap-mock (out)", "extractor", "STATE", "debug", "stdout"),
+                LogEntry("tap-mock", "extractor", "Done", "info", "stderr"),
+                LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                LogEntry("target-mock", "loader", "Running", "info", "stderr"),
                 LogEntry(
-                    "target-mock (out)", "loader", '{"line": 1}\n', "debug", "stdout"
+                    "target-mock (out)", "loader", '{"line": 1}', "debug", "stdout"
                 ),
                 LogEntry(
-                    "target-mock (out)", "loader", '{"line": 2}\n', "debug", "stdout"
+                    "target-mock (out)", "loader", '{"line": 2}', "debug", "stdout"
                 ),
                 LogEntry(
-                    "target-mock (out)", "loader", '{"line": 3}\n', "debug", "stdout"
+                    "target-mock (out)", "loader", '{"line": 3}', "debug", "stdout"
                 ),
-                LogEntry("target-mock", "loader", "Done\n", "info", "stderr"),
+                LogEntry("target-mock", "loader", "Done", "info", "stderr"),
             ]
 
             assert_log_lines(result.stdout + result.stderr, lines)
 
-            log = job_logging_service.get_latest_log(job_id).splitlines()
+            log = job_logging_service.get_latest_log(job_id)
 
             full_result = result.stdout + result.stderr
 
             # we already test the redirect handler in test_output_logger, so we'll just verify that the # of lines matches
-            assert len(log) == len(full_result.splitlines())
+            assert len(log.splitlines()) == len(full_result.splitlines())
+            # and just to be safe - check if these debug mode only strings show up
+            assert "target-mock (out)" in log
+            assert "tap-mock (out)" in log
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
@@ -446,7 +447,7 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                 ],
             )
 
@@ -458,12 +459,12 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("tap-mock", "extractor", "Starting\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Running\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Failure\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Starting\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Running\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Done\n", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Failure", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Done", "info", "stderr"),
                 ],
             )
 
@@ -527,7 +528,7 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                 ],
             )
             assert exception_logged(
@@ -538,12 +539,12 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("tap-mock", "extractor", "Starting\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Running\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Done\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Starting\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Running\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Failure\n", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Done", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Failure", "info", "stderr"),
                 ],
             )
 
@@ -588,7 +589,7 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                     LogEntry("meltano", None, "Loading failed", "error"),
                 ],
             )
@@ -600,12 +601,12 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("tap-mock", "extractor", "Starting\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Running\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Done\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Starting\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Running\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Failure\n", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Done", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Failure", "info", "stderr"),
                 ],
             )
 
@@ -657,7 +658,7 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                     LogEntry("meltano", None, "Extraction failed", "error"),
                     LogEntry("meltano", None, "Loading failed", "error"),
                 ],
@@ -671,12 +672,12 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("tap-mock", "extractor", "Starting\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Running\n", "info", "stderr"),
-                    LogEntry("tap-mock", "extractor", "Failure\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Starting\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Running\n", "info", "stderr"),
-                    LogEntry("target-mock", "loader", "Failure\n", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Failure", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Failure", "info", "stderr"),
                 ],
             )
 
@@ -735,11 +736,11 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                     LogEntry(
                         None,
                         None,
-                        "The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
+                        "The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).",
                         "error",
                     ),
                 ],
@@ -796,7 +797,7 @@ class TestCliEltScratchpadOne:
             assert_log_lines(
                 result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                 ],
             )
 
@@ -1017,25 +1018,25 @@ class TestCliEltScratchpadTwo:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
-                    LogEntry("meltano", None, "Extract & load complete!\n", "info"),
-                    LogEntry("meltano", None, "Running transformation...\n", "info"),
-                    LogEntry("meltano", None, "Transformation complete!\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry("meltano", None, "Extract & load complete!", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
+                    LogEntry("meltano", None, "Transformation complete!", "info"),
                 ],
             )
 
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("tap-mock", "extractor", "Starting\n", "info"),
-                    LogEntry("tap-mock", "extractor", "Running\n", "info"),
-                    LogEntry("tap-mock", "extractor", "Done\n", "info"),
-                    LogEntry("target-mock", "loader", "Starting\n", "info"),
-                    LogEntry("target-mock", "loader", "Running\n", "info"),
-                    LogEntry("target-mock", "loader", "Done\n", "info"),
-                    LogEntry("dbt", "transformer", "Starting\n", "info"),
-                    LogEntry("dbt", "transformer", "Running\n", "info"),
-                    LogEntry("dbt", "transformer", "Done\n", "info"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info"),
+                    LogEntry("tap-mock", "extractor", "Running", "info"),
+                    LogEntry("tap-mock", "extractor", "Done", "info"),
+                    LogEntry("target-mock", "loader", "Starting", "info"),
+                    LogEntry("target-mock", "loader", "Running", "info"),
+                    LogEntry("target-mock", "loader", "Done", "info"),
+                    LogEntry("dbt", "transformer", "Starting", "info"),
+                    LogEntry("dbt", "transformer", "Running", "info"),
+                    LogEntry("dbt", "transformer", "Done", "info"),
                 ],
             )
 
@@ -1095,9 +1096,9 @@ class TestCliEltScratchpadTwo:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Running extract & load...\n", "info"),
-                    LogEntry("meltano", None, "Extract & load complete!\n", "info"),
-                    LogEntry("meltano", None, "Running transformation...\n", "info"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry("meltano", None, "Extract & load complete!", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
                     LogEntry("meltano", None, "Transformation failed", "error"),
                 ],
             )
@@ -1108,15 +1109,15 @@ class TestCliEltScratchpadTwo:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("tap-mock", "extractor", "Starting\n", "info"),
-                    LogEntry("tap-mock", "extractor", "Running\n", "info"),
-                    LogEntry("tap-mock", "extractor", "Done\n", "info"),
-                    LogEntry("target-mock", "loader", "Starting\n", "info"),
-                    LogEntry("target-mock", "loader", "Running\n", "info"),
-                    LogEntry("target-mock", "loader", "Done\n", "info"),
-                    LogEntry("dbt", "transformer", "Starting\n", "info"),
-                    LogEntry("dbt", "transformer", "Running\n", "info"),
-                    LogEntry("dbt", "transformer", "Failure\n", "info"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info"),
+                    LogEntry("tap-mock", "extractor", "Running", "info"),
+                    LogEntry("tap-mock", "extractor", "Done", "info"),
+                    LogEntry("target-mock", "loader", "Starting", "info"),
+                    LogEntry("target-mock", "loader", "Running", "info"),
+                    LogEntry("target-mock", "loader", "Done", "info"),
+                    LogEntry("dbt", "transformer", "Starting", "info"),
+                    LogEntry("dbt", "transformer", "Running", "info"),
+                    LogEntry("dbt", "transformer", "Failure", "info"),
                 ],
             )
 
@@ -1155,9 +1156,9 @@ class TestCliEltScratchpadThree:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Extract & load skipped.\n", "info"),
-                    LogEntry("meltano", None, "Running transformation...\n", "info"),
-                    LogEntry("meltano", None, "Transformation complete!\n", "info"),
+                    LogEntry("meltano", None, "Extract & load skipped.", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
+                    LogEntry("meltano", None, "Transformation complete!", "info"),
                 ],
             )
 
@@ -1194,8 +1195,8 @@ class TestCliEltScratchpadThree:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
-                    LogEntry("meltano", None, "Extract & load skipped.\n", "info"),
-                    LogEntry("meltano", None, "Running transformation...\n", "info"),
-                    LogEntry("meltano", None, "Transformation complete!\n", "info"),
+                    LogEntry("meltano", None, "Extract & load skipped.", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
+                    LogEntry("meltano", None, "Transformation complete!", "info"),
                 ],
             )
