@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppress
+from typing import Optional
 
 import structlog
 from async_generator import asynccontextmanager
@@ -19,12 +20,15 @@ class OutputLogger:
 
         self.outs = {}
 
-    def out(self, name: str, logger=None) -> "Out":
+    def out(
+        self, name: str, logger=None, write_level: Optional[int] = logging.INFO
+    ) -> "Out":
         """Obtain an Out instance for use as a logger or use for output capture.
 
         Args:
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
+            write_level: log level passed to underlying logger.log calls.
 
         Returns:
             An Out instance that will log anything written in to a
@@ -37,6 +41,7 @@ class OutputLogger:
             self,
             name,
             logger=logger,
+            write_level=write_level,
             file=self.file,
         )
         self.outs[name] = out
@@ -74,6 +79,7 @@ class Out:  # noqa: WPS230
         output_logger: OutputLogger,
         name: str,
         logger: structlog.stdlib.BoundLogger,
+        write_level: int,
         file: str,
     ):
         """Log anything written in a stream.
@@ -82,11 +88,13 @@ class Out:  # noqa: WPS230
             output_logger: the OutputLogger to use.
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
+            write_level: log level passed to logger.log calls.
             file: file to associate with the FileHandler to log to.
         """
         self.output_logger = output_logger
         self.logger = logger
         self.name = name
+        self.write_level = write_level
         self.file = file
 
         self.last_line = ""
@@ -150,7 +158,7 @@ class Out:  # noqa: WPS230
     def writeline(self, line: str) -> None:
         """Write a line to the underlying structured logger, cleaning up any dangling control chars."""
         self.last_line = line
-        self.logger.info(line.rstrip(), name=self.name)
+        self.logger.log(self.write_level, line.rstrip(), name=self.name)
 
     async def _read_from_fd(self, read_fd):
         # Since we're redirecting our own stdout and stderr output,

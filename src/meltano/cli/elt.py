@@ -265,10 +265,10 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(run_id=str(elt_context.job.run_id), stdio="stdout")
         extractor_out = output_logger.out(
-            f"{extractor} (out)", stdout_log.bind(type="extractor")
+            f"{extractor} (out)", stdout_log.bind(type="extractor"), logging.DEBUG
         )
         loader_out = output_logger.out(
-            f"{loader} (out)", stdout_log.bind(type="loader")
+            f"{loader} (out)", stdout_log.bind(type="loader"), logging.DEBUG
         )
 
         extractor_out_writer = extractor_out.line_writer
@@ -312,7 +312,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 async def _run_transform(log, elt_context, output_logger, **kwargs):
 
     stderr_log = logger.bind(
-        job_id=str(elt_context.job.run_id),
+        run_id=str(elt_context.job.run_id),
         stdio="stderr",
         type="transformer",
     )

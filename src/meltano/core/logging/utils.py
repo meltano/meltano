@@ -35,63 +35,45 @@ def parse_log_level(log_level: Dict[str, int]) -> int:
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
 
 
-def _logging_config(
-    config_file: Optional[str] = None, override_log_level: Optional[str] = None
-) -> None:
+def read_config(config_file: Optional[str] = None) -> dict:
+    if config_file and os.path.exists(config_file):
+        with open(config_file) as cf:
+            return yaml.safe_load(cf.read())
+    else:
+        return None
+
+
+def default_config(override_log_level: Optional[str] = None) -> dict:
     log_level = DEFAULT_LEVEL.upper()
     if override_log_level:
         log_level = override_log_level.upper()
-
-    if config_file and os.path.exists(config_file):
-        with open(config_file) as cf:
-            config = yaml.safe_load(cf.read())
-            logging_config.dictConfig(config)
-            logging.debug(f"Loaded custom logging config. [{config_file}]")
-            return
-
-    logging_config.dictConfig(
-        {
-            "version": 1,
-            "disable_existing_loggers": False,
-            "formatters": {
-                "colored": {
-                    "()": structlog.stdlib.ProcessorFormatter,
-                    "processor": structlog.dev.ConsoleRenderer(colors=True),
-                    "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
-                },
+    config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "colored": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.dev.ConsoleRenderer(colors=True),
+                "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
             },
-            "handlers": {
-                "console": {
-                    "class": "logging.StreamHandler",
-                    "level": log_level,
-                    "formatter": "colored",
-                    "stream": "ext://sys.stderr",
-                },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": log_level,
+                "formatter": "colored",
+                "stream": "ext://sys.stderr",
             },
-            "loggers": {
-                "": {
-                    "handlers": ["console"],
-                    "level": log_level,
-                    "propagate": True,
-                },
+        },
+        "loggers": {
+            "": {
+                "handlers": ["console"],
+                "level": log_level,
+                "propagate": True,
             },
-        }
-    )
-    logging.debug("Loaded default logging config.")
-
-    structlog.configure(
-        processors=[
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            TIMESTAMPER,
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ],
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        wrapper_class=structlog.stdlib.BoundLogger,
-        cache_logger_on_first_use=True,
-    )
+        },
+    }
+    return config
 
 
 def setup_logging(project=None, log_level=DEFAULT_LEVEL):
@@ -111,7 +93,21 @@ def setup_logging(project=None, log_level=DEFAULT_LEVEL):
         log_config = settings_service.get("cli.log_config")
         log_level = settings_service.get("cli.log_level")
 
-    _logging_config(config_file=log_config, override_log_level=log_level)
+    config = read_config(log_config) or default_config(log_level)
+    logging_config.dictConfig(config)
+    structlog.configure(
+        processors=[
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            TIMESTAMPER,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
 
 
 def remove_ansi_escape_sequences(line):
