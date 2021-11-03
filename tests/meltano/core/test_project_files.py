@@ -24,6 +24,9 @@ class TestProjectFiles:
                     "interval": "@once",
                 }
             ],
+            "environments": [
+                {"name": "test-meltano-environment", "env": {"TEST": "TEST-MELTANO"}}
+            ],
         }
         assert project_files.include_paths == [
             (project_files.root / "subconfig_2.yml"),
@@ -71,6 +74,17 @@ class TestProjectFiles:
                     "loader": "target-subconfig-1-yml",
                     "transform": "skip",
                     "interval": "@once",
+                },
+            ],
+            "environments": [
+                {"name": "test-meltano-environment", "env": {"TEST": "TEST-MELTANO"}},
+                {
+                    "name": "test-subconfig-2-yml",
+                    "env": {"TEST": "TEST-SUBCONFIG-2-YML"},
+                },
+                {
+                    "name": "test-subconfig-1-yml",
+                    "env": {"TEST": "TEST-SUBCONFIG-1-YML"},
                 },
             ],
         }
@@ -128,6 +142,17 @@ class TestProjectFiles:
                     "loader": "target-subconfig-1-yml",
                     "name": "test-subconfig-1-yml",
                     "transform": "skip",
+                },
+            ],
+            "environments": [
+                {"name": "test-meltano-environment", "env": {"TEST": "TEST-MELTANO"}},
+                {
+                    "name": "test-subconfig-2-yml",
+                    "env": {"TEST": "TEST-SUBCONFIG-2-YML"},
+                },
+                {
+                    "name": "test-subconfig-1-yml",
+                    "env": {"TEST": "TEST-SUBCONFIG-1-YML"},
                 },
             ],
             "version": 2,

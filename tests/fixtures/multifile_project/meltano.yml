@@ -18,3 +18,8 @@ schedules:
     loader: target-meltano-yml
     transform: skip
     interval: '@once'
+
+environments:
+  - name: test-meltano-environment
+    env:
+      TEST: TEST-MELTANO

@@ -130,10 +130,15 @@ class ProjectFiles:  # noqa: WPS214
                 plugin_key = ("plugins", plugin_type, plugin["name"])
                 self._add_to_index(key=plugin_key, include_path=include_file_path)
         # index schedules
-        schedules = include_file_contents.get("schedules", {})
+        schedules = include_file_contents.get("schedules", [])
         for schedule in schedules:
             schedule_key = ("schedules", schedule["name"])
             self._add_to_index(key=schedule_key, include_path=include_file_path)
+        # index environments
+        environments = include_file_contents.get("environments", [])
+        for environment in environments:
+            environment_key = ("environments", environment["name"])
+            self._add_to_index(key=environment_key, include_path=include_file_path)
 
     def _load_included_files(self):
         """Read and index included files."""
@@ -168,6 +173,13 @@ class ProjectFiles:  # noqa: WPS214
         if schedule["name"] not in {scd["name"] for scd in schedules}:
             schedules.append(schedule)
 
+    @staticmethod
+    def _add_environment(file_dicts, file, environment):
+        file_dict = file_dicts.setdefault(file, {})
+        environments = file_dict.setdefault("environments", [])
+        if environment["name"] not in {env["name"] for env in environments}:
+            environments.append(environment)
+
     def _add_plugins(self, file_dicts, all_plugins):
         for plugin_type, plugins in all_plugins.items():
             plugin_type = str(plugin_type)
@@ -182,6 +194,12 @@ class ProjectFiles:  # noqa: WPS214
             file = self._plugin_file_map.get(key, str(self._meltano_file_path))
             self._add_schedule(file_dicts, file, schedule)
 
+    def _add_environments(self, file_dicts, environments):
+        for environment in environments:
+            key = ("environments", environment["name"])
+            file = self._plugin_file_map.get(key, str(self._meltano_file_path))
+            self._add_environment(file_dicts, file, environment)
+
     def _split_config_dict(self, config: dict):
         file_dicts = {}
         for key, value in config.items():
@@ -189,6 +207,8 @@ class ProjectFiles:  # noqa: WPS214
                 self._add_plugins(file_dicts, value)
             elif key == "schedules":
                 self._add_schedules(file_dicts, value)
+            elif key == "environments":
+                self._add_environments(file_dicts, value)
             else:
                 file = str(self._meltano_file_path)
                 file_dict = file_dicts.setdefault(file, {})

@@ -11,3 +11,8 @@ schedules:
     loader: target-subconfig-2-yml
     transform: skip
     interval: '@once'
+
+environments:
+  - name: test-subconfig-2-yml
+    env:
+      TEST: TEST-SUBCONFIG-2-YML
