@@ -34,8 +34,12 @@ except AttributeError:
 class NotFound(Exception):
     """Occurs when an element is not found."""
 
-    def __init__(self, name):
-        super().__init__(f"{name} was not found.")
+    def __init__(self, name, obj_type=None):
+        """Create a new exception."""
+        if obj_type is None:
+            super().__init__(f"{name} was not found.")
+        else:
+            super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
 def run_async(coro):

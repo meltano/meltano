@@ -27,7 +27,7 @@ Before you can get started with Meltano and the [`meltano` CLI](/docs/command-li
 
 ### Local installation
 
-If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6, 3.7 or 3.8 installed,
+If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6, 3.7, 3.8 or 3.9 installed,
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
 inside the directory that will hold your [Meltano projects](/docs/project.html).
 
@@ -188,13 +188,13 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
       plugins:
         extractors:
         - name: tap-gitlab
-          variant: meltano
-          pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+          variant: meltanolabs
+          pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
       ```
 
       You can now continue to step 4.
 
-    - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking [Singer's index of taps](https://www.singer.io/#taps) and/or doing a web search for `Singer tap <data source>`, e.g. `Singer tap COVID-19`.
+    - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking out [MeltanoHub for Singer](https://hub.meltano.com/singer/), which is the best place to find and explore existing Singer taps and targets.
 
 1. Depending on the result, pick your next step:
 
@@ -297,12 +297,16 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
 
 1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/docs/command-line-interface.html#config):
 
+      ::: tip
+      See [MeltanoHub for details](https://hub.meltano.com/extractors/gitlab#private-token) on how to get a GitLab `private_token` for tap-gitlab.
+      :::
+
     ```bash
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
-    meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+    meltano config tap-gitlab set projects "meltano/meltano meltano/sdk"
+    meltano config tap-gitlab set start_date 2021-10-01T00:00:00Z
     meltano config tap-gitlab set private_token my_private_token
     ```
 
@@ -312,10 +316,10 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     plugins:
       extractors:
       - name: tap-gitlab
-        variant: meltano
+        variant: meltanolabs
         config:
-          projects: meltano/meltano meltano/tap-gitlab
-          start_date: '2020-10-01T00:00:00Z'
+          projects: meltano/meltano meltano/sdk
+          start_date: '2021-10-01T00:00:00Z'
     ```
 
     Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
@@ -340,11 +344,11 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
       "api_url": "https://gitlab.com",
       "private_token": "my_private_token",
       "groups": "",
-      "projects": "meltano/meltano meltano/tap-gitlab",
+      "projects": "meltano/meltano meltano/sdk",
       "ultimate_license": false,
       "fetch_merge_request_commits": false,
       "fetch_pipelines_extended": false,
-      "start_date": "2020-10-01T00:00:00Z"
+      "start_date": "2021-10-01T00:00:00Z"
     }
     ```
 
@@ -407,12 +411,12 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
       extractors:
       - name: tap-gitlab
         select:
-        - tags.*
         - commits.id
         - commits.project_id
         - commits.created_at
         - commits.author_name
         - commits.message
+        - tags.*
         - '!*.*_url'
     ```
 
@@ -432,7 +436,9 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
 If the data source you'll be pulling data from is a database, like [PostgreSQL](https://hub.meltano.com/extractors/postgres.html) or [MongoDB](https://hub.meltano.com/extractors/mongodb.html), your extractor likely requires one final setup step:
 setting a [replication method](/docs/integration.html#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
 
-Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
+::: tip
+  Extractors for SaaS APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and [move on to setting up a loader](#add-a-loader-to-send-data-to-a-destination).
+:::
 
 Most database extractors, on the other hand, support two or more of the following replication methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](/docs/integration.html#setting-metadata) key:
 
@@ -533,21 +539,25 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
       ```bash
       meltano add loader <plugin name>
 
-      # For example:
-      meltano add loader target-postgres
-
-      # If you have a preference for a non-default variant, select it using `--variant`:
+      # For this example, we'll use the transferwise non-default
+      # variant, selected using `--variant`:
       meltano add loader target-postgres --variant=transferwise
+
+      # Or if you just want the default variant you can use this:
+      meltano add loader target-postgres
       ```
 
+      ::: tip
+        Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any issues while installing, refer to [MeltanoHub](https://hub.meltano.com/) for more help troubleshooting or join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink> to ask questions.
+      :::
       This will add the new plugin to your [`meltano.yml` project file](/docs/project.html#plugins):
 
       ```yml{3-5}
       plugins:
         loaders:
         - name: target-postgres
-          variant: datamill-co
-          pip_url: singer-target-postgres
+          variant: transferwise
+          pip_url: pipelinewise-target-postgres
       ```
 
       You can now continue to step 4.
@@ -657,11 +667,15 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     # For example:
     meltano config target-postgres set postgres_host localhost
     meltano config target-postgres set postgres_port 5432
-    meltano config target-postgres set postgres_username meltano
-    meltano config target-postgres set postgres_password meltano
-    meltano config target-postgres set postgres_database warehouse
-    meltano config target-postgres set postgres_schema public
+    meltano config target-postgres set user meltano
+    meltano config target-postgres set password meltano
+    meltano config target-postgres set dbname warehouse
+    meltano config target-postgres set default_target_schema public
     ```
+
+    ::: tip
+      You can turn on a local postgres docker instance with these configs using `docker run --name postgres -e POSTGRES_PASSWORD=meltano -e POSTGRES_USER=meltano -e POSTGRES_DB=warehouse -d -p 5432:5432 postgres`.
+    :::
 
     This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
 
@@ -697,12 +711,24 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
 
     ```json
     {
+      "host": "localhost",
+      "port": 5432,
+      "user": "meltano",
+      "password": "meltano",
+      "dbname": "warehouse",
+      "ssl": "false",
+      "default_target_schema": "public",
+      "batch_size_rows": 100000,
+      "flush_all_streams": false,
+      "parallelism": 0,
+      "parallelism_max": 16,
+      "add_metadata_columns": false,
+      "hard_delete": false,
+      "data_flattening_max_level": 0,
+      "primary_key_required": true,
+      "validate_records": false,
       "postgres_host": "localhost",
-      "postgres_port": 5432,
-      "postgres_username": "meltano",
-      "postgres_password": "meltano",
-      "postgres_database": "warehouse",
-      "postgres_schema": "public"
+      "postgres_port": 5432
     }
     ```
 
@@ -721,7 +747,7 @@ meltano elt <extractor> <loader> --job_id=<pipeline name>
 meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 ```
 
-If everything was configured correctly, you should now see your data flow from your source into your destination!
+If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
 
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/docs/command-line-interface.html#debugging) to get some more insight into what's going on behind the scenes.
 If that doesn't get you closer to a solution, learn how to [get help with your issue](/docs/getting-help.md).
@@ -831,6 +857,17 @@ will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-air
     # Add `-D` to run the scheduler in the background:
     meltano invoke airflow webserver -D
     ```
+  
+1. Create `melty` the Admin user for logging in.
+
+    ```bash
+    meltano invoke airflow users create --username melty \
+    --firstname melty \
+    --lastname meltano \
+    --role Admin \
+    --password melty \
+    --email melty@meltano.com
+    ```
 
     The web interface and DAG overview will be available at <http://localhost:8080>.
 
@@ -841,6 +878,100 @@ Once your raw data has arrived in your data warehouse, its schema will likely ne
 To help you realize this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
 
 To learn about data transformation, refer to the [Data Transformation (T) guide](/docs/transforms.html).
+
+1. To install the dbt transformer to your project run:
+
+    ```bash
+    meltano add transformer dbt
+    ```
+
+1. Once dbt has been installed in your Meltano project you will see the `/transform` directory populated with dbt artifacts.
+    These artifacts are installed via the [dbt file bundle](https://gitlab.com/meltano/files-dbt/).
+    For more about file bundles, refer to the [Plugin File bundles](https://meltano.com/docs/plugins.html#file-bundles).
+    
+    Now all you need to do is start writing your dbt models in the `/transform/models` directory.
+    This usually consists of a `source.yml` file defining the source tables you will be referencing inside your dbt models.
+    
+    For example the `/transform/models/tap_gitlab/source.yml` below configures dbt sources from the postgres tables where our tap-gitlab ELT job output to.
+
+    Create and navigate to the `/transform/models/tap_gitlab` directory to hold your dbt models:
+
+    ```bash
+    mkdir ./transform/models/tap_gitlab
+    touch  ./transform/models/tap_gitlab/source.yml
+    ```
+
+    Add the following content to your new `source.yml` file:
+
+    ```yaml
+    config-version: 2
+    version: 2
+    sources:
+      - name: tap_gitlab
+        schema: public
+        tables:
+          - name: commits
+          - name: tags
+    ```
+
+    The organization of your dbt project is up to you but if you'd like to run a specific set of models as part of a Meltano ELT pipeline it can be done via `meltano elt tap target --transform=run` which requires the model directory to match the extractor's name using snake_case (i.e. tap_gitlab) so it can automatically find your models. Running as part of a pipeline allows Meltano to simplify dbt configuration by inferring some of your settings based on the pipeline tap and target.
+    
+    See more in the [Data Transformation (T) guide - transform in your ELT pipeline](/docs/transforms.html#transform-in-your-elt-pipeline).
+
+1. Then add a model file with your SQL transformation logic.
+  For example the dbt model SQL below generates a table with new commits in the last 7 days `/transform/models/tap_gitlab/commits_last_7d.sql`.
+
+    Create your model file:
+
+    ```bash
+    touch  ./transform/models/tap_gitlab/commits_last_7d.sql
+    ```
+
+    Add the following content to your new `commits_last_7d.sql` file:
+
+    ```sql
+    {{
+      config(
+        materialized='table'
+      )
+    }}
+
+    select *
+    from {{ source('tap_gitlab', 'commits') }}
+    where created_at::date >= current_date - interval '7 days'
+
+    ```
+
+1. Run your dbt models, either using a pipeline transform:
+
+  ```bash
+  meltano elt <extractor> <loader>  --transform=run --job_id=<pipeline name>
+
+  # For example:
+  meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+  ```
+
+  Or directly using the `meltano invoke`, which requires more settings to be defined prior to running:
+
+  ```bash
+  meltano invoke dbt:<command>
+
+  # For example:
+  export DBT_TARGET="postgres"
+  export PG_ADDRESS="localhost"
+  export PG_PORT="5432"
+  export PG_USERNAME="meltano"
+  export PG_PASSWORD="meltano"
+  export PG_DATABASE="warehouse"
+  export DBT_SOURCE_SCHEMA="public"
+  meltano invoke dbt:run
+  ```
+
+  For this example we just used environment variables to set the dbt configurations but they can be defined as settings in your meltano.yml using `meltano config dbt set <setting> <setting_value>`.
+
+  After your transform run is complete you should see a new table named after your model `warehouse.analytics.commits_last_7d` in your target.
+
+  See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) from other supported dbt commands like `dbt:test`, `dbt:seed`, `dbt:snapshot` and selection criteria like `dbt:run --models tap_gitlab.*`.
 
 ### Containerize your project
 

@@ -8,7 +8,7 @@ const docsSidebar = [
     title: "Concepts",
     collapsable: false,
     sidebarDepth: 2,
-    children: ["/docs/project", "/docs/plugins"],
+    children: ["/docs/project", "/docs/plugins", "/docs/environments"],
   },
   {
     title: "Guide",
@@ -47,7 +47,7 @@ const docsSidebar = [
       "/docs/community",
       "/docs/contributor-guide",
       "/docs/responsible-disclosure",
-      "/handbook/",
+      ["https://handbook.meltano.com/", "Company Handbook"],
     ],
   },
 ];
@@ -170,7 +170,7 @@ module.exports = {
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join 1600+ on Slack",
+        text: "Join 1800+ on Slack",
         link:
           "https://meltano.com/slack",
         icon: "SlackIcon",
@@ -199,14 +199,6 @@ module.exports = {
     sidebar: {
       "/docs": docsSidebar,
       "/tutorials": docsSidebar,
-      "/handbook": [
-        "/handbook/",
-        "/handbook/engineering/",
-        "/handbook/marketing/",
-        "/handbook/product/",
-        "/handbook/tech-stack/",
-        "/handbook/resources/",
-      ],
     },
     logo: "/meltano-logo-with-text.svg",
     lastUpdated: "Last Updated",

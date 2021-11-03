@@ -1,41 +1,41 @@
 <script>
 export default {
-    name: 'LogoList',
+    name: 'LogoListArchive',
     data() {
         return {
             logos: [
                 {
-                    url: '/Meltano-Melty-logo-stacked.svg',
-                    alt: 'Meltano Logo (Purple)',
-                    label: 'Meltano Logo (Purple)',
+                    url: '/meltano-logo.svg',
+                    alt: 'Meltano Logo (Color)',
+                    label: 'Meltano Logo'
                 },
                 {
-                    url: '/Meltano-Melty-logo-stacked-black.svg',
+                    url: '/meltano-logo-black.svg',
                     alt: 'Meltano Logo (Black)',
-                    label: 'Meltano Logo (Black)',
+                    label: 'Meltano Logo (Black)'
                 },
                 {
-                    url: '/Meltano-Melty-logo-stacked-white.svg',
+                    url: '/meltano-logo-white.svg',
                     alt: 'Meltano Logo (White)',
                     label: 'Meltano Logo (White)',
-                    theme: 'dark',
+                    theme: 'dark'
                 },
                 {
-                    url: '/Meltano-Melty-logo.svg',
-                    alt: 'Meltano Logo (Purple)',
-                    label: 'Meltano Logo with Text (Purple)',
+                    url: '/meltano-logo-with-text.svg',
+                    alt: 'Meltano Logo with Text',
+                    label: 'Meltano Logo with Text',
                 },
                 {
-                    url: '/Meltano-Melty-logo-black.svg',
-                    alt: 'Meltano Logo (Black)',
+                    url: '/meltano-logo-with-text-black.svg',
+                    alt: 'Meltano Logo with Text (Black)',
                     label: 'Meltano Logo with Text (Black)',
                 },
                 {
-                    url: '/Meltano-Melty-logo-white.svg',
-                    alt: 'Meltano Logo (White)',
+                    url: '/meltano-logo-with-text-white.svg',
+                    alt: 'Meltano Logo with Text (White)',
                     label: 'Meltano Logo with Text (White)',
-                    theme: 'dark',
-                },
+                    theme: 'dark'
+                }
             ]
         }
     }

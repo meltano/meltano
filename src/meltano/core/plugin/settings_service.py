@@ -1,4 +1,6 @@
-from typing import Dict, Iterable, List
+"""Settings manager for Meltano plugins."""
+
+from typing import Any, Dict
 
 from meltano.core.plugin import BasePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -41,6 +43,14 @@ class PluginSettingsService(SettingsService):
         }
 
         self._inherited_settings_service = None
+        if self.project.active_environment:
+            environment = self.project.active_environment
+            self.environment_plugin_config = environment.get_plugin_config(
+                self.plugin.type,
+                self.plugin.name,
+            )
+        else:
+            self.environment_plugin_config = None
 
     @property
     def label(self):
@@ -72,10 +82,22 @@ class PluginSettingsService(SettingsService):
         """Return current configuration in `meltano.yml`."""
         return self.plugin.config_with_extras
 
+    @property
+    def environment_config(self):
+        """Return current environment configuration in `meltano.yml`."""
+        if self.environment_plugin_config:
+            return self.environment_plugin_config.config_with_extras
+        return {}
+
     def update_meltano_yml_config(self, config_with_extras):
         """Update configuration in `meltano.yml`."""
         self.plugin.config_with_extras = config_with_extras
         self.plugins_service.update_plugin(self.plugin)
+
+    def update_meltano_environment_config(self, config_with_extras: Dict[str, Any]):
+        """Update environment configuration in `meltano.yml`."""
+        self.environment_plugin_config.config_with_extras = config_with_extras
+        self.plugins_service.update_environment_plugin(self.environment_plugin_config)
 
     @property
     def inherited_settings_service(self):

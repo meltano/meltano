@@ -11,7 +11,7 @@
             class="nav-link action-button"
           >
             <img
-              src="/meltano-logo-white.svg"
+              src="/melty-icon-white.png"
               width="25"
               height="25"
               style="vertical-align: text-bottom;"
@@ -20,7 +20,7 @@
           </router-link>
 
           <SlackChannelLink class="action-button secondary">
-            <SlackIcon /> Join 1600+ on Slack
+            <SlackIcon /> Join 1800+ on Slack
           </SlackChannelLink>
 
           <a

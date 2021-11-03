@@ -12,14 +12,81 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.86.0 - (2021-10-28)
+---
+
+### New
+
+- [#2869](https://gitlab.com/meltano/meltano/-/issues/2869) Introduce top-level "Environments" within `meltano.yml`
+
+
+### Changes
+
+- [#2968](https://gitlab.com/meltano/meltano/-/issues/2968) Set `singer-io` as the default tap-marketo extractor.
+- [#2970](https://gitlab.com/meltano/meltano/-/issues/2970) Set `singer-io` as the default tap-stripe extractor.
+- [#2971](https://gitlab.com/meltano/meltano/-/issues/2971) Set `meltanolabs` as the default target-sqlite loader.
+
+### Fixes
+
+- [#3027](https://gitlab.com/meltano/meltano/-/issues/3027) Fixes an issue where elt invocation could hang if the tap produced large amounts of error output during discovery.
+
+
+## 1.85.0 - (2021-10-21)
+---
+
+### Changes
+
+- [#2986](https://gitlab.com/meltano/meltano/-/issues/2986) Set `transferwise` as the default target-snowflake loader.
+- [#2966](https://gitlab.com/meltano/meltano/-/issues/2966) Set `singer-io` as the default tap-adwords extractor.
+- [#2964](https://gitlab.com/meltano/meltano/-/issues/2964) Set `singer-io` as the default tap-facebook extractor.
+- [#2963](https://gitlab.com/meltano/meltano/-/issues/2963) Set `meltanolabs` as the default tap-csv extractor.
+- [#2965](https://gitlab.com/meltano/meltano/-/issues/2965) Set `meltanolabs` as the default tap-gitlab extractor.
+- [2339](https://gitlab.com/meltano/meltano/-/merge_requests/2339) Update `elt` log format to include subtask field. Lines are now prefixed with `<name> | <subtask>` which may cause issues with existing log parsers.
+
+
+### Fixes
+
+- [#2997](https://gitlab.com/meltano/meltano/-/issues/2997) Bump required version of `jsonschema`.
+
+
+## 1.84.0 - (2021-10-07)
+---
+
+### New
+
+- [#2357](https://gitlab.com/meltano/meltano/-/merge_requests/2357) Use dbt [`v0.21.0`](https://github.com/dbt-labs/dbt/releases/tag/v0.21.0) by default for new dbt installs
+- [2363](https://gitlab.com/meltano/meltano/-/merge_requests/2363), [2360](https://gitlab.com/meltano/meltano/-/merge_requests/2360) Small branding and logo updates throughout - and introducing Melty to the community!
+
+
+### Fixes
+
+- [2349](https://gitlab.com/meltano/meltano/-/merge_requests/2349) Fixes test extractor API endpoint to work with new PluginTestService. _Thanks, **[ReubenFrankel](https://gitlab.com/ReubenFrankel)**!_
+
+
+## 1.83.0 - (2021-09-30)
+---
+
+### New
+
+- [#2647](https://gitlab.com/meltano/meltano/-/issues/2647) Extend `meltano select` with flag to remove rules.
+
+
+## 1.82.0 - (2021-09-23)
+---
+
+### Changes
+
 - [#2782](https://gitlab.com/meltano/meltano/-/issues/2782) Switches all extractors and loaders in discovery.yml to `variants` syntax
+- [#2950](https://gitlab.com/meltano/meltano/-/issues/2950) Update werkzeug to `2.0`. _Thanks, **[Keith Siilats](https://gitlab.com/siilats)**!_
 
 ### Fixes
 
 - [#2881](https://gitlab.com/meltano/meltano/-/issues/2881) Send CLI error messages to `stderr`.
-
-### Breaks
-
 
 ## 1.81.0 - (2021-09-16)
 ---

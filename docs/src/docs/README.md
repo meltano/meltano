@@ -78,19 +78,34 @@ members:
 openings:
 - title: Head of Partnerships
   location: Anywhere, Remote 🌍
-  description: "Build and nourish relationships with data consultancies, open source data tools Meltano can integrate with, and connector maintainers including SaaS vendors"
   description_url: https://boards.greenhouse.io/meltano/jobs/4088646004
 - title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
-  description: "Identify and deliver strategies and programs to improve the community experience and build engagement"
   description_url: https://boards.greenhouse.io/meltano/jobs/4075560004
-- title: Senior Frontend Engineer & UI/UX Designer
+- title: Content Marketing Manager
   location: Anywhere, Remote 🌍
-  description: "Nice to have: Vue.js experience"
-  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
+  description_url: https://boards.greenhouse.io/meltano/jobs/4144713004
+- title: DataOps Evangelist
+  location: Anywhere, Remote 🌍
+  description_url: https://boards.greenhouse.io/meltano/jobs/4148045004
 - title: Senior Backend Engineer
   location: Anywhere, Remote 🌍
-  description: "Required: Python & data experience"
+  description_url: https://boards.greenhouse.io/meltano/jobs/4117149004
+- title: Senior Backend Engineer
+  location: Anywhere, Remote 🌍
+  description_url: https://boards.greenhouse.io/meltano/jobs/4117149004
+- title: Backend Engineer
+  location: Anywhere, Remote 🌍
+  description_url: https://boards.greenhouse.io/meltano/jobs/4148049004
+- title: Backend Engineer
+  location: Anywhere, Remote 🌍
+  description_url: https://boards.greenhouse.io/meltano/jobs/4148049004
+- title: Senior Frontend Engineer
+  location: Anywhere, Remote 🌍
+  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
+- title: Senior UI/UX Designer
+  location: Anywhere, Remote 🌍
+  description_url: https://boards.greenhouse.io/meltano/jobs/4147449004
 ---
 
 # Introduction
@@ -108,24 +123,11 @@ To find guides and references on other topics, use the Table of Contents in the 
 
 ## Mission
 
-Our mission is to enable every organization to make the
-best decisions possible by becoming data-informed.
+Our mission is to enable everyone to realize the full potential of their data.
 
-To achieve this mission we are building an **open source platform for the complete DataOps lifecycle**
-that is optimized for the happiness and productivity of Data Teams and Data Professionals.
-It integrates best-in-class [open source components](/docs/plugins.html) and
-enables teams to collaborate on data projects and pipelines more efficiently and with higher confidence.
+Our vision is for Meltano to become the foundation of every team's ideal data stack.
 
-Our focus has been on bringing these qualities to the first step in any data journey:
-integration and transformation, aka EL(T): [Extract, Load, Transform](https://en.wikipedia.org/wiki/Extract,_load,_transform),
-where traditional solutions are either off-the-shelf and near-impossible to extend, tweak, and debug,
-or fully custom and a pain to maintain.
-
-We believe that [data integration is ripe for commoditization](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/),
-and are building towards a future in which fast and reliable **open source connectors
-for every data source and destination** in the world will be freely available,
-collectively maintained by a community of data engineers in consulting and at in-house data teams,
-and by API vendors themselves, just like we see with API client libraries today.
+Our CEO, Douwe Maan, wrote a detailed post about why we believe in this mission and vision [here](https://meltano.com/blog/meltano-the-strategic-foundation-of-the-ideal-data-stack/).
 
 ### Embracing Singer
 
@@ -155,19 +157,21 @@ developers to build **connectors with all the bells and whistles** without havin
 This further lowers the barrier to creating new connectors and contributing to existing ones,
 and will lead to increased reliability and consistency.
 
+We've also [launched](https://meltano.com/blog/launching-meltanolabs-your-home-for-singer-connectors-dbt-packages-and-all-meltano-plugins/) [MeltanoLabs](https://github.com/MeltanoLabs) which is the best place for the community to collaboratively support open source connectors. 
+
 We've also [created an interpretation of the Singer specification](https://hub.meltano.com/singer/spec)
 that aims to be clearer for newcomers to the project. We believe the spec is great in its current version, but
 confusing documentation has made it challenging for some to onboard to the community.
 
-Last but not least, we intend to **[**unlock the evolution**](https://gitlab.com/groups/meltano/-/epics/88) of the
-[**Singer spec**](https://hub.meltano.com/singer/spec)** through
-a framework for the proposal and consideration of optional extensions to the spec
+Last but not least, we're also **[**unlocking the evolution**](https://gitlab.com/groups/meltano/-/epics/88) of the
+[**Singer spec**](https://hub.meltano.com/singer/spec)** through the [Singer Working Group](https://meltano.com/blog/2021/10/13/announcing-the-singer-working-group-the-future-of-singer-is-bright/).
+This is a framework built with the community for the proposal and consideration of optional extensions to the spec
 that compatible tools, including the SDK and Meltano, can choose to support,
 while maintaining compatibility between all taps and targets.
 
 ## Focus
 
-As described above, our vision for ELT in the DataOps era involves
+Our vision for ELT in the DataOps era involves
 a decentralized ecosystem of open source connectors and
 a community of data engineers maintaining and contributing to these projects.
 
@@ -226,43 +230,39 @@ Our focus for the rest of the year is going to mainly be in two categories:
 
 These efforts are the foundation of our larger vision to enable a full DataOps platform.
 
-#### September 2021
-
-* Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
-* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2725)
-* MeltanoHub as SSOT for Meltano - [Epic](https://gitlab.com/groups/meltano/-/epics/102)
-* Easy deployment of Meltano for local development - [Epic](https://gitlab.com/groups/meltano/-/epics/124) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2927)
-* Decentralized Management of MeltanoHub Connectors - [Epic](https://gitlab.com/groups/meltano/-/epics/105) & [Issue](https://gitlab.com/meltano/meta/-/issues/73)
-
-### October 2021
-
-* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116)
-  * Stream Maps [Issue](https://gitlab.com/meltano/meltano/-/issues/2300)
-  * `meltano run` [Issue](https://gitlab.com/meltano/meltano/-/issues/2301)
-* Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/124)
-* Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
-* Native Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
 
 ### November 2021
 
-* Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
-* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
-* Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
+* Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116)
+  * `meltano run` [Issue](https://gitlab.com/meltano/meltano/-/issues/2301)
+  * Stream Maps [Issue](https://gitlab.com/meltano/meltano/-/issues/2300)
+* Structured Logging [Issue](https://gitlab.com/meltano/meltano/-/issues/2772)
+* Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/124)
+* Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
+* Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
 
 ### December 2021
 
+* Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
 * Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
-* Monitoring, observability, and data lineage - [Epic](https://gitlab.com/groups/meltano/-/epics/93)
+* Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
+* Add support for OpenMetadata observability - [Epic](https://gitlab.com/groups/meltano/-/epics/93) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2805)
+* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
 * Add Dagster as an Orchestrator - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
 
 
-#### 2022-H1
+### January 2022
+
+* Add Pluggable Log / Metadata Shipping for Observability Enhancement - [Issue](https://gitlab.com/meltano/meltano/-/issues/3008) & [Epic](https://gitlab.com/groups/meltano/-/epics/93)
+* Support Secrets Backends Natively -[Issue](https://gitlab.com/meltano/meltano/-/issues/2918)
+* UI Improvements and Parity - [Issue](https://gitlab.com/groups/meltano/-/epics/78)
+
+### 2022-H1
 
 Next year will be continuing to make Meltano the best data integration tool on the market and Singer the best open source ecosystem.
 With this great foundation in place, we'll continue to invest in making Meltano the best DataOps platform on the market.
-This means focusing more on the user interface and on sell Meltano to paying customers.
+This means focusing more on the user interface and on adding features that enable our DataOps vision.
 
-* [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
 * [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 * [Initial conversion of MeltanoHub to dynamic site](https://gitlab.com/groups/meltano/-/epics/101)
@@ -301,20 +301,25 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 ## Values
 
-Meltano's core values are community, empathy, sustainability, accountability, transparency, and iteration.
+Meltano's core values are empathy, community, sustainability, transparency, iteration, ambition, and accountability.
+
+We view our values as supporting each other.
+We build a strong foundation by bringing **empathy** to everything we do so that we can build with the **community** in a **sustainable** manner for years to come.
+With this foundation, we work **transparently** and **iteratively** to achieve our goals.
+Our goals are **ambitious** and we hold ourselves and each other **accountable** for our results.
 
 Our values act as a guide in how we conduct day-to-day business, make decisions, hire, and build our product. While we use these values as our compass, we adjust them based on lessons we've learned and our experiences using them in practice. Anyone can suggest improvements to our values - from team members to internet friends - and we're always open to growing and learning.
+
+### Empathy
+
+We work with empathy, recognizing we're not alone in this journey.
+We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
 
 ### Community
 
 We work to build a more diverse and inclusive community by hiring globally and creating a culture that supports team members everywhere.
 We want to enable everyone to contribute - from team members to users - and we recognize that our vibrant community is at the core of Meltano.
 We will always keep the interests of our open source users and contributors in mind as we continue to grow.
-
-### Empathy
-
-We work with empathy, recognizing we're not alone in this journey.
-We bring kindness, humility, trust, honesty, and an assumption of good faith to all of our interactions.
 
 ### Sustainability
 
@@ -324,12 +329,6 @@ We do this by putting family and friends first, by being wise with resources, an
 Sustainability plays a role in all aspects of our business - from hiring and developing to selecting swag options.
 We should strive to be a net positive company that makes net positive actions.
 Every change should be towards making "the thing" a little bit better than the one that came before.
-
-### Accountability
-
-We have a responsibility to ourselves, our teammates, and our community to do our best.
-We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions.
-We're accountable for our mistakes, but we focus on learning from them and move forward together.
 
 ### Transparency
 
@@ -344,6 +343,25 @@ We strive to provide users with the same level of insight as our team members so
 We work in small iterations so that we can be efficient, add value quickly, and get feedback from the community.
 We have a bias for action and aim to continually improve our product and processes, and we believe small, positive steps are the best way to achieve large goals.
 In practice, we ship minimum viable changes, and we continually seek to improve ourselves.
+
+### Ambition 
+
+We have high aspirations and the drive to exceed them. 
+We want to collaborate with those who are inspired and motivated by our mission. 
+We’re determined to realize our goals and achieve strong results in everything we set out to accomplish. 
+To us, ambition means:
+* Resilience in the face of setbacks 
+* Continual learning
+* A strong sense of purpose and priorities 
+* Passion 
+* Perseverance 
+* Calculated risk taking
+
+### Accountability
+
+We have a responsibility to ourselves, our teammates, and our community to do our best.
+We hold ourselves and each other to high standards, and we're responsible for our work, words, and actions.
+We're accountable for our mistakes, but we focus on learning from them and move forward together.
 
 ## Careers <a name="job-openings" />
 

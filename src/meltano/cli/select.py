@@ -2,6 +2,7 @@ import fnmatch
 import json
 import logging
 import os
+from typing import Dict
 
 import click
 from meltano.core.db import project_engine
@@ -46,21 +47,29 @@ def selection_mark(selection):
 @click.argument("attributes_filter", default="*")
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
+@click.option("--rm", "--remove", "remove", is_flag=True)
 @click.option("--exclude", is_flag=True)
 @pass_project(migrate=True)
 @click_run_async
-async def select(project, extractor, entities_filter, attributes_filter, **flags):
+async def select(
+    project,
+    extractor,
+    entities_filter,
+    attributes_filter,
+    **flags: Dict[str, bool],
+):
     """Execute the meltano select command."""
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])
         else:
-            add(
+            update(
                 project,
                 extractor,
                 entities_filter,
                 attributes_filter,
                 exclude=flags["exclude"],
+                remove=flags["remove"],
             )
 
         tracker = GoogleAnalyticsTracker(project)
@@ -74,9 +83,12 @@ async def select(project, extractor, entities_filter, attributes_filter, **flags
         raise CliError(f"Cannot list the selected attributes: {err}") from err
 
 
-def add(project, extractor, entities_filter, attributes_filter, exclude=False):
+def update(
+    project, extractor, entities_filter, attributes_filter, exclude=False, remove=False
+):
+    """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
-    select_service.select(entities_filter, attributes_filter, exclude)
+    select_service.update(entities_filter, attributes_filter, exclude, remove)
 
 
 async def show(project, extractor, show_all=False):

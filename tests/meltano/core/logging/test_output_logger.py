@@ -31,6 +31,7 @@ class TestOutputLogger:
         writer_out = subject.out("writer")
         line_writer_out = subject.out("lwriter")
         basic_out = subject.out("basic")
+        subtask_out = subject.out("basic", subtask_name="subtask")
 
         async with stdout_out.redirect_stdout():
             sys.stdout.write("STD")
@@ -59,25 +60,28 @@ class TestOutputLogger:
         basic_out.writeline("LINE\n")
         basic_out.writeline("LINE 2\n")
 
+        subtask_out.writeline("LINE\n")
+
         # read from the beginning
         log.seek(0)
         log_content = log.read()
 
         assert_lines(
             log_content,
-            "stdout  | STDOUT\n",
-            "stdout  | STDOUT 2\n",
-            "stderr  | STDERR\n",
-            "stderr  | STDERR 2\n",
-            "logging | INFO info\n",
-            "logging | WARNING warning\n",
-            "logging | ERROR error\n",
-            "writer  | WRITER\n",
-            "writer  | WRITER 2\n",
-            "lwriter | LINE\n",
-            "lwriter | LINE 2\n",
-            "basic   | LINE\n",
-            "basic   | LINE 2\n",
+            "stdout  | main    | STDOUT\n",
+            "stdout  | main    | STDOUT 2\n",
+            "stderr  | main    | STDERR\n",
+            "stderr  | main    | STDERR 2\n",
+            "logging | main    | INFO info\n",
+            "logging | main    | WARNING warning\n",
+            "logging | main    | ERROR error\n",
+            "writer  | main    | WRITER\n",
+            "writer  | main    | WRITER 2\n",
+            "lwriter | main    | LINE\n",
+            "lwriter | main    | LINE 2\n",
+            "basic   | main    | LINE\n",
+            "basic   | main    | LINE 2\n",
+            "basic   | subtask | LINE\n",
         )
 
     def test_logging_exception(self, log, subject):
@@ -98,4 +102,4 @@ class TestOutputLogger:
         log_content = log.read()
 
         # make sure the exception is logged
-        assert "logging | ERROR exception" in log_content
+        assert "logging | main   | ERROR exception" in log_content

@@ -2,7 +2,9 @@ import json
 import logging
 
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
@@ -26,20 +28,25 @@ class SelectService:
         )
 
     @property
-    def extractor(self):
+    def extractor(self) -> ProjectPlugin:
+        """Retrieve extractor ProjectPlugin object."""
         return self._extractor
 
     @property
     def current_select(self):
         plugin_settings_service = PluginSettingsService(
-            self.project, self.extractor, plugins_service=self.plugins_service
+            self.project,
+            self.extractor,
+            plugins_service=self.plugins_service,
         )
         return plugin_settings_service.get("_select")
 
     async def load_catalog(self, session):
         """Load the catalog."""
         invoker = invoker_factory(
-            self.project, self.extractor, plugins_service=self.plugins_service
+            self.project,
+            self.extractor,
+            plugins_service=self.plugins_service,
         )
 
         async with invoker.prepared(session):
@@ -61,14 +68,34 @@ class SelectService:
 
         return list_all
 
-    def select(self, entities_filter, attributes_filter, exclude=False):
+    def update(self, entities_filter, attributes_filter, exclude, remove=False):
+        """Update plugins' select patterns."""
+        plugin: PluginRef
+
+        if self.project.active_environment is None:
+            plugin = self.extractor
+        else:
+            plugin = self.project.active_environment.get_plugin_config(
+                self.extractor.type, self.extractor.name
+            )
+
+        this_pattern = self._get_pattern_string(
+            entities_filter, attributes_filter, exclude
+        )
+        patterns = plugin.extras.get("select", [])
+        if remove:
+            patterns.remove(this_pattern)
+        else:
+            patterns.append(this_pattern)
+        plugin.extras["select"] = patterns
+
+        if self.project.active_environment is None:
+            self.plugins_service.update_plugin(plugin)
+        else:
+            self.plugins_service.update_environment_plugin(plugin)
+
+    @staticmethod
+    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:
+        """Return a select pattern in string form."""
         exclude = "!" if exclude else ""
-        pattern = f"{exclude}{entities_filter}.{attributes_filter}"
-
-        plugin = self.extractor
-
-        select = plugin.extras.get("select", [])
-        select.append(pattern)
-        plugin.extras["select"] = select
-
-        self.plugins_service.update_plugin(plugin)
+        return f"{exclude}{entities_filter}.{attributes_filter}"

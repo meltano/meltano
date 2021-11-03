@@ -20,7 +20,7 @@ We welcome contributions to the project! Please review our [Contributor Guide](/
 
 ## Demo Days
 
-We have Demo Days every other week on Friday at 9 AM Pacific (16:00 UTC). Join us on Zoom to share and hear updates from community members and the Meltano team about how they've been using Meltano. We also have the #demo-day Slack channel for planning and discussion.
+We have Demo Days **every other week on Thursday at 9 AM Pacific** (16:00 UTC). Join us on Zoom to share and hear updates from community members and the Meltano team about how they've been using Meltano. We also have the #demo-day Slack channel for planning and discussion.
 
 Use [this link][gcal] to view the full events calendar. View past Demo Days in our [YouTube Playlist][demodayplaylist].
 
