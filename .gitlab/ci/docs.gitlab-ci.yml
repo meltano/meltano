@@ -24,6 +24,7 @@ docs:
     - yarn build:docs
     - $REMOTE_EXEC "mkdir -p $SSH_BACKUP_DIRECTORY; tar zcvf $SSH_BACKUP_DIRECTORY-$(date +%Y-%m-%dT%H:%M).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY"
     - $REMOTE_EXEC "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
+    - $REMOTE_EXEC "find $SSH_BACKUP_DIRECTORY -name '*.tar.gz' -mtime +14 -delete"
     - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/* $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
     - scp -o stricthostkeychecking=no -P$SSH_PORT public/.htaccess $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
   only:
