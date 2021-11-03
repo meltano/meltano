@@ -47,6 +47,12 @@ environments:
           batch_size_rows: 1000
 ```
 
+## Inheritance
+
+Environments are most powerful when [inheriting](/docs/plugins.html#plugin-inheritance) from a base plugin definition. 
+Configuration that is set in an environment can be used to add or override configuration set in the base plugin configuration. 
+This enables reuse of configuration common to multiple environments while making it easy to switch configuratino for a specific environment. 
+
 ## Activation
 
 To use an environment, you can pass the option `--environment=<ENV>` to the CLI command, or set the `MELTANO_ENVIRONMENT=<ENV>` variable.
