@@ -118,7 +118,9 @@ class ProjectFiles:  # noqa: WPS214
         else:
             self._plugin_file_map.update({key: str(include_path)})
 
-    def _index_file(self, include_file_path: Path, include_file_contents: dict) -> None:
+    def _index_file(  # noqa: WPS210
+        self, include_file_path: Path, include_file_contents: dict
+    ) -> None:
         """Populate map of plugins/schedules to their respective files.
 
         This allows us to know exactly which plugin is configured where when we come to update plugins.
