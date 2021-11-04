@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+[#3042](https://gitlab.com/meltano/meltano/-/issues/3042) Hides non-default `meltano` variants from the UI.
+
 ### Fixes
 
 ### Breaks
