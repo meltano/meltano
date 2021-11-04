@@ -365,10 +365,9 @@ We're accountable for our mistakes, but we focus on learning from them and move 
 
 ## Careers <a name="job-openings" />
 
-The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! 
 
-If our [mission](#mission) excites you, and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
-Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
+If our [mission](#mission) excites you, and you think could make a difference, we'd love to talk to you. Apply directly through the [job openings](https://boards.greenhouse.io/meltano) below!
 
 <TeamGrid :openings="$frontmatter.openings" />
 
