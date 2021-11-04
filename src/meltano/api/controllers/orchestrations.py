@@ -455,12 +455,13 @@ def save_pipeline_schedule() -> Response:
     loader = payload["loader"]
     transform = payload["transform"]
     interval = payload["interval"]
+    env = payload.get("env", {})
 
     project = Project.find()
     schedule_service = ScheduleService(project)
 
     schedule = schedule_service.add(
-        db.session, slug, extractor, loader, transform, interval
+        db.session, slug, extractor, loader, transform, interval, **env
     )
 
     schedule = dict(schedule)
