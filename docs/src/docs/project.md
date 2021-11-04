@@ -247,6 +247,23 @@ schedules:
 
 To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/docs/orchestration.html).
 
+### Multiple YAML Files
+
+As your project grows, and your `meltano.yml` with it, you may wish to break your config into multiple `.yml` files and to store those subfiles in various places in your Project folder hierachy.
+
+This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](https://en.wikipedia.org/wiki/Glob_(programming))) to the `include_paths` key of your `meltano.yml`:
+
+```yaml
+include_paths:
+  - './subconfig_[0-9].yml'
+  - './*/subconfig_[0-9].yml'
+  - './*/**/subconfig_[0-9].yml'
+```
+
+Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://gitlab.com/meltano/meltano/-/issues/2985)).
+
+Currently supported elements in subfiles are [plugins](/docs/projects.html#plugins), [schedules](/docs/projects.html#plugins) and [environments](/docs/environments.html).
+
 ## `.gitignore`
 
 A newly initialized project comes with a [`.gitignore` file](https://git-scm.com/docs/gitignore) to ensure that
