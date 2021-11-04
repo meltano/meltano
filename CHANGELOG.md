@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2456](https://gitlab.com/meltano/meltano/-/issues/2456) Let project plugin definitions and config be defined in multiple individual YAML files.
+
 ### Fixes
 
 ### Breaks
