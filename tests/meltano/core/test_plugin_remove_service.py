@@ -45,9 +45,8 @@ class TestPluginRemoveService:
         target_csv_installation = subject.project.meltano_dir().joinpath(
             "loaders", "target-csv"
         )
-
-        os.makedirs(tap_gitlab_installation)
-        os.makedirs(target_csv_installation)
+        os.makedirs(tap_gitlab_installation, exist_ok=True)
+        os.makedirs(target_csv_installation, exist_ok=True)
 
     def test_default_init_should_not_fail(self, subject):
         assert subject

@@ -4,14 +4,10 @@ import os
 import sys
 import threading
 from contextlib import contextmanager
-from copy import deepcopy
-from functools import wraps
 from pathlib import Path
 from typing import Optional, Union
 
 import fasteners
-import yaml
-from atomicwrites import atomic_write
 from dotenv import dotenv_values
 from meltano.core.environment import Environment
 from meltano.core.plugin.base import PluginRef
@@ -20,6 +16,7 @@ from werkzeug.utils import secure_filename
 from .behavior.versioned import Versioned
 from .error import Error
 from .meltano_file import MeltanoFile
+from .project_files import ProjectFiles
 from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
@@ -67,9 +64,8 @@ class Project(Versioned):
 
     def __init__(self, root: Union[Path, str]):
         self.root = Path(root).resolve()
-
         self.readonly = False
-
+        self._project_files = None
         self.__meltano_ip_lock = None
 
         self.active_environment: Optional[Environment] = None
@@ -161,13 +157,19 @@ class Project(Versioned):
         return project
 
     @property
+    def project_files(self):
+        """Return a singleton ProjectFiles file manager instance."""
+        if self._project_files is None:
+            self._project_files = ProjectFiles(
+                root=self.root, meltano_file_path=self.meltanofile
+            )
+        return self._project_files
+
+    @property
     def meltano(self) -> MeltanoFile:
         """Return a copy of the current meltano config"""
-        # fmt: off
-        with self._meltano_rw_lock.read_lock(), \
-             self.meltanofile.open() as meltanofile:
-            return MeltanoFile.parse(yaml.safe_load(meltanofile))
-        # fmt: on
+        with self._meltano_rw_lock.read_lock():
+            return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
     def meltano_update(self):
@@ -183,16 +185,12 @@ class Project(Versioned):
         with self._meltano_rw_lock.write_lock(), \
             self._meltano_ip_lock:
 
-            with self.meltanofile.open() as meltanofile:
-                # read the latest version
-                meltano_update = MeltanoFile.parse(yaml.safe_load(meltanofile))
+            meltano_config = MeltanoFile.parse(self.project_files.load())
 
-            yield meltano_update
+            yield meltano_config
 
             try:
-                with atomic_write(self.meltanofile, overwrite=True) as meltanofile:
-                    # update if everything is fine
-                    yaml.dump(meltano_update, meltanofile, default_flow_style=False, sort_keys=False)
+                meltano_config = self.project_files.update(meltano_config.canonical())
             except Exception as err:
                 logger.critical(f"Could not update meltano.yml: {err}")
                 raise
