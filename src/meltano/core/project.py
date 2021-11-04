@@ -19,7 +19,7 @@ from werkzeug.utils import secure_filename
 
 from .behavior.versioned import Versioned
 from .error import Error
-from .meltano_file import MeltanoFile
+from .multiple_meltano_file import MultipleMeltanoFile, pop_config_file_data
 from .utils import makedirs, truthy
 
 logger = logging.getLogger(__name__)
@@ -160,13 +160,19 @@ class Project(Versioned):
 
         return project
 
+    def parse_meltanofile(self, meltanofile):
+        # There is a better way to do this. For now, MMF needs knowledge of root to verify directories upon __init__
+        contents = yaml.safe_load(meltanofile)
+        contents["project_root"] = str(self.root)
+        return MultipleMeltanoFile.parse(contents)
+
     @property
     def meltano(self) -> MeltanoFile:
         """Return a copy of the current meltano config"""
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
-             self.meltanofile.open() as meltanofile:
-            return MeltanoFile.parse(yaml.safe_load(meltanofile))
+                self.meltanofile.open() as meltanofile:
+            return self.parse_meltanofile(meltanofile)
         # fmt: on
 
     @contextmanager
@@ -181,21 +187,34 @@ class Project(Versioned):
 
         # fmt: off
         with self._meltano_rw_lock.write_lock(), \
-            self._meltano_ip_lock:
+                self._meltano_ip_lock:
 
             with self.meltanofile.open() as meltanofile:
                 # read the latest version
-                meltano_update = MeltanoFile.parse(yaml.safe_load(meltanofile))
+                meltano_update = self.parse_meltanofile(meltanofile)
 
             yield meltano_update
 
-            try:
-                with atomic_write(self.meltanofile, overwrite=True) as meltanofile:
-                    # update if everything is fine
-                    yaml.dump(meltano_update, meltanofile, default_flow_style=False, sort_keys=False)
-            except Exception as err:
-                logger.critical(f"Could not update meltano.yml: {err}")
-                raise
+            all_config_file_path_names = meltano_update.get_config_path_names()
+            included_config_file_component_names = meltano_update.get_included_component_names()
+            meltano_update = meltano_update.canonical()
+
+            for idx, config_file_path_name in enumerate(all_config_file_path_names):
+                config_file_path = Path(config_file_path_name)
+                config_file_path = self.root.joinpath(config_file_path)
+                is_main_config = idx == (len(all_config_file_path_names) - 1)
+                try:
+                    with atomic_write(config_file_path, overwrite=True) as configfile:
+                        # update if everything is fine
+                        config_file_data = pop_config_file_data(meltano_update,
+                                                                config_file_path_name,
+                                                                included_config_file_component_names,
+                                                                is_main_config,
+                                                                )
+                        yaml.dump(config_file_data, configfile, default_flow_style=False, sort_keys=False)
+                except Exception as err:
+                    logger.critical(f"Could not update {config_file_path_name}: {err}")
+                    raise
         # fmt: on
 
     def root_dir(self, *joinpaths):
