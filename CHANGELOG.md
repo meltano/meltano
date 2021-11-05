@@ -10,14 +10,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-### Changes
-
 - [#2456](https://gitlab.com/meltano/meltano/-/issues/2456) Let project plugin definitions and config be defined in multiple individual YAML files. _Thanks, **[Matthew Thurman](https://gitlab.com/mathurmag)** for the inspiration and first draft!_
-- [#2977](https://gitlab.com/meltano/meltano/-/issues/2977) Disable the Explore and Dashboards tabs in the UI by default.
+
+### Changes
 
 ### Fixes
 
 ### Breaks
+
+- [#2977](https://gitlab.com/meltano/meltano/-/issues/2977) Disable the Explore and Dashboards tabs in the UI by default.
 
 
 ## 1.86.0 - (2021-10-28)
