@@ -24,7 +24,8 @@ def deep_merge(parent: dict, children: List[dict]) -> dict:
                 node = base.setdefault(key, {})
                 base[key] = deep_merge(node, [value])
             elif isinstance(value, list):
-                base[key].extend(value)
+                node = base.setdefault(key, [])
+                node.extend(value)
             else:
                 base[key] = value
     return base
