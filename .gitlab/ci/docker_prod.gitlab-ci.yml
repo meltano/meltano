@@ -62,7 +62,7 @@ meltano_edge:
 meltano:
   extends:
     - .build_prod
-    - .only:version-tags
+    - .only:release-branches
   script:
     - source .gitlab/ci/scripts/docker_build_script.sh
 

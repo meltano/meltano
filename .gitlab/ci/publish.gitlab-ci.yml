@@ -1,5 +1,7 @@
-publish:
-  extends: .only:version-tags
+pypi_publish:
+  when: manual
+  extends:
+    - .only:release-branches
   image:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
     entrypoint: [""]
@@ -15,10 +17,10 @@ publish:
 # registry.gitlab.com/meltano/meltano:latest-python<version> → docker.io/meltano:latest-python<version>
 # registry.gitlab.com/meltano/meltano:<tag> → docker.io/meltano:<tag>
 # registry.gitlab.com/meltano/meltano:latest → docker.io/meltano:latest
-hub_meltano:
+dockerhub_publish:
   extends:
     - .parallel:image_tag_suffix
-    - .only:version-tags
+    - .only:release-branches
   image: docker:latest
   stage: publish
   services:
@@ -27,14 +29,16 @@ hub_meltano:
     DOCKERFILE: .
     DOCKER_DRIVER: overlay2
     IMAGE_NAME: meltano/meltano
-    IMAGE_TAG: $CI_COMMIT_TAG
     SOURCE_IMAGE: $CI_REGISTRY_IMAGE
   script:
+    - MELTANO_VERSION="${CI_COMMIT_REF_NAME#release/v}"
+    - echo "Publishing docker images for v$MELTANO_VERSION (git ref '$CI_COMMIT_REF_NAME')"
+
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
 
-    - docker pull $SOURCE_IMAGE:$IMAGE_TAG$IMAGE_TAG_SUFFIX
-    - docker tag $SOURCE_IMAGE:$IMAGE_TAG$IMAGE_TAG_SUFFIX $IMAGE_NAME:$IMAGE_TAG$IMAGE_TAG_SUFFIX
-    - docker push $IMAGE_NAME:$IMAGE_TAG$IMAGE_TAG_SUFFIX
+    - docker pull $SOURCE_IMAGE:$MELTANO_VERSION$IMAGE_TAG_SUFFIX
+    - docker tag $SOURCE_IMAGE:$MELTANO_VERSION$IMAGE_TAG_SUFFIX $IMAGE_NAME:$MELTANO_VERSION$IMAGE_TAG_SUFFIX
+    - docker push $IMAGE_NAME:$MELTANO_VERSION$IMAGE_TAG_SUFFIX
 
     - docker pull $SOURCE_IMAGE:latest$IMAGE_TAG_SUFFIX
     - docker tag $SOURCE_IMAGE:latest$IMAGE_TAG_SUFFIX $IMAGE_NAME:latest$IMAGE_TAG_SUFFIX

@@ -1,5 +1,8 @@
 demo_project:
   stage: test
+  extends:
+    # Omitted because auto-commits on the release branch do not have an authenticated user
+    - .not:release-branches
   variables:
     MELTANO_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.6
   trigger:
