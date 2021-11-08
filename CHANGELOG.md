@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3015](https://gitlab.com/meltano/meltano/-/issues/3015) Add missing settings to default target-snowflake: `role`, `batch_wait_limit_seconds`, `archive_load_files`, `archive_load_files_s3_prefix`, and `archive_load_files_s3_bucket` 
+
 ### Breaks
 
 
