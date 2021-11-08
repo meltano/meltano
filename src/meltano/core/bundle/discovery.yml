@@ -2426,7 +2426,7 @@ loaders:
           # Optional settings
           - name: role
             label: Role
-            description: Snowflake role to use. If not defined then the user's default role will be used
+            description: Snowflake role to use. If not defined then the user's default role will be used.
           - name: aws_access_key_id
             label: AWS Access Key ID
             kind: password
