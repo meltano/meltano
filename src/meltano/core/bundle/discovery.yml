@@ -2427,9 +2427,12 @@ loaders:
             description: Snowflake virtual warehouse name
           - name: file_format
             label: File Format
-            description: Named file format name created at pre-requirements section. Has to be a fully qualified name including the schema name.
+            description: The Snowflake file format object name which needs to be manually created as part of the pre-requirements section of the docs. Has to be the fully qualified name including the schema. Refer to the docs for more details https://github.com/transferwise/pipelinewise-target-snowflake#pre-requirements.
 
           # Optional settings
+          - name: role
+            label: Role
+            description: Snowflake role to use. If not defined then the user's default role will be used.
           - name: aws_access_key_id
             label: AWS Access Key ID
             kind: password
@@ -2475,6 +2478,10 @@ loaders:
             kind: integer
             value: 100000
             description: Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Snowflake.
+          - name: batch_wait_limit_seconds
+            label: Batch Wait Limit Seconds
+            kind: integer
+            description: Maximum time to wait for batch to reach batch_size_rows.
           - name: flush_all_streams
             label: Flush All Streams
             kind: boolean
@@ -2549,6 +2556,17 @@ loaders:
           - name: query_tag
             label: Query Tag
             description: Optional string to tag executed queries in Snowflake. Replaces tokens `schema` and `table` with the appropriate values. The tags are displayed in the output of the Snowflake `QUERY_HISTORY`, `QUERY_HISTORY_BY_*` functions.
+          - name: archive_load_files
+            label: Archive Load Files
+            kind: boolean
+            value: false
+            description: When enabled, the files loaded to Snowflake will also be stored in archive_load_files_s3_bucket under the key /{archive_load_files_s3_prefix}/{schema_name}/{table_name}/. All archived files will have tap, schema, table and archived-by as S3 metadata keys. When incremental replication is used, the archived files will also have the following S3 metadata keys - incremental-key, incremental-key-min and incremental-key-max.
+          - name: archive_load_files_s3_prefix
+            label: Archive Load Files S3 Prefix
+            description: When archive_load_files is enabled, the archived files will be placed in the archive S3 bucket under this prefix.
+          - name: archive_load_files_s3_bucket
+            label: Archive Load Files S3 Bucket
+            description: When archive_load_files is enabled, the archived files will be placed in this bucket.
       - name: datamill-co
         docs: https://hub.meltano.com/loaders/snowflake--datamill-co.html
         repo: https://github.com/datamill-co/target-snowflake
