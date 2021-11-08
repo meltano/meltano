@@ -2560,7 +2560,7 @@ loaders:
             description: When archive_load_files is enabled, the archived files will be placed in the archive S3 bucket under this prefix.
           - name: archive_load_files_s3_bucket
             label: Archive Load Files S3 Bucket
-            description: When archive_load_files is enabled, the archived files will be
+            description: When archive_load_files is enabled, the archived files will be placed in this bucket.
       - name: datamill-co
         docs: https://hub.meltano.com/loaders/snowflake--datamill-co.html
         repo: https://github.com/datamill-co/target-snowflake
