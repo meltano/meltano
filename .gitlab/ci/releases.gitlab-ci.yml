@@ -1,4 +1,5 @@
-pypi_publish:
+publish_trigger:
+  # Dummy job. Administrator triggers this job manually to allow other publish jobs to run.
   when: manual
   extends:
     - .only:release-branches
@@ -6,12 +7,49 @@ pypi_publish:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
     entrypoint: [""]
   stage: publish
+  script:
+    - MELTANO_VERSION="${CI_COMMIT_REF_NAME#release/v}"
+    - echo "Triggering publish step for v$MELTANO_VERSION (git ref '$CI_COMMIT_REF_NAME')"
+
+pypi_publish:
+  extends:
+    - .only:release-branches
+  image:
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    entrypoint: [""]
+  stage: publish
+  needs: [publish_trigger]
   before_script:
     - pip install poetry
   script:
     # grab the built package
     - ln -s /meltano/dist
     - poetry publish
+
+# Manages:
+#  - meltano/meltano:<sha>-python<version>
+#  - meltano/meltano:<tag>-python<version>
+#  - meltano/meltano:latest-python<version>
+#  - meltano/meltano:<tag>
+#  - meltano/meltano:latest
+gitlab_images_publish:
+  extends:
+    - .build_prod
+    - .only:release-branches
+  script:
+    - source .gitlab/ci/scripts/docker_build_script.sh
+
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
+    - docker push $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
+
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
+    - docker push $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
+
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG || true'
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:$CI_COMMIT_TAG || true'
+
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest || true'
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:latest || true'
 
 # registry.gitlab.com/meltano/meltano:<tag>-python<version> → docker.io/meltano:<tag>-python<version>
 # registry.gitlab.com/meltano/meltano:latest-python<version> → docker.io/meltano:latest-python<version>
@@ -23,6 +61,7 @@ dockerhub_publish:
     - .only:release-branches
   image: docker:latest
   stage: publish
+  needs: [publish_trigger]
   services:
     - docker:dind
   variables:
