@@ -270,6 +270,7 @@ extractors:
           label: Primary Keys
           description: Primary Keys for the selected Entities (Streams)
     - name: meltano
+      hidden: true
       repo: https://gitlab.com/meltano/tap-adwords
       pip_url: 'git+https://gitlab.com/meltano/tap-adwords.git'
       capabilities:
@@ -820,6 +821,7 @@ extractors:
           placeholder: Ex. files-def.json
           documentation: https://github.com/MeltanoLabs/tap-csv#settings
     - name: meltano
+      hidden: true
       repo: https://gitlab.com/meltano/tap-csv
       pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
       capabilities:
@@ -882,6 +884,7 @@ extractors:
           label: Include Deleted Objects
           description: Determines if it should include deleted objects or not.
     - name: meltano
+      hidden: true
       repo: https://gitlab.com/meltano/tap-facebook
       pip_url: 'git+https://gitlab.com/meltano/tap-facebook.git'
       capabilities:
@@ -993,6 +996,7 @@ extractors:
           kind: date_iso8601
           description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
     - name: meltano
+      hidden: true
       repo: https://gitlab.com/meltano/tap-gitlab
       pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
       capabilities:
@@ -1334,6 +1338,7 @@ extractors:
           description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
           kind: date_iso8601
     - name: meltano
+      hidden: true
       repo: https://gitlab.com/meltano/tap-marketo
       pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
       capabilities: []
@@ -1838,6 +1843,7 @@ extractors:
           label: Account ID
           placeholder: Ex. acct_1a2b3c4d5e
     - name: meltano
+      hidden: true
       repo: https://github.com/meltano/tap-stripe
       pip_url: 'git+https://github.com/meltano/tap-stripe.git'
       capabilities:
@@ -2647,6 +2653,7 @@ loaders:
             kind: password
       - name: meltano
         original: true
+        hidden: true
         docs: https://hub.meltano.com/loaders/snowflake--meltano.html
         repo: https://gitlab.com/meltano/target-snowflake
         pip_url: git+https://gitlab.com/meltano/target-snowflake.git
@@ -2720,6 +2727,7 @@ loaders:
           value: '__loaded_at'
           description: Name of the column used for recording the timestamp when Data are loaded to SQLite.
     - name: meltano
+      hidden: true
       repo: https://gitlab.com/meltano/target-sqlite
       pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
       dialect: sqlite
