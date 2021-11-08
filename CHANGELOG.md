@@ -19,6 +19,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 1.87.0 - (2021-11-05)
+---
+
+### New
+
+- [#2456](https://gitlab.com/meltano/meltano/-/issues/2456) Let project plugin definitions and config be defined in multiple individual YAML files. _Thanks, **[Matthew Thurman](https://gitlab.com/mathurmag)** for the inspiration and first draft!_
+
+
+### Breaks
+
+- [#2977](https://gitlab.com/meltano/meltano/-/issues/2977) Disable the Explore and Dashboards tabs in the UI by default.
+
+
 ## 1.86.0 - (2021-10-28)
 ---
 
@@ -49,7 +62,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2963](https://gitlab.com/meltano/meltano/-/issues/2963) Set `meltanolabs` as the default tap-csv extractor.
 - [#2965](https://gitlab.com/meltano/meltano/-/issues/2965) Set `meltanolabs` as the default tap-gitlab extractor.
 - [2339](https://gitlab.com/meltano/meltano/-/merge_requests/2339) Update `elt` log format to include subtask field. Lines are now prefixed with `<name> | <subtask>` which may cause issues with existing log parsers.
-- [#2977](https://gitlab.com/meltano/meltano/-/issues/2977) Disable the Explore and Dashboards tabs in the UI by default.
 
 
 ### Fixes
