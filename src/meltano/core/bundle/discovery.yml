@@ -2421,7 +2421,7 @@ loaders:
             description: Snowflake virtual warehouse name
           - name: file_format
             label: File Format
-            description: Named file format name created at pre-requirements section. Has to be a fully qualified name including the schema name.
+            description: The Snowflake file format object name which needs to be manually created as part of the pre-requirements section of the docs. Has to be the fully qualified name including the schema. Refer to the docs for more details https://github.com/transferwise/pipelinewise-target-snowflake#pre-requirements.
 
           # Optional settings
           - name: role
