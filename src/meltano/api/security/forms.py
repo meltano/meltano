@@ -2,9 +2,9 @@ from flask import url_for
 from flask_security.forms import ConfirmRegisterForm, LoginForm, RegisterForm
 from flask_security.utils import _datastore, get_message
 from wtforms import StringField
-from wtforms.validators import Length, Required, ValidationError
+from wtforms.validators import Length, InputRequired, ValidationError
 
-username_required = Required(message="USERNAME_NOT_PROVIDED")
+username_required = InputRequired(message="USERNAME_NOT_PROVIDED")
 username_validator = Length(min=6, max=32, message="USERNAME_INVALID")
 
 
@@ -15,7 +15,7 @@ def unique_username(form, field):
 
 
 class MeltanoLoginForm(LoginForm):
-    email = StringField("Username or Email Address", validators=[Required()])
+    email = StringField("Username or Email Address", validators=[InputRequired()])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
