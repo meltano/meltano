@@ -18,30 +18,23 @@ triggered_version_bump:
     # - poetry install 
   script:
     - |
-      echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'..."
-      echo "Current location: Ref='$CI_COMMIT_REF_NAME' and Namespace='$CI_PROJECT_NAMESPACE'..."
+      source .gitlab/ci/scripts/meltano_version_from_branch.sh
+      '[[ "$RELEASE_VERSION" == "$CODE_VERSION" ]] && echo "Version is already bumped. Aborting job." && exit 0'
     - |
-      echo "Detecting and validating version number..."
-      CURR_VER="$(bumpversion major --allow-dirty --dry-run --list | grep current_version= | cut -d'=' -f2)"
-      NEW_VER="${CI_COMMIT_REF_NAME#release/v}"
-      echo "Detected current version '$CURR_VER' and new version '$NEW_VER'"
-      [[ "$CURR_VER" == "" ]] && echo "Could not detect current version" && exit 1
-      [[ "$NEW_VER" == "" ]] && echo "Could not detect new version" && exit 1
-      [[ "$NEW_VER" == "$CURR_VER" ]] && echo "Version is already bumped. Aborting job." && exit 0
       MAJOR_BUMP="$(bumpversion major --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       MINOR_BUMP="$(bumpversion minor --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       PATCH_BUMP="$(bumpversion patch --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
-      [[ $NEW_VER = $MAJOR_BUMP ]] && BUMP_TYPE="major"
-      [[ $NEW_VER = $MINOR_BUMP ]] && BUMP_TYPE="minor"
-      [[ $NEW_VER = $PATCH_BUMP ]] && BUMP_TYPE="patch"
-      [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER'" && exit 1
-      echo "Detected bump type '$BUMP_TYPE' from '$CURR_VER' to '$NEW_VER'"
+      [[ $RELEASE_VERSION = $MAJOR_BUMP ]] && BUMP_TYPE="major"
+      [[ $RELEASE_VERSION = $MINOR_BUMP ]] && BUMP_TYPE="minor"
+      [[ $RELEASE_VERSION = $PATCH_BUMP ]] && BUMP_TYPE="patch"
+      [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$RELEASE_VERSION'" && exit 1
+      echo "Detected bump type '$BUMP_TYPE' from '$CODE_VERSION' to '$RELEASE_VERSION'"
       echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
       changelog release --$BUMP_TYPE --yes
       echo "Adding changelog to git..."
       git add CHANGELOG.md
       echo "Bumping version entries..."
-      bumpversion $BUMP_TYPE --tag --allow-dirty --new-version=$NEW_VER
+      bumpversion $BUMP_TYPE --tag --allow-dirty --new-version=$RELEASE_VERSION
       echo "Pushing branch updates..."
       git push http://root:$CI_COMMITS_GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
 
@@ -55,8 +48,10 @@ publish_trigger:
     entrypoint: [""]
   stage: publish
   script:
-    - MELTANO_VERSION="${CI_COMMIT_REF_NAME#release/v}"
-    - echo "Triggering publish step for v$MELTANO_VERSION (git ref '$CI_COMMIT_REF_NAME')"
+    - |
+      source .gitlab/ci/scripts/meltano_version_from_branch.sh
+      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
+    - echo "Triggering publish step for v$RELEASE_VERSION (git ref '$CI_COMMIT_REF_NAME')"
 
 pypi_publish:
   extends:
@@ -67,6 +62,9 @@ pypi_publish:
   stage: publish
   needs: [publish_trigger]
   before_script:
+    - |
+      source .gitlab/ci/scripts/meltano_version_from_branch.sh
+      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
     - pip install poetry
   script:
     # grab the built package
@@ -84,6 +82,9 @@ gitlab_images_publish:
     - .build_prod
     - .only:release-branches
   script:
+    - |
+      source .gitlab/ci/scripts/meltano_version_from_branch.sh
+      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
     - source .gitlab/ci/scripts/docker_build_script.sh
 
     - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
@@ -117,14 +118,15 @@ dockerhub_publish:
     IMAGE_NAME: meltano/meltano
     SOURCE_IMAGE: $CI_REGISTRY_IMAGE
   script:
-    - MELTANO_VERSION="${CI_COMMIT_REF_NAME#release/v}"
-    - echo "Publishing docker images for v$MELTANO_VERSION (git ref '$CI_COMMIT_REF_NAME')"
+    - |
+      source .gitlab/ci/scripts/meltano_version_from_branch.sh
+      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
 
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
 
-    - docker pull $SOURCE_IMAGE:$MELTANO_VERSION$IMAGE_TAG_SUFFIX
-    - docker tag $SOURCE_IMAGE:$MELTANO_VERSION$IMAGE_TAG_SUFFIX $IMAGE_NAME:$MELTANO_VERSION$IMAGE_TAG_SUFFIX
-    - docker push $IMAGE_NAME:$MELTANO_VERSION$IMAGE_TAG_SUFFIX
+    - docker pull $SOURCE_IMAGE:$RELEASE_VERSION$IMAGE_TAG_SUFFIX
+    - docker tag $SOURCE_IMAGE:$RELEASE_VERSION$IMAGE_TAG_SUFFIX $IMAGE_NAME:$RELEASE_VERSION$IMAGE_TAG_SUFFIX
+    - docker push $IMAGE_NAME:$RELEASE_VERSION$IMAGE_TAG_SUFFIX
 
     - docker pull $SOURCE_IMAGE:latest$IMAGE_TAG_SUFFIX
     - docker tag $SOURCE_IMAGE:latest$IMAGE_TAG_SUFFIX $IMAGE_NAME:latest$IMAGE_TAG_SUFFIX
