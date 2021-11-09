@@ -19,7 +19,7 @@ triggered_version_bump:
   script:
     - |
       source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      '[[ "$RELEASE_VERSION" == "$CODE_VERSION" ]] && echo "Version is already bumped. Aborting job." && exit 0'
+      [[ "$RELEASE_VERSION" == "$CODE_VERSION" ]] && echo "Version is already bumped. Aborting job." && exit 0
     - |
       MAJOR_BUMP="$(bumpversion major --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
       MINOR_BUMP="$(bumpversion minor --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
@@ -50,7 +50,7 @@ publish_trigger:
   script:
     - |
       source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
+      [[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1
     - echo "Triggering publish step for v$RELEASE_VERSION (git ref '$CI_COMMIT_REF_NAME')"
 
 pypi_publish:
@@ -64,7 +64,7 @@ pypi_publish:
   before_script:
     - |
       source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
+      [[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1
     - pip install poetry
   script:
     # grab the built package
@@ -84,7 +84,7 @@ gitlab_images_publish:
   script:
     - |
       source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
+      [[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1
     - source .gitlab/ci/scripts/docker_build_script.sh
 
     - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
@@ -120,7 +120,7 @@ dockerhub_publish:
   script:
     - |
       source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      '[[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1'
+      [[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1
 
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
 
