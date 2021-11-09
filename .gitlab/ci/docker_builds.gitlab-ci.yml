@@ -41,7 +41,7 @@ meltano_dev_forks:
 #  - meltano/meltano:<sha>-python<version>
 #  - meltano/meltano:edge-python<version>
 #  - meltano/meltano:edge
-meltano_edge:
+meltano_edge_images:
   extends:
     - .build_prod
     - .only:master
@@ -52,28 +52,3 @@ meltano_edge:
 
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge || true'
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:edge || true'
-
-# Manages:
-#  - meltano/meltano:<sha>-python<version>
-#  - meltano/meltano:<tag>-python<version>
-#  - meltano/meltano:latest-python<version>
-#  - meltano/meltano:<tag>
-#  - meltano/meltano:latest
-meltano:
-  extends:
-    - .build_prod
-    - .only:version-tags
-  script:
-    - source .gitlab/ci/scripts/docker_build_script.sh
-
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
-    - docker push $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
-
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
-    - docker push $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
-
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG || true'
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:$CI_COMMIT_TAG || true'
-
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest || true'
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:latest || true'
