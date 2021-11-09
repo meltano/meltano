@@ -1,8 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-metaTitle: "Meltano: ELT for the DataOps era"
-description: Open source, self-hosted, CLI-first, debuggable, and extensible. Embraces Singer and its library of connectors, and leverages dbt for transformation.
+metaTitle: "ELT tool for open source data integration with Meltano "
+description: Meltano is your one stop destination for data integration. Extract-load-transform pipelines in minutes, for free. Bring together best in class open source data tools in a single project repo
 installation:
   primaryAction:
     text: Get started
@@ -34,33 +34,17 @@ ui:
 ---
 
 ::: slot installation
+# Open Source Data Integration (ELT)
 
-# ELT for the DataOps era
+Meltano brings the benefits of open source and DevOps best practices to the data lifecycle by embracing DataOps. Meltano is your one stop destination for data integration. Meltano is the open source platform for managing data pipelines, dashboards, and orchestration. Best of all Meltano is self-hosted, CLI-first, debuggable, and extensible.
 
-Meltano is
-[open source](https://gitlab.com/meltano/meltano),
-[self-hosted](/docs/production.html),
-[CLI-first](/docs/command-line-interface.html),
-[debuggable](/docs/command-line-interface.html#debugging), and
-[extensible](/docs/plugins.html).
+Bring together your data tools in a single self hosted project repo:
+* Extract & Load
+* Transform
+* Orchestration
+* Testing
+* Analysis
 
-[Pipelines are code](#meltano-init),
-ready to be version controlled,
-[containerized](#containerization), and
-[deployed continuously](/docs/production.html#and-onto-the-production-environment).
-Develop and test
-[locally](/docs/getting-started.html#local-installation),
-then
-[deploy in production](/docs/production.html)
-along with the built-in
-[Airflow integration](/docs/production.html#airflow-orchestrator),
-or inside your
-[orchestrator of choice](/docs/production.html#meltano-elt).
-
-Meltano [embraces](/docs/#embracing-singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
-[extractors](https://hub.meltano.com/extractors/) and
-[loaders](https://hub.meltano.com/loaders/),
-and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
 
 :::
 
@@ -80,7 +64,6 @@ Read on for more about
 
 **Experience it for yourself in just a few minutes,**
 or watch the ["from 0 to ELT in 90 seconds" speedrun](https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/)
-
 ```bash
 # For these examples to work, ensure that:
 # - you are running Linux or macOS
