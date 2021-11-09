@@ -1,4 +1,5 @@
-# This file defines the release process, including version bump, manual trigger, and auto-publish steps.
+# This file defines the release process, including version bump, manual trigger, and 
+# auto-publish steps.
 
 triggered_version_bump:
   # This job triggers for any branches named like `release/vX.Y.Z`
@@ -40,11 +41,14 @@ triggered_version_bump:
 
 publish_trigger:
   # Dummy job. Administrator triggers this job manually to allow other publish jobs to run.
-  when: manual
+  # This job should fail (and block) if version numbers in the code do not match the version
+  # number of the release branch.
   extends:
     - .only:release-branches
+  when: manual
+  allow_failure: false
   image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.8
     entrypoint: [""]
   stage: publish
   script:
@@ -57,14 +61,12 @@ pypi_publish:
   extends:
     - .only:release-branches
   image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.8
     entrypoint: [""]
   stage: publish
   needs: [publish_trigger]
   before_script:
-    - |
-      source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      [[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1
+    - source .gitlab/ci/scripts/meltano_version_from_branch.sh
     - pip install poetry
   script:
     # grab the built package
@@ -82,18 +84,17 @@ gitlab_images_publish:
     - .build_prod
     - .only:release-branches
   script:
-    - |
-      source .gitlab/ci/scripts/meltano_version_from_branch.sh
+    - source .gitlab/ci/scripts/meltano_version_from_branch.sh
     - source .gitlab/ci/scripts/docker_build_script.sh
 
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
-    - docker push $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$RELEASE_VERSION-python$PYTHON_IMAGE_VERSION
+    - docker push $IMAGE_NAME:$RELEASE_VERSION-python$PYTHON_IMAGE_VERSION
 
     - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
     - docker push $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
 
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG || true'
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:$CI_COMMIT_TAG || true'
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$RELEASE_VERSION || true'
+    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:$RELEASE_VERSION || true'
 
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest || true'
     - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:latest || true'
@@ -117,9 +118,7 @@ dockerhub_publish:
     IMAGE_NAME: meltano/meltano
     SOURCE_IMAGE: $CI_REGISTRY_IMAGE
   script:
-    - |
-      source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      [[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1
+    - source .gitlab/ci/scripts/meltano_version_from_branch.sh
 
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
 
