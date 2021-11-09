@@ -84,7 +84,6 @@ gitlab_images_publish:
   script:
     - |
       source .gitlab/ci/scripts/meltano_version_from_branch.sh
-      [[ "$RELEASE_VERSION" != "$CODE_VERSION" ]] && echo "Version is not yet bumped. Aborting job." && exit 1
     - source .gitlab/ci/scripts/docker_build_script.sh
 
     - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG-python$PYTHON_IMAGE_VERSION
