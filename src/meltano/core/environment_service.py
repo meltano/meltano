@@ -80,7 +80,7 @@ class EnvironmentService:
             name: Name of the Environment that should be removed.
 
         Returns:
-            The named of the removed Environment.
+            The name of the removed Environment.
         """
         with self.project.meltano_update() as meltano:
             environment = find_named(
