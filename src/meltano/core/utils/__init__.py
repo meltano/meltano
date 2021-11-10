@@ -283,11 +283,12 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
-def find_named(xs: Iterable[dict], name: str):
+def find_named(xs: Iterable[dict], name: str, obj_type: type = None):
+    """Find an object by its 'name' key."""
     try:
         return next(x for x in xs if x["name"] == name)
     except StopIteration as stop:
-        raise NotFound(name)
+        raise NotFound(name, obj_type) from stop
 
 
 def makedirs(func):

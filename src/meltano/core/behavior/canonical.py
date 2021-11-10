@@ -1,7 +1,9 @@
 import copy
-from typing import Iterable
+from typing import Type, TypeVar
 
 import yaml
+
+T = TypeVar("T")  # noqa: WPS111
 
 
 class Canonical:
@@ -62,11 +64,12 @@ class Canonical:
         return self.__class__(**{**self.canonical(), **kwargs})
 
     @classmethod
-    def parse(cls, obj) -> "Canonical":
+    def parse(cls: Type[T], obj) -> T:
+        """Parse a 'Canonical' object from a dictionary or return the instance."""
         if obj is None:
             return None
 
-        if isinstance(obj, Canonical):
+        if isinstance(obj, cls):
             return obj
 
         return cls(**obj)

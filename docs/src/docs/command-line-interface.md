@@ -294,7 +294,7 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/docs/plugins.html#select-filter-extra).
 
-- A `--environment` option can be passed to specify a [Meltano Environment](/docs/environments.md) context for running. 
+- A `--environment` option can be passed to specify a [Meltano Environment](/docs/environments.md) context for running.
 
 - A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually running the pipeline.
   This can aid in debugging [extractor catalog generation](/docs/integration.html#extractor-catalog-generation), [incremental replication state lookup](/docs/integration.html#incremental-replication-state), and [pipeline environment variables](/docs/integration.html#pipeline-environment-variables).
@@ -367,6 +367,40 @@ target-jsonl (out) | {"project_7603319": "2020-08-05T21:04:59.158000Z"}
 meltano            | INFO Incremental state has been updated at 2020-08-05 21:30:26.669170.
 meltano            | DEBUG Incremental state: {'project_7603319': '2020-08-05T21:04:59.158000Z'}
 meltano            | INFO Extract & load complete!
+```
+
+## `environment`
+
+Use the `environment` command to manage [Environments](/docs/environments) in your Meltano project.
+
+### How to use
+
+```bash
+# Add an environment
+meltano environment add <environment_name>
+
+# Remove an environment
+meltano environment remove <environment_name>
+
+# List available environments
+meltano environment list
+```
+
+### Examples
+
+
+```bash
+# Add a new Environment
+meltano environment add prod
+
+# List existing Environments
+meltano environment list
+
+# Add plugin configuration within the new Environment
+meltano --environment=prod config target-postgres set batch_size_rows 50000
+
+# Remove an Environment
+meltano environment remove prod
 ```
 
 ## `init`

@@ -9,15 +9,17 @@ from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
 
-from .environment import environment_option
-
 logger = logging.getLogger(__name__)
 
 
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
 @click.option("-v", "--verbose", count=True)
-@environment_option
+@click.option(
+    "--environment",
+    envvar="MELTANO_ENVIRONMENT",
+    help="Meltano environment name",
+)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(ctx, log_level: str, verbose: int, environment: str):  # noqa: WPS231
