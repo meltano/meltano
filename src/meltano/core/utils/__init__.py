@@ -283,8 +283,20 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
-def find_named(xs: Iterable[dict], name: str, obj_type: type = None):
-    """Find an object by its 'name' key."""
+def find_named(xs: Iterable[dict], name: str, obj_type: type = None) -> dict:
+    """Find an object by its 'name' key.
+
+    Args:
+        xs: Some iterable of objects against which that name should be matched.
+        name: Used to match against the input objects.
+        obj_type: Object type used for generating the exception message.
+
+    Returns:
+        The first item matched, if any. Otherwise raises an exception.
+
+    Raises:
+        NotFound: If an object with the given name was not found.
+    """
     try:
         return next(x for x in xs if x["name"] == name)
     except StopIteration as stop:
