@@ -151,12 +151,6 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 meltano config --plugin-type=<type> <plugin> ...
 ```
 
-If you have multiple [Meltano Environments](/docs/environments.md) you can specify the environment name:
-
-```bash
-meltano --environment=<ENVIRONMENT> config <plugin>
-```
-
 #### Nested properties
 
 Nested properties can be set (and unset) by specifying a list of property names:
@@ -200,6 +194,14 @@ meltano config <plugin> set <property>.<deep>.<nesting> <value>
 # `meltano.yml`:
 #  config:
 #    <property>.<deep>.<nesting>: <value>
+```
+
+### Using `config` with Environments
+
+If you have multiple [Meltano Environments](/docs/environments.md) you can specify the environment name:
+
+```bash
+meltano --environment=<ENVIRONMENT> config <plugin>
 ```
 
 ### How to use: Plugin extras
@@ -294,8 +296,6 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/docs/plugins.html#select-filter-extra).
 
-- A `--environment` option can be passed to specify a [Meltano Environment](/docs/environments.md) context for running.
-
 - A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually running the pipeline.
   This can aid in debugging [extractor catalog generation](/docs/integration.html#extractor-catalog-generation), [incremental replication state lookup](/docs/integration.html#incremental-replication-state), and [pipeline environment variables](/docs/integration.html#pipeline-environment-variables).
 
@@ -312,7 +312,6 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
 
 ```bash
 meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
-meltano --environment=prod elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 
 meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --full-refresh
 
@@ -323,6 +322,14 @@ meltano elt tap-gitlab target-postgres --select commits
 meltano elt tap-gitlab target-postgres --exclude project_members
 
 meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --dump=state > extract/tap-gitlab.state.json
+```
+
+### Using `elt` with Environments
+
+The `--environment` option can be passed to specify a [Meltano Environment](/docs/environments.md) context for running.
+
+```bash
+meltano --environment=prod elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
 ```
 
 ### Debugging
@@ -385,6 +392,13 @@ meltano environment remove <environment_name>
 # List available environments
 meltano environment list
 ```
+
+Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRONMENT` environment variable can be used with the following commands:
+
+- [`config`](#using-config-with-environments)
+- [`elt`](#using-elt-with-environments)
+- [`invoke`](#using-invoke-with-environments)
+- [`select`](#using-select-with-environments)
 
 ### Examples
 
@@ -512,12 +526,6 @@ Invoke the plugin's executable with specified arguments.
 meltano invoke <plugin> [PLUGIN]_ARGS...]
 ```
 
-If you have multiple [Meltano Environments](/docs/environments.md) you can specify the environment name:
-
-```bash
-meltano --environment=<ENVIRONMENT> invoke <plugin> [PLUGIN]_ARGS...]
-```
-
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
@@ -532,6 +540,14 @@ meltano invoke --dump=catalog <plugin>
 ```
 
 Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
+
+### Using `invoke` with Environments
+
+If you have multiple [Meltano Environments](/docs/environments.md) you can specify the environment name:
+
+```bash
+meltano --environment=<ENVIRONMENT> invoke <plugin> [PLUGIN]_ARGS...]
+```
 
 ### Commands
 
@@ -636,12 +652,6 @@ Selection rules will be stored in the extractor's [`select` extra](/docs/plugins
 Not all taps support this feature. In addition, taps needs to support the `--discover` switch. You can use `meltano invoke tap-... --discover` to see if the tap supports it.
 :::
 
-If you have multiple [Meltano Environments](/docs/environments.md) you can specify the environment name:
-
-```bash
-meltano --environment=<ENVIRONMENT> select <tap_name>
-```
-
 ### How to use
 
 [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in selection patterns to match multiple entities or attributes at once:
@@ -656,6 +666,14 @@ Use `--list` to list the current selected tap attributes.
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
 Use `--rm` or `--remove` to remove previously added select patterns.
+
+### Using `select` with Environments
+
+If you have multiple [Meltano Environments](/docs/environments.md) you can specify the environment name:
+
+```bash
+meltano --environment=<ENVIRONMENT> select <tap_name>
+```
 
 ### Examples
 
