@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#3003](https://gitlab.com/meltano/meltano/-/issues/3003) Add `matatika` variant of tap-solarvista extractor.
+
 ### Changes
 
 ### Fixes
