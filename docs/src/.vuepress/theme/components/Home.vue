@@ -784,6 +784,7 @@ export default {
     margin: 0 !important;
     display: flex;
     flex-wrap: wrap;
+    gap: 1.5rem;
     align-items: center;
     justify-content: center;
 
