@@ -109,7 +109,7 @@ Meltano is now ready for its [first project](/#meltano-init)!
 - [![HackerOne logo](images/home/logos/hackerone.png)](https://www.hackerone.com/)
 - [![Remote logo](images/home/logos/remote.png)](https://remote.com/)
 - [![Netlify logo](images/home/logos/netlify.png)](https://www.netlify.com/)
-- [![Zapier logo](/images/home/logos/zapier.png/)](https://zapier.com/)
+- [![Zapier logo](images/home/logos/zapier.png)](https://zapier.com/)
 
 :::
 
