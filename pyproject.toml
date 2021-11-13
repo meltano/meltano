@@ -226,6 +226,9 @@ pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the mo
 [tool.flakehell.exceptions."src/meltano/core/project_files.py"]
 wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
 
+[tool.flakehell.exceptions."src/meltano/core/block"]
+wemake-python-styleguide = ["-WPS428"] # Allow ... use inside of typing protocol interface classes
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

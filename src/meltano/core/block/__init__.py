@@ -1,15 +1,11 @@
 from typing import Protocol
 
 
-class BlockSetValidationError(Exception):
-    def __init__(self, error: str, message: str = "block violates set requirements"):
-        super().__init__(f"{message}: {error}")
-
-
 class BlockSet(Protocol):
-    """Right now the only complex block set is out ExtractLoadBlocks type. So just defining BlockSet as a protocol for
-    now. Once we implement additional complex block sets it'll be more evident on what the BlockSet class might look
-    like long term.
+    """Right now the only complex block set is our ExtractLoadBlocks type.
+
+    So just defining BlockSet as a protocol for now. Once we implement additional complex block sets it'll be more
+    evident on what the BlockSet class might look like long term.
 
     Theoretically, the bare minimum that we need to run and terminate (i.e. early abort) a block set. So anything
     implementing a run(), terminate(), and validate_set() method currently satisfies the BlockSet interface.

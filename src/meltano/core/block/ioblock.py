@@ -1,5 +1,5 @@
 from asyncio import StreamWriter, Task
-from typing import Protocol
+from typing import Optional, Protocol
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 
@@ -11,9 +11,9 @@ class IOBlock(Protocol):
     any class that satisfies the IOBlock interface.
     """
 
-    stdin: StreamWriter
-    requires_input: bool  # TODO: do we really need dedicated Producer/Consumer/Transformer blocks?
-    has_output: bool  # TODO: these two vars could become "is consumer" "is producer" vars?
+    stdin: Optional[StreamWriter]
+    consumer: bool  # TODO: do we really need dedicated Producer/Consumer/Transformer blocks?
+    producer: bool
 
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst."""
@@ -48,6 +48,15 @@ class IOBlock(Protocol):
         """
         ...
 
+    def proxy_io(self) -> (Task, Task):
+        """Start proxying stdout AND stderr to the linked destinations.
+
+        Returns: proxy_stdout Task and proxy_stderr Task
+        """
+        stdout = self.proxy_stdout()
+        stderr = self.proxy_stderr()
+        return stdout, stderr
+
     async def pre(self, block_ctx: dict) -> None:
         """Execute pre-start tasks.
 
@@ -62,15 +71,3 @@ class IOBlock(Protocol):
         TODO: consider switching to context manager/decarator
         """
         ...
-
-
-class ProducerBlock(IOBlock):
-    pass
-
-
-class ConsumerBlock(IOBlock):
-    pass
-
-
-class TransformerBlock(IOBlock):
-    pass
