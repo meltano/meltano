@@ -5,7 +5,7 @@ from typing import Optional, Sequence
 import structlog
 from structlog.types import Processor
 
-TIMESTAMPER = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S")  # noqa: WPS323
+TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
 
 LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
     (

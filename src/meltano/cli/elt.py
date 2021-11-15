@@ -208,7 +208,7 @@ async def _run_job(project, job, session, context_builder, force=False):
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
 
-        log = logger.bind(name="meltano", run_id=str(job.run_id))
+        log = logger.bind(name="meltano", run_id=str(job.run_id), job_id=job.job_id)
 
         await _run_elt(log, context_builder, output_logger)
 
