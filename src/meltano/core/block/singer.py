@@ -25,26 +25,13 @@ class SingerBlock(IOBlock):
         self.plugin_args: Tuple[str] = plugin_args
         self.command_name = None
 
+        self.producer: bool = self.invoker.plugin.type == PluginType.EXTRACTORS
+        self.consumer: bool = self.invoker.plugin.type == PluginType.LOADERS
+
         self._handle: Process = None
         self._process_future: Task = None
         self._stdout_future: Task = None
         self._stderr_future: Task = None
-
-    @property
-    def propagate_errors(self) -> bool:
-        if self.invoker.plugin.type == PluginType.LOADERS:
-            return True
-        return False
-
-    @property
-    def producer(self) -> bool:
-        return self.invoker.plugin.type == PluginType.EXTRACTORS
-
-    @property
-    def consumer(self) -> bool:
-        if self.invoker.plugin.type == PluginType.LOADERS:
-            return True
-        return False
 
     async def start(self):
         try:
