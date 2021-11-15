@@ -14,7 +14,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner import RunnerError
 
-from .ioblock import ConsumerBlock, IOBlock, ProducerBlock
+from .ioblock import IOBlock
 
 
 class SingerBlock(IOBlock):
@@ -123,23 +123,3 @@ class SingerBlock(IOBlock):
     async def post(self) -> None:
         """Post triggers reseting the underlying plugin config."""
         await self.invoker.cleanup()
-
-
-class SingerProducer(SingerBlock, ProducerBlock):
-    """SingerProducer is just a place holder class right now. Not sure we'll actually need them.
-
-    TODO: remove me?
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class SingerConsumer(SingerBlock, ConsumerBlock):
-    """SingerConsumer is just a place holder class right now. Not sure we'll actually need them.
-
-    TODO: remove me?
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)

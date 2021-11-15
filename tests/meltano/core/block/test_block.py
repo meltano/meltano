@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock, Mock
+from meltano.core.block.error import BlockSetValidationError
 from meltano.core.block.extract_load import ExtractLoadBlocks
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job, Payload, State
@@ -129,3 +130,66 @@ class TestBlock:
             assert tap_process.stdout.readline.called
             assert target_process.wait.called
             assert target_process.stdin.writeline.called
+
+    @pytest.mark.asyncio
+    async def test_elb_validation(
+        self,
+        session,
+        subject,
+        tap_config_dir,
+        target_config_dir,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        plugin_invoker_factory,
+        elt_context,
+    ):
+
+        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stdout.at_eof.side_effect = (False, False, True)
+        tap_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
+
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async:
+
+            blocks = (SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),)
+            elb = ExtractLoadBlocks(elt_context, blocks)
+            with pytest.raises(
+                BlockSetValidationError,
+                match=r"^.*: last block in set should not be a producer",
+            ):
+                elb.validate_set()
+
+            blocks = (
+                SingerBlock(plugin_invoker=target_invoker, plugin_args=[]),
+                SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),
+            )
+            elb = ExtractLoadBlocks(elt_context, blocks)
+            with pytest.raises(
+                BlockSetValidationError,
+                match=r"^.*: first block in set should not be consumer",
+            ):
+                elb.validate_set()
+
+            blocks = (
+                SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),
+                SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),
+                SingerBlock(plugin_invoker=target_invoker, plugin_args=[]),
+            )
+            elb = ExtractLoadBlocks(elt_context, blocks)
+            with pytest.raises(
+                BlockSetValidationError,
+                match=r"^.*: intermediate blocks must be producers AND consumers",
+            ):
+                elb.validate_set()
