@@ -18,7 +18,7 @@ Meltano related news, logos, and how to get in touch.
 
 ## Podcasts
 - [**Hashmap on Tap**](https://www.hashmapinc.com/hashmapontap/episode/ce3d9168/99-building-a-community-around-dataops-driven-elt-with-douwe-maan-founder-and-ceo-of-meltano)
-  - Episode #99: Building a Community Around DataOps-driven ELT with Douwe Maan, Founder and CEO of Meltano
+  - Building a Community Around DataOps-driven ELT with Douwe Maan, Founder and CEO of Meltano- Episode 99
 - [**Data Leadership Lessons**](https://podcasts.apple.com/us/podcast/open-source-data-operations-with-douwe-maan-episode-56/id1505108710?i=1000540320210)
   - Open Source Data Operations with Douwe Maan - Episode 56
 - [**Data Engineering Podcast**](https://podcasts.apple.com/al/podcast/open-source-production-grade-data-integration-meltano/id1193040557?i=1000484737750)
