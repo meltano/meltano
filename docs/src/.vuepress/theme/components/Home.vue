@@ -782,15 +782,16 @@ export default {
   ul {
     padding: 0 !important;
     margin: 0 !important;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    grid-gap: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
     align-items: center;
     justify-content: center;
 
     li {
       list-style: none;
       text-align: center;
+      flex: 250px;
 
       a {
         img {

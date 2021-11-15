@@ -286,11 +286,7 @@ To learn more about contributing to Meltano, refer to the [Contributor Guide](/d
 
 ## History
 
-Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team. Meltano started as an open source tool built for GitLab’s data and analytics team, who wanted an end-to-end data platform built around open source components and DevOps principles.
-
-In 2020, the project strategically [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)to focus on open source data integration (ELT).
-
-In 2021, After 3 years of being a GitLab incubator project, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
+Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team. Meltano started as an open source tool built for GitLab’s data and analytics team, who wanted an end-to-end data platform built around open source components and DevOps principles. You can read more about our history via our [handbook](https://handbook.meltano.com/timeline).
 
 ## Team
 
@@ -365,10 +361,9 @@ We're accountable for our mistakes, but we focus on learning from them and move 
 
 ## Careers <a name="job-openings" />
 
-The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! 
 
-If our [mission](#mission) excites you, and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
-Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
+If our [mission](#mission) excites you, and you think could make a difference, we'd love to talk to you. Apply directly through the [job openings](https://boards.greenhouse.io/meltano) below!
 
 <TeamGrid :openings="$frontmatter.openings" />
 

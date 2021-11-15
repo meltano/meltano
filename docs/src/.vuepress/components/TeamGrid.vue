@@ -49,11 +49,6 @@
               📝 Job description
             </a>
           </li>
-          <li class="email">
-            <a href="mailto:hello@meltano.com">
-              ✉️ Email us!
-            </a>
-          </li>
         </ul>
       </li>
     </ul>
