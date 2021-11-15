@@ -1,12 +1,12 @@
 import asyncio
 import logging
+import os
 from contextlib import suppress
 from logging import config as logging_config
 from typing import Dict, Optional
 
 import structlog
 import yaml
-from coverage.annotate import os
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
 from meltano.core.project_settings_service import ProjectSettingsService
 
