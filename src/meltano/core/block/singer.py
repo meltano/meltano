@@ -1,6 +1,4 @@
-"""
-SingerBlock wraps singer plugins to implement the IOBlock interface.
-"""
+"""SingerBlock wraps singer plugins to implement the IOBlock interface."""
 
 import asyncio
 from asyncio import StreamWriter, Task
@@ -18,12 +16,19 @@ from .ioblock import IOBlock
 
 
 class SingerBlock(IOBlock):
+    """SingerBlock wraps singer plugins to implement the IOBlock interface."""
+
     def __init__(self, plugin_invoker: PluginInvoker, plugin_args):
+        """Configure and return a Singer plunger wrapped as an IOBlock.
+
+        Args:
+            plugin_invoker: the plugin invoker.
+            plugin_args: any additional plugin args that should be used.
+        """
         self.outputs = []  # callback ?
         self.err_outputs = []
         self.invoker: PluginInvoker = plugin_invoker
         self.plugin_args: Tuple[str] = plugin_args
-        self.command_name = None
 
         self.producer: bool = self.invoker.plugin.type == PluginType.EXTRACTORS
         self.consumer: bool = self.invoker.plugin.type == PluginType.LOADERS
@@ -34,15 +39,19 @@ class SingerBlock(IOBlock):
         self._stderr_future: Task = None
 
     async def start(self):
+        """Start the SingerBlock by invoking the underlying plugin.
+
+        Raises:
+            RunnerError: If the plugin can not start.
+        """
         try:
             self._handle = await self.invoker.invoke_async(
                 *self.plugin_args,
-                command=self.command_name,
                 stdout=asyncio.subprocess.PIPE,  # Singer messages
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start extractor: {err}") from err
+            raise RunnerError(f"Cannot start plugin: {err}") from err
 
     async def stop(self):
         """Stop (kill) the underlying process and cancel output proxying."""
@@ -53,8 +62,13 @@ class SingerBlock(IOBlock):
         self.invoker.cleanup()
 
     def proxy_stdout(self) -> Task:
+        """Start proxying stdout to the linked stdout destinations.
+
+        Raises:
+            RunnerError: If the processes is not running and so - there is no IO to proxy.
+        """
         if self._handle is None:
-            raise Exception("No IO to proxy, process not running")
+            raise RunnerError("No IO to proxy, process not running")
 
         if self._stdout_future is None:
             self._stdout_future = asyncio.ensure_future(
@@ -64,6 +78,11 @@ class SingerBlock(IOBlock):
         return self._stdout_future
 
     def proxy_stderr(self) -> Task:
+        """Start proxying stderr to the linked stderr destinations.
+
+        Raises:
+            RunnerError: If the processes is not running and so - there is no IO to proxy.
+        """
         if self._handle is None:
             raise Exception("No IO to proxy, process not running")
 
@@ -76,6 +95,9 @@ class SingerBlock(IOBlock):
     def proxy_io(self) -> (Task, Task):
         """Start proxying stdout AND stderr to the respectively linked destinations.
 
+        Raises:
+            RunnerError: If the processes is not running and so - there is no IO to proxy.
+
         Returns: proxy_stdout Task and proxy_stderr Task
         """
         stdout = self.proxy_stdout()
@@ -84,6 +106,7 @@ class SingerBlock(IOBlock):
 
     @property
     def process_future(self) -> Task:
+        """Return the future of the underlying process wait() call."""
         if self._process_future is None:
             if self._handle is None:
                 raise Exception("No process to wait, process not running running")
@@ -92,6 +115,7 @@ class SingerBlock(IOBlock):
 
     @property
     def stdin(self) -> Optional[StreamWriter]:
+        """Return stdin of the underlying process."""
         return self._handle.stdin
 
     def stdout_link(self, dst: SubprocessOutputWriter):

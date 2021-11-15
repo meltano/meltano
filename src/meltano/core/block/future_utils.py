@@ -40,7 +40,7 @@ def handle_producer_line_length_limit_error(
     exception: Exception, line_length_limit: int, stream_buffer_size: int
 ):
     """
-    This function handles/wraps asyncio.LimitOverrunError's from producers.
+    Handle and wrap asyncio.LimitOverrunError's from producers, emitting an useful log line along the way.
 
     TODO: reuse from runner/singer.py
     StreamReader.readline can raise a ValueError wrapping a LimitOverrunError:

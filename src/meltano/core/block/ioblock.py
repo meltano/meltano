@@ -1,3 +1,5 @@
+"""The actual IOBlock interface is one of the lower level blocks for use with various BlockSet implementations."""
+
 from asyncio import StreamWriter, Task
 from typing import Optional, Protocol
 
@@ -42,7 +44,7 @@ class IOBlock(Protocol):
         ...
 
     def proxy_stderr(self) -> Task:
-        """Start proxying stderr to the linked stdout destinations.
+        """Start proxying stderr to the linked stderr destinations.
 
         Returns: Future of the proxy task.
         """

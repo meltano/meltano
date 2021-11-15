@@ -5,7 +5,7 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock, Mock
-from meltano.core.block.error import BlockSetValidationError
+from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import ExtractLoadBlocks
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job, Payload, State

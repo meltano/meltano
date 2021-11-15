@@ -1,6 +1,7 @@
+"""Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 from asyncio import Task
-from contextlib import suppress
+from contextlib import asynccontextmanager, suppress
 from typing import List, Set, Tuple
 
 from meltano.core.elt_context import ELTContextBuilder
@@ -8,13 +9,21 @@ from meltano.core.plugin import PluginType
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 
-from .error import BlockSetValidationError
+from .blockset import BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
 
 
 class ExtractLoadBlocks:
+    """A basic BlockSet interface implementation that supports running basic EL (extract, load) patterns."""
+
     def __init__(self, context: ELTContextBuilder, blocks: Tuple[IOBlock]):
+        """Initialize a basic BlockSet suitable for executing ELT tasks.
+
+        Args:
+            context: the elt context to use for this elt run.
+            blocks: the IOBlocks that should be used for this elt run.
+        """
         self.context = context
         self.blocks = blocks
         self.project_settings_service = ProjectSettingsService(
@@ -25,32 +34,7 @@ class ExtractLoadBlocks:
         self._process_futures = None
         self._stdout_futures = None
         self._stderr_futures = None
-        self._has_io = self._series_has_io()
         self._errors = []
-
-    def _series_has_io(self) -> bool:
-        for block in self.blocks:
-            if block.consumer or block.producer:
-                return True
-        return False
-
-    @property
-    def process_futures(self) -> List[Task]:
-        if self._process_futures is None:
-            self._process_futures = [block.process_future for block in self.blocks]
-        return self._process_futures
-
-    @property
-    def stdout_futures(self) -> List[Task]:
-        if self._stdout_futures is None:
-            self._stdout_futures = [block.proxy_stdout() for block in self.blocks]
-        return self._stdout_futures
-
-    @property
-    def stderr_futures(self) -> List[Task]:
-        if self._stderr_futures is None:
-            self._stderr_futures = [block.proxy_stderr() for block in self.blocks]
-        return self._stderr_futures
 
     def index_last_input_done(self) -> int:
         """Return index of the block furthest from the start that has exited and required input."""
@@ -77,23 +61,6 @@ class ExtractLoadBlocks:
         )
         return done
 
-    async def _upstream_stop(self, index):
-        """Stop all blocks upstream of a given index."""
-        for block in reversed(self.blocks[:index]):
-            await block.stop()
-
-    @property
-    def head(self) -> IOBlock:  # TODO: should be Producer block
-        return self.blocks[0]
-
-    @property
-    def tail(self) -> IOBlock:  # TODO: should be Consumer block
-        return self.blocks[-1]
-
-    @property
-    def intermediate(self) -> IOBlock:
-        return self.blocks[1:-1]
-
     def validate_set(self) -> None:
         # TODO: this method might not even need to exist here, whatever creates ExtractLoadBlock() should
         # probably pre-validate, but for MVP/testing its handy.
@@ -111,18 +78,59 @@ class ExtractLoadBlocks:
                 )
 
     async def run(self, session) -> bool:
-        try:  # noqa: WPS229
-            await self._start_blocks(session)
+        async with self._start_blocks(session):
             await self._link_io()
             await experimental_run(self, self.project_settings_service)
             return True
+
+    @staticmethod
+    async def terminate(self) -> bool:
+        return False
+
+    @property
+    def process_futures(self) -> List[Task]:
+        if self._process_futures is None:
+            self._process_futures = [block.process_future for block in self.blocks]
+        return self._process_futures
+
+    @property
+    def stdout_futures(self) -> List[Task]:
+        if self._stdout_futures is None:
+            self._stdout_futures = [block.proxy_stdout() for block in self.blocks]
+        return self._stdout_futures
+
+    @property
+    def stderr_futures(self) -> List[Task]:
+        if self._stderr_futures is None:
+            self._stderr_futures = [block.proxy_stderr() for block in self.blocks]
+        return self._stderr_futures
+
+    @property
+    def head(self) -> IOBlock:  # TODO: should be Producer block
+        return self.blocks[0]
+
+    @property
+    def tail(self) -> IOBlock:  # TODO: should be Consumer block
+        return self.blocks[-1]
+
+    @property
+    def intermediate(self) -> IOBlock:
+        return self.blocks[1:-1]
+
+    @asynccontextmanager
+    async def _start_blocks(self, session):
+        try:  # noqa:  WPS229
+            for block in self.blocks:
+                await block.pre({"session": session})
+                await block.start()
+            yield
         finally:
             self._cleanup()
 
-    async def _start_blocks(self, session):
-        for block in self.blocks:
-            await block.pre({"session": session})
-            await block.start()
+    async def _upstream_stop(self, index):
+        """Stop all blocks upstream of a given index."""
+        for block in reversed(self.blocks[:index]):
+            await block.stop()
 
     async def _cleanup(self):
         for block in self.blocks:
@@ -139,17 +147,11 @@ class ExtractLoadBlocks:
                 else:
                     raise Exception("run step requires input but has no upstream")
 
-    @staticmethod
-    async def terminate(self) -> bool:
-        return False
-
 
 async def experimental_run(  # noqa: WPS217
     elb: ExtractLoadBlocks, project_settings_service: ProjectSettingsService
 ):
-    """
-    This is very much still a WIP. If you're getting an early look at this MR keep in mind this isn't the final state.
-    """
+    """If you're getting an early look at this MR keep in mind this runner is still a WIP."""
     stream_buffer_size = project_settings_service.get("elt.buffer_size")
     line_length_limit = stream_buffer_size // 2
 
@@ -185,43 +187,10 @@ async def experimental_run(  # noqa: WPS217
 
     if consumer.process_future.done():
         consumer_code = consumer.process_future.result()
-
-        # TODO: when introducing inline transformers, we'll need to switch to upstream_complete(index) to verify
-        # everything upstream completed.
-        if elb.upstream_complete(len(elb.blocks) - 1):
-            producer_code = producer.process_future.result()
-        else:
-            # If the consumer (target) completes before the upstream producers, it failed before processing all output
-            # So we should kill the upstream producers and cancel output processing since theres no final destination
-            # to forward output to.
-
-            # TODO: when introducing inline transformers, we'll need to switch to upstream_stop() to stop
-            # everything upstream. I haven't done that yet to keep the door open for a refactor when add stream maps.
-
-            await producer.stop()
-            # Pretend the producer (tap) finished successfully since it didn't itself fail
-            producer_code = 0
-
-        # Wait for all buffered consumer (target) output to be processed
-        await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
-
+        producer_code = await _complete_upstream(elb)
     elif producer.process_future.done():
         producer_code = producer.process_future.result()
-
-        # If the tap completes before the target, the target should have a chance to process all tap output
-        # Wait for all buffered tap output to be processed
-        await asyncio.wait([producer.proxy_stdout(), producer.proxy_stderr()])
-
-        # Close target stdin so process can complete naturally
-        consumer.stdin.close()
-        with suppress(AttributeError):  # `wait_closed` is Python 3.7+
-            await consumer.stdin.wait_closed()
-
-        # Wait for all buffered target output to be processed
-        await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
-
-        # Wait for target to complete
-        consumer_code = await consumer.process_future
+        consumer_code = await _complete_downstream()
     else:  # would imply that a (not yet implemented) inline transformer finished first
         await producer.stop()
         producer_code = 1
@@ -232,12 +201,66 @@ async def experimental_run(  # noqa: WPS217
             {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
         )
 
+    _check_exit_codes(producer_code, consumer_code)
+
+
+async def _complete_upstream(elb: ExtractLoadBlocks) -> int:
+    producer = elb.head
+    consumer = elb.tail
+
+    # TODO: when introducing inline transformers, we'll need to switch to upstream_complete(index) to verify
+    # everything upstream completed.
+    if elb.upstream_complete(len(elb.blocks) - 1):
+        producer_code = producer.process_future.result()
+    else:
+        # If the consumer (target) completes before the upstream producers, it failed before processing all output
+        # So we should kill the upstream producers and cancel output processing since theres no final destination
+        # to forward output to.
+
+        # TODO: when introducing inline transformers, we'll need to switch to upstream_stop() to stop
+        # everything upstream. I haven't done that yet to keep the door open for a refactor when add stream maps.
+
+        await producer.stop()
+        # Pretend the producer (tap) finished successfully since it didn't itself fail
+        producer_code = 0
+
+    # Wait for all buffered consumer (target) output to be processed
+    await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
+
+    return producer_code
+
+
+async def _complete_downstream(elb: ExtractLoadBlocks) -> int:
+    producer = elb.head
+    consumer = elb.tail
+
+    # If the tap completes before the target, the target should have a chance to process all tap output
+    # Wait for all buffered tap output to be processed
+    await asyncio.wait([producer.proxy_stdout(), producer.proxy_stderr()])
+
+    # Close target stdin so process can complete naturally
+    consumer.stdin.close()
+    with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+        await consumer.stdin.wait_closed()
+
+    # Wait for all buffered target output to be processed
+    await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
+
+    # Wait for target to complete
+    await consumer.process_future
+    return consumer.process_future.result()
+
+
+def _check_exit_codes(producer_code: int, consumer_code: int):
+    """Check exit codes for failures, and raise the appropriate RunnerError if needed."""
     if producer_code and consumer_code:
         raise RunnerError(
             "Extractor and loader failed",
             {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
         )
-    elif producer_code:
+
+    if producer_code:
         raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})
-    elif consumer_code:
+
+    if consumer_code:
         raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
