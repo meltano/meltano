@@ -50,7 +50,7 @@ class EnvironmentService:
             environment: An instance of meltano.core.environment.Environment to add.
 
         Raises:
-            Exception: If an Environment with the same name already exists.
+            EnvironmentAlreadyExistsError: If an Environment with the same name already exists.
 
         Returns:
             The newly added Environment.
