@@ -18,7 +18,7 @@ class TestCliAdd:
         "plugin_type,plugin_name,default_variant,related_plugin_refs",
         [
             (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
-            (PluginType.LOADERS, "target-sqlite", "meltano", []),
+            (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
             (
                 PluginType.TRANSFORMS,
                 "tap-carbon-intensity",

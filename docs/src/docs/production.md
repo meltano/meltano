@@ -48,7 +48,7 @@ Once your Meltano project is in version control, getting it to your production
 environment can take various shapes.
 
 In general, we recommend setting up a CI/CD pipeline to run automatically whenever
-new changes are pushed to your reponsitory's default branch, that will connect with the
+new changes are pushed to your repository's default branch, that will connect with the
 production environment and either directly push the project files, or trigger
 some kind of mechanism to pull the latest changes from the repository.
 
@@ -147,7 +147,7 @@ or sensitive should be stored in its [`meltano.yml` project file](/docs/project.
 control.
 
 Configuration that _is_ environment-specific or sensitive is [most appropriately
-managed using environment variables](/docs/configuration.html#configuring-settings). How these can
+managed using environment variables](/docs/configuration.html#configuring-settings). [Meltano Environments](/docs/environments.md) can be used to better manage configuration between different deployment environments. How these can
 be best administered will depend on your deployment strategy and destination.
 
 If you'd like to store sensitive configuration in a secrets store, you can

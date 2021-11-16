@@ -1,3 +1,6 @@
+"""Google Analytics tracker for CLI commands."""
+
+import hashlib
 import json
 import logging
 import os
@@ -6,6 +9,7 @@ from typing import Dict
 
 import requests
 import yaml
+from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 REQUEST_TIMEOUT = 2.0
@@ -14,7 +18,19 @@ DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect
 
 
 class GoogleAnalyticsTracker:
-    def __init__(self, project, tracking_id: str = None, request_timeout: float = None):
+    def __init__(
+        self,
+        project: Project,
+        tracking_id: str = None,
+        request_timeout: float = None,
+    ):
+        """Create a new Google Analytics tracker.
+
+        Args:
+            project: Meltano project.
+            tracking_id: Unique identifier for tracking. Defaults to None.
+            request_timeout: For GA requests. Defaults to None.
+        """
         self.project = project
         self.settings_service = ProjectSettingsService(self.project)
 
@@ -119,6 +135,11 @@ class GoogleAnalyticsTracker:
             logging.debug(e)
 
     def track_event(self, category: str, action: str, debug: bool = False) -> None:
+        if self.project.active_environment is not None:
+            environment = self.project.active_environment
+            hashed_name = hashlib.sha256(environment.name.encode()).hexdigest()
+            action = f"{action} --environment={hashed_name}"
+
         event = self.event(category, action)
         self.track_data(event, debug)
 

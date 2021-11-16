@@ -2,6 +2,7 @@ import json
 import logging
 
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -34,14 +35,18 @@ class SelectService:
     @property
     def current_select(self):
         plugin_settings_service = PluginSettingsService(
-            self.project, self.extractor, plugins_service=self.plugins_service
+            self.project,
+            self.extractor,
+            plugins_service=self.plugins_service,
         )
         return plugin_settings_service.get("_select")
 
     async def load_catalog(self, session):
         """Load the catalog."""
         invoker = invoker_factory(
-            self.project, self.extractor, plugins_service=self.plugins_service
+            self.project,
+            self.extractor,
+            plugins_service=self.plugins_service,
         )
 
         async with invoker.prepared(session):
@@ -65,7 +70,15 @@ class SelectService:
 
     def update(self, entities_filter, attributes_filter, exclude, remove=False):
         """Update plugins' select patterns."""
-        plugin = self.extractor
+        plugin: PluginRef
+
+        if self.project.active_environment is None:
+            plugin = self.extractor
+        else:
+            plugin = self.project.active_environment.get_plugin_config(
+                self.extractor.type, self.extractor.name
+            )
+
         this_pattern = self._get_pattern_string(
             entities_filter, attributes_filter, exclude
         )
@@ -75,7 +88,11 @@ class SelectService:
         else:
             patterns.append(this_pattern)
         plugin.extras["select"] = patterns
-        self.plugins_service.update_plugin(plugin)
+
+        if self.project.active_environment is None:
+            self.plugins_service.update_plugin(plugin)
+        else:
+            self.plugins_service.update_environment_plugin(plugin)
 
     @staticmethod
     def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:

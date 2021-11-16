@@ -123,24 +123,11 @@ To find guides and references on other topics, use the Table of Contents in the 
 
 ## Mission
 
-Our mission is to enable every organization to make the
-best decisions possible by becoming data-informed.
+Our mission is to enable everyone to realize the full potential of their data.
 
-To achieve this mission we are building an **open source platform for the complete DataOps lifecycle**
-that is optimized for the happiness and productivity of Data Teams and Data Professionals.
-It integrates best-in-class [open source components](/docs/plugins.html) and
-enables teams to collaborate on data projects and pipelines more efficiently and with higher confidence.
+Our vision is for Meltano to become the foundation of every team's ideal data stack.
 
-Our focus has been on bringing these qualities to the first step in any data journey:
-integration and transformation, aka EL(T): [Extract, Load, Transform](https://en.wikipedia.org/wiki/Extract,_load,_transform),
-where traditional solutions are either off-the-shelf and near-impossible to extend, tweak, and debug,
-or fully custom and a pain to maintain.
-
-We believe that [data integration is ripe for commoditization](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/),
-and are building towards a future in which fast and reliable **open source connectors
-for every data source and destination** in the world will be freely available,
-collectively maintained by a community of data engineers in consulting and at in-house data teams,
-and by API vendors themselves, just like we see with API client libraries today.
+Our CEO, Douwe Maan, wrote a detailed post about why we believe in this mission and vision [here](https://meltano.com/blog/meltano-the-strategic-foundation-of-the-ideal-data-stack/).
 
 ### Embracing Singer
 
@@ -170,19 +157,21 @@ developers to build **connectors with all the bells and whistles** without havin
 This further lowers the barrier to creating new connectors and contributing to existing ones,
 and will lead to increased reliability and consistency.
 
+We've also [launched](https://meltano.com/blog/launching-meltanolabs-your-home-for-singer-connectors-dbt-packages-and-all-meltano-plugins/) [MeltanoLabs](https://github.com/MeltanoLabs) which is the best place for the community to collaboratively support open source connectors. 
+
 We've also [created an interpretation of the Singer specification](https://hub.meltano.com/singer/spec)
 that aims to be clearer for newcomers to the project. We believe the spec is great in its current version, but
 confusing documentation has made it challenging for some to onboard to the community.
 
-Last but not least, we intend to **[**unlock the evolution**](https://gitlab.com/groups/meltano/-/epics/88) of the
-[**Singer spec**](https://hub.meltano.com/singer/spec)** through
-a framework for the proposal and consideration of optional extensions to the spec
+Last but not least, we're also **[**unlocking the evolution**](https://gitlab.com/groups/meltano/-/epics/88) of the
+[**Singer spec**](https://hub.meltano.com/singer/spec)** through the [Singer Working Group](https://meltano.com/blog/2021/10/13/announcing-the-singer-working-group-the-future-of-singer-is-bright/).
+This is a framework built with the community for the proposal and consideration of optional extensions to the spec
 that compatible tools, including the SDK and Meltano, can choose to support,
 while maintaining compatibility between all taps and targets.
 
 ## Focus
 
-As described above, our vision for ELT in the DataOps era involves
+Our vision for ELT in the DataOps era involves
 a decentralized ecosystem of open source connectors and
 a community of data engineers maintaining and contributing to these projects.
 
@@ -242,36 +231,38 @@ Our focus for the rest of the year is going to mainly be in two categories:
 These efforts are the foundation of our larger vision to enable a full DataOps platform.
 
 
-### October 2021
+### November 2021
 
 * Composable Meltano Pipelines - [Epic](https://gitlab.com/groups/meltano/-/epics/116)
   * `meltano run` [Issue](https://gitlab.com/meltano/meltano/-/issues/2301)
   * Stream Maps [Issue](https://gitlab.com/meltano/meltano/-/issues/2300)
+* Structured Logging [Issue](https://gitlab.com/meltano/meltano/-/issues/2772)
 * Easy deployment of Meltano for production development - [Epic](https://gitlab.com/groups/meltano/-/epics/124)
-* Native Environments - [Issue](https://gitlab.com/meltano/meltano/-/issues/2869)
 * Add validator plugin type with Great Expectations and `dbt test` support  - [Epic](https://gitlab.com/groups/meltano/-/epics/111)
 * Telemetry Enhancements for Meltano, Meltano SDK, and MeltanoHub - [Epic](https://gitlab.com/groups/meltano/-/epics/122)
 
-### November 2021
-
-* Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
-* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
-* Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
-
 ### December 2021
 
+* Release v1.0 of Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/121)
 * Documentation Overhaul - [Epic](https://gitlab.com/groups/meltano/-/epics/81)
-* Monitoring, observability, and data lineage - [Epic](https://gitlab.com/groups/meltano/-/epics/93)
+* Support non-Python plugins - [Issue](https://gitlab.com/meltano/meltano/-/issues/2205)
+* Add support for OpenMetadata observability - [Epic](https://gitlab.com/groups/meltano/-/epics/93) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2805)
+* Add Fast Sync / `BATCH` Messages to Meltano SDK - [Epic](https://gitlab.com/groups/meltano/-/epics/114)
 * Add Dagster as an Orchestrator - [Epic](https://gitlab.com/groups/meltano/-/epics/113) & [Issue](https://gitlab.com/meltano/meltano/-/issues/2393)
 
+
+### January 2022
+
+* Add Pluggable Log / Metadata Shipping for Observability Enhancement - [Issue](https://gitlab.com/meltano/meltano/-/issues/3008) & [Epic](https://gitlab.com/groups/meltano/-/epics/93)
+* Support Secrets Backends Natively -[Issue](https://gitlab.com/meltano/meltano/-/issues/2918)
+* UI Improvements and Parity - [Issue](https://gitlab.com/groups/meltano/-/epics/78)
 
 ### 2022-H1
 
 Next year will be continuing to make Meltano the best data integration tool on the market and Singer the best open source ecosystem.
 With this great foundation in place, we'll continue to invest in making Meltano the best DataOps platform on the market.
-This means focusing more on the user interface and on sell Meltano to paying customers.
+This means focusing more on the user interface and on adding features that enable our DataOps vision.
 
-* [Fully featured UI](https://gitlab.com/groups/meltano/-/epics/78)
 * [SaaS Deployment of Meltano](https://gitlab.com/groups/meltano/-/epics/94)
 * [Out-of-the-box support for an OLAP Database](https://gitlab.com/meltano/meltano/-/issues/2634)
 * [Initial conversion of MeltanoHub to dynamic site](https://gitlab.com/groups/meltano/-/epics/101)
@@ -295,11 +286,7 @@ To learn more about contributing to Meltano, refer to the [Contributor Guide](/d
 
 ## History
 
-Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team. Meltano started as an open source tool built for GitLab’s data and analytics team, who wanted an end-to-end data platform built around open source components and DevOps principles.
-
-In 2020, the project strategically [pivoted](https://meltano.com/blog/2020/05/13/why-we-are-building-an-open-source-platform-for-elt-pipelines/)to focus on open source data integration (ELT).
-
-In 2021, After 3 years of being a GitLab incubator project, Meltano [spun out](https://meltano.com/blog/2021/06/30/meltano-spins-out-of-gitlab-raises-seed-round) of GitLab and raised a seed funding round to become an independent startup and bring the benefits of open source data integration and DataOps to a wider audience.
+Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team. Meltano started as an open source tool built for GitLab’s data and analytics team, who wanted an end-to-end data platform built around open source components and DevOps principles. You can read more about our history via our [handbook](https://handbook.meltano.com/timeline).
 
 ## Team
 
@@ -374,10 +361,9 @@ We're accountable for our mistakes, but we focus on learning from them and move 
 
 ## Careers <a name="job-openings" />
 
-The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! See a complete list of our [job openings](https://boards.greenhouse.io/meltano)!
+The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! 
 
-If our [mission](#mission) excites you, and you think could make a great addition to the team in one of the following roles, we'd love to talk to you.
-Please send a cover letter and resume to [hello@meltano.com](mailto:hello@meltano.com) and you'll hear back from us shortly.
+If our [mission](#mission) excites you, and you think could make a difference, we'd love to talk to you. Apply directly through the [job openings](https://boards.greenhouse.io/meltano) below!
 
 <TeamGrid :openings="$frontmatter.openings" />
 

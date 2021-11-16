@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "1.84.0"
+version = "1.87.1"
 description = "Meltano"
 authors = ["Meltano Team and Contributors <meltano@gitlab.com>"]
 license = "MIT"
@@ -36,7 +36,7 @@ flask-sqlalchemy = "^2.4.4"
 flatten-dict = "^0.1.0"
 gunicorn = "^19.9.0"
 ipython = "^7.5.0"
-jsonschema = "^2.6.0"
+jsonschema = "^3.0.0"
 markdown = "^3.0.1"
 meltano-flask-security = "^0.1.0"
 networkx = "^2.2"
@@ -194,6 +194,8 @@ wemake-python-styleguide = [
   "-WPS218",  # Don't warn on too many `assert` statements in test methods
   "-WPS214",  # Don't warn on too many methods in test modules
   "-WPS226",  # Don't warn on too many string constants in test methods
+  "-WPS440",  # Ignore false positives for block variables overlap
+  "-WPS441",  # Ignore false positives for control variable used after block
   "-WPS442",  # Allow outer scope name shadowing for fixtures
   "-WPS430",  # Allow nested functions in test methods
   "-WPS437",  # Allow protected attribute usage in test methods
@@ -220,6 +222,9 @@ wemake-python-styleguide = ["-WPS601"] # Class attributes can be used as instanc
 
 [tool.flakehell.exceptions."**/__init__.py"]
 pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the module namespace
+
+[tool.flakehell.exceptions."src/meltano/core/project_files.py"]
+wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

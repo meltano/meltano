@@ -10,11 +10,77 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#3003](https://gitlab.com/meltano/meltano/-/issues/3003) Add `matatika` variant of tap-solarvista extractor.
+
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.87.1 - (2021-11-09)
+---
+
+### Changes
+
+- [#3042](https://gitlab.com/meltano/meltano/-/issues/3042) Hides non-default `meltano` variants from the UI.
+
+### Fixes
+
+- [#3015](https://gitlab.com/meltano/meltano/-/issues/3015) Add missing settings to default target-snowflake: `role`, `batch_wait_limit_seconds`, `archive_load_files`, `archive_load_files_s3_prefix`, and `archive_load_files_s3_bucket` 
+- [#3047](https://gitlab.com/meltano/meltano/-/issues/3047) Don't fail if primary `meltano.yml` file is missing top-level entries.
+- [#3049](https://gitlab.com/meltano/meltano/-/issues/3049) Fix installation issues caused by breaking change in WTForms library v3.0.x.
+
+
+## 1.87.0 - (2021-11-05)
+---
+
+### New
+
+- [#2456](https://gitlab.com/meltano/meltano/-/issues/2456) Let project plugin definitions and config be defined in multiple individual YAML files. _Thanks, **[Matthew Thurman](https://gitlab.com/mathurmag)** for the inspiration and first draft!_
+
+
+### Breaks
+
+- [#2977](https://gitlab.com/meltano/meltano/-/issues/2977) Disable the Explore and Dashboards tabs in the UI by default.
+
+
+## 1.86.0 - (2021-10-28)
+---
+
+### New
+
+- [#2869](https://gitlab.com/meltano/meltano/-/issues/2869) Introduce top-level "Environments" within `meltano.yml`
+
+
+### Changes
+
+- [#2968](https://gitlab.com/meltano/meltano/-/issues/2968) Set `singer-io` as the default tap-marketo extractor.
+- [#2970](https://gitlab.com/meltano/meltano/-/issues/2970) Set `singer-io` as the default tap-stripe extractor.
+- [#2971](https://gitlab.com/meltano/meltano/-/issues/2971) Set `meltanolabs` as the default target-sqlite loader.
+
+### Fixes
+
+- [#3027](https://gitlab.com/meltano/meltano/-/issues/3027) Fixes an issue where elt invocation could hang if the tap produced large amounts of error output during discovery.
+
+
+## 1.85.0 - (2021-10-21)
+---
+
+### Changes
+
+- [#2986](https://gitlab.com/meltano/meltano/-/issues/2986) Set `transferwise` as the default target-snowflake loader.
+- [#2966](https://gitlab.com/meltano/meltano/-/issues/2966) Set `singer-io` as the default tap-adwords extractor.
+- [#2964](https://gitlab.com/meltano/meltano/-/issues/2964) Set `singer-io` as the default tap-facebook extractor.
+- [#2963](https://gitlab.com/meltano/meltano/-/issues/2963) Set `meltanolabs` as the default tap-csv extractor.
+- [#2965](https://gitlab.com/meltano/meltano/-/issues/2965) Set `meltanolabs` as the default tap-gitlab extractor.
+- [2339](https://gitlab.com/meltano/meltano/-/merge_requests/2339) Update `elt` log format to include subtask field. Lines are now prefixed with `<name> | <subtask>` which may cause issues with existing log parsers.
+
+
+### Fixes
+
+- [#2997](https://gitlab.com/meltano/meltano/-/issues/2997) Bump required version of `jsonschema`.
 
 
 ## 1.84.0 - (2021-10-07)

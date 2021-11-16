@@ -8,7 +8,7 @@ const docsSidebar = [
     title: "Concepts",
     collapsable: false,
     sidebarDepth: 2,
-    children: ["/docs/project", "/docs/plugins"],
+    children: ["/docs/project", "/docs/plugins", "/docs/environments"],
   },
   {
     title: "Guide",
@@ -170,7 +170,7 @@ module.exports = {
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join 1700+ on Slack",
+        text: "Join 1800+ on Slack",
         link:
           "https://meltano.com/slack",
         icon: "SlackIcon",
