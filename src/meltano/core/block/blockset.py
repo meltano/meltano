@@ -43,7 +43,7 @@ class BlockSet(Protocol):
         pass
 
     def validate_set(self) -> None:  # TODO: probably not required long term
-        """Validate a block set to ensure its valid and runable.
+        """Validate a block set to ensure its valid and runnable.
 
         Raises: BlockSetValidationError on validation failure
         """

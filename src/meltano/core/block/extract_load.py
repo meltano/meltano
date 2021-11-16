@@ -14,7 +14,7 @@ from .future_utils import first_failed_future, handle_producer_line_length_limit
 from .ioblock import IOBlock
 
 
-class ExtractLoadBlocks:
+class ExtractLoadBlocks:  # noqa: WPS214
     """A basic BlockSet interface implementation that supports running basic EL (extract, load) patterns."""
 
     def __init__(self, context: ELTContextBuilder, blocks: Tuple[IOBlock]):
@@ -62,9 +62,10 @@ class ExtractLoadBlocks:
         return done
 
     def validate_set(self) -> None:
-        # TODO: this method might not even need to exist here, whatever creates ExtractLoadBlock() should
-        # probably pre-validate, but for MVP/testing its handy.
+        """Validate a ExtractLoad block set to ensure its valid and runnable.
 
+        Raises: BlockSetValidationError on validation failure
+        """
         if self.head.consumer:
             raise BlockSetValidationError("first block in set should not be consumer")
 
@@ -78,43 +79,63 @@ class ExtractLoadBlocks:
                 )
 
     async def run(self, session) -> bool:
+        """Build the IO chain and execute the actual ELT task.
+
+        Raises:
+            RunnerError if failures are encountered during execution.
+        """
         async with self._start_blocks(session):
             await self._link_io()
             await experimental_run(self, self.project_settings_service)
             return True
 
     @staticmethod
-    async def terminate(self) -> bool:
+    async def terminate(self, graceful: bool = True) -> bool:
+        """Terminate an in flight ExtractLoad execution, potentially disruptive.
+
+        Not actually implemented yet.
+
+        Args:
+            graceful: Whether or not the BlockSet should try to gracefully quit.
+        Returns:
+            Whether or not the BlockSet terminated successfully.
+        """
         return False
 
     @property
     def process_futures(self) -> List[Task]:
+        """Access the futures of the blocks subprocess calls."""
         if self._process_futures is None:
             self._process_futures = [block.process_future for block in self.blocks]
         return self._process_futures
 
     @property
     def stdout_futures(self) -> List[Task]:
+        """Access the futures of the blocks stdout proxy tasks."""
         if self._stdout_futures is None:
             self._stdout_futures = [block.proxy_stdout() for block in self.blocks]
         return self._stdout_futures
 
     @property
     def stderr_futures(self) -> List[Task]:
+        """Access the futures of the blocks stderr proxy tasks."""
         if self._stderr_futures is None:
             self._stderr_futures = [block.proxy_stderr() for block in self.blocks]
         return self._stderr_futures
 
     @property
-    def head(self) -> IOBlock:  # TODO: should be Producer block
+    def head(self) -> IOBlock:
+        """Obtain the first block in the block set."""
         return self.blocks[0]
 
     @property
-    def tail(self) -> IOBlock:  # TODO: should be Consumer block
+    def tail(self) -> IOBlock:
+        """Obtain the last block in the block set."""
         return self.blocks[-1]
 
     @property
     def intermediate(self) -> IOBlock:
+        """Obtain the intermediate blocks in the set - excluding the first and last block."""
         return self.blocks[1:-1]
 
     @asynccontextmanager
@@ -151,7 +172,13 @@ class ExtractLoadBlocks:
 async def experimental_run(  # noqa: WPS217
     elb: ExtractLoadBlocks, project_settings_service: ProjectSettingsService
 ):
-    """If you're getting an early look at this MR keep in mind this runner is still a WIP."""
+    """If you're getting an early look at this MR keep in mind this runner is still a WIP.
+
+    Hence it being broken out as a func and named experimental_run. We need much more extensive
+    tests (unit and functional) to verify this works.
+
+    It also contains rough shims and todos to account for multiple intermediate blocks (i.e. steam map transforms).
+    """
     stream_buffer_size = project_settings_service.get("elt.buffer_size")
     line_length_limit = stream_buffer_size // 2
 
@@ -178,7 +205,7 @@ async def experimental_run(  # noqa: WPS217
         # If all of the output handlers completed without raising an exception,
         # we still need to wait for all of the underlying block processes to complete.
         done, _ = await asyncio.wait(
-            [*elb.process_futures],
+            [elb.process_futures],
             return_when=asyncio.FIRST_COMPLETED,
         )
 

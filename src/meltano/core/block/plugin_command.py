@@ -63,7 +63,7 @@ class InvokerCommand(InvokerBase):
             await self.start(self.command_args)
 
             self.stdout_link(self._log)
-            self.stderr_ling(self._log)
+            self.stderr_link(self._log)
 
             await asyncio.wait(
                 self.proxy_io(),
