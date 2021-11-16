@@ -55,7 +55,7 @@ You can add the Meltano DAG generator to your project without also installing th
 meltano add files airflow
 ```
 
-Now, you'll want to copy the DAG generator your Airflow installation's `dags_folder`,
+Now, you'll want to copy the DAG generator to your Airflow installation's `dags_folder`,
 or reconfigure it to look in your project's `orchestrate/dags` directory instead.
 
 This setup assumes you'll use `meltano schedule` to schedule your `meltano elt`
