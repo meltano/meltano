@@ -129,7 +129,7 @@ class Environment(NameEq, Canonical):
         self,
         plugin_type: PluginType,
         name: str,
-    ) -> Optional[EnvironmentPluginConfig]:
+    ) -> EnvironmentPluginConfig:
         """Get configuration for a plugin in this environment.
 
         Args:
@@ -139,10 +139,12 @@ class Environment(NameEq, Canonical):
         Returns:
             A plugin configuration object if one is present in this environment.
         """
+        default = EnvironmentPluginConfig(plugin_type, name)
+
         return next(
             filter(
                 lambda plugin: plugin.name == name,
                 self.config.plugins.get(plugin_type, []),
             ),
-            None,
+            default,
         )
