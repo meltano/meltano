@@ -4,7 +4,7 @@
 # nested in that directory, on any level
 
 # Default
-* @DouweM @aaronsteers @pandemicsyn @edgarrmondragon @emily @afolson 
+* @DouweM @aaronsteers @pandemicsyn @edgarrmondragon
 
 # Docs
-/docs/src/docs/ @meltano/core-team
+/docs/ @meltano/core-team
