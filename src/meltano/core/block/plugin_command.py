@@ -12,7 +12,7 @@ except ImportError:
     from typing_extensions import Protocol  # noqa:  WPS433,WPS440
 
 
-class PluginCommand(Protocol):
+class PluginCommandBlock(Protocol):
     """Basic PluginCommand interface specification."""
 
     name: str
@@ -24,7 +24,7 @@ class PluginCommand(Protocol):
 
 
 class InvokerCommand(InvokerBase):
-    """A basic PluginCommmand interface implementation that supports running plugin commands."""
+    """A basic PluginCommandBlock interface implementation that supports running plugin commands."""
 
     def __init__(
         self,
