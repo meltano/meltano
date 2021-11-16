@@ -3,63 +3,71 @@
 import asyncio
 from asyncio import StreamWriter, Task
 from asyncio.subprocess import Process
-from typing import Optional
+from typing import Dict, Optional, Tuple
 
-from click import Tuple
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.utils import SubprocessOutputWriter
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 
 from .ioblock import IOBlock
 
 
-class SingerBlock(IOBlock):
-    """SingerBlock wraps singer plugins to implement the IOBlock interface."""
+class InvokerBase:  # noqa: WPS230
+    """Base class for creating IOBlock's built on top of existing Meltano plugins."""
 
-    def __init__(self, plugin_invoker: PluginInvoker, plugin_args):
-        """Configure and return a Singer plunger wrapped as an IOBlock.
+    def __init__(
+        self, block_ctx, plugin_invoker: PluginInvoker, command: Optional[str]
+    ):
+        """Configure and return a wrapped plugin invoker extendable for use as an IOBlock or PluginCommandBlock.
 
         Args:
-            plugin_invoker: the plugin invoker.
-            plugin_args: any additional plugin args that should be used.
+            block_ctx: context that should be used for this instance to do things like obtaining project settings.
+            plugin_invoker: the actual plugin invoker.
+            command: the optional command to invoke.
         """
-        self.outputs = []  # callback ?
-        self.err_outputs = []
+        self.context = block_ctx
+        self.project_settings_service = ProjectSettingsService(
+            self.context.project,
+            config_service=self.context.plugins_service.config_service,
+        )
+
         self.invoker: PluginInvoker = plugin_invoker
-        self.plugin_args: Tuple[str] = plugin_args
+        self.command: Optional[str] = command
 
-        self.producer: bool = self.invoker.plugin.type == PluginType.EXTRACTORS
-        self.consumer: bool = self.invoker.plugin.type == PluginType.LOADERS
+        self.outputs = []
+        self.err_outputs = []
 
-        self._handle: Process = None
+        self.process_handle: Process = None
         self._process_future: Task = None
         self._stdout_future: Task = None
         self._stderr_future: Task = None
 
-    async def start(self):
-        """Start the SingerBlock by invoking the underlying plugin.
+    async def start(self, *args, **kwargs):
+        """Spawn the process, invoking the underlying plugin.
 
         Raises:
-            RunnerError: If the plugin can not start.
+            RunnerError: If the plugin process can not start.
         """
         try:
-            self._handle = await self.invoker.invoke_async(
-                *self.plugin_args,
-                stdout=asyncio.subprocess.PIPE,  # Singer messages
-                stderr=asyncio.subprocess.PIPE,  # Log
+            self.process_handle = await self.invoker.invoke_async(
+                *args,
+                command=self.command,
+                **kwargs,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
         except Exception as err:
             raise RunnerError(f"Cannot start plugin: {err}") from err
 
     async def stop(self):
         """Stop (kill) the underlying process and cancel output proxying."""
-        self._handle.kill()
+        self.process_handle.kill()
         await self.process_future
         self.proxy_stdout.cancel()
         self.proxy_stderr.cancel()
-        self.invoker.cleanup()
 
     def proxy_stdout(self) -> Task:
         """Start proxying stdout to the linked stdout destinations.
@@ -67,13 +75,13 @@ class SingerBlock(IOBlock):
         Raises:
             RunnerError: If the processes is not running and so - there is no IO to proxy.
         """
-        if self._handle is None:
+        if self.process_handle is None:
             raise RunnerError("No IO to proxy, process not running")
 
         if self._stdout_future is None:
             self._stdout_future = asyncio.ensure_future(
                 # forward subproc stdout to downstream (i.e. targets stdin, loggers)
-                capture_subprocess_output(self._handle.stdout, *self.outputs)
+                capture_subprocess_output(self.process_handle.stdout, *self.outputs)
             )
         return self._stdout_future
 
@@ -83,12 +91,12 @@ class SingerBlock(IOBlock):
         Raises:
             RunnerError: If the processes is not running and so - there is no IO to proxy.
         """
-        if self._handle is None:
+        if self.process_handle is None:
             raise Exception("No IO to proxy, process not running")
 
         if self._stderr_future is None:
             self._stderr_future = asyncio.ensure_future(
-                capture_subprocess_output(self._handle.stderr, *self.err_outputs)
+                capture_subprocess_output(self.process_handle.stderr, *self.err_outputs)
             )
         return self._stderr_future
 
@@ -108,15 +116,15 @@ class SingerBlock(IOBlock):
     def process_future(self) -> Task:
         """Return the future of the underlying process wait() call."""
         if self._process_future is None:
-            if self._handle is None:
+            if self.process_handle is None:
                 raise Exception("No process to wait, process not running running")
-            self._process_future = asyncio.ensure_future(self._handle.wait())
+            self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future
 
     @property
     def stdin(self) -> Optional[StreamWriter]:
         """Return stdin of the underlying process."""
-        return self._handle.stdin
+        return self.process_handle.stdin
 
     def stdout_link(self, dst: SubprocessOutputWriter):
         """Use stdout_link to instruct block to link/write stdout content to dst.
@@ -140,10 +148,83 @@ class SingerBlock(IOBlock):
         else:
             raise Exception("IO capture already in flight")
 
-    async def pre(self, block_ctx) -> None:
+    async def pre(self, context: Dict) -> None:
         """Pre triggers preparation of the underlying plugin."""
-        await self.invoker.prepare(block_ctx.get("session"))
+        await self.invoker.prepare(context.get("session"))
 
     async def post(self) -> None:
-        """Post triggers reseting the underlying plugin config."""
+        """Post triggers resetting the underlying plugin config."""
         await self.invoker.cleanup()
+
+
+class SingerBlock(InvokerBase, IOBlock):
+    """SingerBlock wraps singer plugins to implement the IOBlock interface."""
+
+    def __init__(
+        self, block_ctx: Dict, plugin_invoker: PluginInvoker, plugin_args: Tuple[str]
+    ):
+        """Configure and return a Singer plugin wrapped as an IOBlock.
+
+        Args:
+            block_ctx: the block context.
+            plugin_invoker: the plugin invoker.
+            plugin_args: any additional plugin args that should be used.
+        """
+        super().__init__(
+            block_ctx=block_ctx, plugin_invoker=plugin_invoker, command=None
+        )
+
+        self.producer: bool = self.invoker.plugin.type == PluginType.EXTRACTORS
+        self.consumer: bool = self.invoker.plugin.type == PluginType.LOADERS
+
+    async def start(self):
+        """Start the SingerBlock by invoking the underlying plugin.
+
+        Raises:
+            RunnerError: If the plugin can not start.
+        """
+        stream_buffer_size = self.project_settings_service.get("elt.buffer_size")
+        line_length_limit = stream_buffer_size // 2
+        if self.consumer:
+            await self._consumer_start(line_length_limit)
+        else:
+            await self._producer_start(line_length_limit)
+
+    async def stop(self):
+        """Stop (kill) the underlying process and cancel output proxying."""
+        self._handle.kill()
+        await self.process_future
+        self.proxy_stdout.cancel()
+        self.proxy_stderr.cancel()
+        self.invoker.cleanup()
+
+    async def _producer_start(self, line_length_limit: int) -> Process:
+        """Only stdout and stderr is need for io capture for producers.
+
+        Args:
+            line_length_limit: io line length limit.
+        """
+        try:
+            self.process_handle = await self.invoker.invoke_async(
+                limit=line_length_limit,
+                stdout=asyncio.subprocess.PIPE,  # Singer messages
+                stderr=asyncio.subprocess.PIPE,  # Log
+            )
+        except Exception as err:
+            raise RunnerError(f"Cannot start plugin: {err}") from err
+
+    async def _consumer_start(self, line_length_limit: int) -> Process:
+        """Consumers require stdin to be configured in addition to stdout/stderr.
+
+        Args:
+            line_length_limit: io line length limit.
+        """
+        try:
+            self.process_handle = await self.invoker.invoke_async(
+                limit=line_length_limit,
+                stdin=asyncio.subprocess.PIPE,  # Singer messages
+                stdout=asyncio.subprocess.PIPE,  # Singer state
+                stderr=asyncio.subprocess.PIPE,  # Log
+            )
+        except Exception as err:
+            raise RunnerError(f"Cannot start plugin: {err}") from err

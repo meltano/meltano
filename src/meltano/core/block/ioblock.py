@@ -33,7 +33,7 @@ class IOBlock(Protocol):
     async def start(self) -> None:
         """Start the block.
 
-        Whatever that might entail (spanning a process, spinning up a async task that will handle transforms, etc
+        Whatever that might entail (spwaning a process, spinning up a async task that will handle transforms, etc)
         """
         ...
 

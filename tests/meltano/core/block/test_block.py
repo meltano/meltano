@@ -118,8 +118,12 @@ class TestBlock:
         ) as invoke_async:
 
             blocks = (
-                SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),
-                SingerBlock(plugin_invoker=target_invoker, plugin_args=[]),
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                ),
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=target_invoker, plugin_args=[]
+                ),
             )
 
             elb = ExtractLoadBlocks(elt_context, blocks)
@@ -163,7 +167,11 @@ class TestBlock:
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async:
 
-            blocks = (SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),)
+            blocks = (
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                ),
+            )
             elb = ExtractLoadBlocks(elt_context, blocks)
             with pytest.raises(
                 BlockSetValidationError,
@@ -172,8 +180,12 @@ class TestBlock:
                 elb.validate_set()
 
             blocks = (
-                SingerBlock(plugin_invoker=target_invoker, plugin_args=[]),
-                SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=target_invoker, plugin_args=[]
+                ),
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                ),
             )
             elb = ExtractLoadBlocks(elt_context, blocks)
             with pytest.raises(
@@ -183,9 +195,15 @@ class TestBlock:
                 elb.validate_set()
 
             blocks = (
-                SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),
-                SingerBlock(plugin_invoker=tap_invoker, plugin_args=[]),
-                SingerBlock(plugin_invoker=target_invoker, plugin_args=[]),
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                ),
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                ),
+                SingerBlock(
+                    block_ctx=elt_context, plugin_invoker=target_invoker, plugin_args=[]
+                ),
             )
             elb = ExtractLoadBlocks(elt_context, blocks)
             with pytest.raises(
