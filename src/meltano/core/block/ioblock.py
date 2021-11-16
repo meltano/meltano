@@ -1,9 +1,14 @@
 """The actual IOBlock interface is one of the lower level blocks for use with various BlockSet implementations."""
 
 from asyncio import StreamWriter, Task
-from typing import Optional, Protocol
+from typing import Optional
 
 from meltano.core.logging.utils import SubprocessOutputWriter
+
+try:
+    from typing import Protocol  # noqa:  WPS433
+except ImportError:
+    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
 
 
 class IOBlock(Protocol):

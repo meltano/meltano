@@ -74,14 +74,14 @@ class TestBlock:
     @pytest.fixture()
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
-        tap.stdout.readline = CoroutineMock(return_value="{}")
+        tap.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
         tap.wait = CoroutineMock(return_value=0)
         return tap
 
     @pytest.fixture()
     def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
-        target.stdout.readline = CoroutineMock(return_value="{}")
+        target.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
         target.wait = CoroutineMock(return_value=0)
         return target
 

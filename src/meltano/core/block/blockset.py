@@ -1,5 +1,8 @@
 """This holds the actual BlockSet interface class as well as related components such as exceptions."""
-from typing import Protocol
+try:
+    from typing import Protocol  # noqa:  WPS433
+except ImportError:
+    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
 
 
 class BlockSetValidationError(Exception):
