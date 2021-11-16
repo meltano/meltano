@@ -1,9 +1,10 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 from asyncio import Task
-from contextlib import asynccontextmanager, suppress
+from contextlib import suppress
 from typing import List, Set, Tuple
 
+from async_generator import asynccontextmanager
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.plugin import PluginType
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -146,7 +147,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
                 await block.start()
             yield
         finally:
-            self._cleanup()
+            await self._cleanup()
 
     async def _upstream_stop(self, index):
         """Stop all blocks upstream of a given index."""
@@ -205,7 +206,7 @@ async def experimental_run(  # noqa: WPS217
         # If all of the output handlers completed without raising an exception,
         # we still need to wait for all of the underlying block processes to complete.
         done, _ = await asyncio.wait(
-            [elb.process_futures],
+            elb.process_futures,
             return_when=asyncio.FIRST_COMPLETED,
         )
 
