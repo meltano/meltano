@@ -22,6 +22,7 @@ from .params import pass_project
 @click.pass_context
 @pass_project(migrate=True)
 def schedule(project, ctx):
+    """Manage Schedules."""
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
 
