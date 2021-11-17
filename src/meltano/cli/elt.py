@@ -4,6 +4,7 @@ import logging
 from contextlib import contextmanager
 
 import click
+import structlog
 from async_generator import asynccontextmanager
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
@@ -19,6 +20,7 @@ from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
 from structlog import stdlib as structlog_stdlib
+from structlog.contextvars import bind_contextvars, clear_contextvars
 
 from . import cli
 from .params import pass_project
@@ -208,14 +210,15 @@ async def _run_job(project, job, session, context_builder, force=False):
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
 
-        log = logger.bind(name="meltano", run_id=str(job.run_id), job_id=job.job_id)
+        log = structlog.get_logger()
+        clear_contextvars()
+        bind_contextvars(run_id=str(job.run_id), job_id=job.job_id, name="meltano")
 
         await _run_elt(log, context_builder, output_logger)
 
 
 @asynccontextmanager
 async def _redirect_output(log, output_logger):
-
     meltano_stdout = output_logger.out(
         "meltano", log.bind(stdio="stdout", cmd_type="elt")
     )
@@ -255,10 +258,10 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
-    stderr_log = logger.bind(run_id=str(elt_context.job.run_id), stdio="stderr")
-
-    extractor_log = output_logger.out(extractor, stderr_log.bind(cmd_type="extractor"))
-    loader_log = output_logger.out(loader, stderr_log.bind(cmd_type="loader"))
+    extractor_log = output_logger.out(
+        extractor, log.bind(cmd_type="extractor", stdio="stderr")
+    )
+    loader_log = output_logger.out(loader, log.bind(cmd_type="loader", stdio="stderr"))
 
     @contextmanager
     def nullcontext():
@@ -267,20 +270,21 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     extractor_out_writer = nullcontext
     loader_out_writer = nullcontext
     if logger.getEffectiveLevel() == logging.DEBUG:
-        stdout_log = logger.bind(run_id=str(elt_context.job.run_id), stdio="stdout")
         extractor_out = output_logger.out(
-            f"{extractor} (out)", stdout_log.bind(cmd_type="extractor"), logging.DEBUG
+            f"{extractor} (out)",
+            log.bind(cmd_type="extractor", stdio="stdout"),
+            logging.DEBUG,
         )
         loader_out = output_logger.out(
-            f"{loader} (out)", stdout_log.bind(cmd_type="loader"), logging.DEBUG
+            f"{loader} (out)",
+            log.bind(cmd_type="loader", stdio="stdout"),
+            logging.DEBUG,
         )
 
         extractor_out_writer = extractor_out.line_writer
         loader_out_writer = loader_out.line_writer
 
-    log.info(
-        "Running extract & load...",
-    )
+    log.info("Running extract & load...")
 
     singer_runner = SingerRunner(elt_context)
     try:
@@ -315,13 +319,9 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
 async def _run_transform(log, elt_context, output_logger, **kwargs):
 
-    stderr_log = logger.bind(
-        run_id=str(elt_context.job.run_id),
-        stdio="stderr",
-        cmd_type="transformer",
+    transformer_log = output_logger.out(
+        elt_context.transformer.name, log.bind(stdio="stderr", cmd_type="transformer")
     )
-
-    transformer_log = output_logger.out(elt_context.transformer.name, stderr_log)
 
     log.info("Running transformation...")
 
