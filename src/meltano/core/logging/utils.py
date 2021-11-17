@@ -9,7 +9,6 @@ import structlog
 import yaml
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
 from meltano.core.project_settings_service import ProjectSettingsService
-from structlog.contextvars import merge_contextvars
 
 try:
     from typing import Protocol  # noqa:  WPS433
@@ -107,7 +106,6 @@ def setup_logging(project=None, log_level=DEFAULT_LEVEL):
     logging_config.dictConfig(config)
     structlog.configure(
         processors=[
-            merge_contextvars,
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             TIMESTAMPER,

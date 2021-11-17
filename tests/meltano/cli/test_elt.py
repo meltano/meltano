@@ -96,10 +96,7 @@ def assert_log_lines(result_output: str, expected: List[LogEntry]):
         seen_lines.append(parsed_line)
 
     for entry in expected:
-        res = entry.matches(seen_lines)
-        if not res:
-            print("nope")
-        assert res
+        assert entry.matches(seen_lines)
 
 
 test_log_config = {
@@ -253,10 +250,7 @@ class TestCliEltScratchpadOne:
                 [
                     LogEntry("meltano", None, "Running extract & load...", "info"),
                     LogEntry(
-                        "meltano",
-                        None,
-                        "No state was found, complete import.",
-                        "warning",
+                        None, None, "No state was found, complete import.", "warning"
                     ),
                     LogEntry(
                         None, None, "Incremental state has been updated at", "info"
@@ -356,9 +350,7 @@ class TestCliEltScratchpadOne:
                 LogEntry(
                     None, None, "Created configuration at", "debug"
                 ),  # followed by path
-                LogEntry(
-                    "meltano", None, "No state was found, complete import.", "warning"
-                ),
+                LogEntry(None, None, "No state was found, complete import.", "warning"),
                 LogEntry(
                     None, None, "Incremental state has been updated at", "info"
                 ),  # followed by timestamp
