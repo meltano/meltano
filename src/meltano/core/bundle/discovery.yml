@@ -1141,6 +1141,7 @@ extractors:
           kind: date_iso8601
           description: Date up to when historical data will be extracted.
     - name:  meltano
+      hidden: true
       docs: 'https://hub.meltano.com/extractors/google-analytics.html'
       repo: https://gitlab.com/meltano/tap-google-analytics
       pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
