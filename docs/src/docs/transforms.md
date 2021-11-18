@@ -41,7 +41,7 @@ meltano elt <tap> <target> --transform run
 meltano elt tap-gitlab target-postgres --transform run
 ```
 
-After the Extract and Load steps are successfully completed meaning data has been extracted from the GitLab API and loaded to a Postgres DB, the dbt transform in the `/transforms/tap-gitlab/` directory is run.
+After the Extract and Load steps are successfully completed meaning data has been extracted from the GitLab API and loaded to a Postgres DB, the dbt transform in the `/transform/models/tap_gitlab/` directory is run.
 
 Under the hood this `--transform run` option is telling Meltano to run multiple dbt commands.
 First it installs any required dbt package dependencies using `dbt deps` then it runs your models using `dbt run --models <models>`.
@@ -66,7 +66,7 @@ meltano invoke dbt:<command>
 meltano invoke dbt:run --models tap_gitlab.*
 ```
 
-Again, this runs all dbt models in the `/transforms/models/tap_gitlab/` directory.
+Again, this runs all dbt models in the `/transform/models/tap_gitlab/` directory.
 
 The downside of running directly vs in a pipeline is that Meltano can't infer anything about how dbt should run so more settings might need to be explictly set by the user. This includes target dialet `DBT_TARGET`, source schema `DBT_SOURCE_SCHEMA` , target schema`DBT_TARGET_SCHEMA`, and models `DBT_MODELS`.
 
