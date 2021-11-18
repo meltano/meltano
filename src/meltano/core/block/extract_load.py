@@ -91,7 +91,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
             return True
 
     @staticmethod
-    async def terminate(self, graceful: bool = True) -> bool:
+    async def terminate(self, graceful: bool = False) -> bool:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
 
         Not actually implemented yet.
@@ -101,7 +101,11 @@ class ExtractLoadBlocks:  # noqa: WPS214
         Returns:
             Whether or not the BlockSet terminated successfully.
         """
-        return False
+        if graceful:
+            raise NotImplementedError
+
+        for block in self.blocks:
+            block.stop(kill=True)
 
     @property
     def process_futures(self) -> List[Task]:

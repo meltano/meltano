@@ -37,8 +37,12 @@ class IOBlock(Protocol):
         """
         ...
 
-    async def stop(self) -> None:
-        """Stop a block."""
+    async def stop(self, kill: bool = True) -> None:
+        """Stop a block.
+
+        Args:
+            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+        """
         ...
 
     def proxy_stdout(self) -> Task:

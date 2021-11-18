@@ -62,9 +62,16 @@ class InvokerBase:  # noqa: WPS230
         except Exception as err:
             raise RunnerError(f"Cannot start plugin: {err}") from err
 
-    async def stop(self):
-        """Stop (kill) the underlying process and cancel output proxying."""
-        self.process_handle.kill()
+    async def stop(self, kill: bool = True):
+        """Stop (kill) the underlying process and cancel output proxying.
+
+        Args:
+            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+        """
+        if kill:
+            self.process_handle.kill()
+        else:
+            self.process_handle.terminate()
         await self.process_future
         self.proxy_stdout.cancel()
         self.proxy_stderr.cancel()
@@ -185,46 +192,32 @@ class SingerBlock(InvokerBase, IOBlock):
         """
         stream_buffer_size = self.project_settings_service.get("elt.buffer_size")
         line_length_limit = stream_buffer_size // 2
+
+        stdin = None
         if self.consumer:
-            await self._consumer_start(line_length_limit)
-        else:
-            await self._producer_start(line_length_limit)
+            stdin = asyncio.subprocess.PIPE
 
-    async def stop(self):
-        """Stop (kill) the underlying process and cancel output proxying."""
-        self._handle.kill()
-        await self.process_future
-        self.proxy_stdout.cancel()
-        self.proxy_stderr.cancel()
-        self.invoker.cleanup()
-
-    async def _producer_start(self, line_length_limit: int) -> Process:
-        """Only stdout and stderr is need for io capture for producers.
-
-        Args:
-            line_length_limit: io line length limit.
-        """
         try:
             self.process_handle = await self.invoker.invoke_async(
                 limit=line_length_limit,
-                stdout=asyncio.subprocess.PIPE,  # Singer messages
-                stderr=asyncio.subprocess.PIPE,  # Log
-            )
-        except Exception as err:
-            raise RunnerError(f"Cannot start plugin: {err}") from err
-
-    async def _consumer_start(self, line_length_limit: int) -> Process:
-        """Consumers require stdin to be configured in addition to stdout/stderr.
-
-        Args:
-            line_length_limit: io line length limit.
-        """
-        try:
-            self.process_handle = await self.invoker.invoke_async(
-                limit=line_length_limit,
-                stdin=asyncio.subprocess.PIPE,  # Singer messages
+                stdin=stdin,  # Singer messages
                 stdout=asyncio.subprocess.PIPE,  # Singer state
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
             raise RunnerError(f"Cannot start plugin: {err}") from err
+
+    async def stop(self, kill: bool = True):
+        """Stop (kill) the underlying process and cancel output proxying.
+
+        Args:
+            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+        """
+        if kill:
+            self.process_handle.kill()
+        else:
+            self.process_handle.terminate()
+        await self.process_future
+        self.proxy_stdout.cancel()
+        self.proxy_stderr.cancel()
+        self.invoker.cleanup()
