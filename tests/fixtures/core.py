@@ -2,6 +2,8 @@ import datetime
 import logging
 import os
 import shutil
+import sys
+from distutils import dir_util
 from pathlib import Path
 
 import meltano.core.bundle
@@ -11,6 +13,7 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.environment_service import EnvironmentService
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -20,6 +23,7 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_plugins_service import (
     PluginAlreadyAddedException,
@@ -28,6 +32,15 @@ from meltano.core.project_plugins_service import (
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 
 PROJECT_NAME = "a_meltano_project"
+
+
+def compatible_copy_tree(source: Path, destination: Path):
+    """Copy files recursively from source to destination, ignoring existing dirs."""
+    if sys.version_info >= (3, 8):
+        # shutil.copytree option `dirs_exist_ok` was added in python3.8
+        shutil.copytree(source, destination, dirs_exist_ok=True)
+    else:
+        dir_util.copy_tree(str(source), str(destination))
 
 
 @pytest.fixture(scope="class")
@@ -377,6 +390,16 @@ def schedule(project, tap, target, schedule_service):
         return err.schedule
 
 
+@pytest.fixture(scope="function")
+def environment_service(project):
+    service = EnvironmentService(project)
+    yield service
+
+    # Cleanup: remove any added Environments
+    for environment in service.list_environments():
+        service.remove(environment.name)
+
+
 @pytest.fixture(scope="class")
 def elt_context_builder(project, project_plugins_service):
     return ELTContextBuilder(project, plugins_service=project_plugins_service)
@@ -400,6 +423,29 @@ def project(test_dir, project_init_service):
     os.chdir(project.root)
 
     yield project
+
+    # clean-up
+    Project.deactivate()
+    os.chdir(test_dir)
+    shutil.rmtree(project.root)
+    logging.debug(f"Cleaned project at {project.root}")
+
+
+@pytest.fixture(scope="class")
+def project_files(test_dir):
+    project_init_service = ProjectInitService("a_multifile_meltano_project")
+    project = project_init_service.init(add_discovery=False)
+    logging.debug(f"Created new project at {project.root}")
+
+    current_dir = Path(__file__).parent
+    multifile_project_root = current_dir.joinpath("multifile_project/")
+
+    os.remove(project.meltanofile)
+    compatible_copy_tree(multifile_project_root, project.root)
+    # cd into the new project root
+    os.chdir(project.root)
+
+    yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
 
     # clean-up
     Project.deactivate()

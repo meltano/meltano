@@ -17,6 +17,7 @@ from . import (  # isort:skip # noqa: F401, WPS235
     config,
     discovery,
     elt,
+    environment,
     initialize,
     install,
     invoke,

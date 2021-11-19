@@ -47,6 +47,12 @@ environments:
           batch_size_rows: 1000
 ```
 
+## Inheritance
+
+Environments are most powerful when [inheriting](/docs/plugins.html#plugin-inheritance) from a base plugin definition.
+Configuration that is set in an environment can be used to add or override configuration set in the base plugin configuration.
+This enables reuse of configuration common to multiple environments while making it easy to switch configuratino for a specific environment.
+
 ## Activation
 
 To use an environment, you can pass the option `--environment=<ENV>` to the CLI command, or set the `MELTANO_ENVIRONMENT=<ENV>` variable.
@@ -85,39 +91,4 @@ $ meltano --environment=dev config target-snowflake
 
 ## Commands with support for `--environment`
 
-### [`config`](/docs/command-line-interface#config)
-
-To add, update or remove plugin configuration from an environment defined in `meltano.yml`:
-
-```shell
-meltano --environment=<ENVIRONMENT> config <plugin>
-```
-
-### [`elt`](/docs/command-line-interface#elt)
-
-To run an ELT pipeline with configuration taken preferably from an Environment:
-
-```shell
-meltano --environment=<ENVIRONMENT> elt <extractor> <loader>
-```
-
-### [`invoke`](/docs/command-line-interface#invoke)
-
-Invoke a plugin pipeline with configuration taken preferably from an Environment:
-
-```shell
-meltano --environment=<ENVIRONMENT> invoke <plugin>
-```
-
-### [`select`](/docs/command-line-interface#select)
-
-Manage select patterns for an extractor within an Environment:
-
-```shell
-meltano --environment=<ENVIRONMENT> select <tap_name>
-```
-
-## Incremental adoption
-
-__Environments__ promote _incremental_ adoption. You can continue using Meltano the way you've been doing it so far,
-and leverage environments whenever you need to starting switching between different sets of configurations.
+See the [CLI Reference](/docs/command-line-interface#environment).

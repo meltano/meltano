@@ -98,7 +98,7 @@ settings:
   env_specific: true
 - name: ui.analysis
   kind: boolean
-  value: true
+  value: false
 
 # UI customization
 - name: ui.logo_url

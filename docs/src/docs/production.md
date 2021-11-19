@@ -48,7 +48,7 @@ Once your Meltano project is in version control, getting it to your production
 environment can take various shapes.
 
 In general, we recommend setting up a CI/CD pipeline to run automatically whenever
-new changes are pushed to your reponsitory's default branch, that will connect with the
+new changes are pushed to your repository's default branch, that will connect with the
 production environment and either directly push the project files, or trigger
 some kind of mechanism to pull the latest changes from the repository.
 
