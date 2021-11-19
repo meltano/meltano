@@ -1096,46 +1096,46 @@ extractors:
         - ['oauth_credentials.client_id', 'oauth_credentials.client_secret', 'oauth_credentials.access_token', 'oauth_credentials.refresh_token', 'view_id', 'start_date']
       settings:
         - name: key_file_location
-          env_aliases: [GOOGLE_ANALYTICS_API_KEY_FILE_LOCATION]
           kind: file
+          description: A file that contains the Google Analytics client secrets json.
           value: $MELTANO_PROJECT_ROOT/client_secrets.json
           label: Client Secrets File Location
           placeholder: Ex. client_secrets.json
         - name: client_secrets
-          env_aliases: [GOOGLE_ANALYTICS_API_CLIENT_SECRETS]
+          description: An object that contains the Google Analytics client secrets.
           kind: object
           label: Client Secrets JSON
           placeholder: Ex. client_secrets.json
         - name: oauth_credentials.client_id
-          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID]
+          description: The Google Analytics oauth client ID.
           kind: password
           label: OAuth Client ID
         - name: oauth_credentials.client_secret
-          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET]
+          description: The Google Analytics oauth client secret.
           kind: password
           label: OAuth Client Secret
         - name: oauth_credentials.access_token
-          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN]
+          description: The Google Analytics oauth access token.
           kind: password
           label: OAuth Access Token
         - name: oauth_credentials.refresh_token
-          env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN]
           kind: password
+          description: The Google Analytics oauth refresh token.
           label: OAuth Refresh Token
         - name: view_id
-          env_aliases: [GOOGLE_ANALYTICS_API_VIEW_ID]
+          description: The ID for the view to fetch data from.
           label: View ID
           placeholder: Ex. 198343027
         - name: reports
-          env_aliases: [GOOGLE_ANALYTICS_API_REPORTS]
+          description: The reports definition of which fields to retrieve from the view.
           label: Reports
           placeholder: Ex. my_report_definition.json
         - name: start_date
-          env_aliases: [GOOGLE_ANALYTICS_API_START_DATE]
+          label: Start Date
           kind: date_iso8601
           description: This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         - name: end_date
-          env_aliases: [GOOGLE_ANALYTICS_API_END_DATE]
+          label: End Date
           kind: date_iso8601
           description: Date up to when historical data will be extracted.
     - name:  meltano
