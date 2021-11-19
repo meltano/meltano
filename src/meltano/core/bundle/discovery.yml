@@ -1131,7 +1131,6 @@ extractors:
           env_aliases: [GOOGLE_ANALYTICS_API_REPORTS]
           label: Reports
           placeholder: Ex. my_report_definition.json
-  
         - name: start_date
           env_aliases: [GOOGLE_ANALYTICS_API_START_DATE]
           kind: date_iso8601
