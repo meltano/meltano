@@ -1,13 +1,14 @@
 import asyncio
 import json
-from typing import List, Tuple
+from typing import List, Optional
 
 import pytest
+import structlog
 from asserts import assert_cli_runner
 from asynctest import CoroutineMock, mock
-from meltano.cli import cli
+from meltano.cli import CliError, cli
 from meltano.core.job import Job, State
-from meltano.core.logging.utils import remove_ansi_escape_sequences
+from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
@@ -17,72 +18,113 @@ from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
+class LogEntry:
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        cmd_type: Optional[str] = None,
+        event: Optional[str] = None,
+        level: Optional[str] = None,
+        stdio: Optional[str] = None,
+    ):
+        """Logentries is a simple support class for checking whether a log entry is in a list of dicts.
+
+        Args:
+            name: contents of the name field field to search for (or None if it should not be set)
+            cmd_type: contents of the cmd_type field to search for (or None if it should not be set)
+            event: str prefix of the event field to search for (or None if it should not be set)
+            level: contents of the level field to search for (or None if it should not be set)
+            stdio: optionally, if set also verify the stdio field matches. (or None to skip)
+        """
+        self.name = name
+        self.cmd_type = cmd_type
+        self.event = event
+        self.level = level
+        self.stdio = stdio
+
+    def matches(self, lines: List[dict]) -> bool:
+        """Find a matching log line in the provided list of log lines.
+
+        Its important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
+        This is because quite a few log lines have dynamic suffix segments.
+        """
+        for line in lines:
+
+            matches = (
+                line.get("name") == self.name
+                and line.get("cmd_type") == self.cmd_type
+                and line.get("event").startswith(self.event)
+                and line.get("level") == self.level
+            )
+
+            if matches:
+                if self.stdio:
+                    return line.get("stdio") == self.stdio
+                return True
+
+
 def assert_lines(output, *lines):
     for line in lines:
         assert line in output
 
 
-def _extract_name_and_task(line: str) -> (str, str):
-    expected_prefixes = ("meltano", "tap", "target", "dbt")
-    # theres a lot of trash in the output that will throw off formatting attempts so try to only look
-    # for log lines that are explicitly meltano.
-    if not line.startswith(expected_prefixes):
-        return None, None
-
-    split_line = line.split("|", 2)
-    if len(split_line) != 3:
-        return None, None
-    return split_line[0].strip(" "), split_line[1].strip(" ")
-
-
-def _longest_fields(full_set: str) -> (int, int):
-    """Find the longest name and task fields in log output.
+def exception_logged(result_output: str, exc: Exception) -> bool:
+    """Small utility to search click result output for a specific excpetion .
 
     Args:
-        full_set: The raw string of the log output.
+        result_output: The click result output string to search.
+        exc: The exception to search for.
     Returns:
-        int: The length of the longest name field.
-        int: The length of the longest task field.
-
+        bool: Whether or not the exception was found
     """
-    longest_name = 0
-    longest_task = 0
-    for line in full_set.splitlines():
+    seen_lines: List[dict] = []
+    for line in result_output.splitlines():
+        parsed_line = json.loads(line)
+        seen_lines.append(parsed_line)
 
-        name, task = _extract_name_and_task(line)
-        if name is None or task is None:
-            continue
-
-        if len(name) > longest_name:
-            longest_name = len(name)
-
-        if len(task) > longest_task:
-            longest_task = len(task)
-
-    return longest_name, longest_task
+    for line in seen_lines:
+        if line.get("exc_info"):
+            if repr(exc) in line.get("exc_info"):
+                return True
+    return False
 
 
-def format_and_assert_lines(
-    full_set: str, search_set: str, lines: List[Tuple[str, str, str]]
-):
-    """Format and assert that lines are present in log output.
+def assert_log_lines(result_output: str, expected: List[LogEntry]):
+    seen_lines: List[dict] = []
+    for line in result_output.splitlines():
+        parsed_line = json.loads(line)
+        seen_lines.append(parsed_line)
 
-    Args:
-        full_set: The raw string holding the full output set to use for determining output formatting.
-        search_set: The raw string holding the subset of the output we should assert against.
-        lines: The lines you expect to be present in the search set, formatted as a tuple of the name, task, and message fields.
+    for entry in expected:
+        assert entry.matches(seen_lines)
 
-    """
-    longest_name, longest_task = _longest_fields(full_set)
 
-    for fields in lines:
-        name, task, msg = fields
-        padded_name = name.ljust(max(longest_name, 6))
-        padded_task = task.ljust(max(longest_task, 6))
-
-        entry = f"{padded_name} | {padded_task} | {msg}"
-
-        assert entry in search_set
+test_log_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "test": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "test",
+            "stream": "ext://sys.stderr",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+}
 
 
 @pytest.fixture(scope="class")
@@ -164,9 +206,13 @@ def dbt_process(process_mock_factory, dbt):
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -199,32 +245,30 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    ("meltano", "elt", "No state was found, complete import.\n"),
-                    (
-                        "meltano",
-                        "elt",
-                        "Incremental state has been updated at",
-                    ),  # followed by timestamp
-                    ("meltano", "elt", "Extract & load complete!\n"),
-                    ("meltano", "elt", "Transformation skipped.\n"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry(
+                        None, None, "No state was found, complete import.", "warning"
+                    ),
+                    LogEntry(
+                        None, None, "Incremental state has been updated at", "info"
+                    ),
+                    LogEntry("meltano", None, "Extract & load complete!", "info"),
+                    LogEntry("meltano", None, "Transformation skipped.", "info"),
                 ],
             )
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stderr,
                 [
-                    ("tap-mock", "extractor", "Starting\n"),
-                    ("tap-mock", "extractor", "Running\n"),
-                    ("tap-mock", "extractor", "Done\n"),
-                    ("target-mock", "loader", "Starting\n"),
-                    ("target-mock", "loader", "Running\n"),
-                    ("target-mock", "loader", "Done\n"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info"),
+                    LogEntry("tap-mock", "extractor", "Running", "info"),
+                    LogEntry("tap-mock", "extractor", "Done", "info"),
+                    LogEntry("target-mock", "loader", "Starting", "info"),
+                    LogEntry("target-mock", "loader", "Running", "info"),
+                    LogEntry("target-mock", "loader", "Done", "info"),
                 ],
             )
 
@@ -240,23 +284,26 @@ class TestCliEltScratchpadOne:
             assert result.exception == exc
 
             lines = [
-                "meltano     | elt       | Running extract & load...\n",
-                "meltano     | elt       | This is a grave danger.\n",
-                "Traceback",
-                "Exception: This is a grave danger.\n",
+                LogEntry("meltano", None, "Running extract & load...", "info"),
+                LogEntry(None, None, "This is a grave danger.", "error"),
             ]
-
-            assert_lines(result.output, *lines)
+            assert_log_lines(result.stderr, lines)
+            assert exception_logged(result.stderr, exc)
 
             # ensure there is a log of this exception
-            log = job_logging_service.get_latest_log(job_id)
-            assert_lines(log, *(remove_ansi_escape_sequences(l) for l in lines))
+            log = job_logging_service.get_latest_log(job_id).splitlines()
+            assert "Traceback (most recent call last):" in log
+            assert "Exception: This is a grave danger." in log
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_debug_logging(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -289,71 +336,85 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            stdout_lines = [
-                ("meltano", "elt", "INFO Running extract & load...\n"),
-                (
-                    "meltano",
-                    "elt",
-                    "DEBUG Created configuration at",
+            lines = [
+                LogEntry("meltano", None, "Running extract & load...", "info"),
+                LogEntry(
+                    None, None, "Created configuration at", "debug"
                 ),  # followed by path
-                (
-                    "meltano",
-                    "elt",
-                    "DEBUG Could not find tap.properties.json in",
+                LogEntry(
+                    None, None, "Could not find tap.properties.json in", "debug"
                 ),  # followed by path
-                (
-                    "meltano",
-                    "elt",
-                    "DEBUG Could not find state.json in",
+                LogEntry(
+                    None, None, "Could not find state.json in", "debug"
                 ),  # followed by path
-                (
-                    "meltano",
-                    "elt",
-                    "DEBUG Created configuration at",
+                LogEntry(
+                    None, None, "Created configuration at", "debug"
                 ),  # followed by path
-                ("meltano", "elt", "WARNING No state was found, complete import.\n"),
-                (
-                    "meltano",
-                    "elt",
-                    "INFO Incremental state has been updated at",
+                LogEntry(None, None, "No state was found, complete import.", "warning"),
+                LogEntry(
+                    None, None, "Incremental state has been updated at", "info"
                 ),  # followed by timestamp
-                ("meltano", "elt", "DEBUG Incremental state: {'line': 1}\n"),
-                ("meltano", "elt", "DEBUG Incremental state: {'line': 2}\n"),
-                ("meltano", "elt", "DEBUG Incremental state: {'line': 3}\n"),
-                ("meltano", "elt", "INFO Extract & load complete!\n"),
-                ("meltano", "elt", "INFO Transformation skipped.\n"),
+                LogEntry(
+                    None,
+                    None,
+                    "Incremental state: {'line': 1}",
+                    "debug",
+                ),
+                LogEntry(
+                    None,
+                    None,
+                    "Incremental state: {'line': 2}",
+                    "debug",
+                ),
+                LogEntry(
+                    None,
+                    None,
+                    "Incremental state: {'line': 3}",
+                    "debug",
+                ),
+                LogEntry("meltano", None, "Extract & load complete!", "info"),
+                LogEntry("meltano", None, "Transformation skipped.", "info"),
+                LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                LogEntry("tap-mock (out)", "extractor", "SCHEMA", "debug", "stdout"),
+                LogEntry("tap-mock (out)", "extractor", "RECORD", "debug", "stdout"),
+                LogEntry("tap-mock (out)", "extractor", "STATE", "debug", "stdout"),
+                LogEntry("tap-mock", "extractor", "Done", "info", "stderr"),
+                LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                LogEntry(
+                    "target-mock (out)", "loader", '{"line": 1}', "debug", "stdout"
+                ),
+                LogEntry(
+                    "target-mock (out)", "loader", '{"line": 2}', "debug", "stdout"
+                ),
+                LogEntry(
+                    "target-mock (out)", "loader", '{"line": 3}', "debug", "stdout"
+                ),
+                LogEntry("target-mock", "loader", "Done", "info", "stderr"),
             ]
 
-            stderr_lines = [
-                ("tap-mock", "extractor", "Starting\n"),
-                ("tap-mock", "extractor", "Running\n"),
-                ("tap-mock (out)", "extractor", "SCHEMA\n"),
-                ("tap-mock (out)", "extractor", "RECORD\n"),
-                ("tap-mock (out)", "extractor", "STATE\n"),
-                ("tap-mock", "extractor", "Done\n"),
-                ("target-mock", "loader", "Starting\n"),
-                ("target-mock", "loader", "Running\n"),
-                ("target-mock (out)", "loader", '{"line": 1}\n'),
-                ("target-mock (out)", "loader", '{"line": 2}\n'),
-                ("target-mock (out)", "loader", '{"line": 3}\n'),
-                ("target-mock", "loader", "Done\n"),
-            ]
-
-            format_and_assert_lines(
-                result.stdout + result.stderr, result.stdout, stdout_lines
-            )
-            format_and_assert_lines(
-                result.stdout + result.stderr, result.stderr, stderr_lines
-            )
+            assert_log_lines(result.stdout + result.stderr, lines)
 
             log = job_logging_service.get_latest_log(job_id)
-            format_and_assert_lines(log, log, stdout_lines + stderr_lines)
+
+            full_result = result.stdout + result.stderr
+
+            # we already test the redirect handler in test_output_logger, so we'll just verify that the # of lines matches
+            assert len(log.splitlines()) == len(full_result.splitlines())
+            # and just to be safe - check if these debug mode only strings show up
+            assert "target-mock (out)" in log
+            assert "tap-mock (out)" in log
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_tap_failure(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -383,32 +444,39 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Extractor failed" in str(result.exception)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    ("meltano", "elt", "Extraction failed (1): Failure\n"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                 ],
             )
-            format_and_assert_lines(
+
+            assert exception_logged(
                 result.stdout + result.stderr,
-                result.stderr,
+                CliError("ELT could not be completed: Extractor failed"),
+            )
+
+            assert_log_lines(
+                result.stdout + result.stderr,
                 [
-                    ("tap-mock", "extractor", "Starting\n"),
-                    ("tap-mock", "extractor", "Running\n"),
-                    ("tap-mock", "extractor", "Failure\n"),
-                    ("target-mock", "loader", "Starting\n"),
-                    ("target-mock", "loader", "Running\n"),
-                    ("target-mock", "loader", "Done\n"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Failure", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Done", "info", "stderr"),
                 ],
             )
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_target_failure_before_tap_finishes(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -457,33 +525,38 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    ("meltano", "elt", "Loading failed (1): Failure\n"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
                 ],
             )
-
-            format_and_assert_lines(
+            assert exception_logged(
                 result.stdout + result.stderr,
-                result.stderr,
+                CliError("ELT could not be completed: Loader failed"),
+            )
+
+            assert_log_lines(
+                result.stdout + result.stderr,
                 [
-                    ("tap-mock", "extractor", "Starting\n"),
-                    ("tap-mock", "extractor", "Running\n"),
-                    ("tap-mock", "extractor", "Done\n"),
-                    ("target-mock", "loader", "Starting\n"),
-                    ("target-mock", "loader", "Running\n"),
-                    ("target-mock", "loader", "Failure\n"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Done", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Failure", "info", "stderr"),
                 ],
             )
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_target_failure_after_tap_finishes(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -513,32 +586,39 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    ("meltano", "elt", "Loading failed (1): Failure\n"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry("meltano", None, "Loading failed", "error"),
                 ],
             )
-            format_and_assert_lines(
+            assert exception_logged(
                 result.stdout + result.stderr,
-                result.stderr,
+                CliError("ELT could not be completed: Loader failed"),
+            )
+
+            assert_log_lines(
+                result.stdout + result.stderr,
                 [
-                    ("tap-mock", "extractor", "Starting\n"),
-                    ("tap-mock", "extractor", "Running\n"),
-                    ("tap-mock", "extractor", "Done\n"),
-                    ("target-mock", "loader", "Starting\n"),
-                    ("target-mock", "loader", "Running\n"),
-                    ("target-mock", "loader", "Failure\n"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Done", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Failure", "info", "stderr"),
                 ],
             )
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_tap_and_target_failure(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -575,33 +655,41 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Extractor and loader failed" in str(result.exception)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    ("meltano", "elt", "Extraction failed (1): Failure\n"),
-                    ("meltano", "elt", "Loading failed (1): Failure\n"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry("meltano", None, "Extraction failed", "error"),
+                    LogEntry("meltano", None, "Loading failed", "error"),
                 ],
             )
-            format_and_assert_lines(
+
+            assert exception_logged(
                 result.stdout + result.stderr,
-                result.stderr,
+                CliError("ELT could not be completed: Extractor and loader failed"),
+            )
+
+            assert_log_lines(
+                result.stdout + result.stderr,
                 [
-                    ("tap-mock", "extractor", "Starting\n"),
-                    ("tap-mock", "extractor", "Running\n"),
-                    ("tap-mock", "extractor", "Failure\n"),
-                    ("target-mock", "loader", "Starting\n"),
-                    ("target-mock", "loader", "Running\n"),
-                    ("target-mock", "loader", "Failure\n"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Running", "info", "stderr"),
+                    LogEntry("tap-mock", "extractor", "Failure", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Running", "info", "stderr"),
+                    LogEntry("target-mock", "loader", "Failure", "info", "stderr"),
                 ],
             )
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_tap_line_length_limit_error(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -645,36 +733,35 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert "Output line length limit exceeded" in str(result.exception)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    (
-                        "meltano",
-                        "elt",
-                        "The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).\n",
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry(
+                        None,
+                        None,
+                        "The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).",
+                        "error",
                     ),
                 ],
             )
 
-            format_and_assert_lines(
+            assert exception_logged(
                 result.stdout + result.stderr,
-                result.stderr,
-                [
-                    (
-                        "meltano",
-                        "elt",
-                        "ELT could not be completed: Output line length limit exceeded\n",
-                    )
-                ],
+                CliError(
+                    "ELT could not be completed: Output line length limit exceeded"
+                ),
             )
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_output_handler_error(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -707,10 +794,15 @@ class TestCliEltScratchpadOne:
             assert result.exit_code == 1
             assert result.exception == exc
 
-            assert_lines(
-                result.stdout,
-                "meltano     | elt       | Running extract & load...\n",
-                "meltano     | elt       | Failed to read from target stderr.\n",
+            assert_log_lines(
+                result.stderr,
+                [
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                ],
+            )
+
+            assert exception_logged(
+                result.stderr, Exception("Failed to read from target stderr.")
             )
 
     def test_elt_already_running(
@@ -881,9 +973,13 @@ class TestCliEltScratchpadOne:
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_transform_run(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -919,38 +1015,40 @@ class TestCliEltScratchpadTwo:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    ("meltano", "elt", "Extract & load complete!\n"),
-                    ("meltano", "elt", "Running transformation...\n"),
-                    ("meltano", "elt", "Transformation complete!\n"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry("meltano", None, "Extract & load complete!", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
+                    LogEntry("meltano", None, "Transformation complete!", "info"),
                 ],
             )
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stderr,
                 [
-                    ("tap-mock", "extractor", "Starting\n"),
-                    ("tap-mock", "extractor", "Running\n"),
-                    ("tap-mock", "extractor", "Done\n"),
-                    ("target-mock", "loader", "Starting\n"),
-                    ("target-mock", "loader", "Running\n"),
-                    ("target-mock", "loader", "Done\n"),
-                    ("dbt", "main", "Starting\n"),
-                    ("dbt", "main", "Running\n"),
-                    ("dbt", "main", "Done\n"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info"),
+                    LogEntry("tap-mock", "extractor", "Running", "info"),
+                    LogEntry("tap-mock", "extractor", "Done", "info"),
+                    LogEntry("target-mock", "loader", "Starting", "info"),
+                    LogEntry("target-mock", "loader", "Running", "info"),
+                    LogEntry("target-mock", "loader", "Done", "info"),
+                    LogEntry("dbt", "transformer", "Starting", "info"),
+                    LogEntry("dbt", "transformer", "Running", "info"),
+                    LogEntry("dbt", "transformer", "Done", "info"),
                 ],
             )
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_transform_run_dbt_failure(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -995,30 +1093,31 @@ class TestCliEltScratchpadTwo:
             assert result.exit_code == 1
             assert "`dbt run` failed" in str(result.exception)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Running extract & load...\n"),
-                    ("meltano", "elt", "Extract & load complete!\n"),
-                    ("meltano", "elt", "Running transformation...\n"),
-                    ("meltano", "elt", "Transformation failed (1): Failure\n"),
+                    LogEntry("meltano", None, "Running extract & load...", "info"),
+                    LogEntry("meltano", None, "Extract & load complete!", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
+                    LogEntry("meltano", None, "Transformation failed", "error"),
                 ],
             )
+            assert exception_logged(
+                result.stderr, CliError("ELT could not be completed: `dbt run` failed")
+            )
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stderr,
                 [
-                    ("tap-mock", "extractor", "Starting\n"),
-                    ("tap-mock", "extractor", "Running\n"),
-                    ("tap-mock", "extractor", "Done\n"),
-                    ("target-mock", "loader", "Starting\n"),
-                    ("target-mock", "loader", "Running\n"),
-                    ("target-mock", "loader", "Done\n"),
-                    ("dbt", "main", "Starting\n"),
-                    ("dbt", "main", "Running\n"),
-                    ("dbt", "main", "Failure\n"),
+                    LogEntry("tap-mock", "extractor", "Starting", "info"),
+                    LogEntry("tap-mock", "extractor", "Running", "info"),
+                    LogEntry("tap-mock", "extractor", "Done", "info"),
+                    LogEntry("target-mock", "loader", "Starting", "info"),
+                    LogEntry("target-mock", "loader", "Running", "info"),
+                    LogEntry("target-mock", "loader", "Done", "info"),
+                    LogEntry("dbt", "transformer", "Starting", "info"),
+                    LogEntry("dbt", "transformer", "Running", "info"),
+                    LogEntry("dbt", "transformer", "Failure", "info"),
                 ],
             )
 
@@ -1026,9 +1125,13 @@ class TestCliEltScratchpadTwo:
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_transform_only(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -1050,21 +1153,24 @@ class TestCliEltScratchpadThree:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Extract & load skipped.\n"),
-                    ("meltano", "elt", "Running transformation...\n"),
-                    ("meltano", "elt", "Transformation complete!\n"),
+                    LogEntry("meltano", None, "Extract & load skipped.", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
+                    LogEntry("meltano", None, "Transformation complete!", "info"),
                 ],
             )
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_elt_transform_only_with_transform(
         self,
         google_tracker,
+        default_config,
         cli_runner,
         project,
         tap,
@@ -1086,13 +1192,11 @@ class TestCliEltScratchpadThree:
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
-
-            format_and_assert_lines(
+            assert_log_lines(
                 result.stdout + result.stderr,
-                result.stdout,
                 [
-                    ("meltano", "elt", "Extract & load skipped.\n"),
-                    ("meltano", "elt", "Running transformation...\n"),
-                    ("meltano", "elt", "Transformation complete!\n"),
+                    LogEntry("meltano", None, "Extract & load skipped.", "info"),
+                    LogEntry("meltano", None, "Running transformation...", "info"),
+                    LogEntry("meltano", None, "Transformation complete!", "info"),
                 ],
             )

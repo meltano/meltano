@@ -1,8 +1,6 @@
 """Defines `meltano elt` command."""
 import datetime
 import logging
-import os
-import sys
 from contextlib import contextmanager
 
 import click
@@ -14,14 +12,13 @@ from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.transform_add_service import TransformAddService
 from meltano.core.utils import click_run_async
+from structlog import stdlib as structlog_stdlib
 
 from . import cli
 from .params import pass_project
@@ -34,11 +31,7 @@ DUMPABLES = {
     "loader-config": (PluginType.LOADERS, "config"),
 }
 
-logger = logging.getLogger(__name__)
-
-
-def logs(*args, **kwargs):
-    logger.info(click.style(*args, **kwargs))
+logger = structlog_stdlib.get_logger(__name__)
 
 
 @cli.command()
@@ -210,22 +203,28 @@ async def _run_job(project, job, session, context_builder, force=False):
 
     async with job.run(session):
         job_logging_service = JobLoggingService(project)
-        with job_logging_service.create_log(job.job_id, job.run_id) as log_file:
-            output_logger = OutputLogger(log_file)
+        log_file = job_logging_service.generate_log_name(job.job_id, job.run_id)
 
-            context_builder.set_base_output_logger(output_logger)
-            await _run_elt(project, context_builder, output_logger)
+        output_logger = OutputLogger(log_file)
+        context_builder.set_base_output_logger(output_logger)
+
+        log = logger.bind(name="meltano", run_id=str(job.run_id), job_id=job.job_id)
+
+        await _run_elt(log, context_builder, output_logger)
 
 
 @asynccontextmanager
-async def _redirect_output(output_logger):
+async def _redirect_output(log, output_logger):
+
     meltano_stdout = output_logger.out(
-        "meltano", "elt", stream=sys.stdout, color="blue"
+        "meltano", log.bind(stdio="stdout", cmd_type="elt")
     )
-    meltano_stderr = output_logger.out("meltano", "elt", color="blue")
+    meltano_stderr = output_logger.out(
+        "meltano", log.bind(stdio="stderr", cmd_type="elt")
+    )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
-        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():
+        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():  # noqa: WPS316
             try:
                 yield
             except CliError as err:
@@ -233,30 +232,37 @@ async def _redirect_output(output_logger):
                 raise
 
 
-async def _run_elt(project, context_builder, output_logger):
-    async with _redirect_output(output_logger):
+async def _run_elt(log, context_builder, output_logger):
+    async with _redirect_output(log, output_logger):
         try:
             elt_context = context_builder.context()
 
             if not elt_context.only_transform:
-                await _run_extract_load(elt_context, output_logger)
+                await _run_extract_load(log, elt_context, output_logger)
             else:
-                logs("Extract & load skipped.", fg="yellow")
+                log.info("Extract & load skipped.")
 
             if elt_context.transformer:
-                await _run_transform(elt_context, output_logger)
+                await _run_transform(log, elt_context, output_logger)
             else:
-                logs("Transformation skipped.", fg="yellow")
+                log.info("Transformation skipped.")
         except RunnerError as err:
             raise CliError(f"ELT could not be completed: {err}") from err
 
 
-async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS231
+async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa: WPS231
+
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
-    extractor_log = output_logger.out(extractor, "extractor", color="yellow")
-    loader_log = output_logger.out(loader, "loader", color="green")
+    stderr_log = logger.bind(
+        run_id=str(elt_context.job.run_id),
+        job_id=elt_context.job.job_id,
+        stdio="stderr",
+    )
+
+    extractor_log = output_logger.out(extractor, stderr_log.bind(cmd_type="extractor"))
+    loader_log = output_logger.out(loader, stderr_log.bind(cmd_type="loader"))
 
     @contextmanager
     def nullcontext():
@@ -265,17 +271,24 @@ async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS2
     extractor_out_writer = nullcontext
     loader_out_writer = nullcontext
     if logger.getEffectiveLevel() == logging.DEBUG:
+        stdout_log = logger.bind(
+            run_id=str(elt_context.job.run_id),
+            job_id=elt_context.job.job_id,
+            stdio="stdout",
+        )
         extractor_out = output_logger.out(
-            f"{extractor} (out)", "extractor", color="bright_yellow"
+            f"{extractor} (out)", stdout_log.bind(cmd_type="extractor"), logging.DEBUG
         )
         loader_out = output_logger.out(
-            f"{loader} (out)", "loader", color="bright_green"
+            f"{loader} (out)", stdout_log.bind(cmd_type="loader"), logging.DEBUG
         )
 
         extractor_out_writer = extractor_out.line_writer
         loader_out_writer = loader_out.line_writer
 
-    logs("Running extract & load...")
+    log.info(
+        "Running extract & load...",
+    )
 
     singer_runner = SingerRunner(elt_context)
     try:
@@ -292,30 +305,34 @@ async def _run_extract_load(elt_context, output_logger, **kwargs):  # noqa: WPS2
         try:
             code = err.exitcodes[PluginType.EXTRACTORS]
             message = extractor_log.last_line.rstrip() or "(see above)"
-            logger.error(
-                f"{click.style(f'Extraction failed ({code}):', fg='red')} {message}"
-            )
+            log.error("Extraction failed", code=code, message=message)
         except KeyError:
             pass
 
         try:
             code = err.exitcodes[PluginType.LOADERS]
             message = loader_log.last_line.rstrip() or "(see above)"
-            logger.error(
-                f"{click.style(f'Loading failed ({code}):', fg='red')} {message}"
-            )
+            log.error("Loading failed", code=code, message=message)
         except KeyError:
             pass
 
         raise
 
-    logs("Extract & load complete!", fg="green")
+    log.info("Extract & load complete!")
 
 
-async def _run_transform(elt_context, output_logger, **kwargs):
-    transformer_log = output_logger.out(elt_context.transformer.name, color="magenta")
+async def _run_transform(log, elt_context, output_logger, **kwargs):
 
-    logs("Running transformation...")
+    stderr_log = logger.bind(
+        run_id=str(elt_context.job.run_id),
+        job_id=elt_context.job.job_id,
+        stdio="stderr",
+        cmd_type="transformer",
+    )
+
+    transformer_log = output_logger.out(elt_context.transformer.name, stderr_log)
+
+    log.info("Running transformation...")
 
     dbt_runner = DbtRunner(elt_context)
     try:
@@ -325,15 +342,13 @@ async def _run_transform(elt_context, output_logger, **kwargs):
         try:
             code = err.exitcodes[PluginType.TRANSFORMERS]
             message = transformer_log.last_line.rstrip() or "(see above)"
-            logger.error(
-                f"{click.style(f'Transformation failed ({code}):', fg='red')} {message}"
-            )
+            log.error("Transformation failed", code=code, message=message)
         except KeyError:
             pass
 
         raise
 
-    logs("Transformation complete!", fg="green")
+    log.info("Transformation complete!")
 
 
 def _find_transform_for_extractor(extractor: str, plugins_service):

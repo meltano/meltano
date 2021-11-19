@@ -12,11 +12,34 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-[#3042](https://gitlab.com/meltano/meltano/-/issues/3042) Hides non-default `meltano` variants from the UI.
+- [#2772](https://gitlab.com/meltano/meltano/-/issues/2772) Transition to a new structured log format with support for additional formats like JSON and key=value, configurable via stock python logging yaml configs.
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.88.0 - (2021-11-18)
+---
+
+### New
+
+- [#3021](https://gitlab.com/meltano/meltano/-/issues/3021) Added CLI for high-level Environment management.
+
+- [#3003](https://gitlab.com/meltano/meltano/-/issues/3003) Add `matatika` variant of tap-solarvista extractor.
+
+## 1.87.1 - (2021-11-09)
+---
+
+### Changes
+
+- [#3042](https://gitlab.com/meltano/meltano/-/issues/3042) Hides non-default `meltano` variants from the UI.
+
+### Fixes
+
+- [#3015](https://gitlab.com/meltano/meltano/-/issues/3015) Add missing settings to default target-snowflake: `role`, `batch_wait_limit_seconds`, `archive_load_files`, `archive_load_files_s3_prefix`, and `archive_load_files_s3_bucket`
+- [#3047](https://gitlab.com/meltano/meltano/-/issues/3047) Don't fail if primary `meltano.yml` file is missing top-level entries.
+- [#3049](https://gitlab.com/meltano/meltano/-/issues/3049) Fix installation issues caused by breaking change in WTForms library v3.0.x.
 
 
 ## 1.87.0 - (2021-11-05)

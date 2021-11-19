@@ -13,6 +13,7 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.environment_service import EnvironmentService
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -387,6 +388,16 @@ def schedule(project, tap, target, schedule_service):
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule
+
+
+@pytest.fixture(scope="function")
+def environment_service(project):
+    service = EnvironmentService(project)
+    yield service
+
+    # Cleanup: remove any added Environments
+    for environment in service.list_environments():
+        service.remove(environment.name)
 
 
 @pytest.fixture(scope="class")
