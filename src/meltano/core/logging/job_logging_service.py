@@ -33,6 +33,12 @@ class JobLoggingService:
     def logs_dir(self, job_id, *joinpaths):
         return self.project.job_logs_dir(job_id, *joinpaths)
 
+    def generate_log_name(
+        self, job_id: str, run_id: str, file_name: str = "elt.log"
+    ) -> str:
+        """Generate an internal etl log path and name."""
+        return self.logs_dir(job_id, str(run_id), file_name)
+
     @contextmanager
     def create_log(self, job_id, run_id, file_name="elt.log"):
         """
@@ -40,7 +46,7 @@ class JobLoggingService:
 
         Log will be created inside the logs_dir, which is .meltano/logs/elt/:job_id/:run_id
         """
-        log_file_name = self.logs_dir(job_id, str(run_id), file_name)
+        log_file_name = self.generate_log_name(job_id, run_id, file_name)
 
         try:
             log_file = open(log_file_name, "w")

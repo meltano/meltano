@@ -41,6 +41,8 @@ settings:
     value: critical
   value: info
   env_specific: true
+- name: cli.log_config
+  value: logging.yaml
 
 # UI server
 - name: ui.bind_host

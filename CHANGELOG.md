@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#2772](https://gitlab.com/meltano/meltano/-/issues/2772) Transition to a new structured log format with support for additional formats like JSON and key=value, configurable via stock python logging yaml configs.
+
 ### Fixes
 
 ### Breaks
