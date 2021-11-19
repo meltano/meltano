@@ -1122,7 +1122,6 @@ extractors:
           env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN]
           kind: password
           label: OAuth Refresh Token
-  
         - name: view_id
           env_aliases: [GOOGLE_ANALYTICS_API_VIEW_ID]
           label: View ID
