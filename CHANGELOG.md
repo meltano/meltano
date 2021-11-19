@@ -9,9 +9,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#3021](https://gitlab.com/meltano/meltano/-/issues/3021) Added CLI for high-level Environment management.
-
-- [#3003](https://gitlab.com/meltano/meltano/-/issues/3003) Add `matatika` variant of tap-solarvista extractor.
 
 ### Changes
 
@@ -19,6 +16,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
+
+## 1.88.0 - (2021-11-18)
+---
+
+### New
+
+- [#3021](https://gitlab.com/meltano/meltano/-/issues/3021) Added CLI for high-level Environment management.
+
+- [#3003](https://gitlab.com/meltano/meltano/-/issues/3003) Add `matatika` variant of tap-solarvista extractor.
 
 ## 1.87.1 - (2021-11-09)
 ---
