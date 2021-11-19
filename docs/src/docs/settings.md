@@ -244,7 +244,7 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/docs/c
 - Options: `debug`, `info`, `warning`, `error`, `critical`
 - Default: `info`
 
-The granularity of CLI logging.
+The granularity of CLI logging. Ignored if a local logging config is found.
 
 #### How to use
 
@@ -255,6 +255,64 @@ export MELTANO_CLI_LOG_LEVEL=debug
 export MELTANO_LOG_LEVEL=debug
 
 meltano --log-level=debug ...
+```
+
+### `cli.log_config`
+
+- [Environment variable](/docs/configuration.html#configuring-settings): `MELTANO_CLI_LOG_CONFIG`, alias: `MELTANO_LOG_CONFIG`
+- `meltano` CLI option: `--log-config`
+- Default: `logging.yaml`
+
+The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging *if present*.
+
+#### How to use
+
+```bash
+meltano config meltano set cli log_config /path/to/logging.yaml
+
+export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
+export MELTANO_LOG_CONFIG=/path/to/logging.yaml
+
+meltano --log-config=/path/to/logging.yaml ...
+```
+
+A sample logging config:
+
+```yaml
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  default:
+    format: "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
+  structured_plain:
+    (): meltano.core.logging.console_log_formatter
+    colors: False
+  structured_colored:
+    (): meltano.core.logging.console_log_formatter
+    colors: True
+  key_value:
+    (): meltano.core.logging.key_value_formatter
+    sort_keys: False
+  json:
+    (): meltano.core.logging.json_formatter
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: structured_colored
+    stream: "ext://sys.stderr"
+  file:
+    class: logging.FileHandler
+    level: INFO
+    filename: /var/log/meltano.log
+    formatter: json
+
+root:
+  level: DEBUG
+  propagate: yes
+  handlers: [console, file]
 ```
 
 ## `meltano elt`
