@@ -210,14 +210,23 @@ class ProjectPluginsService:
             )
 
             # find the proper plugin to update
+            environment.config.plugins.setdefault(plugin.type, [])
             p_idx, p_outdated = next(
-                (idx, plg)
-                for idx, plg in enumerate(environment.config.plugins[plugin.type])
-                if plg == plugin
+                (
+                    (idx, plg)
+                    for idx, plg in enumerate(environment.config.plugins[plugin.type])
+                    if plg == plugin
+                ),
+                (None, None),
             )
 
             active_environment = environments[env_idx]
-            active_environment.config.plugins[plugin.type][p_idx] = plugin
+
+            if p_idx is None:
+                active_environment.config.plugins.setdefault(plugin.type, [])
+                active_environment.config.plugins[plugin.type].append(plugin)
+            else:
+                active_environment.config.plugins[plugin.type][p_idx] = plugin
 
             return p_outdated
 

@@ -9,8 +9,6 @@ from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
 
-from .environment import environment_option
-
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +18,11 @@ logger = logging.getLogger(__name__)
     "--log-config", type=str, help="Path to a python logging yaml config file."
 )
 @click.option("-v", "--verbose", count=True)
-@environment_option
+@click.option(
+    "--environment",
+    envvar="MELTANO_ENVIRONMENT",
+    help="Meltano environment name",
+)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(  # noqa: WPS231
