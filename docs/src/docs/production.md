@@ -23,6 +23,11 @@ Additionally, you may want to [run Meltano UI and configure it for production](#
 If you're [containerizing your Meltano project](/docs/containerization.md),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
 
+## SaaS Hosting Options
+
+Meltano currently does not offer project hosting as a paid offering.
+We recommend users look at [Singerly](https://www.singerly.co/), [Astronomer.io](https://www.astronomer.io/), or [Google Cloud Composer](https://cloud.google.com/composer/) as options for hosting and running your Meltano project. 
+
 ## Your Meltano project
 
 ### Off of your local machine...
