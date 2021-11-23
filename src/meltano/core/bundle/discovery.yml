@@ -921,6 +921,24 @@ extractors:
     description: Edge cloud computing services provider
     namespace: tap_fastly
     variants:
+    - name: splitio
+      docs: 'https://hub.meltano.com/extractors/fastly.html'
+      repo: https://github.com/splitio/tap-fastly
+      pip_url: 'git+https://github.com/splitio/tap-fastly.git'
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: api_token
+          label: API Token
+          kind: password
+          placeholder: Ex. *****************
+          description: Fastly token for authenticating with the API.
+        - name: start_date
+          label: Start Date
+          kind: date_iso8601
+          description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
     - name: meltano
       docs: 'https://hub.meltano.com/extractors/fastly.html'
       repo: https://gitlab.com/meltano/tap-fastly
