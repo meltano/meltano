@@ -79,7 +79,7 @@ members:
 
 # Meet the team
 
-Meltano is built by an all-remote team of {{$frontmatter.members.length}} and a [community](/docs/community.html) of thousands.
+Meltano is built by an [all-remote](https://handbook.meltano.com/company/all-remote) team of {{$frontmatter.members.length}} and a [community](/docs/community.html) of thousands.
 If you'd like to join us on our [mission](https://handbook.meltano.com/company/#mission) to enable everyone to realize the full potential of their data, check out our [job openings](/jobs/)!
 
 <TeamGrid :members="$frontmatter.members" />
