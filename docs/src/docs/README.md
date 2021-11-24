@@ -110,43 +110,23 @@ openings:
 
 # Introduction
 
-[Meltano](https://meltano.com) is ELT for the DataOps era:
+Meltano is ELT for the DataOps era:
 [open source](https://gitlab.com/meltano/meltano),
 [self-hosted](/docs/production.html),
 [CLI-first](/docs/command-line-interface.html),
 [debuggable](/docs/command-line-interface.html#debugging), and
 [extensible](/docs/plugins.html).
 
-This page covers the project's [Mission](#mission), [Focus](#focus), [Roadmap](#roadmap), [History](#history), and [Team](#team).
+To learn **how to use Meltano**, check out the [Getting Started guide](/docs/getting-started.html) and the additional guides and references linked from the Table of Contents in the sidebar.
 
-To find guides and references on other topics, use the Table of Contents in the sidebar.
+To learn about **contributing to Meltano**, refer to the [Contributor Guide](/docs/contributor-guide.html).
 
-## Mission
-
-Our mission is to enable everyone to realize the full potential of their data.
-
-Our vision is for Meltano to become the foundation of every team's ideal data stack.
-
-Our CEO, Douwe Maan, wrote a detailed post about why we believe in this mission and vision [here](https://meltano.com/blog/meltano-the-strategic-foundation-of-the-ideal-data-stack/).
-
-
-## Contributing
-
-Meltano is built for and by its community, and we welcome your contributions to our [GitLab repository](https://gitlab.com/meltano/meltano),
-which houses Meltano's
-[core](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/core),
-[CLI](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/cli),
-[UI](https://gitlab.com/meltano/meltano/-/tree/master/src/webapp),
-[UI API](https://gitlab.com/meltano/meltano/-/tree/master/src/meltano/api),
-[these docs](https://gitlab.com/meltano/meltano/-/tree/master/docs/src), and
-the [index of discoverable plugins](/docs/contributor-guide.html#discoverable-plugins),
-which feeds the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/) that are supported out of the box.
-
-To learn more about contributing to Meltano, refer to the [Contributor Guide](/docs/contributor-guide.html).
-
-## History
-
-Meltano was [founded](https://about.gitlab.com/blog/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) inside [GitLab](https://about.gitlab.com/) in 2018 to serve the GitLab Data Team. Meltano started as an open source tool built for GitLab’s data and analytics team, who wanted an end-to-end data platform built around open source components and DevOps principles. You can read more about our history via our [handbook](https://handbook.meltano.com/timeline).
+To learn **how Meltano is made**, check out the [company handbook](https://handbook.meltano.com/) with sections on:
+- our company [values](https://handbook.meltano.com/company/values) of empathy, community, sustainability, transparency, iteration, ambition, and accountability,
+- our [mission](https://handbook.meltano.com/company/#mission) to enable everyone to realize the full potential of their data,
+- our [vision](https://handbook.meltano.com/company/#vision) to become the foundation of every team's ideal data stack,
+- the product [strategy](https://handbook.meltano.com/company/#strategy) and [roadmap](https://handbook.meltano.com/product/roadmap) that will get us there, and
+- our [history](https://handbook.meltano.com/timeline) from 2018 until today.
 
 ## Team
 
