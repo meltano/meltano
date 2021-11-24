@@ -34,10 +34,8 @@
       <li v-for="opening in openings" :key="opening.title" class="opening">
         <img src="/android-chrome-512x512.png" class="avatar" />
 
-        <h3>Possibly You</h3>
+        <h3>{{opening.title}}</h3>
         <small>{{opening.location}}</small>
-
-        <strong>{{opening.title}}</strong>
 
         <p v-if="opening.description">
           {{opening.description}}
@@ -46,7 +44,7 @@
         <ul class="social">
           <li v-if="opening.description_url" class="job-description">
             <a :href="opening.description_url" target="_blank">
-              📝 Job description
+              📝 Learn more
             </a>
           </li>
         </ul>
@@ -118,6 +116,7 @@ ul.members
 
     ul.social
       padding: 0
+      margin-top: 1rem
 
       > li
         list-style: none
