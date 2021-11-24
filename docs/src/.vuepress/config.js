@@ -155,12 +155,20 @@ module.exports = {
             link: "/docs/community#guidelines",
           },
           {
+            text: "Office Hours",
+            link: "/docs/community#office-hours",
+          },
+          {
             text: "Demo Days",
             link: "/docs/community#demo-days",
           },
           {
-            text: "Office Hours",
-            link: "/docs/community#office-hours",
+            text: "Contributing",
+            link: "/docs/contributor-guide.html",
+          },
+          {
+            text: "Slack",
+            link: "https://meltano.com/slack",
           },
           {
             text: "YouTube",
@@ -174,6 +182,14 @@ module.exports = {
           {
             text: "About",
             link: "https://handbook.meltano.com/company/",
+          },
+          {
+            text: "Jobs",
+            link: "/jobs/",
+          },
+          {
+            text: "Team",
+            link: "/team/",
           },
           {
             text: "Values",
