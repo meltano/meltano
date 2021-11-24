@@ -57,7 +57,7 @@ along with the built-in
 or inside your
 [orchestrator of choice](/docs/production.html#meltano-elt).
 
-Meltano [embraces](/docs/#embracing-singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
+Meltano [embraces](https://handbook.meltano.com/product/singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
 [extractors](https://hub.meltano.com/extractors/) and
 [loaders](https://hub.meltano.com/loaders/),
 and leverages [dbt](https://www.getdbt.com) for [transformation](#transformation).
@@ -396,7 +396,6 @@ Your data has now been extracted and loaded!
 
 ## A UI for management and monitoring
 
-In line with [our current focus](/docs/#focus) on data engineers comfortable with CLIs and version control,
 Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html)
 and direct changes to the [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
