@@ -295,10 +295,6 @@ If you'd like to join the team, check out the [career opportunities](#careers) b
 
 <TeamGrid :members="$frontmatter.members" />
 
-## Values
-
-Our values define how we work together and make decisions. You can read them in [our handbook](https://handbook.meltano.com/values).
-
 ## Careers <a name="job-openings" />
 
 The team is growing: we're planning to bring on {{$frontmatter.openings.length}} more people in the near future! 
