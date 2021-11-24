@@ -168,6 +168,27 @@ module.exports = {
           },
         ],
       },
+      {
+        text: "Company",
+        items: [
+          {
+            text: "About",
+            link: "https://handbook.meltano.com/company/",
+          },
+          {
+            text: "Values",
+            link: "https://handbook.meltano.com/company/values",
+          },
+          {
+            text: "Handbook",
+            link: "https://handbook.meltano.com",
+          },
+          {
+            text: "Press",
+            link: "/press/",
+          },
+        ],
+      },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
         text: "Join 1800+ on Slack",
