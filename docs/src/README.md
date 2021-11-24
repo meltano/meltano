@@ -396,7 +396,6 @@ Your data has now been extracted and loaded!
 
 ## A UI for management and monitoring
 
-In line with [our current focus](/docs/#focus) on data engineers comfortable with CLIs and version control,
 Meltano is optimized for usage through the [`meltano` CLI](/docs/command-line-interface.html)
 and direct changes to the [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 

@@ -129,43 +129,6 @@ Our vision is for Meltano to become the foundation of every team's ideal data st
 
 Our CEO, Douwe Maan, wrote a detailed post about why we believe in this mission and vision [here](https://meltano.com/blog/meltano-the-strategic-foundation-of-the-ideal-data-stack/).
 
-## Focus
-
-Our vision for ELT in the DataOps era involves
-a decentralized ecosystem of open source connectors and
-a community of data engineers maintaining and contributing to these projects.
-
-To make this happen, we are primarily focused on users and teams
-that have the potential and the necessary technical skills to become
-**active participants in this community**,
-rather than those who prefer a hands-off approach with off-the-shelf connectors maintained by a single (paid) provider.
-
-In order of priority, our target personas are:
-
-1. **Data consultants** who may become [implementation partners](/partners/)
-   - They frequently write one-off (Python) scripts to extract data from niche sources that aren't supported by commercial EL(T) vendors.
-   - They want to stop reinventing the wheel and standardize their approach to building reliable and reusable custom connectors.
-   - They are willing to open source their custom connectors to share the maintenance burden with the community and,
-      in return, get access to connectors built and maintained by other consulting firms and data engineers.
-   - They want a consistent approach to extracting data from common sources (that are supported by commercial vendors) and niche ones (that aren't).
-   - They want the ability to customize and fix bugs in connectors without having to wait on a vendor.
-   - They want to save their clients money by self-hosting pipelines instead of being beholden to vendor pricing.
-   - They want to give their clients the option of never having their sensitive data pass through systems out of their control for privacy or compliance reasons.
-   - They want to manage their data projects like any other software engineering project, with all of the benefits of version control and CI/CD.
-   - They want to offer clients a (whitelabel) web UI to set up their connections and manage their pipelines.
-2. **Data engineers** with a software development background
-   - They are comfortable using a CLI and want to manage their data project like any other software engineering project, with all of the benefits of version control and CI/CD.
-   - They recognize that connectors are like API client libraries, and are comfortable using open source options even if they may require some tweaking and contributing fixes upstream.
-   - They want a consistent approach to extracting data from common sources (that are supported by commercial vendors) and niche ones (that aren't).
-   - They want the ability to customize and fix bugs in connectors without having to wait on a vendor.
-   - They may not want their sensitive data to pass through systems out of their control for privacy or compliance reasons.
-   - They may want to extract data from region-specific sources and SaaS tools that are not supported by the US-centric commercial vendors.
-   - They may have more development time to spend than money and would rather build and contribute to connectors than pay an expensive vendor.
-3. Developers of **data products**
-   - They want to let their users connect sources directly to their product.
-   - They want to be able to configure and run pipelines programmatically.
-   - They want to leverage existing connectors so they can focus on what their product does with the data instead of getting access to it.
-   - They want to open source any custom connectors they write to share the maintenance burden with the community.
 
 ## Contributing
 
