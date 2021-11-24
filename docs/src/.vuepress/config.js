@@ -119,11 +119,11 @@ module.exports = {
             text: "Connector SDK",
             link: "https://sdk.meltano.com/",
           },
+          {
+            text: "Implementation Partners",
+            link: "/partners/",
+          },
         ],
-      },
-      {
-        text: "Partners",
-        link: "/partners/",
       },
       {
         text: "Documentation",
@@ -165,6 +165,27 @@ module.exports = {
           {
             text: "YouTube",
             link: "https://www.youtube.com/meltano",
+          },
+        ],
+      },
+      {
+        text: "Company",
+        items: [
+          {
+            text: "About",
+            link: "https://handbook.meltano.com/company/",
+          },
+          {
+            text: "Values",
+            link: "https://handbook.meltano.com/company/values",
+          },
+          {
+            text: "Handbook",
+            link: "https://handbook.meltano.com",
+          },
+          {
+            text: "Press",
+            link: "/press/",
           },
         ],
       },

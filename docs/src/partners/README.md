@@ -9,7 +9,7 @@ This page lists [consultancies](#consultancies) that can help you take Meltano a
 
 ## Consultancies
 
-Meltano and [Singer](https://www.singer.io/) are [popular with data consultants](/docs/#focus), and various consultancies have adopted both as part of the stack they offer to clients.
+Meltano and [Singer](https://www.singer.io/) are popular with data consultants, and various consultancies have adopted both as part of the stack they offer to clients.
 
 If you lack the time and/or expertise to do so yourself, they can help you
 [set up](/docs/getting-started.html) your pipelines, deploy them to [production](/docs/production.html),
