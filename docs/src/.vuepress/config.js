@@ -176,6 +176,14 @@ module.exports = {
             link: "https://handbook.meltano.com/company/",
           },
           {
+            text: "Jobs",
+            link: "/jobs/",
+          },
+          {
+            text: "Team",
+            link: "/team/",
+          },
+          {
             text: "Values",
             link: "https://handbook.meltano.com/company/values",
           },
