@@ -119,11 +119,11 @@ module.exports = {
             text: "Connector SDK",
             link: "https://sdk.meltano.com/",
           },
+          {
+            text: "Implementation Partners",
+            link: "/partners/",
+          },
         ],
-      },
-      {
-        text: "Partners",
-        link: "/partners/",
       },
       {
         text: "Documentation",
