@@ -49,6 +49,8 @@ If not, please join us on <SlackChannelLink>Slack</SlackChannelLink> or [contrib
 
 Our [public company handbook](https://handbook.meltano.com) has all the details on
 our [values](https://handbook.meltano.com/company/values),
+[all-remote work](https://handbook.meltano.com/company/all-remote),
+[where we hire](https://handbook.meltano.com/company/all-remote#where-we-hire),
 [benefits](https://handbook.meltano.com/peopleops/benefits),
 and what it's like to work with us in general.
 
