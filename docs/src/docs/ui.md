@@ -22,7 +22,7 @@ as is an experimental [Analysis](/docs/analysis.html) feature, but many (newer) 
 
 Missing functionality and other improvements are being tracked in the ["Pipeline management and monitoring UI" epic](https://gitlab.com/groups/meltano/-/epics/78),
 and [new issues and contributions](/docs/contributor-guide.html) from the community are more than welcome,
-but the team is not currently [prioritizing](/docs/#roadmap) improvements to the UI because of the heavy focus on the CLI.
+but the team is not currently [prioritizing](https://handbook.meltano.com/product/roadmap) improvements to the UI because of the heavy focus on the CLI.
 
 ## Usage during development
 
