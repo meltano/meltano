@@ -42,7 +42,7 @@ View past office hours in our [YouTube Playlist][officehoursplaylist].
 
 ## Slack
 
-Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 1000 community members. You can ask any questions you may have in here, or just chat with fellow users.
+Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 1800 community members. You can ask any questions you may have in here, or just chat with fellow users.
 
 [conduct]: https://www.pypa.io/en/latest/code-of-conduct/
 [pep609]: https://www.python.org/dev/peps/pep-0609/

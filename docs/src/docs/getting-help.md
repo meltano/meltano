@@ -12,7 +12,7 @@ Check out the [Meltano issue tracker][issues] to see if someone else has already
 
 ## Slack
 
-Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 1000 community members. You can ask any questions you may have in here, or just chat with fellow users.
+Join the <SlackChannelLink>Meltano Slack workspace<OutboundLink /></SlackChannelLink>, which is frequented by the core team and over 1800 community members. You can ask any questions you may have in here, or just chat with fellow users.
 
 ## Intercom
 
