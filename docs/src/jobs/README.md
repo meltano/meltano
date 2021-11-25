@@ -45,12 +45,13 @@ To this end, we are bringing software engineering best practices to data teams i
 If you want to help data organizations become more effective, collaborative, and confident in the results of their work,
 we'd love to hear from you.
 If one of the openings below resonates, please apply!
-If not, please join us on <SlackChannelLink>Slack</SlackChannelLink> or [contribute on GitLab](/docs/contributor-guide.html)!
+If not, please join our community on <SlackChannelLink>Slack</SlackChannelLink> or [contribute on GitLab](/docs/contributor-guide.html)!
 
 Our [public company handbook](https://handbook.meltano.com) has all the details on
 our [values](https://handbook.meltano.com/company/values),
 [all-remote work](https://handbook.meltano.com/company/all-remote),
 [where we hire](https://handbook.meltano.com/company/all-remote#where-we-hire),
+[compensation](https://handbook.meltano.com/peopleops/compensation),
 [benefits](https://handbook.meltano.com/peopleops/benefits),
 and what it's like to work with us in general.
 
