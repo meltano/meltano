@@ -10,6 +10,7 @@ from .base import PluginDefinition, PluginRef, PluginType, Variant
 from .command import Command
 from .factory import base_plugin_factory
 
+TEST_COMMAND_NAME = "test"
 logger = logging.getLogger(__name__)
 
 
@@ -154,6 +155,11 @@ class ProjectPlugin(PluginRef):
     def all_commands(self):
         """Return a dictonary of supported commands, including those inherited from the parent plugin."""
         return {**self._parent.all_commands, **self.commands}
+
+    @property
+    def test_command(self) -> Optional[Command]:
+        """Return a the test command for this plugin."""
+        return self.all_commands.get(TEST_COMMAND_NAME)
 
     @property
     def supported_commands(self):

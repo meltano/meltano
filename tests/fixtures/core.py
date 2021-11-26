@@ -87,6 +87,10 @@ def discovery():
                             "description": "a description of cmd",
                         },
                         "cmd-variant": "cmd-variant meltano",
+                        "test": {
+                            "args": "--test",
+                            "description": "Run tests",
+                        },
                     },
                 },
                 {
