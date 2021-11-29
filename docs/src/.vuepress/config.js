@@ -206,7 +206,7 @@ module.exports = {
       },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join 1800+ on Slack",
+        text: "Join 1900+ on Slack",
         link: "https://meltano.com/slack",
         icon: "SlackIcon",
       },
