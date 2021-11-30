@@ -17,6 +17,7 @@ extractor.
 ### Changes
 
 - [#2772](https://gitlab.com/meltano/meltano/-/issues/2772) Transition to a new structured log format with support for additional formats like JSON and key=value, configurable via stock python logging yaml configs.
+- [#2443](https://gitlab.com/meltano/meltano/-/issues/2443) Bump dbt version to 0.21.1
 
 ### Fixes
 
