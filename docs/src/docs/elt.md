@@ -1,5 +1,5 @@
 ---
-title: ELT Meaning, Advantages & More: All You Need To Know To Get Started
+title: "ELT Meaning, Advantages & More: All You Need To Know To Get Started"
 ---
 
 # ELT: How to get started
