@@ -13,7 +13,6 @@ from meltano.core.utils import NotFound, find_named
 
 from .command import Command
 
-TEST_COMMAND_NAME = "test"
 logger = logging.getLogger(__name__)
 
 
@@ -288,9 +287,13 @@ class BasePlugin(HookObject):
         return self._variant.commands
 
     @property
-    def test_command(self) -> Optional[Command]:
+    def test_commands(self) -> Dict[str, Command]:
         """Return a the test command for this plugin."""
-        return self._variant.commands.get(TEST_COMMAND_NAME)
+        return {
+            name: command
+            for name, command in self.all_commands.items()
+            if name.startswith("test")
+        }
 
     @property
     def extra_settings(self):

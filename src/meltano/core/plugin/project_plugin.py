@@ -1,7 +1,7 @@
 import copy
 import logging
 import sys
-from typing import Optional
+from typing import Dict, Optional
 
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import expand_env_vars, flatten, uniques_in
@@ -10,7 +10,6 @@ from .base import PluginDefinition, PluginRef, PluginType, Variant
 from .command import Command
 from .factory import base_plugin_factory
 
-TEST_COMMAND_NAME = "test"
 logger = logging.getLogger(__name__)
 
 
@@ -157,9 +156,13 @@ class ProjectPlugin(PluginRef):
         return {**self._parent.all_commands, **self.commands}
 
     @property
-    def test_command(self) -> Optional[Command]:
+    def test_commands(self) -> Dict[str, Command]:
         """Return a the test command for this plugin."""
-        return self.all_commands.get(TEST_COMMAND_NAME)
+        return {
+            name: command
+            for name, command in self.all_commands.items()
+            if name.startswith("test")
+        }
 
     @property
     def supported_commands(self):
