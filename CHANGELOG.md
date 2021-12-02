@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.89.0 - (2021-12-02)
+---
+
+### New
+
 - [#3060](https://gitlab.com/meltano/meltano/-/issues/3060) Set `splitio` variant as the default tap-fastly extractor.
 - [#3076](https://gitlab.com/meltano/meltano/-/issues/3076) Set `transferwise` as the default target-postgres loader.
 - [#2967](https://gitlab.com/meltano/meltano/-/issues/2967) Set `meltanolabs` as the default tap-google-analytics extractor.
@@ -18,10 +30,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2772](https://gitlab.com/meltano/meltano/-/issues/2772) Transition to a new structured log format with support for additional formats like JSON and key=value, configurable via stock python logging yaml configs.
 - [#2443](https://gitlab.com/meltano/meltano/-/issues/2443) Bump dbt version to 0.21.1
-
-### Fixes
-
-### Breaks
 
 
 ## 1.88.0 - (2021-11-18)
