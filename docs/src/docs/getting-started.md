@@ -747,7 +747,7 @@ meltano elt <extractor> <loader> --job_id=<pipeline name>
 meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 ```
 ::: tip
-  The `--job_id` must be included on each execution if you want to run incremental syncs. This argument should define a unique job identifier which is used to store and retrieve state from the system database across executions. Its a good idea to make this a unique string based on the job being run (i.e. `gitlab-to-postgres`).
+  The `--job_id` must be included on each execution if you want to run incremental syncs. This argument should define a globally unique job identifier which is used to store and retrieve state from the system database across executions. Its a good idea to make this a unique string based on the job being run (i.e. `gitlab-to-postgres`).
 :::
 
 If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
