@@ -745,6 +745,9 @@ meltano elt <extractor> <loader> --job_id=<pipeline name>
 # For example:
 meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 ```
+::: tip
+  The `--job_id` must be included on each execution if you want to run incremental syncs. This argument should define a globally unique job identifier which is used to store and retrieve state from the system database across executions. Its a good idea to make this a unique string based on the job being run (i.e. `gitlab-to-postgres`).
+:::
 
 If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
 
@@ -810,6 +813,9 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
       transform: skip
       interval: '@daily'
     ```
+    ::: tip
+      The `name` setting in schedules acts as the `job_id` so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. `gitlab-to-postgres` or `gitlab-to-postgres-prod` if you have multiple environemnts).
+    :::
 
 1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/docs/command-line-interface.html#schedule):
 
