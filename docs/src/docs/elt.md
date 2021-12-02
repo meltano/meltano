@@ -16,7 +16,7 @@ On one hand, there is the familiar and reliable ETL process that has been a stap
 * Outlining the key differences between ELT and ETL
 * Exploring the typical use cases of the ELT approach
 
-### [Click here to join](https://meltano.com/slack)
+### [Meltano ELT Today](https://meltano.com/docs/command-line-interface.html#elt)
 
 ## What Is ELT?
 ELT means Extract, Load, Transform. It is a method of data replication and transformation used to perform data integration at any scale.
@@ -41,9 +41,9 @@ While the two processes have their similarities, ELT has a few clear advantages 
 You don't want that to be a one-time or destructive process that can't be repeated or that can't be iterated upon.
 #### Advantage #2: Repeatable
 The transformation is where you want to apply your business logic you're cleansing. And the important thing to think about is that transforms your business logic and your cleansing is going to improve constantly.
-#### Advantage #3: Feswer errors and duplicate work
+#### Advantage #3: Fewer Errors and Duplicate Work
 When you do the transformation in the middle, then you're in, you're imposing your business logic on the data. While it's in flight, as your business laws changes, you have no way to rerun what you ran at that point in time. You're also going to have a lot more failures.
-#### Advantage #4: Collaborative and Cost effective
+#### Advantage #4: Collaborative and Cost Effective
 What is helpful about ELT is that you can have a kind of virtuous downstream cycle. The example being, I extract and load transform and publish. But my teammate also needs to extract from me and they can have the same process and so on and so on and so on. So you can have a core team doing ELT. They can also have subscribing teams which can have subscribing teams and so on and so on. 
 The benefit of this ETL process here is that they have an official record of whatever we published on that day. You are able to restate everything to your downstream consumer who will have some record of what I published on that day. And that's one of the reasons why we have a separate EL step vs including the transformation in with the replication.
 
@@ -51,9 +51,9 @@ The benefit of this ETL process here is that they have an official record of wha
 Because of ELT’s unique features and advantages, it is superior to ETL as a data processing protocol in a variety of use scenarios and projects. But when would ETL benefit you the most?
 
 Here are a few scenarios when ELT would work best for you:
-* You run a small to medium-sized enterprise: Let’s start with the most obvious scenario that has to do with one of ELT’s key advantages: cost. The truth is that ETL, despite all its advantages, can be too costly of a solution for organizations that don’t have enough resources to operate a maintenance-heavy system. By comparison, ELT is a much more affordable solution that can be more suitable for small or medium-sized organizations that don’t have the resources or need for a costly solution.
-* You need to process a large data set, quickly: Due to its inherent scalable cloud computing abilities, ELT is more capable at loading and processing large data sets. By comparison, ETL is best suited for smaller data chunks and can be more sensitive to the data quality and formatting due to the limitation of the staging transformation environment.
-* You need to keep all your old data at hand: Processing your data using ELT means that once it reaches your data warehouse or storage and gets processed, it will stay there indefinitely — as long as the storage capacity allows it. This can be a crucial factor for organizations that prefer to keep all their data in one place, including its unprocessed raw form. With ELT, you will always be able to access your old data in case you need to use it at any point in the future.
+* **You run a small to medium-sized enterprise:** Let’s start with the most obvious scenario that has to do with one of ELT’s key advantages: cost. The truth is that ETL, despite all its advantages, can be too costly of a solution for organizations that don’t have enough resources to operate a maintenance-heavy system. By comparison, ELT is a much more affordable solution that can be more suitable for small or medium-sized organizations that don’t have the resources or need for a costly solution.
+* **You need to process a large data set, quickly:** Due to its inherent scalable cloud computing abilities, ELT is more capable at loading and processing large data sets. By comparison, ETL is best suited for smaller data chunks and can be more sensitive to the data quality and formatting due to the limitation of the staging transformation environment.
+* **You need to keep all your old data at hand:** Processing your data using ELT means that once it reaches your data warehouse or storage and gets processed, it will stay there indefinitely — as long as the storage capacity allows it. This can be a crucial factor for organizations that prefer to keep all their data in one place, including its unprocessed raw form. With ELT, you will always be able to access your old data in case you need to use it at any point in the future.
 
 In contrast to many ETL solutions, ELT is cloud-based and does not require as much human input for updates and maintenance.
 
