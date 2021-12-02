@@ -26,9 +26,6 @@ openings:
 - title: Backend Engineer
   location: Anywhere, Remote 🌍
   description_url: https://boards.greenhouse.io/meltano/jobs/4148049004
-- title: Senior Frontend Engineer
-  location: Anywhere, Remote 🌍
-  description_url: https://boards.greenhouse.io/meltano/jobs/4067842004
 - title: Senior UI/UX Designer
   location: Anywhere, Remote 🌍
   description_url: https://boards.greenhouse.io/meltano/jobs/4147449004
