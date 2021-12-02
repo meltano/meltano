@@ -539,12 +539,12 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
       ```bash
       meltano add loader <plugin name>
 
-      # For this example, we'll use the transferwise non-default
-      # variant, selected using `--variant`:
-      meltano add loader target-postgres --variant=transferwise
-
-      # Or if you just want the default variant you can use this:
+      # For this example, we'll use the default variant:
       meltano add loader target-postgres
+
+      # Or if you just want to use a non-default variant you can use this,
+      # selected using `--variant`:
+      meltano add loader target-postgres --variant=datamill-co
       ```
 
       ::: tip
@@ -665,8 +665,8 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config target-postgres set postgres_host localhost
-    meltano config target-postgres set postgres_port 5432
+    meltano config target-postgres set host localhost
+    meltano config target-postgres set port 5432
     meltano config target-postgres set user meltano
     meltano config target-postgres set password meltano
     meltano config target-postgres set dbname warehouse
@@ -682,17 +682,18 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     ```yml{5-10}
     plugins:
       loaders:
-      - name: target-bigquery
-        variant: datamill-co
+      - name: target-postgres
+        variant: transferwise
+        pip_url: pipelinewise-target-postgres
         config:
-          postgres_host: localhost
-          postgres_port: 5432
-          postgres_username: meltano
-          postgres_database: warehouse
-          postgres_schema: public
+          host: localhost
+          port: 5432
+          user: meltano
+          dbname: warehouse
+          default_target_schema: public
     ```
 
-    Sensitive configuration (like `postgres_password`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
+    Sensitive configuration (like `password`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
 
     ```bash
     export TARGET_POSTGRES_PASSWORD=meltano
@@ -726,9 +727,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
       "hard_delete": false,
       "data_flattening_max_level": 0,
       "primary_key_required": true,
-      "validate_records": false,
-      "postgres_host": "localhost",
-      "postgres_port": 5432
+      "validate_records": false
     }
     ```
 

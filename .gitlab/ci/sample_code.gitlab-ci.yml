@@ -255,12 +255,12 @@ getting_started_sample_code:
 
     - meltano config target-postgres list
 
-    - meltano config target-postgres set postgres_host $POSTGRES_ADDRESS
-    - meltano config target-postgres set postgres_port $POSTGRES_PORT
-    - meltano config target-postgres set postgres_username $POSTGRES_USER
-    - meltano config target-postgres set postgres_password $POSTGRES_PASSWORD
-    - meltano config target-postgres set postgres_database $POSTGRES_DB
-    - meltano config target-postgres set postgres_schema public
+    - meltano config target-postgres set host $POSTGRES_ADDRESS
+    - meltano config target-postgres set port $POSTGRES_PORT
+    - meltano config target-postgres set user $POSTGRES_USER
+    - meltano config target-postgres set password $POSTGRES_PASSWORD
+    - meltano config target-postgres set dbname $POSTGRES_DB
+    - meltano config target-postgres set default_target_schema public
 
     - meltano config target-postgres
 
