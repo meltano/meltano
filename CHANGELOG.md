@@ -11,8 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#3060](https://gitlab.com/meltano/meltano/-/issues/3060) Set `splitio` variant as the default tap-fastly extractor.
+- [#3076](https://gitlab.com/meltano/meltano/-/issues/3076) Set `transferwise` as the default target-postgres loader.
 - [#2967](https://gitlab.com/meltano/meltano/-/issues/2967) Set `meltanolabs` as the default tap-google-analytics extractor.
-extractor.
 
 ### Changes
 
