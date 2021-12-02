@@ -2165,7 +2165,7 @@ loaders:
         - name: add_metadata_columns
           description: Add `_time_extracted` and `_time_loaded` metadata columns
           kind: boolean
-          value: false
+          value: true
         - name: replication_method
           description: Replication method, `append` or `truncate`
           kind: options
@@ -2348,7 +2348,7 @@ loaders:
             label: Schema Mapping
           - name: add_metadata_columns
             kind: boolean
-            value: false
+            value: true
             description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in postgres etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Postgres.
             label: Add Metadata Columns
           - name: hard_delete
@@ -2653,7 +2653,7 @@ loaders:
           - name: add_metadata_columns
             label: Add Metadata Columns
             kind: boolean
-            value: false
+            value: true
             description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in snowflake etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Snowflake.
           - name: hard_delete
             label: Hard Delete
@@ -2999,7 +2999,7 @@ loaders:
         description: By default the connector caches the available table structures in Redshift at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With disable_table_cache option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.
       - name: add_metadata_columns
         kind: boolean
-        value: false
+        value: true
         description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in redshift etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix _SDC_. The metadata columns are documented at https://transferwise.github.io/pipelinewise/data_structure/sdc-columns.html. Enabling metadata columns will flag the deleted rows by setting the _SDC_DELETED_AT metadata column. Without the add_metadata_columns option the deleted rows from singer taps will not be recongisable in Redshift.
       - name: hard_delete
         kind: boolean
