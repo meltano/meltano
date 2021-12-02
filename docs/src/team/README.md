@@ -77,7 +77,7 @@ members:
   location: CA, USA 🇺🇸
 - name: Alex Marple
   title: Senior Frontend Engineer
-  location: CA, USA 🇺🇸
+  location: Oakland, CA, USA 🇺🇸
   gravatar_hash: efeec6d1f508bbafa54ffb82c9a5cd3d
   social:
     gitlab: alex1126
