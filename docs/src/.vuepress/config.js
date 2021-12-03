@@ -25,6 +25,7 @@ const docsSidebar = [
       "/docs/production",
       "/docs/analysis",
       "/docs/ui",
+      "/docs/elt",
     ],
   },
   {
