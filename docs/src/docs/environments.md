@@ -47,11 +47,19 @@ environments:
           batch_size_rows: 1000
 ```
 
+::: tip Environments vs Python Virtual Environments
+
+For installable Python plugins (i.e. those with a [`pip_url`](/docs/project.html#plugins) property) configured across multiple Environments,
+the same Python virtual environment and executable are reused.
+
+To install different versions of the same plugin side by side, you can use [plugin inheritance](/docs/plugins.html#plugin-inheritance) and set a different `pip_url` in the inherited plugin.
+:::
+
 ## Inheritance
 
 Environments are most powerful when [inheriting](/docs/plugins.html#plugin-inheritance) from a base plugin definition.
 Configuration that is set in an environment can be used to add or override configuration set in the base plugin configuration.
-This enables reuse of configuration common to multiple environments while making it easy to switch configuratino for a specific environment.
+This enables reuse of configuration common to multiple environments while making it easy to switch configuration for a specific environment.
 
 ## Activation
 
