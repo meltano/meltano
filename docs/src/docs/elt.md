@@ -74,5 +74,5 @@ By comparison, ELT is more streamlined and follows the key principle of a data p
 
 In other words, ELT means cost-effectiveness, flexibility and limitless collaboration.
 
-Get Started with [Meltano ELT Today](https://meltano.com/docs/command-line-interface.html#elt)
+Get Started with [Meltano ELT Today](/docs/command-line-interface.html#elt)
 
