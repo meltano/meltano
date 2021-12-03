@@ -2193,7 +2193,7 @@ loaders:
           value: 50
           label: Max Cache
         - name: merge_state_messages
-          type: boolean
+          kind: boolean
           description: Whether to merge multiple state messages from the tap into the state
             file or uses the last state message as the state file.
           label: Merge State Messages
