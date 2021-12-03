@@ -16,7 +16,7 @@ On one hand, there is the familiar and reliable ETL process that has been a stap
 * Outlining the key differences between ELT and ETL
 * Exploring the typical use cases of the ELT approach
 
-### [Meltano ELT Today](https://meltano.com/docs/command-line-interface.html#elt)
+### [Meltano ELT Today](/docs/command-line-interface.html#elt)
 
 ## What Is ELT?
 ELT means Extract, Load, Transform. It is a method of data replication and transformation used to perform data integration at any scale.
