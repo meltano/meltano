@@ -4,7 +4,19 @@
 # nested in that directory, on any level
 
 # Default
-* @DouweM @aaronsteers @pandemicsyn @edgarrmondragon
+* @DouweM @aaronsteers
 
 # Docs
 /docs/ @meltano/core-team
+/CONTRIBUTING.md @meltano/core-team
+/README.md @meltano/core-team
+
+# Release Ops (see `/.bumbversion.cfg` for list of bumped files)
+/CHANGELOG.md @meltano/core-team
+/cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml @meltano/core-team
+/cookiecutter/target-template/{{cookiecutter.target_id}}/pyproject.toml @meltano/core-team
+/docs/package.json @meltano/core-team
+/package.json @meltano/core-team
+/pyproject.toml @meltano/core-team
+/src/meltano/__init__.py @meltano/core-team
+/src/webapp/package.json @meltano/core-team
