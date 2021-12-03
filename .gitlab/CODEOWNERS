@@ -11,8 +11,8 @@
 /CONTRIBUTING.md @meltano/core-team
 /README.md @meltano/core-team
 
-# Release Ops (see `/.bumbversion.cfg` for list of bumped files)
-/.bumbversion.cfg
+# Release Ops (see `/.bumpversion.cfg` for list of bumped files)
+/.bumpversion.cfg
 /CHANGELOG.md @meltano/core-team
 /cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml @meltano/core-team
 /cookiecutter/target-template/{{cookiecutter.target_id}}/pyproject.toml @meltano/core-team
