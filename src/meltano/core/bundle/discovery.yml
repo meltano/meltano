@@ -2348,7 +2348,7 @@ loaders:
             label: Schema Mapping
           - name: add_metadata_columns
             kind: boolean
-            value: false
+            value: true
             description: Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in postgres etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Postgres.
             label: Add Metadata Columns
           - name: hard_delete
