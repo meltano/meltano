@@ -6,7 +6,7 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.error import Error
 from meltano.core.utils import expand_env_vars
 
-T = TypeVar("T")  # noqa: WPS111
+T = TypeVar("T")
 
 
 class UndefinedEnvVarError(Error):

@@ -1,7 +1,7 @@
 """Validation command."""
 
 import sys
-from typing import Dict, Iterable, Tuple, TypeVar
+from typing import Dict, Iterable, Tuple
 
 import click
 import structlog
@@ -18,7 +18,6 @@ from . import cli
 from .params import pass_project
 
 logger = structlog.getLogger(__name__)
-T = TypeVar("T")  # noqa: WPS111
 
 TEST_LINE_LENGTH = 60
 

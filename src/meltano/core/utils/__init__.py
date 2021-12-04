@@ -16,7 +16,7 @@ import flatten_dict
 from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
-T = TypeVar("T")  # noqa: WPS111
+T = TypeVar("T")
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"

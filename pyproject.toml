@@ -173,6 +173,7 @@ pyflakes = ["+*"]
 wemake-python-styleguide = [
   "+*",
   "-WPS110",  # Allow blacklisted variable names that can be clear enough in method context
+  "-WPS111",  # Allow short variable names, e.g. for generic type parameters
   "-WPS115",  # Allow upper-case constants in Enum subclasses
   "-WPS300",  # Allow local folder imports (import .module)
   "-WPS305",  # Allow f-strings
