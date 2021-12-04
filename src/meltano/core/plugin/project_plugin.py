@@ -157,7 +157,7 @@ class ProjectPlugin(PluginRef):
 
     @property
     def test_commands(self) -> Dict[str, Command]:
-        """Return a the test command for this plugin."""
+        """Return the test commands for this plugin."""
         return {
             name: command
             for name, command in self.all_commands.items()

@@ -11,9 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Validation as a first-class citizen through the plugin test commands.
-extractor.
 - [#2967](https://gitlab.com/meltano/meltano/-/issues/2967) Set `meltanolabs` as the default tap-google-analytics extractor.
-extractor.
 
 ### Changes
 

@@ -1,8 +1,7 @@
 """Validation command."""
 
-import asyncio
 import sys
-from typing import List, Tuple, TypeVar
+from typing import Dict, Iterable, Tuple, TypeVar
 
 import click
 import structlog
@@ -12,6 +11,7 @@ from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.utils import run_async
+from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 from sqlalchemy.orm.session import sessionmaker
 
 from . import cli
@@ -19,6 +19,31 @@ from .params import pass_project
 
 logger = structlog.getLogger(__name__)
 T = TypeVar("T")  # noqa: WPS111
+
+TEST_LINE_LENGTH = 60
+
+
+class CommandLineValidator:
+    """Validator that runs in the CLI."""
+
+    def __init__(self, name: str, selected: bool = True) -> None:
+        """Create a new CLI validator."""
+        self.name = name
+        self.selected = selected
+
+    async def run_async(self, invoker: PluginInvoker):
+        """Run this validation.
+
+        Args:
+            invoker: A plugin CLI invoker.
+
+        Returns:
+            Exit code for the plugin invocation.
+        """
+        handle = await invoker.invoke_async(command=self.name)
+        with propagate_stop_signals(handle):
+            exit_code = await handle.wait()
+        return exit_code
 
 
 @cli.command()
@@ -41,70 +66,83 @@ def test(
     plugin_tests: Tuple[str] = (),
 ):
     """Run validations using plugins' tests."""
-    plugins_service = ProjectPluginsService(project)
     _, session_maker = project_engine(project)
     session = session_maker()
 
-    # All tests for all plugins
-    if all_tests:
-        tasks = []
-        plugins = plugins_service.plugins()
-        for project_plugin in plugins:
-            invoker = invoker_factory(
-                project, project_plugin, plugins_service=plugins_service
-            )
-            tasks.append(_test_plugin(invoker, session, *project_plugin.test_commands))
+    collected = collect_tests(project, select_all=all_tests)
 
-        exit_codes = _flatten(run_async(asyncio.gather(*tasks)))
-        sys.exit(1 if any(exit_codes) else 0)
-
-    if not plugin_tests:
-        click.secho("No plugin tests were selected", fg="yellow")
-
-    # Test specific plugins
-    tasks = []
     for plugin_test in plugin_tests:
         try:
             plugin_name, test_name = plugin_test.split(":")
         except ValueError:
             plugin_name, test_name = plugin_test, None
 
-        plugin = plugins_service.find_plugin(plugin_name, configurable=True)
-        invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
+        if test_name:
+            collected[plugin_name].select_test(test_name)
+        else:
+            collected[plugin_name].select_all()
 
-        tests = (test_name,) if test_name else tuple(plugin.test_commands)
-        tasks.append(_test_plugin(invoker, session, *tests))
+    exit_codes = run_async(_run_plugin_tests(session, collected.values()))
 
-    exit_codes = _flatten(run_async(asyncio.gather(*tasks)))
-    sys.exit(1 if any(exit_codes) else 0)
-
-
-async def _test_plugin(
-    invoker: PluginInvoker,
-    session: sessionmaker,
-    *tests: str,
-) -> List[int]:
-    """Run all tests for a plugin."""
-    async with invoker.prepared(session):
-        return await asyncio.gather(
-            *(_invoke_command(invoker, command) for command in tests)
-        )
+    click.echo()
+    _report_and_exit(exit_codes)
 
 
-async def _invoke_command(invoker: PluginInvoker, command: str) -> int:
-    """Invoke a single plugin command."""
-    handle = await invoker.invoke_async(command=command)
-    with propagate_stop_signals(handle):
-        exit_code = await handle.wait()
+def collect_tests(
+    project: Project,
+    select_all: bool = True,
+) -> Dict[str, ValidationsRunner]:
+    """Collect all tests for CLI invocation.
 
-    return exit_code
+    Args:
+        project: A Meltano project object.
+        select_all: Flag to select all validations by default.
 
-
-def _flatten(top: List[List[T]]) -> List[T]:
-    """Flatten a one-level nested list.
-
-    Example:
-    >>> _flatten([[0, 1, 1], [0, 0]])
-    [0, 1, 1, 0, 0]
+    Returns:
+        A mapping of plugin names to validation runners.
     """
-    return [value for nested in top for value in nested]
+    plugins_service = ProjectPluginsService(project)
+    return {
+        plugin.name: ValidationsRunner(
+            invoker=invoker_factory(project, plugin, plugins_service=plugins_service),
+            validators={
+                test: CommandLineValidator(test, select_all)
+                for test in plugin.test_commands
+            },
+        )
+        for plugin in plugins_service.plugins()
+    }
+
+
+async def _run_plugin_tests(
+    session: sessionmaker,
+    runners: Iterable[ValidationsRunner],
+) -> Dict[str, Dict[str, int]]:
+    return {runner.plugin_name: await runner.run_all(session) for runner in runners}
+
+
+def _report_and_exit(results: Dict[str, Dict[str, int]]):
+    exit_code = 0
+    failed_count = 0
+    passed_count = 0
+
+    for plugin_name, test_results in results.items():
+        for test_name, test_exit_code in test_results.items():
+            outcome = ValidationOutcome.from_exit_code(test_exit_code)
+            if test_exit_code == 0:
+                passed_count += 1
+            else:
+                exit_code = 1
+                failed_count += 1
+            styled_result = click.style(outcome, fg=outcome.color)
+            plugin_test = click.style(f"{plugin_name}:{test_name}", bold=True)
+            click.echo(f"{plugin_test.ljust(TEST_LINE_LENGTH, '.')} {styled_result}")
+
+    message = "successfully" if failed_count == 0 else "with failures"
+
+    click.echo(
+        f"\nTesting completed {message}. "
+        + f"{passed_count} tests successful. {failed_count} tests failed."
+    )
+
+    sys.exit(exit_code)
