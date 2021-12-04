@@ -37,16 +37,16 @@ class ValidatorProtocol(Protocol):
     @property
     def name(self) -> str:
         """Retrive validator name."""
-        ...  # noqa: WPS428
+        ...
 
     @property
     def selected(self) -> bool:
         """Retrive whether validator is selected to run."""
-        ...  # noqa: WPS428
+        ...
 
     async def run_async(self, invoker: PluginInvoker) -> int:
         """Run validator."""
-        ...  # noqa: WPS428
+        ...
 
 
 class ValidationsRunner:
