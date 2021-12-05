@@ -1,7 +1,7 @@
 """The actual IOBlock interface is one of the lower level blocks for use with various BlockSet implementations."""
 
 from asyncio import StreamWriter, Task
-from typing import Optional
+from typing import Optional, Tuple
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 
@@ -21,6 +21,7 @@ class IOBlock(Protocol):
     stdin: Optional[StreamWriter]
     consumer: bool  # TODO: do we really need dedicated Producer/Consumer/Transformer blocks?
     producer: bool
+    string_id: str
 
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst."""
@@ -59,7 +60,7 @@ class IOBlock(Protocol):
         """
         ...
 
-    def proxy_io(self) -> (Task, Task):
+    def proxy_io(self) -> Tuple[Task, Task]:
         """Start proxying stdout AND stderr to the linked destinations.
 
         Returns: proxy_stdout Task and proxy_stderr Task

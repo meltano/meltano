@@ -4,8 +4,10 @@ from asyncio import Task
 from contextlib import suppress
 from typing import List, Set, Tuple
 
+import structlog
 from async_generator import asynccontextmanager
 from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.logging import OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
@@ -14,16 +16,24 @@ from .blockset import BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
 
+logger = structlog.getLogger(__name__)
+
 
 class ExtractLoadBlocks:  # noqa: WPS214
     """A basic BlockSet interface implementation that supports running basic EL (extract, load) patterns."""
 
-    def __init__(self, context: ELTContextBuilder, blocks: Tuple[IOBlock]):
+    def __init__(
+        self,
+        context: ELTContextBuilder,
+        blocks: Tuple[IOBlock],
+        output_logger: OutputLogger,
+    ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
         Args:
             context: the elt context to use for this elt run.
             blocks: the IOBlocks that should be used for this elt run.
+            output_logger: the logger to use for output.
         """
         self.context = context
         self.blocks = blocks
@@ -31,6 +41,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
             self.context.project,
             config_service=self.context.plugins_service.config_service,
         )
+        self.output_logger = output_logger
 
         self._process_futures = None
         self._stdout_futures = None
@@ -62,11 +73,14 @@ class ExtractLoadBlocks:  # noqa: WPS214
         )
         return done
 
-    def validate_set(self) -> None:
+    def validate_set(self) -> None:  # noqa: WPS231
         """Validate a ExtractLoad block set to ensure its valid and runnable.
 
         Raises: BlockSetValidationError on validation failure
         """
+        if not self.blocks:
+            raise BlockSetValidationError("No blocks in set.")
+
         if self.head.consumer:
             raise BlockSetValidationError("first block in set should not be consumer")
 
@@ -109,7 +123,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
 
     @property
     def process_futures(self) -> List[Task]:
-        """Access the futures of the blocks subprocess calls."""
+        """Return the futures of the blocks subprocess calls."""
         if self._process_futures is None:
             self._process_futures = [block.process_future for block in self.blocks]
         return self._process_futures
@@ -145,6 +159,11 @@ class ExtractLoadBlocks:  # noqa: WPS214
 
     @asynccontextmanager
     async def _start_blocks(self, session):
+        """Start the blocks in the block set.
+
+        Args:
+            session: The session to use for the blocks.
+        """
         try:  # noqa:  WPS229
             for block in self.blocks:
                 await block.pre({"session": session})
@@ -163,7 +182,25 @@ class ExtractLoadBlocks:  # noqa: WPS214
             await block.post()
 
     async def _link_io(self) -> None:
+        """Link the blocks in the set together."""
         for idx, block in enumerate(self.blocks):
+            logger_base = logger.bind(
+                consumer=block.consumer,
+                producer=block.producer,
+                string_id=block.string_id,
+            )
+            block.stdout_link(
+                self.output_logger.out(
+                    "stdout",
+                    logger_base,
+                )
+            )
+            block.stderr_link(
+                self.output_logger.out(
+                    "stderr",
+                    logger_base,
+                )
+            )
             if block.consumer:
                 # TODO: this check is redundent if validate_set has been called. So we should use that probably.
                 if idx != 0 and self.blocks[idx - 1].producer:
@@ -237,6 +274,7 @@ async def experimental_run(  # noqa: WPS217
 
 
 async def _complete_upstream(elb: ExtractLoadBlocks) -> int:
+    """Wait for the upstream blocks to complete and return the exit code."""
     producer = elb.head
     consumer = elb.tail
 
@@ -263,6 +301,7 @@ async def _complete_upstream(elb: ExtractLoadBlocks) -> int:
 
 
 async def _complete_downstream(elb: ExtractLoadBlocks) -> int:
+    """Wait for the downstream blocks to complete and return the exit code."""
     producer = elb.head
     consumer = elb.tail
 
@@ -278,7 +317,7 @@ async def _complete_downstream(elb: ExtractLoadBlocks) -> int:
     # Wait for all buffered target output to be processed
     await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
-    # Wait for target to complete
+    # Wait for target process future to complete
     await consumer.process_future
     return consumer.process_future.result()
 

@@ -46,11 +46,14 @@ class InvokerBase:  # noqa: WPS230
         self._stderr_future: Task = None
 
     async def start(self, *args, **kwargs):
-        """Spawn the process, invoking the underlying plugin.
+        """Invoke the process asynchronously.
 
         Raises:
             RunnerError: If the plugin process can not start.
         """
+        if self.command is None:
+            raise RunnerError("No command to run")
+
         try:
             self.process_handle = await self.invoker.invoke_async(
                 *args,
@@ -68,13 +71,22 @@ class InvokerBase:  # noqa: WPS230
         Args:
             kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
         """
-        if kill:
-            self.process_handle.kill()
-        else:
-            self.process_handle.terminate()
+        if self.process_handle is None:
+            return
+
+        try:
+            if kill:
+                self.process_handle.kill()
+            else:
+                self.process_handle.terminate()
+        except ProcessLookupError:
+            # Process already stopped
+            pass
         await self.process_future
-        self.proxy_stdout.cancel()
-        self.proxy_stderr.cancel()
+        if self._stdout_future is not None:
+            self._stdout_future.cancel()
+        if self._stderr_future is not None:
+            self._stderr_future.cancel()
 
     def proxy_stdout(self) -> Task:
         """Start proxying stdout to the linked stdout destinations.
@@ -107,7 +119,7 @@ class InvokerBase:  # noqa: WPS230
             )
         return self._stderr_future
 
-    def proxy_io(self) -> (Task, Task):
+    def proxy_io(self) -> Tuple[Task, Task]:
         """Start proxying stdout AND stderr to the respectively linked destinations.
 
         Raises:
@@ -115,9 +127,7 @@ class InvokerBase:  # noqa: WPS230
 
         Returns: proxy_stdout Task and proxy_stderr Task
         """
-        stdout = self.proxy_stdout()
-        stderr = self.proxy_stderr()
-        return stdout, stderr
+        return self.proxy_stdout(), self.proxy_stderr()
 
     @property
     def process_future(self) -> Task:
@@ -131,6 +141,8 @@ class InvokerBase:  # noqa: WPS230
     @property
     def stdin(self) -> Optional[StreamWriter]:
         """Return stdin of the underlying process."""
+        if self.process_handle is None:
+            return None
         return self.process_handle.stdin
 
     def stdout_link(self, dst: SubprocessOutputWriter):
@@ -181,8 +193,10 @@ class SingerBlock(InvokerBase, IOBlock):
             block_ctx=block_ctx, plugin_invoker=plugin_invoker, command=None
         )
 
+        self.plugin_args = plugin_args
         self.producer: bool = self.invoker.plugin.type == PluginType.EXTRACTORS
         self.consumer: bool = self.invoker.plugin.type == PluginType.LOADERS
+        self.string_id = self.invoker.plugin.name
 
     async def start(self):
         """Start the SingerBlock by invoking the underlying plugin.
@@ -213,11 +227,21 @@ class SingerBlock(InvokerBase, IOBlock):
         Args:
             kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
         """
-        if kill:
-            self.process_handle.kill()
-        else:
-            self.process_handle.terminate()
+        if self.process_handle is None:
+            return
+
+        try:
+            if kill:
+                self.process_handle.kill()
+            else:
+                self.process_handle.terminate()
+        except ProcessLookupError:
+            # Process already stopped
+            pass
+
         await self.process_future
-        self.proxy_stdout.cancel()
-        self.proxy_stderr.cancel()
+        if self._stdout_future is not None:
+            self._stdout_future.cancel()
+        if self._stderr_future is not None:
+            self._stderr_future.cancel()
         self.invoker.cleanup()

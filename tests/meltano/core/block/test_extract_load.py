@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -9,6 +10,7 @@ from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import ExtractLoadBlocks
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job, Payload, State
+from meltano.core.logging import OutputLogger
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner.singer import SingerRunner
@@ -25,7 +27,11 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     return config_dir
 
 
-class TestBlock:
+class TestExtractLoadBlocks:
+    @pytest.fixture
+    def log(self, tmp_path):
+        return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
+
     @pytest.fixture()
     def elt_context(self, project, session, tap, target, elt_context_builder):
         job = Job(job_id="pytest_test_runner")
@@ -98,6 +104,7 @@ class TestBlock:
         target_process,
         plugin_invoker_factory,
         elt_context,
+        log,
     ):
 
         tap_process.sterr.at_eof.side_effect = True
@@ -126,7 +133,9 @@ class TestBlock:
                 ),
             )
 
-            elb = ExtractLoadBlocks(elt_context, blocks)
+            output_log = OutputLogger(log)
+
+            elb = ExtractLoadBlocks(elt_context, blocks, output_log)
             elb.validate_set()
             assert await elb.run(session)
 
@@ -172,7 +181,9 @@ class TestBlock:
                     block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
                 ),
             )
-            elb = ExtractLoadBlocks(elt_context, blocks)
+
+            elb = ExtractLoadBlocks(elt_context, blocks, output_logger=None)
+
             with pytest.raises(
                 BlockSetValidationError,
                 match=r"^.*: last block in set should not be a producer",
@@ -187,7 +198,7 @@ class TestBlock:
                     block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
                 ),
             )
-            elb = ExtractLoadBlocks(elt_context, blocks)
+            elb = ExtractLoadBlocks(elt_context, blocks, None)
             with pytest.raises(
                 BlockSetValidationError,
                 match=r"^.*: first block in set should not be consumer",
@@ -205,7 +216,7 @@ class TestBlock:
                     block_ctx=elt_context, plugin_invoker=target_invoker, plugin_args=[]
                 ),
             )
-            elb = ExtractLoadBlocks(elt_context, blocks)
+            elb = ExtractLoadBlocks(elt_context, blocks, None)
             with pytest.raises(
                 BlockSetValidationError,
                 match=r"^.*: intermediate blocks must be producers AND consumers",
