@@ -1,7 +1,6 @@
 import asyncio
 import tempfile
 from unittest import mock
-from unittest.mock import AsyncMock
 
 import pytest
 import structlog
@@ -32,7 +31,7 @@ class TestSingerBlocks:
     @pytest.fixture()
     def process_mock_factory(self):
         def _factory(name):
-            process_mock = AsyncMock()
+            process_mock = Mock()
             process_mock.name = name
             process_mock.wait = CoroutineMock(return_value=0)
             return process_mock
