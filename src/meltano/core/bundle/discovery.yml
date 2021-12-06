@@ -1812,7 +1812,7 @@ extractors:
         - discover
         - state
       settings:
-        - name: api_token
+        - name: token
           kind: password
           label: API Token
           documentation: https://slack.com/help/articles/215770388-Create-and-regenerate-API-tokens
