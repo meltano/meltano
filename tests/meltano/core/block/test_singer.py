@@ -81,13 +81,13 @@ class TestSingerBlocks:
         assert block.producer
         await block.start()
         assert mock_tap_plugin_invoker.invoke_async.called
-        assert mock_tap_plugin_invoker.invoke_async.call_args.kwargs["stdin"] is None
+        assert mock_tap_plugin_invoker.invoke_async.call_args[1]["stdin"] is None
         assert (
-            mock_tap_plugin_invoker.invoke_async.call_args.kwargs["stdout"]
+            mock_tap_plugin_invoker.invoke_async.call_args[1]["stdout"]
             == asyncio.subprocess.PIPE
         )
         assert (
-            mock_tap_plugin_invoker.invoke_async.call_args.kwargs["stderr"]
+            mock_tap_plugin_invoker.invoke_async.call_args[1]["stderr"]
             == asyncio.subprocess.PIPE
         )
 
@@ -100,15 +100,15 @@ class TestSingerBlocks:
         await block.start()
         assert mock_target_plugin_invoker.invoke_async.called
         assert (
-            mock_target_plugin_invoker.invoke_async.call_args.kwargs["stdin"]
+            mock_target_plugin_invoker.invoke_async.call_args[1]["stdin"]
             == asyncio.subprocess.PIPE
         )
         assert (
-            mock_target_plugin_invoker.invoke_async.call_args.kwargs["stdout"]
+            mock_target_plugin_invoker.invoke_async.call_args[1]["stdout"]
             == asyncio.subprocess.PIPE
         )
         assert (
-            mock_target_plugin_invoker.invoke_async.call_args.kwargs["stderr"]
+            mock_target_plugin_invoker.invoke_async.call_args[1]["stderr"]
             == asyncio.subprocess.PIPE
         )
 
