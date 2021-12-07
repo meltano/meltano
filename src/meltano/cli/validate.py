@@ -30,7 +30,7 @@ class CommandLineValidator:
         self.name = name
         self.selected = selected
 
-    async def run_async(self, invoker: PluginInvoker):
+    async def run_async(self, invoker: PluginInvoker) -> int:
         """Run this validation.
 
         Args:
