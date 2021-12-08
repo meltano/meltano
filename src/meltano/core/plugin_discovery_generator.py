@@ -1,13 +1,16 @@
+"""PluginDiscoveryGenerator for compiling discovery.yml dynamically."""
 import os
-import re
 from typing import Any, Dict
 
-import meltano.core.bundle as bundle
+from meltano.core import bundle
 from ruamel.yaml import YAML
 
 
 class PluginDiscoveryGenerator:
+    """This class generates and writes out the discovery.yml file."""
+
     def __init__(self):
+        """Init PluginDiscoveryGenerator with yaml and discovery extras."""
         self._yaml = YAML()
 
         self._discovery_version = 19
@@ -18,9 +21,15 @@ class PluginDiscoveryGenerator:
 
     def generate_discovery(
         self,
-        plugin_definitions_dir=str(bundle.find("discovery_definitions")) + "/",
-        discovery_file_path=str(bundle.find("")) + "/discovery.yml",
+        plugin_definitions_dir=None,
+        discovery_file_path=None,
     ):
+        """Generate the discovery.yml and write it out to a file."""
+        if not plugin_definitions_dir:
+            definition_path = str(bundle.find("discovery_definitions"))
+            plugin_definitions_dir = f"{definition_path}/"
+        if not discovery_file_path:
+            discovery_file_path = str(bundle.find("discovery.yml"))
         discovery_dict: Dict[str, Any] = {}
         discovery_dict["version"] = self._discovery_version
 

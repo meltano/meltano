@@ -75,10 +75,10 @@ DEFINITIONS_PATH = f"{ABS_PATH}/test_plugin_definitions/"
 @pytest.fixture
 def plugin_definitions():
     os.makedirs(DEFINITIONS_PATH, exist_ok=True)
-    os.makedirs(DEFINITIONS_PATH + "extractors", exist_ok=True)
+    os.makedirs(f"{DEFINITIONS_PATH}extractors", exist_ok=True)
 
-    with open(DEFINITIONS_PATH + "extractors/csv.yml", "w") as f:
-        f.write(TEST_DEFINITION)
+    with open(f"{DEFINITIONS_PATH}extractors/csv.yml", "w") as csv_definition:
+        csv_definition.write(TEST_DEFINITION)
 
     yield
 
@@ -91,6 +91,6 @@ def test_discovery_generator(plugin_definitions):
         plugin_definitions_dir=DEFINITIONS_PATH,
         discovery_file_path=f"{DEFINITIONS_PATH}/discovery.yml",
     )
-    with open(f"{DEFINITIONS_PATH}/discovery.yml", "r") as f:
-        generated_discovery = f.read()
+    with open(f"{DEFINITIONS_PATH}/discovery.yml", "r") as discovery_file:
+        generated_discovery = discovery_file.read()
     assert generated_discovery == EXPECTED_DISCOVERY
