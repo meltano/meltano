@@ -1,5 +1,6 @@
 """Validation command."""
 
+import shutil
 import sys
 from typing import Dict, Iterable, Tuple
 
@@ -22,6 +23,23 @@ logger = structlog.getLogger(__name__)
 TEST_LINE_LENGTH = 60
 
 
+def write_sep_line(title: str, sepchar: str, **kwargs):
+    """Write a separator line in the terminal."""
+    terminal_width, _ = shutil.get_terminal_size()
+    char_count = (
+        terminal_width - len(title) - 2  # Whitespace between sepchar and title
+    ) // (2 * len(sepchar))
+    char_count = max(char_count, 1)
+
+    fill = sepchar * char_count
+    line = f"\n{fill} {title} {fill}"
+
+    if len(line) + len(sepchar.rstrip()) <= terminal_width:
+        line += sepchar.rstrip()
+
+    click.secho(line, **kwargs)
+
+
 class CommandLineValidator:
     """Validator that runs in the CLI."""
 
@@ -39,6 +57,7 @@ class CommandLineValidator:
         Returns:
             Exit code for the plugin invocation.
         """
+        write_sep_line(self.name, "=", bold=True)
         handle = await invoker.invoke_async(command=self.name)
         with propagate_stop_signals(handle):
             exit_code = await handle.wait()
@@ -137,11 +156,12 @@ def _report_and_exit(results: Dict[str, Dict[str, int]]):
             plugin_test = click.style(f"{plugin_name}:{test_name}", bold=True)
             click.echo(f"{plugin_test.ljust(TEST_LINE_LENGTH, '.')} {styled_result}")
 
-    message = "successfully" if failed_count == 0 else "with failures"
-
-    click.echo(
-        f"\nTesting completed {message}. "
+    status = "successfully" if failed_count == 0 else "with failures"
+    message = (
+        f"Testing completed {status}. "
         + f"{passed_count} tests successful. {failed_count} tests failed."
     )
+
+    write_sep_line(message, "=", fg=("red" if exit_code else "green"))
 
     sys.exit(exit_code)
