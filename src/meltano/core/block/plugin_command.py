@@ -1,6 +1,6 @@
 """A "CommandBlock" pattern supporting Meltano plugin's command like `dbt:run`, `dbt:docs` or `dbt:test`."""
 import asyncio
-from typing import Optional
+from typing import Dict, Optional, Tuple
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 from meltano.core.plugin_invoker import PluginInvoker
