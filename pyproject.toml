@@ -214,12 +214,6 @@ wemake-python-styleguide = [
   "-WPS202",  # Allow many module members
 ]
 
-[tool.flakehell.exceptions."src/meltano/cli/run.py"]
-flake8-docstrings = ["-D101"] # Don't require docstrings in public class since init methods are documented
-wemake-python-styleguide = [
-  "-WPS201", # Suppress too many imports warning
-]
-
 [tool.flakehell.exceptions."src/meltano/migrations/versions/"]
 flake8-docstrings = ["-D103"] # Don't require function docstrings in migrations
 wemake-python-styleguide = ["-WPS118"] # Allow long filenames
@@ -234,7 +228,11 @@ pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the mo
 wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
 
 [tool.flakehell.exceptions."src/meltano/core/block"]
-wemake-python-styleguide = ["-WPS428"] # Allow ... use inside of typing protocol interface classes
+flake8-docstrings = ["-D101"] # Don't require docstrings in public class since init methods are documented
+wemake-python-styleguide = [
+  "-WPS428", # Allow ... use inside of typing protocol interface classes
+  "-WPS201",# Suppress too many imports warning (typing inflates count)
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

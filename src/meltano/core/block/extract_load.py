@@ -3,21 +3,167 @@ import asyncio
 import logging
 from asyncio import Task
 from contextlib import suppress
-from typing import List, Set, Tuple
+from typing import List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
-from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.elt_context import ELTContextBuilder, PluginContext
+from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 
 from .blockset import BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
+from .singer import SingerBlock
 
 logger = structlog.getLogger(__name__)
+
+
+class ELBContext:
+    def __init__(
+        self,
+        project: Project,
+        plugins_service: ProjectPluginsService = None,
+        session=None,
+        job: Optional[Job] = None,
+        base_output_logger: Optional[OutputLogger] = None,
+    ):
+        """Use an ELBContext to pass information on to ExtractLoadBlocks.
+
+        Args:
+            project: The project to use.
+            plugins_service: The plugins service to use.
+            session: The session to use.
+            job: The job within this context should run.
+            base_output_logger: The base logger to use.
+        """
+        self.project = project
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
+
+        self.session = session
+        self.job = job
+
+        self.base_output_logger = base_output_logger
+
+    @property
+    def elt_run_dir(self):
+        """Obtain the run directory for the current job."""
+        if self.job:
+            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+
+
+class ELBContextBuilder:
+    def __init__(
+        self,
+        project: Project,
+        plugins_service: ProjectPluginsService = None,
+        session=None,
+        job: Optional[Job] = None,
+    ):
+        """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
+
+        Args:
+            project: the meltano project for the context.
+            plugins_service: the plugins service for the context.
+            session: the database session for the context.
+            job:
+        """
+        self.project = project
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
+        self.session = session
+        self.job = job
+
+        self._env = {}
+        self._blocks = []
+
+        self._base_output_logger = None
+
+    def make_block(
+        self, plugin: ProjectPlugin, plugin_args: Optional[List[str]] = None
+    ) -> SingerBlock:
+        """Create a new `SingerBlock` object, from a plugin.
+
+        Args:
+            plugin: The plugin to be executed.
+            plugin_args: The arguments to be passed to the plugin.
+        Returns:
+            The new `SingerBlock` object.
+        """
+        ctx = self.plugin_context(plugin, env=self._env.copy())
+
+        block = SingerBlock(
+            block_ctx=ctx,
+            project=self.project,
+            plugins_service=self.plugins_service,
+            plugin_invoker=self.invoker_for(ctx),
+            plugin_args=plugin_args,
+        )
+        self._blocks.append(block)
+        self._env.update(ctx.env)
+        return block
+
+    def plugin_context(
+        self,
+        plugin: ProjectPlugin,
+        env: dict = None,
+        config: dict = None,
+    ) -> PluginContext:
+        """Create context object for a plugin.
+
+        Args:
+            plugin: The plugin to create the context for.
+            env: Environment override dictionary. Defaults to None.
+            config: Plugin configuration override dictionary. Defaults to None.
+
+        Returns:
+            A new `PluginContext` object.
+        """
+        return PluginContext(
+            plugin=plugin,
+            settings_service=PluginSettingsService(
+                self.project,
+                plugin,
+                plugins_service=self.plugins_service,
+                env_override=env,
+                config_override=config,
+            ),
+            session=self.session,
+        )
+
+    def invoker_for(self, plugin_context: PluginContext) -> PluginInvoker:
+        """Create an invoker for a plugin from a PluginContext."""
+        return invoker_factory(
+            self.project,
+            plugin_context.plugin,
+            context=self,
+            run_dir=self.elt_run_dir,
+            plugins_service=self.plugins_service,
+            plugin_settings_service=plugin_context.settings_service,
+        )
+
+    @property
+    def elt_run_dir(self):
+        """Get the run directory for the current job."""
+        if self.job:
+            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+
+    def context(self) -> ELBContext:
+        """Create an ELBContext object from the current builder state."""
+        return ELBContext(
+            project=self.project,
+            plugins_service=self.plugins_service,
+            session=self.session,
+            job=self.job,
+            base_output_logger=self._base_output_logger,
+        )
 
 
 class ExtractLoadBlocks:  # noqa: WPS214
