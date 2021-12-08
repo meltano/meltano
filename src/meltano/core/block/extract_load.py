@@ -7,7 +7,7 @@ from typing import List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
-from meltano.core.elt_context import ELTContextBuilder, PluginContext
+from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
@@ -54,7 +54,7 @@ class ELBContext:
         self.base_output_logger = base_output_logger
 
     @property
-    def elt_run_dir(self):
+    def elt_run_dir(self) -> str:
         """Obtain the run directory for the current job."""
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
@@ -171,7 +171,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
 
     def __init__(
         self,
-        context: ELTContextBuilder,
+        context: ELBContextBuilder,
         blocks: Tuple[IOBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
