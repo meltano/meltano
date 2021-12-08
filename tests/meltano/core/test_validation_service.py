@@ -1,5 +1,7 @@
 import pytest
+from meltano.cli.validate import collect_tests
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project import Project
 from meltano.core.validation_service import ValidationsRunner
 
 
@@ -36,3 +38,12 @@ class TestValidationsRunner:
             "other-test": 1,
             "skipped-test": 1,
         }
+
+    def test_collect_tests(self, project: Project):
+        collected = collect_tests(project, select_all=False)
+
+        assert "test" in collected["dbt"].validators
+        assert not collected["dbt"].validators["test"].selected
+
+        collected["dbt"].select_all()
+        assert collected["dbt"].validators["test"].selected
