@@ -263,4 +263,4 @@ class SingerBlock(InvokerBase, IOBlock):
             self._stdout_future.cancel()
         if self._stderr_future is not None:
             self._stderr_future.cancel()
-        # await self.invoker.cleanup()
+        await self.invoker.cleanup()
