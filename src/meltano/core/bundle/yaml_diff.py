@@ -2,9 +2,10 @@ import sys
 from pprint import pprint
 
 import requests
+from ruamel.yaml import YAML
+
 from deepdiff import DeepDiff
 from deepdiff.helper import CannotCompare
-from ruamel.yaml import YAML
 
 yaml = YAML()
 
