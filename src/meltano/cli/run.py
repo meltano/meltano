@@ -333,7 +333,7 @@ class BlockParser:
                     f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{self._plugins[cur].name}'"
                 )
 
-    def _find_next_elb_set(
+    def _find_next_elb_set(  # noqa: WPS231
         self,
         offset: int = 0,
     ) -> Tuple[ExtractLoadBlocks, int]:  # noqa: WPS231
