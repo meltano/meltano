@@ -52,7 +52,7 @@ Passionate about remote working, Douwe spent six months traveling the world, vis
 Taylor Murphy is the Head of Product and Data of Meltano, an open source data platform that enables collaboration, efficiency, and visibility.
 Taylor has been deeply involved in leading and building data-informed teams his entire career. At Concert Genetics he scaled the Data Operations team to enable the management of hundreds of thousands of genetic tests and millions of claims records. 
 At GitLab, he was the first data hire where he focused on building and scaling the data organization as the company headed towards its IPO.
-He was very involved with Meltano since its inception, acting as the primary customer with whom the team engaged with to understand modern data challenges. 
+He has been involved with Meltano since its inception, acting as the primary customer with whom the team engaged to understand the needs of modern data professionals. 
 
 Taylor is passionate about maximizing the potential of data and building the future of the data profession. Outside of work, he loves spending time with his wife, two boys, and two dogs. 
 
