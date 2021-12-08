@@ -1,5 +1,6 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
+import logging
 from asyncio import Task
 from contextlib import suppress
 from typing import List, Set, Tuple
@@ -7,7 +8,7 @@ from typing import List, Set, Tuple
 import structlog
 from async_generator import asynccontextmanager
 from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.logging import OutputLogger
+from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
@@ -26,14 +27,12 @@ class ExtractLoadBlocks:  # noqa: WPS214
         self,
         context: ELTContextBuilder,
         blocks: Tuple[IOBlock],
-        output_logger: OutputLogger,
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
         Args:
             context: the elt context to use for this elt run.
             blocks: the IOBlocks that should be used for this elt run.
-            output_logger: the logger to use for output.
         """
         self.context = context
         self.blocks = blocks
@@ -41,7 +40,15 @@ class ExtractLoadBlocks:  # noqa: WPS214
             self.context.project,
             config_service=self.context.plugins_service.config_service,
         )
-        self.output_logger = output_logger
+
+        log_file = "run.log"
+        if self.context.job:
+            job_logging_service = JobLoggingService(self.context.project)
+            log_file = job_logging_service.generate_log_name(
+                self.context.job.job_id, self.context.job.run_id
+            )
+
+        self.output_logger = OutputLogger(log_file)
 
         self._process_futures = None
         self._stdout_futures = None
@@ -181,7 +188,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
         for block in self.blocks:
             await block.post()
 
-    async def _link_io(self) -> None:
+    async def _link_io(self) -> None:  # noqa: WPS231
         """Link the blocks in the set together."""
         for idx, block in enumerate(self.blocks):
             logger_base = logger.bind(
@@ -189,12 +196,13 @@ class ExtractLoadBlocks:  # noqa: WPS214
                 producer=block.producer,
                 string_id=block.string_id,
             )
-            block.stdout_link(
-                self.output_logger.out(
-                    "stdout",
-                    logger_base,
+            if logger.isEnabledFor(logging.DEBUG):
+                block.stdout_link(
+                    self.output_logger.out(
+                        "stdout",
+                        logger_base,
+                    )
                 )
-            )
             block.stderr_link(
                 self.output_logger.out(
                     "stderr",
@@ -259,7 +267,7 @@ async def experimental_run(  # noqa: WPS217
         producer_code = await _complete_upstream(elb)
     elif producer.process_future.done():
         producer_code = producer.process_future.result()
-        consumer_code = await _complete_downstream()
+        consumer_code = await _complete_downstream(elb)
     else:  # would imply that a (not yet implemented) inline transformer finished first
         await producer.stop()
         producer_code = 1

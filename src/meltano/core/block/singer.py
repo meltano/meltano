@@ -9,6 +9,8 @@ from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.utils import SubprocessOutputWriter
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 
@@ -19,19 +21,26 @@ class InvokerBase:  # noqa: WPS230
     """Base class for creating IOBlock's built on top of existing Meltano plugins."""
 
     def __init__(
-        self, block_ctx, plugin_invoker: PluginInvoker, command: Optional[str]
+        self,
+        block_ctx,
+        project: Project,
+        plugins_service: ProjectPluginsService,
+        plugin_invoker: PluginInvoker,
+        command: Optional[str],
     ):
         """Configure and return a wrapped plugin invoker extendable for use as an IOBlock or PluginCommandBlock.
 
         Args:
             block_ctx: context that should be used for this instance to do things like obtaining project settings.
+            project: that should be used to obtain the ProjectSettingsService.
             plugin_invoker: the actual plugin invoker.
             command: the optional command to invoke.
         """
         self.context = block_ctx
+        self.project = project
         self.project_settings_service = ProjectSettingsService(
-            self.context.project,
-            config_service=self.context.plugins_service.config_service,
+            self.project,
+            config_service=plugins_service.config_service,
         )
 
         self.invoker: PluginInvoker = plugin_invoker
@@ -180,17 +189,27 @@ class SingerBlock(InvokerBase, IOBlock):
     """SingerBlock wraps singer plugins to implement the IOBlock interface."""
 
     def __init__(
-        self, block_ctx: Dict, plugin_invoker: PluginInvoker, plugin_args: Tuple[str]
+        self,
+        block_ctx: Dict,
+        project: Project,
+        plugins_service: ProjectPluginsService,
+        plugin_invoker: PluginInvoker,
+        plugin_args: Tuple[str],
     ):
         """Configure and return a Singer plugin wrapped as an IOBlock.
 
         Args:
             block_ctx: the block context.
+            project:  the project to use to obtain project settings.
             plugin_invoker: the plugin invoker.
             plugin_args: any additional plugin args that should be used.
         """
         super().__init__(
-            block_ctx=block_ctx, plugin_invoker=plugin_invoker, command=None
+            block_ctx=block_ctx,
+            project=project,
+            plugins_service=plugins_service,
+            plugin_invoker=plugin_invoker,
+            command=None,
         )
 
         self.plugin_args = plugin_args
@@ -244,4 +263,4 @@ class SingerBlock(InvokerBase, IOBlock):
             self._stdout_future.cancel()
         if self._stderr_future is not None:
             self._stderr_future.cancel()
-        self.invoker.cleanup()
+        # await self.invoker.cleanup()

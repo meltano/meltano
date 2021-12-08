@@ -10,7 +10,6 @@ from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import ExtractLoadBlocks
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job, Payload, State
-from meltano.core.logging import OutputLogger
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner.singer import SingerRunner
@@ -126,16 +125,22 @@ class TestExtractLoadBlocks:
 
             blocks = (
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
                 ),
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=target_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=target_invoker,
+                    plugin_args=[],
                 ),
             )
 
-            output_log = OutputLogger(log)
-
-            elb = ExtractLoadBlocks(elt_context, blocks, output_log)
+            elb = ExtractLoadBlocks(elt_context, blocks)
             elb.validate_set()
             assert await elb.run(session)
 
@@ -178,11 +183,15 @@ class TestExtractLoadBlocks:
 
             blocks = (
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
                 ),
             )
 
-            elb = ExtractLoadBlocks(elt_context, blocks, output_logger=None)
+            elb = ExtractLoadBlocks(elt_context, blocks)
 
             with pytest.raises(
                 BlockSetValidationError,
@@ -192,13 +201,21 @@ class TestExtractLoadBlocks:
 
             blocks = (
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=target_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=target_invoker,
+                    plugin_args=[],
                 ),
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
                 ),
             )
-            elb = ExtractLoadBlocks(elt_context, blocks, None)
+            elb = ExtractLoadBlocks(elt_context, blocks)
             with pytest.raises(
                 BlockSetValidationError,
                 match=r"^.*: first block in set should not be consumer",
@@ -207,16 +224,28 @@ class TestExtractLoadBlocks:
 
             blocks = (
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
                 ),
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=tap_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
                 ),
                 SingerBlock(
-                    block_ctx=elt_context, plugin_invoker=target_invoker, plugin_args=[]
+                    block_ctx=elt_context,
+                    project=elt_context.project,
+                    plugins_service=elt_context.plugins_service,
+                    plugin_invoker=target_invoker,
+                    plugin_args=[],
                 ),
             )
-            elb = ExtractLoadBlocks(elt_context, blocks, None)
+            elb = ExtractLoadBlocks(elt_context, blocks)
             with pytest.raises(
                 BlockSetValidationError,
                 match=r"^.*: intermediate blocks must be producers AND consumers",

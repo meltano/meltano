@@ -3,6 +3,8 @@ import asyncio
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 
 from .singer import InvokerBase
 
@@ -31,6 +33,8 @@ class InvokerCommand(InvokerBase):
         name: str,
         log: SubprocessOutputWriter,
         block_ctx: Dict,
+        project: Project,
+        plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
         command: Optional[str],
         command_args: Tuple[str],
@@ -46,7 +50,11 @@ class InvokerCommand(InvokerBase):
             command_args: any additional plugin args that should be used.
         """
         super().__init__(
-            block_ctx=block_ctx, plugin_invoker=plugin_invoker, command=command
+            block_ctx=block_ctx,
+            project=project,
+            plugins_service=plugins_service,
+            plugin_invoker=plugin_invoker,
+            command=command,
         )
         self.name = name
         self.command = command
@@ -66,8 +74,7 @@ class InvokerCommand(InvokerBase):
             self.stderr_link(self._log)
 
             await asyncio.wait(
-                self.proxy_io(),
-                self.process_future,
+                [*self.proxy_io(), self.process_future],
                 return_when=asyncio.ALL_COMPLETED,
             )
 
