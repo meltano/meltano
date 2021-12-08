@@ -24,20 +24,27 @@ class PluginDiscoveryGenerator:
         discovery_dict: Dict[str, Any] = {}
         discovery_dict["version"] = self._discovery_version
 
-        for root, _, files in os.walk(plugin_definitions_dir):
-            meltano_type = re.sub(plugin_definitions_dir, "", root)
-            if meltano_type == "":
+        for plugin_type_path, _, files in os.walk(plugin_definitions_dir):
+            if plugin_type_path == plugin_definitions_dir:
                 continue
-            meltano_array = []
+            plugin_type = os.path.basename(plugin_type_path)
+            plugin_type_definitions = self._get_plugin_type_definitions(
+                files, plugin_type_path
+            )
+            discovery_dict[plugin_type] = plugin_type_definitions
+        self._write_discovery(discovery_file_path, discovery_dict)
 
-            for file in files:
-                with open(os.path.join(root, file), "r") as plugin_file:
-                    plugin_data = self._yaml.load(plugin_file)
+    def _get_plugin_type_definitions(self, files, root_path):
+        plugin_type_definitions = []
 
-                meltano_array.append(plugin_data)
+        for file in files:
+            with open(os.path.join(root_path, file), "r") as plugin_file:
+                plugin_definition = self._yaml.load(plugin_file)
 
-            discovery_dict[meltano_type] = meltano_array
+            plugin_type_definitions.append(plugin_definition)
+        return plugin_type_definitions
 
+    def _write_discovery(self, discovery_file_path, discovery_dict):
         with open(discovery_file_path, "w") as outfile:
             outfile.writelines(self._header_comment)
             self._yaml.dump(discovery_dict, outfile)
