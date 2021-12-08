@@ -1,0 +1,4 @@
+name: docker-compose
+namespace: docker_compose
+repo: https://gitlab.com/meltano/files-docker-compose
+pip_url: git+https://gitlab.com/meltano/files-docker-compose.git

@@ -1,0 +1,7 @@
+name: tap-shopify
+namespace: tap_shopify
+variant: meltano
+repo: https://gitlab.com/meltano/dbt-tap-shopify
+pip_url: https://gitlab.com/meltano/dbt-tap-shopify.git@config-version-2
+vars:
+  schema: '{{ env_var(''DBT_SOURCE_SCHEMA'') }}'

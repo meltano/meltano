@@ -1,0 +1,21 @@
+name: airflow
+namespace: airflow
+docs: https://meltano.com/docs/orchestration.html
+repo: https://github.com/apache/airflow
+pip_url: apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.1.2/constraints-${MELTANO__PYTHON_VERSION}.txt
+settings:
+- name: core.dags_folder
+  value: $MELTANO_PROJECT_ROOT/orchestrate/dags
+  env: AIRFLOW__CORE__DAGS_FOLDER
+- name: core.plugins_folder
+  value: $MELTANO_PROJECT_ROOT/orchestrate/plugins
+  env: AIRFLOW__CORE__PLUGINS_FOLDER
+- name: core.sql_alchemy_conn
+  value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/orchestrators/airflow/airflow.db
+  env: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+- name: core.load_examples
+  value: false
+  env: AIRFLOW__CORE__LOAD_EXAMPLES
+- name: core.dags_are_paused_at_creation
+  env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
+  value: false

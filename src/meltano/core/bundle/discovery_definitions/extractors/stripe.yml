@@ -1,0 +1,87 @@
+name: tap-stripe
+label: Stripe
+description: Online payment processing for internet businesses
+namespace: tap_stripe
+variants:
+- name: singer-io
+  docs: https://hub.meltano.com/extractors/stripe.html
+  repo: https://github.com/singer-io/tap-stripe
+  pip_url: git+https://github.com/singer-io/tap-stripe.git
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings_group_validation:
+  - - account_id
+    - client_secret
+    - start_date
+  settings:
+  - name: account_id
+    env_aliases:
+    - STRIPE_ACCOUNT_ID
+    label: Account ID
+    placeholder: Ex. acct_1a2b3c4d5e
+  - name: client_secret
+    env_aliases:
+    - STRIPE_API_KEY
+    kind: password
+    label: Secret API Key
+    placeholder: Ex. sk_live_1a2b3c4d5e
+  - name: start_date
+    label: Start Date
+    kind: date_iso8601
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+- name: prratek
+  repo: https://github.com/prratek/tap-stripe
+  pip_url: git+https://github.com/prratek/tap-stripe.git
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings_group_validation:
+  - - api_key
+    - start_date
+  settings:
+  - name: api_key
+    env_aliases:
+    - STRIPE_API_KEY
+    kind: password
+    label: Secret API Key
+    placeholder: Ex. sk_live_1a2b3c4d5e
+  - name: start_date
+    kind: date_iso8601
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+  - name: account_id
+    env_aliases:
+    - STRIPE_ACCOUNT_ID
+    label: Account ID
+    placeholder: Ex. acct_1a2b3c4d5e
+- name: meltano
+  hidden: true
+  repo: https://github.com/meltano/tap-stripe
+  pip_url: git+https://github.com/meltano/tap-stripe.git
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings:
+  - name: account_id
+    env_aliases:
+    - STRIPE_ACCOUNT_ID
+    label: Account ID
+    placeholder: Ex. acct_1a2b3c4d5e
+  - name: client_secret
+    env_aliases:
+    - STRIPE_API_KEY
+    kind: password
+    label: Secret API Key
+    placeholder: Ex. sk_live_1a2b3c4d5e
+  - name: start_date
+    kind: date_iso8601
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.

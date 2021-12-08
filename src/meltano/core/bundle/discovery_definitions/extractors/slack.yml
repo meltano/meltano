@@ -1,0 +1,57 @@
+name: tap-slack
+label: Slack
+description: Team communication tool
+namespace: tap_slack
+variants:
+- name: mashey
+  docs: https://hub.meltano.com/extractors/slack.html
+  repo: https://github.com/Mashey/tap-slack
+  pip_url: git+https://github.com/Mashey/tap-slack.git
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings:
+  - name: token
+    kind: password
+    label: API Token
+    documentation: https://slack.com/help/articles/215770388-Create-and-regenerate-API-tokens
+  - name: start_date
+    kind: date_iso8601
+    label: Sync Start Date
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+  - name: channels
+    labels: Channels to Sync
+    kind: array
+    description: By default the tap will sync all channels it has been invited to,
+      but this can be overriden to limit it ot specific channels. Note this needs
+      to be channel ID, not the name, as recommended by the Slack API. To get the
+      ID for a channel, either use the Slack API or find it in the URL.
+    placeholder: Ex. ["abc123", "def456"]
+  - name: private_channels
+    label: Join Private Channels
+    kind: boolean
+    value: true
+    description: Specifies whether to sync private channels or not. Default is true.
+  - name: join_public_channels
+    label: Join Public Channels
+    kind: boolean
+    value: false
+    description: Specifies whether to have the tap auto-join all public channels in
+      your ogranziation. Default is false.
+  - name: archived_channels
+    label: Sync Archived Channels
+    kind: boolean
+    value: false
+    description: Specifies whether the tap will sync archived channels or not. Note
+      that a bot cannot join an archived channel, so unless the bot was added to the
+      channel prior to it being archived it will not be able to sync the data from
+      that channel. Default is false.
+  - name: date_window_size
+    label: Date Window Size
+    kind: integer
+    value: 7
+    description: Specifies the window size for syncing certain streams (messages,
+      files, threads). The default is 7 days.

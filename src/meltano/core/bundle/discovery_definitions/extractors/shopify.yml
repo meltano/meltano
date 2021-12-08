@@ -1,0 +1,35 @@
+name: tap-shopify
+label: Shopify
+description: Ecommerce platform
+namespace: tap_shopify
+variants:
+- name: singer-io
+  docs: https://hub.meltano.com/extractors/shopify.html
+  repo: https://github.com/singer-io/tap-shopify
+  pip_url: tap-shopify
+  capabilities:
+  - catalog
+  - discover
+  - state
+  select:
+  - abandoned_checkouts.*
+  - collects.*
+  - custom_collections.*
+  - customers.*
+  - order_refunds.*
+  - orders.*
+  - products.*
+  - transactions.*
+  settings:
+  - name: shop
+    label: Store Subdomain
+    placeholder: Ex. my-first-store
+  - name: api_key
+    kind: password
+    label: Private App API Password
+    placeholder: Ex. shppa_1a2b3c4d5e6f
+  - name: start_date
+    kind: date_iso8601
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.

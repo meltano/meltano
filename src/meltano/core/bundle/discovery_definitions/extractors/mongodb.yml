@@ -1,0 +1,47 @@
+name: tap-mongodb
+label: MongoDB
+description: General purpose, document-based, distributed database
+namespace: tap_mongodb
+variants:
+- name: singer-io
+  docs: https://hub.meltano.com/extractors/mongodb.html
+  repo: https://github.com/singer-io/tap-mongodb
+  pip_url: tap-mongodb
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings_group_validation:
+  - - host
+    - port
+    - user
+    - password
+    - database
+  settings:
+  - name: host
+    label: Host URL
+    value: localhost
+  - name: port
+    kind: integer
+    value: 27017
+  - name: user
+  - name: password
+    kind: password
+  - name: database
+    label: Database Name
+  - name: replica_set
+  - name: ssl
+    kind: boolean
+    value: false
+    value_post_processor: stringify
+    label: SSL
+  - name: verify_mode
+    kind: boolean
+    value: true
+    value_post_processor: stringify
+    description: SSL Verify Mode
+  - name: include_schemas_in_destination_stream_name
+    kind: boolean
+    value: false
+    description: Forces the stream names to take the form `<database_name>_<collection_name>`
+      instead of `<collection_name>`

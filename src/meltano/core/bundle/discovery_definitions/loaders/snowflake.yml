@@ -1,0 +1,453 @@
+name: target-snowflake
+label: Snowflake
+description: Snowflake database loader
+namespace: target_snowflake
+dialect: snowflake
+target_schema: $TARGET_SNOWFLAKE_SCHEMA
+variants:
+- name: transferwise
+  docs: https://hub.meltano.com/loaders/snowflake.html
+  repo: https://github.com/transferwise/pipelinewise-target-snowflake
+  pip_url: pipelinewise-target-snowflake
+  settings_group_validation:
+  - - account
+    - dbname
+    - user
+    - password
+    - warehouse
+    - file_format
+    - default_target_schema
+  settings:
+  - name: account
+    label: Account
+    env_aliases:
+    - SF_ACCOUNT
+    description: Snowflake account name (i.e. rtXXXXX.eu-central-1)
+    placeholder: E.g. rtXXXXX.eu-central-1
+  - name: dbname
+    label: DB Name
+    aliases:
+    - database
+    env_aliases:
+    - TARGET_SNOWFLAKE_DATABASE
+    - SF_DATABASE
+    description: Snowflake Database name
+  - name: user
+    label: User
+    aliases:
+    - username
+    env_aliases:
+    - TARGET_SNOWFLAKE_USERNAME
+    - SF_USER
+    description: Snowflake User
+  - name: password
+    label: Password
+    env_aliases:
+    - SF_PASSWORD
+    kind: password
+    description: Snowflake Password
+  - name: warehouse
+    label: Warehouse
+    env_aliases:
+    - SF_WAREHOUSE
+    description: Snowflake virtual warehouse name
+  - name: file_format
+    label: File Format
+    description: The Snowflake file format object name which needs to be manually
+      created as part of the pre-requirements section of the docs. Has to be the fully
+      qualified name including the schema. Refer to the docs for more details https://github.com/transferwise/pipelinewise-target-snowflake#pre-requirements.
+  - name: role
+    label: Role
+    description: Snowflake role to use. If not defined then the user's default role
+      will be used.
+  - name: aws_access_key_id
+    label: AWS Access Key ID
+    kind: password
+    description: S3 Access Key Id. If not provided, `AWS_ACCESS_KEY_ID` environment
+      variable or IAM role will be used
+  - name: aws_secret_access_key
+    label: AWS Secret Access Key
+    kind: password
+    description: S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment
+      variable or IAM role will be used
+  - name: aws_session_token
+    label: AWS Session Token
+    kind: password
+    description: AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment
+      variable will be used
+  - name: aws_profile
+    label: AWS Profile
+    description: AWS profile name for profile based authentication. If not provided,
+      `AWS_PROFILE` environment variable will be used.
+  - name: default_target_schema
+    label: Default Target Schema
+    aliases:
+    - schema
+    env_aliases:
+    - TARGET_SNOWFLAKE_SCHEMA
+    - SF_SCHEMA
+    value: $MELTANO_EXTRACT__LOAD_SCHEMA
+    value_processor: upcase_string
+    description: Name of the schema where the tables will be created, without database
+      prefix. If `schema_mapping` is not defined then every stream sent by the tap
+      is loaded into this schema.
+  - name: s3_bucket
+    label: S3 Bucket
+    description: S3 Bucket name
+  - name: s3_key_prefix
+    label: S3 Key Prefix
+    description: A static prefix before the generated S3 key names. Using prefixes
+      you can upload files into specific directories in the S3 bucket.
+  - name: s3_endpoint_url
+    label: S3 Endpoint URL
+    description: The complete URL to use for the constructed client. This is allowing
+      to use non-native s3 account.
+  - name: s3_region_name
+    label: S3 Region Name
+    description: Default region when creating new connections
+  - name: s3_acl
+    label: S3 ACL
+    description: S3 ACL name to set on the uploaded files
+  - name: stage
+    label: Stage
+    description: Named external stage name created at pre-requirements section. Has
+      to be a fully qualified name including the schema name
+  - name: batch_size_rows
+    label: Batch Size Rows
+    kind: integer
+    value: 100000
+    description: Maximum number of rows in each batch. At the end of each batch, the
+      rows in the batch are loaded into Snowflake.
+  - name: batch_wait_limit_seconds
+    label: Batch Wait Limit Seconds
+    kind: integer
+    description: Maximum time to wait for batch to reach batch_size_rows.
+  - name: flush_all_streams
+    label: Flush All Streams
+    kind: boolean
+    value: false
+    description: 'Flush and load every stream into Snowflake when one batch is full.
+      Warning: This may trigger the COPY command to use files with low number of records,
+      and may cause performance problems.'
+  - name: parallelism
+    label: Parallelism
+    kind: integer
+    value: 0
+    description: The number of threads used to flush tables. 0 will create a thread
+      for each stream, up to parallelism_max. -1 will create a thread for each CPU
+      core. Any other positive number will create that number of threads, up to parallelism_max.
+  - name: parallelism_max
+    label: Parallelism Max
+    kind: integer
+    value: 16
+    description: Max number of parallel threads to use when flushing tables.
+  - name: default_target_schema_select_permission
+    label: Default Target Schema Select Permission
+    description: Grant USAGE privilege on newly created schemas and grant SELECT privilege
+      on newly created tables to a specific role or a list of roles. If `schema_mapping`
+      is not defined then every stream sent by the tap is granted accordingly.
+  - name: schema_mapping
+    label: Schema Mapping
+    kind: object
+    description: 'Useful if you want to load multiple streams from one tap to multiple
+      Snowflake schemas.
+
+      If the tap sends the `stream_id` in `<schema_name>-<table_name>` format then
+      this option overwrites the `default_target_schema` value. Note, that using `schema_mapping`
+      you can overwrite the `default_target_schema_select_permission` value to grant
+      SELECT permissions to different groups per schemas or optionally you can create
+      indices automatically for the replicated tables.
+
+      '
+  - name: disable_table_cache
+    label: Disable Table Cache
+    kind: boolean
+    value: false
+    description: By default the connector caches the available table structures in
+      Snowflake at startup. In this way it doesn't need to run additional queries
+      when ingesting data to check if altering the target tables is required. With
+      `disable_table_cache` option you can turn off this caching. You will always
+      see the most recent table structures but will cause an extra query runtime.
+  - name: client_side_encryption_master_key
+    label: Client Side Encryption Master Key
+    kind: password
+    description: When this is defined, Client-Side Encryption is enabled. The data
+      in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs,
+      can see data in the clear. Snowflake COPY command will decrypt the data once
+      it's in Snowflake. The master key must be 256-bit length and must be encoded
+      as base64 string.
+  - name: client_side_encryption_stage_object
+    label: Client Side Encryption Stage Object
+    description: Required when `client_side_encryption_master_key` is defined. The
+      name of the encrypted stage object in Snowflake that created separately and
+      using the same encryption master key.
+  - name: add_metadata_columns
+    label: Add Metadata Columns
+    kind: boolean
+    value: false
+    description: Metadata columns add extra row level information about data ingestions,
+      (i.e. when was the row read in source, when was inserted or deleted in snowflake
+      etc.) Metadata columns are creating automatically by adding extra columns to
+      the tables with a column prefix `_SDC_`. The column names are following the
+      stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns.
+      Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT`
+      metadata column. Without the `add_metadata_columns` option the deleted rows
+      from singer taps will not be recongisable in Snowflake.
+  - name: hard_delete
+    label: Hard Delete
+    kind: boolean
+    value: false
+    description: When `hard_delete` option is true then DELETE SQL commands will be
+      performed in Snowflake to delete rows in tables. It's achieved by continuously
+      checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to
+      deleting rows requires metadata columns, `hard_delete` option automatically
+      enables the `add_metadata_columns` option as well.
+  - name: data_flattening_max_level
+    label: Data Flattening Max Level
+    kind: integer
+    value: 0
+    description: Object type RECORD items from taps can be loaded into VARIANT columns
+      as JSON (default) or we can flatten the schema by creating columns automatically.
+      When value is 0 (default) then flattening functionality is turned off.
+  - name: primary_key_required
+    label: Primary Key Required
+    kind: boolean
+    value: true
+    description: Log based and Incremental replications on tables with no Primary
+      Key cause duplicates when merging UPDATE events. When set to true, stop loading
+      data if no Primary Key is defined.
+  - name: validate_records
+    label: Validate Records
+    kind: boolean
+    value: false
+    description: Validate every single record message to the corresponding JSON schema.
+      This option is disabled by default and invalid RECORD messages will fail only
+      at load time by Snowflake. Enabling this option will detect invalid records
+      earlier but could cause performance degradation.
+  - name: temp_dir
+    label: Temporary Directory
+    description: '(Default: platform-dependent) Directory of temporary CSV files with
+      RECORD messages.'
+  - name: no_compression
+    label: No Compression
+    kind: boolean
+    value: false
+    description: Generate uncompressed CSV files when loading to Snowflake. Normally,
+      by default GZIP compressed files are generated.
+  - name: query_tag
+    label: Query Tag
+    description: Optional string to tag executed queries in Snowflake. Replaces tokens
+      `schema` and `table` with the appropriate values. The tags are displayed in
+      the output of the Snowflake `QUERY_HISTORY`, `QUERY_HISTORY_BY_*` functions.
+  - name: archive_load_files
+    label: Archive Load Files
+    kind: boolean
+    value: false
+    description: When enabled, the files loaded to Snowflake will also be stored in
+      archive_load_files_s3_bucket under the key /{archive_load_files_s3_prefix}/{schema_name}/{table_name}/.
+      All archived files will have tap, schema, table and archived-by as S3 metadata
+      keys. When incremental replication is used, the archived files will also have
+      the following S3 metadata keys - incremental-key, incremental-key-min and incremental-key-max.
+  - name: archive_load_files_s3_prefix
+    label: Archive Load Files S3 Prefix
+    description: When archive_load_files is enabled, the archived files will be placed
+      in the archive S3 bucket under this prefix.
+  - name: archive_load_files_s3_bucket
+    label: Archive Load Files S3 Bucket
+    description: When archive_load_files is enabled, the archived files will be placed
+      in this bucket.
+- name: datamill-co
+  docs: https://hub.meltano.com/loaders/snowflake--datamill-co.html
+  repo: https://github.com/datamill-co/target-snowflake
+  pip_url: target-snowflake
+  settings_group_validation:
+  - - snowflake_account
+    - snowflake_username
+    - snowflake_password
+    - snowflake_database
+    - snowflake_warehouse
+  settings:
+  - name: snowflake_account
+    label: Snowflake Account
+    env: TARGET_SNOWFLAKE_ACCOUNT
+    env_aliases:
+    - SF_ACCOUNT
+    description: '`ACCOUNT` might require the `region` and `cloud` platform where
+      your account is located, in the form of: `<your_account_name>.<region_id>.<cloud>`
+      (e.g. `xy12345.east-us-2.azure`)
+
+      Refer to Snowflake''s documentation about Account: https://docs.snowflake.net/manuals/user-guide/connecting.html#your-snowflake-account-name-and-url
+
+      '
+  - name: snowflake_username
+    label: Snowflake Username
+    env: TARGET_SNOWFLAKE_USERNAME
+    env_aliases:
+    - SF_USER
+  - name: snowflake_password
+    label: Snowflake Password
+    env: TARGET_SNOWFLAKE_PASSWORD
+    env_aliases:
+    - SF_PASSWORD
+    kind: password
+  - name: snowflake_role
+    label: Snowflake Role
+    env: TARGET_SNOWFLAKE_ROLE
+    env_aliases:
+    - SF_ROLE
+    description: If not specified, Snowflake will use the user's default role.
+  - name: snowflake_database
+    label: Snowflake Database
+    env: TARGET_SNOWFLAKE_DATABASE
+    env_aliases:
+    - SF_DATABASE
+  - name: snowflake_authenticator
+    label: Snowflake Authenticator
+    value: snowflake
+    description: Specifies the authentication provider for snowflake to use. Valud
+      options are the internal one ("snowflake"), a browser session ("externalbrowser"),
+      or Okta ("https://<your_okta_account_name>.okta.com"). See the snowflake docs
+      for more details.
+  - name: snowflake_warehouse
+    label: Snowflake Warehouse
+    env: TARGET_SNOWFLAKE_WAREHOUSE
+    env_aliases:
+    - SF_WAREHOUSE
+  - name: invalid_records_detect
+    label: Invalid Records Detect
+    kind: boolean
+    value: true
+    description: Include `false` in your config to disable crashing on invalid records
+  - name: invalid_records_threshold
+    label: Invalid Records Threshold
+    kind: integer
+    value: 0
+    description: Include a positive value `n` in your config to allow at most `n`
+      invalid records per stream before giving up.
+  - name: disable_collection
+    label: Disable Collection
+    kind: boolean
+    value: false
+    description: 'Include `true` in your config to disable Singer Usage Logging: https://github.com/datamill-co/target-snowflake#usage-logging'
+  - name: logging_level
+    label: Logging Level
+    kind: options
+    value: INFO
+    options:
+    - label: Debug
+      value: DEBUG
+    - label: Info
+      value: INFO
+    - label: Warning
+      value: WARNING
+    - label: Error
+      value: ERROR
+    - label: Critical
+      value: CRITICAL
+    description: The level for logging. Set to `DEBUG` to get things like queries
+      executed, timing of those queries, etc.
+  - name: persist_empty_tables
+    label: Persist Empty Tables
+    kind: boolean
+    value: false
+    description: Whether the Target should create tables which have no records present
+      in Remote.
+  - name: snowflake_schema
+    label: Snowflake Schema
+    env: TARGET_SNOWFLAKE_SCHEMA
+    env_aliases:
+    - SF_SCHEMA
+    value: $MELTANO_EXTRACT__LOAD_SCHEMA
+    value_processor: upcase_string
+  - name: state_support
+    label: State Support
+    kind: boolean
+    value: true
+    description: Whether the Target should emit `STATE` messages to stdout for further
+      consumption. In this mode, which is on by default, STATE messages are buffered
+      in memory until all the records that occurred before them are flushed according
+      to the batch flushing schedule the target is configured with.
+  - name: target_s3.bucket
+    label: Target S3 Bucket
+    description: When included, use S3 to stage files. Bucket where staging files
+      should be uploaded to.
+  - name: target_s3.key_prefix
+    label: Target S3 Key Prefix
+    description: Prefix for staging file uploads to allow for better delineation of
+      tmp files
+  - name: target_s3.aws_access_key_id
+    label: Target S3 AWS Access Key ID
+    kind: password
+  - name: target_s3.aws_secret_access_key
+    label: Target S3 AWS Secret Access Key
+    kind: password
+- name: meltano
+  original: true
+  hidden: true
+  docs: https://hub.meltano.com/loaders/snowflake--meltano.html
+  repo: https://gitlab.com/meltano/target-snowflake
+  pip_url: git+https://gitlab.com/meltano/target-snowflake.git
+  settings_group_validation:
+  - - account
+    - username
+    - password
+    - role
+    - database
+    - warehouse
+    - schema
+  settings:
+  - name: account
+    label: Account
+    env_aliases:
+    - SF_ACCOUNT
+    - SNOWFLAKE_ACCOUNT
+    description: Account Name in Snowflake (https://XXXXX.snowflakecomputing.com)
+  - name: username
+    label: Username
+    env_aliases:
+    - SF_USER
+    - SNOWFLAKE_USERNAME
+    description: The username you use for logging in
+  - name: password
+    label: Password
+    env_aliases:
+    - SF_PASSWORD
+    - SNOWFLAKE_PASSWORD
+    kind: password
+    description: The password you use for logging in
+  - name: role
+    label: Role
+    env_aliases:
+    - SF_ROLE
+    - SNOWFLAKE_ROLE
+    description: Role to be used for loading the data, e.g. `LOADER`. Also this role
+      is GRANTed usage to all tables and schemas created
+  - name: database
+    label: Database
+    env_aliases:
+    - SF_DATABASE
+    - SNOWFLAKE_DATABASE
+    description: The name of the Snowflake database you want to use
+  - name: warehouse
+    label: Warehouse
+    env_aliases:
+    - SF_WAREHOUSE
+    - SNOWFLAKE_WAREHOUSE
+    description: The name of the Snowflake warehouse you want to use
+  - name: schema
+    label: Schema
+    env_aliases:
+    - SF_SCHEMA
+    - SNOWFLAKE_SCHEMA
+    value: $MELTANO_EXTRACT__LOAD_SCHEMA
+    value_processor: upcase_string
+  - name: batch_size
+    label: Batch Size
+    kind: integer
+    value: 5000
+    description: How many records are sent to Snowflake at a time?
+  - name: timestamp_column
+    label: Timestamp Column
+    value: __loaded_at
+    description: Name of the column used for recording the timestamp when Data are
+      uploaded to Snowflake.

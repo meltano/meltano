@@ -1,0 +1,9 @@
+name: tap-carbon-intensity
+namespace: tap_carbon
+variant: meltano
+repo: https://gitlab.com/meltano/dbt-tap-carbon-intensity
+pip_url: https://gitlab.com/meltano/dbt-tap-carbon-intensity.git@config-version-2
+vars:
+  entry_table: '{{ env_var(''DBT_SOURCE_SCHEMA'') }}.entry'
+  generationmix_table: '{{ env_var(''DBT_SOURCE_SCHEMA'') }}.generationmix'
+  region_table: '{{ env_var(''DBT_SOURCE_SCHEMA'') }}.region'

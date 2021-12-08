@@ -1,0 +1,5 @@
+name: model-gitflix
+namespace: tap_gitflix
+variant: meltano
+repo: https://gitlab.com/jschatz1/model-gitflix
+pip_url: git+https://gitlab.com/jschatz1/model-gitflix.git

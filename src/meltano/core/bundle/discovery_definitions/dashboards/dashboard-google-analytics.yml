@@ -1,0 +1,5 @@
+name: dashboard-google-analytics
+namespace: tap_google_analytics
+variant: meltano
+repo: https://gitlab.com/meltano/dashboard-google-analytics
+pip_url: git+https://gitlab.com/meltano/dashboard-google-analytics.git

@@ -1,0 +1,78 @@
+name: tap-salesforce
+label: Salesforce
+description: Customer-relationship management & customer success platform
+namespace: tap_salesforce
+variants:
+- name: meltano
+  docs: https://hub.meltano.com/extractors/salesforce.html
+  repo: https://gitlab.com/meltano/tap-salesforce
+  pip_url: git+https://gitlab.com/meltano/tap-salesforce.git
+  capabilities:
+  - properties
+  - discover
+  - state
+  select:
+  - Lead.*
+  - Contact.*
+  - User.*
+  - OpportunityHistory.*
+  - Account.*
+  - Opportunity.*
+  settings_group_validation:
+  - - username
+    - password
+    - security_token
+    - start_date
+  - - client_id
+    - client_secret
+    - refresh_token
+    - start_date
+  settings:
+  - name: username
+    placeholder: Ex. me@my-organization.com
+  - name: password
+    kind: password
+    label: Password
+    placeholder: Ex. *****************
+  - name: security_token
+    kind: password
+    label: Security Token
+    placeholder: Ex. *****************
+    description: Your Salesforce Account access token
+    documentation: https://hub.meltano.com/extractors/salesforce.html#salesforce-setup
+  - name: client_id
+    label: Client ID
+  - name: client_secret
+    kind: password
+  - name: refresh_token
+    kind: password
+  - name: start_date
+    kind: date_iso8601
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+  - name: is_sandbox
+    kind: boolean
+    value: false
+    description: Use Salesforce Sandbox
+  - name: api_type
+    value: REST
+    kind: options
+    options:
+    - label: REST
+      value: REST
+    - label: BULK
+      value: BULK
+    label: API Type
+  - name: select_fields_by_default
+    kind: boolean
+    value: true
+    description: Select by default any new fields discovered in Salesforce objects
+  - name: state_message_threshold
+    kind: integer
+    value: 1000
+    description: Generate a STATE message every N records
+  - name: max_workers
+    kind: integer
+    value: 8
+    label: Maximum number of threads to use
