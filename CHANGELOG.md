@@ -12,9 +12,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-[#3085](https://gitlab.com/meltano/meltano/-/issues/3085) Upgrade `target-bigquery` default variant `adswerve` to [`v0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3).
+- [#3085](https://gitlab.com/meltano/meltano/-/issues/3085) Upgrade `target-bigquery` default variant `adswerve` to [`v0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3).
 
 ### Fixes
+
+- [#3111](https://gitlab.com/meltano/meltano/-/issues/3111) Set the pinned tag of `target-bigquery` default variant `adswerve` to [`0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3) instead of `v0.11.3`.
 
 ### Breaks
 
