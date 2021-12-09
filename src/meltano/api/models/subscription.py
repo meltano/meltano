@@ -2,9 +2,10 @@ import uuid
 from datetime import datetime
 from enum import Enum
 
+from sqlalchemy.orm import validates
+
 from meltano.core import utils
 from meltano.core.sqlalchemy import GUID
-from sqlalchemy.orm import validates
 
 from . import db
 

@@ -5,6 +5,9 @@ from pathlib import Path
 
 import sqlalchemy
 from flask import jsonify, redirect, url_for
+from pypika import Order, Query
+from sqlalchemy.event import listen
+
 from meltano.api.json import freeze_keys
 from meltano.api.models import db
 from meltano.api.security import create_dev_user
@@ -14,8 +17,6 @@ from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.project import Project
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
-from pypika import Order, Query
-from sqlalchemy.event import listen
 
 from .settings_helper import SettingsHelper
 

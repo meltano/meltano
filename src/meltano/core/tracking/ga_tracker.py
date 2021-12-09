@@ -9,6 +9,7 @@ from typing import Dict, List, Tuple
 
 import requests
 import yaml
+
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 

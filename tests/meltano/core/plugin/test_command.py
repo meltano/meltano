@@ -1,4 +1,5 @@
 import pytest
+
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin.command import Command, UndefinedEnvVarError
 

@@ -1,9 +1,10 @@
 import logging
 
-from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.project import Project
 from watchdog.events import EVENT_TYPE_MODIFIED, PatternMatchingEventHandler
 from watchdog.observers import Observer
+
+from meltano.core.compiler.project_compiler import ProjectCompiler
+from meltano.core.project import Project
 
 
 class CompileEventHandler(PatternMatchingEventHandler):

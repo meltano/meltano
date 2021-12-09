@@ -1,6 +1,7 @@
 import sqlalchemy
 from flask import jsonify, request
 from flask_security import roles_required
+
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import block_if_readonly
 from meltano.api.security.resource_filter import NameFilterMixin, Need, ResourceFilter

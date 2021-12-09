@@ -3,6 +3,7 @@ import shutil
 
 import pytest
 import yaml
+
 from meltano.core.plugin import PluginType, Variant
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project_add_service import ProjectAddService

@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from typing import Optional
 
 import click
+
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (

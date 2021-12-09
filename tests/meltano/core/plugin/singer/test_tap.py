@@ -7,6 +7,7 @@ from contextlib import contextmanager
 
 import pytest
 from asynctest import CoroutineMock, mock
+
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError

@@ -2,6 +2,7 @@ from configparser import ConfigParser
 
 import pytest
 from asynctest import CoroutineMock, mock
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.airflow import AirflowInvoker
 from meltano.core.plugin_install_service import PluginInstallService

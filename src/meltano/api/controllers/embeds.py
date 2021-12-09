@@ -1,4 +1,5 @@
 from flask import jsonify, request
+
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models import db
 from meltano.api.security import block_if_api_auth_required

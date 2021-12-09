@@ -6,8 +6,9 @@ from unittest import mock
 
 import pytest
 import structlog
-from meltano.core.logging.output_logger import Out, OutputLogger
 from structlog.testing import LogCapture
+
+from meltano.core.logging.output_logger import Out, OutputLogger
 
 
 def assert_lines(output, *lines):

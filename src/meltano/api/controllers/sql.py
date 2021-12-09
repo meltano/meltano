@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import sqlalchemy
 from flask import jsonify, request
+
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.core.project import Project
 from meltano.core.schedule_service import ScheduleNotFoundError, ScheduleService

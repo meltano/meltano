@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException

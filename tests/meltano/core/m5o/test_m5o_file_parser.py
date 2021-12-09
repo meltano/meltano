@@ -1,4 +1,5 @@
 import pytest
+
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 
 

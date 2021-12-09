@@ -1,4 +1,5 @@
 import pytest
+
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.project_plugins_service import PluginAlreadyAddedException

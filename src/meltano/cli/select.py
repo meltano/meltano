@@ -5,6 +5,7 @@ import os
 from typing import Dict
 
 import click
+
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
