@@ -341,18 +341,19 @@ class ExtractLoadBlocks:  # noqa: WPS214
                 consumer=block.consumer,
                 producer=block.producer,
                 string_id=block.string_id,
+                cmd_type="elb",
             )
             if logger.isEnabledFor(logging.DEBUG):
                 block.stdout_link(
                     self.output_logger.out(
-                        "stdout",
-                        logger_base,
+                        block.string_id,
+                        logger_base.bind(stdio="stdout"),
                     )
                 )
             block.stderr_link(
                 self.output_logger.out(
-                    "stderr",
-                    logger_base,
+                    block.string_id,
+                    logger_base.bind(stdio="stderr"),
                 )
             )
             if block.consumer:

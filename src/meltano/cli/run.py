@@ -163,22 +163,28 @@ class BlockParser:  # noqa: D101
         """
         cur = offset
         while cur < len(self._plugins):
+            plugin = self._plugins[cur]
             elb, idx = self._find_next_elb_set(cur)
             if elb:
                 self.log.debug("found ExtractLoadBlocks set", offset=cur)
                 yield elb
                 cur += idx
-            elif is_command_block(self._plugins[cur]):
+            elif is_command_block(plugin):
+                self.log.debug(
+                    "found PluginCommand",
+                    offset=cur,
+                    plugin_type=plugin.type,
+                )
                 yield plugin_command_invoker(
                     self._plugins[cur],
                     self.project,
                     session=self.session,
-                    command=self._commands.get(self._plugins[cur]),
+                    command=self._commands.get(plugin),
                 )
                 cur += 1
             else:
                 raise Exception(
-                    f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{self._plugins[cur].name}'"
+                    f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{plugin.name}'"
                 )
 
     def _find_next_elb_set(  # noqa: WPS231
