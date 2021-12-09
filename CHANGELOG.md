@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#3085](https://gitlab.com/meltano/meltano/-/issues/3085) Upgrade `target-bigquery` default variant `adswerve` to [`v0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3).
+- [#3113](https://gitlab.com/meltano/meltano/-/issues/3113) Pin tag [`v1.4.27`](https://gitlab.com/meltano/tap-salesforce/-/tags/v1.4.27) of `tap-salesforce` default variant `meltano`.
 
 ### Fixes
 
