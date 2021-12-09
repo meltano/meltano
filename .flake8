@@ -14,8 +14,6 @@ select =
     D
     # flake8-eradicate
     E80
-    # flake8-isort
-    I
     # flake8-rst-docstrings
     RST
     # flake8-string-format
@@ -36,18 +34,35 @@ select =
 
 ignore =
     # flake8-bandit
+    # Allow subprocess module to be used
     S404
+    # pycodestyle
+    # Allow for line breaks where Black decides are valid
+    W503
+    # Allow for long lines since we delegate to Black for enforcement
+    E501
     # wemake-python-styleguide
+    # Allow blacklisted variable names that can be clear enough in method context
     WPS110
+    # Allow upper-case constants in Enum subclasses
     WPS115
+    # Allow local folder imports (import .module)
     WPS300
+    # Allow f-strings
     WPS305
+    # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration
     WPS306
+    # Allow assignment expressions (walrus operator :=)
     WPS332
+    # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
     WPS348
+    # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
     WPS420
+    # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
     WPS600
+    # Allow using @staticmethod
     WPS602
+    # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
     WPS212
 
 exclude =
@@ -94,6 +109,8 @@ per_file_ignores =
         # Allow for print function calls
         WPS421
     src/meltano/cli/*:
+        # Don't require docstrings in click commands
+        DAR
         # Allow many local variables, since these aid in string building
         WPS210
         # Allow many arguments, since these often represent CLI arguments
@@ -126,6 +143,9 @@ per_file_ignores =
     src/meltano/core/job/job.py:
         # Class attributes can be used as instance attributes in sqlalchemy.declarative model
         WPS601
+    src/meltano/core/project_files.py:
+        # Dict manipulation requires lots of string constant references
+        WPS226
     **/__init__.py:
         # Allow for using __init__.py to promote imports to the module namespace
         F401

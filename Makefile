@@ -152,7 +152,7 @@ docs/serve: docs/build
 
 BLACK_RUN = poetry run black src/meltano tests/
 ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
-FLAKEHELL_RUN = poetry run flakehell lint src/ tests/
+FLAKE8_RUN = poetry run flake8 src/ tests/ --statistics
 ISORT_RUN = poetry run isort --recursive --settings-path pyproject.toml
 JSON_YML_VALIDATE = poetry run python src/meltano/core/utils/validate_json_schema.py
 
@@ -160,7 +160,7 @@ lint_python:
 	${JSON_YML_VALIDATE}
 	${ISORT_RUN} --apply
 	${BLACK_RUN}
-	${FLAKEHELL_RUN}
+	${FLAKE8_RUN}
 
 lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN} --fix
@@ -169,7 +169,7 @@ show_lint_python:
 	${JSON_YML_VALIDATE}
 	${ISORT_RUN} --check-only --diff
 	${BLACK_RUN} --check --diff
-	${FLAKEHELL_RUN}
+	${FLAKE8_RUN} --diff
 
 show_lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN}
