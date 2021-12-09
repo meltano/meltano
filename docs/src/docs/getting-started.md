@@ -305,8 +305,8 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config tap-gitlab set projects "meltano/meltano meltano/sdk"
-    meltano config tap-gitlab set start_date 2021-10-01T00:00:00Z
+    meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
+    meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
     meltano config tap-gitlab set private_token my_private_token
     ```
 
