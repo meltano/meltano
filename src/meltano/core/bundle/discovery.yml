@@ -1646,7 +1646,7 @@ extractors:
     - name: meltano
       docs: 'https://hub.meltano.com/extractors/salesforce.html'
       repo: https://gitlab.com/meltano/tap-salesforce
-      pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
+      pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git@v1.4.27'
       capabilities:
         - properties
         - discover
