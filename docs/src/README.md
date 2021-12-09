@@ -185,7 +185,7 @@ meltano add extractor tap-gitlab
 # - the https://gitlab.com/meltano/meltano project
 meltano config tap-gitlab set projects meltano/meltano
 # - going back to May 1st, 2020
-meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
 # Select all attributes of the "tags" entity
 meltano select tap-gitlab tags "*"
