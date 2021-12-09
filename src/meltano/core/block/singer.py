@@ -238,7 +238,7 @@ class SingerBlock(InvokerBase, IOBlock):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start plugin: {err}") from err
+            raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err
 
     async def stop(self, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.

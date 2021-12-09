@@ -12,6 +12,7 @@ from meltano.core.environment import Environment
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -129,6 +130,25 @@ def target_process(process_mock_factory, target):
     return target
 
 
+@pytest.fixture()
+def dbt_process(process_mock_factory, dbt):
+    dbt = process_mock_factory(dbt)
+
+    async def wait_mock():
+        await asyncio.sleep(1)
+        return dbt.wait.return_value
+
+    dbt.wait.side_effect = wait_mock
+
+    dbt.stdout.at_eof.side_effect = (False, True)
+    dbt.stdout.readline = CoroutineMock(side_effect=(b"Testoutput"))
+    dbt.stderr.at_eof.side_effect = (False, False, False, True)
+    dbt.stderr.readline = CoroutineMock(
+        side_effect=(b"Starting\n", b"Running\n", b"Done\n")
+    )
+    return dbt
+
+
 class EventMatcher:
     def __init__(self, result_output: str):
         """Build a matcher for the result output of a command."""
@@ -159,7 +179,7 @@ class TestCliRunScratchpadOne:
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
-    def test_run_parsing(
+    def test_run_parsing_failures(
         self,
         google_tracker,
         default_config,
@@ -184,6 +204,7 @@ class TestCliRunScratchpadOne:
             side_effect=(tap_process, target_process)
         )
 
+        # check that the various ELB validation checks actually run and fail as expected
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -231,6 +252,7 @@ class TestCliRunScratchpadOne:
                 result = cli_runner.invoke(cli, args, catch_exceptions=False)
                 assert result.exit_code == 1
 
+        # Verify that a vanilla ELB run works
         args = ["run", tap.name, target.name]
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
@@ -249,4 +271,83 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches(
                 "All ExtractLoadBlocks validated, starting execution."
             )
+            assert matcher.find_by_event("Run call completed.").get("success")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_basic_invocations(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
+        tap_process,
+        target_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = CoroutineMock(
+            side_effect=(tap_process, target_process)
+        )
+
+        # Verify that a vanilla ELB run works
+        args = ["run", tap.name, target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.cli.run.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+
+            assert matcher.event_matches(
+                "All ExtractLoadBlocks validated, starting execution."
+            )
+            assert matcher.find_by_event("Run call completed.").get("success")
+
+        # Verify that a vanilla ELB run works
+        invoke_async = CoroutineMock(side_effect=(dbt_process,))  # dbt run
+
+        args = ["run", "dbt:run"]
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.run.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert (
+                matcher.find_by_event("found plugin in cli invocation").get(
+                    "plugin_name"
+                )
+                == "dbt"
+            )
+            dbt_start_event = matcher.find_by_event("Starting")
+            assert dbt_start_event is not None
+            assert dbt_start_event.get("name") == "dbt"
+            assert dbt_start_event.get("cmd_type") == "command"
+            assert dbt_start_event.get("cmd_type") == "command"
+            assert dbt_start_event.get("stdio") == "stderr"
+            assert matcher.find_by_event("Run call completed.").get("success")
             assert matcher.find_by_event("Run call completed.").get("success")

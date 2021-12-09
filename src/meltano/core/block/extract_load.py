@@ -396,7 +396,7 @@ async def experimental_run(  # noqa: WPS217
                 line_length_limit=line_length_limit,
                 stream_buffer_size=stream_buffer_size,
             )
-        raise output_futures_failed.pop().exception()
+        raise output_futures_failed.exception()
     else:
         # If all of the output handlers completed without raising an exception,
         # we still need to wait for all of the underlying block processes to complete.
