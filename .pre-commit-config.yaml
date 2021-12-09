@@ -14,13 +14,6 @@ repos:
     - id: check-merge-conflict
     - id: check-toml
     - id: debug-statements
-- repo: https://github.com/asottile/pyupgrade
-  rev: v2.7.4
-  hooks:
-    - id: pyupgrade
-      args:
-        - '--py3-plus'
-        - '--py36-plus'
 # - repo: https://github.com/pre-commit/mirrors-mypy
 #   rev: v0.790
 #   hooks:
@@ -57,5 +50,14 @@ repos:
     name: isort
     entry: poetry run isort
     language: system
+    types: [python]
+    files: '.py'
+  - id: pyupgrade
+    name: pyupgrade
+    entry: poetry run pyupgrade
+    language: system
+    args:
+    - "--py3-plus"
+    - "--py36-plus"
     types: [python]
     files: '.py'
