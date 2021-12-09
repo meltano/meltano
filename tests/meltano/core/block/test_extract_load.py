@@ -61,8 +61,7 @@ class TestELBContextBuilder:
     def test_make_block_returns_valid_singer_block(
         self, project, session, project_plugins_service, tap, target
     ):
-        """Ensure that calling make_block returns a valid SingerBlock"""
-
+        """Ensure that calling make_block returns a valid SingerBlock."""
         builder = ELBContextBuilder(
             project=project,
             plugins_service=project_plugins_service,

@@ -25,7 +25,7 @@ from .params import pass_project
 logger = structlog.getLogger(__name__)
 
 
-@cli.command(help="Like elt, with magic")
+@cli.command(help="Like elt, with magic <preview feature>")
 @click.argument(
     "blocks",
     nargs=-1,
@@ -55,7 +55,7 @@ async def run(project, blocks):
             return
 
         if _validate_blocks(parsed_blocks):
-            logger.info("All ExtractLoadBlocks validated, starting execution")
+            logger.info("All ExtractLoadBlocks validated, starting execution.")
         else:
             return
         await _run_blocks(parsed_blocks, session)
@@ -67,11 +67,11 @@ async def run(project, blocks):
 def _validate_blocks(parsed_blocks: List[Union[BlockSet, PluginCommandBlock]]) -> bool:
     for idx, blk in enumerate(parsed_blocks):
         if blk == BlockSet:
-            logger.info("Validating ExtractLoadBlock", set_number=idx)
+            logger.debug("validating ExtractLoadBlock.", set_number=idx)
             try:
                 blk.validate_set()
             except Exception as err:
-                logger.error("Validation failed", err=err)
+                logger.error("Validation failed.", err=err)
                 return False
     return True
 
@@ -83,7 +83,7 @@ async def _run_blocks(
         if isinstance(blk, ExtractLoadBlocks):
             result = await blk.run(session)
             logger.info(
-                "Run call completed",
+                "Run call completed.",
                 set_number=idx,
                 block_type=blk.__class__.__name__,
                 success=result,
@@ -92,7 +92,7 @@ async def _run_blocks(
         elif isinstance(blk, InvokerCommand):
             await blk.run()
             logger.info(
-                "Run call completed",
+                "Run call completed.",
                 set_number=idx,
                 block_type=blk.__class__.__name__,
                 success=True,
@@ -165,7 +165,7 @@ class BlockParser:  # noqa: D101
         while cur < len(self._plugins):
             elb, idx = self._find_next_elb_set(cur)
             if elb:
-                self.log.info("Found ExtractLoadBlocks set", offset=cur)
+                self.log.debug("found ExtractLoadBlocks set", offset=cur)
                 yield elb
                 cur += idx
             elif is_command_block(self._plugins[cur]):
@@ -267,5 +267,5 @@ def generate_job_id(
         Job id or None if project active environment is not set.
     """
     if project.active_environment:
-        return f"{project.active_environment}-{consumer.string_id}-{producer.string_id}"
+        return f"{project.active_environment.name}-{consumer.string_id}-{producer.string_id}"
     return None
