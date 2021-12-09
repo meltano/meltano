@@ -1,10 +1,11 @@
 from enum import Enum
 
 from flask_mail import Mail, Message
+from smtpapi import SMTPAPIHeader
+
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from smtpapi import SMTPAPIHeader
 
 mail = Mail()
 

@@ -9,9 +9,10 @@ from typing import Optional, Union
 
 import fasteners
 from dotenv import dotenv_values
+from werkzeug.utils import secure_filename
+
 from meltano.core.environment import Environment
 from meltano.core.plugin.base import PluginRef
-from werkzeug.utils import secure_filename
 
 from .behavior.versioned import Versioned
 from .error import Error

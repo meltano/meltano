@@ -1,4 +1,5 @@
 import pytest
+
 from meltano.core.utils import nest, pop_at_path, set_at_path
 
 

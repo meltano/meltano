@@ -6,10 +6,12 @@ import logging.handlers
 import os
 from urllib.parse import urlsplit
 
-import meltano.api.config
 from flask import Flask, g, jsonify, request
 from flask_cors import CORS
 from flask_login import current_user
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
+import meltano.api.config
 from meltano.api.headers import *
 from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.compiler.project_compiler import ProjectCompiler
@@ -19,7 +21,6 @@ from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.oauth.app import create_app as create_oauth_service
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 setup_logging()
 
@@ -57,12 +58,12 @@ def create_app(config={}):
     # 1) Extensions
     security_options = {}
 
-    from .models import db
-    from .mail import mail
     from .executor import setup_executor
-    from .security import security, users, setup_security
-    from .security.oauth import setup_oauth
     from .json import setup_json
+    from .mail import mail
+    from .models import db
+    from .security import security, setup_security, users
+    from .security.oauth import setup_oauth
 
     db.init_app(app)
     mail.init_app(app)
@@ -84,13 +85,13 @@ def create_app(config={}):
 
     from .controllers.dashboards import dashboardsBP
     from .controllers.embeds import embedsBP
-    from .controllers.reports import reportsBP
-    from .controllers.repos import reposBP
-    from .controllers.settings import settingsBP
-    from .controllers.sql import sqlBP
     from .controllers.orchestrations import orchestrationsBP
     from .controllers.plugins import pluginsBP
-    from .controllers.root import root, api_root
+    from .controllers.reports import reportsBP
+    from .controllers.repos import reposBP
+    from .controllers.root import api_root, root
+    from .controllers.settings import settingsBP
+    from .controllers.sql import sqlBP
 
     app.register_blueprint(dashboardsBP)
     app.register_blueprint(embedsBP)

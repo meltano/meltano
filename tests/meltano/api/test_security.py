@@ -9,6 +9,8 @@ from flask import url_for
 from flask_login import current_user
 from flask_security import AnonymousUser, login_user, logout_user
 from freezegun import freeze_time
+from sqlalchemy.orm import joinedload
+
 from meltano.api.models.embed_token import EmbedToken, ResourceType
 from meltano.api.models.oauth import OAuth
 from meltano.api.models.security import User, db
@@ -16,7 +18,6 @@ from meltano.api.security import FreeUser, users
 from meltano.api.security.oauth import OAuthError, gitlab_token_identity
 from meltano.core.project import PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from sqlalchemy.orm import joinedload
 
 
 def gitlab_client():

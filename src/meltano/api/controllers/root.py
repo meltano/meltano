@@ -3,7 +3,6 @@ import subprocess
 from functools import wraps
 from urllib.parse import urlsplit
 
-import meltano
 import requests
 from flask import (
     Blueprint,
@@ -18,6 +17,8 @@ from flask import (
 from flask_login import current_user
 from flask_security import logout_user, roles_required
 from jinja2 import TemplateNotFound
+
+import meltano
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import block_if_readonly, passes_authentication_checks
 from meltano.core.project import Project, ProjectReadonly

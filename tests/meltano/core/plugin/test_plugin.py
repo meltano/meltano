@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.setting_definition import SettingDefinition, SettingKind

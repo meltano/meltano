@@ -7,9 +7,10 @@ import subprocess
 from typing import Optional
 
 import click
+import psutil
+
 import meltano
 import meltano.core.bundle as bundle
-import psutil
 from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.migration_service import MigrationError, MigrationService

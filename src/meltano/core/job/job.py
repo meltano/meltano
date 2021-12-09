@@ -10,11 +10,12 @@ from enum import Enum
 
 import sqlalchemy.types as types
 from async_generator import asynccontextmanager
+from sqlalchemy import Column
+from sqlalchemy.ext.mutable import MutableDict
+
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
-from sqlalchemy import Column
-from sqlalchemy.ext.mutable import MutableDict
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5

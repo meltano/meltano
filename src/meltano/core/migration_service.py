@@ -8,6 +8,7 @@ from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
+
 from meltano.api.models.security import Role, RolePermissions
 from meltano.core.db import project_engine
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR

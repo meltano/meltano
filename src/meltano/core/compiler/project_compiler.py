@@ -2,6 +2,7 @@ import logging
 import threading
 
 import fasteners
+
 from meltano.core.m5o.m5o_file_parser import (
     MeltanoAnalysisFileParser,
     MeltanoAnalysisFileParserError,
