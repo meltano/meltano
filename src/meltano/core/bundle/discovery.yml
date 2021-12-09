@@ -2139,7 +2139,7 @@ loaders:
     - name: adswerve
       docs: https://hub.meltano.com/loaders/bigquery.html
       repo: https://github.com/adswerve/target-bigquery
-      pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.11.3
+      pip_url: git+https://github.com/adswerve/target-bigquery.git@0.11.3
       dialect: bigquery
       target_schema: $TARGET_BIGQUERY_DATASET_ID
       settings_group_validation:
