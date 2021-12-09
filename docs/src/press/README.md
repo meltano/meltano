@@ -58,5 +58,7 @@ Taylor is passionate about maximizing the potential of data and building the fut
 
 He graduated from Vanderbilt with a PhD in Chemical and Biomolecular Engineering and the University of Tennessee at Chattanooga with a BS in Chemical Engineering.
 
+Taylor can be found on [Twitter](https://twitter.com/tayloramurphy), [LinkedIn](https://www.linkedin.com/in/tayloramurphy/), and the [Meltano Slack](https://meltano.com/slack).
+
 ### Exec and Team Photos
 [Exec and Team Photos](https://gitlab.com/meltano/meltano/-/tree/master/docs/src/.vuepress/public/images/press-images)
