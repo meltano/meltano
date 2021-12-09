@@ -375,11 +375,6 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        # exit cleanly when everything is fine
-        create_subprocess_exec = CoroutineMock(
-            side_effect=(tap_process, target_process)
-        )
-
         # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
         invoke_async = CoroutineMock(
             side_effect=(tap_process, target_process, dbt_process)
@@ -391,12 +386,9 @@ class TestCliRunScratchpadOne:
             "meltano.cli.run.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch(
-            "meltano.core.plugin_invoker.asyncio"
-        ) as asyncio_mock, mock.patch(
             "meltano.core.transform_add_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-            asyncio_mock.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=False)
             assert result.exit_code == 0
 
@@ -432,3 +424,83 @@ class TestCliRunScratchpadOne:
             assert dbt_done_event[0].get("name") == "dbt"
             assert dbt_done_event[0].get("cmd_type") == "command"
             assert dbt_done_event[0].get("stdio") == "stderr"
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_plugin_command_failure(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
+        tap_process,
+        target_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+        args = ["run", tap.name, target.name, "dbt:run"]
+
+        dbt_process.wait.return_value = 1
+        dbt_process.returncode = 1
+        dbt_process.stderr.readline.side_effect = (
+            b"dbt starting\n",
+            b"dbt running\n",
+            b"dbt failure\n",
+        )
+
+        # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, target_process, dbt_process)
+        )
+
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.cli.run.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert "`dbt run` failed" in str(result.exception)
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches(
+                "found ExtractLoadBlocks set"
+            )  # tap/target pair
+            assert (
+                matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
+                == "transformers"
+            )  # dbt
+
+            # verify that both ExtractLoadBlocks and PluginCommand completed successfully
+            completed_events = matcher.find_by_event("Run call completed.")
+            assert len(completed_events) == 1
+            for event in completed_events:
+                assert event.get("success")
+
+            tap_stop_event = matcher.find_by_event("tap done")
+            assert len(tap_stop_event) == 1
+            assert tap_stop_event[0].get("name") == tap.name
+            assert tap_stop_event[0].get("cmd_type") == "elb"
+            assert tap_stop_event[0].get("stdio") == "stderr"
+
+            target_stop_event = matcher.find_by_event("target done")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+
+            assert not matcher.event_matches("dbt done")
+            assert matcher.event_matches("dbt starting")
+            assert matcher.event_matches("dbt running")
+            assert matcher.event_matches("dbt failure")
