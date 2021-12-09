@@ -152,8 +152,8 @@ docs/serve: docs/build
 
 BLACK_RUN = poetry run black src/meltano tests/
 ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
-FLAKE8_RUN = poetry run flake8 src/ tests/ --statistics
-ISORT_RUN = poetry run isort --recursive --settings-path pyproject.toml
+FLAKE8_RUN = poetry run flake8 src/meltano tests/ --statistics
+ISORT_RUN = poetry run isort src/meltano tests/
 JSON_YML_VALIDATE = poetry run python src/meltano/core/utils/validate_json_schema.py
 
 lint_python:
