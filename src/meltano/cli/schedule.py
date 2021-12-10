@@ -7,7 +7,6 @@ from pathlib import Path
 
 import click
 from click_default_group import DefaultGroup
-
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.project import Project, ProjectNotFound

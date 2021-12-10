@@ -7,10 +7,9 @@ from typing import Dict
 
 import networkx as nx
 import sqlparse
+from meltano.core.behavior.visitor import visit_with
 from networkx.readwrite import json_graph
 from sqlparse.sql import Comparison, TokenList
-
-from meltano.core.behavior.visitor import visit_with
 
 from .analysis_helper import AnalysisHelper
 from .base import MeltanoDesign, MeltanoTable

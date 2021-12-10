@@ -1,6 +1,5 @@
 """Defines `meltano remove` command."""
 import click
-
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (

@@ -5,7 +5,6 @@ import webbrowser
 
 import click
 import requests
-
 from meltano.core.project_settings_service import ProjectSettingsService
 
 

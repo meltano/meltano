@@ -3,12 +3,11 @@ import json
 from contextlib import contextmanager
 from unittest import mock
 
+import meltano.core.bundle as bundle
 import pytest
 import requests
 import requests_mock
 import yaml
-
-import meltano.core.bundle as bundle
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.plugin import (
     PluginDefinition,

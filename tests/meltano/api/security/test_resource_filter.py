@@ -2,7 +2,6 @@ import pytest
 from flask import appcontext_pushed, g
 from flask_login import current_user
 from flask_principal import Identity, Need, Permission
-
 from meltano.api.security.auth import ResourcePermission
 from meltano.api.security.resource_filter import ResourceFilter, TopicFilter
 from meltano.core.m5o.m5oc_file import M5ocFile

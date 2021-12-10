@@ -6,10 +6,9 @@ import sys
 from distutils import dir_util
 from pathlib import Path
 
+import meltano.core.bundle
 import pytest
 import yaml
-
-import meltano.core.bundle
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService

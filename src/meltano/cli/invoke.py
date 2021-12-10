@@ -3,7 +3,6 @@ import sys
 from typing import Tuple
 
 import click
-
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType

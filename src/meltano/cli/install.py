@@ -1,5 +1,4 @@
 import click
-
 from meltano.core.plugin import PluginType
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService

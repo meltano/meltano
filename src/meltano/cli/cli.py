@@ -3,7 +3,6 @@ import sys
 import warnings
 
 import click
-
 import meltano
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.logging import LEVELS, setup_logging

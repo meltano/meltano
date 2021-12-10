@@ -15,7 +15,6 @@ from typing import Tuple
 
 import structlog
 from jsonschema import Draft4Validator
-
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import JobFinder, Payload
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError

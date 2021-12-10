@@ -2,7 +2,6 @@ import logging
 
 import click
 from flask_security.utils import hash_password
-
 from meltano.api.app import create_app
 from meltano.core.utils import identity
 

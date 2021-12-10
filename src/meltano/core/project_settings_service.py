@@ -1,5 +1,4 @@
 from dotenv import dotenv_values
-
 from meltano.core.settings_service import (
     SettingMissingError,
     SettingsService,

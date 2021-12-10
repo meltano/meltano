@@ -5,7 +5,6 @@ from os.path import join
 from pathlib import Path
 
 import pytest
-
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.m5o.m5oc_file import M5ocFile

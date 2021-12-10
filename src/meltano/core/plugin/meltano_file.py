@@ -1,8 +1,7 @@
 from pathlib import Path
 
-import yaml
-
 import meltano.core.bundle as bundle
+import yaml
 
 from .file import FilePlugin
 

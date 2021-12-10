@@ -4,7 +4,6 @@ from unittest import mock
 
 import pytest
 import yaml
-
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_install_service import PluginInstallService
 

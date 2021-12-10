@@ -8,8 +8,6 @@ import sqlalchemy
 from flask import Response, jsonify, make_response, request, send_file, url_for
 from flask_restful import Api, Resource, fields, marshal, marshal_with
 from flask_security import roles_required
-from werkzeug.exceptions import Conflict, UnprocessableEntity
-
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.executor import run_schedule
 from meltano.api.json import freeze_keys
@@ -43,6 +41,7 @@ from meltano.core.schedule_service import (
 )
 from meltano.core.setting_definition import SettingKind
 from meltano.core.utils import flatten, iso8601_datetime, slugify
+from werkzeug.exceptions import Conflict, UnprocessableEntity
 
 from .errors import InvalidFileNameError
 from .upload_helper import InvalidFileSizeError, InvalidFileTypeError, UploadHelper
