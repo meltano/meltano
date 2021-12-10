@@ -490,7 +490,7 @@ class TestCliRunScratchpadOne:
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
-    def test_run_elb_failures(
+    def test_run_elb_tap_failure(
         self,
         google_tracker,
         default_config,
@@ -517,7 +517,6 @@ class TestCliRunScratchpadOne:
             b"tap failure\n",
         )
 
-        # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
         invoke_async = CoroutineMock(
             side_effect=(tap_process, target_process, dbt_process)
         )
@@ -540,19 +539,14 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.event_matches(
-                "found ExtractLoadBlocks set"
-            )  # tap/target pair
+            assert matcher.event_matches("found ExtractLoadBlocks set")
             assert (
                 matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
                 == "transformers"
-            )  # dbt
+            )
 
-            # verify that both ExtractLoadBlocks and PluginCommand completed successfully
             completed_events = matcher.find_by_event("Block run completed.")
-            assert (
-                len(completed_events) == 1
-            )  # there should only be one completed event
+            assert len(completed_events) == 1
             assert completed_events[0].get("success") is False
             assert completed_events[0].get("err") == "RunnerError('Extractor failed')"
             assert completed_events[0].get("exit_codes").get("extractors") == 1
@@ -564,6 +558,286 @@ class TestCliRunScratchpadOne:
             assert tap_stop_event[0].get("stdio") == "stderr"
 
             target_stop_event = matcher.find_by_event("target done")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+
+            # dbt should not have run at all
+            assert not matcher.event_matches("dbt starting")
+            assert not matcher.event_matches("dbt running")
+            assert not matcher.event_matches("dbt done")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_elb_target_failure_before_tap_finished(  # noqa: WPS118
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
+        tap_process,
+        target_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+
+        args = ["run", tap.name, target.name, "dbt:run"]
+
+        # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
+        async def tap_wait_mock():
+            await asyncio.sleep(2)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = tap_wait_mock
+
+        # Writing to target stdin will fail because (we'll pretend) it has already died
+        target_process.stdin = mock.Mock(spec=asyncio.StreamWriter)
+        target_process.stdin.write.side_effect = BrokenPipeError
+        target_process.stdin.drain = CoroutineMock(side_effect=ConnectionResetError)
+        target_process.stdin.wait_closed = CoroutineMock(return_value=True)
+
+        # Have `target_process.wait` take 1s to make sure the `stdin.write`/`drain` exceptions can be raised
+        async def target_wait_mock():
+            await asyncio.sleep(1)
+            return 1
+
+        target_process.wait.side_effect = target_wait_mock
+
+        target_process.wait.return_value = 1
+        target_process.returncode = 1
+        target_process.stderr.readline.side_effect = (
+            b"target starting\n",
+            b"target running\n",
+            b"target failure\n",
+        )
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, target_process, dbt_process)
+        )
+
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            assert (
+                "Run invocation could not be completed as block failed: Loader failed"
+                in str(result.exception)
+            )
+            assert result.exit_code == 1
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches(
+                "found ExtractLoadBlocks set"
+            )  # tap/target pair
+            assert (
+                matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
+                == "transformers"
+            )  # dbt
+
+            completed_events = matcher.find_by_event("Block run completed.")
+            # there should only be one completed event
+            assert len(completed_events) == 1
+            assert completed_events[0].get("success") is False
+            assert completed_events[0].get("err") == "RunnerError('Loader failed')"
+            assert completed_events[0].get("exit_codes").get("loaders") == 1
+
+            # the tap should NOT have finished
+            assert not matcher.event_matches("tap done")
+
+            target_stop_event = matcher.find_by_event("target failure")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+
+            # dbt should not have run at all
+            assert not matcher.event_matches("dbt starting")
+            assert not matcher.event_matches("dbt running")
+            assert not matcher.event_matches("dbt done")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_elb_target_failure_after_tap_finished(  # noqa: WPS118
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
+        tap_process,
+        target_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+
+        args = ["run", tap.name, target.name, "dbt:run"]
+
+        target_process.wait.return_value = 1
+        target_process.returncode = 1
+        target_process.stderr.readline.side_effect = (
+            b"target starting\n",
+            b"target running\n",
+            b"target failure\n",
+        )
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, target_process, dbt_process)
+        )
+
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            assert (
+                "Run invocation could not be completed as block failed: Loader failed"
+                in str(result.exception)
+            )
+            assert result.exit_code == 1
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches(
+                "found ExtractLoadBlocks set"
+            )  # tap/target pair
+            assert (
+                matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
+                == "transformers"
+            )  # dbt
+
+            completed_events = matcher.find_by_event("Block run completed.")
+            # there should only be one completed event
+            assert len(completed_events) == 1
+            assert completed_events[0].get("success") is False
+            assert completed_events[0].get("err") == "RunnerError('Loader failed')"
+            assert completed_events[0].get("exit_codes").get("loaders") == 1
+
+            tap_stop_event = matcher.find_by_event("tap done")
+            assert len(tap_stop_event) == 1
+            assert tap_stop_event[0].get("name") == tap.name
+            assert tap_stop_event[0].get("cmd_type") == "elb"
+            assert tap_stop_event[0].get("stdio") == "stderr"
+
+            target_stop_event = matcher.find_by_event("target failure")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+
+            # dbt should not have run at all
+            assert not matcher.event_matches("dbt starting")
+            assert not matcher.event_matches("dbt running")
+            assert not matcher.event_matches("dbt done")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_elb_tap_and_target_failed(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
+        tap_process,
+        target_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+
+        args = ["run", tap.name, target.name, "dbt:run"]
+
+        tap_process.wait.return_value = 1
+        tap_process.returncode = 1
+        tap_process.stderr.readline.side_effect = (
+            b"tap starting\n",
+            b"tap running\n",
+            b"tap failure\n",
+        )
+
+        target_process.wait.return_value = 1
+        target_process.returncode = 1
+        target_process.stderr.readline.side_effect = (
+            b"target starting\n",
+            b"target running\n",
+            b"target failure\n",
+        )
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, target_process, dbt_process)
+        )
+
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            assert (
+                "Run invocation could not be completed as block failed: Extractor and loader failed"
+                in str(result.exception)
+            )
+            assert result.exit_code == 1
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("found ExtractLoadBlocks set")
+            assert (
+                matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
+                == "transformers"
+            )
+
+            completed_events = matcher.find_by_event("Block run completed.")
+            assert len(completed_events) == 1
+            assert completed_events[0].get("success") is False
+            assert (
+                completed_events[0].get("err")
+                == "RunnerError('Extractor and loader failed')"
+            )
+            assert completed_events[0].get("exit_codes").get("loaders") == 1
+
+            tap_stop_event = matcher.find_by_event("tap failure")
+            assert len(tap_stop_event) == 1
+            assert tap_stop_event[0].get("name") == tap.name
+            assert tap_stop_event[0].get("cmd_type") == "elb"
+            assert tap_stop_event[0].get("stdio") == "stderr"
+
+            target_stop_event = matcher.find_by_event("target failure")
             assert len(target_stop_event) == 1
             assert target_stop_event[0].get("name") == target.name
             assert target_stop_event[0].get("cmd_type") == "elb"

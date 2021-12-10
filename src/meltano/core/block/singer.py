@@ -182,7 +182,12 @@ class InvokerBase:  # noqa: WPS230
 
     async def post(self) -> None:
         """Post triggers resetting the underlying plugin config."""
-        await self.invoker.cleanup()
+        try:
+            await self.invoker.cleanup()
+        except FileNotFoundError:
+            # TODO: should we preserve these on a failure ?
+            # the invoker prepared context manager was able to clean up the configs
+            pass
 
 
 class SingerBlock(InvokerBase, IOBlock):
@@ -263,4 +268,8 @@ class SingerBlock(InvokerBase, IOBlock):
             self._stdout_future.cancel()
         if self._stderr_future is not None:
             self._stderr_future.cancel()
-        await self.invoker.cleanup()
+        try:
+            await self.invoker.cleanup()
+        except FileNotFoundError:
+            # the invoker prepared context manager was able to clean up the configs
+            pass
