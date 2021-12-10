@@ -544,7 +544,12 @@ class TestCliRunScratchpadOne:
             completed_events = matcher.find_by_event("Block run completed.")
             assert len(completed_events) == 1
             assert completed_events[0].get("success") is False
-            assert completed_events[0].get("err") == "RunnerError('Extractor failed')"
+
+            # or is hack to work around python 3.6 failures
+            assert (
+                completed_events[0].get("err") == "RunnerError('Extractor failed',)"
+                or "RunnerError('Extractor failed')"
+            )
             assert completed_events[0].get("exit_codes").get("extractors") == 1
 
             tap_stop_event = matcher.find_by_event("tap failure")
@@ -649,7 +654,12 @@ class TestCliRunScratchpadOne:
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0].get("success") is False
-            assert completed_events[0].get("err") == "RunnerError('Loader failed')"
+
+            # or is hack to work around python 3.6 failures
+            assert (
+                completed_events[0].get("err") == "RunnerError('Loader failed',)"
+                or "RunnerError('Loader failed')"
+            )
             assert completed_events[0].get("exit_codes").get("loaders") == 1
 
             # the tap should NOT have finished
@@ -731,7 +741,11 @@ class TestCliRunScratchpadOne:
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0].get("success") is False
-            assert completed_events[0].get("err") == "RunnerError('Loader failed')"
+            # or is hack to work around python 3.6 failures
+            assert (
+                completed_events[0].get("err") == "RunnerError('Loader failed',)"
+                or "RunnerError('Loader failed')"
+            )
             assert completed_events[0].get("exit_codes").get("loaders") == 1
 
             tap_stop_event = matcher.find_by_event("tap done")
@@ -821,9 +835,12 @@ class TestCliRunScratchpadOne:
             completed_events = matcher.find_by_event("Block run completed.")
             assert len(completed_events) == 1
             assert completed_events[0].get("success") is False
+
+            # or is hack to work around python 3.6 failures
             assert (
                 completed_events[0].get("err")
-                == "RunnerError('Extractor and loader failed')"
+                == "RunnerError('Extractor and loader failed',)"
+                or "RunnerError('Extractor and loader failed')"
             )
             assert completed_events[0].get("exit_codes").get("loaders") == 1
 
@@ -916,7 +933,10 @@ class TestCliRunScratchpadOne:
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0].get("success") is False
+
+            # or is hack to work around python 3.6 failures
             assert (
                 completed_events[0].get("err")
-                == "RunnerError('Output line length limit exceeded')"
+                == "RunnerError('Output line length limit exceeded',)"
+                or "RunnerError('Output line length limit exceeded')"
             )

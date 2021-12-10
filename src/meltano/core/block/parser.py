@@ -194,7 +194,6 @@ class BlockParser:  # noqa: D101
                 blocks.append(builder.make_block(plugin))
                 if plugin.type == PluginType.LOADERS:
                     self.log.debug("blocks", offset=offset, idx=idx + 1)
-                    builder.job = generate_job_id(self.project, blocks[0], blocks[-1])
                     elb = ExtractLoadBlocks(builder.context(), blocks)
                     return elb, idx + 2
             else:

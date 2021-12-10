@@ -18,7 +18,7 @@ from .params import pass_project
 logger = structlog.getLogger(__name__)
 
 
-@cli.command(help="Like elt, with magic <preview feature>")
+@cli.command()
 @click.argument(
     "blocks",
     nargs=-1,
@@ -26,14 +26,22 @@ logger = structlog.getLogger(__name__)
 @pass_project(migrate=True)
 @click_run_async
 async def run(project, blocks):
-    """Run a set of blocks.
+    """Run a set of command blocks in series.
 
     Blocks are specified as a list of plugin names, e.g.
-    `meltano run some_extractor some_loader some_plugin:some_command`.
-    Blocks are run in the order they are specified from left to right.
+    `meltano run some_extractor some_loader some_plugin:some_command` and are run in the order they are specified
+    from left to right. A failure in any block will cause the entire run to abort.
+
+    Multiple commmand blocks can be chained together or repeated, and tap/target pairs will automatically be linked:
+
+    `meltano run tap-gitlab target-postgres dbt:test dbt:run`
+    `meltano run tap-gitlab target-postgres tap-salesforce target-mysql ...`
+    `meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery ...`
+
+    This a beta feature - its functionality and cli signature is still evolving.
     """
-    if project.active_environment is None:
-        logger.warning("No active environment, will run without job_id!")
+    if project.active_environment is not None:
+        logger.warning("Job ID generation not yet supported - running without job!")
 
     _, session_maker = project_engine(project)
     session = session_maker()
