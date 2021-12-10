@@ -6,9 +6,7 @@ import pytest
 import structlog
 from asynctest import CoroutineMock, mock
 from meltano.cli import cli
-from meltano.cli.run import generate_job_id, is_command_block
 from meltano.core.block.ioblock import IOBlock
-from meltano.core.environment import Environment
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -20,29 +18,6 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 class MockIOBlock(IOBlock):
 
     string_id = "mock-io-block"
-
-
-class TestCliRunUtils:
-    def test_is_command_block(self, tap, dbt):
-        """Verify that the is_command_block function returns True when the block is an IOBlock and has a command."""
-        assert not is_command_block(tap)
-        assert is_command_block(dbt)
-
-    def test_generate_job_id(self):
-        """Verify that the job id is generated correctly when an environment is provided."""
-        block1 = mock.Mock(spec=IOBlock)
-        block1.string_id = "block1"
-
-        block2 = mock.Mock(spec=IOBlock)
-        block2.string_id = "block2"
-
-        project = mock.Mock()
-
-        project.active_environment = None
-        assert not generate_job_id(project, block1, block2)
-
-        project.active_environment = Environment(name="test")
-        assert generate_job_id(project, block1, block2) == "test-block1-block2"
 
 
 test_log_config = {
@@ -152,15 +127,20 @@ def dbt_process(process_mock_factory, dbt):
 class EventMatcher:
     def __init__(self, result_output: str):
         """Build a matcher for the result output of a command."""
-        self.seen_lines: List[dict] = []
+        self.seen_events: List[dict] = []
+        self.seen_raw: List[str] = []
 
         for line in result_output.splitlines():
-            parsed_line = json.loads(line)
-            self.seen_lines.append(parsed_line)
+            try:
+                parsed_line = json.loads(line)
+            except json.JSONDecodeError:
+                self.seen_raw.append(line)
+                continue
+            self.seen_events.append(parsed_line)
 
     def event_matches(self, event: str) -> bool:
         """Search result output for an event, that matches the given event."""
-        for line in self.seen_lines:
+        for line in self.seen_events:
             matches = line.get("event") == event
             if matches:
                 return True
@@ -168,7 +148,7 @@ class EventMatcher:
     def find_by_event(self, event: str) -> Optional[List[dict]]:
         """Return the first matching event, that matches the given event."""
         matches = []
-        for line in self.seen_lines:
+        for line in self.seen_events:
             match = line.get("event") == event
             if match:
                 matches.append(line)
@@ -212,7 +192,7 @@ class TestCliRunScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
@@ -226,7 +206,7 @@ class TestCliRunScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
@@ -243,7 +223,7 @@ class TestCliRunScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
@@ -261,7 +241,7 @@ class TestCliRunScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
@@ -273,7 +253,7 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches(
                 "All ExtractLoadBlocks validated, starting execution."
             )
-            assert matcher.find_by_event("Run call completed.")[0].get("success")
+            assert matcher.find_by_event("Block run completed.")[0].get("success")
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
@@ -307,7 +287,7 @@ class TestCliRunScratchpadOne:
         ), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
@@ -324,7 +304,7 @@ class TestCliRunScratchpadOne:
             assert target_stop_event[0].get("name") == target.name
             assert target_stop_event[0].get("cmd_type") == "elb"
             assert target_stop_event[0].get("stdio") == "stderr"
-            assert matcher.find_by_event("Run call completed.")[0].get("success")
+            assert matcher.find_by_event("Block run completed.")[0].get("success")
 
         # Verify that a vanilla command plugin (dbt:run) run works
         invoke_async = CoroutineMock(side_effect=(dbt_process,))  # dbt run
@@ -332,7 +312,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch(
             "meltano.core.transform_add_service.ProjectPluginsService",
@@ -353,7 +333,7 @@ class TestCliRunScratchpadOne:
             assert dbt_start_event[0].get("name") == "dbt"
             assert dbt_start_event[0].get("cmd_type") == "command"
             assert dbt_start_event[0].get("stdio") == "stderr"
-            assert matcher.find_by_event("Run call completed.")[0].get("success")
+            assert matcher.find_by_event("Block run completed.")[0].get("success")
 
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
@@ -383,7 +363,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch(
             "meltano.core.transform_add_service.ProjectPluginsService",
@@ -402,7 +382,7 @@ class TestCliRunScratchpadOne:
             )  # dbt
 
             # verify that both ExtractLoadBlocks and PluginCommand completed successfully
-            completed_events = matcher.find_by_event("Run call completed.")
+            completed_events = matcher.find_by_event("Block run completed.")
             assert len(completed_events) == 2
             for event in completed_events:
                 assert event.get("success")
@@ -463,7 +443,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
-            "meltano.cli.run.ProjectPluginsService",
+            "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch(
             "meltano.core.transform_add_service.ProjectPluginsService",
@@ -483,7 +463,7 @@ class TestCliRunScratchpadOne:
             )  # dbt
 
             # verify that both ExtractLoadBlocks and PluginCommand completed successfully
-            completed_events = matcher.find_by_event("Run call completed.")
+            completed_events = matcher.find_by_event("Block run completed.")
             assert len(completed_events) == 1
             for event in completed_events:
                 assert event.get("success")
@@ -504,3 +484,92 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches("dbt starting")
             assert matcher.event_matches("dbt running")
             assert matcher.event_matches("dbt failure")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_elb_failures(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
+        tap_process,
+        target_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+
+        # in this scenario, the tap fails on the third read. Target should still complete, but dbt should not.
+        args = ["run", tap.name, target.name, "dbt:run"]
+
+        tap_process.wait.return_value = 1
+        tap_process.returncode = 1
+        tap_process.stderr.readline.side_effect = (
+            b"tap starting\n",
+            b"tap running\n",
+            b"tap failure\n",
+        )
+
+        # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, target_process, dbt_process)
+        )
+
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            assert (
+                "Run invocation could not be completed as block failed: Extractor failed"
+                in str(result.exception)
+            )
+            assert result.exit_code == 1
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches(
+                "found ExtractLoadBlocks set"
+            )  # tap/target pair
+            assert (
+                matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
+                == "transformers"
+            )  # dbt
+
+            # verify that both ExtractLoadBlocks and PluginCommand completed successfully
+            completed_events = matcher.find_by_event("Block run completed.")
+            assert (
+                len(completed_events) == 1
+            )  # there should only be one completed event
+            assert completed_events[0].get("success") is False
+            assert completed_events[0].get("err") == "RunnerError('Extractor failed')"
+            assert completed_events[0].get("exit_codes").get("extractors") == 1
+
+            tap_stop_event = matcher.find_by_event("tap failure")
+            assert len(tap_stop_event) == 1
+            assert tap_stop_event[0].get("name") == tap.name
+            assert tap_stop_event[0].get("cmd_type") == "elb"
+            assert tap_stop_event[0].get("stdio") == "stderr"
+
+            target_stop_event = matcher.find_by_event("target done")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+
+            # dbt should not have run at all
+            assert not matcher.event_matches("dbt starting")
+            assert not matcher.event_matches("dbt running")
+            assert not matcher.event_matches("dbt done")
