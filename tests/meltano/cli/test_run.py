@@ -573,3 +573,82 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt starting")
             assert not matcher.event_matches("dbt running")
             assert not matcher.event_matches("dbt done")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_elb_tap_line_length_limit_error(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        dbt,
+        tap_process,
+        target_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+
+        args = ["run", tap.name, target.name]
+
+        # Raise a ValueError wrapping a LimitOverrunError, like StreamReader.readline does:
+        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
+        try:  # noqa: WPS328
+            raise asyncio.LimitOverrunError(
+                "Separator is not found, and chunk exceed the limit", 0
+            )
+        except asyncio.LimitOverrunError as err:
+            try:  # noqa: WPS328, WPS505
+                # `ValueError` needs to be raised from inside the except block
+                # for `LimitOverrunError` so that `__context__` is set.
+                raise ValueError(str(err))
+            except ValueError as wrapper_err:
+                tap_process.stdout.readline.side_effect = wrapper_err
+
+        # Have `tap_process.wait` take 1s to make sure the LimitOverrunError exception can be raised before tap finishes
+        async def wait_mock():
+            await asyncio.sleep(1)
+            return tap_process.wait.return_value
+
+        tap_process.wait.side_effect = wait_mock
+
+        # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
+        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            assert (
+                "Run invocation could not be completed as block failed: Output line length limit exceeded"
+                in str(result.exception)
+            )
+            assert result.exit_code == 1
+
+            matcher = EventMatcher(result.stderr)
+
+            # tap/target pair
+            assert matcher.event_matches("found ExtractLoadBlocks set")
+
+            # verify that both ExtractLoadBlocks and PluginCommand completed successfully
+            completed_events = matcher.find_by_event("Block run completed.")
+
+            # there should only be one completed event
+            assert len(completed_events) == 1
+            assert completed_events[0].get("success") is False
+            assert (
+                completed_events[0].get("err")
+                == "RunnerError('Output line length limit exceeded')"
+            )
