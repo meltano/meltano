@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-
 from meltano.core.behavior.hookable import HookObject, hook
 
 

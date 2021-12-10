@@ -7,7 +7,6 @@ from multiprocessing.pool import ThreadPool
 
 import pytest
 import yaml
-
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.project import PROJECT_ROOT_ENV, Project, ProjectNotFound
 

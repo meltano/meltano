@@ -1,7 +1,6 @@
 """Project Plugin Service."""
 
 import yaml
-
 from meltano.core.environment import Environment, EnvironmentPluginConfig
 
 from .config_service import ConfigService

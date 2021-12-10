@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 from async_generator import asynccontextmanager
-
 from meltano.core.logging.utils import SubprocessOutputWriter
 
 from .error import Error

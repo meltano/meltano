@@ -1,6 +1,5 @@
 import sqlalchemy
 from flask import url_for
-
 from meltano.api.models.embed_token import EmbedToken, ResourceType
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService

@@ -7,7 +7,6 @@ from urllib.parse import urlparse
 
 import click
 import yaml
-
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService

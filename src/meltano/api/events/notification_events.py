@@ -3,7 +3,6 @@ import logging
 from blinker import ANY
 from flask import render_template, url_for
 from flask_mail import Message
-
 from meltano.api.mail import MailService, mail
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.api.signals import PipelineSignals

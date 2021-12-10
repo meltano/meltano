@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import pytest
-
 from meltano.core.job import Job
 from meltano.core.job.stale_job_failer import StaleJobFailer
 

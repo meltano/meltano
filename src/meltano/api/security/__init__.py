@@ -7,7 +7,6 @@ from flask_login import current_user, user_logged_in
 from flask_principal import Identity, identity_loaded
 from flask_security import Security, login_required
 from flask_security.utils import login_user
-
 from meltano.core.project_settings_service import ProjectSettingsService
 
 from .auth import (

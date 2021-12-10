@@ -4,16 +4,15 @@ import subprocess
 from pathlib import Path
 
 import click
+import meltano
 import psutil
 from click_default_group import DefaultGroup
-from sqlalchemy import create_engine
-
-import meltano
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.migration_service import MigrationService
 from meltano.core.project import Project
 from meltano.core.upgrade_service import UpgradeService
+from sqlalchemy import create_engine
 
 from . import cli
 from .params import pass_project

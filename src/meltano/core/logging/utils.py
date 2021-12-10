@@ -7,7 +7,6 @@ from typing import Dict, Optional
 
 import structlog
 import yaml
-
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
 from meltano.core.project_settings_service import ProjectSettingsService
 

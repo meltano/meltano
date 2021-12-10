@@ -4,9 +4,8 @@ from unittest import mock
 
 import pytest
 import yaml
-from sqlalchemy.exc import OperationalError
-
 from meltano.core.plugin_remove_service import PluginRemoveService
+from sqlalchemy.exc import OperationalError
 
 
 class TestPluginRemoveService:

@@ -5,7 +5,6 @@ from asynctest import CoroutineMock, mock
 from flask import Flask, url_for
 from flask.testing import FlaskClient
 from flask.wrappers import Response
-
 from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
 
 
