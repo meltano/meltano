@@ -25,17 +25,24 @@ lint_python:
     matrix:
       # Lint only on 'primary' python version:
       - PYTHON_IMAGE_VERSION: ["3.8"]
-  script:
-    - make show_lint_python
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      variables:
+        REF: '-r origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}'
 
-lint_all:
+  script:
+    - 'FILES=$(git diff-tree --name-only $REF -r ${CI_COMMIT_SHA} | grep "\.py$")'
+    - 'echo "Changed files are $FILES"'
+    - 'make show_lint_python $(echo $FILES | xargs)'
+
+lint_eslint:
   extends: .test
   parallel:
     matrix:
       # Lint only on 'primary' python version:
       - PYTHON_IMAGE_VERSION: ["3.8"]
   script:
-    - make show_lint
+    - make show_lint_eslint
 
 .pytest:
   extends: .test

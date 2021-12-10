@@ -150,23 +150,26 @@ docs/serve: docs/build
 
 .PHONY: lint show_lint
 
-BLACK_RUN = poetry run black src/meltano tests/
+BLACK_RUN = @poetry run black
 ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
-FLAKE8_RUN = poetry run flake8 src/meltano tests/ --statistics
-ISORT_RUN = poetry run isort src/meltano tests/
+FLAKE8_RUN = @poetry run flake8 --statistics
+ISORT_RUN = @poetry run isort
+
+DEFAULT_LINT_TARGET = "src/meltano/ tests/"
+args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
 lint_python:
-	${ISORT_RUN} --apply
-	${BLACK_RUN}
-	${FLAKE8_RUN}
+	${ISORT_RUN} $(call args, ${DEFAULT_LINT_TARGET}) --apply
+	${BLACK_RUN} $(call args, ${DEFAULT_LINT_TARGET})
+	${FLAKE8_RUN} $(call args, ${DEFAULT_LINT_TARGET})
 
 lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN} --fix
 
 show_lint_python:
-	${ISORT_RUN} --check-only --diff
-	${BLACK_RUN} --check --diff
-	${FLAKE8_RUN} --diff
+	${ISORT_RUN} $(call args, ${DEFAULT_LINT_TARGET}) --check-only --diff
+	${BLACK_RUN} $(call args, ${DEFAULT_LINT_TARGET}) --check --diff
+	${FLAKE8_RUN} $(call args, ${DEFAULT_LINT_TARGET})
 
 show_lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN}
