@@ -3,7 +3,7 @@ import asyncio
 import logging
 from asyncio import Task
 from contextlib import suppress
-from typing import List, Optional, Set, Tuple
+from typing import AsyncIterator, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
@@ -18,6 +18,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
+from sqlalchemy.orm import Session
 
 from .blockset import BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -32,7 +33,7 @@ class ELBContext:
         self,
         project: Project,
         plugins_service: ProjectPluginsService = None,
-        session=None,
+        session: Session = None,
         job: Optional[Job] = None,
         base_output_logger: Optional[OutputLogger] = None,
     ):
@@ -65,7 +66,7 @@ class ELBContextBuilder:
         self,
         project: Project,
         plugins_service: ProjectPluginsService = None,
-        session=None,
+        session: Session = None,
         job: Optional[Job] = None,
     ):
         """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
@@ -150,7 +151,7 @@ class ELBContextBuilder:
         )
 
     @property
-    def elt_run_dir(self):
+    def elt_run_dir(self) -> str:
         """Get the run directory for the current job."""
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
@@ -254,7 +255,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
         """
         async with self._start_blocks(session):
             await self._link_io()
-            await experimental_run(self, self.project_settings_service)
+            await run(self, self.project_settings_service)
             return True
 
     @staticmethod
@@ -311,7 +312,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self, session):
+    async def _start_blocks(self, session) -> AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Args:
@@ -325,12 +326,12 @@ class ExtractLoadBlocks:  # noqa: WPS214
         finally:
             await self._cleanup()
 
-    async def _upstream_stop(self, index):
+    async def _upstream_stop(self, index) -> None:
         """Stop all blocks upstream of a given index."""
         for block in reversed(self.blocks[:index]):
             await block.stop()
 
-    async def _cleanup(self):
+    async def _cleanup(self) -> None:
         for block in self.blocks:
             await block.post()
 
@@ -366,15 +367,22 @@ class ExtractLoadBlocks:  # noqa: WPS214
                     raise Exception("run step requires input but has no upstream")
 
 
-async def experimental_run(  # noqa: WPS217
+async def run(  # noqa: WPS217
     elb: ExtractLoadBlocks, project_settings_service: ProjectSettingsService
-):
-    """If you're getting an early look at this MR keep in mind this runner is still a WIP.
+) -> None:
+    """Run is used to actually perform the execution of the ExtractLoadBlock set.
 
-    Hence it being broken out as a func and named experimental_run. We need much more extensive
-    tests (unit and functional) to verify this works.
+    That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
+    stopping blocks or waiting for IO to complete as appropriate.
 
-    It also contains rough shims and todos to account for multiple intermediate blocks (i.e. steam map transforms).
+    This is a bit forward looking in that tt also contains rough shims and todos to account for multiple intermediate
+    blocks (i.e. steam map transforms).
+
+    Args:
+        elb: The ExtractLoadBlock set to run.
+        project_settings_service: The project settings service to use.
+    Raises:
+        RunnerError: if any blocks in the set finished with a non 0 exit code
     """
     stream_buffer_size = project_settings_service.get("elt.buffer_size")
     line_length_limit = stream_buffer_size // 2
@@ -477,8 +485,15 @@ async def _complete_downstream(elb: ExtractLoadBlocks) -> int:
     return consumer.process_future.result()
 
 
-def _check_exit_codes(producer_code: int, consumer_code: int):
-    """Check exit codes for failures, and raise the appropriate RunnerError if needed."""
+def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
+    """Check exit codes for failures, and raise the appropriate RunnerError if needed.
+
+    Args:
+        producer_code: exit code of the producer (tap)
+        consumer_code: exit code of the consumer (target)
+    Raises:
+        RunnerError: if the producer or consumer exit codes are non-zero
+    """
     if producer_code and consumer_code:
         raise RunnerError(
             "Extractor and loader failed",

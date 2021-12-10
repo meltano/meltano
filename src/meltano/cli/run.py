@@ -53,7 +53,9 @@ async def run(project, blocks):
         session.close()
 
 
-async def _run_single_block(blk: Union[BlockSet, PluginCommandBlock], session: Session):
+async def _run_single_block(
+    blk: Union[BlockSet, PluginCommandBlock], session: Session
+) -> None:
     """Run a single block."""
     if isinstance(blk, ExtractLoadBlocks):
         await blk.run(session)
@@ -65,7 +67,7 @@ async def _run_single_block(blk: Union[BlockSet, PluginCommandBlock], session: S
 
 async def _run_blocks(
     parsed_blocks: List[Union[BlockSet, PluginCommandBlock]], session: Session
-):
+) -> None:
     for idx, blk in enumerate(parsed_blocks):
         try:
             await _run_single_block(blk, session)

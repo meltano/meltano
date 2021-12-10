@@ -355,10 +355,9 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
         invoke_async = CoroutineMock(
             side_effect=(tap_process, target_process, dbt_process)
-        )  # dbt run
+        )
         args = ["run", tap.name, target.name, "dbt:run"]
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -381,7 +380,6 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            # verify that both ExtractLoadBlocks and PluginCommand completed successfully
             completed_events = matcher.find_by_event("Block run completed.")
             assert len(completed_events) == 2
             for event in completed_events:
@@ -435,7 +433,6 @@ class TestCliRunScratchpadOne:
             b"dbt failure\n",
         )
 
-        # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
         invoke_async = CoroutineMock(
             side_effect=(tap_process, target_process, dbt_process)
         )
@@ -462,7 +459,6 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            # verify that both ExtractLoadBlocks and PluginCommand completed successfully
             completed_events = matcher.find_by_event("Block run completed.")
             assert len(completed_events) == 1
             for event in completed_events:
@@ -892,7 +888,6 @@ class TestCliRunScratchpadOne:
 
         tap_process.wait.side_effect = wait_mock
 
-        # combine the two scenarios and verify that both a ExtractLoadBlock set and PluginCommand command works
         invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -916,7 +911,6 @@ class TestCliRunScratchpadOne:
             # tap/target pair
             assert matcher.event_matches("found ExtractLoadBlocks set")
 
-            # verify that both ExtractLoadBlocks and PluginCommand completed successfully
             completed_events = matcher.find_by_event("Block run completed.")
 
             # there should only be one completed event
