@@ -601,6 +601,8 @@ class TestCliRunScratchpadOne:
 
         # Writing to target stdin will fail because (we'll pretend) it has already died
         target_process.stdin = mock.Mock(spec=asyncio.StreamWriter)
+        # capture_subprocess_output writer will return and close the pipe when either BrokenPipeError or ConnectionResetError is enccountered
+        # it does not itself reraise the exception - so you shouldn't expect to see these.
         target_process.stdin.write.side_effect = BrokenPipeError
         target_process.stdin.drain = CoroutineMock(side_effect=ConnectionResetError)
         target_process.stdin.wait_closed = CoroutineMock(return_value=True)
@@ -662,8 +664,10 @@ class TestCliRunScratchpadOne:
             )
             assert completed_events[0].get("exit_codes").get("loaders") == 1
 
-            # the tap should NOT have finished
-            assert not matcher.event_matches("tap done")
+            # the tap should NOT have finished, we'll have a write of the SCHEMA message and then nothing further:
+            assert matcher.event_matches("SCHEMA")
+            assert not matcher.event_matches("RECORD")
+            assert not matcher.event_matches("STATE")
 
             target_stop_event = matcher.find_by_event("target failure")
             assert len(target_stop_event) == 1

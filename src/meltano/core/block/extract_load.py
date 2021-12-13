@@ -389,7 +389,7 @@ async def run(  # noqa: WPS217
 
     output_exception_future = asyncio.ensure_future(
         asyncio.wait(
-            [*elb.stdout_futures, *elb.stdout_futures],
+            [*elb.stdout_futures, *elb.stderr_futures],
             return_when=asyncio.FIRST_EXCEPTION,
         )
     )
