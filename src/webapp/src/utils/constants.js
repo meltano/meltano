@@ -4,6 +4,7 @@ export const PIPELINE_INTERVAL_OPTIONS = {
   '@daily': 'Daily',
   '@weekly': 'Weekly',
   '@monthly': 'Monthly',
-  '@yearly': 'Yearly'
+  '@yearly': 'Yearly',
+  '@other': 'Other'
 }
 export const TRANSFORM_OPTIONS = ['run', 'only', 'skip']

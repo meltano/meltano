@@ -45,6 +45,12 @@ export default {
     },
     getMomentFromNow() {
       return val => utils.momentFromNow(val)
+    },
+    getModalName() {
+      return this.$route.name
+    },
+    isModal() {
+      return this.$route.meta.isModal
     }
   },
   methods: {
@@ -70,6 +76,9 @@ export default {
           )
           .catch(this.$error.handle)
       }
+    },
+    setCRONInterval() {
+      this.$router.push({ name: 'cronJobSettings' })
     },
     removePipeline(pipeline) {
       this.deletePipelineSchedule(pipeline)
@@ -145,8 +154,16 @@ export default {
                       </select>
                     </span>
                   </div>
-
-                  <div class="control">
+                  <div v-if="pipeline.interval === '@other'" class="control">
+                    <button
+                      class="button is-small tooltip is-tooltip-right"
+                      data-tooltip="Set the CRON interval you'd like"
+                      @click="setCRONInterval()"
+                    >
+                      Set Interval
+                    </button>
+                  </div>
+                  <div v-if="pipeline.interval !== '@other'" class="control">
                     <button
                       class="button is-small tooltip is-tooltip-right"
                       :class="{ 'is-loading': pipeline.isRunning }"
@@ -267,5 +284,8 @@ export default {
         </template>
       </tbody>
     </table>
+    <div v-if="isModal">
+      <router-view :name="getModalName"></router-view>
+    </div>
   </div>
 </template>

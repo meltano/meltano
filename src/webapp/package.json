@@ -27,6 +27,7 @@
     "v-calendar": "^1.0.0-beta.23",
     "vue": "^2.6.10",
     "vue-analytics": "^5.17.2",
+    "vue-cron-editor-buefy": "^0.2.17",
     "vue-intercom": "^1.0.14",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1",
