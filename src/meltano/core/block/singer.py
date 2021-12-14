@@ -44,7 +44,7 @@ class InvokerBase:  # noqa: WPS230
         )
 
         self.invoker: PluginInvoker = plugin_invoker
-        self.command: Optional[str] = command
+        self._command: Optional[str] = command
 
         self.outputs = []
         self.err_outputs = []
@@ -53,6 +53,16 @@ class InvokerBase:  # noqa: WPS230
         self._process_future: Task = None
         self._stdout_future: Task = None
         self._stderr_future: Task = None
+
+    @property
+    def command(self) -> Optional[str]:
+        """Command is the specific plugin command to use when invoking the plugin (if any)."""
+        return self._command
+
+    @property
+    def string_id(self) -> str:
+        """Return a string identifier for this block."""
+        return self.invoker.plugin.name
 
     async def start(self, *args, **kwargs):
         """Invoke the process asynchronously.
@@ -216,11 +226,23 @@ class SingerBlock(InvokerBase, IOBlock):
             plugin_invoker=plugin_invoker,
             command=None,
         )
-
         self.plugin_args = plugin_args
-        self.producer: bool = self.invoker.plugin.type == PluginType.EXTRACTORS
-        self.consumer: bool = self.invoker.plugin.type == PluginType.LOADERS
-        self.string_id = self.invoker.plugin.name
+
+    @property
+    def producer(self) -> bool:
+        """Whether or not this plugin is a producer.
+
+        Currently if the underlying plugin is of type extractor, it is a producer.
+        """
+        return self.invoker.plugin.type == PluginType.EXTRACTORS
+
+    @property
+    def consumer(self) -> bool:
+        """Whether or not this plugin is a consumer.
+
+        Currently if the underlying plugin is of type loader, it is a consumer.
+        """
+        return self.invoker.plugin.type == PluginType.LOADERS
 
     async def start(self):
         """Start the SingerBlock by invoking the underlying plugin.

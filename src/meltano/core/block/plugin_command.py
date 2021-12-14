@@ -1,5 +1,6 @@
 """A "CommandBlock" pattern supporting Meltano plugin's command like `dbt:run`, `dbt:docs` or `dbt:test`."""
 import asyncio
+from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Optional, Tuple
 
 import structlog
@@ -24,18 +25,32 @@ except ImportError:
 logger = structlog.getLogger(__name__)
 
 
-class PluginCommandBlock(Protocol):
+class PluginCommandBlock(metaclass=ABCMeta):
     """Basic PluginCommand interface specification."""
 
-    name: str
-    command: Optional[str]
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        """Name of the plugin command block.
 
+        In the case of a singer plugin this would most likely be the name of the plugin.
+        ex. `dbt:run` name = dbt , command = run
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def command(self) -> Optional[str]:
+        """Command is the specific plugin command to use when invoking the plugin (if any)."""
+        raise NotImplementedError
+
+    @abstractmethod
     async def run(self) -> None:
         """Run the command."""
-        ...
+        raise NotImplementedError
 
 
-class InvokerCommand(InvokerBase):
+class InvokerCommand(InvokerBase, PluginCommandBlock):
     """A basic PluginCommandBlock interface implementation that supports running plugin commands."""
 
     def __init__(
@@ -66,10 +81,25 @@ class InvokerCommand(InvokerBase):
             plugin_invoker=plugin_invoker,
             command=command,
         )
-        self.name = name
-        self.command = command
-        self.command_args = command_args
+        self._name = name
+        self._command = command
+        self._command_args = command_args
         self._log = log
+
+    @property
+    def name(self) -> str:
+        """Name is the underlying name of the plugin/command."""
+        return self._name
+
+    @property
+    def command(self) -> Optional[str]:
+        """Command is the specific plugin command to use when invoking the plugin."""
+        return self._command
+
+    @property
+    def command_args(self) -> Optional[str]:
+        """Command args are the specific plugin command args to use when invoking the plugin (if any)."""
+        return self._command_args
 
     async def run(self):
         """Invoke a command capturing and logging produced output.

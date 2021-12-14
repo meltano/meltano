@@ -1,8 +1,10 @@
-"""This holds the actual BlockSet interface class as well as related components such as exceptions."""
+"""This holds the actual BlockSet meta class as well as related components such as exceptions."""
 try:
     from typing import Protocol  # noqa:  WPS433
 except ImportError:
     from typing_extensions import Protocol  # noqa:  WPS433,WPS440
+
+from abc import ABCMeta, abstractmethod
 
 
 class BlockSetValidationError(Exception):
@@ -18,20 +20,19 @@ class BlockSetValidationError(Exception):
         super().__init__(f"{message}: {error}")
 
 
-class BlockSet(Protocol):
-    """Right now the only complex block set is our ExtractLoadBlocks type.
+class BlockSet(metaclass=ABCMeta):
+    """Currently the only complex block set is our ExtractLoadBlocks type.
 
-    So just defining BlockSet as a protocol for now. Once we implement additional complex block sets it'll be more
-    evident on what the BlockSet class might look like long term.
-
-    Theoretically, the bare minimum that we need to run and terminate (i.e. early abort) a block set. So anything
+    Theoretically, this is the bare minimum that we need to run and terminate (i.e. early abort) a block set. So anything
     implementing a run(), terminate(), and validate_set() method currently satisfies the BlockSet interface.
     """
 
+    @abstractmethod
     async def run(self) -> None:
         """Do whatever a BlockSet is designed to do."""
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     async def terminate(self, graceful: bool = True) -> bool:
         """Terminate a currently executing BlockSet.
 
@@ -40,11 +41,13 @@ class BlockSet(Protocol):
         Returns:
             Whether or not the BlockSet terminated successfully.
         """
-        pass
+        raise NotImplementedError
 
-    def validate_set(self) -> None:  # TODO: probably not required long term
+    @abstractmethod
+    def validate_set(self) -> None:
         """Validate a block set to ensure its valid and runnable.
 
-        Raises: BlockSetValidationError on validation failure
+        Raises:
+            BlockSetValidationError: on validation failure
         """
-        pass  # or raise BlockSetValidationError
+        raise NotImplementedError
