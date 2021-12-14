@@ -38,7 +38,7 @@ async def run(project, blocks):
     `meltano run tap-gitlab target-postgres tap-salesforce target-mysql ...`
     `meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery ...`
 
-    This a beta feature - its functionality and cli signature is still evolving.
+    This a preview feature - its functionality and cli signature is still evolving.
     """
     if project.active_environment is not None:
         logger.warning("Job ID generation not yet supported - running without job!")
