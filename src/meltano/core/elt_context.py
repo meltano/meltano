@@ -79,7 +79,6 @@ class ELTContext:
         }
 
         plugin_context = plugin_contexts[plugin_type]
-
         return invoker_factory(
             self.project,
             plugin_context.plugin,

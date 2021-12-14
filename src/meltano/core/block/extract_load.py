@@ -1,22 +1,170 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
+import logging
 from asyncio import Task
 from contextlib import suppress
-from typing import List, Set, Tuple
+from typing import AsyncIterator, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
-from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.logging import OutputLogger
+from meltano.core.elt_context import PluginContext
+from meltano.core.job import Job
+from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
+from sqlalchemy.orm import Session
 
 from .blockset import BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
+from .singer import SingerBlock
 
 logger = structlog.getLogger(__name__)
+
+
+class ELBContext:
+    def __init__(
+        self,
+        project: Project,
+        plugins_service: ProjectPluginsService = None,
+        session: Session = None,
+        job: Optional[Job] = None,
+        base_output_logger: Optional[OutputLogger] = None,
+    ):
+        """Use an ELBContext to pass information on to ExtractLoadBlocks.
+
+        Args:
+            project: The project to use.
+            plugins_service: The plugins service to use.
+            session: The session to use.
+            job: The job within this context should run.
+            base_output_logger: The base logger to use.
+        """
+        self.project = project
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
+
+        self.session = session
+        self.job = job
+
+        self.base_output_logger = base_output_logger
+
+    @property
+    def elt_run_dir(self) -> str:
+        """Obtain the run directory for the current job."""
+        if self.job:
+            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+
+
+class ELBContextBuilder:
+    def __init__(
+        self,
+        project: Project,
+        plugins_service: ProjectPluginsService = None,
+        session: Session = None,
+        job: Optional[Job] = None,
+    ):
+        """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
+
+        Args:
+            project: the meltano project for the context.
+            plugins_service: the plugins service for the context.
+            session: the database session for the context.
+            job:
+        """
+        self.project = project
+        self.plugins_service = plugins_service or ProjectPluginsService(project)
+        self.session = session
+        self.job = job
+
+        self._env = {}
+        self._blocks = []
+
+        self._base_output_logger = None
+
+    def make_block(
+        self, plugin: ProjectPlugin, plugin_args: Optional[List[str]] = None
+    ) -> SingerBlock:
+        """Create a new `SingerBlock` object, from a plugin.
+
+        Args:
+            plugin: The plugin to be executed.
+            plugin_args: The arguments to be passed to the plugin.
+        Returns:
+            The new `SingerBlock` object.
+        """
+        ctx = self.plugin_context(plugin, env=self._env.copy())
+
+        block = SingerBlock(
+            block_ctx=ctx,
+            project=self.project,
+            plugins_service=self.plugins_service,
+            plugin_invoker=self.invoker_for(ctx),
+            plugin_args=plugin_args,
+        )
+        self._blocks.append(block)
+        self._env.update(ctx.env)
+        return block
+
+    def plugin_context(
+        self,
+        plugin: ProjectPlugin,
+        env: dict = None,
+        config: dict = None,
+    ) -> PluginContext:
+        """Create context object for a plugin.
+
+        Args:
+            plugin: The plugin to create the context for.
+            env: Environment override dictionary. Defaults to None.
+            config: Plugin configuration override dictionary. Defaults to None.
+
+        Returns:
+            A new `PluginContext` object.
+        """
+        return PluginContext(
+            plugin=plugin,
+            settings_service=PluginSettingsService(
+                self.project,
+                plugin,
+                plugins_service=self.plugins_service,
+                env_override=env,
+                config_override=config,
+            ),
+            session=self.session,
+        )
+
+    def invoker_for(self, plugin_context: PluginContext) -> PluginInvoker:
+        """Create an invoker for a plugin from a PluginContext."""
+        return invoker_factory(
+            self.project,
+            plugin_context.plugin,
+            context=self,
+            run_dir=self.elt_run_dir,
+            plugins_service=self.plugins_service,
+            plugin_settings_service=plugin_context.settings_service,
+        )
+
+    @property
+    def elt_run_dir(self) -> str:
+        """Get the run directory for the current job."""
+        if self.job:
+            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+
+    def context(self) -> ELBContext:
+        """Create an ELBContext object from the current builder state."""
+        return ELBContext(
+            project=self.project,
+            plugins_service=self.plugins_service,
+            session=self.session,
+            job=self.job,
+            base_output_logger=self._base_output_logger,
+        )
 
 
 class ExtractLoadBlocks:  # noqa: WPS214
@@ -24,16 +172,14 @@ class ExtractLoadBlocks:  # noqa: WPS214
 
     def __init__(
         self,
-        context: ELTContextBuilder,
+        context: ELBContextBuilder,
         blocks: Tuple[IOBlock],
-        output_logger: OutputLogger,
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
         Args:
             context: the elt context to use for this elt run.
             blocks: the IOBlocks that should be used for this elt run.
-            output_logger: the logger to use for output.
         """
         self.context = context
         self.blocks = blocks
@@ -41,7 +187,15 @@ class ExtractLoadBlocks:  # noqa: WPS214
             self.context.project,
             config_service=self.context.plugins_service.config_service,
         )
-        self.output_logger = output_logger
+
+        log_file = "run.log"
+        if self.context.job:
+            job_logging_service = JobLoggingService(self.context.project)
+            log_file = job_logging_service.generate_log_name(
+                self.context.job.job_id, self.context.job.run_id
+            )
+
+        self.output_logger = OutputLogger(log_file)
 
         self._process_futures = None
         self._stdout_futures = None
@@ -101,7 +255,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
         """
         async with self._start_blocks(session):
             await self._link_io()
-            await experimental_run(self, self.project_settings_service)
+            await run(self, self.project_settings_service)
             return True
 
     @staticmethod
@@ -158,7 +312,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self, session):
+    async def _start_blocks(self, session) -> AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Args:
@@ -172,33 +326,35 @@ class ExtractLoadBlocks:  # noqa: WPS214
         finally:
             await self._cleanup()
 
-    async def _upstream_stop(self, index):
+    async def _upstream_stop(self, index) -> None:
         """Stop all blocks upstream of a given index."""
         for block in reversed(self.blocks[:index]):
             await block.stop()
 
-    async def _cleanup(self):
+    async def _cleanup(self) -> None:
         for block in self.blocks:
             await block.post()
 
-    async def _link_io(self) -> None:
+    async def _link_io(self) -> None:  # noqa: WPS231
         """Link the blocks in the set together."""
         for idx, block in enumerate(self.blocks):
             logger_base = logger.bind(
                 consumer=block.consumer,
                 producer=block.producer,
                 string_id=block.string_id,
+                cmd_type="elb",
             )
-            block.stdout_link(
-                self.output_logger.out(
-                    "stdout",
-                    logger_base,
+            if logger.isEnabledFor(logging.DEBUG):
+                block.stdout_link(
+                    self.output_logger.out(
+                        block.string_id,
+                        logger_base.bind(stdio="stdout"),
+                    )
                 )
-            )
             block.stderr_link(
                 self.output_logger.out(
-                    "stderr",
-                    logger_base,
+                    block.string_id,
+                    logger_base.bind(stdio="stderr"),
                 )
             )
             if block.consumer:
@@ -211,22 +367,29 @@ class ExtractLoadBlocks:  # noqa: WPS214
                     raise Exception("run step requires input but has no upstream")
 
 
-async def experimental_run(  # noqa: WPS217
+async def run(  # noqa: WPS217
     elb: ExtractLoadBlocks, project_settings_service: ProjectSettingsService
-):
-    """If you're getting an early look at this MR keep in mind this runner is still a WIP.
+) -> None:
+    """Run is used to actually perform the execution of the ExtractLoadBlock set.
 
-    Hence it being broken out as a func and named experimental_run. We need much more extensive
-    tests (unit and functional) to verify this works.
+    That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
+    stopping blocks or waiting for IO to complete as appropriate.
 
-    It also contains rough shims and todos to account for multiple intermediate blocks (i.e. steam map transforms).
+    This is a bit forward looking in that tt also contains rough shims and todos to account for multiple intermediate
+    blocks (i.e. steam map transforms).
+
+    Args:
+        elb: The ExtractLoadBlock set to run.
+        project_settings_service: The project settings service to use.
+    Raises:
+        RunnerError: if any blocks in the set finished with a non 0 exit code
     """
     stream_buffer_size = project_settings_service.get("elt.buffer_size")
     line_length_limit = stream_buffer_size // 2
 
     output_exception_future = asyncio.ensure_future(
         asyncio.wait(
-            [*elb.stdout_futures, *elb.stdout_futures],
+            [*elb.stdout_futures, *elb.stderr_futures],
             return_when=asyncio.FIRST_EXCEPTION,
         )
     )
@@ -242,7 +405,7 @@ async def experimental_run(  # noqa: WPS217
                 line_length_limit=line_length_limit,
                 stream_buffer_size=stream_buffer_size,
             )
-        raise output_futures_failed.pop().exception()
+        raise output_futures_failed.exception()
     else:
         # If all of the output handlers completed without raising an exception,
         # we still need to wait for all of the underlying block processes to complete.
@@ -259,7 +422,7 @@ async def experimental_run(  # noqa: WPS217
         producer_code = await _complete_upstream(elb)
     elif producer.process_future.done():
         producer_code = producer.process_future.result()
-        consumer_code = await _complete_downstream()
+        consumer_code = await _complete_downstream(elb)
     else:  # would imply that a (not yet implemented) inline transformer finished first
         await producer.stop()
         producer_code = 1
@@ -322,8 +485,15 @@ async def _complete_downstream(elb: ExtractLoadBlocks) -> int:
     return consumer.process_future.result()
 
 
-def _check_exit_codes(producer_code: int, consumer_code: int):
-    """Check exit codes for failures, and raise the appropriate RunnerError if needed."""
+def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
+    """Check exit codes for failures, and raise the appropriate RunnerError if needed.
+
+    Args:
+        producer_code: exit code of the producer (tap)
+        consumer_code: exit code of the consumer (target)
+    Raises:
+        RunnerError: if the producer or consumer exit codes are non-zero
+    """
     if producer_code and consumer_code:
         raise RunnerError(
             "Extractor and loader failed",

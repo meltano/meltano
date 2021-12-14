@@ -56,6 +56,7 @@ class TestSingerBlocks:
         invoker = Mock()
         invoker.invoke_async = CoroutineMock(return_value=tap_process)
         invoker.plugin = tap
+        invoker.cleanup = CoroutineMock()
         return invoker
 
     @pytest.fixture()
@@ -66,6 +67,7 @@ class TestSingerBlocks:
         invoker = Mock()
         invoker.invoke_async = CoroutineMock(return_value=target_process)
         invoker.plugin = target
+        invoker.cleanup = CoroutineMock()
         return invoker
 
     @pytest.mark.asyncio
@@ -75,6 +77,8 @@ class TestSingerBlocks:
 
         block = SingerBlock(
             block_ctx=elt_context,
+            project=elt_context.project,
+            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -93,6 +97,8 @@ class TestSingerBlocks:
 
         block = SingerBlock(
             block_ctx=elt_context,
+            project=elt_context.project,
+            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -116,6 +122,8 @@ class TestSingerBlocks:
     async def test_singer_block_stop(self, elt_context, mock_target_plugin_invoker):
         block = SingerBlock(
             block_ctx=elt_context,
+            project=elt_context.project,
+            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -127,6 +135,8 @@ class TestSingerBlocks:
 
         block = SingerBlock(
             block_ctx=elt_context,
+            project=elt_context.project,
+            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -140,6 +150,8 @@ class TestSingerBlocks:
     async def test_singer_block_io(self, elt_context, mock_tap_plugin_invoker, log):
         producer = SingerBlock(
             block_ctx=elt_context,
+            project=elt_context.project,
+            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
