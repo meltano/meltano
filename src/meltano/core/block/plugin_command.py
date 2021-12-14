@@ -57,7 +57,7 @@ class InvokerCommand(InvokerBase):
         """Invoke a command capturing and logging produced output.
 
         Raises:
-            Exception if the command fails.
+            Exception: if the command fails.
         """
         async with self.invoker.prepared(self.context.session):
             await self.start(self.command_args)
