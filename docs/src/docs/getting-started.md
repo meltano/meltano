@@ -305,8 +305,8 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config tap-gitlab set projects "meltano/meltano meltano/sdk"
-    meltano config tap-gitlab set start_date 2021-10-01T00:00:00Z
+    meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
+    meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
     meltano config tap-gitlab set private_token my_private_token
     ```
 
@@ -539,12 +539,12 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
       ```bash
       meltano add loader <plugin name>
 
-      # For this example, we'll use the transferwise non-default
-      # variant, selected using `--variant`:
-      meltano add loader target-postgres --variant=transferwise
-
-      # Or if you just want the default variant you can use this:
+      # For this example, we'll use the default variant:
       meltano add loader target-postgres
+
+      # Or if you just want to use a non-default variant you can use this,
+      # selected using `--variant`:
+      meltano add loader target-postgres --variant=datamill-co
       ```
 
       ::: tip
@@ -665,8 +665,8 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config target-postgres set postgres_host localhost
-    meltano config target-postgres set postgres_port 5432
+    meltano config target-postgres set host localhost
+    meltano config target-postgres set port 5432
     meltano config target-postgres set user meltano
     meltano config target-postgres set password meltano
     meltano config target-postgres set dbname warehouse
@@ -682,17 +682,18 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     ```yml{5-10}
     plugins:
       loaders:
-      - name: target-bigquery
-        variant: datamill-co
+      - name: target-postgres
+        variant: transferwise
+        pip_url: pipelinewise-target-postgres
         config:
-          postgres_host: localhost
-          postgres_port: 5432
-          postgres_username: meltano
-          postgres_database: warehouse
-          postgres_schema: public
+          host: localhost
+          port: 5432
+          user: meltano
+          dbname: warehouse
+          default_target_schema: public
     ```
 
-    Sensitive configuration (like `postgres_password`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
+    Sensitive configuration (like `password`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
 
     ```bash
     export TARGET_POSTGRES_PASSWORD=meltano
@@ -726,9 +727,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
       "hard_delete": false,
       "data_flattening_max_level": 0,
       "primary_key_required": true,
-      "validate_records": false,
-      "postgres_host": "localhost",
-      "postgres_port": 5432
+      "validate_records": false
     }
     ```
 
@@ -746,6 +745,9 @@ meltano elt <extractor> <loader> --job_id=<pipeline name>
 # For example:
 meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 ```
+::: tip
+  The `--job_id` must be included on each execution if you want to run incremental syncs. This argument should define a globally unique job identifier which is used to store and retrieve state from the system database across executions. Its a good idea to make this a unique string based on the job being run (i.e. `gitlab-to-postgres`).
+:::
 
 If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
 
@@ -811,6 +813,9 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
       transform: skip
       interval: '@daily'
     ```
+    ::: tip
+      The `name` setting in schedules acts as the `job_id` so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. `gitlab-to-postgres` or `gitlab-to-postgres-prod` if you have multiple environemnts).
+    :::
 
 1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/docs/command-line-interface.html#schedule):
 

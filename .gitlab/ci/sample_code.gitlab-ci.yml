@@ -67,7 +67,7 @@ homepage_sample_code:
     # - the https://gitlab.com/meltano/meltano project
     - meltano config tap-gitlab set projects meltano/meltano
     # - going back to May 1st, 2020
-    - meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+    - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
     # Select all attributes of the "tags" entity
     - meltano select tap-gitlab tags "*"
@@ -226,7 +226,7 @@ getting_started_sample_code:
     - meltano config tap-gitlab list
 
     - meltano config tap-gitlab set projects meltano/meltano
-    - meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+    - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
     - meltano config tap-gitlab
 
@@ -255,12 +255,12 @@ getting_started_sample_code:
 
     - meltano config target-postgres list
 
-    - meltano config target-postgres set postgres_host $POSTGRES_ADDRESS
-    - meltano config target-postgres set postgres_port $POSTGRES_PORT
-    - meltano config target-postgres set postgres_username $POSTGRES_USER
-    - meltano config target-postgres set postgres_password $POSTGRES_PASSWORD
-    - meltano config target-postgres set postgres_database $POSTGRES_DB
-    - meltano config target-postgres set postgres_schema public
+    - meltano config target-postgres set host $POSTGRES_ADDRESS
+    - meltano config target-postgres set port $POSTGRES_PORT
+    - meltano config target-postgres set user $POSTGRES_USER
+    - meltano config target-postgres set password $POSTGRES_PASSWORD
+    - meltano config target-postgres set dbname $POSTGRES_DB
+    - meltano config target-postgres set default_target_schema public
 
     - meltano config target-postgres
 

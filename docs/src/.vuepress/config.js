@@ -25,6 +25,7 @@ const docsSidebar = [
       "/docs/production",
       "/docs/analysis",
       "/docs/ui",
+      "/docs/elt",
     ],
   },
   {
@@ -119,14 +120,14 @@ module.exports = {
             text: "Connector SDK",
             link: "https://sdk.meltano.com/",
           },
+          {
+            text: "Implementation Partners",
+            link: "/partners/",
+          },
         ],
       },
       {
-        text: "Partners",
-        link: "/partners/",
-      },
-      {
-        text: "Documentation",
+        text: "Docs",
         link: "/docs/",
       },
       {
@@ -138,8 +139,7 @@ module.exports = {
           },
           {
             text: "Slack",
-            link:
-              "https://meltano.com/slack",
+            link: "https://meltano.com/slack",
           },
           {
             text: "Office Hours",
@@ -155,12 +155,20 @@ module.exports = {
             link: "/docs/community#guidelines",
           },
           {
+            text: "Office Hours",
+            link: "/docs/community#office-hours",
+          },
+          {
             text: "Demo Days",
             link: "/docs/community#demo-days",
           },
           {
-            text: "Office Hours",
-            link: "/docs/community#office-hours",
+            text: "Contributing",
+            link: "/docs/contributor-guide.html",
+          },
+          {
+            text: "Slack",
+            link: "https://meltano.com/slack",
           },
           {
             text: "YouTube",
@@ -168,11 +176,39 @@ module.exports = {
           },
         ],
       },
+      {
+        text: "Company",
+        items: [
+          {
+            text: "About",
+            link: "https://handbook.meltano.com/company/",
+          },
+          {
+            text: "Jobs",
+            link: "/jobs/",
+          },
+          {
+            text: "Team",
+            link: "/team/",
+          },
+          {
+            text: "Values",
+            link: "https://handbook.meltano.com/company/values",
+          },
+          {
+            text: "Handbook",
+            link: "https://handbook.meltano.com",
+          },
+          {
+            text: "Press",
+            link: "/press/",
+          },
+        ],
+      },
       { text: "Blog", link: "https://www.meltano.com/blog", target: "_self" },
       {
-        text: "Join 1800+ on Slack",
-        link:
-          "https://meltano.com/slack",
+        text: "Join 1900+ on Slack",
+        link: "https://meltano.com/slack",
         icon: "SlackIcon",
       },
       {
@@ -213,8 +249,7 @@ module.exports = {
     data: {
       digitalOceanUrl:
         "https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322",
-      slackChannelUrl:
-        "https://meltano.com/slack",
+      slackChannelUrl: "https://meltano.com/slack",
     },
     smoothScroll: true,
   },

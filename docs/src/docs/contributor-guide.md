@@ -99,6 +99,13 @@ import pdb; pdb.set_trace()
 
 :::
 
+::: warning Potential MacOS port conflicts
+
+On recent versions of MacOS (Monterey/12.0 and up) an AirPlay related service may be bound to port 5000. In that scenario you may
+way want to specify an alternate [bind to port](/docs/settings.html#ui-bind-port) to start the service on a port other than 5000. 
+
+:::
+
 ## UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
@@ -125,7 +132,7 @@ yarn serve
 
 The development build of the Meltano UI will now be available at <http://localhost:8080/>.
 
-A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly.
+A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/docs/contributor-guide.html#api-development) above, users on MacOS may need to specify an alternate [bind to port](/docs/settings.html#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000. 
 
 ::: tip
 
