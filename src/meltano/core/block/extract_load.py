@@ -307,7 +307,7 @@ class ExtractLoadBlocks:  # noqa: WPS214
         return self.blocks[-1]
 
     @property
-    def intermediate(self) -> IOBlock:
+    def intermediate(self) -> Tuple[IOBlock]:
         """Obtain the intermediate blocks in the set - excluding the first and last block."""
         return self.blocks[1:-1]
 
