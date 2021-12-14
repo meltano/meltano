@@ -1,8 +1,17 @@
 """A "CommandBlock" pattern supporting Meltano plugin's command like `dbt:run`, `dbt:docs` or `dbt:test`."""
 import asyncio
+from typing import Dict, List, Optional, Tuple
 
+import structlog
+from meltano.core.elt_context import PluginContext
+from meltano.core.logging import OutputLogger
 from meltano.core.logging.utils import SubprocessOutputWriter
-from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
+from sqlalchemy.orm import Session
 
 from .singer import InvokerBase
 
@@ -10,6 +19,9 @@ try:
     from typing import Protocol, Dict, Tuple, Optional  # noqa:  WPS433
 except ImportError:
     from typing_extensions import Protocol  # noqa:  WPS433,WPS440
+
+
+logger = structlog.getLogger(__name__)
 
 
 class PluginCommandBlock(Protocol):
@@ -31,6 +43,8 @@ class InvokerCommand(InvokerBase):
         name: str,
         log: SubprocessOutputWriter,
         block_ctx: Dict,
+        project: Project,
+        plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
         command: Optional[str],
         command_args: Tuple[str],
@@ -46,7 +60,11 @@ class InvokerCommand(InvokerBase):
             command_args: any additional plugin args that should be used.
         """
         super().__init__(
-            block_ctx=block_ctx, plugin_invoker=plugin_invoker, command=command
+            block_ctx=block_ctx,
+            project=project,
+            plugins_service=plugins_service,
+            plugin_invoker=plugin_invoker,
+            command=command,
         )
         self.name = name
         self.command = command
@@ -66,8 +84,7 @@ class InvokerCommand(InvokerBase):
             self.stderr_link(self._log)
 
             await asyncio.wait(
-                self.proxy_io(),
-                self.process_future,
+                [*self.proxy_io(), self.process_future],
                 return_when=asyncio.ALL_COMPLETED,
             )
 
@@ -77,3 +94,63 @@ class InvokerCommand(InvokerBase):
             raise Exception(
                 f"`{self.name} {command}` failed with exit code: {exitcode}"
             )
+
+
+def plugin_command_invoker(
+    plugin: ProjectPlugin,
+    project: Project,
+    session: Session,
+    command: Optional[str],
+    command_args: Optional[List[str]] = None,
+    run_dir: str = None,
+) -> InvokerCommand:
+    """
+    Make an InvokerCommand from a plugin.
+
+    Args:
+        plugin: Plugin to make command from.
+        project: Project to use.
+        session: SQLAlchemy session to use.
+        command: the command to invoke on the plugin i.e. `run` in dbt run.
+        command_args: any additional command args that should be passed in during invocation.
+        run_dir: Optional directory to run commands in.
+    Returns:
+        InvokerCommand
+    """
+    stderr_log = logger.bind(
+        stdio="stderr",
+        cmd_type="command",
+    )
+    output_logger = OutputLogger("run.log")
+    invoker_log = output_logger.out(plugin.name, stderr_log)
+
+    plugins_service = ProjectPluginsService(project)
+
+    ctx = PluginContext(
+        plugin=plugin,
+        settings_service=PluginSettingsService(
+            project,
+            plugin,
+            plugins_service=plugins_service,
+        ),
+        session=session,
+    )
+
+    invoker = invoker_factory(
+        project,
+        ctx.plugin,
+        context=ctx,
+        run_dir=run_dir,
+        plugins_service=plugins_service,
+        plugin_settings_service=ctx.settings_service,
+    )
+    return InvokerCommand(
+        name=plugin.name,
+        log=invoker_log,
+        block_ctx=ctx,
+        project=project,
+        plugins_service=plugins_service,
+        plugin_invoker=invoker,
+        command=command,
+        command_args=command_args,
+    )
