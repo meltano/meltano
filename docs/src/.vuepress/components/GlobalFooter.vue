@@ -58,7 +58,7 @@ export default {
   color white
   background-color #3e3c8e
   .footer-logo img
-    width: 2.2rem
+    width: 150px
   .footer-links-columns
     display: flex
     justify-content: center
