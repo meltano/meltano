@@ -15,8 +15,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.logging.job_logging_service import JobLoggingService
-from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_install_service import PluginInstallService
