@@ -1,7 +1,7 @@
 import copy
 import logging
 import sys
-from typing import Optional
+from typing import Dict, Optional
 
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import expand_env_vars, flatten, uniques_in
@@ -154,6 +154,15 @@ class ProjectPlugin(PluginRef):
     def all_commands(self):
         """Return a dictonary of supported commands, including those inherited from the parent plugin."""
         return {**self._parent.all_commands, **self.commands}
+
+    @property
+    def test_commands(self) -> Dict[str, Command]:
+        """Return the test commands for this plugin."""
+        return {
+            name: command
+            for name, command in self.all_commands.items()
+            if name.startswith("test")
+        }
 
     @property
     def supported_commands(self):

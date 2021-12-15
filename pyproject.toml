@@ -173,6 +173,7 @@ pyflakes = ["+*"]
 wemake-python-styleguide = [
   "+*",
   "-WPS110",  # Allow blacklisted variable names that can be clear enough in method context
+  "-WPS111",  # Allow short variable names, e.g. for generic type parameters
   "-WPS115",  # Allow upper-case constants in Enum subclasses
   "-WPS300",  # Allow local folder imports (import .module)
   "-WPS305",  # Allow f-strings
@@ -226,6 +227,11 @@ pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the mo
 
 [tool.flakehell.exceptions."src/meltano/core/project_files.py"]
 wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
+
+[tool.flakehell.exceptions."src/meltano/core/validation_service.py"]
+wemake-python-styleguide = [
+  "-WPS428",  # Three dots are OK for empty methods in a Protocol
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
