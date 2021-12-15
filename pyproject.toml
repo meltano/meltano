@@ -214,6 +214,7 @@ wemake-python-styleguide = [
   "-WPS213",  # Allow many expressions, since string building requires them
   "-WPS216",  # Allow many decorators, since `click` uses them to define the CLI
   "-WPS202",  # Allow many module members
+  "-WPS232",  # The cli module will continue to grow, so while the module is large the complexity is well contained
 ]
 
 [tool.flakehell.exceptions."src/meltano/migrations/versions/"]
