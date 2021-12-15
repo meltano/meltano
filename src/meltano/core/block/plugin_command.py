@@ -16,12 +16,6 @@ from sqlalchemy.orm import Session
 
 from .singer import InvokerBase
 
-try:
-    from typing import Protocol, Dict, Tuple, Optional  # noqa:  WPS433
-except ImportError:
-    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
-
-
 logger = structlog.getLogger(__name__)
 
 

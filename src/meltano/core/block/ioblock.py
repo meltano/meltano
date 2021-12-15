@@ -5,11 +5,6 @@ from typing import Optional, Tuple
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 
-try:
-    from typing import Protocol  # noqa:  WPS433
-except ImportError:
-    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
-
 
 class IOBlock(metaclass=ABCMeta):
     """The IOBlock interface is a basic block that Consumes, Produces, or Consume and Produces (Transforms) output.

@@ -3,11 +3,6 @@ from abc import ABCMeta, abstractmethod
 
 from sqlalchemy.orm import Session
 
-try:
-    from typing import Protocol  # noqa:  WPS433
-except ImportError:
-    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
-
 
 class BlockSetValidationError(Exception):
     """Base exception when a block in a BlockSet violates the sets requirements."""
