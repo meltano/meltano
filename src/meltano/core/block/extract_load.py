@@ -436,7 +436,7 @@ async def run(  # noqa: WPS217
         await consumer.stop()
         consumer_code = 1
         raise RunnerError(
-            "Unexpected future in ExtractLoadBlock. Assume extractor and loader failed",
+            "Unexpected completion sequence in ExtractLoadBlock. Assume extractor and loader failed",
             {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
         )
 
