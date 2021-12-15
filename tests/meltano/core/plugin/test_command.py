@@ -10,6 +10,7 @@ class TestCommand:
             "foo": {"args": "foo", "description": "foo desc", "executable": "foo"},
             "bar": {"args": "bar"},
             "baz": "baz",
+            "test": {"args": "--test", "description": "Run tests"},
         }
 
     def test_serialize(self, commands):
@@ -17,6 +18,7 @@ class TestCommand:
         assert Command.parse(commands["foo"]).args == "foo"
         assert Command.parse(commands["bar"]).args == "bar"
         assert Command.parse(commands["baz"]).args == "baz"
+        assert Command.parse(commands["test"]).args == "--test"
 
         serialized = Command.parse_all(commands)
         assert serialized["foo"].args == "foo"
@@ -28,6 +30,9 @@ class TestCommand:
         assert serialized["baz"].args == "baz"
         assert serialized["baz"].description is None
         assert serialized["baz"].executable is None
+        assert serialized["test"].args == "--test"
+        assert serialized["test"].description == "Run tests"
+        assert serialized["test"].executable is None
 
     def test_deserialize(self, commands):
         serialized = Command.parse_all(commands)
@@ -35,6 +40,7 @@ class TestCommand:
         assert serialized["foo"].canonical() == commands["foo"]
         assert serialized["bar"].canonical() == "bar"
         assert serialized["baz"].canonical() == "baz"
+        assert serialized["test"].canonical() == commands["test"]
 
         assert Canonical.as_canonical(serialized) == {**commands, "bar": "bar"}
 

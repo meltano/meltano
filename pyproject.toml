@@ -173,6 +173,7 @@ pyflakes = ["+*"]
 wemake-python-styleguide = [
   "+*",
   "-WPS110",  # Allow blacklisted variable names that can be clear enough in method context
+  "-WPS111",  # Allow short variable names, e.g. for generic type parameters
   "-WPS115",  # Allow upper-case constants in Enum subclasses
   "-WPS300",  # Allow local folder imports (import .module)
   "-WPS305",  # Allow f-strings
@@ -234,7 +235,12 @@ wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of stri
 flake8-docstrings = ["-D101"] # Don't require docstrings in public class since init methods are documented
 wemake-python-styleguide = [
   "-WPS428", # Allow ... use inside of typing protocol interface classes
-  "-WPS201",# Suppress too many imports warning (typing inflates count)
+  "-WPS201", # Suppress too many imports warning (typing inflates count)
+]
+
+[tool.flakehell.exceptions."src/meltano/core/validation_service.py"]
+wemake-python-styleguide = [
+  "-WPS428",  # Three dots are OK for empty methods in a Protocol
 ]
 
 [build-system]

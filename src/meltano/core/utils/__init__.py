@@ -1,23 +1,22 @@
 """Defines helpers for the core codebase."""
 import asyncio
-import base64
 import functools
 import logging
 import math
 import os
 import re
-import sys
 from collections import OrderedDict
 from contextlib import suppress
 from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
-from typing import Callable, Dict, Iterable, Optional, Union
+from typing import Any, Callable, Coroutine, Dict, Iterable, Optional, TypeVar, Union
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
+T = TypeVar("T")
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -42,7 +41,7 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def run_async(coro):
+def run_async(coro: Coroutine[Any, Any, T]) -> T:
     """Run coroutine and handle event loop and cleanup."""
     # Taken from https://stackoverflow.com/a/58532304
     # and inspired by Python 3.7's `asyncio.run`

@@ -31,6 +31,7 @@ from . import (  # isort:skip # noqa: F401, WPS235
     upgrade,
     user,
     run,
+    validate,
 )
 
 setup_logging()

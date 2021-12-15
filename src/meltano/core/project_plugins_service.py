@@ -1,11 +1,10 @@
-import logging
-import os
-from contextlib import contextmanager
-from typing import Iterable, List, Optional
+"""Project Plugin Service."""
 
-import yaml
+from contextlib import contextmanager
+from typing import Generator, List, Optional
+
+import structlog
 from meltano.core.environment import Environment, EnvironmentPluginConfig
-from meltano.core.utils import NotFound, find_named
 
 from .config_service import ConfigService
 from .plugin import PluginRef, PluginType
@@ -14,7 +13,7 @@ from .plugin.project_plugin import ProjectPlugin
 from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PluginAlreadyAddedException(Exception):
@@ -179,7 +178,7 @@ class ProjectPluginsService:
             for plugin_type in PluginType
         }
 
-    def plugins(self, ensure_parent=True) -> Iterable[ProjectPlugin]:
+    def plugins(self, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:
         """Return all plugins."""
         yield from (
             plugin

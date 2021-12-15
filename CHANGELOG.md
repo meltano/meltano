@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new `meltano run` command.
+- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Validation as a first-class citizen through the plugin test commands.
+- [#2967](https://gitlab.com/meltano/meltano/-/issues/2967) Set `meltanolabs` as the default tap-google-analytics extractor.
 
 ### Changes
 

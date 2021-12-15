@@ -9,7 +9,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.utils import NotFound
 
-T = TypeVar("T")  # noqa: WPS111
+T = TypeVar("T")
 
 
 class NoActiveEnvironment(Exception):
