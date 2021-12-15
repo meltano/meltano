@@ -29,8 +29,12 @@ lint_python:
     - 'REF="" && [[ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]] && REF="-r origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"'
     - 'declare FILES=$(git diff-tree --name-only $REF -r ${CI_COMMIT_SHA} | grep "\.py$")'
     - 'echo "Changed files are $FILES"'
-    - '[[ -n "${FILES}" ]] && make show_lint_python $(echo $FILES | xargs) || exit_code=$?'
-    - 'if [ $exit_code -ne 0 ]; then echo "Linting failed"; fi;'
+    - |
+      if [ -n "${FILES}" ]; then
+        make show_lint_python $(echo $FILES | xargs)
+      else
+        echo "Nothing to lint"
+      fi
 
 lint_eslint:
   extends: .test
