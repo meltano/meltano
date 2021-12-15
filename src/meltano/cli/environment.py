@@ -1,5 +1,3 @@
-"""Environment management in CLI."""
-
 import click
 from meltano.cli.params import pass_project
 from meltano.core.environment_service import EnvironmentService
