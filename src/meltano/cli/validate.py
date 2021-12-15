@@ -9,6 +9,7 @@ import structlog
 from meltano.cli.utils import propagate_stop_signals
 from meltano.core.db import project_engine
 from meltano.core.project import Project
+from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 from sqlalchemy.orm.session import sessionmaker
@@ -94,6 +95,12 @@ def test(
             collected[plugin_name].select_all()
 
     exit_codes = run_async(_run_plugin_tests(session, collected.values()))
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_test(
+        plugin_tests=plugin_tests,
+        all_tests=all_tests,
+    )
 
     click.echo()
     _report_and_exit(exit_codes)
