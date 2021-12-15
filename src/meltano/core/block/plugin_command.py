@@ -45,7 +45,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    async def run(self) -> None:
+    async def run(self, session: Session) -> None:
         """Run the command."""
         raise NotImplementedError
 
@@ -101,13 +101,15 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         """Command args are the specific plugin command args to use when invoking the plugin (if any)."""
         return self._command_args
 
-    async def run(self):
+    async def run(self, session: Session) -> None:
         """Invoke a command capturing and logging produced output.
 
+        Args:
+            session: the database session, currently just passed to the invoker to prepare the plugin.
         Raises:
             Exception: if the command fails.
         """
-        async with self.invoker.prepared(self.context.session):
+        async with self.invoker.prepared(session):
             await self.start(self.command_args)
 
             self.stdout_link(self._log)
