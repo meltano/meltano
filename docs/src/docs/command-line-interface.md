@@ -875,5 +875,7 @@ meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
 ```
 
-Note: similar to `meltano invoke dbt:[cmd]` when invoking dbt commands, you may need to populate `DBT_*`
-specific env variables.
+Note:
+
+- During the feature preview, and similar to `meltano invoke dbt:[cmd]`, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link [#3098](https://gitlab.com/meltano/meltano/-/issues/3098).
+- Some flags and options supported `meltano elt` are not yet supported in `meltano run`. For a list of these and a discussion of available workarounds, please see our issue tracker link [#3094](https://gitlab.com/meltano/meltano/-/issues/3094).
