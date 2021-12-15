@@ -5,6 +5,7 @@ import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
 import ExploreButton from '@/components/analyze/ExploreButton'
+import EditButton from '@/components/analyze/EditButton'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 import { PIPELINE_INTERVAL_OPTIONS } from '@/utils/constants'
 import utils from '@/utils/utils'
@@ -16,6 +17,7 @@ export default {
     ConnectorLogo,
     Dropdown,
     ExploreButton,
+    EditButton,
     ScheduleTableHead
   },
   filters: {
@@ -222,6 +224,11 @@ export default {
                 <ExploreButton
                   :pipeline="pipeline"
                   is-tooltip-left
+                  custom-class="is-small"
+                />
+                <EditButton
+                  :pipeline="pipeline"
+                  is-tooltip-top
                   custom-class="is-small"
                 />
                 <Dropdown
