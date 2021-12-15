@@ -4,9 +4,8 @@ from typing import List, Union
 import click
 import structlog
 from meltano.core.block.blockset import BlockSet
-from meltano.core.block.extract_load import ExtractLoadBlocks
 from meltano.core.block.parser import BlockParser, validate_block_sets
-from meltano.core.block.plugin_command import InvokerCommand, PluginCommandBlock
+from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.db import project_engine
 from meltano.core.runner import RunnerError
 from meltano.core.utils import click_run_async
