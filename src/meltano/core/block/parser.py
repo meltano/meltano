@@ -24,8 +24,7 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
     Returns:
         True if plugin is a command block.
     """
-    if plugin.type == PluginType.TRANSFORMERS:
-        return True
+    return plugin.type not in (PluginType.EXTRACTORS, PluginType.LOADERS):
 
 
 def generate_job_id(
