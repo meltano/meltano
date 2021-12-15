@@ -336,7 +336,13 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             await block.post()
 
     async def _link_io(self) -> None:  # noqa: WPS231
-        """Link the blocks in the set together."""
+        """Link the blocks in the set together.
+
+        This method does one last validation check to ensure that a consumer has a producer upstream.
+
+        Raises:
+            BlockSetValidationError: if consumer does not have an upstream producer.
+        """
         for idx, block in enumerate(self.blocks):
             logger_base = logger.bind(
                 consumer=block.consumer,
@@ -358,13 +364,14 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 )
             )
             if block.consumer:
-                # TODO: this check is redundent if validate_set has been called. So we should use that probably.
                 if idx != 0 and self.blocks[idx - 1].producer:
                     self.blocks[idx - 1].stdout_link(
                         block.stdin
                     )  # link previous blocks stdout with current blocks stdin
                 else:
-                    raise Exception("run step requires input but has no upstream")
+                    raise BlockSetValidationError(
+                        "run step requires input but has no upstream"
+                    )
 
 
 async def run(  # noqa: WPS217
