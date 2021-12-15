@@ -18,7 +18,7 @@ include:
   - local: .gitlab/ci/docker_base.gitlab-ci.yml
 
   # build-meltano
-  - local: .gitlab/ci/docker_prod.gitlab-ci.yml
+  - local: .gitlab/ci/docker_builds.gitlab-ci.yml
 
   # docs
   - local: .gitlab/ci/docs.gitlab-ci.yml
@@ -31,7 +31,7 @@ include:
   - local: .gitlab/ci/sast.gitlab-ci.yml
 
   # publish
-  - local: .gitlab/ci/publish.gitlab-ci.yml
+  - local: .gitlab/ci/releases.gitlab-ci.yml
 
   # manual (git-ops)
   - local: .gitlab/ci/gitops.gitlab-ci.yml
