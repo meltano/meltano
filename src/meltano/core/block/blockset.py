@@ -1,10 +1,12 @@
 """This holds the actual BlockSet meta class as well as related components such as exceptions."""
+from abc import ABCMeta, abstractmethod
+
+from sqlalchemy.orm import Session
+
 try:
     from typing import Protocol  # noqa:  WPS433
 except ImportError:
     from typing_extensions import Protocol  # noqa:  WPS433,WPS440
-
-from abc import ABCMeta, abstractmethod
 
 
 class BlockSetValidationError(Exception):
@@ -28,7 +30,7 @@ class BlockSet(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    async def run(self) -> None:
+    async def run(self, session: Session) -> None:
         """Do whatever a BlockSet is designed to do."""
         raise NotImplementedError
 

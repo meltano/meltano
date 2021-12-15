@@ -20,7 +20,7 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 from sqlalchemy.orm import Session
 
-from .blockset import BlockSetValidationError
+from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
 from .singer import SingerBlock
@@ -167,7 +167,7 @@ class ELBContextBuilder:
         )
 
 
-class ExtractLoadBlocks:  # noqa: WPS214
+class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     """A basic BlockSet interface implementation that supports running basic EL (extract, load) patterns."""
 
     def __init__(
