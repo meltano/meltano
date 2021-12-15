@@ -873,3 +873,30 @@ It is used to check which version of Meltano currently installed.
 ```bash
 meltano --version
 ```
+
+## `run`
+
+Run a set of command blocks in series.
+
+Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_target some_plugin:some_cmd` and
+are run in the order they are specified from left to right. A failure in any block will cause the entire run to abort.
+
+Multiple commmand blocks can be chained together or repeated, and tap/target pairs will automatically be linked to
+perform EL work.
+
+*This a preview feature - its functionality and cli signature is still evolving.*
+
+### How to use
+
+```bash
+meltano run tap-gitlab target-postgres 
+meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run 
+meltano run tap-gitlab target-postgres tap-salesforce target-mysql
+meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
+meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
+```
+
+Note:
+
+- During the feature preview, and similar to `meltano invoke dbt:[cmd]`, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link [#3098](https://gitlab.com/meltano/meltano/-/issues/3098).
+- Some flags and options supported `meltano elt` are not yet supported in `meltano run`. For a list of these and a discussion of available workarounds, please see our issue tracker link [#3094](https://gitlab.com/meltano/meltano/-/issues/3094).
