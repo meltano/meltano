@@ -201,6 +201,8 @@ wemake-python-styleguide = [
   "-WPS442",  # Allow outer scope name shadowing for fixtures
   "-WPS430",  # Allow nested functions in test methods
   "-WPS437",  # Allow protected attribute usage in test methods
+  "-WPS316",  # Allow context managers with multiple assignments
+  "-WPS202",  # Allow many module members
 ]
 
 [tool.flakehell.exceptions."scripts/"]
@@ -213,6 +215,7 @@ wemake-python-styleguide = [
   "-WPS213",  # Allow many expressions, since string building requires them
   "-WPS216",  # Allow many decorators, since `click` uses them to define the CLI
   "-WPS202",  # Allow many module members
+  "-WPS232",  # The cli module will continue to grow, so while the module is large the complexity is well contained
 ]
 
 [tool.flakehell.exceptions."src/meltano/migrations/versions/"]
@@ -227,6 +230,13 @@ pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the mo
 
 [tool.flakehell.exceptions."src/meltano/core/project_files.py"]
 wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
+
+[tool.flakehell.exceptions."src/meltano/core/block"]
+flake8-docstrings = ["-D101"] # Don't require docstrings in public class since init methods are documented
+wemake-python-styleguide = [
+  "-WPS428", # Allow ... use inside of typing protocol interface classes
+  "-WPS201", # Suppress too many imports warning (typing inflates count)
+]
 
 [tool.flakehell.exceptions."src/meltano/core/validation_service.py"]
 wemake-python-styleguide = [
