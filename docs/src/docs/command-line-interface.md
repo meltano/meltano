@@ -756,6 +756,27 @@ meltano select --exclude tap-carbon-intensity '*' 'latitude'
 
 This will exclude all `longitude` and `latitude` attributes.
 
+
+## `test`
+
+Run tests for one or more plugins. A test is any [command](/docs/command-line-interface.html#commands) with a name starting with `test`.
+
+### How to use
+
+```bash
+# Runs all tests for all plugins
+meltano test --all
+
+# Run all available tests for one or more selected plugins
+meltano test <plugin1> <plugin2>
+
+# Run a named test for a single plugin
+meltano test <plugin>:<test-name>
+
+# Run a named test for one or more plugins
+meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
+```
+
 ## `ui`
 
 - `meltano ui`: Start the Meltano UI.
