@@ -101,8 +101,7 @@ import pdb; pdb.set_trace()
 
 ::: warning Potential MacOS port conflicts
 
-On recent versions of MacOS (Monterey/12.0 and up) an AirPlay related service may be bound to port 5000. In that scenario you may
-way want to specify an alternate [bind to port](/docs/settings.html#ui-bind-port) to start the service on a port other than 5000. 
+On recent versions of MacOS (Monterey/12.0 and up) an AirPlay related service may be bound to port 5000. In that scenario you may want to specify an alternate [bind to port](/docs/settings.html#ui-bind-port) to start the service on a port other than 5000. If you would like to continue using that port, please consult this [Apple Developers Forum article](https://developer.apple.com/forums/thread/682332) to how to reset port 5000.
 
 :::
 
