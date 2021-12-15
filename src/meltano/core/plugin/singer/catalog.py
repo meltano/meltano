@@ -20,7 +20,7 @@ from typing import (  # noqa: WPS235
 from meltano.core.behavior.visitor import visit_with
 
 Node = Dict[str, Any]
-T = TypeVar("T", bound="CatalogRule")  # noqa: WPS111
+T = TypeVar("T", bound="CatalogRule")
 
 
 class CatalogRule:

@@ -408,17 +408,34 @@ class TestProjectPlugin:
 
         assert tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
         assert tap.all_commands["cmd-variant"].description is None
-        assert tap.supported_commands == ["cmd", "cmd-variant"]
+
+        assert tap.all_commands["test"].args == "--test"
+        assert tap.all_commands["test"].description == "Run tests"
+        assert tap.supported_commands == ["cmd", "cmd-variant", "test", "test_extra"]
 
         # inheritance
         assert inherited_tap.all_commands["cmd"].args == "cmd inherited"
         assert inherited_tap.all_commands["cmd-variant"].args == "cmd-variant meltano"
         assert inherited_tap.all_commands["cmd-inherited"].args == "cmd-inherited"
+        assert inherited_tap.all_commands["test"].args == "--test"
         assert inherited_tap.supported_commands == [
             "cmd",
             "cmd-variant",
+            "test",
+            "test_extra",
             "cmd-inherited",
         ]
+
+    def test_command_test(self, tap: BasePlugin):
+        """Validate the plugin 'test' command."""
+        assert "test" in tap.test_commands
+        assert tap.test_commands["test"].args == "--test"
+        assert tap.test_commands["test"].description == "Run tests"
+
+        assert "test_extra" in tap.test_commands
+        assert tap.test_commands["test_extra"].args is None
+        assert tap.test_commands["test_extra"].description == "Run extra tests"
+        assert tap.test_commands["test_extra"].executable == "test-extra"
 
     def testenv_prefixes(self, inherited_tap, tap):
         assert tap.env_prefixes() == ["tap-mock", "tap_mock"]
