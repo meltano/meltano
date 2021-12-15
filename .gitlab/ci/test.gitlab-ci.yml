@@ -26,8 +26,15 @@ lint_python:
       # Lint only on 'primary' python version:
       - PYTHON_IMAGE_VERSION: ["3.8"]
   script:
-    - 'REF="" && [[ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]] && REF="-r origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"'
-    - 'declare FILES=$(git diff-tree --name-only $REF -r ${CI_COMMIT_SHA} | grep "\.py$")'
+    - |
+      if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
+        git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME;
+        echo "Comparing to $CI_MERGE_REQUEST_TARGET_BRANCH_NAME";
+        REF="-r ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}";
+      else
+        REF=""
+      fi
+    - 'declare FILES=$(git diff-tree --no-commit-id --name-only $REF -r ${CI_COMMIT_SHA} | grep "\.py$")'
     - 'echo "Changed files are $FILES"'
     - |
       if [ -n "${FILES}" ]; then
