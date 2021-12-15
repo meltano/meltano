@@ -1,17 +1,10 @@
 import pytest
-from meltano.cli.validate import collect_tests
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.validation_service import ValidationsRunner
 
 
-class MockValidator:
-    def __init__(self, name, selected):
-        """Create a mock validator."""
-        self.name = name
-        self.selected = selected
-
-    async def run_async(self, invoker: PluginInvoker) -> int:
+class MockValidationsRunner(ValidationsRunner):
+    async def run_test(self, name: str):
         return 1
 
 
@@ -19,12 +12,12 @@ class TestValidationsRunner:
     @pytest.mark.asyncio
     async def test_run_all(self, session, dbt, plugin_invoker_factory):
         invoker = plugin_invoker_factory(dbt)
-        runner = ValidationsRunner(
+        runner = MockValidationsRunner(
             invoker,
             {
-                "test": MockValidator("test", selected=True),
-                "other-test": MockValidator("other-test", selected=False),
-                "skipped-test": MockValidator("skipped-test", selected=False),
+                "test": True,
+                "other-test": False,
+                "skipped-test": False,
             },
         )
         assert await runner.run_all(session) == {"test": 1}
@@ -40,10 +33,10 @@ class TestValidationsRunner:
         }
 
     def test_collect_tests(self, project: Project):
-        collected = collect_tests(project, select_all=False)
+        collected = MockValidationsRunner.collect(project, select_all=False)
 
-        assert "test" in collected["dbt"].validators
-        assert not collected["dbt"].validators["test"].selected
+        assert "test" in collected["dbt"].tests_selection
+        assert not collected["dbt"].tests_selection["test"]
 
         collected["dbt"].select_all()
-        assert collected["dbt"].validators["test"].selected
+        assert collected["dbt"].tests_selection["test"]

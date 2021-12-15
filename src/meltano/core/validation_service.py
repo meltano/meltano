@@ -1,17 +1,17 @@
 """Class for invoking plugin validations."""
 
+from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import Dict
+from typing import Dict, Type, TypeVar
 
-from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 from sqlalchemy.orm.session import sessionmaker
 
-try:
-    from typing import Protocol  # noqa:  WPS433
-except ImportError:
-    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
-
 EXIT_CODE_OK = 0
+
+T = TypeVar("T")
 
 
 class ValidationOutcome(str, Enum):
@@ -31,35 +31,17 @@ class ValidationOutcome(str, Enum):
         return cls.SUCCESS if exit_code == EXIT_CODE_OK else cls.FAILURE
 
 
-class ValidatorProtocol(Protocol):
-    """Interface for all validators."""
-
-    @property
-    def name(self) -> str:
-        """Retrive validator name."""
-        ...
-
-    @property
-    def selected(self) -> bool:
-        """Retrive whether validator is selected to run."""
-        ...
-
-    async def run_async(self, invoker: PluginInvoker) -> int:
-        """Run validator."""
-        ...
-
-
-class ValidationsRunner:
+class ValidationsRunner(metaclass=ABCMeta):
     """Class to collect all validations defined for a plugin."""
 
     def __init__(
         self,
         invoker: PluginInvoker,
-        validators: Dict[str, ValidatorProtocol],
+        tests_selection: Dict[str, bool],
     ) -> None:
         """Create a validators runner for a plugin."""
         self.invoker = invoker
-        self.validators = validators
+        self.tests_selection = tests_selection
 
     @property
     def plugin_name(self) -> str:
@@ -76,7 +58,7 @@ class ValidationsRunner:
             KeyError: If plugin test is not defined.
         """
         try:
-            self.validators[name].selected = True
+            self.tests_selection[name] = True
         except KeyError as exc:
             raise KeyError(
                 f"Plugin {self.plugin_name} does not have a test named '{name}'"
@@ -84,8 +66,8 @@ class ValidationsRunner:
 
     def select_all(self) -> None:
         """Mark all plugin validators as selected."""
-        for name in self.validators.keys():
-            self.validators[name].selected = True
+        for name in self.tests_selection.keys():
+            self.tests_selection[name] = True
 
     async def run_all(self, session: sessionmaker) -> Dict[str, int]:
         """Run all validators defined in a plugin.
@@ -98,7 +80,40 @@ class ValidationsRunner:
         """
         results = {}
         async with self.invoker.prepared(session):
-            for name, validation in self.validators.items():
-                if validation.selected:
-                    results[name] = await validation.run_async(self.invoker)
+            for name, selected in self.tests_selection.items():
+                if selected:
+                    results[name] = await self.run_test(name)
         return results
+
+    @classmethod
+    def collect(
+        cls: Type[T],
+        project: Project,
+        select_all: bool = True,
+    ) -> Dict[str, T]:
+        """Collect all tests for CLI invocation.
+
+        Args:
+            project: A Meltano project object.
+            select_all: Flag to select all validations by default.
+
+        Returns:
+            A mapping of plugin names to validation runners.
+        """
+        plugins_service = ProjectPluginsService(project)
+        return {
+            plugin.name: cls(
+                invoker=invoker_factory(
+                    project, plugin, plugins_service=plugins_service
+                ),
+                tests_selection={
+                    test_name: select_all for test_name in plugin.test_commands
+                },
+            )
+            for plugin in plugins_service.plugins()
+        }
+
+    @abstractmethod
+    async def run_test(self, name: str):
+        """Run a test command."""
+        ...

@@ -8,9 +8,7 @@ import click
 import structlog
 from meltano.cli.utils import propagate_stop_signals
 from meltano.core.db import project_engine
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 from sqlalchemy.orm.session import sessionmaker
@@ -40,25 +38,20 @@ def write_sep_line(title: str, sepchar: str, **kwargs):
     click.secho(line, **kwargs)
 
 
-class CommandLineValidator:
+class CommandLineRunner(ValidationsRunner):
     """Validator that runs in the CLI."""
 
-    def __init__(self, name: str, selected: bool = True) -> None:
-        """Create a new CLI validator."""
-        self.name = name
-        self.selected = selected
-
-    async def run_async(self, invoker: PluginInvoker) -> int:
-        """Run this validation.
+    async def run_test(self, name: str) -> int:
+        """Run a test command.
 
         Args:
-            invoker: A plugin CLI invoker.
+            name: Test command name to invoke.
 
         Returns:
             Exit code for the plugin invocation.
         """
-        write_sep_line(self.name, "=", bold=True)
-        handle = await invoker.invoke_async(command=self.name)
+        write_sep_line(f"{self.plugin_name}:{name}", "=", bold=True)
+        handle = await self.invoker.invoke_async(command=name)
         with propagate_stop_signals(handle):
             exit_code = await handle.wait()
         return exit_code
@@ -87,7 +80,7 @@ def test(
     _, session_maker = project_engine(project)
     session = session_maker()
 
-    collected = collect_tests(project, select_all=all_tests)
+    collected = CommandLineRunner.collect(project, select_all=all_tests)
 
     for plugin_test in plugin_tests:
         try:
@@ -104,32 +97,6 @@ def test(
 
     click.echo()
     _report_and_exit(exit_codes)
-
-
-def collect_tests(
-    project: Project,
-    select_all: bool = True,
-) -> Dict[str, ValidationsRunner]:
-    """Collect all tests for CLI invocation.
-
-    Args:
-        project: A Meltano project object.
-        select_all: Flag to select all validations by default.
-
-    Returns:
-        A mapping of plugin names to validation runners.
-    """
-    plugins_service = ProjectPluginsService(project)
-    return {
-        plugin.name: ValidationsRunner(
-            invoker=invoker_factory(project, plugin, plugins_service=plugins_service),
-            validators={
-                test: CommandLineValidator(test, select_all)
-                for test in plugin.test_commands
-            },
-        )
-        for plugin in plugins_service.plugins()
-    }
 
 
 async def _run_plugin_tests(
@@ -159,7 +126,7 @@ def _report_and_exit(results: Dict[str, Dict[str, int]]):
     status = "successfully" if failed_count == 0 else "with failures"
     message = (
         f"Testing completed {status}. "
-        + f"{passed_count} tests successful. {failed_count} tests failed."
+        + f"{passed_count} test(s) successful. {failed_count} test(s) failed."
     )
 
     write_sep_line(message, "=", fg=("red" if exit_code else "green"))
