@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [!3043](https://gitlab.com/meltano/meltano/-/issues/3043) Block architecture and interface implementations in support of new `meltano run` command.
+- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301) Preview release of new `meltano run` command.
+
 ### Changes
 
 - [#3085](https://gitlab.com/meltano/meltano/-/issues/3085) Upgrade `target-bigquery` default variant `adswerve` to [`v0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3).
