@@ -35,7 +35,7 @@ lint_python:
       if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
         git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME;
         echo "Comparing to $CI_MERGE_REQUEST_TARGET_BRANCH_NAME";
-        REF="-r ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}";
+        REF="-r origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}";
       else
         REF=""
       fi
