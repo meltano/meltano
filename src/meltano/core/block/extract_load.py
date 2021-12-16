@@ -87,8 +87,9 @@ class ELBContextBuilder:
 
         if self.job:
             job_logging_service = JobLoggingService(project)
-            log_file = job_logging_service.generate_log_name(job.job_id, job.run_id)
-            self._base_output_logger = OutputLogger(log_file)
+            self._base_output_logger = OutputLogger(
+                job_logging_service.generate_log_name(job.job_id, job.run_id)
+            )
         else:
             self._base_output_logger = None
 

@@ -47,23 +47,22 @@ def output_logger() -> OutputLogger:
 
 
 @pytest.fixture
-def elb_context(project, session, mock_job, output_logger) -> ELBContext:
+def elb_context(project, session, test_job, output_logger) -> ELBContext:
     return ELBContext(
         project=project,
         session=session,
-        job=mock_job,
+        job=test_job,
         base_output_logger=output_logger,
     )
 
 
 class TestELBContext:
-    def test_elt_run_dir_is_returned(self, project, mock_job, elb_context: ELBContext):
-        expected_path = project.job_dir(mock_job.job_id, str(mock_job.run_id))
+    def test_elt_run_dir_is_returned(self, project, test_job, elb_context: ELBContext):
+        expected_path = project.job_dir(test_job.job_id, str(test_job.run_id))
         assert elb_context.elt_run_dir == Path(expected_path)
 
 
 class TestELBContextBuilder:
-
     def test_builder_returns_elb_context(
         self, project, session, project_plugins_service, tap, target
     ):
