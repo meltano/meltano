@@ -144,7 +144,7 @@ class ELBContextBuilder:
         return invoker_factory(
             self.project,
             plugin_context.plugin,
-            context=self,
+            context=self.context(),
             run_dir=self.elt_run_dir,
             plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
