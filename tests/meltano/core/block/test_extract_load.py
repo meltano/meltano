@@ -32,8 +32,13 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 
 
 @pytest.fixture
-def mock_job() -> Job:
-    return Job(job_id="test-job")
+def test_job(session) -> Job:
+    return Job(
+        job_id=TEST_JOB_ID,
+        state=State.SUCCESS,
+        payload_flags=Payload.STATE,
+        payload={"singer_state": {"bookmarks": []}},
+    ).save(session)
 
 
 @pytest.fixture
@@ -42,22 +47,35 @@ def output_logger() -> OutputLogger:
 
 
 @pytest.fixture
-def elb_context(project, session, mock_job, output_logger) -> ELBContext:
+def elb_context(project, session, test_job, output_logger) -> ELBContext:
     return ELBContext(
         project=project,
         session=session,
-        job=mock_job,
+        job=test_job,
         base_output_logger=output_logger,
     )
 
 
 class TestELBContext:
-    def test_elt_run_dir_is_returned(self, project, mock_job, elb_context: ELBContext):
-        expected_path = project.job_dir(mock_job.job_id, str(mock_job.run_id))
+    def test_elt_run_dir_is_returned(self, project, test_job, elb_context: ELBContext):
+        expected_path = project.job_dir(test_job.job_id, str(test_job.run_id))
         assert elb_context.elt_run_dir == Path(expected_path)
 
 
 class TestELBContextBuilder:
+    def test_builder_returns_elb_context(
+        self, project, session, project_plugins_service, tap, target
+    ):
+        """Ensure that builder is returning ELBContext and not itself."""
+        builder = ELBContextBuilder(
+            project=project,
+            plugins_service=project_plugins_service,
+            session=session,
+            job=None,
+        )
+        assert isinstance(builder.context(), ELBContext)
+        assert isinstance(builder.make_block(tap).invoker.context, ELBContext)
+
     def test_make_block_returns_valid_singer_block(
         self, project, session, project_plugins_service, tap, target
     ):
