@@ -14,7 +14,7 @@ from meltano.core.block.extract_load import (
 )
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job, Payload, State
-from meltano.core.logging import OutputLogger
+from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner.singer import SingerRunner
@@ -32,8 +32,13 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 
 
 @pytest.fixture
-def mock_job() -> Job:
-    return Job(job_id="test-job")
+def test_job(session) -> Job:
+    return Job(
+        job_id=TEST_JOB_ID,
+        state=State.SUCCESS,
+        payload_flags=Payload.STATE,
+        payload={"singer_state": {"bookmarks": []}},
+    ).save(session)
 
 
 @pytest.fixture
@@ -58,6 +63,52 @@ class TestELBContext:
 
 
 class TestELBContextBuilder:
+
+    def test_builder_returns_elb_context(
+        self, project, session, project_plugins_service, tap, target
+    ):
+        """Ensure that builder is returning ELBContext and not itself."""
+        builder = ELBContextBuilder(
+            project=project,
+            plugins_service=project_plugins_service,
+            session=session,
+            job=None,
+        )
+        assert isinstance(builder.context(), ELBContext)
+        assert isinstance(builder.make_block(tap).invoker.context, ELBContext)
+
+    def test_base_output_logger_configured(
+        self, project, session, project_plugins_service, tap, test_job
+    ):
+        """Ensure that if a job is passed to the builder, the base_output_logger is configured."""
+        # No job, so no base output logger
+        builder = ELBContextBuilder(
+            project=project,
+            plugins_service=project_plugins_service,
+            session=session,
+            job=None,
+        )
+        block = builder.make_block(tap)
+        assert block.invoker.context.job is None
+        assert block.invoker.context.base_output_logger is None
+
+        # With job, so base output logger is set
+        builder = ELBContextBuilder(
+            project=project,
+            plugins_service=project_plugins_service,
+            session=session,
+            job=test_job,
+        )
+        block = builder.make_block(tap)
+        assert block.invoker.context.base_output_logger is not None
+        assert block.invoker.context.job.job_id == test_job.job_id
+
+        job_logging_service = JobLoggingService(project)
+        log_file = job_logging_service.generate_log_name(
+            test_job.job_id, test_job.run_id
+        )
+        assert block.invoker.context.base_output_logger.file == log_file
+
     def test_make_block_returns_valid_singer_block(
         self, project, session, project_plugins_service, tap, target
     ):
