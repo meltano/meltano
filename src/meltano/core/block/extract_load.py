@@ -75,7 +75,7 @@ class ELBContextBuilder:
             project: the meltano project for the context.
             plugins_service: the plugins service for the context.
             session: the database session for the context.
-            job: The job within this context should run.
+            job:
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
@@ -85,13 +85,7 @@ class ELBContextBuilder:
         self._env = {}
         self._blocks = []
 
-        if self.job:
-            job_logging_service = JobLoggingService(project)
-            self._base_output_logger = OutputLogger(
-                job_logging_service.generate_log_name(job.job_id, job.run_id)
-            )
-        else:
-            self._base_output_logger = None
+        self._base_output_logger = None
 
     def make_block(
         self, plugin: ProjectPlugin, plugin_args: Optional[List[str]] = None

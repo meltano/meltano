@@ -1,5 +1,5 @@
 """Utilities for turning a string list of plugins into a usable list of BlockSet and PluginCommand objects."""
-from typing import Generator, List, Optional, Tuple, Union
+from typing import Generator, List, Tuple, Union
 
 import click
 import structlog
@@ -8,7 +8,6 @@ from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
 from meltano.core.block.singer import SingerBlock
-from meltano.core.logging import OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
@@ -74,7 +73,6 @@ class BlockParser:  # noqa: D101
         project,
         blocks: List[str],
         session=None,
-        base_output_logger: Optional[OutputLogger] = None,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
@@ -90,7 +88,6 @@ class BlockParser:  # noqa: D101
         self.project = project
         self.session = session
 
-        self._base_output_logger = base_output_logger
         self._plugins_service = ProjectPluginsService(project)
         self._plugins: List[ProjectPlugin] = []
 
@@ -166,9 +163,7 @@ class BlockParser:  # noqa: D101
         """
         blocks: List[SingerBlock] = []
 
-        builder = ELBContextBuilder(
-            self.project, self._plugins_service, self.session, self._base_output_logger
-        )
+        builder = ELBContextBuilder(self.project, self._plugins_service, self.session)
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:
             self.log.debug(
