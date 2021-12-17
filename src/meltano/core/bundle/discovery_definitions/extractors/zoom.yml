@@ -1,0 +1,30 @@
+name: tap-zoom
+label: Zoom
+description: Video conferencing software
+namespace: tap_zoom
+variants:
+- name: mashey
+  docs: https://hub.meltano.com/extractors/zoom.html
+  repo: https://github.com/mashey/tap-zoom
+  pip_url: git+https://github.com/mashey/tap-zoom.git
+  capabilities:
+  - catalog
+  - discover
+  settings_group_validation:
+  - - jwt
+  - - client_id
+    - client_secret
+    - refresh_token
+  settings:
+  - name: jwt
+    kind: password
+    label: JSON Web Token
+    documentation: https://marketplace.zoom.us/docs/guides/auth/jwt
+  - name: client_id
+    documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+  - name: client_secret
+    kind: password
+    documentation: https://marketplace.zoom.us/docs/guides/auth/oauth
+  - name: refresh_token
+    kind: password
+    documentation: https://marketplace.zoom.us/docs/guides/auth/oauth

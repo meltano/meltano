@@ -1,0 +1,19 @@
+name: tap-spreadsheets-anywhere
+label: Spreadsheets Anywhere
+description: Data extractor for CSV and Excel files from any smart_open supported
+  transport (S3, SFTP, localhost, etc...)
+namespace: tap_spreadsheets_anywhere
+variants:
+- name: ets
+  docs: https://hub.meltano.com/extractors/spreadsheets-anywhere.html
+  repo: https://github.com/ets/tap-spreadsheets-anywhere
+  pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings:
+  - name: tables
+    kind: array
+    description: An array holding json objects that each describe a set of targeted
+      source files. See docs for details.

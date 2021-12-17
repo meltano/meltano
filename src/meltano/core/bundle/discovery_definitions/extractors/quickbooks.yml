@@ -1,0 +1,50 @@
+name: tap-quickbooks
+namespace: tap_quickbooks
+label: Quickbooks
+description: Accounting management platform
+variants:
+- name: hotgluexyz
+  docs: https://hub.meltano.com/extractors/quickbooks.html
+  repo: https://github.com/hotgluexyz/tap-quickbooks
+  pip_url: git+https://github.com/hotgluexyz/tap-quickbooks.git
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings_group_validation:
+  - - client_id
+    - client_secret
+    - refresh_token
+    - realmId
+    - start_date
+  settings:
+  - name: realmId
+    label: Realm ID
+  - name: client_id
+    kind: password
+    label: Client ID
+  - name: client_secret
+    kind: password
+  - name: refresh_token
+    kind: password
+  - name: start_date
+    kind: date_iso8601
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+  - name: is_sandbox
+    kind: boolean
+    value: false
+    description: Use Quickbooks Sandbox
+  - name: select_fields_by_default
+    kind: boolean
+    value: true
+    description: Select by default any new fields discovered in Quickbooks objects
+  - name: state_message_threshold
+    kind: integer
+    value: 1000
+    description: Generate a STATE message every N records
+  - name: max_workers
+    kind: integer
+    value: 8
+    label: Maximum number of threads to use

@@ -97,7 +97,10 @@ bundle: clean ui
 freeze_db:
 	poetry run scripts/alembic_freeze.py
 
-sdist: freeze_db bundle
+build_discovery:
+	poetry run python src/meltano/core/plugin_discovery_generator.py
+
+sdist: freeze_db bundle build_discovery
 	poetry build -f sdist
 
 docker_sdist: base_image

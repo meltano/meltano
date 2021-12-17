@@ -1,0 +1,5 @@
+name: model-gitlab-ultimate
+namespace: tap_gitlab_ultimate
+variant: meltano
+repo: https://gitlab.com/meltano/model-gitlab-ultimate
+pip_url: git+https://gitlab.com/meltano/model-gitlab-ultimate.git

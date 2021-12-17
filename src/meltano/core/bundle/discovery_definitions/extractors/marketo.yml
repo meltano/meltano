@@ -1,0 +1,41 @@
+name: tap-marketo
+label: Marketo
+description: Marketing automation for account-based marketing
+namespace: tap_marketo
+variants:
+- name: singer-io
+  docs: https://hub.meltano.com/extractors/marketo.html
+  repo: https://github.com/singer-io/tap-marketo
+  pip_url: git+https://github.com/singer-io/tap-marketo.git
+  capabilities: []
+  settings:
+  - name: endpoint
+    label: Endpoint
+  - name: client_id
+    label: Client ID
+  - name: client_secret
+    kind: password
+    label: Client Secret
+  - name: start_date
+    label: Start Date
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+    kind: date_iso8601
+- name: meltano
+  hidden: true
+  repo: https://gitlab.com/meltano/tap-marketo
+  pip_url: git+https://gitlab.com/meltano/tap-marketo.git
+  capabilities: []
+  settings:
+  - name: endpoint
+  - name: identity
+  - name: client_id
+    label: Client ID
+  - name: client_secret
+    kind: password
+  - name: start_date
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+    kind: date_iso8601

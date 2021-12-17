@@ -1,0 +1,5 @@
+name: dashboard-shopify
+namespace: tap_shopify
+variant: meltano
+repo: https://gitlab.com/meltano/dashboard-shopify
+pip_url: git+https://gitlab.com/meltano/dashboard-shopify.git

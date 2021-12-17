@@ -1,0 +1,43 @@
+name: tap-chargebee
+namespace: tap_chargebee
+label: Chargebee
+description: Subscription billing software
+variants:
+- name: hotgluexyz
+  docs: https://hub.meltano.com/extractors/chargebee.html
+  repo: https://github.com/hotgluexyz/tap-chargebee
+  pip_url: git+https://github.com/hotgluexyz/tap-chargebee.git
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings_group_validation:
+  - - api_key
+    - site
+    - product_catalog
+    - start_date
+  settings:
+  - name: api_key
+    label: API Key
+    kind: password
+  - name: site
+    label: Chargebee Site
+  - name: product_catalog
+    label: Chargebee Product Catalog
+  - name: start_date
+    kind: date_iso8601
+    description: Determines how much historical data will be extracted. Please be
+      aware that the larger the time period and amount of data, the longer the initial
+      extraction can be expected to take.
+  - name: select_fields_by_default
+    kind: boolean
+    value: true
+    description: Select by default any new fields discovered in Quickbooks objects
+  - name: state_message_threshold
+    kind: integer
+    value: 1000
+    description: Generate a STATE message every N records
+  - name: max_workers
+    kind: integer
+    value: 8
+    label: Maximum number of threads to use

@@ -1,0 +1,6 @@
+name: airflow
+namespace: airflow
+repo: https://gitlab.com/meltano/files-airflow
+pip_url: git+https://gitlab.com/meltano/files-airflow.git
+update:
+  orchestrate/dags/meltano.py: true

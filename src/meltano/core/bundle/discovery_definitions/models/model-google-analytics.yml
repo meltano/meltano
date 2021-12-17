@@ -1,0 +1,5 @@
+name: model-google-analytics
+namespace: tap_google_analytics
+variant: meltano
+repo: https://gitlab.com/meltano/model-google-analytics
+pip_url: git+https://gitlab.com/meltano/model-google-analytics.git

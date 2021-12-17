@@ -1,0 +1,49 @@
+name: tap-pendo
+description: Product Experience and Digital Adoption Solutions
+label: Pendo
+namespace: tap_pendo
+variants:
+- name: singer-io
+  docs: https://hub.meltano.com/extractors/pendo
+  pip_url: git+https://github.com/singer-io/tap-pendo.git
+  repo: https://github.com/singer-io/tap-pendo
+  capabilities:
+  - catalog
+  - discover
+  - state
+  settings_group_validation:
+  - - x_pendo_integration_key
+    - period
+    - start_date
+  settings:
+  - name: x_pendo_integration_key
+    label: Integration Key
+    env: TAP_PENDO_INTEGRATION_KEY
+    description: 'This is the integration key generated via the Pendo website: Settings
+      -> Integrations -> Integration Keys.'
+    kind: password
+  - name: period
+    label: Period
+    description: This defines how data is aggregated, either on a daily or hourly
+      basis.
+    kind: options
+    options:
+    - label: Daily
+      value: dayRange
+    - label: Hourly
+      value: hourRange
+  - name: lookback_window
+    kind: integer
+    label: Lookback Window
+    description: The number of days to use as the lookback window.
+    value: 0
+  - name: include_anonymous_visitors
+    label: Include Anonymous Visitors
+    description: Defines whether or not to include anonymous visitors in the results.
+    kind: boolean
+    default: false
+    value_post_processor: stringify
+  - name: start_date
+    label: Start Date
+    description: This is the default start date value to use if no bookmark is present.
+    kind: date_iso8601

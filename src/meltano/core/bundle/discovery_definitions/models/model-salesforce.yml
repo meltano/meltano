@@ -1,0 +1,5 @@
+name: model-salesforce
+namespace: tap_salesforce
+variant: meltano
+repo: https://gitlab.com/meltano/model-salesforce
+pip_url: git+https://gitlab.com/meltano/model-salesforce.git

@@ -1,0 +1,5 @@
+name: model-carbon-intensity
+namespace: tap_carbon
+variant: meltano
+repo: https://gitlab.com/meltano/model-carbon-intensity
+pip_url: git+https://gitlab.com/meltano/model-carbon-intensity.git

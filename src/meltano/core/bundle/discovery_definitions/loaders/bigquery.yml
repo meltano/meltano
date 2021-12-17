@@ -1,0 +1,72 @@
+name: target-bigquery
+label: BigQuery
+description: BigQuery loader
+namespace: target_bigquery
+variants:
+- name: adswerve
+  docs: https://hub.meltano.com/loaders/bigquery.html
+  repo: https://github.com/adswerve/target-bigquery
+  pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.11.3
+  dialect: bigquery
+  target_schema: $TARGET_BIGQUERY_DATASET_ID
+  settings_group_validation:
+  - - project_id
+    - dataset_id
+    - location
+    - credentials_path
+  settings:
+  - name: project_id
+    description: BigQuery project
+    label: Project Id
+  - name: dataset_id
+    description: BigQuery dataset
+    value: $MELTANO_EXTRACT__LOAD_SCHEMA
+    label: Dataset Id
+  - name: location
+    description: Dataset location
+    value: US
+    label: Location
+  - name: credentials_path
+    env_aliases:
+    - GOOGLE_APPLICATION_CREDENTIALS
+    value: $MELTANO_PROJECT_ROOT/client_secrets.json
+    description: Fully qualified path to `client_secrets.json` for your service account.
+    label: Credentials Path
+  - name: validate_records
+    description: Validate records
+    kind: boolean
+    value: false
+    label: Validate Records
+  - name: add_metadata_columns
+    description: Add `_time_extracted` and `_time_loaded` metadata columns
+    kind: boolean
+    value: false
+    label: Add Metadata Columns
+  - name: replication_method
+    description: Replication method, `append` or `truncate`
+    kind: options
+    options:
+    - label: Append
+      value: append
+    - label: Truncate
+      value: truncate
+    value: append
+    label: Replication Method
+  - name: table_prefix
+    description: Add prefix to table name
+    label: Table Prefix
+  - name: table_suffix
+    description: Add suffix to table name
+    label: Table Suffix
+  - name: max_cache
+    description: Maximum cache size in MB
+    value: 50
+    label: Max Cache
+  - name: merge_state_messages
+    kind: boolean
+    description: Whether to merge multiple state messages from the tap into the state
+      file or uses the last state message as the state file.
+    label: Merge State Messages
+  - name: table_config
+    description: A path to a file containing the definition of partitioning and clustering.
+    label: Table Config

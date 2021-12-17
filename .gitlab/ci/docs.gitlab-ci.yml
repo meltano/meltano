@@ -30,4 +30,4 @@ docs:
   only:
     changes:
       - docs/**/*
-      - src/meltano/core/bundle/discovery.yml
+      - src/meltano/core/bundle/discovery_definitions/**/*

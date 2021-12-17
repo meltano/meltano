@@ -1,0 +1,64 @@
+name: tap-jira
+description: Issue and Project Tracking Software
+label: Jira
+namespace: tap_jira
+variants:
+- name: singer-io
+  docs: https://hub.meltano.com/extractors/jira
+  pip_url: git+https://github.com/singer-io/tap-jira.git
+  repo: https://github.com/singer-io/tap-jira
+  capabilities:
+  - discover
+  - properties
+  - state
+  settings_group_validation:
+  - - username
+    - password
+    - base_url
+    - start_date
+    - user_agent
+  - - oauth_client_secret
+    - oauth_client_id
+    - access_token
+    - cloud_id
+    - refresh_token
+    - start_date
+    - user_agent
+  settings:
+  - name: username
+    label: Username
+    description: Your Jira username.
+  - name: password
+    label: Password
+    kind: password
+    description: Your Jira password.
+  - name: base_url
+    label: Base URL
+    description: The base URL for your Jira instance.
+    placeholder: Ex. "https://mycompany.atlassian.net"
+  - name: oauth_client_secret
+    label: OAuth Client Secret
+    kind: password
+    description: The client secret value used for OAuth authentication.
+  - name: oauth_client_id
+    label: OAuth Client ID
+    description: The client ID used for OAuth authentication.
+  - name: access_token
+    label: Access Token
+    kind: password
+    description: The access token generated for your account.
+  - name: cloud_id
+    label: Cloud ID
+    description: The cloud ID of your JIRA instance.
+  - name: refresh_token
+    label: Refresh Token
+    kind: password
+    description: The refresh token generated for your account.
+  - name: start_date
+    label: Start Date
+    kind: date_iso8601
+    description: Specifies the date at which the tap will begin pulling data. This
+      works only for the streams taht suppport it.
+  - name: user_agent
+    label: User Agent
+    value: tap-jira via Meltano
