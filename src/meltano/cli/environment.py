@@ -1,5 +1,3 @@
-"""Environment management in CLI."""
-
 import click
 from meltano.cli.params import pass_project
 from meltano.core.environment_service import EnvironmentService
@@ -7,7 +5,7 @@ from meltano.core.project import Project
 
 from . import cli
 
-ENVIRONMENT_SERVICE_KEY = "environment_service"
+ENVIRONMENT_SERVICE_KEY = 'environment_service'
 
 
 @cli.group(name="environment")
