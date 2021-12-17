@@ -14,9 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#3124](https://gitlab.com/meltano/meltano/-/issues/3124) Fix an error in `meltano run` invocations where tap discover calls triggered an exception.
-
 ### Breaks
+
+
+## 1.90.1 - (2021-12-16)
+---
+
+### Fixes
+
+- [#3124](https://gitlab.com/meltano/meltano/-/issues/3124) Fix an error in `meltano run` invocations where tap discover calls triggered an exception.
 
 
 ## 1.90.0 - (2021-12-15)
