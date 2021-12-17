@@ -41,9 +41,9 @@ lint_python:
         REF=""
       fi
     - 'declare FILES=$(git diff --name-only ${CI_COMMIT_SHA} $REF | grep "\.py$")'
-    - 'echo "Changed files are $FILES"'
     - |
       if [ -n "${FILES}" ]; then
+        echo "Changed files are\n$FILES";
         pip install poetry;
         poetry install --no-root;
         make show_lint_python $(echo $FILES | xargs);
