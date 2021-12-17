@@ -150,26 +150,19 @@ docs/serve: docs/build
 
 .PHONY: lint show_lint
 
-BLACK_RUN = @poetry run black
+TOX_RUN = poetry run tox -e
 ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
-FLAKE8_RUN = @poetry run flake8 --statistics
-ISORT_RUN = @poetry run isort
 
-DEFAULT_LINT_TARGET = "src/meltano/ tests/"
 args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
 lint_python:
-	${ISORT_RUN} $(call args, ${DEFAULT_LINT_TARGET}) --apply
-	${BLACK_RUN} $(call args, ${DEFAULT_LINT_TARGET})
-	${FLAKE8_RUN} $(call args, ${DEFAULT_LINT_TARGET})
+	${TOX_RUN} fix -- $(call args)
 
 lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN} --fix
 
 show_lint_python:
-	${ISORT_RUN} $(call args, ${DEFAULT_LINT_TARGET}) --check-only --diff
-	${BLACK_RUN} $(call args, ${DEFAULT_LINT_TARGET}) --check --diff
-	${FLAKE8_RUN} $(call args, ${DEFAULT_LINT_TARGET})
+	${TOX_RUN} lint -- $(call args)
 
 show_lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN}
