@@ -79,6 +79,7 @@ pylint = "^2.12.2"
 colorama = "^0.4.4"
 isort = "^5.10.1"
 pyupgrade = "^2.29.1"
+tox = "^3.24.4"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
