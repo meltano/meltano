@@ -7,8 +7,6 @@
   before_script:
     - pip install poetry
 
-    - pip install tox
-
     # Workaround for https://github.com/python-poetry/poetry/issues/3199
     - poetry config experimental.new-installer false
 
@@ -32,6 +30,7 @@ lint_python:
     matrix:
       # Lint only on 'primary' python version:
       - PYTHON_IMAGE_VERSION: ["3.8"]
+  before_script: []
   script:
     - |
       if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
@@ -45,7 +44,9 @@ lint_python:
     - 'echo "Changed files are $FILES"'
     - |
       if [ -n "${FILES}" ]; then
-        make show_lint_python $(echo $FILES | xargs)
+        pip install poetry;
+        poetry install --no-root;
+        make show_lint_python $(echo $FILES | xargs);
       else
         echo "Nothing to lint"
       fi
