@@ -57,6 +57,12 @@ export default {
     goToLog(jobId) {
       this.$router.push({ name: 'runLog', params: { jobId } })
     },
+    getModalName() {
+      return this.$route.name
+    },
+    isModal() {
+      return this.$route.meta.isModal
+    },
     onChangeInterval(option, pipeline) {
       const interval = option.srcElement.selectedOptions[0].value
       if (interval !== pipeline.interval) {
@@ -274,5 +280,8 @@ export default {
         </template>
       </tbody>
     </table>
+    <div v-if="isModal">
+      <router-view :name="getModalName"></router-view>
+    </div>
   </div>
 </template>
