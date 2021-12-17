@@ -30,6 +30,9 @@ lint_python:
     matrix:
       # Lint only on 'primary' python version:
       - PYTHON_IMAGE_VERSION: ["3.8"]
+  before_script:
+    - pip install poetry
+    - poetry config experimental.new-installer false
   script:
     - |
       if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
