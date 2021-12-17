@@ -35,11 +35,11 @@ lint_python:
       if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
         git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME;
         echo "Comparing to $CI_MERGE_REQUEST_TARGET_BRANCH_NAME";
-        REF="-r origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}";
+        REF="-origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}";
       else
         REF=""
       fi
-    - 'declare FILES=$(git diff-tree --no-commit-id --name-only $REF -r ${CI_COMMIT_SHA} | grep "\.py$")'
+    - 'declare FILES=$(git diff --name-only ${CI_COMMIT_SHA} $REF | grep "\.py$")'
     - 'echo "Changed files are $FILES"'
     - |
       if [ -n "${FILES}" ]; then
