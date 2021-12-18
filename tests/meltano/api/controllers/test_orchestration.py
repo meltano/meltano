@@ -6,6 +6,7 @@ from flask import Flask, url_for
 from flask.testing import FlaskClient
 from flask.wrappers import Response
 from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
+from meltano.core.utils import slugify
 
 
 class TestOrchestration:
@@ -184,3 +185,39 @@ class TestOrchestration:
 
         assert res.status_code == 200
         assert not res.json["is_success"]
+
+    @mock.patch("meltano.api.controllers.orchestrations.ScheduleService")
+    def test_save_schedule_with_orchestration(
+        self,
+        mock_schedule_service,
+        app: Flask,
+        api: FlaskClient,
+    ):
+        mocked = mock.Mock()
+        mock_schedule_service.return_value = mocked
+
+        params = dict(
+            name="Name",
+            extractor="Extractor",
+            loader="Loader",
+            transform="Transform",
+            interval="@daily",
+            env=dict(SOME_ENV_VALUE="secret")
+        )
+
+        with app.test_request_context():
+            schedule_result = dict(is_success=True, start_date=None)
+            mocked.add.return_value = schedule_result
+            url = url_for("orchestrations.save_pipeline_schedule")
+            res: Response = api.post(url, json=params)
+            mocked.add.assert_called_with(
+                mock.ANY,
+                slugify(params["name"]),
+                params["extractor"],
+                params["loader"],
+                params["transform"],
+                params["interval"],
+                **params["env"]
+            )
+            assert res.status_code == 201
+            assert res.json == schedule_result
