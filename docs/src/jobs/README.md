@@ -2,9 +2,6 @@
 description: Join the Meltano team
 
 openings:
-- title: Head of Partnerships
-  location: Anywhere, Remote 🌍
-  description_url: https://boards.greenhouse.io/meltano/jobs/4088646004
 - title: Technical Marketing Manager
   location: Anywhere, Remote 🌍
   description_url: https://boards.greenhouse.io/meltano/jobs/4075560004
