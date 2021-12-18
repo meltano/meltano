@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3132](https://gitlab.com/meltano/meltano/-/issues/3132) Bump `pyhumps` dependency to fix a bug in converting `SCREAMING_SNAKE_CASE` variables in the API.
+
 ### Breaks
 
 
