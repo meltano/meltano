@@ -1491,7 +1491,7 @@ Duration = ["python-dateutil (>=2.8.0)"]
 
 [[package]]
 name = "pyhumps"
-version = "1.2.2"
+version = "3.0.2"
 description = "🐫  Convert strings (and dictionary keys) between snake case, camel case and pascal case in Python. Inspired by Humps for Node"
 category = "main"
 optional = false
@@ -2067,7 +2067,7 @@ infra = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<3.10"
-content-hash = "c8e06b00592cb2fa513d123f55053f3ec881fc156596d8ab2c0c480a0edd6284"
+content-hash = "2b24a1c204931c629af8b2b3e1270b0a8ca39b0bb948e0f4f1362cbf4c1b961e"
 
 [metadata.files]
 aenum = [
@@ -2973,8 +2973,8 @@ pyhocon = [
     {file = "pyhocon-0.3.58.tar.gz", hash = "sha256:9639e29069dd67c31a7afb14ec972c68765ddee3439b43f6b08f25f4371b6209"},
 ]
 pyhumps = [
-    {file = "pyhumps-1.2.2-py3-none-any.whl", hash = "sha256:e9914845a32d93215fae4c071a4a9766c358a3affcaf7a5abafb0c500e29e229"},
-    {file = "pyhumps-1.2.2.tar.gz", hash = "sha256:8cb4e73a5b0eb43306a0764c3a387f66756aa1a977af643ca5cd523a38de5a04"},
+    {file = "pyhumps-3.0.2-py3-none-any.whl", hash = "sha256:367b1aadcaa64f8196a3cd14f56559a5602950aeb8486f49318e7394f5e18052"},
+    {file = "pyhumps-3.0.2.tar.gz", hash = "sha256:042b4b6eec6c1f862f8310c0eebbae19293e9edab8cafb030ff78c890ef1aa34"},
 ]
 pyjwt = [
     {file = "PyJWT-2.3.0-py3-none-any.whl", hash = "sha256:e0c4bb8d9f0af0c7f5b1ec4c5036309617d03d56932877f2f7a0beeb5318322f"},
