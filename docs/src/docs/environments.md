@@ -99,4 +99,4 @@ $ meltano --environment=dev config target-snowflake
 
 ## Commands with support for `--environment`
 
-See the [CLI Reference](/docs/command-line-interface#environment).
+See the [CLI Reference](/docs/command-line-interface.html#environment).
