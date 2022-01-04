@@ -26,6 +26,8 @@ Meltano related news, logos, and how to get in touch.
   - Leveling Up Open Source Data Integration With Meltano Hub And The Singer SDK - Episode 200 
 - [**Software Engineering Daily**](https://softwareengineeringdaily.com/2021/06/30/meltano-elt-for-dataops-with-douwe-maan/)
   - Meltano: ELT for DataOps with Douwe Maan
+- [**Mad Data Podcast**](https://databand.ai/mad-data-podcast/built-for-complexity-data-observability-meets-data-integration/)
+  - Built For Complexity: Data Observability Meets Data Integration 
 
 ## Get in Touch
 
