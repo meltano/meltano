@@ -348,7 +348,7 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
           extractors:
           - name: tap-gitlab
             config:
-              projects: meltano/meltano meltano/sdk
+              projects: meltano/meltano meltano/tap-gitlab
               start_date: '2021-10-01T00:00:00Z'
     ```
 
@@ -532,20 +532,22 @@ Most database extractors, on the other hand, support two or more of the followin
     This will add the [metadata rules](/docs/plugins.html#metadata-extra) to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
 
     ```yml{4-13}
-    config:
-      plugins:
-        extractors:
-        - name: tap-gitlab
-          metadata:
-            some_entity_id:
-              replication-method: INCREMENTAL
-              replication-key: id
-            other_entity:
-              replication-method: FULL_TABLE
-            '*':
-              replication-method: INCREMENTAL
-            '*_full':
-              replication-method: FULL_TABLE
+    environments:
+    - name: dev
+      config:
+        plugins:
+          extractors:
+          - name: tap-gitlab
+            metadata:
+              some_entity_id:
+                replication-method: INCREMENTAL
+                replication-key: id
+              other_entity:
+                replication-method: FULL_TABLE
+              '*':
+                replication-method: INCREMENTAL
+              '*_full':
+                replication-method: FULL_TABLE
     ```
 
 1. Optionally, verify that the [stream metadata](https://hub.meltano.com/singer/spec#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):
@@ -821,6 +823,17 @@ meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --dump=state 
 
 :::
 
+There is also a beta [`meltano run`](/docs/command-line-interface.html#run) command which allows you to execute the same EL pipelines in a much more flexible fashion. This command allows you to chain multiple EL pipelines and add in other plugins inline too:
+
+```bash
+meltano run <extractor> <loader> <other_plugins>
+
+# For example:
+meltano run tap-gitlab target-postgres
+meltano run tap-gitlab target-postgres dbt:test dbt:run
+```
+
+
 ## Next steps
 
 Now that you've successfully run your first data integration (EL) pipeline using Meltano,
@@ -1004,37 +1017,51 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
   meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
   ```
 
-  Or directly using the `meltano invoke`, which requires more settings to be defined prior to running:
+  Or alternatively you can run dbt directly using the `meltano invoke`, which requires more settings to be defined prior to running:
 
-  First add the following configs to your dbt settings:
-  
+  - First add the following configs to your dbt settings:
+    
+    ```bash
+    meltano config dbt set target postgres
+    meltano config dbt set source_schema public
+    ```
+
+  - Then add the following `env` config, which sets environment variables at runtime, to your dev environment in the meltano.yml file.
+
+    ```yaml
+    environments:
+    - name: dev
+      config:
+        ...
+      env:
+        PG_ADDRESS: localhost
+        PG_PORT: '5432'
+        PG_USERNAME: meltano
+        PG_DATABASE: warehouse
+    ```
+
+  - And finally add the postgres password to your `.env` file so that it doesnt get checked into git:
+
+    ```
+    PG_PASSWORD="meltano"
+    ```
+
+  - After these configurations are set you can run the dbt models using `invoke`:
+
+    ```bash
+    meltano invoke dbt:<command>
+
+    # For example:
+    meltano invoke dbt:run
+    ```
+
+  There is also a beta [`meltano run`](/docs/command-line-interface.html#run) command which allows you to execute dbt in the same way as `invoke` but in a much more flexible fashion. This allows for inline dbt execution and more advanced reverse ETL use cases:
+
   ```bash
-  meltano config dbt set target postgres
-  meltano config dbt set source_schema public
-  ```
-  
-  Then add the following `env` config, which sets environment variables at runtime, to you dev environment in the meltano.yml file.
-
-  ```yaml
-  environments:
-  - name: dev
-    config:
-      ...
-    env:
-      PG_ADDRESS: localhost
-      PG_PORT: '5432'
-      PG_USERNAME: meltano
-      PG_PASSWORD: meltano
-      PG_DATABASE: warehouse
-  ```
-
-  After these configurations are set you can run the dbt models using `invoke`:
-
-  ```bash
-  meltano invoke dbt:<command>
+  meltano run <extractor> <loader> <other_plugins>
 
   # For example:
-  meltano invoke dbt:run
+  meltano run tap-gitlab target-postgres dbt:test dbt:run tap-postgres target-gsheet
   ```
 
   After your transform run is complete you should see a new table named after your model `warehouse.analytics.commits_last_7d` in your target.
