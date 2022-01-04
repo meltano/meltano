@@ -151,7 +151,7 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
 
 ## Add an environment
 
-Now that you have your very own Meltano project, it's time to start by creating your first [environment](/docs/environments.html#environments) (i.e. dev, test, prod). This allows you to define configurations specific to the environment you're running your project in.
+Now that you have your very own Meltano project, it's time to create your first [environment](/docs/environments.html#environments) (i.e. dev, test, prod). This allows you to define configurations specific to the environment you're running your project in.
 
 1. Add `dev`, `test`, and `prod` environments:
 
@@ -170,7 +170,6 @@ Now that you have your very own Meltano project, it's time to start by creating 
   Alternatively you can include the `--environment=dev` argument to each meltano command.
 
 1. List your available environments:
-
 
     ```bash
     meltano environment list
