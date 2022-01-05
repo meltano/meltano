@@ -82,6 +82,14 @@ members:
   social:
     gitlab: alex1126
     linkedin: alexmarple
+- name: REB - Richard E. Baum
+  title: Head of Operations
+  location: Austin, TX, USA 🇺🇸
+  gravatar_hash: 5e5522fa82e07685d4bc4bcf73894f04
+  social:
+    gitlab: Xyzzy
+    twitter: therebbie
+    linkedin: reb33
 ---
 
 # Meet the team
