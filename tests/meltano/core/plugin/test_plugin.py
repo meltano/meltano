@@ -521,6 +521,8 @@ class TestPluginType:
         assert PluginType.UTILITIES.verb == "utilize"
         assert PluginType.UTILITIES.singular == "utility"
         assert PluginType.UTILITIES.verb == "utilize"
+        assert PluginType.MAPPERS.singular == "mapper"
+        assert PluginType.MAPPERS.verb == "map"
 
     def test_from_cli_argument(self):
         for plugin_type in PluginType:

@@ -43,7 +43,7 @@ def compatible_copy_tree(source: Path, destination: Path):
 
 
 @pytest.fixture(scope="class")
-def discovery():
+def discovery():  # noqa: WPS213
     with meltano.core.bundle.find("discovery.yml").open() as base:
         discovery = yaml.safe_load(base)
 
@@ -191,6 +191,16 @@ def discovery():
                     "executable": "other-utility",
                 },
             },
+        }
+    )
+
+    discovery[PluginType.MAPPERS].append(
+        {
+            "name": "mapper-mock",
+            "namespace": "mapper_mock",
+            "pip_url": "mapper-mock",
+            "package_name": "mapper_mock",
+            "executable": "mapper-mock-cmd",
         }
     )
 
@@ -460,3 +470,13 @@ def project_files(test_dir):
     os.chdir(test_dir)
     shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")
+
+
+@pytest.fixture(scope="class")
+def mapper(project_add_service):
+    try:
+        return project_add_service.add(
+            PluginType.MAPPERS, "mapper-mock", variant="singer-io"
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
