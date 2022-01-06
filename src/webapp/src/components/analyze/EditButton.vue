@@ -1,6 +1,4 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
-
 export default {
   name: 'EditButton',
   props: {
@@ -8,36 +6,11 @@ export default {
     isTooltipTop: { type: Boolean, required: false },
     customClass: { type: String, required: false, default: '' }
   },
-  //   computed: {
-  //     ...mapGetters('plugins', ['getInstalledPlugin']),
-  //     ...mapState('repos', ['models']),
-  //     isAnalysisEnabled() {
-  //       return !!this.$flask.isAnalysisEnabled
-  //     },
-  //     getExploreModel() {
-  //       let targetModel
-  //       for (const prop in this.models) {
-  //         const model = this.models[prop]
-  //         if (model.plugin_namespace === this.getNamespace) {
-  //           targetModel = model
-  //           break
-  //         }
-  //       }
-  //       return targetModel
-  //     },
-  //     getIsExplorable() {
-  //       return Boolean(this.getExploreModel)
-  //     },
-  //     getNamespace() {
-  //       return this.getInstalledPlugin('extractors', this.pipeline.extractor)
-  //         .namespace
-  //     }
-  //   },
   methods: {
-    goToEdit() {
-      console.log('editing!', this.pipeline)
+    goToEdit(jobId) {
       this.$router.push({
-        name: 'editPipelineSchedule'
+        name: 'editPipelineSchedule',
+        params: { jobId }
       })
     }
   }
@@ -46,10 +19,10 @@ export default {
 
 <template>
   <button
-    class="button is-info editing-button tooltip"
+    class="button editing-button is-info tooltip"
     :class="[{ 'is-tooltip-top': isTooltipTop }, customClass]"
     data-tooltip="Edit pipeline details"
-    @click="goToEdit"
+    @click="goToEdit(pipeline.jobId)"
   >
     <span class="icon is-small">
       <font-awesome-icon icon="edit"></font-awesome-icon>
@@ -59,6 +32,14 @@ export default {
 
 <style lang="scss">
 .editing-button {
-  padding-right: 0.5em;
+  padding: 0 0.5rem 0 0.65rem;
+  background-color: #fff !important;
+  color: #209cee !important;
+  border: 1px solid #209cee !important;
+  &:hover {
+    background-color: #209cee !important;
+    color: #fff !important;
+    border: 1px solid #209cee !important;
+  }
 }
 </style>

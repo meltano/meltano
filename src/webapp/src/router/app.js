@@ -101,7 +101,7 @@ const router = new Router({
           }
         },
         {
-          path: 'edit-pipeline-schedule',
+          path: 'edit-pipeline-schedule/:jobId',
           name: 'editPipelineSchedule',
           components: {
             default: Pipelines,

@@ -9,7 +9,8 @@ import utils from '@/utils/utils'
 const defaultState = utils.deepFreeze({
   pluginInFocusConfiguration: {},
   pipelinePollers: [],
-  pipelines: []
+  pipelines: [],
+  pipeline: {}
 })
 
 const getters = {
@@ -82,6 +83,10 @@ const getters = {
     )
   },
 
+  getActivePipeline(state) {
+    return state.pipeline
+  },
+
   getSortedPipelines(state) {
     return lodash.orderBy(state.pipelines, 'extractor')
   },
@@ -135,6 +140,20 @@ const actions = {
     commit('setPipelineStatus', status)
     return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
       commit('deletePipeline', pipeline)
+    })
+  },
+
+  getPipelineByJobId({ commit, state }, jobId) {
+    return new Promise(resolve => {
+      if (state.pipelines.length > 0) {
+        let pipeline = state.pipelines.find(
+          pipeline => pipeline.jobId === jobId
+        )
+        commit('setActivePipeline', pipeline)
+        resolve()
+      } else {
+        console.log('do thing')
+      }
     })
   },
 
@@ -305,6 +324,10 @@ const mutations = {
     if (defaultState.hasOwnProperty(attr)) {
       state[attr] = lodash.cloneDeep(defaultState[attr])
     }
+  },
+
+  setActivePipeline(state, pipeline) {
+    state.pipeline = pipeline
   },
 
   setInFocusConfiguration(state, { configuration, target }) {

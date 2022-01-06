@@ -14,19 +14,15 @@ export default {
   data() {
     return {
       isLoaded: false,
-      isSaving: false,
-      pipeline: {
-        name: '',
-        extractor: '',
-        loader: '',
-        transform: 'skip',
-        interval: '',
-        isRunning: false
-      }
+      isSaving: false
     }
   },
   computed: {
     ...mapGetters('plugins', ['getPluginLabel', 'getHasDefaultTransforms']),
+    ...mapState({
+      pipelineFromState: 'orchestration/pipeline'
+    }),
+    ...mapState('orchestration', ['pipeline']),
     ...mapState('plugins', ['installedPlugins']),
     transformOptions() {
       return TRANSFORM_OPTIONS
@@ -60,18 +56,22 @@ export default {
       )
     }
   },
-  created() {
-    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
-      this.isLoaded = true
+  async created() {
+    await this.$store.dispatch(
+      'orchestration/getPipelineByJobId',
+      this.$route.params.jobId
+    ),
+      await this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+        this.isLoaded = true
 
-      const { extractor, loader } = this.$route.query
-      if (extractor) {
-        this.pipeline.extractor = extractor
-      }
-      if (loader) {
-        this.pipeline.loader = loader
-      }
-    })
+        const { extractor, loader } = this.$route.query
+        if (extractor) {
+          this.pipeline.extractor = extractor
+        }
+        if (loader) {
+          this.pipeline.loader = loader
+        }
+      })
   },
   methods: {
     ...mapActions('orchestration', ['savePipelineSchedule']),
@@ -116,6 +116,9 @@ export default {
         <h3 class="modal-card-title">Edit a pipeline</h3>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
+        <div>
+          <pre>{{ pipeline }}</pre>
+        </div>
         <progress
           v-if="!isLoaded || isSaving"
           class="progress is-small is-info"
