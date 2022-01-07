@@ -872,12 +872,10 @@ class TestSingerTap:
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
-        ), mock.patch("sys.getdefaultencoding", return_value="ascii") as encoding_mock:
+        ), mock.patch("sys.getdefaultencoding", return_value="ascii"):
             with pytest.raises(UnicodeDecodeError):
                 await subject.run_discovery(invoker, catalog_path)
 
-        # the failure would trigger even without logging but just to be safe
-        # we also enable debug logging.
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
         ):
