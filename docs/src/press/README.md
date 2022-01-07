@@ -28,6 +28,8 @@ Meltano related news, logos, and how to get in touch.
   - Meltano: ELT for DataOps with Douwe Maan
 - [**Mad Data Podcast**](https://databand.ai/mad-data-podcast/built-for-complexity-data-observability-meets-data-integration/)
   - Built For Complexity: Data Observability Meets Data Integration 
+- [**Dapper Data Podcast**](https://www.youtube.com/watch?v=Xi5CrT991eo)
+  - Realizing the Full Potential of Their Data - Episode #49 w/ Douwe Maan  
 
 ## Get in Touch
 
