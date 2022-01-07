@@ -1,0 +1,77 @@
+html, body {
+  /* IE 10-11 didn't like using min-height */
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: IBM Plex Sans,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+}
+
+.navbar {
+  border-bottom: 1px solid #eaecef;
+  margin-bottom: 1rem;
+  min-height: 4rem;
+}
+
+.navbar-item img {
+    max-height: none;
+}
+
+.breadcrumb a {
+  color: #c0c0c4;
+}
+
+.breadcrumb a:hover {
+  color: #3e3c8e;
+}
+
+.content {
+  flex: 1 0 auto; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
+  padding: 20px;
+}
+
+.footer {
+  flex-shrink: 0; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
+  padding: 20px;
+  background: #eaecef;
+}
+
+.footer a {
+  color: #62626e;
+}
+
+.footer a:hover {
+  color: #3438bf;
+}
+
+.footer ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.title {
+  color: #3e3c8e;
+}
+
+.chiclet {
+  display: flex;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 0.5rem;
+  flex-direction: column;
+  height: 100%;
+}
+
+/*.chiclet a:hover {
+  color: #ffffff;
+  background-color: var(--primary);
+  border-bottom-right-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+}*/
+
+.chiclet-header {
+  box-shadow: none;
+}

@@ -1,0 +1,98 @@
+<!-- TODO: No need to pull in this whole thing for a burger. Fix it later. -->
+<script 
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous">    
+</script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+  $(".navbar-burger").click(function() {
+      $(".navbar-burger, .navbar-menu", $(this).closest('.navbar')).toggleClass("is-active");
+  });
+});
+</script>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content">
+      <div class="columns is-centered">
+      
+        <div class="column is-one-quarter has-text-centered">
+
+          <figure class="image is-128x128 is-inline-block mb-0">
+            <img src="/images/meltano-logo-stacked.png" alt="The Meltano Logo, a purple dragon spitting fire">
+          </figure>
+
+          <ul class="social-media-list">
+
+            <li class="is-inline">
+              <a href="https://gitlab.com/meltano/meltano">
+                <span class="fab fa-gitlab fa-lg"></span>
+              </a>
+            </li>
+
+            <li class="is-inline">
+              <a href="https://github.com/MeltanoLabs">
+                <span class="fab fa-github fa-lg"></span>
+              </a>
+            </li>
+
+            <li class="is-inline">
+              <a href="https://twitter.com/meltanodata">
+                <span class="fab fa-twitter fa-lg"></span>
+              </a>
+            </li>
+
+            <li class="is-inline">
+              <a href="https://www.linkedin.com/company/meltano">
+                <span class="fab fa-linkedin fa-lg"></span>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+              
+        <div class="column">
+          <h3>The Project</h3>
+          <ul>
+            <li><a href="https://handbook.meltano.com/company/#mission">Our Mission</a></li>
+            <li><a href="https://handbook.meltano.com/company/#vision">Our Vision</a></li>
+            <li><a href="https://handbook.meltano.com/product/roadmap">Roadmap</a></li>
+            <li><a href="https://handbook.meltano.com/company/#strategy">Strategy</a></li>
+          </ul>
+        </div>
+
+        <div class="column">
+          <h3>The Company</h3>
+          <ul>
+            <li><a href="https://handbook.meltano.com/">Company Handbook</a></li>
+            <li><a href="https://handbook.meltano.com/company/values">Our Values</li>
+            <li><a href="https://handbook.meltano.com/timeline">History</li>
+          </ul>
+        </div>
+
+        <div class="column">
+          <h3>Community</h3>
+          <ul>
+            <li><a href="https://meltano.com/slack">Slack</a></li>
+            <li><a href="https://handbook.meltano.com/company/values">MeltanoLabs</li>
+            <li><a href="https://handbook.meltano.com/timeline">Meltano Hub</li>
+          </ul>
+        </div>
+
+
+        <div class="column">
+          <h3>Support</h3>
+          <ul>
+            <li><a href="https://meltano.com/slack">Contact</a></li>
+            <li><a href="https://stackoverflow.com/questions/tagged/meltano">StackOverflow</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+    
+  </div>
+
+</footer>

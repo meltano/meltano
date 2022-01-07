@@ -1,0 +1,69 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+title: Meltano Documentation
+email: hello@meltano.com
+description: > # this means to ignore newlines until "baseurl:"
+  Meltano Documentation
+#baseurl: "/jekyll" # the subpath of your site, e.g. /blog
+url: "https://docs.meltano.com" # the base hostname & protocol for your site
+
+# Outputting
+permalink: /:categories/:year/:month/:day/:title
+
+# Build settings
+markdown: kramdown
+exclude: ["README.md"]
+
+# Add plugins here.
+plugins:
+  - jekyll-toc
+  - jekyll-sitemap
+  - jekyll-algolia
+
+# Default plugin configuration
+defaults:
+  - scope:
+      path: ""
+    values:
+      toc: true # Show TOC by default. Set `toc: false` in Front Matter to override this.
+
+# Every top level section of the handbook is actually a collection. Their files are in a _folder in src/
+collections:
+  getting-started:
+    output: true
+    name: "Getting Started"
+  reference:
+    output: true
+    name: "Reference"
+  tutorials:
+    output: true
+    name: "Tutorials"
+  posts:
+    output: false
+
+# The directory that contains file for our collections
+collections_dir: src
+
+# jekyll-toc Config
+toc:
+  min_level: 1
+  max_level: 2
+  ordered_list: false
+  no_toc_section_class: no_toc_section
+  list_id: toc
+  list_class: section-nav
+  sublist_class: ''
+  item_class: toc-entry
+  item_prefix: toc-
+
+# jekyll-algolia
+#algolia:
+#  application_id: ''
+#  index_name: documentation_search
+#  search_only_api_key: ''
