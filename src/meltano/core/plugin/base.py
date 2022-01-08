@@ -1,16 +1,15 @@
-import copy
-import fnmatch
+"""Base class for all Meltano plugins."""
+
 import logging
 import re
-from collections import namedtuple
-from typing import Dict, Iterable, Optional, Union
+from typing import Dict, Optional, Union
 
 import yaml
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
 from meltano.core.setting_definition import SettingDefinition, YAMLEnum
-from meltano.core.utils import NotFound, compact, find_named, flatten
+from meltano.core.utils import NotFound, find_named
 
 from .command import Command
 
@@ -286,6 +285,15 @@ class BasePlugin(HookObject):
     def all_commands(self):
         """Return a dictonary of supported commands."""
         return self._variant.commands
+
+    @property
+    def test_commands(self) -> Dict[str, Command]:
+        """Return a the test command for this plugin."""
+        return {
+            name: command
+            for name, command in self.all_commands.items()
+            if name.startswith("test")
+        }
 
     @property
     def extra_settings(self):

@@ -91,9 +91,10 @@ python3 --version
 mkdir meltano-projects
 cd meltano-projects
 
-# Create and activate virtual environment
+# Create and activate virtual environment, and update pip
 python3 -m venv .venv
 source .venv/bin/activate
+pip3 install pip --upgrade
 
 # Install Meltano
 pip3 install meltano

@@ -12,15 +12,35 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#3085](https://gitlab.com/meltano/meltano/-/issues/3085) Upgrade `target-bigquery` default variant `adswerve` to [`v0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3).
-- [#3113](https://gitlab.com/meltano/meltano/-/issues/3113) Pin tag [`v1.4.27`](https://gitlab.com/meltano/tap-salesforce/-/tags/v1.4.27) of `tap-salesforce` default variant `meltano`.
-
 ### Fixes
 
-- [#3111](https://gitlab.com/meltano/meltano/-/issues/3111) Set the pinned tag of `target-bigquery` default variant `adswerve` to [`0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3) instead of `v0.11.3`.
+- [#3132](https://gitlab.com/meltano/meltano/-/issues/3132) Bump `pyhumps` dependency to fix a bug in converting `SCREAMING_SNAKE_CASE` variables in the API.
 
 ### Breaks
 
+
+## 1.90.1 - (2021-12-16)
+---
+
+### Fixes
+
+- [#3124](https://gitlab.com/meltano/meltano/-/issues/3124) Fix an error in `meltano run` invocations where tap discover calls triggered an exception.
+
+
+## 1.90.0 - (2021-12-15)
+---
+
+### New
+
+- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://meltano.com/docs/command-line-interface.html#run) command.
+- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://meltano.com/docs/command-line-interface.html#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
+
+### Changes
+
+- [#2967](https://gitlab.com/meltano/meltano/-/issues/2967) Set the `meltanolabs` variant as the default tap-google-analytics extractor.
+- [#3085](https://gitlab.com/meltano/meltano/-/issues/3085), [#3111](https://gitlab.com/meltano/meltano/-/issues/3111) Upgrade `target-bigquery` default variant `adswerve` to [`0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3).
+- [#3113](https://gitlab.com/meltano/meltano/-/issues/3113) Pin tag [`v1.4.27`](https://gitlab.com/meltano/tap-salesforce/-/tags/v1.4.27) of `tap-salesforce` default variant `meltano`.
+- [#3119](https://gitlab.com/meltano/meltano/-/issues/3119) Bump `meltano` variant of `tap-salesforce` to tag [`v1.5.0`](https://gitlab.com/meltano/tap-salesforce/-/tags/v1.5.0).
 
 ## 1.89.0 - (2021-12-02)
 ---

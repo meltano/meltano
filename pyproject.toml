@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "1.89.0"
+version = "1.90.1"
 description = "Meltano"
 authors = ["Meltano Team and Contributors <meltano@gitlab.com>"]
 license = "MIT"
@@ -43,7 +43,7 @@ networkx = "^2.2"
 psutil = "^5.6.3"
 psycopg2-binary = "^2.8.5"
 pyhocon = "^0.3.51"
-pyhumps = "1.2.2"
+pyhumps = "^3.0.0"
 pypika = "^0.25.1"
 python-dotenv = "^0.14.0"
 python-gitlab = "^1.8.0"
@@ -173,6 +173,7 @@ pyflakes = ["+*"]
 wemake-python-styleguide = [
   "+*",
   "-WPS110",  # Allow blacklisted variable names that can be clear enough in method context
+  "-WPS111",  # Allow short variable names, e.g. for generic type parameters
   "-WPS115",  # Allow upper-case constants in Enum subclasses
   "-WPS300",  # Allow local folder imports (import .module)
   "-WPS305",  # Allow f-strings
@@ -200,6 +201,8 @@ wemake-python-styleguide = [
   "-WPS442",  # Allow outer scope name shadowing for fixtures
   "-WPS430",  # Allow nested functions in test methods
   "-WPS437",  # Allow protected attribute usage in test methods
+  "-WPS316",  # Allow context managers with multiple assignments
+  "-WPS202",  # Allow many module members
 ]
 
 [tool.flakehell.exceptions."scripts/"]
@@ -212,6 +215,7 @@ wemake-python-styleguide = [
   "-WPS213",  # Allow many expressions, since string building requires them
   "-WPS216",  # Allow many decorators, since `click` uses them to define the CLI
   "-WPS202",  # Allow many module members
+  "-WPS232",  # The cli module will continue to grow, so while the module is large the complexity is well contained
 ]
 
 [tool.flakehell.exceptions."src/meltano/migrations/versions/"]
@@ -226,6 +230,18 @@ pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the mo
 
 [tool.flakehell.exceptions."src/meltano/core/project_files.py"]
 wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
+
+[tool.flakehell.exceptions."src/meltano/core/block"]
+flake8-docstrings = ["-D101"] # Don't require docstrings in public class since init methods are documented
+wemake-python-styleguide = [
+  "-WPS428", # Allow ... use inside of typing protocol interface classes
+  "-WPS201", # Suppress too many imports warning (typing inflates count)
+]
+
+[tool.flakehell.exceptions."src/meltano/core/validation_service.py"]
+wemake-python-styleguide = [
+  "-WPS428",  # Three dots are OK for empty methods in a Protocol
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
