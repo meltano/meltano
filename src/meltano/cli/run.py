@@ -61,7 +61,7 @@ async def run(project, blocks):
         session.close()
 
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_elt(blocks)
+    tracker.track_meltano_run(blocks)
 
 
 async def _run_blocks(
