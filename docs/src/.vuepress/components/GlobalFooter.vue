@@ -26,7 +26,7 @@ export default {
         <h5>Company</h5>
         <ul>
           <li>
-            <a href="https://meltano.com/blog/about/"
+            <a href="https://handbook.meltano.com/company/"
               >About Meltano</a
             >
           </li>
