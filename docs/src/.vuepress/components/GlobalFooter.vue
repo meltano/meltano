@@ -26,12 +26,12 @@ export default {
         <h5>Company</h5>
         <ul>
           <li>
-            <a href="https://meltano.com/handbook/#subresources"
+            <a href="https://handbook.meltano.com/company/"
               >About Meltano</a
             >
           </li>
           <li><a href="https://meltano.com/handbook/">Handbook</a></li>
-          <li><a href="https://meltano.com/docs/#job-openings">Careers</a></li>
+          <li><a href="https://meltano.com/jobs">Careers</a></li>
           <li><a href="https://meltano.com/press/">Press</a></li>
         </ul>
       </div>
