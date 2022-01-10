@@ -8,6 +8,7 @@ from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.db import project_engine
 from meltano.core.runner import RunnerError
+from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
 from sqlalchemy.orm import Session
 
@@ -58,6 +59,9 @@ async def run(project, blocks):
         await _run_blocks(parsed_blocks, session)
     finally:
         session.close()
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_run(blocks)
 
 
 async def _run_blocks(
