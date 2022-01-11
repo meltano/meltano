@@ -475,8 +475,6 @@ def project_files(test_dir):
 @pytest.fixture(scope="class")
 def mapper(project_add_service):
     try:
-        return project_add_service.add(
-            PluginType.MAPPERS, "mapper-mock", variant="singer-io"
-        )
+        return project_add_service.add(PluginType.MAPPERS, "mapper-mock")
     except PluginAlreadyAddedException as err:
         return err.plugin

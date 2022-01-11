@@ -15,16 +15,30 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
-    """Check if a plugin is a command block.
-
-    Note: currently, our only command block is dbt so we just check if the plugin type is a TRANSFORMERS.
+    """Check if a plugin is a command block..
 
     Args:
         plugin: Plugin to check.
     Returns:
         True if plugin is a command block.
     """
-    return plugin.type not in {PluginType.EXTRACTORS, PluginType.LOADERS}
+    return plugin.type not in {
+        PluginType.EXTRACTORS,
+        PluginType.LOADERS,
+        PluginType.MAPPERS,
+    }
+
+
+def is_mapper_block(plugin: ProjectPlugin) -> bool:
+    """Check if a plugin is a mapper.
+
+    Args:
+        plugin: Plugin to check.
+    Returns:
+        True if plugin is a command block.
+    """
+    if plugin.type != PluginType.MAPPERS:
+        return False
 
 
 def generate_job_id(
@@ -189,7 +203,7 @@ class BlockParser:  # noqa: D101
                 return None, offset + idx + 1
 
             self.log.debug("found block", block_type=plugin.type, index=idx + 1)
-            if plugin.type == PluginType.TRANSFORMS or PluginType.LOADERS:
+            if plugin.type == PluginType.MAPPERS or PluginType.LOADERS:
                 blocks.append(builder.make_block(plugin))
                 if plugin.type == PluginType.LOADERS:
                     self.log.debug("blocks", offset=offset, idx=idx + 1)
@@ -202,6 +216,6 @@ class BlockParser:  # noqa: D101
                     plugin_name=plugin.name,
                 )
                 raise BlockSetValidationError(
-                    f"Expected {PluginType.TRANSFORMS} or {PluginType.LOADERS}."
+                    f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}."
                 )
         raise Exception("Found no end in block set!")

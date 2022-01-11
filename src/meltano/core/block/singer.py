@@ -16,6 +16,9 @@ from meltano.core.runner import RunnerError
 
 from .ioblock import IOBlock
 
+PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPERS)
+CONSUMERS = (PluginType.LOADERS, PluginType.MAPPERS)
+
 
 class InvokerBase:  # noqa: WPS230
     """Base class for creating IOBlock's built on top of existing Meltano plugins."""
@@ -234,7 +237,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
         Currently if the underlying plugin is of type extractor, it is a producer.
         """
-        return self.invoker.plugin.type == PluginType.EXTRACTORS
+        return self.invoker.plugin.type in PRODUCERS
 
     @property
     def consumer(self) -> bool:
@@ -242,7 +245,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
         Currently if the underlying plugin is of type loader, it is a consumer.
         """
-        return self.invoker.plugin.type == PluginType.LOADERS
+        return self.invoker.plugin.type in CONSUMERS
 
     async def start(self):
         """Start the SingerBlock by invoking the underlying plugin.
