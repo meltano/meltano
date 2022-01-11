@@ -3300,6 +3300,10 @@ files:
     namespace: gitlab_ci
     repo: https://gitlab.com/meltano/files-gitlab-ci
     pip_url: git+https://gitlab.com/meltano/files-gitlab-ci.git
+  - name: local-kubernetes
+    namespace: infrastructure
+    repo: https://gitlab.com/meltano/infra/files-local-kubernetes
+    pip_url: git+https://gitlab.com/meltano/infra/files-local-kubernetes.git
 utilities:
   - name: sqlfluff
     namespace: sqlfluff
