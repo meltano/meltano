@@ -91,9 +91,10 @@ python3 --version
 mkdir meltano-projects
 cd meltano-projects
 
-# Create and activate virtual environment
+# Create and activate virtual environment, and update pip
 python3 -m venv .venv
 source .venv/bin/activate
+pip3 install pip --upgrade
 
 # Install Meltano
 pip3 install meltano
@@ -185,7 +186,7 @@ meltano add extractor tap-gitlab
 # - the https://gitlab.com/meltano/meltano project
 meltano config tap-gitlab set projects meltano/meltano
 # - going back to May 1st, 2020
-meltano config tap-gitlab set start_date 2020-05-01T00:00:00Z
+meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
 # Select all attributes of the "tags" entity
 meltano select tap-gitlab tags "*"

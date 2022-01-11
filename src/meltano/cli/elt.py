@@ -109,7 +109,6 @@ async def elt(
     session = Session()
     try:
         plugins_service = ProjectPluginsService(project)
-
         context_builder = _elt_context_builder(
             project,
             job,

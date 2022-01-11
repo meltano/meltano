@@ -149,6 +149,33 @@ will hold the [plugins](/docs/plugins.html) that implement the various details o
     to easily check the impact of the [`meltano` commands](/docs/command-line-interface.html)
     you'll run below on your project files, most notably your [`meltano.yml` project file](/docs/project.html#meltano-yml-project-file).
 
+## Add an environment
+
+Now that you have your very own Meltano project, it's time to create your first [environment](/docs/environments.html#environments) (i.e. dev, test, prod). This allows you to define configurations specific to the environment you're running your project in.
+
+1. Add `dev`, `test`, and `prod` environments:
+
+    ```bash
+    meltano environment add dev
+    meltano environment add test
+    meltano environment add prod
+    ```
+
+1. Activate your environment for your shell session:
+
+    ```bash
+    export MELTANO_ENVIRONMENT=dev
+    ```
+
+  Alternatively you can include the `--environment=dev` argument to each meltano command.
+
+1. List your available environments:
+
+    ```bash
+    meltano environment list
+    ```
+
+  You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
 ## Add an extractor to pull data from a source
 
 Now that you have your very own Meltano project, it's time to add some [plugins](/docs/plugins.html) to it!
@@ -305,21 +332,23 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
     meltano config <plugin> set <setting> <value>
 
     # For example:
-    meltano config tap-gitlab set projects "meltano/meltano meltano/sdk"
-    meltano config tap-gitlab set start_date 2021-10-01T00:00:00Z
+    meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
+    meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
     meltano config tap-gitlab set private_token my_private_token
     ```
 
     This will add the non-sensitive configuration to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
 
     ```yml{5-7}
-    plugins:
-      extractors:
-      - name: tap-gitlab
-        variant: meltanolabs
-        config:
-          projects: meltano/meltano meltano/sdk
-          start_date: '2021-10-01T00:00:00Z'
+    environments:
+    - name: dev
+      config:
+        plugins:
+          extractors:
+          - name: tap-gitlab
+            config:
+              projects: meltano/meltano meltano/tap-gitlab
+              start_date: '2021-10-01T00:00:00Z'
     ```
 
     Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
@@ -344,11 +373,11 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
       "api_url": "https://gitlab.com",
       "private_token": "my_private_token",
       "groups": "",
-      "projects": "meltano/meltano meltano/sdk",
+      "projects": "meltano/meltano meltano/tap-gitlab",
       "ultimate_license": false,
       "fetch_merge_request_commits": false,
       "fetch_pipelines_extended": false,
-      "start_date": "2021-10-01T00:00:00Z"
+      "start_date": "2021-03-01T00:00:00Z"
     }
     ```
 
@@ -410,14 +439,25 @@ If you'd like Meltano to use it instead of [generating a catalog](/docs/integrat
     plugins:
       extractors:
       - name: tap-gitlab
-        select:
-        - commits.id
-        - commits.project_id
-        - commits.created_at
-        - commits.author_name
-        - commits.message
-        - tags.*
-        - '!*.*_url'
+        variant: meltanolabs
+        pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
+    environments:
+    - name: dev
+      config:
+        plugins:
+          extractors:
+          - name: tap-gitlab
+            config:
+              projects: meltano/meltano meltano/tap-gitlab
+              start_date: '2021-03-01T00:00:00Z'
+            select:
+            - commits.id
+            - commits.project_id
+            - commits.created_at
+            - commits.author_name
+            - commits.message
+            - tags.*
+            - '!*.*_url'
     ```
 
     Note that exclusion takes precedence over inclusion. If an attribute is excluded, there is no way to include it back without removing the exclusion pattern first. This is also detailed in the CLI documentation for the [`--exclude` parameter](/docs/command-line-interface.html#exclude-parameter).
@@ -491,19 +531,22 @@ Most database extractors, on the other hand, support two or more of the followin
     This will add the [metadata rules](/docs/plugins.html#metadata-extra) to your [`meltano.yml` project file](/docs/project.html#plugin-configuration):
 
     ```yml{4-13}
-    plugins:
-      extractors:
-      - name: tap-gitlab
-        metadata:
-          some_entity_id:
-            replication-method: INCREMENTAL
-            replication-key: id
-          other_entity:
-            replication-method: FULL_TABLE
-          '*':
-            replication-method: INCREMENTAL
-          '*_full':
-            replication-method: FULL_TABLE
+    environments:
+    - name: dev
+      config:
+        plugins:
+          extractors:
+          - name: tap-gitlab
+            metadata:
+              some_entity_id:
+                replication-method: INCREMENTAL
+                replication-key: id
+              other_entity:
+                replication-method: FULL_TABLE
+              '*':
+                replication-method: INCREMENTAL
+              '*_full':
+                replication-method: FULL_TABLE
     ```
 
 1. Optionally, verify that the [stream metadata](https://hub.meltano.com/singer/spec#metadata) for each table was set correctly in the extractor's [generated catalog file](/docs/integration.html#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/docs/command-line-interface.html#select):
@@ -685,12 +728,18 @@ Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572
       - name: target-postgres
         variant: transferwise
         pip_url: pipelinewise-target-postgres
-        config:
-          host: localhost
-          port: 5432
-          user: meltano
-          dbname: warehouse
-          default_target_schema: public
+    environments:
+    - name: dev
+      config:
+        plugins:
+          loaders:
+          - name: target-postgres
+            config:
+              host: localhost
+              port: 5432
+              user: meltano
+              dbname: warehouse
+              default_target_schema: public
     ```
 
     Sensitive configuration (like `password`) will instead be stored in your project's [`.env` file](/docs/project.html#env) so that it will not be checked into version control:
@@ -772,6 +821,17 @@ meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --dump=state 
 ```
 
 :::
+
+There is also a beta [`meltano run`](/docs/command-line-interface.html#run) command which allows you to execute the same EL pipelines in a much more flexible fashion. This command allows you to chain multiple EL pipelines and add in other plugins inline too:
+
+```bash
+meltano run <extractor> <loader> <other_plugins>
+
+# For example:
+meltano run tap-gitlab target-postgres
+meltano run tap-gitlab target-postgres dbt:test dbt:run
+```
+
 
 ## Next steps
 
@@ -956,23 +1016,52 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
   meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
   ```
 
-  Or directly using the `meltano invoke`, which requires more settings to be defined prior to running:
+  Or alternatively you can run dbt directly using the `meltano invoke`, which requires more settings to be defined prior to running:
+
+  - First add the following configs to your dbt settings:
+    
+    ```bash
+    meltano config dbt set target postgres
+    meltano config dbt set source_schema public
+    ```
+
+  - Then add the following `env` config, which sets environment variables at runtime, to your dev environment in the meltano.yml file.
+
+    ```yaml
+    environments:
+    - name: dev
+      config:
+        ...
+      env:
+        PG_ADDRESS: localhost
+        PG_PORT: '5432'
+        PG_USERNAME: meltano
+        PG_DATABASE: warehouse
+    ```
+
+  - And finally add the postgres password to your `.env` file so that it doesnt get checked into git:
+
+    ```
+    PG_PASSWORD="meltano"
+    ```
+
+  - After these configurations are set you can run the dbt models using `invoke`:
+
+    ```bash
+    meltano invoke dbt:<command>
+
+    # For example:
+    meltano invoke dbt:run
+    ```
+
+  There is also a beta [`meltano run`](/docs/command-line-interface.html#run) command which allows you to execute dbt in the same way as `invoke` but in a much more flexible fashion. This allows for inline dbt execution and more advanced reverse ETL use cases:
 
   ```bash
-  meltano invoke dbt:<command>
+  meltano run <extractor> <loader> <other_plugins>
 
   # For example:
-  export DBT_TARGET="postgres"
-  export PG_ADDRESS="localhost"
-  export PG_PORT="5432"
-  export PG_USERNAME="meltano"
-  export PG_PASSWORD="meltano"
-  export PG_DATABASE="warehouse"
-  export DBT_SOURCE_SCHEMA="public"
-  meltano invoke dbt:run
+  meltano run tap-gitlab target-postgres dbt:test dbt:run tap-postgres target-gsheet
   ```
-
-  For this example we just used environment variables to set the dbt configurations but they can be defined as settings in your meltano.yml using `meltano config dbt set <setting> <setting_value>`.
 
   After your transform run is complete you should see a new table named after your model `warehouse.analytics.commits_last_7d` in your target.
 

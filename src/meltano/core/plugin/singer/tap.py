@@ -279,7 +279,6 @@ class SingerTap(SingerPlugin):
         """
         catalog_path = plugin_invoker.files["catalog"]
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
-
         if catalog_path.exists():
             try:
                 cached_key = catalog_cache_key_path.read_text()
