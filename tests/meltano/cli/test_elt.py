@@ -453,7 +453,11 @@ class TestCliEltScratchpadOne:
 
             assert exception_logged(
                 result.stdout + result.stderr,
-                CliError("ELT could not be completed: Extractor failed"),
+                CliError(
+                    "ELT could not be completed: Extractor failed\n"
+                    f"For more detailed log messages, check the generated log file '' "
+                    "or re-run the command using the '--log-level=debug' CLI flag."
+                ),
             )
 
             assert_log_lines(
