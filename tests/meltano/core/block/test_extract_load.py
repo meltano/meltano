@@ -361,7 +361,7 @@ class TestExtractLoadBlocks:
             assert target_process.stdin.writeline.called
 
             # sanity check to verify that we saw mapper output and not tap output
-            first_write = mapper_process.stdin.writeline.call_args_list[0]
+            first_write = target_process.stdin.writeline.call_args_list[0]
             assert "mapper" in first_write[0][0]
 
     @pytest.mark.asyncio

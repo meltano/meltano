@@ -29,18 +29,6 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
     }
 
 
-def is_mapper_block(plugin: ProjectPlugin) -> bool:
-    """Check if a plugin is a mapper.
-
-    Args:
-        plugin: Plugin to check.
-    Returns:
-        True if plugin is a command block.
-    """
-    if plugin.type != PluginType.MAPPERS:
-        return False
-
-
 def generate_job_id(
     project: Project, consumer: IOBlock, producer: IOBlock
 ) -> Union[str, None]:
