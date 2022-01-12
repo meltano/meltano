@@ -20,7 +20,7 @@
         },
         "environments": {
             "type": "array",
-            "description": ""
+            "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in."
         },
         "discovery_url": {
             "type": "string",
@@ -29,7 +29,7 @@
         },
         "include_paths": {
             "type": "array",
-            "description": ""
+            "description": "An array of paths (relative to the project directory) of other Meltano config files to include in the configuration."
         },
         "plugins": {
             "type": "object",
@@ -195,7 +195,7 @@
                 }
             },
             "extractors": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#extractors",
                 "type": "object",
                 "allOf": [
                     {
@@ -274,14 +274,14 @@
                                 "default": {}
                             },
                             "state": {
-                                "description": "a path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
+                                "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
                             }
                         }
                     }
                 ]
             },
             "loaders": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#loaders",
                 "type": "object",
                 "allOf": [
                     {
@@ -333,7 +333,7 @@
                 ]
             },
             "orchestrators": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#orchestrators",
                 "type": "object",
                 "allOf": [
                     {
@@ -361,7 +361,7 @@
                 ]
             },
             "transformers": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#transformers",
                 "type": "object",
                 "allOf": [
                     {
@@ -389,7 +389,7 @@
                 ]
             },
             "files": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#file-bundles",
                 "type": "object",
                 "allOf": [
                     {
@@ -423,7 +423,7 @@
                 ]
             },
             "utilities": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#utilities",
                 "type": "object",
                 "allOf": [
                     {
@@ -451,7 +451,7 @@
                 ]
             },
             "transforms": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#transforms",
                 "type": "object",
                 "allOf": [
                     {
@@ -486,7 +486,7 @@
                 ]
             },
             "models": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#models",
                 "type": "object",
                 "allOf": [
                     {
@@ -514,7 +514,7 @@
                 ]
             },
             "dashboards": {
-                "description": "https://www.meltano.com/plugins/extractors/#extractors-data-sources",
+                "description": "https://meltano.com/docs/plugins.html#dashboards",
                 "type": "object",
                 "allOf": [
                     {
