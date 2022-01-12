@@ -248,8 +248,8 @@ async def _run_elt(log, context_builder, output_logger):
         except RunnerError as err:
             raise CliError(
                 f"ELT could not be completed: {err}\n"
-                f"For more detailed log messages, check the generated log file '{output_logger.file}' "
-                "or re-run the command using the '--log-level=debug' CLI flag."
+                + f"For more detailed log messages, check the generated log file '{output_logger.file}' "
+                + "or re-run the command using the '--log-level=debug' CLI flag."
             ) from err
 
 

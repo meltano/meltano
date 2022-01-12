@@ -422,7 +422,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         project_plugins_service,
-        job_logging_service
+        job_logging_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -457,8 +457,8 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Extractor failed\n"
-                    f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    "or re-run the command using the '--log-level=debug' CLI flag."
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
                 ),
             )
 
@@ -543,8 +543,8 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Loader failed\n"
-                    f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    "or re-run the command using the '--log-level=debug' CLI flag."
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
                 ),
             )
 
@@ -611,8 +611,8 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Loader failed\n"
-                    f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    "or re-run the command using the '--log-level=debug' CLI flag."
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
                 ),
             )
 
@@ -688,8 +688,8 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Extractor and loader failed\n"
-                    f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    "or re-run the command using the '--log-level=debug' CLI flag."
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
                 ),
             )
 
@@ -776,8 +776,8 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Output line length limit exceeded\n"
-                    f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    "or re-run the command using the '--log-level=debug' CLI flag."
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
                 ),
             )
 
@@ -1090,7 +1090,7 @@ class TestCliEltScratchpadTwo:
         project_plugins_service,
         job_logging_service,
     ):
-        job_id = 'pytest_test_elt'
+        job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name, "--transform", "run"]
 
         dbt_process.wait.return_value = 1
@@ -1134,11 +1134,12 @@ class TestCliEltScratchpadTwo:
                 ],
             )
             assert exception_logged(
-                result.stderr, CliError(
+                result.stderr,
+                CliError(
                     "ELT could not be completed: `dbt run` failed\n"
-                    f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    "or re-run the command using the '--log-level=debug' CLI flag."
-                )
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                ),
             )
 
             assert_log_lines(
