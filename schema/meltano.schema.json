@@ -233,9 +233,7 @@
                                         "activate-version",
                                         "batch",
                                         "test",
-                                        "log-based",
-                                        "soft-delete",
-                                        "hard-delete"
+                                        "log-based"
                                     ]
                                 }
                             },
@@ -299,8 +297,6 @@
                                         "stream-maps",
                                         "activate-version",
                                         "batch",
-                                        "test",
-                                        "log-based",
                                         "soft-delete",
                                         "hard-delete",
                                         "datatype-failsafe",
