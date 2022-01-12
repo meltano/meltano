@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Create JSON Schema for meltano.yml. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
+
 ### Changes
 
 ### Fixes
