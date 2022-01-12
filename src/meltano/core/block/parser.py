@@ -7,7 +7,7 @@ from meltano.core.block.blockset import BlockSet, BlockSetValidationError
 from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
-from meltano.core.block.singer import SingerBlock
+from meltano.core.block.singer import CONSUMERS, SingerBlock
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
@@ -182,9 +182,9 @@ class BlockParser:  # noqa: D101
         blocks.append(builder.make_block(self._plugins[offset]))
 
         for idx, plugin in enumerate(self._plugins[offset + 1 :]):  # noqa: E203
-            if plugin.type != PluginType.LOADERS:
+            if plugin.type not in CONSUMERS:
                 self.log.debug(
-                    "next block not loader",
+                    "next block not a consumer of output",
                     offset=offset,
                     plugin_type=plugin.type,
                 )
