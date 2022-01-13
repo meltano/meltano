@@ -21,7 +21,7 @@ ALL = "all"
 logger = logging.getLogger(__name__)
 
 
-@cli.command()
+@cli.command(short_help="Create a new Meltano project.")
 @click.pass_context
 @click.argument("project_name")
 @click.option(
@@ -29,9 +29,7 @@ logger = logging.getLogger(__name__)
 )
 @database_uri_option
 def init(ctx, project_name, no_usage_stats):
-    """
-    Creates a new Meltano project
-    """
+    """Create a new Meltano project."""
     if ctx.obj["project"]:
         logging.warning(f"Found meltano project at: {ctx.obj['project'].root}")
         raise CliError("`meltano init` cannot run inside a Meltano project.")

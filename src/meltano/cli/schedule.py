@@ -18,16 +18,20 @@ from . import cli
 from .params import pass_project
 
 
-@cli.group(cls=DefaultGroup, default="add")
+@cli.group(cls=DefaultGroup, default="add", short_help="Manage pipeline schedules.")
 @click.pass_context
 @pass_project(migrate=True)
 def schedule(project, ctx):
-    """Manage Schedules."""
+    """
+    Manage pipeline schedules.
+
+    Read more at https://meltano.com/docs/command-line-interface.html#schedule
+    """
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
 
 
-@schedule.command(short_help="[default] Add a new schedule")
+@schedule.command(short_help="[default] Add a new schedule.")
 @click.argument("name")
 @click.argument("extractor")
 @click.argument("loader")
@@ -37,15 +41,14 @@ def schedule(project, ctx):
 @click.pass_context
 def add(ctx, name, extractor, loader, transform, interval, start_date):
     """
-    Add a new schedule
+    Add a new schedule.
 
     \b
     NAME:\tThe schedule name, must be unique
     EXTRACTOR:\tWhich extractor should be used
     LOADER:\tWhich loader should be used
     INTERVAL:\tCron-like syntax to specify the schedule interval (@daily, @hourly, etc…)
-    """
-
+    """  # noqa: D301
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 
@@ -65,10 +68,11 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
         session.close()
 
 
-@schedule.command()
+@schedule.command(short_help="List available schedules.")  # noqa: WPS441
 @click.option("--format", type=click.Choice(["json", "text"]), default="text")
 @click.pass_context
 def list(ctx, format):
+    """List available schedules."""
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 
@@ -124,12 +128,14 @@ def list(ctx, format):
 
 
 @schedule.command(
-    context_settings=dict(ignore_unknown_options=True, allow_interspersed_args=False)
+    context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
+    short_help="Run a schedule.",
 )
 @click.argument("name")
 @click.argument("elt_options", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def run(ctx, name, elt_options):
+    """Run a schedule."""
     schedule_service = ctx.obj["schedule_service"]
 
     schedule = schedule_service.find_schedule(name)
