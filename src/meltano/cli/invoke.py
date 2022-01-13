@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 
 
 @cli.command(
-    context_settings=dict(ignore_unknown_options=True, allow_interspersed_args=False)
+    context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
+    short_help="Invoke a plugin.",
 )
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
@@ -32,12 +33,12 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--dump",
     type=click.Choice(["catalog", "config"]),
-    help="Dump content of generated file",
+    help="Dump content of specified file to disk.",
 )
 @click.option(
     "--list-commands",
     is_flag=True,
-    help="List the commands supported by the plugin",
+    help="List the commands supported by the plugin.",
 )
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
@@ -50,7 +51,11 @@ def invoke(
     plugin_name: str,
     plugin_args: Tuple[str, ...],
 ):
-    """Invoke the plugin's executable with specified arguments."""
+    """
+    Invoke a plugin's executable with specified arguments.
+
+    Read more at https://meltano.com/docs/command-line-interface.html#invoke
+    """
     try:
         plugin_name, command_name = plugin_name.split(":")
     except ValueError:

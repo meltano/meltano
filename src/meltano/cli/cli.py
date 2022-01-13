@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--log-config", type=str, help="Path to a python logging yaml config file."
 )
-@click.option("-v", "--verbose", count=True)
+@click.option("-v", "--verbose", count=True, help="Not used.")
 @click.option(
     "--environment",
     envvar="MELTANO_ENVIRONMENT",
-    help="Meltano environment name",
+    help="Meltano environment name.",
 )
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
@@ -29,7 +29,9 @@ def cli(  # noqa: WPS231
     ctx, log_level: str, log_config: str, verbose: int, environment: str
 ):  # noqa: WPS231
     """
-    Get help at https://www.meltano.com/docs/command-line-interface.html
+    ELT for the DataOps era.
+
+    Read more at https://www.meltano.com/docs/command-line-interface.html
     """
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level

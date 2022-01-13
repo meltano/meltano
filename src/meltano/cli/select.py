@@ -41,14 +41,28 @@ def selection_mark(selection):
     return f"[{selection:<{colwidth}}]"
 
 
-@cli.command()
+@cli.command(short_help="Manage extractor selection patterns.")
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")
-@click.option("--list", is_flag=True)
-@click.option("--all", is_flag=True)
-@click.option("--rm", "--remove", "remove", is_flag=True)
-@click.option("--exclude", is_flag=True)
+@click.option("--list", is_flag=True, help="List the current selected tap attributes.")
+@click.option(
+    "--all",
+    is_flag=True,
+    help="Show all the tap attributes with their selected status.",
+)
+@click.option(
+    "--rm",
+    "--remove",
+    "remove",
+    is_flag=True,
+    help="Remove previously added select patterns.",
+)
+@click.option(
+    "--exclude",
+    is_flag=True,
+    help="Exclude all attributes that match specified pattern.",
+)
 @pass_project(migrate=True)
 @click_run_async
 async def select(
@@ -58,7 +72,11 @@ async def select(
     attributes_filter,
     **flags: Dict[str, bool],
 ):
-    """Execute the meltano select command."""
+    """
+    Manage extractor selection patterns.
+
+    Read more at https://meltano.com/docs/command-line-interface.html#select
+    """
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])
