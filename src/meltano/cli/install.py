@@ -9,7 +9,7 @@ from .params import pass_project
 from .utils import CliError, add_related_plugins, install_plugins
 
 
-@cli.command()
+@cli.command(short_help="Install project dependencies.")
 @click.argument(
     "plugin_type", type=click.Choice(PluginType.cli_arguments()), required=False
 )
@@ -30,8 +30,9 @@ from .utils import CliError, add_related_plugins, install_plugins
 @pass_project(migrate=True)
 def install(project, plugin_type, plugin_name, include_related, clean, parallelism):
     """
-    Installs all the dependencies of your project based on the meltano.yml file.
-    Read more at https://www.meltano.com/docs/command-line-interface.html.
+    Install all the dependencies of your project based on the meltano.yml file.
+
+    Read more at https://www.meltano.com/docs/command-line-interface.html
     """
     plugins_service = ProjectPluginsService(project)
 

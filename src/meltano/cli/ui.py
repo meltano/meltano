@@ -73,19 +73,30 @@ def start_workers(workers):
     return stop_all
 
 
-@cli.group(cls=DefaultGroup, default="start", default_if_no_args=True)
+@cli.group(
+    cls=DefaultGroup,
+    default="start",
+    default_if_no_args=True,
+    short_help="Start the Meltano UI webserver.",
+)
 @pass_project(migrate=True)
 @click.pass_context
 def ui(ctx, project):
+    """
+    Start the Meltano UI webserver.
+
+    Read more at https://meltano.com/docs/command-line-interface.html#ui
+    """
     ctx.obj["project"] = project
 
 
-@ui.command()
+@ui.command(short_help="Start the Meltano UI webserver.")
 @click.option("--reload", is_flag=True, default=False)
 @click.option("--bind", help="The hostname (or IP address) to bind on")
 @click.option("--bind-port", help="Port to run webserver on", type=int)
 @click.pass_context
 def start(ctx, reload, bind, bind_port):
+    """Start the Meltano UI webserver."""
     if bind:
         ProjectSettingsService.config_override["ui.bind_host"] = bind
     if bind_port:
@@ -120,14 +131,26 @@ def start(ctx, reload, bind, bind_port):
     logger.info("All workers started.")
 
 
-@ui.command()
+@ui.command(short_help="Generate and store server name and secrets.")
 @click.argument("server_name")
-@click.option("--bits", default=256)
+@click.option(
+    "--bits",
+    default=256,  # noqa: WPS432
+    help="Specify the size of secrets in bits in the system DB (default 256)",
+)
 @click.pass_context
 def setup(ctx, server_name, **flags):
     """
-    Generates and stores server name and secrets.
-    """
+    Generate and store server name and secrets.
+
+    WARNING\n
+        Regenerating secrets will cause the following:
+
+        - All passwords will be invalid\n
+        - All sessions will be expired\n
+
+    Use with caution!
+    """  # noqa: D301
     project = ctx.obj["project"]
     settings_service = ProjectSettingsService(project)
 

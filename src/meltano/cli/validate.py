@@ -58,7 +58,7 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.command()
+@cli.command(short_help="Run validations using plugins' tests.")
 @click.option(
     "--all",
     "all_tests",
@@ -77,7 +77,11 @@ def test(
     all_tests: bool,
     plugin_tests: Tuple[str] = (),
 ):
-    """Run validations using plugins' tests."""
+    """
+    Run validations using plugins' tests.
+
+    Read more at https://meltano.com/docs/command-line-interface.html#test
+    """
     _, session_maker = project_engine(project)
     session = session_maker()
 
