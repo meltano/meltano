@@ -22,7 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Create JSON Schema for meltano.yml. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
+- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Published JSON Schemas for `meltan`.yml` and `discovery.yml`.. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
 - [#3001](https://gitlab.com/meltano/meltano/-/issues/3001) Always print log advice on ELT failure.
 
 ### Fixes
