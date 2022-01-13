@@ -187,10 +187,6 @@
                     "commands": {
                         "type": "object",
                         "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable."
-                    },
-                    "env": {
-                        "type": "object",
-                        "description": "An object containing environment variables and their value that should be injected into the execution environment at runtime."
                     }
                 }
             },
@@ -218,7 +214,6 @@
                             "docs": {},
                             "settings_group_validation": {},
                             "commands": {},
-                            "env": {},
                             "capabilities": {
                                 "type": "array",
                                 "items": {
@@ -317,7 +312,6 @@
                             "docs": {},
                             "settings_group_validation": {},
                             "commands": {},
-                            "env": {},
                             "dialect": {
                                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
                             },
@@ -350,8 +344,7 @@
                             "settings": {},
                             "docs": {},
                             "settings_group_validation": {},
-                            "commands": {},
-                            "env": {}
+                            "commands": {}
                         }
                     }
                 ]
@@ -378,8 +371,7 @@
                             "settings": {},
                             "docs": {},
                             "settings_group_validation": {},
-                            "commands": {},
-                            "env": {}
+                            "commands": {}
                         }
                     }
                 ]
@@ -407,7 +399,6 @@
                             "docs": {},
                             "settings_group_validation": {},
                             "commands": {},
-                            "env": {},
                             "update": {
                                 "type": "object",
                                 "additionalProperties": {
@@ -440,8 +431,7 @@
                             "settings": {},
                             "docs": {},
                             "settings_group_validation": {},
-                            "commands": {},
-                            "env": {}
+                            "commands": {}
                         }
                     }
                 ]
@@ -469,7 +459,6 @@
                             "docs": {},
                             "settings_group_validation": {},
                             "commands": {},
-                            "env": {},
                             "vars": {
                                 "type": "object",
                                 "description": "An object containing dbt model variables"
@@ -503,8 +492,7 @@
                             "settings": {},
                             "docs": {},
                             "settings_group_validation": {},
-                            "commands": {},
-                            "env": {}
+                            "commands": {}
                         }
                     }
                 ]
@@ -723,10 +711,6 @@
                     "examples": [
                         "2020-08-06 00:00:00"
                     ]
-                },
-                "env": {
-                    "type": "object",
-                    "description": "An object containing environment variables and their value that should be injected into the execution environment at runtime."
                 }
             }
         }
