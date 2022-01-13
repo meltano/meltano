@@ -1,5 +1,0 @@
-[
-  { "entity": "users", "file": "extract/GitFlixUsers.csv", "keys": ["id"] },
-  { "entity": "episodes", "file": "extract/GitFlixEpisodes.csv", "keys": ["id"] },
-  { "entity": "streams", "file": "extract/GitFlixStreams.csv", "keys": ["id"] }
-]

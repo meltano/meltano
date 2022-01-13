@@ -1,40 +1,6 @@
 {
-  "name": "meltano.com",
-  "author": "Meltano Team & Contributors <meltano@gitlab.com>",
-  "license": "MIT",
-  "version": "1.90.1",
-  "description": "https://meltano.com",
-  "main": "index.js",
-  "scripts": {
-    "clean": "rm -rf node_modules public",
-    "discovery.yml": "cp ../src/meltano/core/bundle/discovery.yml ./src/.vuepress/public",
-    "dev": "vuepress dev src",
-    "build": "vuepress build src",
-    "dev:docs": "npm run discovery.yml && npm run dev",
-    "build:docs": "npm run discovery.yml && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://gitlab.com/meltano/meltano.git"
-  },
-  "keywords": [
-    "meltano"
-  ],
-  "bugs": {
-    "url": "https://gitlab.com/meltano/meltano/issues"
-  },
-  "homepage": "https://gitlab.com/meltano/meltano#readme",
-  "devDependencies": {
-    "@vuepress/plugin-active-header-links": "^1.5.3",
-    "@vuepress/plugin-google-analytics": "^1.5.3",
-    "vuepress": "^1.5.3",
-    "vuepress-plugin-container": "^2.1.4"
-  },
   "dependencies": {
-    "vue-intercom": "^1.0.14",
-    "vuepress-intercom": "^1.0.3",
-    "vuepress-plugin-google-tag-manager": "^0.0.4",
-    "vuepress-plugin-sitemap": "^2.3.0"
+    "bulma": "^0.9.3",
+    "bulma-timeline": "^3.0.4"
   }
 }
