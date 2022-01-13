@@ -140,7 +140,8 @@ def start(ctx, reload, bind, bind_port):
 )
 @click.pass_context
 def setup(ctx, server_name, **flags):
-    """Generate and store server name and secrets.
+    """
+    Generate and store server name and secrets.
 
     WARNING\n
         Regenerating secrets will cause the following:

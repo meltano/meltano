@@ -86,7 +86,8 @@ def init_sqlite_hook(engine):
 class DB:
     @classmethod
     def ensure_schema_exists(cls, engine, schema_name, grant_roles=()):
-        """Make sure that the given schema_name exists in the database. If not, create it.
+        """
+        Make sure that the given schema_name exists in the database. If not, create it.
 
         :param db_conn: psycopg2 database connection
         :param schema_name: database schema
