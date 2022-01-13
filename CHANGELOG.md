@@ -10,17 +10,26 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Create JSON Schema for meltano.yml. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
-
 ### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.91.0 - (2022-01-13)
+---
+
+### New
+
+- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Published JSON Schemas for `meltano.yml` and `discovery.yml`. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
+- [#3001](https://gitlab.com/meltano/meltano/-/issues/3001) Always print log advice on ELT failure.
 
 ### Fixes
 
 - [#3132](https://gitlab.com/meltano/meltano/-/issues/3132) Bump `pyhumps` dependency to fix a bug in converting `SCREAMING_SNAKE_CASE` variables in the API.
 - [#3116](https://gitlab.com/meltano/meltano/-/issues/3116) Fix a unicode decode issue during discovery when debug logging is enabled.
-
-### Breaks
-
+- [#2716](https://gitlab.com/meltano/meltano/-/issues/2716) Add `--help `docs for all Meltano CLI commands and options.
 
 ## 1.90.1 - (2021-12-16)
 ---
