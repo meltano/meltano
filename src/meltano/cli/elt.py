@@ -34,7 +34,7 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.command(short_help=("Run an ELT pipeline to Extract, Load, and Transform data."))
+@cli.command(short_help="Run an ELT pipeline to Extract, Load, and Transform data.")
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
