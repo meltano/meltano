@@ -1,3 +1,5 @@
+"""Validates yaml files against their schemas."""
+
 import json
 import os
 import pathlib
