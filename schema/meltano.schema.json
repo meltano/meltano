@@ -16,7 +16,7 @@
         },
         "project_id": {
             "type": "string",
-            "description": "A globally unique project identifier"
+            "description": "A globally unique project identifier. Defaults to a Meltano-generated unique GUID for each project."
         },
         "environments": {
             "type": "array",
@@ -110,7 +110,7 @@
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "The same of the plugin.",
+                        "description": "The name of the plugin.",
                         "examples": [
                             "target-jsonl"
                         ]
@@ -625,7 +625,7 @@
                 },
                 "env": {
                     "type": "string",
-                    "description": "The environment variable name this setting can be configured with",
+                    "description": "Deprecated. An environment variable name this setting can be configured with.",
                     "examples": [
                         "GITLAB_API_TOKEN",
                         "FACEBOOK_ADS_ACCESS_TOKEN"
@@ -633,7 +633,7 @@
                 },
                 "env_aliases": {
                     "type": "array",
-                    "description": "Use to delegate alternative environment variables for overriding this setting's value",
+                    "description": "Deprecated. Use to delegate alternative environment variables for overriding this setting's value.",
                     "examples": [
                         "TAP_ACCOUNT_ID",
                         "TAP_ACCOUNT_IDENTIFIER"
