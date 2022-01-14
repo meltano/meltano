@@ -7,7 +7,7 @@
   publish = "docs/publish"
 
   # Default build command.
-  command = "bundle exec jekyll build -d public && bundle exec jekyll algolia"
+  command = "bundle exec jekyll build -d public"
 
 # [build.environment] # not sure if we'll need to specify a version
   # RUBY_VERSION = "some.version.of.ruby" 
