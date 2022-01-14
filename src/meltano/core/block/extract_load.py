@@ -217,12 +217,17 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 continue
             return False
 
+    async def upstream_stop(self, index) -> None:
+        """Stop all blocks upstream of a given index."""
+        for block in reversed(self.blocks[:index]):
+            await block.stop()
+
     async def process_wait(
         self, output_exception_future: Task, subset: int = None
     ) -> Set[Task]:
         """Wait on all process futures in the block set."""
         done, _ = await asyncio.wait(
-            [*self.process_futures[:subset], output_exception_future],
+            [*self.process_futures[subset:], output_exception_future],
             return_when=asyncio.FIRST_COMPLETED,
         )
         return done
@@ -326,11 +331,6 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         finally:
             await self._cleanup()
 
-    async def _upstream_stop(self, index) -> None:
-        """Stop all blocks upstream of a given index."""
-        for block in reversed(self.blocks[:index]):
-            await block.stop()
-
     async def _cleanup(self) -> None:
         for block in self.blocks:
             await block.post()
@@ -393,54 +393,12 @@ async def run(  # noqa: WPS217
     """
     stream_buffer_size = project_settings_service.get("elt.buffer_size")
     line_length_limit = stream_buffer_size // 2
+    current_head = elb.head
 
-    output_exception_future = asyncio.ensure_future(
-        asyncio.wait(
-            [*elb.stdout_futures, *elb.stderr_futures],
-            return_when=asyncio.FIRST_EXCEPTION,
-        )
+    await wait_for_process_completion(
+        elb, current_head, stream_buffer_size, line_length_limit
     )
-
-    done = await elb.process_wait(output_exception_future)
-
-    output_futures_failed = first_failed_future(output_exception_future, done)
-    if output_futures_failed:
-        # Special behavior for the producer stdout handler raising a line length limit error.
-        if elb.head.proxy_stdout() == output_futures_failed:
-            handle_producer_line_length_limit_error(
-                output_futures_failed.exception(),
-                line_length_limit=line_length_limit,
-                stream_buffer_size=stream_buffer_size,
-            )
-        raise output_futures_failed.exception()
-    else:
-        # If all of the output handlers completed without raising an exception,
-        # we still need to wait for all of the underlying block processes to complete.
-        done, _ = await asyncio.wait(
-            elb.process_futures,
-            return_when=asyncio.FIRST_COMPLETED,
-        )
-
-    producer = elb.head
-    consumer = elb.tail
-
-    if consumer.process_future.done():
-        consumer_code = consumer.process_future.result()
-        producer_code = await _complete_upstream(elb)
-    elif producer.process_future.done():
-        producer_code = producer.process_future.result()
-        consumer_code = await _complete_downstream(elb)
-    else:  # would imply that a (not yet implemented) inline transformer finished first
-        await producer.stop()
-        producer_code = 1
-        await consumer.stop()
-        consumer_code = 1
-        raise RunnerError(
-            "Unexpected completion sequence in ExtractLoadBlock. Assume extractor and loader failed",
-            {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
-        )
-
-    _check_exit_codes(producer_code, consumer_code)
+    _check_exit_codes(0, 0)
 
 
 async def _complete_upstream(elb: ExtractLoadBlocks) -> int:
@@ -448,19 +406,13 @@ async def _complete_upstream(elb: ExtractLoadBlocks) -> int:
     producer = elb.head
     consumer = elb.tail
 
-    # TODO: when introducing inline transformers, we'll need to switch to upstream_complete(index) to verify
-    # everything upstream completed.
     if elb.upstream_complete(len(elb.blocks) - 1):
         producer_code = producer.process_future.result()
     else:
-        # If the consumer (target) completes before the upstream producers, it failed before processing all output
+        # If the last consumer (target) completes before the upstream producers, it failed before processing all output
         # So we should kill the upstream producers and cancel output processing since theres no final destination
         # to forward output to.
-
-        # TODO: when introducing inline transformers, we'll need to switch to upstream_stop() to stop
-        # everything upstream. I haven't done that yet to keep the door open for a refactor when add stream maps.
-
-        await producer.stop()
+        await elb.upstream_stop(len(elb.blocks) - 1)
         # Pretend the producer (tap) finished successfully since it didn't itself fail
         producer_code = 0
 
@@ -468,28 +420,6 @@ async def _complete_upstream(elb: ExtractLoadBlocks) -> int:
     await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
     return producer_code
-
-
-async def _complete_downstream(elb: ExtractLoadBlocks) -> int:
-    """Wait for the downstream blocks to complete and return the exit code."""
-    producer = elb.head
-    consumer = elb.tail
-
-    # If the tap completes before the target, the target should have a chance to process all tap output
-    # Wait for all buffered tap output to be processed
-    await asyncio.wait([producer.proxy_stdout(), producer.proxy_stderr()])
-
-    # Close target stdin so process can complete naturally
-    consumer.stdin.close()
-    with suppress(AttributeError):  # `wait_closed` is Python 3.7+
-        await consumer.stdin.wait_closed()
-
-    # Wait for all buffered target output to be processed
-    await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
-
-    # Wait for target process future to complete
-    await consumer.process_future
-    return consumer.process_future.result()
 
 
 def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
@@ -512,3 +442,101 @@ def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
 
     if consumer_code:
         raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
+
+
+async def wait_for_process_completion(
+    elb: ExtractLoadBlocks,
+    current_head: IOBlock,
+    stream_buffer_size: int,
+    line_length_limit: int,
+) -> None:
+    start_idx = elb.blocks.index(current_head)
+    remaining_blocks = elb.blocks[start_idx:]
+
+    if remaining_blocks is None:
+        return
+    if len(remaining_blocks) == 1:
+        await _stop_all_blocks(elb, start_idx)
+
+    stdout_futures = [block.proxy_stdout() for block in remaining_blocks]
+    stderr_futures = [block.proxy_stderr() for block in remaining_blocks]
+
+    output_exception_future = asyncio.ensure_future(
+        asyncio.wait(
+            [*stdout_futures, *stderr_futures],
+            return_when=asyncio.FIRST_EXCEPTION,
+        )
+    )
+
+    logger.debug("waiting for process completion or exception", index=start_idx)
+
+    done = await elb.process_wait(output_exception_future, start_idx)
+
+    output_futures_failed = first_failed_future(output_exception_future, done)
+    if output_futures_failed:
+        # Special behavior for the producer stdout handler raising a line length limit error.
+        if elb.head.proxy_stdout() == output_futures_failed:
+            handle_producer_line_length_limit_error(
+                output_futures_failed.exception(),
+                line_length_limit=line_length_limit,
+                stream_buffer_size=stream_buffer_size,
+            )
+        raise output_futures_failed.exception()
+    else:
+        # If all of the output handlers completed without raising an exception,
+        # we still need to wait for all of the underlying block processes to complete.
+        done, _ = await asyncio.wait(
+            elb.process_futures,
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+
+    if elb.tail.process_future.done():
+        logger.debug("last consumer done first", index=start_idx)
+        consumer_code = elb.tail.process_future.result()
+        logger.debug("waiting for upstream process completion", index=start_idx)
+        producer_code = await _complete_upstream(elb)
+    elif current_head.process_future.done():
+        logger.debug("head producer done first", index=start_idx)
+        producer_code = current_head.process_future.result()
+        logger.debug("waiting for remaining process completion", index=start_idx)
+        await asyncio.wait([current_head.proxy_stdout(), current_head.proxy_stderr()])
+        # Close next inline stdin so downstream can cascade and complete naturally
+        next_head = elb.blocks[start_idx + 1]
+        next_head.stdin.close()
+        with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+            await next_head.stdin.wait_closed()
+        consumer_code = await wait_for_process_completion(
+            elb, next_head, stream_buffer_size, line_length_limit
+        )
+    else:
+        logger.debug("intermediate block done first")
+        await _stop_all_blocks(start_idx)
+        producer_code = 1
+        consumer_code = 1
+        raise RunnerError(
+            "Unexpected completion sequence in ExtractLoadBlock. Assume extractor and loader failed",
+            {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
+        )
+
+
+def _failed_block(blocks: List[IOBlock], exception_future: Task) -> Optional[IOBlock]:
+    for block in blocks:
+        if (
+            block.proxy_stderr() == exception_future
+            or block.proxy_stdout() == exception_future
+        ):
+            return block
+
+
+async def _stop_all_blocks(elb: ExtractLoadBlocks, idx: int = 0) -> None:
+    """Close stdin and stop all blocks inclusive of index.
+
+    Args:
+        blocks: list of blocks to stop
+    """
+    for block in elb.blocks[idx:]:
+        if block.stdin:
+            block.stdin.close()
+            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+                await block.stdin.wait_closed()
+        await block.stop()
