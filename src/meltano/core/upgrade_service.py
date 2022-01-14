@@ -4,6 +4,7 @@ import os
 import shutil
 import signal
 import subprocess
+import sys
 from typing import Optional
 
 import click
@@ -68,7 +69,7 @@ class UpgradeService:
 
         pip_url = pip_url or "meltano"
         run = subprocess.run(
-            ["pip", "install", "--upgrade", pip_url],
+            [sys.executable, "-m", "pip", "install", "--upgrade", pip_url],
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
