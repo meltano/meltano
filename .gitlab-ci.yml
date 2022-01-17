@@ -24,6 +24,9 @@ include:
   # docs
   - local: .gitlab/ci/docs.gitlab-ci.yml
 
+  # pre-test
+  - local: .gitlab/ci/generate_requirements.gitlab-ci.yml
+
   # test
   - local: .gitlab/ci/test.gitlab-ci.yml
   - local: .gitlab/ci/test_webapp.gitlab-ci.yml
