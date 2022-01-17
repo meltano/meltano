@@ -41,7 +41,7 @@ async def run(project, blocks):
 
     This a preview feature - its functionality and cli signature is still evolving.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#run
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#run
     """  # noqa: D301
     if project.active_environment is not None:
         logger.warning("Job ID generation not yet supported - running without job!")

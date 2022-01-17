@@ -25,8 +25,8 @@ def schedule(project, ctx):
     """
     Manage pipeline schedules.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#schedule
-    """
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#schedule
+    """  # noqa: D301
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
 

@@ -29,7 +29,11 @@ logger = logging.getLogger(__name__)
 )
 @database_uri_option
 def init(ctx, project_name, no_usage_stats):
-    """Create a new Meltano project."""
+    """
+    Create a new Meltano project.
+
+    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#init
+    """  # noqa: D301
     if ctx.obj["project"]:
         logging.warning(f"Found meltano project at: {ctx.obj['project'].root}")
         raise CliError("`meltano init` cannot run inside a Meltano project.")

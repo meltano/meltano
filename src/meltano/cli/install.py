@@ -32,8 +32,8 @@ def install(project, plugin_type, plugin_name, include_related, clean, paralleli
     """
     Install all the dependencies of your project based on the meltano.yml file.
 
-    Read more at https://www.meltano.com/docs/command-line-interface.html
-    """
+    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#install
+    """  # noqa: D301
     plugins_service = ProjectPluginsService(project)
 
     if plugin_type:

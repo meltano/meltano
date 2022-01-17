@@ -18,8 +18,8 @@ def user(ctx, project):
 
     TIP: This command is only relevant when Meltano is run with authentication enabled.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#user
-    """
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#user
+    """  # noqa: D301
     ctx.obj["project"] = project
 
 

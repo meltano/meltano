@@ -24,8 +24,8 @@ def discover(project, plugin_type):
     """
     List the available discoverable plugins and their variants.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#discover
-    """
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#discover
+    """  # noqa: D301
     discover_service = PluginDiscoveryService(project)
     if plugin_type == "all":
         plugin_types = list(PluginType)

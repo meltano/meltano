@@ -80,8 +80,8 @@ def test(
     """
     Run validations using plugins' tests.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#test
-    """
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#test
+    """  # noqa: D301
     _, session_maker = project_engine(project)
     session = session_maker()
 

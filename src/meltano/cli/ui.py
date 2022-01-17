@@ -85,8 +85,8 @@ def ui(ctx, project):
     """
     Start the Meltano UI webserver.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#ui
-    """
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#ui
+    """  # noqa: D301
     ctx.obj["project"] = project
 
 

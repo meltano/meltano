@@ -75,7 +75,7 @@ def all(ctx, pip_url, force, skip_package):
     - Apply migrations to system database\n
     - Recompile models\n
 
-    Read more at https://meltano.com/docs/command-line-interface.html#upgrade
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#upgrade
     """  # noqa: D301
     project = ctx.obj["project"]
     upgrade_service = ctx.obj["upgrade_service"]
