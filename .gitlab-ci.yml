@@ -24,19 +24,15 @@ include:
   - local: .gitlab/ci/docs.gitlab-ci.yml
 
   # test
-  - template: Security/License-Scanning.gitlab-ci.yml
   - local: .gitlab/ci/test.gitlab-ci.yml
   - local: .gitlab/ci/test_webapp.gitlab-ci.yml
   - local: .gitlab/ci/sample_code.gitlab-ci.yml
   - local: .gitlab/ci/demo_project.gitlab-ci.yml
   - local: .gitlab/ci/sast.gitlab-ci.yml
+  - local: .gitlab/ci/license_scanning.gitlab-ci.yml
 
   # publish
   - local: .gitlab/ci/publish.gitlab-ci.yml
 
   # manual (git-ops)
   - local: .gitlab/ci/gitops.gitlab-ci.yml
-
-license_scanning:
-  variables:
-    SETUP_CMD: "poetry export -f requirements.txt --output requirements.txt"
