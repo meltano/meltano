@@ -2,15 +2,17 @@ include:
   - template: Security/License-Scanning.gitlab-ci.yml
 
 generate_requirements:
-  stage: test
+  stage: pre-test
   image:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.8
     entrypoint: [""]
   script:
-    - poetry export -f requirements.txt --output requirements.txt
+    - poetry export --without-hashes --format requirements.txt --output requirements.txt
   artifacts:
     paths:
       - requirements.txt
 
 license_scanning:
-  needs: ["generate_requirements"]
+  stage: test
+  dependencies:
+    - generate_requirements

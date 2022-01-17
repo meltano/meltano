@@ -6,6 +6,7 @@ stages:
   - docs
   - build-base
   - build-meltano
+  - pre-test
   - test
   - publish
   - distribute
