@@ -24,6 +24,7 @@ include:
   - local: .gitlab/ci/docs.gitlab-ci.yml
 
   # test
+  - template: Security/License-Scanning.gitlab-ci.yml
   - local: .gitlab/ci/test.gitlab-ci.yml
   - local: .gitlab/ci/test_webapp.gitlab-ci.yml
   - local: .gitlab/ci/sample_code.gitlab-ci.yml
@@ -35,3 +36,7 @@ include:
 
   # manual (git-ops)
   - local: .gitlab/ci/gitops.gitlab-ci.yml
+
+license_scanning:
+  variables:
+    SETUP_CMD: "poetry export -f requirements.txt --output requirements.txt"
