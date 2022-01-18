@@ -17,7 +17,7 @@ def meltano_environment(project: Project, ctx: click.Context):
     """
     Manage Environments.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#environment
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#environment
     """
     ctx.obj[ENVIRONMENT_SERVICE_KEY] = EnvironmentService(project)
 
