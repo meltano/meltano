@@ -66,7 +66,7 @@ def add(
     Add a plugin to your project.
 
     \b\nRead more at https://meltano.com/docs/command-line-interface.html#add
-    """  # noqa: D301
+    """
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 

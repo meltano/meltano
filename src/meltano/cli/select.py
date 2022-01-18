@@ -76,7 +76,7 @@ async def select(
     Manage extractor selection patterns.
 
     \b\nRead more at https://meltano.com/docs/command-line-interface.html#select
-    """  # noqa: D301
+    """
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])

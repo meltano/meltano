@@ -100,7 +100,7 @@ async def elt(
     loader_name: loader to be used in this pipeline.
 
     \b\nRead more at https://meltano.com/docs/command-line-interface.html#elt
-    """  # noqa: D301
+    """
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
