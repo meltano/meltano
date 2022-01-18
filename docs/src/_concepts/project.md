@@ -2,6 +2,7 @@
 title: Meltano Projects
 description: At the core of the Meltano experience is your Meltano project, which represents the single source of truth regarding your ELT pipelines.
 layout: doc
+weight: 1
 ---
 
 <!-- The following is reproduced in docs/src/README.md#meltano-init -->

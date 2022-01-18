@@ -2,6 +2,7 @@
 title: Data Transformation (T)
 description: Transform your data.
 layout: doc
+weight: 5
 ---
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required

@@ -33,14 +33,20 @@ defaults:
     values:
       toc: true # Show TOC by default. Set `toc: false` in Front Matter to override this.
 
-# Every top level section of the handbook is actually a collection. Their files are in a _folder in src/
+# Every top level section is actually a collection. Their files are in a _folder in src/
 collections:
-  getting-started:
+  concepts:
     output: true
-    name: "Getting Started"
+    name: "Concepts"
+  guide:
+    output: true
+    name: "Guide"
   reference:
     output: true
     name: "Reference"
+  the-project:
+    output: true
+    name: "The Project"
   tutorials:
     output: true
     name: "Tutorials"
@@ -62,8 +68,7 @@ toc:
   item_class: toc-entry
   item_prefix: toc-
 
-# jekyll-algolia
-#algolia:
-#  application_id: ''
-#  index_name: documentation_search
-#  search_only_api_key: ''
+algolia:
+ application_id: 'ALHYNO312B'
+ index_name: documentation_search
+ search_only_api_key: '28f2a216e3886060fa641b7cb703de90'

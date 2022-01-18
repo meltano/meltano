@@ -2,7 +2,7 @@
 title: Orchestrate Meltano
 description: Learn how to schedule and orchestrate your pipelines using Meltano and Airflow.
 layout: doc
-weight: 2
+weight: 6
 ---
 
 Most EL(T) pipelines aren't run just once, but over and over again, to make sure additions and changes in the source eventually make their way to the destination.

@@ -13,6 +13,11 @@
 });
 </script>
 
+{% if page.url == "/search" %}
+  {% include algolia.html %}
+{% endif %}
+
+
 <footer class="footer">
   <div class="container">
     <div class="content">

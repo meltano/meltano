@@ -2,6 +2,7 @@
 title: Running & Deploying Meltano in Production
 description: Learn how to deploy your ELT pipelines in production.
 layout: doc
+weight: 8
 ---
 
 Once you've [set up a Meltano project](/reference/project) and

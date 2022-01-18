@@ -2,6 +2,7 @@
 title: Meltano Environments
 description: Environments allow data teams to manage different sets of configurations for extractors, loaders and plugins.
 layout: doc
+weight: 3
 ---
 
 As part of Meltano's vision to enable data teams to operate with best practices, __Environments__ allows

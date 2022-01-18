@@ -11,6 +11,12 @@
       <div class="columns">
         <div class="column is-2">
           <aside class="menu is-fullheight is-narrow-mobile is-hidden-mobile">
+            <ul class="menu-list">  
+              <li>
+                <a href="/getting-started" class="{% if page.url == '/getting-started' %}is-active{% endif %}">Getting Started</a>
+              </li>  
+            </ul>
+
             {% if site.collections %}
               {% for collection in site.collections %}
                 {% if collection.label != "posts" %}

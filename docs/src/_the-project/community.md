@@ -2,6 +2,7 @@
 title: Meltano Community
 description: Learn how to get involved with the Meltano community.
 layout: doc
+weight: 1
 ---
 
 We aim to build Meltano with the support of the community and we want everyone to feel included.

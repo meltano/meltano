@@ -1,7 +1,8 @@
 ---
-title: "ELT: How to get started"
+title: "Getting Started with ELT"
 description: "ELT Meaning, Advantages & More: All You Need To Know To Get Started"
 layout: doc
+weight: 11
 ---
 
 Just like ETL, ELT is a data integration process found in most data management processes.

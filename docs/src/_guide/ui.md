@@ -2,6 +2,7 @@
 title: Meltano UI
 description: Learn how to manage and monitor your plugins and pipelines using Meltano UI
 layout: doc
+weight: 10
 ---
 
 Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)

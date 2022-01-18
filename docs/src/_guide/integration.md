@@ -2,7 +2,7 @@
 title: Data Integration (EL)
 description: Learn how to extract and load data using Meltano and Singer taps and targets
 layout: doc
-weight: 2
+weight: 4
 ---
 
 Meltano lets you easily extract and load data from and to databases, SaaS APIs, and file formats

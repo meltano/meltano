@@ -2,6 +2,7 @@
 title: Contributor Guide
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
+weight: 2
 ---
 
 Meltano is built for and by its community, and we welcome your contributions to our [GitLab repository](https://gitlab.com/meltano/meltano),

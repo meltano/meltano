@@ -2,6 +2,7 @@
 title: Install Meltano
 description: Learn how to install Meltano locally or using Docker.
 layout: doc
+weight: 1
 ---
 
 If the installation instructions on the [homepage](/) or the [Getting Started guide](/getting-started/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.

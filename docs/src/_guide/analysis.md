@@ -2,7 +2,7 @@
 title: Data Analysis
 description: Learn how to analyze your data and create repotrs and dashboards.
 layout: doc
-weight: 2
+weight: 9
 ---
 
 <div class="notification">

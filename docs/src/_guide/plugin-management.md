@@ -2,6 +2,7 @@
 title: Plugin Management
 description: Learn how to manage your Meltano project's plugins.
 layout: doc
+weight: 2
 ---
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,

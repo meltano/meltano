@@ -2,6 +2,7 @@
 title: Meltano Plugins
 description: Meltano takes a modular approach to data engineering and EL(T), where your project and pipelines are composed of plugins.
 layout: doc
+weight: 2
 ---
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
