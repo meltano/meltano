@@ -1,7 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
-import _ from 'lodash'
 
 import { PIPELINE_INTERVAL_OPTIONS, TRANSFORM_OPTIONS } from '@/utils/constants'
 import capitalize from '@/filters/capitalize'
@@ -14,29 +13,23 @@ export default {
   data() {
     return {
       isLoaded: false,
-      isSaving: false
+      isSaving: false,
+      updatedPipeline: {}
     }
   },
   computed: {
-    ...mapGetters('plugins', ['getPluginLabel', 'getHasDefaultTransforms']),
-    ...mapState({
-      pipelineFromState: 'orchestration/pipeline'
-    }),
-    ...mapState('orchestration', ['pipeline']),
+    ...mapGetters('plugins', [
+      'getPluginLabel',
+      'getHasDefaultTransforms',
+      'getInstalledPlugin'
+    ]),
+    ...mapState('orchestration', ['pipeline', 'pipelines']),
     ...mapState('plugins', ['installedPlugins']),
     transformOptions() {
       return TRANSFORM_OPTIONS
     },
     intervalOptions() {
       return PIPELINE_INTERVAL_OPTIONS
-    },
-    isSaveable() {
-      const hasOwns = []
-      _.forOwn(this.pipeline, val => hasOwns.push(val))
-      const isValidPipeline =
-        hasOwns.find(val => val === '' || val === null) === undefined
-
-      return isValidPipeline
     },
     hasDefaultTransforms() {
       const pipelineExtractor = this.pipeline.extractor
@@ -71,10 +64,18 @@ export default {
         if (loader) {
           this.pipeline.loader = loader
         }
+        // let clonedObject = Object.assign({}, obj)
+        // let clonedThing = {...thing}
+        // let clonedObject = Object.assign({}, obj)
       })
   },
   methods: {
-    ...mapActions('orchestration', ['savePipelineSchedule']),
+    ...mapActions('orchestration', [
+      'deletePipelineSchedule',
+      'savePipelineSchedule',
+      'updatePipelineDetails',
+      'updatePipelineSchedule'
+    ]),
     onExtractorLoaderChange() {
       if (!this.pipeline.extractor || !this.pipeline.loader) {
         return
@@ -85,15 +86,51 @@ export default {
         '-to-' +
         this.pipeline.loader.replace(/^target-/, '')
     },
+    inputUpdate(keyItem, update) {
+      let valueItem
+      if (update.srcElement.localName === 'select') {
+        valueItem = update.srcElement.selectedOptions[0].value
+      } else if (update.srcElement.localName === 'input') {
+        valueItem = update.srcElement.value
+      }
+      this.$set(this.updatedPipeline, keyItem, valueItem)
+    },
+    kebabCase(str) {
+      return str
+        .match(
+          /[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g
+        )
+        .join('-')
+        .toLowerCase()
+    },
     save() {
       this.isSaving = true
-      this.savePipelineSchedule({
-        pipeline: this.pipeline
+      const pipeline = this.pipeline
+      const interval = this.updatedPipeline.interval || this.pipeline.interval
+      const transform =
+        this.updatedPipeline.transform || this.pipeline.transform
+      const kebabName = this.kebabCase(this.updatedPipeline.name)
+      const name = kebabName || this.pipeline.name
+      const jobId = kebabName || this.pipeline.name
+      const pluginNamespace = this.getInstalledPlugin(
+        'extractors',
+        pipeline.extractor
+      ).namespace
+      this.updatePipelineSchedule({
+        interval,
+        transform,
+        name,
+        jobId,
+        pipeline,
+        pluginNamespace
       })
-        .then(() => {
-          Vue.toasted.global.success(`Pipeline Saved - ${this.pipeline.name}`)
+        .then(
+          () =>
+            Vue.toasted.global.success(
+              `Pipeline successfully updated - ${pipeline.name}`
+            ),
           this.close()
-        })
+        )
         .catch(error => {
           Vue.toasted.global.error(error.response.data.code)
         })
@@ -116,33 +153,19 @@ export default {
         <h3 class="modal-card-title">Edit a pipeline</h3>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
-        <div>
-          <pre>{{ pipeline }}</pre>
-        </div>
         <progress
           v-if="!isLoaded || isSaving"
           class="progress is-small is-info"
         ></progress>
         <div v-else-if="isLoaded" class="columns is-multiline">
           <div class="column is-half">
-            <small class="has-text-interactive-navigation">Step 1</small>
             <h4>Extractor</h4>
             <div class="control is-expanded">
-              <span class="select is-fullwidth">
-                <select
-                  v-model="pipeline.extractor"
-                  class="select is-fullwidth"
-                  @change="onExtractorLoaderChange"
-                >
-                  <option value="">Select extractor</option>
-                  <option
-                    v-for="(extractor, index) in installedPlugins.extractors"
-                    :key="`${extractor.name}-${index}`"
-                    :value="extractor.name"
-                    >{{ getPluginLabel('extractors', extractor.name) }}
-                  </option>
-                </select>
-              </span>
+              <input
+                v-model="pipeline.extractor"
+                class="input is-fullwidth"
+                disabled
+              />
             </div>
             <router-link
               :to="{ name: 'extractors' }"
@@ -152,36 +175,30 @@ export default {
             </router-link>
           </div>
           <div class="column is-half">
-            <small class="has-text-interactive-navigation">Step 2</small>
             <h4>Loader</h4>
             <div class="control is-expanded">
-              <span class="select is-fullwidth">
-                <select
-                  v-model="pipeline.loader"
-                  class="select is-fullwidth"
-                  @change="onExtractorLoaderChange"
-                >
-                  <option value="">Select loader</option>
-                  <option
-                    v-for="(loader, index) in installedPlugins.loaders"
-                    :key="`${loader.name}-${index}`"
-                    :value="loader.name"
-                  >
-                    {{ getPluginLabel('loaders', loader.name) }}
-                  </option>
-                </select>
-              </span>
+              <input
+                v-model="pipeline.loader"
+                class="full-width input"
+                disabled
+              />
             </div>
             <router-link :to="{ name: 'loaders' }" class="has-text-underlined">
               Manage loaders
             </router-link>
           </div>
           <div class="column is-half">
-            <small class="has-text-interactive-navigation">Step 3</small>
             <h4>Transform</h4>
             <div class="control is-expanded">
               <span class="select is-fullwidth">
-                <select v-model="pipeline.transform">
+                <!-- <select
+                  :value="pipeline.transform"
+                  @change="inputUpdate('transform', $event)"
+                > -->
+                <select
+                  v-model="pipeline.transform"
+                  @change="inputUpdate('transform', $event)"
+                >
                   <option value="">Select transform type</option>
                   <option
                     v-for="(transform, index) in transformOptions"
@@ -195,11 +212,17 @@ export default {
             </div>
           </div>
           <div class="column is-half">
-            <small class="has-text-interactive-navigation">Step 4</small>
             <h4>Interval</h4>
             <div class="control is-expanded">
               <span class="select is-fullwidth">
-                <select v-model="pipeline.interval">
+                <!-- <select
+                  :value="pipeline.interval"
+                  @change="inputUpdate('interval', $event)"
+                > -->
+                <select
+                  v-model="pipeline.interval"
+                  @change="inputUpdate('interval', $event)"
+                >
                   <option value="">Select interval</option>
                   <option
                     v-for="(interval, label) in intervalOptions"
@@ -212,17 +235,30 @@ export default {
             </div>
           </div>
           <div class="column is-half">
-            <small class="has-text-interactive-navigation">Step 5</small>
             <h4>Name</h4>
             <div class="control is-expanded">
+              <!-- <input
+                :value="pipeline.name"
+                class="input is-fullwidth"
+                type="text"
+                @input="inputUpdate('name', $event)"
+              /> -->
               <input
                 v-model="pipeline.name"
                 class="input is-fullwidth"
                 type="text"
+                @input="inputUpdate('name', $event)"
               />
             </div>
           </div>
           <div class="column is-full">
+            <p class="has-text-grey">
+              Warning: Changing the job name will modify incremental tracking.
+              If the new name does not exist, all refreshes will be rerun from
+              the defined job state. State from the prior name `{{
+                pipeline.name
+              }}` will not be referenced for this schedule going forward.
+            </p>
             <p v-if="showTransformWarning" class="has-text-grey">
               Your Meltano project does not contain a transform plugin for this
               extractor. Only proceed with running transformations as part of
@@ -237,7 +273,7 @@ export default {
         >
         <button
           class="button is-interactive-primary"
-          :disabled="isSaving || !isSaveable"
+          :disabled="isSaving"
           @click="save"
         >
           Save
