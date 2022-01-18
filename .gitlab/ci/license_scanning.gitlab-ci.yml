@@ -8,4 +8,4 @@ license_scanning:
 
 variables:
   LM_PYTHON_VERSION: 3
-  LICENSE_FINDER_CLI_OPTS: "--enabled-package-managers=pip --python-version=3"
+  LICENSE_FINDER_CLI_OPTS: "--enabled-package-managers=pip --python-version=3 --decisions-file=dependency_decisions.yml"
