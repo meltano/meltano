@@ -4,7 +4,7 @@ generate_requirements:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.8
     entrypoint: [""]
   script:
-    - poetry export --without-hashes --format requirements.txt --output requirements.txt
+    - poetry export --format requirements.txt --output requirements.txt
   artifacts:
     paths:
       - requirements.txt

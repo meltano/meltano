@@ -5,3 +5,6 @@ license_scanning:
   stage: test
   dependencies:
     - generate_requirements
+
+variables:
+  LM_PYTHON_VERSION: 3
