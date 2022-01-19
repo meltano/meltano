@@ -132,7 +132,7 @@ We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Do
 
 To get the latest version of Meltano, pull the `latest` tag. Images for specific versions of Meltano are tagged `v<X.Y.Z>`, e.g. `v1.55.0`.
 
-By default, these images come with what we feel is the version of Python the best fit for most users, currently Python 3.8.
+By default, these images come with a version of Python chosen for a balance of stability and compatibility, currently Python 3.8.
 If you'd like to use a different version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.7` and `v1.54.0-python3.7`.
 
 ```bash
