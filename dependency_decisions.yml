@@ -3,7 +3,7 @@
 ---
 - - :ignore
   - click-default-group
-  - :who: @kgpayne
+  - :who: "@kgpayne"
     :why: Failing to install in CI
     :versions: []
     :when: 2022-01-18 19:49:05.328529000 Z
