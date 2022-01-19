@@ -720,7 +720,9 @@
         "environments": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name"],
+            "required": [
+                "name"
+            ],
             "properties": {
                 "name": {
                     "type": "string",
@@ -738,42 +740,84 @@
                                 "extractors": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/definitions/environments/$defs/plugins"
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "name": {},
+                                                    "config": {},
+                                                    "select": {},
+                                                    "select_filer": {}
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "select": {
+                                                        "type": "array",
+                                                        "default": [
+                                                            "*.*"
+                                                        ],
+                                                        "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "select_filter": {
+                                                        "type": "array",
+                                                        "description": "An array of entity selection filter rules that are applied to the extractor's discovered or provided catalog file when the extractor is run.",
+                                                        "items": {
+                                                            "type": "string"
+                                                        },
+                                                        "default": []
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     }
                                 },
                                 "loaders": {
                                     "type": "array",
                                     "items": {
+                                        "additionalProperties": false,
                                         "$ref": "#/definitions/environments/$defs/plugins"
                                     }
                                 },
                                 "orchestrators": {
                                     "type": "array",
                                     "items": {
+                                        "additionalProperties": false,
                                         "$ref": "#/definitions/environments/$defs/plugins"
                                     }
                                 },
                                 "transformers": {
                                     "type": "array",
                                     "items": {
+                                        "additionalProperties": false,
                                         "$ref": "#/definitions/environments/$defs/plugins"
                                     }
                                 },
                                 "files": {
                                     "type": "array",
                                     "items": {
+                                        "additionalProperties": false,
                                         "$ref": "#/definitions/environments/$defs/plugins"
                                     }
                                 },
                                 "utilities": {
                                     "type": "array",
                                     "items": {
+                                        "additionalProperties": false,
                                         "$ref": "#/definitions/environments/$defs/plugins"
                                     }
                                 },
                                 "transforms": {
                                     "type": "array",
                                     "items": {
+                                        "additionalProperties": false,
                                         "$ref": "#/definitions/environments/$defs/plugins"
                                     }
                                 },
@@ -786,6 +830,7 @@
                                 "dashboards": {
                                     "type": "array",
                                     "items": {
+                                        "additionalProperties": false,
                                         "$ref": "#/definitions/environments/$defs/plugins"
                                     }
                                 }
@@ -801,8 +846,9 @@
             "$defs": {
                 "plugins": {
                     "type": "object",
-                    "additionalProperties": false,
-                    "required": ["name"],
+                    "required": [
+                        "name"
+                    ],
                     "properties": {
                         "name": {
                             "type": "string"
