@@ -20,7 +20,10 @@
         },
         "environments": {
             "type": "array",
-            "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in."
+            "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",
+            "items": {
+                "$ref": "#/definitions/environments"
+            }
         },
         "discovery_url": {
             "type": "string",
@@ -33,7 +36,7 @@
         },
         "plugins": {
             "type": "object",
-            "additionalProperties": true,
+            "additionalProperties": false,
             "properties": {
                 "extractors": {
                     "type": "array",
@@ -711,6 +714,103 @@
                     "examples": [
                         "2020-08-06 00:00:00"
                     ]
+                }
+            }
+        },
+        "environments": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the environment."
+                },
+                "config": {
+                    "type": "object",
+                    "description": "An object of environment specific configurations.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "plugins": {
+                            "type": "object",
+                            "description": "An object of environment specific plugin configurations.",
+                            "properties": {
+                                "extractors": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "loaders": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "orchestrators": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "transformers": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "files": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "utilities": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "transforms": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "models": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "dashboards": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "env": {
+                    "type": "object",
+                    "description": "An object of environment specific variables."
+                }
+            },
+            "$defs": {
+                "plugins": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["name"],
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "config": {
+                            "type": "object"
+                        }
+                    }
                 }
             }
         }
