@@ -405,7 +405,7 @@ class ELBExecutionManager:
         _check_exit_codes(self._producer_code, self._consumer_code)
 
     async def _complete_upstream(self) -> None:
-        """Wait for the upstream blocks to complete and return the exit code."""
+        """Wait for the upstream blocks to complete."""
         producer = self.elb.head
         consumer = self.elb.tail
 
@@ -418,7 +418,6 @@ class ELBExecutionManager:
             await self.elb.upstream_stop(len(self.elb.blocks) - 1)
             # Pretend the producer (tap) finished successfully since it didn't itself fail
             self._producer_code = 0
-
         # Wait for all buffered consumer (target) output to be processed
         await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
@@ -429,18 +428,14 @@ class ELBExecutionManager:
 
         Args:
             current_head: The current head block
-        Returns:
-            A tuple of the exit codes of the producer (of the current head!) and consumer (always the tail)
         Raises:
             RunnerError: if any intermediate blocks failed.
         """
         start_idx = self.elb.blocks.index(current_head)
         remaining_blocks = self.elb.blocks[start_idx:]
 
-        if remaining_blocks is None:
+        if remaining_blocks is None or current_head == self.elb.tail:
             return
-        if len(remaining_blocks) == 1:
-            await self._stop_all_blocks(start_idx)
 
         stdout_futures = [block.proxy_stdout() for block in remaining_blocks]
         stderr_futures = [block.proxy_stderr() for block in remaining_blocks]
@@ -452,12 +447,12 @@ class ELBExecutionManager:
             )
         )
 
-        logger.debug("waiting for process completion or exception", index=start_idx)
+        logger.debug("waiting for process completion or exception")
         done = await self.elb.process_wait(output_exception_future, start_idx)
 
         output_futures_failed = first_failed_future(output_exception_future, done)
         if output_futures_failed:
-            # Special behavior for the producer stdout handler raising a line length limit error.
+            # Special behavior for a producer stdout handler raising a line length limit error.
             if self.elb.head.proxy_stdout() == output_futures_failed:
                 handle_producer_line_length_limit_error(
                     output_futures_failed.exception(),
@@ -472,19 +467,18 @@ class ELBExecutionManager:
                 self.elb.process_futures,
                 return_when=asyncio.FIRST_COMPLETED,
             )
-
         if self.elb.tail.process_future.done():
-            logger.debug("last consumer done first", index=start_idx)
+            logger.debug("tail consumer completed first")
             self._consumer_code = self.elb.tail.process_future.result()
-            logger.debug("waiting for upstream process completion", index=start_idx)
             await self._complete_upstream()
         elif current_head.process_future.done():
+            logger.debug("head producer completed first as expected")
             await self._handle_head_completed(current_head, start_idx)
         else:
-            logger.debug("intermediate block done first")
+            logger.warning("Intermediate block in sequence failed.")
             await self._stop_all_blocks(start_idx)
             raise RunnerError(
-                "Unexpected completion sequence in ExtractLoadBlock. Assume extractor and loader failed",
+                "Unexpected completion sequence in ExtractLoadBlock set. Intermediate block (likely a mapper) failed.",
                 {
                     PluginType.EXTRACTORS: 1,
                     PluginType.LOADERS: 1,
@@ -494,16 +488,26 @@ class ELBExecutionManager:
     async def _handle_head_completed(
         self, current_head: IOBlock, start_idx: int
     ) -> None:
-        logger.debug("head producer done first", index=start_idx)
+        next_head = self.elb.blocks[start_idx + 1]
 
         if current_head is self.elb.head:
             self._producer_code = current_head.process_future.result()
 
-        logger.debug("waiting for remaining process completion", index=start_idx)
         await asyncio.wait([current_head.proxy_stdout(), current_head.proxy_stderr()])
         # Close next inline stdin so downstream can cascade and complete naturally
-        next_head = self.elb.blocks[start_idx + 1]
-        await next_head.close_stdin()
+        next_head.stdin.close()
+        await next_head.stdin.wait_closed()
+
+        if next_head is self.elb.tail:
+            logger.debug("tail consumer is next block, wrapping up")
+            # Wait for all buffered target output to be processed
+            await asyncio.wait([next_head.proxy_stdout(), next_head.proxy_stderr()])
+
+            # Wait for target process future to complete
+            await next_head.process_future
+            self._consumer_code = next_head.process_future.result()
+            return  # break our recursion
+
         await self._wait_for_process_completion(next_head)
 
     async def _stop_all_blocks(self, idx: int = 0) -> None:

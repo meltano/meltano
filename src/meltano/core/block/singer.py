@@ -171,9 +171,9 @@ class InvokerBase:  # noqa: WPS230
     async def close_stdin(self) -> None:
         """Close the underlying process stdin if the block is a producer."""
         if self.producer:
-            self.stdin.close()
+            self.process_handle.stdin.close()
             with suppress(AttributeError):  # `wait_closed` is Python 3.7+
-                await self.stdin.wait_closed()
+                await self.process_handle.stdin.wait_closed()
 
     def stdout_link(self, dst: SubprocessOutputWriter):
         """Use stdout_link to instruct block to link/write stdout content to dst.
