@@ -193,12 +193,38 @@
                     }
                 }
             },
+            "extractor_shared": {
+                "type": "object",
+                "properties": {
+                    "select": {
+                        "type": "array",
+                        "default": [
+                            "*.*"
+                        ],
+                        "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "select_filter": {
+                        "type": "array",
+                        "description": "An array of entity selection filter rules that are applied to the extractor's discovered or provided catalog file when the extractor is run.",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": []
+                    }
+                }
+            },
             "extractors": {
                 "description": "https://meltano.com/docs/plugins.html#extractors",
                 "type": "object",
                 "allOf": [
                     {
                         "$ref": "#/definitions/plugins/plugin_generic"
+                    },
+                    {
+                        "$ref": "#/definitions/plugins/extractor_shared"
                     },
                     {
                         "additionalProperties": false,
@@ -235,24 +261,8 @@
                                     ]
                                 }
                             },
-                            "select": {
-                                "type": "array",
-                                "default": [
-                                    "*.*"
-                                ],
-                                "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "select_filter": {
-                                "type": "array",
-                                "description": "An array of entity selection filter rules that are applied to the extractor's discovered or provided catalog file when the extractor is run.",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "default": []
-                            },
+                            "select": {},
+                            "select_filter": {},
                             "catalog": {
                                 "description": "A path to a catalog file (relative to the project directory) to be provided to the extractor when it is run in sync mode."
                             },
@@ -750,31 +760,11 @@
                                                     "name": {},
                                                     "config": {},
                                                     "select": {},
-                                                    "select_filer": {}
+                                                    "select_filter": {}
                                                 }
                                             },
                                             {
-                                                "type": "object",
-                                                "properties": {
-                                                    "select": {
-                                                        "type": "array",
-                                                        "default": [
-                                                            "*.*"
-                                                        ],
-                                                        "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
-                                                        "items": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "select_filter": {
-                                                        "type": "array",
-                                                        "description": "An array of entity selection filter rules that are applied to the extractor's discovered or provided catalog file when the extractor is run.",
-                                                        "items": {
-                                                            "type": "string"
-                                                        },
-                                                        "default": []
-                                                    }
-                                                }
+                                                "$ref": "#/definitions/plugins/extractor_shared"
                                             }
                                         ]
                                     }
