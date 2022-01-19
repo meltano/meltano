@@ -3,6 +3,7 @@
 import asyncio
 from asyncio import StreamWriter, Task
 from asyncio.subprocess import Process
+from contextlib import suppress
 from typing import Dict, Optional, Tuple
 
 from meltano.core.logging import capture_subprocess_output
@@ -166,6 +167,13 @@ class InvokerBase:  # noqa: WPS230
         if self.process_handle is None:
             return None
         return self.process_handle.stdin
+
+    async def close_stdin(self) -> None:
+        """Close the underlying process stdin if the block is a producer."""
+        if self.producer:
+            self.stdin.close()
+            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+                await self.stdin.wait_closed()
 
     def stdout_link(self, dst: SubprocessOutputWriter):
         """Use stdout_link to instruct block to link/write stdout content to dst.
