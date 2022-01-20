@@ -21,7 +21,7 @@ def remove(ctx, project, plugin_type, plugin_names):
     """
     Remove plugins from your project.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#remove
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#remove
     """
     plugins = [
         ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)

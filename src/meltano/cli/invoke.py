@@ -54,7 +54,7 @@ def invoke(
     """
     Invoke a plugin's executable with specified arguments.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#invoke
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#invoke
     """
     try:
         plugin_name, command_name = plugin_name.split(":")

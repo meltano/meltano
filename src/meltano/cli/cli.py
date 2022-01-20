@@ -31,7 +31,7 @@ def cli(  # noqa: WPS231
     """
     ELT for the DataOps era.
 
-    Read more at https://www.meltano.com/docs/command-line-interface.html
+    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html
     """
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level

@@ -99,7 +99,7 @@ async def elt(
     extractor_name: extractor to be used in this pipeline.
     loader_name: loader to be used in this pipeline.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#elt
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#elt
     """
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
