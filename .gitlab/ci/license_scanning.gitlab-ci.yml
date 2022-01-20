@@ -14,7 +14,7 @@ license_scanning:
     - pip install poetry
     # Workaround for https://github.com/python-poetry/poetry/issues/3199
     - poetry config experimental.new-installer false
-    - poetry config settings.virtualenvs.create false
+    - poetry config virtualenvs.create false
     - poetry install
     - poetry export --format requirements.txt --output requirements.txt
   script:
