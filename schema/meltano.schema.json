@@ -196,6 +196,25 @@
             "extractor_shared": {
                 "type": "object",
                 "properties": {
+                    "catalog": {
+                        "description": "A path to a catalog file (relative to the project directory) to be provided to the extractor when it is run in sync mode."
+                    },
+                    "load_schema": {
+                        "description": "The name of the database schema extracted data should be loaded into."
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "description": "An object containing Singer stream and property metadata",
+                        "default": {}
+                    },
+                    "schema": {
+                        "type": "object",
+                        "description": "An object representing override rules for a Singer stream schema",
+                        "default": {}
+                    },
+                    "state": {
+                        "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
+                    },
                     "select": {
                         "type": "array",
                         "default": [
@@ -263,25 +282,11 @@
                             },
                             "select": {},
                             "select_filter": {},
-                            "catalog": {
-                                "description": "A path to a catalog file (relative to the project directory) to be provided to the extractor when it is run in sync mode."
-                            },
-                            "load_schema": {
-                                "description": "The name of the database schema extracted data should be loaded into."
-                            },
-                            "metadata": {
-                                "type": "object",
-                                "description": "An object containing Singer stream and property metadata",
-                                "default": {}
-                            },
-                            "schema": {
-                                "type": "object",
-                                "description": "An object representing override rules for a Singer stream schema",
-                                "default": {}
-                            },
-                            "state": {
-                                "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
-                            }
+                            "catalog": {},
+                            "load_schema": {},
+                            "metadata": {},
+                            "schema": {},
+                            "state": {}
                         }
                     }
                 ]
@@ -760,7 +765,12 @@
                                                     "name": {},
                                                     "config": {},
                                                     "select": {},
-                                                    "select_filter": {}
+                                                    "select_filter": {},
+                                                    "catalog": {},
+                                                    "load_schema": {},
+                                                    "metadata": {},
+                                                    "schema": {},
+                                                    "state": {}
                                                 }
                                             },
                                             {
