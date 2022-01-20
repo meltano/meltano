@@ -20,12 +20,10 @@ include:
 
   # build-meltano
   - local: .gitlab/ci/docker_prod.gitlab-ci.yml
+  - local: .gitlab/ci/docker_license_finder.gitlab-ci.yml
 
   # docs
   - local: .gitlab/ci/docs.gitlab-ci.yml
-
-  # pre-test
-  - local: .gitlab/ci/generate_requirements.gitlab-ci.yml
 
   # test
   - local: .gitlab/ci/test.gitlab-ci.yml
