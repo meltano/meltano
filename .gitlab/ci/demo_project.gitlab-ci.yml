@@ -1,7 +1,7 @@
 demo_project:
   stage: test
   variables:
-    MELTANO_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.6
+    MELTANO_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.8
   trigger:
     project: meltano/demo-project
     strategy: depend
@@ -16,7 +16,7 @@ demo_project_forks:
       curl
       --request POST
       --form "token=$CI_JOB_TOKEN"
-      --form "variables[MELTANO_IMAGE]=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.6"
+      --form "variables[MELTANO_IMAGE]=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.8"
       --form ref=master
       https://gitlab.com/api/v4/projects/meltano%2fdemo-project/trigger/pipeline
   except:
