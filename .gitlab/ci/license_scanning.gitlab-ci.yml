@@ -1,11 +1,30 @@
-include:
-  - template: Security/License-Scanning.gitlab-ci.yml
+variables:
+  LICENSE_MANAGEMENT_SETUP_CMD: ''  # If needed, specify a command to setup your environment with a custom package manager.
+  LICENSE_FINDER_CLI_OPTS: "--enabled-package-managers=pip --python-version=3 --decisions-file=license_finder/dependency_decisions.yml"
 
 license_scanning:
   stage: test
-  dependencies:
-    - generate_requirements
+  image:
+    name: "$CI_REGISTRY_IMAGE/license-finder:latest"
   variables:
-    LM_PYTHON_VERSION: 3
-    LICENSE_FINDER_CLI_OPTS: "--enabled-package-managers=pip --python-version=3 --decisions-file=dependency_decisions.yml"
-    SETUP_CMD: "license_management --prepare --enabled-package-managers=pip --python-version=3"
+    LM_REPORT_VERSION: '2.1'
+    SETUP_CMD: $LICENSE_MANAGEMENT_SETUP_CMD
+  allow_failure: true
+  before_script:
+    - pip install poetry
+    # Workaround for https://github.com/python-poetry/poetry/issues/3199
+    - poetry config experimental.new-installer false
+    - poetry config settings.virtualenvs.create false
+    - poetry install
+    - poetry export --format requirements.txt --output requirements.txt
+  script:
+    - /run.sh analyze .
+  artifacts:
+    reports:
+      license_scanning: gl-license-scanning-report.json
+  dependencies: []
+  rules:
+    - if: $LICENSE_MANAGEMENT_DISABLED
+      when: never
+    - if: $CI_COMMIT_BRANCH &&
+          $GITLAB_FEATURES =~ /\blicense_scanning\b/
