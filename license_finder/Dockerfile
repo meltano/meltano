@@ -142,4 +142,4 @@ RUN set -ex; \
 		\) -exec rm -rf '{}' +; \
 	rm -f get-pip.py
 
-ENTRYPOINT ["/bin/sh", "-c"]
+ENTRYPOINT []
