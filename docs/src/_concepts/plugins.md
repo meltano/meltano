@@ -6,28 +6,28 @@ weight: 2
 ---
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
-where your [project](/reference/project) and pipelines are composed of plugins of [different types](#types), most notably
+where your [project](project) and pipelines are composed of plugins of [different types](#types), most notably
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
 [**loaders**](#loaders) ([Singer](https://singer.io) targets),
 [**transformers**](#transformers) ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
 [**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
 
-Meltano provides the glue to make these components work together smoothly and enables consistent [configuration](/reference/configuration) and [deployment](/getting-started/production).
+Meltano provides the glue to make these components work together smoothly and enables consistent [configuration](/guide/configuration) and [deployment](/guide/production).
 
-To learn how to manage your project's plugins, refer to the [Plugin Management guide](/reference/plugin-management).
+To learn how to manage your project's plugins, refer to the [Plugin Management guide](/guide/plugin-management).
 
 ## Project Plugins
 
-In order to use a given package as a plugin in a [project](/reference/project),
+In order to use a given package as a plugin in a [project](project),
 assuming it meets the requirements of the [plugin type](#types) in question, Meltano needs to know:
 1. where to find the package, typically a [pip package](https://pip.pypa.io/en/stable/) identified by its name on [PyPI](https://pypi.org/), public or private Git repository URL, or local directory path,
-2. what [settings](/reference/configuration) and other capabilities it supports, and finally
-3. what its [configuration](/reference/configuration) should be when invoked.
+2. what [settings](/guide/configuration) and other capabilities it supports, and finally
+3. what its [configuration](/guide/configuration) should be when invoked.
 
 Together, a package's location (1) and the metadata (2) describing it in terms Meltano can understand make up the **base plugin description**.
 In your project, **plugins** extend this description with a specific configuration (3) and a unique name.
 
-This means that [different configurations](/reference/configuration#multiple-plugin-configurations) of the same package (base plugin)
+This means that [different configurations](/guide/configuration#multiple-plugin-configurations) of the same package (base plugin)
 would be represented in your project as separate plugins with their own unique names,
 that can be thought of as differently initialized instances of the same class.
 For example: extractors `tap-postgres--billing` and `tap-postgres--events` derived from base extractor [`tap-postgres`](https://hub.meltano.com/extractors/postgres.html),
@@ -38,12 +38,12 @@ Each plugin in a project can either:
 - define its base plugin description explicitly, making it a [custom plugin](#custom-plugins), or
 - [inherit](#plugin-inheritance) both base plugin description and configuration from another plugin in the project.
 
-To learn how to add a plugin to your project, refer to the [Plugin Management guide](/reference/plugin-management#adding-a-plugin-to-your-project).
+To learn how to add a plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#adding-a-plugin-to-your-project).
 
 ## Discoverable plugins
 
 [Base plugin descriptions](#project-plugins) for many popular [extractors](#extractors) (Singer taps), [loaders](#loaders) (Singer targets),
-and other plugins have already been collected by users and [contributed](/getting-started/contributor-guide#discoverable-plugins) to Meltano's index of discoverable plugins,
+and other plugins have already been collected by users and [contributed](/the-project/contributor-guide#discoverable-plugins) to Meltano's index of discoverable plugins,
 making them supported out of the box.
 
 Discoverable plugins are defined in the `discovery.yml` manifest,
@@ -56,7 +56,7 @@ or change the [`discovery_url` setting](/reference/settings#discovery-url).
 
 To find discoverable plugins, run [`meltano discover`](/reference/command-line-interface#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/).
 
-To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](/reference/project#shadowing-plugin-definitions) or [inheriting plugin definition](/reference/project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/reference/plugin-management#discoverable-plugins).
+To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](project#shadowing-plugin-definitions) or [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
 
 ### Variants
 
@@ -78,28 +78,28 @@ If the variant in question is not discoverable yet, it can be added as a [custom
 
 When multiple variants of a discoverable plugin are available, [`meltano discover`](/reference/command-line-interface#discover) will list their names alongside the plugin name.
 
-To learn how to add a non-default variant of a discoverable plugin to your project, refer to the [Plugin Management guide](/reference/plugin-management#variants).
+To learn how to add a non-default variant of a discoverable plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#variants).
 
 ## Custom plugins
 
 If you'd like to use a package in your project whose [base plugin description](#project-plugins) isn't [discoverable](#discoverable-plugins) yet,
 you'll need to collect and provide this metadata yourself.
 
-To learn how to add a custom plugin to your project using a [custom plugin definition](/reference/project#custom-plugin-definitions), refer to the [Plugin Management guide](/reference/plugin-management#custom-plugins).
+To learn how to add a custom plugin to your project using a [custom plugin definition](project#custom-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/getting-started/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ## Plugin Inheritance
 
-If you'd like to use the same package (base plugin) in your project multiple times with [different configurations](/reference/configuration#multiple-plugin-configurations),
+If you'd like to use the same package (base plugin) in your project multiple times with [different configurations](/guide/configuration#multiple-plugin-configurations),
 you can add a new plugin that inherits from an existing one.
 
-The new plugin will inherit its parent's [base plugin description](#project-plugins) and [configuration](/reference/configuration) as if they were defaults,
+The new plugin will inherit its parent's [base plugin description](#project-plugins) and [configuration](/guide/configuration) as if they were defaults,
 which can then be overridden as appropriate.
 
-To learn how to add an inheriting plugin to your project using an [inheriting plugin definition](/reference/project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/reference/plugin-management#plugin-inheritance).
+To learn how to add an inheriting plugin to your project using an [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
 
 ## Types
 
@@ -117,7 +117,7 @@ Meltano supports the following types of plugins:
 
 ### Extractors
 
-Extractors are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data integration](/tutorials/integration).
+Extractors are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data integration](/guide/integration).
 They are responsible for pulling data out of arbitrary data sources: databases, SaaS APIs, or file formats.
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
@@ -126,7 +126,7 @@ To learn which extractors are [discoverable](#discoverable-plugins) and supporte
 
 #### Extras
 
-Extractors support the following [extras](/reference/configuration#plugin-extras):
+Extractors support the following [extras](/guide/configuration#plugin-extras):
 
 - [`catalog`](#catalog-extra)
 - [`load_schema`](#load-schema-extra)
@@ -139,14 +139,14 @@ Extractors support the following [extras](/reference/configuration#plugin-extras
 #### `catalog` extra
 
 - Setting: `_catalog`
-- [Environment variable](/reference/configuration#configuring-settings): `<EXTRACTOR>__CATALOG`, e.g. `TAP_GITLAB__CATALOG`
+- [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__CATALOG`, e.g. `TAP_GITLAB__CATALOG`
 - [`meltano elt`](/reference/command-line-interface#elt) CLI option: `--catalog`
 - Default: None
 
-An extractor's `catalog` [extra](/reference/configuration#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](/reference/project)) to be provided to the extractor
+An extractor's `catalog` [extra](/guide/configuration#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](project)) to be provided to the extractor
 when it is run in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md) using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
-If a catalog path is not set, the catalog will be [generated on the fly](/tutorials/integration#extractor-catalog-generation)
+If a catalog path is not set, the catalog will be [generated on the fly](/guide/integration#extractor-catalog-generation)
 by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec#discovery-mode) and applying the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules to the discovered file.
 
 [Selection filter rules](#select-filter-extra) are always applied to manually provided catalogs as well as discovered ones.
@@ -154,11 +154,11 @@ by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
 a catalog file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--catalog` option.
 
-If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/tutorials/integration#validate-tap-capabilities).
+If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/guide/integration#validate-tap-capabilities).
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3}
 extractors:
@@ -166,7 +166,7 @@ extractors:
   catalog: extract/tap-gitlab.catalog.json
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <extractor> set _catalog <path>
@@ -186,20 +186,20 @@ meltano elt tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
 #### <a name="load-schema-extra"></a>`load_schema` extra
 
 - Setting: `_load_schema`
-- [Environment variable](/reference/configuration#configuring-settings): `<EXTRACTOR>__LOAD_SCHEMA`, e.g. `TAP_GITLAB__LOAD_SCHEMA`
-- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which [will expand to](/reference/configuration#expansion-in-setting-values) the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+- [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__LOAD_SCHEMA`, e.g. `TAP_GITLAB__LOAD_SCHEMA`
+- Default: `$MELTANO_EXTRACTOR_NAMESPACE`, which [will expand to](/guide/configuration#expansion-in-setting-values) the extractor's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
 
-An extractor's `load_schema` [extra](/reference/configuration#plugin-extras)
+An extractor's `load_schema` [extra](/guide/configuration#plugin-extras)
 holds the name of the database schema extracted data should be loaded into,
 when this extractor is used in a pipeline with a [loader](#loaders) for a database that supports schemas, like [PostgreSQL](https://www.postgresql.org/docs/current/ddl-schemas.html) or [Snowflake](https://docs.snowflake.com/en/sql-reference/ddl-database.html).
 
-The value of this extra [can be referenced](/reference/configuration#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
-[pipeline environment variable](/tutorials/integration#pipeline-environment-variables).
+The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a loader's configuration using the `MELTANO_EXTRACT__LOAD_SCHEMA`
+[pipeline environment variable](/guide/integration#pipeline-environment-variables).
 It is used as the default value for the [`target-postgres`](https://hub.meltano.com/loaders/postgres.html) and [`target-snowflake`](https://hub.meltano.com/loaders/snowflake.html) `schema` settings.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3}
 extractors:
@@ -207,7 +207,7 @@ extractors:
   load_schema: gitlab_data
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <extractor> set _load_schema <schema>
@@ -223,10 +223,10 @@ export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 #### `metadata` extra
 
 - Setting: `_metadata`, alias: `metadata`
-- [Environment variable](/reference/configuration#configuring-settings): `<EXTRACTOR>__METADATA`, e.g. `TAP_GITLAB__METADATA`
+- [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__METADATA`, e.g. `TAP_GITLAB__METADATA`
 - Default: `{}` (an empty object)
 
-An extractor's `metadata` [extra](/reference/configuration#plugin-extras) holds an object describing
+An extractor's `metadata` [extra](/guide/configuration#plugin-extras) holds an object describing
 [Singer stream and property metadata](https://hub.meltano.com/singer/spec#metadata)
 rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
@@ -244,7 +244,7 @@ Entity and attribute names can be discovered using [`meltano select --list --all
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3-8}
 extractors:
@@ -257,7 +257,7 @@ extractors:
         is-replication-key: true
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <extractor> set _metadata <entity> <key> <value>
@@ -280,10 +280,10 @@ export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_METHOD=FULL_TABLE
 #### `schema` extra
 
 - Setting: `_schema`
-- [Environment variable](/reference/configuration#configuring-settings): `<EXTRACTOR>__SCHEMA`, e.g. `TAP_GITLAB__SCHEMA`
+- [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SCHEMA`, e.g. `TAP_GITLAB__SCHEMA`
 - Default: `{}` (an empty object)
 
-An extractor's `schema` [extra](/reference/configuration#plugin-extras) holds an object describing
+An extractor's `schema` [extra](/guide/configuration#plugin-extras) holds an object describing
 [Singer stream schema](https://hub.meltano.com/singer/spec#schemas) override
 rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
@@ -301,7 +301,7 @@ This allows you to define a full schema for taps such as [`tap-dynamodb`](https:
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3-7}
 extractors:
@@ -313,7 +313,7 @@ extractors:
         format: date-time
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <extractor> set _schema <entity> <attribute> <schema description>
@@ -335,10 +335,10 @@ export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 #### `select` extra
 
 - Setting: `_select`
-- [Environment variable](/reference/configuration#configuring-settings): `<EXTRACTOR>__SELECT`, e.g. `TAP_GITLAB__SELECT`
+- [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SELECT`, e.g. `TAP_GITLAB__SELECT`
 - Default: `["*.*"]`
 
-An extractor's `select` [extra](/reference/configuration#plugin-extras) holds an array of [entity selection rules](/reference/command-line-interface#select)
+An extractor's `select` [extra](/guide/configuration#plugin-extras) holds an array of [entity selection rules](/reference/command-line-interface#select)
 that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
@@ -352,7 +352,7 @@ selection rules are typically specified using [`meltano select`](/reference/comm
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3-5}
 extractors:
@@ -362,7 +362,7 @@ extractors:
   - commits.*
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
@@ -383,12 +383,12 @@ meltano select tap-gitlab commits "*"
 #### <a name="select-filter-extra"></a>`select_filter` extra
 
 - Setting: `_select_filter`
-- [Environment variable](/reference/configuration#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
+- [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
 - [`meltano elt`](/reference/command-line-interface#elt) CLI options: `--select` and `--exclude`
 - Default: `[]`
 
-An extractor's `select_filter` [extra](/reference/configuration#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
-that are applied to the extractor's [discovered](/tutorials/integration#extractor-catalog-generation) or [provided](#catalog-extra) catalog file
+An extractor's `select_filter` [extra](/guide/configuration#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
+that are applied to the extractor's [discovered](/guide/integration#extractor-catalog-generation) or [provided](#catalog-extra) catalog file
 when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke),
 after [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules are applied.
 
@@ -403,7 +403,7 @@ selection filers are typically specified using [`meltano elt`](/reference/comman
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{6-7}
 extractors:
@@ -415,7 +415,7 @@ extractors:
   - commits
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <extractor> set _select_filter '["<entity>", ...]'
@@ -441,21 +441,21 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 #### `state` extra
 
 - Setting: `_state`
-- [Environment variable](/reference/configuration#configuring-settings): `<EXTRACTOR>__STATE`, e.g. `TAP_GITLAB__STATE`
+- [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__STATE`, e.g. `TAP_GITLAB__STATE`
 - [`meltano elt`](/reference/command-line-interface#elt) CLI option: `--state`
 - Default: None
 
-An extractor's `state` [extra](/reference/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](/reference/project)) to be provided to the extractor
+An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](project)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/reference/command-line-interface#elt).
 
-If a state path is not set, the state will be [looked up automatically](/tutorials/integration#incremental-replication-state) based on the ELT run's Job ID.
+If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's Job ID.
 
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
 a state file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3}
 extractors:
@@ -463,7 +463,7 @@ extractors:
   state: extract/tap-gitlab.state.json
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <extractor> set _state <path>
@@ -482,7 +482,7 @@ meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 
 ### Loaders
 
-Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data integration](/tutorials/integration).
+Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data integration](/guide/integration).
 They are responsible for loading [extracted](#extractors) data into arbitrary data destinations: databases, SaaS APIs, or file formats.
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
@@ -491,7 +491,7 @@ To learn which loaders are [discoverable](#discoverable-plugins) and supported o
 
 #### Extras
 
-Loaders support the following [extras](/reference/configuration#plugin-extras):
+Loaders support the following [extras](/guide/configuration#plugin-extras):
 
 - [`dialect`](#dialect-extra)
 - [`target_schema`](#target-schema-extra)
@@ -499,21 +499,21 @@ Loaders support the following [extras](/reference/configuration#plugin-extras):
 #### `dialect` extra
 
 - Setting: `_dialect`
-- [Environment variable](/reference/configuration#configuring-settings): `<LOADER>__DIALECT`, e.g. `TARGET_POSTGRES__DIALECT`
-- Default: `$MELTANO_LOADER_NAMESPACE`, which [will expand to](/reference/configuration#expansion-in-setting-values) the loader's `namespace`. Note that this default has been overridden on [discoverable](#discoverable-plugins) loaders, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`.
+- [Environment variable](/guide/configuration#configuring-settings): `<LOADER>__DIALECT`, e.g. `TARGET_POSTGRES__DIALECT`
+- Default: `$MELTANO_LOADER_NAMESPACE`, which [will expand to](/guide/configuration#expansion-in-setting-values) the loader's `namespace`. Note that this default has been overridden on [discoverable](#discoverable-plugins) loaders, e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`.
 
-A loader's `dialect` [extra](/reference/configuration#plugin-extras)
+A loader's `dialect` [extra](/guide/configuration#plugin-extras)
 holds the name of the dialect of the target database, so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/tutorials/analysis)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/guide/ui)'s [Analysis feature](/guide/analysis)
 can determine the type of database to connect to.
 
-The value of this extra [can be referenced](/reference/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
-[pipeline environment variable](/tutorials/integration#pipeline-environment-variables).
+The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
+[pipeline environment variable](/guide/integration#pipeline-environment-variables).
 It is used as the default value for `dbt`'s `target` setting, and should therefore correspond to a target name in `transform/profile/profiles.yml`.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3}
 loaders:
@@ -521,7 +521,7 @@ loaders:
   dialect: example-db
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <loader> set _dialect <dialect>
@@ -537,24 +537,24 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 #### <a name="target-schema-extra"></a>`target_schema` extra
 
 - Setting: `_target_schema`
-- [Environment variable](/reference/configuration#configuring-settings): `<LOADER>__TARGET_SCHEMA`, e.g. `TARGET_POSTGRES__TARGET_SCHEMA`
-- Default: `$MELTANO_LOAD_SCHEMA`, which [will expand to](/reference/configuration#expansion-in-setting-values) the value of the loader's `schema` setting
+- [Environment variable](/guide/configuration#configuring-settings): `<LOADER>__TARGET_SCHEMA`, e.g. `TARGET_POSTGRES__TARGET_SCHEMA`
+- Default: `$MELTANO_LOAD_SCHEMA`, which [will expand to](/guide/configuration#expansion-in-setting-values) the value of the loader's `schema` setting
 
-A loader's `target_schema` [extra](/reference/configuration#plugin-extras)
+A loader's `target_schema` [extra](/guide/configuration#plugin-extras)
 holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/tutorials/analysis)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/guide/ui)'s [Analysis feature](/guide/analysis)
 can determine the database schema to load data from.
 
 The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
-If the name of this setting is not `schema`, its value [can be referenced](/reference/configuration#expansion-in-setting-values) from the extra's value using `$MELTANO_LOAD_<TARGET_SCHEMA_SETTING>`, e.g. `$MELTANO_LOAD_DESTINATION_SCHEMA` for setting `destination_schema`.
+If the name of this setting is not `schema`, its value [can be referenced](/guide/configuration#expansion-in-setting-values) from the extra's value using `$MELTANO_LOAD_<TARGET_SCHEMA_SETTING>`, e.g. `$MELTANO_LOAD_DESTINATION_SCHEMA` for setting `destination_schema`.
 
-The value of this extra [can be referenced](/reference/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__TARGET_SCHEMA`
-[pipeline environment variable](/tutorials/integration#pipeline-environment-variables).
+The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__TARGET_SCHEMA`
+[pipeline environment variable](/guide/integration#pipeline-environment-variables).
 It is used as the default value for `dbt`'s `source_schema` setting.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{5}
 loaders:
@@ -564,7 +564,7 @@ loaders:
   target_schema: $MELTANO_LOAD_DESTINATION_SCHEMA # Value of `destination_schema` setting
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <loader> set _target_schema <schema>
@@ -583,9 +583,9 @@ export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
 ### Transforms
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),
-that are used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/reference/transforms).
+that are used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/guide/transformation).
 
-Together with the [dbt](https://www.getdbt.com) [transformer](#transformers), they are responsible for transforming data that has been loaded into a database (data warehouse) into a different format, usually one more appropriate for [analysis](/tutorials/analysis).
+Together with the [dbt](https://www.getdbt.com) [transformer](#transformers), they are responsible for transforming data that has been loaded into a database (data warehouse) into a different format, usually one more appropriate for [analysis](/guide/analysis).
 
 When a transform is added to your project using [`meltano add`](/reference/command-line-interface#add),
 the [dbt package Git repository](https://docs.getdbt.com/docs/building-a-dbt-project/package-management#git-packages) referenced by its `pip_url`
@@ -593,7 +593,7 @@ will be added to your project's `transform/packages.yml` and the package will be
 
 #### Extras
 
-Transforms support the following [extras](/reference/configuration#plugin-extras):
+Transforms support the following [extras](/guide/configuration#plugin-extras):
 
 - [`package_name`](#package-name-extra)
 - [`vars`](#vars-extra)
@@ -601,21 +601,21 @@ Transforms support the following [extras](/reference/configuration#plugin-extras
 #### <a name="package-name-extra"></a>`package_name` extra
 
 - Setting: `_package_name`
-- [Environment variable](/reference/configuration#configuring-settings): `<TRANSFORM>__PACKAGE_NAME`, e.g. `TAP_GITLAB__PACKAGE_NAME`
-- Default: `$MELTANO_TRANSFORM_NAMESPACE`, which [will expand to](/reference/configuration#expansion-in-setting-values) the transform's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
+- [Environment variable](/guide/configuration#configuring-settings): `<TRANSFORM>__PACKAGE_NAME`, e.g. `TAP_GITLAB__PACKAGE_NAME`
+- Default: `$MELTANO_TRANSFORM_NAMESPACE`, which [will expand to](/guide/configuration#expansion-in-setting-values) the transform's `namespace`, e.g. `tap_gitlab` for `tap-gitlab`
 
-A transform's `package_name` [extra](/reference/configuration#plugin-extras)
+A transform's `package_name` [extra](/guide/configuration#plugin-extras)
 holds the name of the dbt package's internal dbt project: the value of `name` in `dbt_project.yml`.
 
 When a transform is added to your project using [`meltano add`](/reference/command-line-interface#add), this name will be added to the `models` dictionary in `transform/dbt_project.yml`.
 
-The value of this extra [can be referenced](/reference/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_TRANSFORM__PACKAGE_NAME`
-[pipeline environment variable](/tutorials/integration#pipeline-environment-variables).
+The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_TRANSFORM__PACKAGE_NAME`
+[pipeline environment variable](/guide/integration#pipeline-environment-variables).
 It is included in the default value for `dbt`'s `models` setting: `$MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{4}
 transforms:
@@ -624,7 +624,7 @@ transforms:
   package_name: facebook_ads
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <transform> set _package_name <name>
@@ -640,19 +640,19 @@ export DBT_FACEBOOK_ADS__PACKGE_NAME=facebook_ads
 #### `vars` extra
 
 - Setting: `_vars`
-- [Environment variable](/reference/configuration#configuring-settings): `<TRANSFORM>__VARS`, e.g. `TAP_GITLAB__VARS`
+- [Environment variable](/guide/configuration#configuring-settings): `<TRANSFORM>__VARS`, e.g. `TAP_GITLAB__VARS`
 - Default: `{}` (an empty object)
 
-A transform's `vars` [extra](/reference/configuration#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
+A transform's `vars` [extra](/guide/configuration#plugin-extras) holds an object representing [dbt model variables](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables)
 that can be referenced from a model using the [`var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/var).
 
 When a transform is added to your project using [`meltano add`](/reference/command-line-interface#add), this object will be used as the dbt model's `vars` object in `transform/dbt_project.yml`.
 
-Because these variables are handled by dbt rather than Meltano, [environment variables](/reference/configuration#expansion-in-setting-values) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$VAR` or `${VAR}`.
+Because these variables are handled by dbt rather than Meltano, [environment variables](/guide/configuration#expansion-in-setting-values) can be referenced using the [`env_var` function](https://docs.getdbt.com/reference/dbt-jinja-functions/env_var) instead of `$VAR` or `${VAR}`.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml
 {% raw %}
@@ -663,7 +663,7 @@ transforms:
 {% endraw %}
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 {% raw %}
@@ -680,20 +680,20 @@ export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 
 ### Models
 
-Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/reference/ui) to aid in [data analysis](/tutorials/analysis).
+Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/guide/ui) to aid in [data analysis](/guide/analysis).
 They describe the schema of the data being analyzed and the ways different tables can be joined,
 and are used to automatically generate SQL queries using a point-and-click interface.
 
 ### Dashboards
 
-Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/reference/ui) dashboards and reports.
+Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/guide/ui) dashboards and reports.
 
 When a dashboard is added to your project using [`meltano add`](/reference/command-line-interface#add),
 the bundled dashboards and reports will automatically be added to your project's `analyze` directory as well.
 
 ### Orchestrators
 
-Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for [orchestrating](/tutorials/orchestration) a project's [scheduled pipelines](/reference/command-line-interface#schedule).
+Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for [orchestrating](/guide/orchestration) a project's [scheduled pipelines](/reference/command-line-interface#schedule).
 
 Meltano supports [Apache Airflow](https://airflow.apache.org/) out of the box, but can be used with any tool capable of reading the output of [`meltano schedule list --format=json`](/reference/command-line-interface#schedule) and executing each pipeline's [`meltano elt`](/reference/command-line-interface#elt) command on a schedule.
 
@@ -702,7 +702,7 @@ its related [file bundle](#file-bundles) will automatically be added as well.
 
 ### Transformers
 
-Transformers are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/reference/transforms).
+Transformers are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/guide/transformation).
 They are responsible for running [transforms](#transforms).
 
 Meltano supports [dbt](https://www.getdbt.com) and its [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) out of the box.
@@ -716,22 +716,22 @@ File bundles are [pip packages](https://pip.pypa.io/en/stable/) bundling files y
 
 When a file bundle is added to your project using [`meltano add`](/reference/command-line-interface#add),
 the bundled files will automatically be added as well.
-The file bundle itself will not be added to your [`meltano.yml` project file](/reference/project#meltano-yml-project-file) unless it contains files that are
+The file bundle itself will not be added to your [`meltano.yml` project file](project#meltano-yml-project-file) unless it contains files that are
 [managed by the file bundle](#update-extra) and to be updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run.
 
 #### `update` extra
 
 - Setting: `_update`
-- [Environment variable](/reference/configuration#configuring-settings): `<BUNDLE>__UPDATE`, e.g. `DBT__UPDATE`
+- [Environment variable](/guide/configuration#configuring-settings): `<BUNDLE>__UPDATE`, e.g. `DBT__UPDATE`
 - Default: `{}` (an empty object)
 
-A file bundle's `update` [extra](/reference/configuration#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
+A file bundle's `update` [extra](/guide/configuration#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
 
 When a file path's value is `True`, the file is considered to be managed by the file bundle and updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml{3-4}
 files:
@@ -740,7 +740,7 @@ files:
     transform/dbt_project.yml: false
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/reference/configuration#configuring-settings):
+Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
 meltano config <bundle> set _update <path> <true/false>

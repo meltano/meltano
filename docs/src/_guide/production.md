@@ -5,8 +5,8 @@ layout: doc
 weight: 8
 ---
 
-Once you've [set up a Meltano project](/reference/project) and
-[run some pipelines](/tutorials/integration) on your local machine,
+Once you've [set up a Meltano project](/concepts/project) and
+[run some pipelines](/guide/integration) on your local machine,
 it'll be time to repeat this trick in production!
 
 This page will help you figure out:
@@ -21,7 +21,7 @@ This page will help you figure out:
 
 Additionally, you may want to [run Meltano UI and configure it for production](#meltano-ui).
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
 
 ## SaaS Hosting Options
@@ -44,7 +44,7 @@ platform like [GitLab](https://about.gitlab.com) or [GitHub](https://github.com)
 
 By default, your Meltano project comes with a `.gitignore` file to ensure that
 environment-specific and potentially sensitive configuration stored inside the
-[`.meltano` directory](/reference/project#meltano-directory) and [`.env` file](/reference/project#env) is not leaked accidentally. All other files
+[`.meltano` directory](/concepts/project#meltano-directory) and [`.env` file](/concepts/project#env) is not leaked accidentally. All other files
 are recommended to be checked into the repository and shared between all users
 and environments that may use the project.
 
@@ -64,14 +64,14 @@ and/or later whenever changes are made.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 your project-specific Docker image will already contain all of your project files.
 
 ## Installing Meltano
 
 Just like on your local machine, the most straightforward way to install Meltano
 onto a production environment is to
-[use `pip` to install the `meltano` package from PyPI](/getting-started/installation#local-installation).
+[use `pip` to install the `meltano` package from PyPI](/guide/installation#local-installation).
 
 If you add `meltano` (or `meltano==<version>`) to your project's `requirements.txt`
 file, you can choose to automatically run `pip install -r requirements.txt` on your
@@ -80,18 +80,18 @@ on the latest (or requested) version.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 your project-specific Docker image will already contain a Meltano installation
 since it's built from the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) base image.
 
 ## Installing plugins
 
 Whenever you [add a new plugin](/reference/command-line-interface#add) to a Meltano project, it will be
-installed into your project's [`.meltano` directory](/reference/project#meltano-directory) automatically.
+installed into your project's [`.meltano` directory](/concepts/project#meltano-directory) automatically.
 However, since this directory is included in your project's `.gitignore` file
 by default, you'll need to explicitly run [`meltano install`](/reference/command-line-interface#install)
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
-to install (or update) all plugins specified in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file).
+to install (or update) all plugins specified in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 Thus, it is strongly recommended that you automatically run `meltano install` on your
 production environment whenever your Meltano project is updated to ensure you're always
@@ -99,16 +99,16 @@ using the correct versions of plugins.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 your project-specific Docker image will already contain all of your project's plugins
 since `meltano install` is a step in its build process.
 
 ## Storing metadata
 
 Meltano stores various types of metadata in a project-specific
-[system database](/reference/project#system-database), that takes
+[system database](/concepts/project#system-database), that takes
 the shape of a SQLite database stored inside the project at `.meltano/meltano.db`
-by default. Like all files stored in the [`.meltano` directory](/reference/project#meltano-directory)
+by default. Like all files stored in the [`.meltano` directory](/concepts/project#meltano-directory)
 (which you'll remember is included in your project's `.gitignore` file by default), the system database is
 also environment-specific.
 
@@ -123,22 +123,22 @@ production instead. You can configure Meltano to use it using the
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 you will _definitely_ want to use an external system database, since changes to
 `.meltano/meltano.db` would not be persisted outside the container.
 
 ## Storing logs
 
 Meltano stores all output generated by [`meltano elt`](/reference/command-line-interface#elt) in `.meltano/logs/elt/{job_id}/{run_id}/elt.log`,
-where `job_id` refers to the value of the provided `--job_id` flag or the name of a [scheduled pipeline](/tutorials/orchestration), and `run_id` is an autogenerated UUID.
+where `job_id` refers to the value of the provided `--job_id` flag or the name of a [scheduled pipeline](/guide/orchestration), and `run_id` is an autogenerated UUID.
 
-You can use [Meltano UI](#meltano-ui) locally or in production to view the most recent logs of your project's [scheduled pipelines](/tutorials/orchestration) right from your browser.
+You can use [Meltano UI](#meltano-ui) locally or in production to view the most recent logs of your project's [scheduled pipelines](/guide/orchestration) right from your browser.
 
 If you'd like to store these logs elsewhere, you can symlink the `.meltano/logs` or `.meltano/logs/elt` directory to a location of your choice.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 these logs will not be persisted outside the container [running your pipelines](#running-pipelines)
 unless you exfiltrate them by [mounting a volume](https://docs.docker.com/engine/reference/commandline/run/#mount-volume--v---read-only)
 inside the container at `/project/.meltano/logs/elt`.
@@ -149,11 +149,11 @@ that runs [Meltano UI](#meltano-ui) if you'd like to use it to view the pipeline
 ## Managing configuration
 
 All of your Meltano project's configuration that is _not_ environment-specific
-or sensitive should be stored in its [`meltano.yml` project file](/reference/project#meltano-yml-project-file) and checked into version
+or sensitive should be stored in its [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) and checked into version
 control.
 
 Configuration that _is_ environment-specific or sensitive is [most appropriately
-managed using environment variables](/reference/configuration#configuring-settings). [Meltano Environments](/reference/environments) can be used to better manage configuration between different deployment environments. How these can
+managed using environment variables](/guide/configuration#configuring-settings). [Meltano Environments](/concepts/environments) can be used to better manage configuration between different deployment environments. How these can
 be best administered will depend on your deployment strategy and destination.
 
 If you'd like to store sensitive configuration in a secrets store, you can
@@ -166,7 +166,7 @@ like `meltano`.
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 you will want to manage sensitive configuration using the mechanism provided
 by your container runner, e.g.
 [Docker Secrets](https://docs.docker.com/engine/swarm/secrets/) or
@@ -186,8 +186,8 @@ or any of dozens of other orchestration tools.
 
 ### Airflow orchestrator
 
-If you've added Airflow to your Meltano project as an [orchestrator](/tutorials/orchestration),
-you can have it automatically run your project's [scheduled pipelines](/tutorials/orchestration)
+If you've added Airflow to your Meltano project as an [orchestrator](/guide/orchestration),
+you can have it automatically run your project's [scheduled pipelines](/guide/orchestration)
 by starting [its scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html)
 using `meltano invoke airflow scheduler`.
 
@@ -220,12 +220,12 @@ Specifically, you will want to configure Airflow to:
 
   For this to work, the [`psycopg2` package](https://pypi.org/project/psycopg2/) will
   also need to be installed alongside [`apache-airflow`](https://pypi.org/project/apache-airflow/),
-  which you can realize by adding `psycopg2` to `airflow`'s `pip_url` in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file) (e.g. `pip_url: psycopg2 apache-airflow`)
+  which you can realize by adding `psycopg2` to `airflow`'s `pip_url` in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) (e.g. `pip_url: psycopg2 apache-airflow`)
   and running [`meltano install orchestrator airflow`](/reference/command-line-interface#install).
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 the built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
 will be [the `meltano` command](/reference/command-line-interface),
 meaning that you can provide `meltano` subcommands and arguments like `elt ...` and `invoke airflow ...` directly to
@@ -234,8 +234,8 @@ as trailing arguments.
 
 ## Meltano UI
 
-Now that your pipelines are running, you may want to also spin up [Meltano UI](/reference/ui),
-which lets you quickly check the status and most recent logs of your project's [scheduled pipelines](/tutorials/orchestration) right from your browser.
+Now that your pipelines are running, you may want to also spin up [Meltano UI](/guide/ui),
+which lets you quickly check the status and most recent logs of your project's [scheduled pipelines](/guide/orchestration) right from your browser.
 
 You can start Meltano UI using [`meltano ui`](/reference/command-line-interface#ui) just like you would locally,
 but there are [a couple of settings](/reference/settings#meltano-ui-server) you'll want to consider changing in production:
@@ -265,8 +265,8 @@ but there are [a couple of settings](/reference/settings#meltano-ui-server) you'
 
 ### Containerized Meltano project
 
-If you're [containerizing your Meltano project](/tutorials/containerization),
+If you're [containerizing your Meltano project](/guide/containerization),
 the [`project_readonly` setting](/reference/settings#project-readonly) will be
 [enabled by default](https://gitlab.com/meltano/files-docker/-/blob/master/bundle/Dockerfile#L17)
 using the `MELTANO_PROJECT_READONLY` environment variable,
-since any changes to your [`meltano.yml` project file](/reference/project#meltano-yml-project-file) would not be persisted outside the container.
+since any changes to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) would not be persisted outside the container.

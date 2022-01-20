@@ -9,7 +9,7 @@ As much as we'd like to support all the data sources out there, we'll need your 
 ## How to Create an Extractor
 
 Meltano's [SDK for Taps](https://sdk.meltano.com)
-makes it easier than ever to create new [extractors](/reference/plugins#extractors) for your own custom data sources.
+makes it easier than ever to create new [extractors](/concepts/plugins#extractors) for your own custom data sources.
 
 <div class="notification is-info">
   <p><strong>What is Singer?</strong></p>
@@ -31,7 +31,7 @@ reusable sample code.
 
 ## Add the Plugin to Your Meltano Project
 
-Meltano exposes each plugin configuration in the plugin definition, located in the [`meltano.yml` project file](/reference/project#meltano-yml-project-file).
+Meltano exposes each plugin configuration in the plugin definition, located in the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 To test the plugin as part of your Meltano project, you will need to add your plugin configuration in the `meltano.yml` file for your project.
 
@@ -70,7 +70,7 @@ plugins:
 ```
 
 <div class="notification is-info">
-  <p>You can further customize the appearance of your custom extractor in [Meltano UI](/reference/ui) using the following options:</p>
+  <p>You can further customize the appearance of your custom extractor in [Meltano UI](/guide/ui) using the following options:</p>
   <ul>
     <li>`label`</li>
     <li>`logo_url`</li>
@@ -106,7 +106,7 @@ _**It is best practice not to store sensitive values directly in `meltano.yml`.*
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
 for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting `kind` is set to `password` and then
-run [`meltano config <plugin> set password <value>`](/getting-started/getting-started#configure-the-extractor). You can also set the matching environment variable for this
+run [`meltano config <plugin> set password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
 setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 
 You may use any of the following to configure setting values (in order of precedence):
@@ -133,7 +133,7 @@ meltano invoke tap-my-custom-source --discover
 ```
 
 
-You can also use [`meltano select`](/getting-started/getting-started#select-entities-and-attributes-to-extract)
+You can also use [`meltano select`](/getting-started#select-entities-and-attributes-to-extract)
 to parse your `catalog` and list all available entities and attributes:
 
 ```bash
@@ -191,7 +191,7 @@ If you have gotten this far... _**Congrats!** You are now a proud Singer tap dev
 ### Make it discoverable
 
 Once you have your tap published to PyPi, consider
-[making it discoverable](/getting-started/contributor-guide#making-a-custom-plugin-discoverable)
+[making it discoverable](/the-project/contributor-guide#making-a-custom-plugin-discoverable)
 for other users of Meltano.
 
 ### Updates for production use

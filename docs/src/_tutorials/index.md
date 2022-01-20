@@ -2,7 +2,8 @@
 title: Tutorials
 description: Learn how to use Meltano for data analysis of CSVs, Postgres, Google Analytics, GitLab, and much more.
 layout: doc
-weight: 1
+hidden: true
+toc: false
 ---
 
 <div class="notification is-info">
@@ -13,7 +14,7 @@ weight: 1
 Here you will find a series of step-by-step tutorials where we help walk you through various scenarios.
 
 <ul>
-  {% for tutorial in site.tutorials %}
-    <li><a href="{{ tutorial.url }}">{{ tutorial.title }}</a></li>
+  {% for doc in site.tutorials %}
+    <li><a href="{{ doc.url }}">{{ doc.title }}</a></li>
   {% endfor %}
 </ul>

@@ -5,17 +5,17 @@ layout: doc
 weight: 1
 ---
 
-If the installation instructions on the [homepage](/) or the [Getting Started guide](/getting-started/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
+If the installation instructions on the [homepage](/) or the [Getting Started guide](/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
 
 <div class="notification is-warning">
     <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
     <p>To get a sense of the Meltano experience in just a few minutes, follow the <a href="https://meltano.com">examples on the homepage</a> or watch the <a href="https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a></p>
-    <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/getting-started/installation">installation</a>, <a href="/tutorials/integration">data integration (EL)</a>, <a href="/reference/transforms">data transformation (T)</a>, <a href="/tutorials/orchestration">orchestration</a>, and <a href="/tutorials/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
+    <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
 </div>
 
 ## Local Installation
 
-In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/reference/ui).
+In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/guide/ui).
 
 ### Requirements
 
@@ -112,7 +112,7 @@ meltano --version
 
 ### Next Steps
 
-Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started/getting-started#create-your-meltano-project).
+Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
 
 ## Installing on Docker
 
@@ -142,7 +142,7 @@ docker run meltano/meltano --version
 
 ### Initialize Your Project
 
-Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/getting-started/getting-started). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
+Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/getting-started). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
 ```bash
 cd /your/projects/directory
@@ -169,14 +169,14 @@ docker run -v $(pwd):/project \
 
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
-Now that you're successfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started/getting-started).
+Now that you're successfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started).
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
 
 ## Troubleshooting Installation
 
 <div class="notification is-info">
-  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/getting-started/community">Getting Help</a> on the different ways to get in touch with us.</p>
+  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/the-project/community">Getting Help</a> on the different ways to get in touch with us.</p>
 </div>
 
 ## Upgrading Meltano Version

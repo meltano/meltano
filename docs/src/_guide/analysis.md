@@ -10,11 +10,11 @@ weight: 9
   <p>For current users of these tabs, they can be re-enabled by running `meltano config set meltano ui analysis true`.</p>
 </div>
 
-If you haven't already, install Meltano and create your first project by following the [Getting Started guide](/getting-started/getting-started). You can come back here before adding an extractor and loader using the CLI, and use the UI instead.
+If you haven't already, install Meltano and create your first project by following the [Getting Started guide](/getting-started). You can come back here before adding an extractor and loader using the CLI, and use the UI instead.
 
 ## Start Meltano UI
 
-Start the [Meltano UI](/reference/ui) web server using [`meltano ui`](/reference/command-line-interface#ui):
+Start the [Meltano UI](/guide/ui) web server using [`meltano ui`](/reference/command-line-interface#ui):
 
 ```bash
 meltano ui

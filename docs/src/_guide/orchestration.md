@@ -9,11 +9,11 @@ Most EL(T) pipelines aren't run just once, but over and over again, to make sure
 
 To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://airflow.apache.org/).
 
-When a new pipeline schedule is created using the [UI](/reference/ui) or [CLI](/reference/command-line-interface#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [UI](/guide/ui) or [CLI](/reference/command-line-interface#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 ## Create a Schedule
 
-To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/reference/ui#pipelines), or the [`meltano schedule`  command](/reference/command-line-interface#schedule):
+To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/guide/ui#pipelines), or the [`meltano schedule`  command](/reference/command-line-interface#schedule):
 
 ```bash
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
@@ -46,7 +46,7 @@ meltano add orchestrator airflow
 You can also use the [Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
 with an existing Airflow installation, as long as the `MELTANO_PROJECT_ROOT` environment variable is set to point at your Meltano project.
 
-In fact, all `meltano invoke airflow ...` does is [populate `MELTANO_PROJECT_ROOT`](/reference/configuration#accessing-from-plugins),
+In fact, all `meltano invoke airflow ...` does is [populate `MELTANO_PROJECT_ROOT`](/guide/configuration#accessing-from-plugins),
 set Airflow's `core.dags_folder` setting to `$MELTANO_PROJECT_ROOT/orchestrate/dags` (where the DAG generator lives by default),
 and invoke the `airflow` executable with the provided arguments.
 
@@ -66,7 +66,7 @@ However, you can also create your own Airflow DAGs for any pipeline you fancy
 by using [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html)
 with the [`meltano elt` command](/reference/command-line-interface#elt), or
 [`DockerOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/_api/airflow/operators/docker_operator/index.html)
-with a [project-specific Docker image](/getting-started/production#containerized-meltano-project).
+with a [project-specific Docker image](/guide/production#containerized-meltano-project).
 
 ## Starting the Airflow scheduler
 
@@ -135,4 +135,4 @@ Airflow is a full-featured orchestrator that has a lot of features that are curr
 ## Meltano UI
 
 While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface),
-basic pipeline management functionality is also available in [the UI](/reference/ui#pipelines).
+basic pipeline management functionality is also available in [the UI](/guide/ui#pipelines).

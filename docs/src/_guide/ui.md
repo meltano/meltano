@@ -6,22 +6,22 @@ weight: 10
 ---
 
 Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
-and direct changes to the [`meltano.yml` project file](/reference/project#meltano-yml-project-file).
+and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 However, a web-based UI is also available for when you want to quickly check the
-status and most recent logs of your project's [scheduled pipelines](/tutorials/orchestration),
-or if you want to give less technical team members or clients the option to [configure](/reference/configuration) their
+status and most recent logs of your project's [scheduled pipelines](/guide/orchestration),
+or if you want to give less technical team members or clients the option to [configure](/guide/configuration) their
 extractors, loaders, and pipelines themselves.
 
 Various [settings](/reference/settings) are available that let you [configure the Meltano UI server](/reference/settings#meltano-ui-server), [enable and disable features](/reference/settings#meltano-ui-features), and [customize its appearance](/reference/settings#meltano-ui-customization).
 
 ## Current status
 
-Basic functionality around [managing](/reference/plugin-management) and [configuring](/reference/configuration) [plugins](/reference/plugins) and monitoring [pipelines](/tutorials/orchestration) is available,
-as is an experimental [Analysis](/tutorials/analysis) feature, but many (newer) features of the CLI do not yet have a UI equivalent.
+Basic functionality around [managing](/guide/plugin-management) and [configuring](/guide/configuration) [plugins](/concepts/plugins) and monitoring [pipelines](/guide/orchestration) is available,
+as is an experimental [Analysis](/guide/analysis) feature, but many (newer) features of the CLI do not yet have a UI equivalent.
 
 Missing functionality and other improvements are being tracked in the ["Pipeline management and monitoring UI" epic](https://gitlab.com/groups/meltano/-/epics/78),
-and [new issues and contributions](/getting-started/contributor-guide) from the community are more than welcome,
+and [new issues and contributions](/the-project/contributor-guide) from the community are more than welcome,
 but the team is not currently [prioritizing](https://handbook.meltano.com/product/roadmap) improvements to the UI because of the heavy focus on the CLI.
 
 ## Usage during development
@@ -58,7 +58,7 @@ For more details and instructions, refer to [README](https://gitlab.com/meltano/
 
 ## Deployment in production
 
-To learn about deploying Meltano UI in production, refer to the ["Meltano UI" section](/getting-started/production#meltano-ui) of the [Deployment in Production guide](/getting-started/production).
+To learn about deploying Meltano UI in production, refer to the ["Meltano UI" section](/guide/production#meltano-ui) of the [Deployment in Production guide](/guide/production).
 
 ## Screenshots
 
@@ -88,4 +88,4 @@ To learn about deploying Meltano UI in production, refer to the ["Meltano UI" se
 
 ### Explore and Dashboards
 
-For more information on (and screenshots of) the Explore and Dashboard interfaces, refer to the [Data Analysis guide](/tutorials/analysis#explore-your-data).
+For more information on (and screenshots of) the Explore and Dashboard interfaces, refer to the [Data Analysis guide](/guide/analysis#explore-your-data).

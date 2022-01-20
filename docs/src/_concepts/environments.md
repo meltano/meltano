@@ -50,13 +50,13 @@ environments:
 
 <div class="notification is-info">
   <p><strong>Environments vs Python Virtual Environments</strong></p>
-  <p>For installable Python plugins (i.e. those with a <a href="/reference/project#plugins"><code>pip_url</code></a> property) configured across multiple Environments, the same Python virtual environment and executable are reused.</p>
-  <p>To install different versions of the same plugin, you can use <a href="/reference/plugins#plugin-inheritance">plugin inheritance</a> and set a different <code>pip_url</code> in the inherited plugin.</p>
+  <p>For installable Python plugins (i.e. those with a <a href="project#plugins"><code>pip_url</code></a> property) configured across multiple Environments, the same Python virtual environment and executable are reused.</p>
+  <p>To install different versions of the same plugin, you can use <a href="plugins#plugin-inheritance">plugin inheritance</a> and set a different <code>pip_url</code> in the inherited plugin.</p>
 </div>
 
 ## Inheritance
 
-Environments are most powerful when [inheriting](/reference/plugins#plugin-inheritance) from a base plugin definition.
+Environments are most powerful when [inheriting](plugins#plugin-inheritance) from a base plugin definition.
 Configuration that is set in an environment can be used to add or override configuration set in the base plugin configuration.
 This enables reuse of configuration common to multiple environments while making it easy to switch configuration for a specific environment.
 

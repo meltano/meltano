@@ -9,9 +9,9 @@ weight: 1
 
 At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
-how data should be [integrated](/tutorials/integration) and [transformed](/reference/transforms),
-how the pipelines should be [orchestrated](/tutorials/orchestration),
-and how the various [plugins](#plugins) that make up your pipelines should be [configured](/reference/configuration).
+how data should be [integrated](/guide/integration) and [transformed](/guide/transformation),
+how the pipelines should be [orchestrated](/guide/orchestration),
+and how the various [plugins](#plugins) that make up your pipelines should be [configured](/guide/configuration).
 
 Since a Meltano project is just a directory on your filesystem containing
 text-based files, you can treat it like any other software development project
@@ -38,26 +38,26 @@ To learn which settings are available, refer to the [Settings reference](/refere
 
 ### Plugins
 
-Your project's [plugins](/reference/plugins#project-plugins),
-typically [added to your project](/reference/plugin-management#adding-a-plugin-to-your-project)
+Your project's [plugins](/concepts/plugins#project-plugins),
+typically [added to your project](/guide/plugin-management#adding-a-plugin-to-your-project)
 using [`meltano add`](/reference/command-line-interface#add),
-are defined under the `plugins` property, inside an array named after the [plugin type](/reference/plugins#types) (e.g. `extractors`, `loaders`).
+are defined under the `plugins` property, inside an array named after the [plugin type](/concepts/plugins#types) (e.g. `extractors`, `loaders`).
 
 Every plugin in your project needs to have:
 1. a `name` that's unique among plugins of the same type,
-2. a [base plugin description](/reference/plugins#project-plugins) describing the package in terms Meltano can understand, and
-3. [configuration](/reference/configuration) that can be defined across [various layers](/reference/configuration#configuration-layers), including the definition's [`config` property](#plugin-configuration).
+2. a [base plugin description](/concepts/plugins#project-plugins) describing the package in terms Meltano can understand, and
+3. [configuration](/guide/configuration) that can be defined across [various layers](/guide/configuration#configuration-layers), including the definition's [`config` property](#plugin-configuration).
 
 A base plugin description consists of the `pip_url`, `executable`, `capabilities`, and `settings` properties,
 but not every plugin definition will specify these explicitly:
 
-- An [**inheriting plugin definition**](#inheriting-plugin-definitions) has an **`inherit_from`** property and inherits its base plugin description from another plugin in your project or a [discoverable plugin](/reference/plugins#discoverable-plugins) identified by name.
+- An [**inheriting plugin definition**](#inheriting-plugin-definitions) has an **`inherit_from`** property and inherits its base plugin description from another plugin in your project or a [discoverable plugin](/concepts/plugins#discoverable-plugins) identified by name.
 - A [**custom plugin definition**](#custom-plugin-definitions) has a **`namespace`** property instead and explicitly defines its base plugin description.
-- A [**shadowing plugin definition**](#shadowing-plugin-definitions) has neither property and implicitly inherits its base plugin description from the [discoverable plugin](/reference/plugins#discoverable-plugins) with the same **`name`**.
+- A [**shadowing plugin definition**](#shadowing-plugin-definitions) has neither property and implicitly inherits its base plugin description from the [discoverable plugin](/concepts/plugins#discoverable-plugins) with the same **`name`**.
 
 When inheriting a base plugin description, the plugin definition does not need to explicitly specify a `pip_url`
 (the package's [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument),
-but you may want to override the inherited value and set the property explicitly to [point at a (custom) fork](/reference/plugin-management#using-a-custom-fork-of-a-plugin) or to [pin a package to a specific version](/reference/plugin-management#using-a-custom-fork-of-a-plugin).
+but you may want to override the inherited value and set the property explicitly to [point at a (custom) fork](/guide/plugin-management#using-a-custom-fork-of-a-plugin) or to [pin a package to a specific version](/guide/plugin-management#using-a-custom-fork-of-a-plugin).
 When a plugin is added using `meltano add`, the `pip_url` is automatically repeated in the plugin definition for convenience.
 
 In order to support version-specific pip constraint files, the pip_url value can optionally be parameterized using the
@@ -66,8 +66,8 @@ install the plugin and will inject the major and minor versions (e.g. 3.8, 3.9, 
 
 #### Inheriting plugin definitions
 
-A plugin defined with an `inherit_from` property inherits its [base plugin description](/reference/plugins#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by
-[discoverable plugins](/reference/plugins#discoverable-plugins):
+A plugin defined with an `inherit_from` property inherits its [base plugin description](/concepts/plugins#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by
+[discoverable plugins](/concepts/plugins#discoverable-plugins):
 
 ```yml{5,7}
 plugins:
@@ -79,7 +79,7 @@ plugins:
     inherit_from: tap-bigquery  # Inherits from discoverable `tap-bigquery`
 ```
 
-When inheriting from another plugin in your project, its [configuration](/reference/configuration) is also inherited as if the values were defaults, which can then be overridden as appropriate:
+When inheriting from another plugin in your project, its [configuration](/guide/configuration) is also inherited as if the values were defaults, which can then be overridden as appropriate:
 
 ```yml{10-12,15-18}
 plugins:
@@ -104,7 +104,7 @@ plugins:
 
 Note that the presence of a [`variant` property](#variants) causes only discoverable plugins to be considered
 (even if there is also a matching plugin in the project),
-since only these can have multiple [variants](/reference/plugins#variants):
+since only these can have multiple [variants](/concepts/plugins#variants):
 
 ```yml{6,8-9}
 plugins:
@@ -118,11 +118,11 @@ plugins:
     variant: transferwise           # using variant `transferwise`
 ```
 
-To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/reference/plugin-management#plugin-inheritance).
+To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
 
 #### Custom plugin definitions
 
-A plugin defined with a `namespace` property (but no `inherit_from` property) is a [custom plugin](/reference/plugins#custom-plugins) that explicitly defines its [base plugin description](/reference/plugins#project-plugins):
+A plugin defined with a `namespace` property (but no `inherit_from` property) is a [custom plugin](/concepts/plugins#custom-plugins) that explicitly defines its [base plugin description](/concepts/plugins#project-plugins):
 
 ```yaml{4-14}
 plugins:
@@ -141,11 +141,11 @@ plugins:
     - name: start_date
 ```
 
-To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/reference/plugin-management#custom-plugins).
+To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
 #### Shadowing plugin definitions
 
-A plugin defined without an `inherit_from` or `namespace` property implicitly inherits its [base plugin description](/reference/plugins#project-plugins) from the [discoverable plugin](/reference/plugins#discoverable-plugins) with the same `name`, as a form of [shadowing](https://en.wikipedia.org/wiki/Variable_shadowing):
+A plugin defined without an `inherit_from` or `namespace` property implicitly inherits its [base plugin description](/concepts/plugins#project-plugins) from the [discoverable plugin](/concepts/plugins#discoverable-plugins) with the same `name`, as a form of [shadowing](https://en.wikipedia.org/wiki/Variable_shadowing):
 
 ```yaml{3}
 plugins:
@@ -153,11 +153,11 @@ plugins:
   - name: tap-gitlab
 ```
 
-To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/reference/plugin-management#discoverable-plugins).
+To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
 
 ##### Variants
 
-If multiple [variants](/reference/plugins#variants) of a discoverable plugin are available,
+If multiple [variants](/concepts/plugins#variants) of a discoverable plugin are available,
 the `variant` property can be used to choose a specific one:
 
 ```yaml{4}
@@ -172,8 +172,8 @@ Note that this is not necessarily the _default_ variant that is recommended to n
 
 #### Plugin configuration
 
-A plugin's [configuration](/reference/configuration) is stored under a `config` property.
-Values for [plugin extras](/reference/configuration#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
+A plugin's [configuration](/guide/configuration) is stored under a `config` property.
+Values for [plugin extras](/guide/configuration#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
 
 ```yaml{3-7}
 extractors:
@@ -187,7 +187,7 @@ extractors:
 
 #### Plugin commands
 
-Plugin [commands](/reference/command-line-interface#commands) are defined by the `commands` property. The keys are the name of the command and the values are the arguments to be passed to the plugin executable. These can contain dynamic references to [configuration](/reference/configuration) using the [Environment variable form](/reference/configuration#environment-variables) of the configuration option.
+Plugin [commands](/reference/command-line-interface#commands) are defined by the `commands` property. The keys are the name of the command and the values are the arguments to be passed to the plugin executable. These can contain dynamic references to [configuration](/guide/configuration) using the [Environment variable form](/guide/configuration#environment-variables) of the configuration option.
 
 ```yaml{3-7}
 transformers:
@@ -217,7 +217,7 @@ Commands can optionally specify some documentation displayed when [listing comma
 ### Schedules
 
 Your project's pipeline schedules,
-typically [created](/tutorials/orchestration#create-a-schedule)
+typically [created](/guide/orchestration#create-a-schedule)
 using [`meltano schedule`](/reference/command-line-interface#schedule),
  are defined under the `schedules` property.
 
@@ -232,7 +232,7 @@ schedules:
   interval: '@hourly'
 ```
 
-[Pipeline-specific configuration](/tutorials/integration#pipeline-specific-configuration) can be specified using [environment variables](/reference/configuration#configuring-settings) in an `env` dictionary:
+[Pipeline-specific configuration](/guide/integration#pipeline-specific-configuration) can be specified using [environment variables](/guide/configuration#configuring-settings) in an `env` dictionary:
 
 ```yaml{7-9}
 schedules:
@@ -246,7 +246,7 @@ schedules:
     TAP_FOO_BAZ: baz
 ```
 
-To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/tutorials/orchestration).
+To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/guide/orchestration).
 
 ### Multiple YAML Files
 
@@ -263,12 +263,12 @@ include_paths:
 
 Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://gitlab.com/meltano/meltano/-/issues/2985)).
 
-Currently supported elements in subfiles are [plugins](/reference/project#plugins), [schedules](/reference/project#plugins) and [environments](/reference/environments).
+Currently supported elements in subfiles are [plugins](/concepts/project#plugins), [schedules](/concepts/project#plugins) and [environments](/concepts/environments).
 
 ## `.gitignore`
 
 A newly initialized project comes with a [`.gitignore` file](https://git-scm.com/docs/gitignore) to ensure that
-environment-specific and potentially sensitive [configuration](/reference/configuration) stored inside the
+environment-specific and potentially sensitive [configuration](/guide/configuration) stored inside the
 [`.meltano` directory](#meltano-directory) and [`.env` file](#env) is not leaked accidentally.
 
 All other files are recommended to be checked into the repository and shared between all users
@@ -277,8 +277,8 @@ and environments that may use the project.
 ## `.env`
 
 Optionally, your project can contain a [`.env` file](https://github.com/theskumar/python-dotenv#usages) specifying
-[environment variables](/reference/configuration#environment-variables)
-used to [configure Meltano and its plugins](/reference/configuration#configuring-settings).
+[environment variables](/guide/configuration#environment-variables)
+used to [configure Meltano and its plugins](/guide/configuration#configuring-settings).
 
 Typically, this file is used to store configuration that is environment-specific or sensitive,
 and should not be stored in [`meltano.yml`](#meltano-yml-project-file) and checked into version control.
@@ -299,7 +299,7 @@ While you would usually not want to modify files in this directory directly, kno
 - `.meltano/meltano.db`: The default SQLite [system database](#system-database).
 - `.meltano/logs/elt/<job_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) output logs for the specified pipeline run.
 - `.meltano/run/bin`: Symlink to the [`meltano` executable](/reference/command-line-interface) most recently used in this project.
-- `.meltano/run/elt/<job_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) to store pipeline-specific generated plugin config files, like an [extractor](/reference/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
+- `.meltano/run/elt/<job_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
 
@@ -313,6 +313,6 @@ You can choose to use a different system database backend or configuration using
 
 While you would usually not want to modify the system database directly, knowing what's in there can aid in debugging:
 
-- `job` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) pipeline run, holding started/ended timestamps and [incremental replication state](/tutorials/integration#incremental-replication-state).
-- `plugin_settings` table: [Plugin configuration](/reference/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
-- `user` table: Users for [Meltano UI](/reference/ui) created using [`meltano user add`](/reference/command-line-interface#user).
+- `job` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
+- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/guide/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+- `user` table: Users for [Meltano UI](/guide/ui) created using [`meltano user add`](/reference/command-line-interface#user).

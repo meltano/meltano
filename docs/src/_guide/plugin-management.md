@@ -6,37 +6,34 @@ weight: 2
 ---
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
-where your [project](/reference/project) and pipelines are composed of [plugins](/reference/plugins) of [different types](#types), most notably
-[**extractors**](#extractors) ([Singer](https://singer.io) taps),
-[**loaders**](#loaders) ([Singer](https://singer.io) targets),
-[**transformers**](#transformers) ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
-[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
+where your [project](/concepts/project) and pipelines are composed of [plugins](/concepts/plugins) of [different types](/concepts/plugins#types), most notably **extractors** ([Singer](https://singer.io) taps), **loaders** ([Singer](https://singer.io) targets), **transformers** ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
+**orchestrators** (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
 
-Your project's plugins are defined in your [`meltano.yml` project file](/reference/project#plugins),
-and are [installed](#installing-your-projects-plugins) inside the [`.meltano` directory](/reference/project#meltano-directory).
-They can be managed using various [CLI commands](/reference/command-line-interface) as well as the [UI](/reference/ui).
+Your project's plugins are defined in your [`meltano.yml` project file](/concepts/project#plugins),
+and are [installed](#installing-your-projects-plugins) inside the [`.meltano` directory](/concepts/project#meltano-directory).
+They can be managed using various [CLI commands](/reference/command-line-interface) as well as the [UI](/guide/ui).
 
 ## Adding a plugin to your project
 
-You can add a new [plugin](/reference/plugins#project-plugins) to your project using [`meltano add`](/reference/command-line-interface#add), or
-by directly modifying your [`meltano.yml` project file](/reference/project#plugins)
+You can add a new [plugin](/concepts/plugins#project-plugins) to your project using [`meltano add`](/reference/command-line-interface#add), or
+by directly modifying your [`meltano.yml` project file](/concepts/project#plugins)
 and [installing the new plugin](#installing-your-projects-plugins) using [`meltano install`](/reference/command-line-interface#install).
 
-If you'd like to add a [discoverable plugin](/reference/plugins#discoverable-plugins) that's supported by Meltano out of the box,
+If you'd like to add a [discoverable plugin](/concepts/plugins#discoverable-plugins) that's supported by Meltano out of the box,
 like one of the extractors and loaders listed on the [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/) pages,
 refer to the ["Discoverable plugins" section](#discoverable-plugins) below.
 
-Alternatively, if you'd like to add a [custom plugin](/reference/plugins#custom-plugins) that Meltano isn't familiar with yet,
+Alternatively, if you'd like to add a [custom plugin](/concepts/plugins#custom-plugins) that Meltano isn't familiar with yet,
 like an arbitrary Singer tap or target, refer to the ["Custom plugins" section](#custom-plugins).
 
-Finally, if you'd like your new plugin to [inherit from an existing plugin](/reference/plugins#plugin-inheritance) in your project,
+Finally, if you'd like your new plugin to [inherit from an existing plugin](/concepts/plugins#plugin-inheritance) in your project,
 so that it can reuse the same package but override (parts of) its configuration,
 refer to the ["Plugin inheritance" section](#plugin-inheritance).
 
 ### Discoverable plugins
 
-[Discoverable plugins](/reference/plugins#discoverable-plugins) can be added to your project by simply providing
-[`meltano add`](/reference/command-line-interface#add) with their [type](/reference/plugins#types) and name:
+[Discoverable plugins](/concepts/plugins#discoverable-plugins) can be added to your project by simply providing
+[`meltano add`](/reference/command-line-interface#add) with their [type](/concepts/plugins#types) and name:
 
 ```bash
 meltano add <type> <name>
@@ -48,7 +45,7 @@ meltano add transformer dbt
 meltano add orchestrator airflow
 ```
 
-This will add a [shadowing plugin definition](/reference/project#shadowing-plugin-definitions) to your [`meltano.yml` project file](/reference/project#plugins) under the `plugins` property, inside an array named after the plugin type:
+This will add a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 
 ```yml{3-5,7-9,11-12,14-15}
 plugins:
@@ -68,24 +65,24 @@ plugins:
     pip_url: apache-airflow
 ```
 
-If multiple [variants](/reference/plugins#variants) of the discoverable plugin are available,
+If multiple [variants](/concepts/plugins#variants) of the discoverable plugin are available,
 the `variant` property is automatically set to the name of the default variant
 (which is known to work well and recommended for new users),
-so that your project is pinned to a specific package and its [base plugin description](/reference/plugins#project-plugins).
+so that your project is pinned to a specific package and its [base plugin description](/concepts/plugins#project-plugins).
 If the `variant` property were omitted from the definition, Meltano would fall back on the _original_ supported variant instead, which does not necessarily match the default.
 
 The package's `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument)
 is repeated here for convenience, since you may want to update it to
 [point at a (custom) fork](#using-a-custom-fork-of-a-plugin) or to [pin a package to a specific version](#pinning-a-plugin-to-a-specific-version).
-If this property is omitted, it is inherited from the discoverable [base plugin description](/reference/plugins#project-plugins) identified by the `name` (and `variant`) instead.
+If this property is omitted, it is inherited from the discoverable [base plugin description](/concepts/plugins#project-plugins) identified by the `name` (and `variant`) instead.
 
-As mentioned above, directly adding a plugin to your [`meltano.yml` project file](/reference/project#plugins)
+As mentioned above, directly adding a plugin to your [`meltano.yml` project file](/concepts/project#plugins)
 and [installing it](#installing-your-projects-plugins) using [`meltano install <type> <name>`](/reference/command-line-interface#install)
 has the same effect as adding it using [`meltano add`](/reference/command-line-interface#add).
 
 #### Variants
 
-If multiple [variants](/reference/plugins#variants) of a discoverable plugin are available,
+If multiple [variants](/concepts/plugins#variants) of a discoverable plugin are available,
 you can choose a specific (non-default) variant using the `--variant` option on [`meltano add`](/reference/command-line-interface#add):
 
 ```bash
@@ -95,7 +92,7 @@ meltano add <type> <name> --variant <variant>
 meltano add loader target-postgres --variant=transferwise
 ```
 
-As you might expect, this will be reflected in the `variant` and `pip_url` properties in your [`meltano.yml` project file](/reference/project#plugins):
+As you might expect, this will be reflected in the `variant` and `pip_url` properties in your [`meltano.yml` project file](/concepts/project#plugins):
 
 ```yml{4-5}
 plugins:
@@ -112,7 +109,7 @@ If you've already added one variant to your project and would like to switch to 
 #### Explicit inheritance
 
 In the examples we've considered so far, plugins in your project implicitly inherit their
-[base plugin descriptions](/reference/project#plugins) from discoverable plugins by reusing their names, which is known as [shadowing](/reference/project#shadowing-plugin-definitions).
+[base plugin descriptions](/concepts/project#plugins) from discoverable plugins by reusing their names, which is known as [shadowing](/concepts/project#shadowing-plugin-definitions).
 
 Alternatively, if you'd like to give the plugin a more descriptive name in your project,
 you can use the `--inherit-from` (or `--as`) option on [`meltano add`](/reference/command-line-interface#add)
@@ -128,7 +125,7 @@ meltano add extractor tap-postgres--billing --inherit-from tap-postgres
 meltano add extractor tap-postgres --as tap-postgres--billing
 ```
 
-The corresponding [inheriting plugin definition](/reference/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/reference/project#plugins) will use `inherit_from`:
+The corresponding [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
 
 ```yml{4}
 plugins:
@@ -154,7 +151,7 @@ meltano add loader target-snowflake --variant=meltano --as target-snowflake--mel
 ```
 
 Assuming a regular (shadowing) `target-snowflake` was added before using `meltano add loader target-snowflake`,
-the resulting [inheriting plugin definitions](/reference/project#inheriting-plugin-definitions) in [`meltano.yml` project file](/reference/project#plugins) will look as follows:
+the resulting [inheriting plugin definitions](/concepts/project#inheriting-plugin-definitions) in [`meltano.yml` project file](/concepts/project#plugins) will look as follows:
 
 ```yml{6-8,10-12}
 plugins:
@@ -183,7 +180,7 @@ just like when shadowing with a `name` but no `variant`.
 
 ### Custom plugins
 
-[Custom plugins](/reference/plugins#custom-plugins) for packages that aren't [discoverable](#discoverable-plugins) yet,
+[Custom plugins](/concepts/plugins#custom-plugins) for packages that aren't [discoverable](#discoverable-plugins) yet,
 like arbitrary Singer taps and targets,
 can be added to your project using the `--custom` option on [`meltano add`](/reference/command-line-interface#add):
 
@@ -200,7 +197,7 @@ meltano add --custom loader target-bigquery--custom
 docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
 ```
 
-Since Meltano doesn't have the [base plugin description](/reference/plugins#project-plugins) for the package in question yet,
+Since Meltano doesn't have the [base plugin description](/concepts/plugins#project-plugins) for the package in question yet,
 `meltano add --custom` will ask you to find and provide this metadata yourself:
 (Note that more context is provided in the actual command prompts.)
 
@@ -243,7 +240,7 @@ Specify the tap's supported Singer features (executable flags), for example:
 	`state`: supports the `--state` flag
 
 To find out what features a tap supports, reference its documentation or try one
-of the tricks under https://meltano.com/getting-started/contributor-guide#how-to-test-a-tap.
+of the tricks under https://meltano.com/the-project/contributor-guide#how-to-test-a-tap.
 
 Multiple capabilities can be separated using commas.
 
@@ -285,9 +282,9 @@ If you add the `-e` flag ahead of the local path, the package will be installed 
 
 To find out what `settings` a tap or target supports, reference the README in the repository and/or documentation.
 If the `capabilities` a tap supports (executable flags like `--discover` and `--state`) are not described there,
-you can try [one of these tricks](/getting-started/contributor-guide#how-to-test-a-tap) or refer directly to the source code.
+you can try [one of these tricks](/the-project/contributor-guide#how-to-test-a-tap) or refer directly to the source code.
 
-This will add a [custom plugin definition](/reference/project#custom-plugin-definitions) to your [`meltano.yml` project file](/reference/project#plugins) under the `plugins` property, inside an array named after the plugin type:
+This will add a [custom plugin definition](/concepts/project#custom-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 
 ```yml{3-14}
 plugins:
@@ -307,16 +304,16 @@ plugins:
 ```
 
 The `pip_url`, `executable`, `capabilities`, and `settings` properties
-constitute the plugin's [base plugin description](/reference/plugins#project-plugins):
+constitute the plugin's [base plugin description](/concepts/plugins#project-plugins):
 everything Meltano needs to know in order to be able to use the package as a plugin.
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/getting-started/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ### Plugin inheritance
 
-To add a new plugin to your project that [inherits from an existing plugin](/reference/plugins#plugin-inheritance),
+To add a new plugin to your project that [inherits from an existing plugin](/concepts/plugins#plugin-inheritance),
 so that it can reuse the same package but override (parts of) its configuration,
 you can use the `--inherit-from` option on [`meltano add`](/reference/command-line-interface#add):
 
@@ -329,7 +326,7 @@ meltano add extractor tap-ga--client-bar --inherit-from tap-google-analytics
 meltano add extractor tap-ga--client-foo--project-baz --inherit-from tap-ga--client-foo
 ```
 
-The corresponding [inheriting plugin definitions](/reference/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/reference/project#plugins) will use `inherit_from`:
+The corresponding [inheriting plugin definitions](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
 
 ```yml{6-11}
 plugins:
@@ -351,12 +348,12 @@ Note that the `--inherit-from` option and `inherit_from` property can also be us
 ## Installing your project's plugins
 
 Whenever you add a new plugin to a Meltano project using [`meltano add`](/reference/command-line-interface#add),
-it will be installed into your project's [`.meltano` directory](/reference/project#meltano-directory) automatically.
+it will be installed into your project's [`.meltano` directory](/concepts/project#meltano-directory) automatically.
 
 However, since this directory is included in your project's `.gitignore` file
 by default, you'll need to explicitly run [`meltano install`](/reference/command-line-interface#install)
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
-to install (or update) all plugins specified in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file).
+to install (or update) all plugins specified in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 To install a specific plugin in your project, use [`meltano install <type> <name>`](/reference/command-line-interface#install), e.g. `meltano install extractor tap-gitlab`. Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
@@ -364,7 +361,7 @@ To install a specific plugin in your project, use [`meltano install <type> <name
 
 When you [add a plugin to your project](#adding-a-plugin-to-your-project), the plugin definition's `pip_url` property
 (the package's [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument)
-in your [`meltano.yml` project file](/reference/project#plugins)
+in your [`meltano.yml` project file](/concepts/project#plugins)
 typically points at a [PyPI](https://pypi.org/) package or Git repository without specifying a specific version,
 to ensure that you always get the latest and (presumably) greatest.
 
@@ -372,7 +369,7 @@ This makes sense when a plugin is installed for the first time, but can lead to 
 as your pipeline may break when a new version of the package is released that introduces a bug or changes its behavior in a backward-incompatible or otherwise undesireable way.
 
 To ensure that [`meltano install`](/reference/command-line-interface#install) always installs the same version that was used when you originally got the pipeline working,
-you can modify the plugin definition in your [`meltano.yml` project file](/reference/project#plugins) to include a version identifier in the `pip_url`.
+you can modify the plugin definition in your [`meltano.yml` project file](/concepts/project#plugins) to include a version identifier in the `pip_url`.
 
 The exact steps to determine the version and modify the `pip_url` will depend on whether you are installing a package from [PyPI](https://pypi.org/) or a Git repository:
 
@@ -443,7 +440,7 @@ RUN meltano install
 
 ## Removing a plugin from your project
 
-You can remove a [plugin](/reference/project#plugins) from your Meltano [project](/reference/project) by using [`meltano remove`](/reference/command-line-interface#remove). You have to specify a [type](/reference/plugins#types) of plugin to remove, but you can remove multiple plugins of that type.
+You can remove a [plugin](/concepts/project#plugins) from your Meltano [project](/concepts/project) by using [`meltano remove`](/reference/command-line-interface#remove). You have to specify a [type](/concepts/plugins#types) of plugin to remove, but you can remove multiple plugins of that type.
 
 ```bash
 meltano remove <type> <name>
@@ -454,13 +451,13 @@ meltano remove extractor tap-gitlab
 meltano remove loader target-postgres target-csv
 ```
 
-Since the [`plugins` section](/reference/project#plugins) of your [`meltano.yml` project file](/reference/project) determines the plugins that make up your project, you can still manually remove a [plugin](/reference/plugins#project-plugins) from your project by deleting its entry from this file. Traces of the plugin may remain in the other locations mentioned above.
+Since the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project) determines the plugins that make up your project, you can still manually remove a [plugin](/concepts/plugins#project-plugins) from your project by deleting its entry from this file. Traces of the plugin may remain in the other locations mentioned above.
 
 ## Using a custom fork of a plugin
 
 If you've forked a plugin's repository and made changes to it, you can update your Meltano project to use your custom fork instead of the canonical source:
 
-1. Modify the plugin definition's `pip_url` in the [`plugins` section](/reference/project#plugins) of your [`meltano.yml` project file](/reference/project) to point at your fork using a [`git+http(s)` URL](https://pip.pypa.io/en/stable/reference/pip_install/#git), with an optional branch or tag name:
+1. Modify the plugin definition's `pip_url` in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project) to point at your fork using a [`git+http(s)` URL](https://pip.pypa.io/en/stable/reference/pip_install/#git), with an optional branch or tag name:
 
     ```yaml{5-6}
     plugins:
@@ -496,17 +493,17 @@ If you've forked a plugin's repository and made changes to it, you can update yo
     meltano install extractor tap-gitlab
     ```
 
-If your fork supports additional settings, you can set them as [custom settings](/reference/configuration#custom-settings).
+If your fork supports additional settings, you can set them as [custom settings](/guide/configuration#custom-settings).
 
 ## Switching from one variant to another
 
-The default [variant](/reference/plugins#variants) of a [discoverable plugin](/reference/plugins#discoverable-plugins)
+The default [variant](/concepts/plugins#variants) of a [discoverable plugin](/concepts/plugins#discoverable-plugins)
 is recommended for new users, but may not always be a perfect fit for your use case.
 
 If you've already added one variant to your project and would like to use another instead,
 you can [add the new variant as a separate plugin](#multiple-variants) or switch your existing plugin over to the new variant:
 
-1. Modify the plugin definition's `variant` and `pip_url` properties in the [`plugins` section](/reference/project#plugins) of your [`meltano.yml` project file](/reference/project):
+1. Modify the plugin definition's `variant` and `pip_url` properties in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project):
 
     ```yml{12-13}
     # Before:
@@ -547,12 +544,12 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 
     Because different variants often use different setting names,
     you will likely see some of the settings used by the old variant show up as
-    [custom settings](/reference/configuration#custom-settings),
+    [custom settings](/guide/configuration#custom-settings),
     indicating that they are not supported by the new variant,
     while settings that the new variant expects show up with a `None` or default value.
 
 1. Assuming at least one setting did not carry over correctly from the old variant to the new variant,
-    modify the plugin's configuration in your [`meltano.yml` project file](/reference/project#plugin-configuration) to use the new setting names:
+    modify the plugin's configuration in your [`meltano.yml` project file](/concepts/project#plugin-configuration) to use the new setting names:
 
     ```yml{10-13}
     # Before:
@@ -570,8 +567,8 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
       dbname: my_database
     ```
 
-    If any of the old settings are stored in [places other than `meltano.yml`](/reference/configuration#configuration-layers),
-    like a sensitive setting that may be stored in your project's [`.env` file](/reference/project#env),
+    If any of the old settings are stored in [places other than `meltano.yml`](/guide/configuration#configuration-layers),
+    like a sensitive setting that may be stored in your project's [`.env` file](/concepts/project#env),
     you can unset the old setting and set the new one using [`meltano config`](/reference/command-line-interface#config):
 
     ```bash
@@ -584,10 +581,10 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
     ```
 
     Keep doing this until `meltano config <name> list` shows a valid configuration for the new variant,
-    without any of the old variant's settings remaining as [custom settings](/reference/configuration#custom-settings).
+    without any of the old variant's settings remaining as [custom settings](/guide/configuration#custom-settings).
 
 ## Meltano UI
 
 While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
-and direct changes to the [`meltano.yml` project file](/reference/project#meltano-yml-project-file),
-basic plugin management functionality is also available in [the UI](/reference/ui#extractors).
+and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
+basic plugin management functionality is also available in [the UI](/guide/ui#extractors).

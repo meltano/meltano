@@ -32,11 +32,13 @@
                     <ul class="menu-list">
                       {% assign items = site[collection.label] | sort: "weight" %}
                       {% for item in items %}
-                        <li>
-                          <a href="{{ item.url }}" class="{% if item.url == page.url %}is-active{% endif %}">
-                           {{ item.title }}
-                          </a>
-                        </li>
+                        {% if item.hidden != true %}
+                          <li>
+                            <a href="{{ item.url }}" class="{% if item.url == page.url %}is-active{% endif %}">
+                             {{ item.title }}
+                            </a>
+                          </li>
+                        {% endif %}
                       {% endfor %}
                       </ul>
                   {% endif %}

@@ -37,7 +37,7 @@ export MELTANO_DISABLE_TRACKING=True
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.6.2+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
+1. [Python 3.6.2+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/guide/installation#requirements) of the Installation instructions, that also apply here.
 2. [Node 8.11.0+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
@@ -131,7 +131,7 @@ yarn serve
 
 The development build of the Meltano UI will now be available at <http://localhost:8080/>.
 
-A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/getting-started/contributor-guide#api-development) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000. 
+A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/the-project/contributor-guide#api-development) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000. 
 
 
 <div class="notification is-warning">
@@ -160,16 +160,16 @@ export MELTANO_UI_URL = ""
 
 ## Discoverable plugins
 
-[Discoverable plugins](/reference/plugins#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
+[Discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
 which can be found inside the Meltano repository at
 [`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
 
 ### Making a custom plugin discoverable
 
-If you've added a [custom plugin](/reference/plugins#custom-plugins) (or [variant](/reference/plugins#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
+If you've added a [custom plugin](/concepts/plugins#custom-plugins) (or [variant](/concepts/plugins#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
 The [GitLab Web IDE](https://docs.gitlab.com/ee/user/project/web_ide/) makes it very easy to contribute changes without requiring you to leave your browser.
 
-Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/reference/project#custom-plugin-definitions) in your [`meltano.yml` project file](/reference/project#meltano-yml-project-file), so a copy-paste is usually sufficient.
+Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/concepts/project#custom-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), so a copy-paste is usually sufficient.
 The format and further requirements are laid out in more detail below.
 
 Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
@@ -191,11 +191,11 @@ Most of the time, variant definitions should also have a `settings` array with [
 Additionally:
 - `capabilities` should be specified for extractor variants,
 - non-default variant executable names can be specified using `executable`, and
-- default values for [plugin extras](/reference/configuration#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
+- default values for [plugin extras](/guide/configuration#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
 
 ##### Variant definitions
 
-If a plugin will only ever have a single [variant](/reference/plugins#variants) (as is typically the case for all types except for extractors and loaders),
+If a plugin will only ever have a single [variant](/concepts/plugins#variants) (as is typically the case for all types except for extractors and loaders),
 the variant definition can be embedded in the plugin definition (variant properties can be mixed in with plugin properties), and a variant name _should not_ be specified using a `variant` key.
 
 If a plugin currently only has a single variant, but more might be added later (as is typically the case for extractors and loaders),
@@ -233,13 +233,13 @@ Until role-based access control is implemented in Meltano, we need to prevent us
 
 ### Adopting a plugin
 
-When the maintainer of the default [variant](/reference/plugins#variants) of a discoverable plugin becomes unresponsive to issues and contributions filed by the community,
+When the maintainer of the default [variant](/concepts/plugins#variants) of a discoverable plugin becomes unresponsive to issues and contributions filed by the community,
 that plugin is considered up for adoption, which means that we are looking for a different variant of the plugin with a more engaged maintainer to become the new default.
 
 This new variant can either be a fork of the original default variant, or an alternative implementation for the same source or destination, as long as it is actively maintained.
 
 If you maintain or are aware of such a variant,
-please add it to your Meltano project as a [custom plugin](/reference/plugins#custom-plugins) and [make it discoverable](#making-a-custom-plugin-discoverable),
+please add it to your Meltano project as a [custom plugin](/concepts/plugins#custom-plugins) and [make it discoverable](#making-a-custom-plugin-discoverable),
 or [file an issue](https://gitlab.com/meltano/meltano/-/issues/new) so that the Meltano core team can assist you.
 
 As a plugin's primary maintainer, you do not have to spend a lot of time improving the plugin yourself.
@@ -369,7 +369,7 @@ When updating the models that will appear in the UI, you can follow these steps:
 1. Create [`table.m5o` file](/reference/architecture#table) that defines the UI columns that will appear on the UI
 1. Update [`topic.m5o` file](/reference/architecture#topic) to include the newly created model table
 1. Compile model repo with `python3 setup.py sdist`
-1. Go to your [`meltano.yml` project file](/reference/project#meltano-yml-project-file) and replace `pip_url` with the file path to the targz file created
+1. Go to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) and replace `pip_url` with the file path to the targz file created
 1. Run `meltano install` to fetch new settings
 1. Refresh browser and you should now see your changes in the UI
 

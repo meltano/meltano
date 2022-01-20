@@ -11,20 +11,20 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 <div class="notification is-warning">
     <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
     <p>To get a sense of the Meltano experience in just a few minutes, follow the <a href="https://meltano.com">examples on the homepage</a> or watch the <a href="https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a></p>
-    <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/getting-started/installation">installation</a>, <a href="/tutorials/integration">data integration (EL)</a>, <a href="/reference/transforms">data transformation (T)</a>, <a href="/tutorials/orchestration">orchestration</a>, and <a href="/tutorials/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
+    <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
 </div>
 
 ## Install Meltano
 
 Before you can get started with Meltano and the [`meltano` CLI](/reference/command-line-interface), you'll need to install it onto your system.
 
-*To learn more about the different installation methods, refer to the [Installation guide](/getting-started/installation).*
+*To learn more about the different installation methods, refer to the [Installation guide](/guide/installation).*
 
 ### Local installation
 
 If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6, 3.7, 3.8 or 3.9 installed,
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
-inside the directory that will hold your [Meltano projects](/reference/project).
+inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1. Create and navigate to a directory to hold your Meltano projects:
 
@@ -52,7 +52,7 @@ pip3 install meltano
 meltano --version
 ```
 
-If anything's not behaving as expected, refer to the ["Local Installation" section](/getting-started/installation#local-installation) of the [Installation guide](/getting-started/installation) for more details.
+If anything's not behaving as expected, refer to the ["Local Installation" section](/guide/installation#local-installation) of the [Installation guide](/guide/installation) for more details.
 
 ### Docker installation
 
@@ -82,15 +82,15 @@ When running a `meltano` subcommand that requires access to your project (which 
 docker run -v $(pwd):/project -w /project meltano/meltano <args>
 ```
 
-If anything's not behaving as expected, refer to the ["Installing on Docker" section](/getting-started/installation#installing-on-docker) of the [Installation guide](/getting-started/installation) for more details.
+If anything's not behaving as expected, refer to the ["Installing on Docker" section](/guide/installation#installing-on-docker) of the [Installation guide](/guide/installation) for more details.
 
 ## Create your Meltano project
 
 Now that you have a way of running the [`meltano` CLI](/reference/command-line-interface),
-it's time to create a new [Meltano project](/reference/project) that (among other things)
-will hold the [plugins](/reference/plugins) that implement the various details of your ELT pipelines.
+it's time to create a new [Meltano project](/concepts/project) that (among other things)
+will hold the [plugins](/concepts/plugins) that implement the various details of your ELT pipelines.
 
-*To learn more about Meltano projects, refer to the [Projects concept doc](/reference/project).*
+*To learn more about Meltano projects, refer to the [Projects concept doc](/concepts/project).*
 
 1. Navigate to the directory that you'd like to hold your Meltano projects, if you didn't already do so earlier:
 
@@ -111,7 +111,7 @@ meltano init my-meltano-project
 docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
 ```
 
-This will create a new directory with, among other things, your [`meltano.yml` project file](/reference/project#meltano-yml-project-file):
+This will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
 
 ```yml
 version: 1
@@ -119,7 +119,7 @@ send_anonymous_usage_stats: true
 project_id: <random UUID>
 ```
 
-It doesn't define any [plugins](/reference/project#plugins) or [pipeline schedules](/reference/project#schedules) yet,
+It doesn't define any [plugins](/concepts/project#plugins) or [pipeline schedules](/concepts/project#schedules) yet,
 but note that the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats) is enabled by default.
 To disable it, change the value to `false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
 
@@ -142,11 +142,11 @@ git commit -m 'Initial Meltano project'
 
 This will allow you to use [`git diff`](https://git-scm.com/docs/git-diff)
 to easily check the impact of the [`meltano` commands](/reference/command-line-interface)
-you'll run below on your project files, most notably your [`meltano.yml` project file](/reference/project#meltano-yml-project-file).
+you'll run below on your project files, most notably your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 ## Add an environment
 
-Now that you have your very own Meltano project, it's time to create your first [environment](/reference/environments) (i.e. dev, test, prod). This allows you to define configurations specific to the environment you're running your project in.
+Now that you have your very own Meltano project, it's time to create your first [environment](/concepts/environments) (i.e. dev, test, prod). This allows you to define configurations specific to the environment you're running your project in.
 
 1. Add `dev`, `test`, and `prod` environments:
 
@@ -175,14 +175,14 @@ You should now see a log message that says `Environment 'dev' is active` each ti
 
 ## Add an extractor to pull data from a source
 
-Now that you have your very own Meltano project, it's time to add some [plugins](/reference/plugins) to it!
+Now that you have your very own Meltano project, it's time to add some [plugins](/concepts/plugins) to it!
 
-The first plugin you'll want to add is an [extractor](/reference/plugins#extractors),
+The first plugin you'll want to add is an [extractor](/concepts/plugins#extractors),
 which will be responsible for pulling data out of your data source.
 
-*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/reference/plugin-management#adding-a-plugin-to-your-project).*
+*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/guide/plugin-management#adding-a-plugin-to-your-project).*
 
-1. Find out if an extractor for your data source is [supported out of the box](/reference/plugins#discoverable-plugins)
+1. Find out if an extractor for your data source is [supported out of the box](/concepts/plugins#discoverable-plugins)
 by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
 ```bash
@@ -206,7 +206,7 @@ meltano add extractor tap-gitlab --variant=singer-io
 docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
 ```
 
-This will add the new plugin to your [`meltano.yml` project file](/reference/project#plugins):
+This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
 ```yml{3-5}
 plugins:
@@ -222,7 +222,7 @@ You can now continue to step 4.
 
 1. Depending on the result, pick your next step:
 
-- If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/reference/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
+- If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
 
 ```bash
 meltano add --custom extractor <tap name>
@@ -238,7 +238,7 @@ docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --cu
 
 Meltano will now ask you some additional questions to learn more about the plugin.
 
-This will add the new plugin to your [`meltano.yml` project file](/reference/project#plugins):
+This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
 ```yml{3-14}
 plugins:
@@ -257,10 +257,10 @@ plugins:
     - name: start_date
 ```
 
-*To learn more about adding custom plugins, refer to the [Plugin Management guide](/reference/plugin-management#custom-plugins).*
+*To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).*
 
 <div class="notification is-info">
-  <p>Once you've got the extractor working in your project, please consider <a href="/getting-started/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/reference/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+  <p>Once you've got the extractor working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
 </div>
 
 - If a Singer tap for your data source **doesn't exist yet**, learn how to build and use your own tap by following the ["Create and Use a Custom Extractor" tutorial](/tutorials/custom-extractor).
@@ -284,14 +284,14 @@ would also confirm that Meltano can invoke the plugin's executable.
 
 ### Configure the extractor
 
-Chances are that the extractor you just added to your project will require some amount of [configuration](/reference/configuration) before it can start extracting data.
+Chances are that the extractor you just added to your project will require some amount of [configuration](/guide/configuration) before it can start extracting data.
 
-*To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/reference/configuration).*
+*To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/guide/configuration).*
 
 <div class="notification">
   <p><strong>What if I already have a config file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
-  <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/reference/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/reference/project#plugin-configuration">plugin's `config` key</a>:</p>
+  <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's `config` key</a>:</p>
 
 <pre>
 extractors:
@@ -332,7 +332,7 @@ meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 meltano config tap-gitlab set private_token my_private_token
 ```
 
-This will add the non-sensitive configuration to your [`meltano.yml` project file](/reference/project#plugin-configuration):
+This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml{5-7}
 environments:
@@ -346,7 +346,7 @@ environments:
           start_date: '2021-10-01T00:00:00Z'
 ```
 
-Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/reference/project#env) so that it will not be checked into version control:
+Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
 
 ```bash
 export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
@@ -382,16 +382,16 @@ Now that the extractor has been configured, it'll know where and how to find you
 but not yet which specific entities and attributes (tables and columns) you're interested in.
 
 By default, Meltano will instruct extractors to extract all supported entities and attributes,
-but it's recommended that you [specify the specific entities and attributes you'd like to extract](/tutorials/integration#selecting-entities-and-attributes-for-extraction),
+but it's recommended that you [specify the specific entities and attributes you'd like to extract](/guide/integration#selecting-entities-and-attributes-for-extraction),
 to improve performance and save on bandwidth and storage.
 
-*To learn more about selecting entities and attributes for extraction, refer to the [Data Integration (EL) guide](/tutorials/integration#selecting-entities-and-attributes-for-extraction).*
+*To learn more about selecting entities and attributes for extraction, refer to the [Data Integration (EL) guide](/guide/integration#selecting-entities-and-attributes-for-extraction).*
 
 
 <div class="notification is-info">
   <p><strong>What if I already have a catalog file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have generated a <a href="https://hub.meltano.com/singer/spec#catalog-files">catalog file</a> already.</p>
-  <p>If you'd like Meltano to use it instead of <a href="/tutorials/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/reference/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#elt">`meltano elt`</a>'s `--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
+  <p>If you'd like Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#elt">`meltano elt`</a>'s `--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
 </div>
 
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/reference/command-line-interface#select):
@@ -427,7 +427,7 @@ meltano select tap-gitlab --exclude "*" "*_url"
 
 As you can see in the example, entity and attribute identifiers can contain wildcards (`*`) to match multiple entities or attributes at once.
 
-This will add the [selection rules](/reference/plugins#select-extra) to your [`meltano.yml` project file](/reference/project#plugin-configuration):
+This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml{4-10}
 plugins:
@@ -468,7 +468,7 @@ meltano select tap-gitlab --list
 ### Choose how to replicate each entity
 
 If the data source you'll be pulling data from is a database, like [PostgreSQL](https://hub.meltano.com/extractors/postgres.html) or [MongoDB](https://hub.meltano.com/extractors/mongodb.html), your extractor likely requires one final setup step:
-setting a [replication method](/tutorials/integration#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
+setting a [replication method](/guide/integration#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
 
 <div class="notification is-info">
   <p>
@@ -476,27 +476,27 @@ setting a [replication method](/tutorials/integration#replication-methods) for e
   </p>
 </div>
 
-Most database extractors, on the other hand, support two or more of the following replication methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](/tutorials/integration#setting-metadata) key:
+Most database extractors, on the other hand, support two or more of the following replication methods and require you to choose an appropriate option for each table through the `replication-method` [stream metadata](/guide/integration#setting-metadata) key:
 
-- `LOG_BASED`: [Log-based Incremental Replication](/tutorials/integration#log-based-incremental-replication)
+- `LOG_BASED`: [Log-based Incremental Replication](/guide/integration#log-based-incremental-replication)
 
 The extractor uses the database's binary log files to identify what records were inserted, updated, and deleted from the table since the last run (if any), and extracts only these records.
 
 This option is not supported by all databases and database extractors.
 
-- `INCREMENTAL`: [Key-based Incremental Replication](/tutorials/integration#key-based-incremental-replication)
+- `INCREMENTAL`: [Key-based Incremental Replication](/guide/integration#key-based-incremental-replication)
 
-The extractor uses the value of a specific column on the table (the [Replication Key](/tutorials/integration#replication-key), e.g. an `updated_at` timestamp or incrementing `id` integer) to identify what records were inserted or updated (but not deleted) since the last run (if any), and extracts only those records.
+The extractor uses the value of a specific column on the table (the [Replication Key](/guide/integration#replication-key), e.g. an `updated_at` timestamp or incrementing `id` integer) to identify what records were inserted or updated (but not deleted) since the last run (if any), and extracts only those records.
 
-- `FULL_TABLE`: [Full Table Replication](/tutorials/integration#full-table-replication)
+- `FULL_TABLE`: [Full Table Replication](/guide/integration#full-table-replication)
 
 The extractor extracts all available records in the table on every run.
 
-*To learn more about replication methods, refer to the [Data Integration (EL) guide](/tutorials/integration#replication-methods).*
+*To learn more about replication methods, refer to the [Data Integration (EL) guide](/guide/integration#replication-methods).*
 
 1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](https://hub.meltano.com/singer/spec#metadata) key) the extractor supports by checking its documentation or the README in its repository.
 
-1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/reference/command-line-interface#config) and the extractor's [`metadata` extra](/reference/plugins#metadata-extra):
+1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/reference/command-line-interface#config) and the extractor's [`metadata` extra](/concepts/plugins#metadata-extra):
 
 ```bash
 meltano config <plugin> set _metadata <entity> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
@@ -514,7 +514,7 @@ meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
 
 As you can see in the example, entity identifiers can contain wildcards (`*`) to match multiple entities at once.
 
-If you've set a table's `replication-method` to `INCREMENTAL`, also choose a [Replication Key](/tutorials/integration#replication-key) by setting the `replication-key` metadata:
+If you've set a table's `replication-method` to `INCREMENTAL`, also choose a [Replication Key](/guide/integration#replication-key) by setting the `replication-key` metadata:
 
 ```bash
 meltano config <plugin> set _metadata <entity> replication-key <column>
@@ -524,7 +524,7 @@ meltano config tap-postgres set _metadata some_entity_id replication-key updated
 meltano config tap-postgres set _metadata some_entity_id replication-key id
 ```
 
-This will add the [metadata rules](/reference/plugins#metadata-extra) to your [`meltano.yml` project file](/reference/project#plugin-configuration):
+This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml{4-13}
 environments:
@@ -545,7 +545,7 @@ environments:
             replication-method: FULL_TABLE
 ```
 
-1. Optionally, verify that the [stream metadata](https://hub.meltano.com/singer/spec#metadata) for each table was set correctly in the extractor's [generated catalog file](/tutorials/integration#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/reference/command-line-interface#select):
+1. Optionally, verify that the [stream metadata](https://hub.meltano.com/singer/spec#metadata) for each table was set correctly in the extractor's [generated catalog file](/guide/integration#extractor-catalog-generation) by dumping it using [`meltano invoke --dump=catalog <plugin>`](/reference/command-line-interface#select):
 
 ```bash
 meltano invoke --dump=catalog <plugin>
@@ -559,12 +559,12 @@ meltano invoke --dump=catalog tap-postgres
 Now that your Meltano project has everything it needs to pull data from your source,
 it's time to tell it where that data should go!
 
-This is where the [loader](/reference/plugins#loaders) comes in,
+This is where the [loader](/concepts/plugins#loaders) comes in,
 which will be responsible for loading [extracted](#add-an-extractor-to-pull-data-from-a-source) data into an arbitrary data destination.
 
-*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/reference/plugin-management#adding-a-plugin-to-your-project).*
+*To learn more about adding plugins to your project, refer to the [Plugin Management guide](/guide/plugin-management#adding-a-plugin-to-your-project).*
 
-1. Find out if a loader for your data destination is [supported out of the box](/reference/plugins#discoverable-plugins)
+1. Find out if a loader for your data destination is [supported out of the box](/concepts/plugins#discoverable-plugins)
 by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
 ```bash
@@ -592,7 +592,7 @@ meltano add loader target-postgres --variant=datamill-co
   </p>
 </div>
 
-This will add the new plugin to your [`meltano.yml` project file](/reference/project#plugins):
+This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
 ```yml{3-5}
 plugins:
@@ -608,7 +608,7 @@ You can now continue to step 4.
 
 1. Depending on the result, pick your next step:
 
-- If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/reference/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
+- If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
 
 ```bash
 meltano add --custom loader <target name>
@@ -624,7 +624,7 @@ docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --cu
 
 Meltano will now ask you some additional questions to learn more about the plugin.
 
-This will add the new plugin to your [`meltano.yml` project file](/reference/project#plugins):
+This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
 ```yml{3-10}
 plugins:
@@ -639,11 +639,11 @@ plugins:
     - name: table_id
 ```
 
-*To learn more about adding custom plugins, refer to the [Plugin Management guide](/reference/plugin-management#custom-plugins).*
+*To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).*
 
 
 <div class="notification is-info">
-  <p>Once you've got the loader working in your project, please consider <a href="/getting-started/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/reference/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+  <p>Once you've got the loader working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
 </div>
 
 - If a Singer target for your data source **doesn't exist yet**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
@@ -667,14 +667,14 @@ would also confirm that Meltano can invoke the plugin's executable.
 
 ### Configure the loader
 
-Chances are that the loader you just added to your project will require some amount of [configuration](/reference/configuration) before it can start loading data.
+Chances are that the loader you just added to your project will require some amount of [configuration](/guide/configuration) before it can start loading data.
 
-*To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/reference/configuration).*
+*To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/guide/configuration).*
 
 <div class="notification is-warning">
   <p><strong>What if I already have a config file for this loader?</strong></p>
   <p>If you've used this Singer target before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a> already.</p>
-  <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/reference/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/reference/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
+  <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
 <pre>
 loaders:
 - name: target-example
@@ -713,7 +713,7 @@ meltano config target-postgres set default_target_schema public
   <p>You can turn on a local postgres docker instance with these configs using <code>docker run --name postgres -e POSTGRES_PASSWORD=meltano -e POSTGRES_USER=meltano -e POSTGRES_DB=warehouse -d -p 5432:5432 postgres</code>.</p>
 </div>
 
-This will add the non-sensitive configuration to your [`meltano.yml` project file](/reference/project#plugin-configuration):
+This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml{5-10}
 plugins:
@@ -729,7 +729,7 @@ plugins:
       default_target_schema: public
 ```
 
-Sensitive configuration (like `password`) will instead be stored in your project's [`.env` file](/reference/project#env) so that it will not be checked into version control:
+Sensitive configuration (like `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
 
 ```bash
 export TARGET_POSTGRES_PASSWORD=meltano
@@ -771,7 +771,7 @@ This will show the current configuration:
 
 Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-an-extractor-to-pull-data-from-a-source), and [loader](#add-a-loader-to-send-data-to-a-destination) are all set up, we've reached the final chapter of this adventure, and it's time to run your first data integration (EL) pipeline!
 
-*To learn more about data integration, refer to the [Data Integration (EL) guide](/tutorials/integration).*
+*To learn more about data integration, refer to the [Data Integration (EL) guide](/guide/integration).*
 
 There's just one step here: run your newly added extractor and loader in a pipeline using [`meltano elt`](/reference/command-line-interface#elt):
 
@@ -789,14 +789,14 @@ meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
 
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/reference/command-line-interface#debugging) to get some more insight into what's going on behind the scenes.
-If that doesn't get you closer to a solution, learn how to [get help with your issue](/getting-started/community).
+If that doesn't get you closer to a solution, learn how to [get help with your issue](/the-project/community).
 
-If you run `meltano elt` another time with the same Job ID, you'll see it automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/tutorials/integration#incremental-replication-state).
+If you run `meltano elt` another time with the same Job ID, you'll see it automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/guide/integration#incremental-replication-state).
 
 <div class="notification is-info">
   <p><strong>What if I already have a state file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#state-files">state file</a> already.</p>
-  <p>If you'd like Meltano to use it instead of <a href="/tutorials/integration#incremental-replication-state">looking up state based on the Job ID</a>, you can either use <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a>'s <code>--state</code> option or set the <a href="/reference/plugins#state-extra"><code>state</code> extractor extra</a>.</p>
+  <p>If you'd like Meltano to use it instead of <a href="/guide/integration#incremental-replication-state">looking up state based on the Job ID</a>, you can either use <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a>'s <code>--state</code> option or set the <a href="/concepts/plugins#state-extra"><code>state</code> extractor extra</a>.</p>
   <p>If you'd like to dump the state generated by the most recent run into a file, so that you can explicitly pass it along to the next invocation, you can use <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a>'s <code>--dump=state</code> option:</p>
 
 <pre>
@@ -806,7 +806,7 @@ meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --dump=state 
 
 </div>
 
-There is also a beta [`meltano run`](/docs/command-line-interface.html#run) command which allows you to execute the same EL pipelines in a much more flexible fashion. This command allows you to chain multiple EL pipelines and add in other plugins inline too:
+There is also a beta [`meltano run`](/reference/command-line-interface#run) command which allows you to execute the same EL pipelines in a much more flexible fashion. This command allows you to chain multiple EL pipelines and add in other plugins inline too:
 
 ```bash
 meltano run <extractor> <loader> <other_plugins>
@@ -832,7 +832,7 @@ Most pipelines aren't run just once, but over and over again, to make sure addit
 
 To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://airflow.apache.org/).
 
-*To learn more about orchestration, refer to the [Orchestration guide](/tutorials/orchestration).*
+*To learn more about orchestration, refer to the [Orchestration guide](/guide/orchestration).*
 
 1. Schedule a new [`meltano elt`](/reference/command-line-interface#elt) pipeline to be invoked on an interval using [`meltano schedule`](/reference/command-line-interface#schedule):
 
@@ -843,11 +843,11 @@ meltano schedule <pipeline name> <extractor> <loader> <interval>
 meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
 ```
 
-The `pipeline name` argument corresponds to the `--job_id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/tutorials/integration#incremental-replication-state).
+The `pipeline name` argument corresponds to the `--job_id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
 
 To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
 
-This will add the new schedule to your [`meltano.yml` project file](/reference/project#schedules):
+This will add the new schedule to your [`meltano.yml` project file](/concepts/project#schedules):
 
 ```yml{2-6}
 schedules:
@@ -874,7 +874,7 @@ meltano schedule list
 meltano add orchestrator airflow
 ```
 
-This will add the new plugin to your [`meltano.yml` project file](/reference/project#plugins):
+This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
 ```yml{3-4}
 plugins:
@@ -927,7 +927,7 @@ Once your raw data has arrived in your data warehouse, its schema will likely ne
 
 To help you realize this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
 
-To learn about data transformation, refer to the [Data Transformation (T) guide](/reference/transforms).
+To learn about data transformation, refer to the [Data Transformation (T) guide](/guide/transformation).
 
 1. To install the dbt transformer to your project run:
 
@@ -938,7 +938,7 @@ meltano add transformer dbt
 1. Once dbt has been installed in your Meltano project you will see the `/transform` directory populated with dbt artifacts.
     
 These artifacts are installed via the [dbt file bundle](https://gitlab.com/meltano/files-dbt/).
-For more about file bundles, refer to the [Plugin File bundles](/reference/plugins#file-bundles).
+For more about file bundles, refer to the [Plugin File bundles](/concepts/plugins#file-bundles).
 
 Now all you need to do is start writing your dbt models in the `/transform/models` directory.
 This usually consists of a `source.yml` file defining the source tables you will be referencing inside your dbt models.
@@ -967,7 +967,7 @@ sources:
 
 The organization of your dbt project is up to you but if you'd like to run a specific set of models as part of a Meltano ELT pipeline it can be done via `meltano elt tap target --transform=run` which requires the model directory to match the extractor's name using snake_case (i.e. tap_gitlab) so it can automatically find your models. Running as part of a pipeline allows Meltano to simplify dbt configuration by inferring some of your settings based on the pipeline tap and target.
     
-See more in the [Data Transformation (T) guide - transform in your ELT pipeline](/reference/transforms#transform-in-your-elt-pipeline).
+See more in the [Data Transformation (T) guide - transform in your ELT pipeline](/guide/transformation#transform-in-your-elt-pipeline).
 
 1. Then add a model file with your SQL transformation logic.
   For example the dbt model SQL below generates a table with new commits in the last 7 days `/transform/models/tap_gitlab/commits_last_7d.sql`.
@@ -1058,8 +1058,8 @@ See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) fr
 
 ### Containerize your project
 
-To learn how to containerize your project, refer to the [Containerization guide](/tutorials/containerization).
+To learn how to containerize your project, refer to the [Containerization guide](/guide/containerization).
 
 ### Deploy your pipelines in production
 
-To learn how to deploy your pipelines in production, refer to the [Deployment in Production guide](/getting-started/production).
+To learn how to deploy your pipelines in production, refer to the [Deployment in Production guide](/guide/production).

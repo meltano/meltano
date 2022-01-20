@@ -5,11 +5,11 @@ layout: doc
 weight: 7
 ---
 
-Once you've [set up a Meltano project](/reference/project) and
-[run some pipelines](/tutorials/integration) on your local machine,
+Once you've [set up a Meltano project](/concepts/project) and
+[run some pipelines](/guide/integration) on your local machine,
 it'll be time to repeat this trick in production!
 
-The [Deployment in Production guide](/getting-started/production) will walk you through getting
+The [Deployment in Production guide](/guide/production) will walk you through getting
 Meltano, your project, and all of its plugins onto a new environment one-by-one, among other things, but
 you can greatly simplify this process (and prevent issues caused by inconsistencies between environments!)
 by wrapping them all up into a project-specific
@@ -71,7 +71,7 @@ docker run \
 ## Docker Compose
 
 If you'd like to use [Docker Compose](https://docs.docker.com/compose/) to experiment with
-a [production-grade](/getting-started/production) setup of your containerized project,
+a [production-grade](/guide/production) setup of your containerized project,
 you can add the appropriate `docker-compose.prod.yml` file to your project by adding the
 [`docker-compose` file bundle](https://gitlab.com/meltano/files-docker-compose):
 

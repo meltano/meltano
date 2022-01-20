@@ -17,7 +17,7 @@ Everyone interacting in Slack, codebases, issue trackers, mailing lists, events,
 
 ### Contributor Guide
 
-We welcome contributions to the project! Please review our [Contributor Guide](/getting-started/contributor-guide) on how to contribute.
+We welcome contributions to the project! Please review our [Contributor Guide](/the-project/contributor-guide) on how to contribute.
 
 ## Demo Days
 
@@ -72,19 +72,19 @@ Meltano:
 
 * #contributing - if you want to contribute to Meltano itself
 * #hub - all about [MeltanoHub](https://hub.meltano.com)
-* #plugins-dbt - all things [dbt](/reference/transforms)
+* #plugins-dbt - all things [dbt](/guide/transformation)
 * #plugins-general - discussion for any other plugins
 
 Support:
 
 * #best-practices - for learning tips on how others are using Meltano and other data products
-* #getting-started - if you need some help [getting up and running with Meltano](/getting-started/getting-started)
+* #getting-started - if you need some help [getting up and running with Meltano](/getting-started)
 * #troubleshooting - if you get a weird stack trace and need some help
 
 Community Events:
 
-* #demo-day - where we plan and organize [Demo Day](/getting-started/community#demo-days)
-* #office-hours - where we plan and organize weekly [Office Hours](/getting-started/community#office-hours)
+* #demo-day - where we plan and organize [Demo Day](/the-project/community#demo-days)
+* #office-hours - where we plan and organize weekly [Office Hours](/the-project/community#office-hours)
 
 Singer Related:
 
