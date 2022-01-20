@@ -334,9 +334,11 @@
                             "settings_group_validation": {},
                             "commands": {},
                             "dialect": {
+                                "type": "string",
                                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
                             },
                             "target_schema": {
+                                "type": "string",
                                 "description": "The name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that transformers in the same pipeline can determine the database schema to load data from."
                             }
                         }
@@ -485,6 +487,7 @@
                                 "description": "An object containing dbt model variables"
                             },
                             "package_name": {
+                                "type": "string",
                                 "description": "The name of the dbt package's internal dbt project: the value of name in dbt_project.yml."
                             }
                         }
