@@ -197,9 +197,11 @@
                 "type": "object",
                 "properties": {
                     "catalog": {
+                        "type": "string",
                         "description": "A path to a catalog file (relative to the project directory) to be provided to the extractor when it is run in sync mode."
                     },
                     "load_schema": {
+                        "type": "string",
                         "description": "The name of the database schema extracted data should be loaded into."
                     },
                     "metadata": {
@@ -213,6 +215,7 @@
                         "default": {}
                     },
                     "state": {
+                        "type": "string",
                         "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
                     },
                     "select": {
