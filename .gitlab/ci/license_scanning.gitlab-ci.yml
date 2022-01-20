@@ -1,5 +1,5 @@
 variables:
-  LICENSE_MANAGEMENT_SETUP_CMD: ''  # If needed, specify a command to setup your environment with a custom package manager.
+  LICENSE_MANAGEMENT_SETUP_CMD: 'echo "Skip preparation."'  # If needed, specify a command to setup your environment with a custom package manager.
   LICENSE_FINDER_CLI_OPTS: "--enabled-package-managers=pip --python-version=3 --decisions-file=license_finder/dependency_decisions.yml"
 
 license_scanning:
