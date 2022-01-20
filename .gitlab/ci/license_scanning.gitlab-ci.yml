@@ -5,7 +5,7 @@ variables:
 license_scanning:
   stage: test
   image:
-    name: "$CI_REGISTRY_IMAGE/license-finder:latest"
+    name: "$CI_REGISTRY_IMAGE/license_finder:latest"
   variables:
     LM_REPORT_VERSION: '2.1'
     SETUP_CMD: $LICENSE_MANAGEMENT_SETUP_CMD
