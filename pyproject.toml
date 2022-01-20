@@ -217,6 +217,7 @@ wemake-python-styleguide = [
   "-WPS202",  # Allow many module members
   "-WPS232",  # The cli module will continue to grow, so while the module is large the complexity is well contained
 ]
+flake8-docstrings = ["-D301"] # Allow backslash char in docstrings for Click wrapping escapes
 
 [tool.flakehell.exceptions."src/meltano/migrations/versions/"]
 flake8-docstrings = ["-D103"] # Don't require function docstrings in migrations

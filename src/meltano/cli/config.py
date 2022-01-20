@@ -49,7 +49,7 @@ def config(  # noqa: WPS231
     """
     Display Meltano or plugin configuration.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#config
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#config
     """
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 

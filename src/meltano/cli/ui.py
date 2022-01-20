@@ -85,7 +85,7 @@ def ui(ctx, project):
     """
     Start the Meltano UI webserver.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#ui
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#ui
     """
     ctx.obj["project"] = project
 
@@ -150,7 +150,7 @@ def setup(ctx, server_name, **flags):
         - All sessions will be expired\n
 
     Use with caution!
-    """  # noqa: D301
+    """
     project = ctx.obj["project"]
     settings_service = ProjectSettingsService(project)
 

@@ -38,7 +38,7 @@ def upgrade(ctx, project):
     - Recompile models\n
 
     Read more at https://meltano.com/docs/command-line-interface.html#upgrade
-    """  # noqa: D301
+    """
     engine, _ = project_engine(project)
     upgrade_service = UpgradeService(engine, project)
     ctx.obj["upgrade_service"] = upgrade_service
@@ -75,8 +75,8 @@ def all(ctx, pip_url, force, skip_package):
     - Apply migrations to system database\n
     - Recompile models\n
 
-    Read more at https://meltano.com/docs/command-line-interface.html#upgrade
-    """  # noqa: D301
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#upgrade
+    """
     project = ctx.obj["project"]
     upgrade_service = ctx.obj["upgrade_service"]
 
