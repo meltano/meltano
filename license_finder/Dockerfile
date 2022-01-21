@@ -144,9 +144,8 @@ RUN set -ex; \
 
 FROM license_finder_python
 # install asdf
-RUN apt-get update && apt-get install -y \
-	curl \
-	git
+RUN echo deb http://deb.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list
+RUN apt-get update && apt-get install -y -t buster-backports git
 
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0
 RUN echo ". $HOME/.asdf/asdf.sh" >> ~/.bashrc
