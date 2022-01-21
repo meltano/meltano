@@ -20,7 +20,10 @@
         },
         "environments": {
             "type": "array",
-            "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in."
+            "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",
+            "items": {
+                "$ref": "#/definitions/environments"
+            }
         },
         "discovery_url": {
             "type": "string",
@@ -33,7 +36,7 @@
         },
         "plugins": {
             "type": "object",
-            "additionalProperties": true,
+            "additionalProperties": false,
             "properties": {
                 "extractors": {
                     "type": "array",
@@ -190,12 +193,60 @@
                     }
                 }
             },
+            "extractor_shared": {
+                "type": "object",
+                "properties": {
+                    "catalog": {
+                        "type": "string",
+                        "description": "A path to a catalog file (relative to the project directory) to be provided to the extractor when it is run in sync mode."
+                    },
+                    "load_schema": {
+                        "type": "string",
+                        "description": "The name of the database schema extracted data should be loaded into."
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "description": "An object containing Singer stream and property metadata",
+                        "default": {}
+                    },
+                    "schema": {
+                        "type": "object",
+                        "description": "An object representing override rules for a Singer stream schema",
+                        "default": {}
+                    },
+                    "state": {
+                        "type": "string",
+                        "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
+                    },
+                    "select": {
+                        "type": "array",
+                        "default": [
+                            "*.*"
+                        ],
+                        "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "select_filter": {
+                        "type": "array",
+                        "description": "An array of entity selection filter rules that are applied to the extractor's discovered or provided catalog file when the extractor is run.",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": []
+                    }
+                }
+            },
             "extractors": {
                 "description": "https://meltano.com/docs/plugins.html#extractors",
                 "type": "object",
                 "allOf": [
                     {
                         "$ref": "#/definitions/plugins/plugin_generic"
+                    },
+                    {
+                        "$ref": "#/definitions/plugins/extractor_shared"
                     },
                     {
                         "additionalProperties": false,
@@ -232,43 +283,13 @@
                                     ]
                                 }
                             },
-                            "select": {
-                                "type": "array",
-                                "default": [
-                                    "*.*"
-                                ],
-                                "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "select_filter": {
-                                "type": "array",
-                                "description": "An array of entity selection filter rules that are applied to the extractor's discovered or provided catalog file when the extractor is run.",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "default": []
-                            },
-                            "catalog": {
-                                "description": "A path to a catalog file (relative to the project directory) to be provided to the extractor when it is run in sync mode."
-                            },
-                            "load_schema": {
-                                "description": "The name of the database schema extracted data should be loaded into."
-                            },
-                            "metadata": {
-                                "type": "object",
-                                "description": "An object containing Singer stream and property metadata",
-                                "default": {}
-                            },
-                            "schema": {
-                                "type": "object",
-                                "description": "An object representing override rules for a Singer stream schema",
-                                "default": {}
-                            },
-                            "state": {
-                                "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
-                            }
+                            "select": {},
+                            "select_filter": {},
+                            "catalog": {},
+                            "load_schema": {},
+                            "metadata": {},
+                            "schema": {},
+                            "state": {}
                         }
                     }
                 ]
@@ -313,9 +334,11 @@
                             "settings_group_validation": {},
                             "commands": {},
                             "dialect": {
+                                "type": "string",
                                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
                             },
                             "target_schema": {
+                                "type": "string",
                                 "description": "The name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that transformers in the same pipeline can determine the database schema to load data from."
                             }
                         }
@@ -464,6 +487,7 @@
                                 "description": "An object containing dbt model variables"
                             },
                             "package_name": {
+                                "type": "string",
                                 "description": "The name of the dbt package's internal dbt project: the value of name in dbt_project.yml."
                             }
                         }
@@ -711,6 +735,134 @@
                     "examples": [
                         "2020-08-06 00:00:00"
                     ]
+                }
+            }
+        },
+        "environments": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the environment."
+                },
+                "config": {
+                    "type": "object",
+                    "description": "An object of environment specific configurations.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "plugins": {
+                            "type": "object",
+                            "description": "An object of environment specific plugin configurations.",
+                            "properties": {
+                                "extractors": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/definitions/environments/$defs/plugins"
+                                            },
+                                            {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                    "name": {},
+                                                    "config": {},
+                                                    "select": {},
+                                                    "select_filter": {},
+                                                    "catalog": {},
+                                                    "load_schema": {},
+                                                    "metadata": {},
+                                                    "schema": {},
+                                                    "state": {}
+                                                }
+                                            },
+                                            {
+                                                "$ref": "#/definitions/plugins/extractor_shared"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "loaders": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "orchestrators": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "transformers": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "files": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "utilities": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "transforms": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "models": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                },
+                                "dashboards": {
+                                    "type": "array",
+                                    "items": {
+                                        "additionalProperties": false,
+                                        "$ref": "#/definitions/environments/$defs/plugins"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "env": {
+                    "type": "object",
+                    "description": "An object of environment specific variables."
+                }
+            },
+            "$defs": {
+                "plugins": {
+                    "type": "object",
+                    "required": [
+                        "name"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "config": {
+                            "type": "object"
+                        }
+                    }
                 }
             }
         }
