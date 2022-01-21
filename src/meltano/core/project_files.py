@@ -1,8 +1,8 @@
 """Module for handling multiple project .yml files."""
 
 import copy
-import glob
 import logging
+from collections import OrderedDict
 from pathlib import Path
 from typing import List
 
@@ -94,9 +94,7 @@ class ProjectFiles:  # noqa: WPS214
         """Return a list of paths from a list of glob pattern strings, not including `meltano.yml` (even if it is matched by a pattern)."""
         include_paths = []
         for pattern in include_path_patterns:
-            for path_name in glob.iglob(pattern):
-                path = Path(path_name)
-                path = path.resolve()
+            for path in self.root.glob(pattern):
                 try:
                     self._is_valid_include_path(path)
                 except InvalidIncludePath as err:
@@ -105,7 +103,9 @@ class ProjectFiles:  # noqa: WPS214
                 include_paths.append(path)
             if self._meltano_file_path in include_paths:
                 include_paths.remove(self._meltano_file_path)
-        return include_paths
+
+        # Deduplicate entries
+        return list(OrderedDict.fromkeys(include_paths))
 
     def _add_to_index(self, key: tuple, include_path: Path) -> None:
         """Add a new key:path to the `_plugin_file_map`."""
