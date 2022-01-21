@@ -6,7 +6,7 @@ import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
 import ExploreButton from '@/components/analyze/ExploreButton'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
-import { PIPELINE_INTERVAL_OPTIONS } from '@/utils/constants'
+import { PIPELINE_INTERVAL_OPTIONS, TRANSFORM_OPTIONS } from '@/utils/constants'
 import utils from '@/utils/utils'
 import capitalize from '@/filters/capitalize'
 
@@ -28,6 +28,9 @@ export default {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
     intervalOptions() {
       return PIPELINE_INTERVAL_OPTIONS
+    },
+    transformOptions() {
+      return TRANSFORM_OPTIONS
     },
     getIsDisabled() {
       return pipeline => pipeline.isRunning || pipeline.isSaving
@@ -55,14 +58,18 @@ export default {
     goToLog(jobId) {
       this.$router.push({ name: 'runLog', params: { jobId } })
     },
-    onChangeInterval(option, pipeline) {
-      const interval = option.srcElement.selectedOptions[0].value
-      if (interval !== pipeline.interval) {
+    onChangeItem(option, pipeline, item) {
+      const newPipelineValue = option.srcElement.selectedOptions[0].value
+      if (newPipelineValue !== pipeline[item]) {
         const pluginNamespace = this.getInstalledPlugin(
           'extractors',
           pipeline.extractor
         ).namespace
-        this.updatePipelineSchedule({ interval, pipeline, pluginNamespace })
+        this.updatePipelineSchedule({
+          [item]: newPipelineValue,
+          pipeline,
+          pluginNamespace
+        })
           .then(() =>
             Vue.toasted.global.success(
               `Pipeline successfully updated - ${pipeline.name}`
@@ -119,7 +126,31 @@ export default {
               {{ getPluginLabel('loaders', pipeline.loader) }}
             </td>
             <td>
-              {{ pipeline.transform | capitalize }}
+              <div class="is-flex is-vcentered">
+                <div class="field has-addons">
+                  <div class="control is-expanded">
+                    <span
+                      class="select is-fullwidth is-size-7"
+                      :class="{
+                        'is-loading': getIsDisabled(pipeline)
+                      }"
+                    >
+                      <select
+                        :value="pipeline.transform"
+                        :disabled="getIsDisabled(pipeline)"
+                        @change="onChangeItem($event, pipeline, 'transform')"
+                      >
+                        <option
+                          v-for="option in transformOptions"
+                          :key="option"
+                          :value="option"
+                          >{{ option | capitalize }}</option
+                        >
+                      </select>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </td>
             <td>
               <div class="is-flex is-vcentered">
@@ -134,7 +165,7 @@ export default {
                       <select
                         :disabled="getIsDisabled(pipeline)"
                         :value="pipeline.interval"
-                        @input="onChangeInterval($event, pipeline)"
+                        @input="onChangeItem($event, pipeline, 'interval')"
                       >
                         <option
                           v-for="(label, value) in intervalOptions"
@@ -144,18 +175,6 @@ export default {
                         >
                       </select>
                     </span>
-                  </div>
-
-                  <div class="control">
-                    <button
-                      class="button is-small tooltip is-tooltip-right"
-                      :class="{ 'is-loading': pipeline.isRunning }"
-                      :disabled="getIsDisabled(pipeline)"
-                      data-tooltip="Manually run this pipeline once"
-                      @click="runELT(pipeline)"
-                    >
-                      Run Now
-                    </button>
                   </div>
                 </div>
               </div>
@@ -218,7 +237,19 @@ export default {
               </p>
             </td>
             <td>
-              <div class="buttons is-right">
+              <div class="buttons">
+                <button
+                  class="button is-small tooltip is-tooltip-top is-info"
+                  :class="{ 'is-loading': pipeline.isRunning }"
+                  :disabled="getIsDisabled(pipeline)"
+                  data-tooltip="Manually run this pipeline once"
+                  @click="runELT(pipeline)"
+                >
+                  <span>Run Now</span>
+                  <span class="icon is-small">
+                    <font-awesome-icon icon="rocket"></font-awesome-icon>
+                  </span>
+                </button>
                 <ExploreButton
                   :pipeline="pipeline"
                   is-tooltip-left
@@ -269,3 +300,8 @@ export default {
     </table>
   </div>
 </template>
+<style lang="scss" scoped>
+.buttons {
+  justify-content: space-evenly;
+}
+</style>
