@@ -26,9 +26,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-[#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
-[#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
 - [#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
+- [#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
 
 
 ## 1.91.0 - (2022-01-13)
