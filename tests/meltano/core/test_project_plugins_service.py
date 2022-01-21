@@ -1,6 +1,6 @@
 import pytest
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType
-from meltano.core.plugin.error import PluginParentNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
@@ -110,3 +110,9 @@ class TestProjectPluginsService:
         # revert back
         subject.update_plugin(outdated)
         assert subject.get_plugin(tap).config == {}
+
+    def test_find_plugins_by_mapping_name(self, subject, mapper):
+        assert subject.find_plugins_by_mapping_name("mock-mapping-1") == [mapper]
+        assert subject.find_plugins_by_mapping_name("mock-mapping-0") == [mapper]
+        with pytest.raises(PluginNotFoundError):
+            subject.find_plugins_by_mapping_name("non-existent-mapping")

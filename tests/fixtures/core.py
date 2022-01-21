@@ -475,6 +475,35 @@ def project_files(test_dir):
 @pytest.fixture(scope="class")
 def mapper(project_add_service):
     try:
-        return project_add_service.add(PluginType.MAPPERS, "mapper-mock")
+        return project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-mock",
+            mappings=[
+                {
+                    "name": "mock-mapping-0",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email",
+                                "tap_stream_name": "commits",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "name": "mock-mapping-1",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "given_name",
+                                "tap_stream_name": "users",
+                                "type": "lowercase",
+                            }
+                        ]
+                    },
+                },
+            ],
+        )
     except PluginAlreadyAddedException as err:
         return err.plugin
