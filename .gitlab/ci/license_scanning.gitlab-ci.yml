@@ -21,7 +21,7 @@ license_scanning:
     - poetry export --format requirements.txt --output requirements.txt
     # install asdf python and configure
     - source /root/.bashrc
-    - asdf plugin-add python
+    # - asdf plugin-add python
     - asdf global python system
     - asdf reshim python
   script:

@@ -154,4 +154,5 @@ RUN chmod +x /root/.asdf/asdf.sh
 RUN /root/.asdf/asdf.sh
 RUN echo ". /root/.asdf/asdf.sh" >> ~/.bashrc
 
-ENTRYPOINT ["/bin/bash", "-c"]
+ENTRYPOINT []
+CMD ["/bin/bash", "-c"]
