@@ -145,8 +145,9 @@ RUN set -ex; \
 FROM license_finder_python
 # install asdf
 RUN apt-get update && apt-get install -y --no-install-recommends \
+	libcurl4-openssl-dev \
 	curl \
-	git
+	git-all
 
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0
 RUN echo ". $HOME/.asdf/asdf.sh" >> ~/.bashrc
