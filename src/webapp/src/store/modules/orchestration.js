@@ -9,7 +9,8 @@ import utils from '@/utils/utils'
 const defaultState = utils.deepFreeze({
   pluginInFocusConfiguration: {},
   pipelinePollers: [],
-  pipelines: []
+  pipelines: [],
+  pipeline: {}
 })
 
 const getters = {
@@ -82,6 +83,10 @@ const getters = {
     )
   },
 
+  getActivePipeline(state) {
+    return state.pipeline
+  },
+
   getSortedPipelines(state) {
     return lodash.orderBy(state.pipelines, 'extractor')
   },
@@ -135,6 +140,22 @@ const actions = {
     commit('setPipelineStatus', status)
     return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
       commit('deletePipeline', pipeline)
+    })
+  },
+
+  getPipelineByJobId({ commit, state }, jobId) {
+    return new Promise(resolve => {
+      try {
+        if (state.pipelines.length > 0) {
+          let pipeline = state.pipelines.find(
+            pipeline => pipeline.jobId === jobId
+          )
+          commit('setActivePipeline', pipeline)
+          resolve()
+        }
+      } catch (error) {
+        console.log('Error: ', error)
+      }
     })
   },
 
@@ -260,13 +281,17 @@ const actions = {
   },
 
   updatePipelineSchedule({ commit }, payload) {
+    console.log('payload', payload)
     commit('setPipelineStatus', {
       pipeline: payload.pipeline,
       ...payload.pipeline,
       isSaving: true
     })
     return orchestrationsApi.updatePipelineSchedule(payload).then(response => {
+      // const updatedPipeline = { ...response.data, ...payload.pipeline }
       const updatedPipeline = Object.assign({}, payload.pipeline, response.data)
+      console.log('response', response.data)
+      console.log('pipeline', updatedPipeline)
       commit('setPipelineStatus', {
         pipeline: updatedPipeline,
         ...updatedPipeline,
@@ -305,6 +330,10 @@ const mutations = {
     if (defaultState.hasOwnProperty(attr)) {
       state[attr] = lodash.cloneDeep(defaultState[attr])
     }
+  },
+
+  setActivePipeline(state, pipeline) {
+    state.pipeline = pipeline
   },
 
   setInFocusConfiguration(state, { configuration, target }) {

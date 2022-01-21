@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Design from '@/components/analyze/Design'
 import Explore from '@/components/analyze/Explore'
 import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
+import EditPipelineScheduleModal from '@/components/pipelines/EditPipelineScheduleModal'
 import LogModal from '@/components/pipelines/LogModal'
 import PluginSettingsModal from '@/components/pipelines/PluginSettingsModal'
 
@@ -97,6 +98,18 @@ const router = new Router({
           meta: {
             isModal: true,
             title: 'Meltano: Job Log'
+          }
+        },
+        {
+          path: 'edit-pipeline-schedule/:jobId',
+          name: 'editPipelineSchedule',
+          components: {
+            default: Pipelines,
+            editPipelineSchedule: EditPipelineScheduleModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Edit pipelines'
           }
         }
       ]
