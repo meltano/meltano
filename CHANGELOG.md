@@ -22,12 +22,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-[#2991](https://gitlab.com/meltano/meltano/-/issues/2991) Remove support for python 3.6. Bumps the base docker image to 3.8.
+- [#2991](https://gitlab.com/meltano/meltano/-/issues/2991) Remove support for python 3.6. Bumps the base docker image to 3.8.
 
 ### Fixes
 
 [#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
 [#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
+- [#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
+
 
 ## 1.91.0 - (2022-01-13)
 ---
