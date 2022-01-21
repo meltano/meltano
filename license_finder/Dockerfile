@@ -143,11 +143,15 @@ RUN set -ex; \
 	rm -f get-pip.py
 
 FROM license_finder_python
-# install asdf
+SHELL ["/bin/bash", "-c"]
+
+# install git
 RUN echo deb http://deb.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list
 RUN apt-get update && apt-get install -y -t buster-backports git
+# install asdf
+RUN git clone https://github.com/asdf-vm/asdf.git /root/.asdf --branch v0.9.0
+RUN chmod +x /root/.asdf/asdf.sh
+RUN /root/.asdf/asdf.sh
+RUN echo ". /root/.asdf/asdf.sh" >> ~/.bashrc
 
-RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0
-RUN echo ". $HOME/.asdf/asdf.sh" >> ~/.bashrc
-
-ENTRYPOINT []
+ENTRYPOINT ["/bin/bash", "-c"]
