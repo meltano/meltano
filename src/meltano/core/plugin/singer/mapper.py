@@ -35,7 +35,7 @@ class SingerMapper(SingerPlugin):
         """Create configuration file."""
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
-            config = invoker.plugin_config_override
+            config = invoker.plugin_config_override or invoker.plugin_config_processed
             json.dump(config, config_file, indent=2)
 
         logger.debug(
