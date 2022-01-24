@@ -75,7 +75,7 @@ async def select(
     """
     Manage extractor selection patterns.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#select
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#select
     """
     try:
         if flags["list"]:

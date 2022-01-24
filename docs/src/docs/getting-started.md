@@ -27,7 +27,7 @@ Before you can get started with Meltano and the [`meltano` CLI](/docs/command-li
 
 ### Local installation
 
-If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6, 3.7, 3.8 or 3.9 installed,
+If you're running Linux or macOS and have [Python](https://www.python.org/) 3.7+ installed,
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
 inside the directory that will hold your [Meltano projects](/docs/project.html).
 
@@ -70,8 +70,8 @@ you can use the [`meltano/meltano` Docker image](https://hub.docker.com/r/meltan
     docker pull meltano/meltano:latest
     ```
 
-    By default, this image comes with the oldest version of Python supported by Meltano, currently Python 3.6.
-    If you'd like to use a newer version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.8`.
+    By default, these images come with what we feel is the version of Python the best fit for most users, currently Python 3.8.
+    If you'd like to use a newer version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.7`.
 
 2. Optionally, verify that the [`meltano` CLI](/docs/command-line-interface.html) is now available through the Docker image by viewing the version:
 
