@@ -382,7 +382,7 @@ meltano            | INFO Extract & load complete!
 
 ## `environment`
 
-Use the `environment` command to manage [Environments](/docs/environments) in your Meltano project.
+Use the `environment` command to manage [Environments](/docs/environments.html#environments) in your Meltano project.
 
 ### How to use
 
