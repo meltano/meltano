@@ -13,7 +13,7 @@ license_scanning:
   allow_failure: true
   before_script:
     - pip install poetry
-    - poetry export --format requirements.txt --output requirements.txt --without-hashes
+    - poetry export --format requirements.txt --output poetry_requirements.txt --without-hashes
     - sed 's/;.*//' poetry_requirements.txt >> requirements.txt
   script:
     - /run.sh analyze .
