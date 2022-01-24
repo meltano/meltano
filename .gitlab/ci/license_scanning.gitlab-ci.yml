@@ -12,9 +12,13 @@ license_scanning:
     SETUP_CMD: $LICENSE_MANAGEMENT_SETUP_CMD
   allow_failure: true
   before_script:
+    # generate requirements.txt
     - pip install poetry
     - poetry export --format requirements.txt --output poetry_requirements.txt --without-hashes
-    - sed 's/;.*//' poetry_requirements.txt >> requirements.txt
+    # remove annotations
+    - sed 's/;.*//' poetry_requirements.txt >> plain_requirements.txt
+    # remove failing dependencies
+    - grep -vwE "(click-default-group==1.2.2)" plain_requirements.txt >> requirements.txt
   script:
     - /run.sh analyze .
   artifacts:
