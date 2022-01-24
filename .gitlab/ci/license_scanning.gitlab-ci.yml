@@ -12,7 +12,6 @@ license_scanning:
     SETUP_CMD: $LICENSE_MANAGEMENT_SETUP_CMD
   allow_failure: true
   before_script:
-    # install poetry
     - pip install poetry
     - poetry export --format requirements.txt --output requirements.txt
   script:
