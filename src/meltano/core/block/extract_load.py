@@ -2,7 +2,7 @@
 import asyncio
 import logging
 from asyncio import Task
-from typing import AsyncIterator, List, Optional, Set, Tuple
+from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
@@ -87,13 +87,17 @@ class ELBContextBuilder:
         self._base_output_logger = None
 
     def make_block(
-        self, plugin: ProjectPlugin, plugin_args: Optional[List[str]] = None
+        self,
+        plugin: ProjectPlugin,
+        plugin_args: Optional[List[str]] = None,
+        plugin_config_overrides: Optional[dict] = None,
     ) -> SingerBlock:
         """Create a new `SingerBlock` object, from a plugin.
 
         Args:
             plugin: The plugin to be executed.
             plugin_args: The arguments to be passed to the plugin.
+            plugin_config_overrides: The env overrides, primarily used by mappers to inject name of the requested mapping.
         Returns:
             The new `SingerBlock` object.
         """
@@ -103,7 +107,7 @@ class ELBContextBuilder:
             block_ctx=ctx,
             project=self.project,
             plugins_service=self.plugins_service,
-            plugin_invoker=self.invoker_for(ctx),
+            plugin_invoker=self.invoker_for(ctx, plugin_config_overrides),
             plugin_args=plugin_args,
         )
         self._blocks.append(block)
@@ -114,15 +118,12 @@ class ELBContextBuilder:
         self,
         plugin: ProjectPlugin,
         env: dict = None,
-        config: dict = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
         Args:
             plugin: The plugin to create the context for.
             env: Environment override dictionary. Defaults to None.
-            config: Plugin configuration override dictionary. Defaults to None.
-
         Returns:
             A new `PluginContext` object.
         """
@@ -133,12 +134,15 @@ class ELBContextBuilder:
                 plugin,
                 plugins_service=self.plugins_service,
                 env_override=env,
-                config_override=config,
             ),
             session=self.session,
         )
 
-    def invoker_for(self, plugin_context: PluginContext) -> PluginInvoker:
+    def invoker_for(
+        self,
+        plugin_context: PluginContext,
+        plugin_config_override: Optional[Dict] = None,
+    ) -> PluginInvoker:
         """Create an invoker for a plugin from a PluginContext."""
         return invoker_factory(
             self.project,
@@ -147,6 +151,7 @@ class ELBContextBuilder:
             run_dir=self.elt_run_dir,
             plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
+            plugin_config_override=plugin_config_override,
         )
 
     @property

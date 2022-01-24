@@ -1,5 +1,5 @@
 """Utilities for turning a string list of plugins into a usable list of BlockSet and PluginCommand objects."""
-from typing import Generator, List, Tuple, Union
+from typing import Dict, Generator, List, Optional, Tuple, Union
 
 import click
 import structlog
@@ -9,13 +9,14 @@ from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
 from meltano.core.block.singer import CONSUMERS, SingerBlock
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
-    """Check if a plugin is a command block..
+    """Check if a plugin is a command block.
 
     Args:
         plugin: Plugin to check.
@@ -49,7 +50,7 @@ def generate_job_id(
 def validate_block_sets(
     log: structlog.BoundLogger, blocks: List[Union[BlockSet, PluginCommandBlock]]
 ) -> bool:
-    """Perform validation of a all blocks in a list that implement the BlockSet interface.
+    """Perform validation of all blocks in a list that implement the BlockSet interface.
 
     Args:
         log: Logger to use in the event of a validation error.
@@ -86,16 +87,16 @@ class BlockParser:  # noqa: D101
             session: Optional session to use.
         """
         self.log = log
-        self.blocks = blocks
         self.project = project
         self.session = session
 
         self._plugins_service = ProjectPluginsService(project)
         self._plugins: List[ProjectPlugin] = []
 
-        self._commands: dict[ProjectPlugin, str] = {}
+        self._commands: Dict[ProjectPlugin, str] = {}
+        self._mappings_ref: Dict[int, str] = {}
 
-        for name in blocks:
+        for idx, name in enumerate(blocks):
 
             try:
                 parsed_name, command_name = name.split(":")
@@ -103,9 +104,13 @@ class BlockParser:  # noqa: D101
                 parsed_name = name
                 command_name = None
 
-            plugin = self._plugins_service.find_plugin(parsed_name)
+            plugin = self._find_plugin_or_mapping(parsed_name)
             if plugin is None:
                 raise click.ClickException(f"Block {name} not found")
+
+            if plugin.type == PluginType.MAPPERS:
+                self._mappings_ref[idx] = parsed_name
+
             self._plugins.append(plugin)
             if command_name:
                 self._commands[plugin] = command_name
@@ -149,15 +154,41 @@ class BlockParser:  # noqa: D101
                     f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{plugin.name}'"
                 )
 
-    def _find_next_elb_set(  # noqa: WPS231
+    def _find_plugin_or_mapping(self, name: str) -> Optional[ProjectPlugin]:
+        """Find a plugin by name OR by mapping name.
+
+        Args:
+            name: Name of the plugin or mapping.
+        Returns:
+            The actual plugin.
+        Raises
+            ClickException: If mapping name returns multiple matches.
+        """
+        try:
+            return self._plugins_service.find_plugin(name)
+        except PluginNotFoundError:
+            pass
+
+        mapper = None
+        try:
+            mapper = self._plugins_service.find_plugins_by_mapping_name(name)
+        except PluginNotFoundError:
+            pass
+
+        if len(mapper) > 1:
+            raise click.ClickException(
+                f"Ambiguous mapping name {name}, found multiple matches."
+            )
+        return mapper[0] if mapper else None
+
+    def _find_next_elb_set(  # noqa: WPS231, WPS213
         self,
         offset: int = 0,
-    ) -> Tuple[ExtractLoadBlocks, int]:  # noqa: WPS231
+    ) -> Tuple[Optional[ExtractLoadBlocks], int]:  # noqa: WPS231, WPS213
         """
         Search a list of project plugins trying to find an extract ExtractLoad block set.
 
         Args:
-            plugins: List of project plugins to search.
             offset: Optional starting offset for search.
         Returns:
             The ExtractLoad object.
@@ -182,21 +213,39 @@ class BlockParser:  # noqa: D101
         blocks.append(builder.make_block(self._plugins[offset]))
 
         for idx, plugin in enumerate(self._plugins[offset + 1 :]):  # noqa: E203
+            next_block = idx + 1
+
             if plugin.type not in CONSUMERS:
                 self.log.debug(
                     "next block not a consumer of output",
                     offset=offset,
                     plugin_type=plugin.type,
                 )
-                return None, offset + idx + 1
+                return None, offset + next_block
 
-            self.log.debug("found block", block_type=plugin.type, index=idx + 1)
-            if plugin.type == PluginType.MAPPERS or PluginType.LOADERS:
+            self.log.debug("found block", block_type=plugin.type, index=next_block)
+
+            if plugin.type == PluginType.MAPPERS:
+                self.log.debug(
+                    "found mapper",
+                    plugin_type=plugin.type,
+                    plugin_name=plugin.name,
+                    mapping=self._mappings_ref.get(next_block),
+                    idx=next_block,
+                )
+                blocks.append(
+                    builder.make_block(
+                        plugin,
+                        plugin_config_overrides=self._get_mapping_config(
+                            next_block, plugin
+                        ),
+                    )
+                )
+            elif plugin.type == PluginType.LOADERS:
+                self.log.debug("blocks", offset=offset, idx=next_block)
                 blocks.append(builder.make_block(plugin))
-                if plugin.type == PluginType.LOADERS:
-                    self.log.debug("blocks", offset=offset, idx=idx + 1)
-                    elb = ExtractLoadBlocks(builder.context(), blocks)
-                    return elb, idx + 2
+                elb = ExtractLoadBlocks(builder.context(), blocks)
+                return elb, idx + 2
             else:
                 self.log.warning(
                     "Found unexpected plugin type for block in middle of block set.",
@@ -207,3 +256,33 @@ class BlockParser:  # noqa: D101
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}."
                 )
         raise Exception("Found no end in block set!")
+
+    def _get_mapping_config(self, block_index: int, plugin: ProjectPlugin) -> Dict:
+        """
+        Get the mapping config from a plugin for a given block index.
+
+        Args:
+            block_index: Index of the block.
+            plugin: Plugin to get mapping config from.
+        Returns:
+            Mapping config.
+        Raises:
+            BlockSetValidationError: If mapping config is not found.
+        """
+        requested_mapping = self._mappings_ref.get(block_index)
+        mapping_config = None
+        for mapping in plugin.config_with_extras.get("_mappings", []):
+            if mapping.get("name") == requested_mapping:
+                mapping_config = mapping.get("config")
+
+        if mapping_config is None:
+            self.log.warning(
+                "No mapping config found for mapping",
+                mapping=requested_mapping,
+                plugin_name=plugin.name,
+            )
+            raise BlockSetValidationError(
+                f"Expected config for {requested_mapping} in {plugin.name}."
+            )
+
+        return mapping_config

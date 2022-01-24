@@ -95,6 +95,7 @@ class PluginInvoker:
         plugins_service: ProjectPluginsService = None,
         plugin_config_service: PluginConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
+        plugin_config_override: Optional[Dict] = None,
     ):
         self.project = project
         self.plugin = plugin
@@ -126,6 +127,7 @@ class PluginInvoker:
         self.plugin_config_processed = {}
         self.plugin_config_extras = {}
         self.plugin_config_env = {}
+        self.plugin_config_override = plugin_config_override
 
     @property
     def capabilities(self):

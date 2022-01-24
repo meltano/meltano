@@ -106,6 +106,14 @@ def target_process(process_mock_factory, target):
 
 
 @pytest.fixture()
+def mapper_process(process_mock_factory, mapper):
+    mapper = process_mock_factory(mapper)
+    mapper.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
+    mapper.wait = CoroutineMock(return_value=0)
+    return mapper
+
+
+@pytest.fixture()
 def dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
 
@@ -268,20 +276,22 @@ class TestCliRunScratchpadOne:
         project,
         tap,
         target,
+        mapper,
         dbt,
         tap_process,
         target_process,
+        mapper_process,
         dbt_process,
         project_plugins_service,
         job_logging_service,
     ):
         # exit cleanly when everything is fine
         create_subprocess_exec = CoroutineMock(
-            side_effect=(tap_process, target_process)
+            side_effect=(tap_process, mapper_process, target_process)
         )
 
         # Verify that a vanilla ELB run works
-        args = ["run", tap.name, target.name]
+        args = ["run", tap.name, mapper.name, target.name]
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -348,17 +358,19 @@ class TestCliRunScratchpadOne:
         project,
         tap,
         target,
+        mapper,
         dbt,
         tap_process,
         target_process,
+        mapper_process,
         dbt_process,
         project_plugins_service,
         job_logging_service,
     ):
         invoke_async = CoroutineMock(
-            side_effect=(tap_process, target_process, dbt_process)
+            side_effect=(tap_process, mapper_process, target_process, dbt_process)
         )
-        args = ["run", tap.name, target.name, "dbt:run"]
+        args = ["run", tap.name, mapper.name, target.name, "dbt:run"]
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -375,6 +387,12 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches(
                 "found ExtractLoadBlocks set"
             )  # tap/target pair
+
+            # make sure mapper was found and at its expected positions
+            for ev in matcher.find_by_event("found block"):
+                if ev.get("block_type") == "mappers":
+                    assert ev.get("index") == 1
+
             assert (
                 matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
                 == "transformers"
