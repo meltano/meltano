@@ -175,6 +175,9 @@ class BlockParser:  # noqa: D101
         except PluginNotFoundError:
             pass
 
+        if mapper is None:
+            return None
+
         if len(mapper) > 1:
             raise click.ClickException(
                 f"Ambiguous mapping name {name}, found multiple matches."

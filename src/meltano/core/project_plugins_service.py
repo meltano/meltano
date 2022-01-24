@@ -158,16 +158,10 @@ class ProjectPluginsService:
             PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
         """
         found: List[ProjectPlugin] = []
-        try:
-            plugin = next(
-                plugin
-                for plugin in self.get_plugins_of_type(PluginType.MAPPERS)
-                for mapping in plugin.extra_config.get("_mappings", [])
-                if mapping.get("name", None) == mapping_name
-            )
-            found.append(self.ensure_parent(plugin))
-        except StopIteration as stop:
-            raise PluginNotFoundError(mapping_name) from stop
+        for plugin in self.get_plugins_of_type(PluginType.MAPPERS):
+            for mapping in plugin.extra_config.get("_mappings", []):
+                if mapping.get("name", None) == mapping_name:
+                    found.append(self.ensure_parent(plugin))
         if not found:
             raise PluginNotFoundError(mapping_name)
         return found

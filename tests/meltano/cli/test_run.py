@@ -291,7 +291,7 @@ class TestCliRunScratchpadOne:
         )
 
         # Verify that a vanilla ELB run works
-        args = ["run", tap.name, mapper.name, target.name]
+        args = ["run", tap.name, "mock-mapping-0", target.name]
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -370,7 +370,7 @@ class TestCliRunScratchpadOne:
         invoke_async = CoroutineMock(
             side_effect=(tap_process, mapper_process, target_process, dbt_process)
         )
-        args = ["run", tap.name, mapper.name, target.name, "dbt:run"]
+        args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -961,4 +961,87 @@ class TestCliRunScratchpadOne:
                 completed_events[0].get("err")
                 == "RunnerError('Output line length limit exceeded',)"
                 or "RunnerError('Output line length limit exceeded')"
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_mapper_config(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        mapper,
+        dbt,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+        project_add_service,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process)
+        )
+
+        # no mapper should be found
+        args = ["run", tap.name, "not-a-valid-mapping-name", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 1
+            assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
+
+        # duplicate mapping name - should also fail
+        project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-mock2",
+            inherit_from=mapper.name,
+            mappings=[
+                {
+                    "name": "mock-mapping-0",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email1",
+                                "tap_stream_name": "commits1",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                }
+            ],
+        )
+
+        args = ["run", tap.name, "mock-mapping-0", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 1
+            assert (
+                "Error: Ambiguous mapping name mock-mapping-0, found multiple matches."
+                in result.stderr
             )
