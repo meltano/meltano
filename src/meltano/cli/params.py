@@ -15,7 +15,7 @@ from .utils import CliError
 
 
 def database_uri_option(func):
-    @click.option("--database-uri", help="System database URI")
+    @click.option("--database-uri", help="System database URI.")
     def decorate(*args, database_uri=None, **kwargs):
         if database_uri:
             ProjectSettingsService.config_override["database_uri"] = database_uri

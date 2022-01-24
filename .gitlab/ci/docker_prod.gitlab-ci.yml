@@ -50,8 +50,8 @@ meltano_edge:
     - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge-python$PYTHON_IMAGE_VERSION
     - docker push $IMAGE_NAME:edge-python$PYTHON_IMAGE_VERSION
 
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge || true'
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:edge || true'
+    - '[[ "$PYTHON_VERSION" == "3.8" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:edge || true'
+    - '[[ "$PYTHON_VERSION" == "3.8" ]] && docker push $IMAGE_NAME:edge || true'
 
 # Manages:
 #  - meltano/meltano:<sha>-python<version>
@@ -72,8 +72,8 @@ meltano:
     - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
     - docker push $IMAGE_NAME:latest-python$PYTHON_IMAGE_VERSION
 
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG || true'
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:$CI_COMMIT_TAG || true'
+    - '[[ "$PYTHON_VERSION" == "3.8" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$CI_COMMIT_TAG || true'
+    - '[[ "$PYTHON_VERSION" == "3.8" ]] && docker push $IMAGE_NAME:$CI_COMMIT_TAG || true'
 
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest || true'
-    - '[[ "$PYTHON_VERSION" == "3.6" ]] && docker push $IMAGE_NAME:latest || true'
+    - '[[ "$PYTHON_VERSION" == "3.8" ]] && docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest || true'
+    - '[[ "$PYTHON_VERSION" == "3.8" ]] && docker push $IMAGE_NAME:latest || true'
