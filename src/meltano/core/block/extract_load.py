@@ -97,7 +97,7 @@ class ELBContextBuilder:
         Args:
             plugin: The plugin to be executed.
             plugin_args: The arguments to be passed to the plugin.
-            plugin_config_overrides: The env overrides, primarily used by mappers to inject name of the requested mapping.
+            plugin_config_overrides: Config override are used by mappers to inject the config of the requested mapping.
         Returns:
             The new `SingerBlock` object.
         """

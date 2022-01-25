@@ -7,8 +7,8 @@ import json
 import structlog
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.setting_definition import SettingDefinition
 
-from ...setting_definition import SettingDefinition
 from . import PluginType, SingerPlugin
 
 logger = structlog.stdlib.get_logger(__name__)
