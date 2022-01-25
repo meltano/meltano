@@ -32,9 +32,7 @@
     "vuepress-plugin-container": "^2.1.4"
   },
   "dependencies": {
-    "vue-intercom": "^1.0.14",
-    "vuepress-intercom": "^1.0.3",
-    "vuepress-plugin-google-tag-manager": "^0.0.4",
-    "vuepress-plugin-sitemap": "^2.3.0"
+    "bulma": "^0.9.3",
+    "bulma-timeline": "^3.0.4"
   }
 }

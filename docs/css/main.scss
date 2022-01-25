@@ -1,0 +1,42 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+@charset "utf-8";
+
+/* 
+ * Brand Colors
+ */
+
+$meltano-blue: #3438bf;
+$meltano-flame-red: #d9042b;
+$meltano-blue-2: #031d4d;
+$meltano-blue-3: #000e29;
+$meltano-ash: #2e2e33;
+$meltano-turqiose: #02a5a5;
+$meltano-jade: #b0e3c1;
+$meltano-moonstone: #fae6be;
+$meltano-steel: #62626e;
+$meltano-armor: #c0c0c4;
+$meltano-silver: #f1f1f2;
+$meltano-dragons-egg: #e8f0ff;
+$meltano-ice: #f5f7fa;
+$meltano-white: #ffffff;
+
+/* Bulma Variables */
+
+$primary: $meltano-blue;
+$yellow: $meltano-moonstone;
+$green: $meltano-jade;
+$grey-darker: $meltano-ash;
+$turquoise: $meltano-turqiose;
+$red: $meltano-flame-red;
+
+/* Bulma Timeline Variables */
+
+$timeline-marker-border: none;
+
+/* Import the needful after variables are set */
+
+@import 'node_modules/bulma/bulma';
+@import 'node_modules/bulma-timeline/dist/css/bulma-timeline';
+@import "syntax.css";
