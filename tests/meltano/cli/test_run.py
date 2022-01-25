@@ -1109,9 +1109,8 @@ class TestCliRunScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
 
-            assert (
-                "Intermediate block (likely a mapper) failed."
-                in str(result.exception)
+            assert "Intermediate block (likely a mapper) failed." in str(
+                result.exception
             )
             assert result.exit_code == 1
 

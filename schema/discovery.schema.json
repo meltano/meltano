@@ -62,6 +62,12 @@
             "items": {
                 "$ref": "#/definitions/dashboards"
             }
+        },
+        "mappers": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/mappers"
+            }
         }
     },
     "definitions": {
@@ -562,6 +568,60 @@
                 }
             ]
         },
+        "mapper_specific": {
+            "type": "object",
+            "properties": {
+                "mappings": {
+                    "description": "Name of the invokable mappings and their associated configs.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "config": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": [
+                        "config",
+                        "name"
+                    ]
+                }
+            }
+        },
+        "mappers": {
+            "description": "https://meltano.com/docs/plugins.html#mappers",
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/common"
+                },
+                {
+                    "$ref": "#/definitions/mapper_specific"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "name": {},
+                        "pip_url": {},
+                        "repo": {},
+                        "namespace": {},
+                        "label": {},
+                        "description": {},
+                        "executable": {},
+                        "settings": {},
+                        "docs": {},
+                        "settings_group_validation": {},
+                        "commands": {}
+                    }
+                }
+            ]
+        },
+
         "base_setting": {
             "type": "object",
             "required": [
