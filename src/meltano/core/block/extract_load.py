@@ -227,11 +227,22 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             await block.stop()
 
     async def process_wait(
-        self, output_exception_future: Task, subset: int = None
+        self, output_exception_future: Optional[Task], subset: int = None
     ) -> Set[Task]:
-        """Wait on all process futures in the block set."""
+        """Wait on all process futures in the block set.
+
+        Args:
+            output_exception_future: additional future to wait on for output exceptions.
+            subset: the subset of blocks to wait on.
+        Returns:
+            The set of all process futures + optional output exception futures.
+        """
+        futures = list(self.process_futures[subset:])
+        if output_exception_future:
+            futures.append(output_exception_future)
+
         done, _ = await asyncio.wait(
-            [*self.process_futures[subset:], output_exception_future],
+            futures,
             return_when=asyncio.FIRST_COMPLETED,
         )
         return done
@@ -396,6 +407,7 @@ class ELBExecutionManager:
 
         self._producer_code = None
         self._consumer_code = None
+        self._intermediate_codes: Dict[str, int] = {}
 
     async def run(self) -> None:
         """Run is used to actually perform the execution of the ExtractLoadBlock set.
@@ -407,7 +419,9 @@ class ELBExecutionManager:
             RunnerError: if any blocks in the set finished with a non 0 exit code
         """
         await self._wait_for_process_completion(self.elb.head)
-        _check_exit_codes(self._producer_code, self._consumer_code)
+        _check_exit_codes(
+            self._producer_code, self._consumer_code, self._intermediate_codes
+        )
 
     async def _complete_upstream(self) -> None:
         """Wait for the upstream blocks to complete."""
@@ -468,16 +482,16 @@ class ELBExecutionManager:
         else:
             # If all the output handlers completed without raising an exception,
             # we still need to wait for all the underlying block processes to complete.
-            done, _ = await asyncio.wait(
-                self.elb.process_futures,
-                return_when=asyncio.FIRST_COMPLETED,
-            )
+            # note that since all output handlers completed we DO NOT need to wait for any output futures!
+            done = await self.elb.process_wait(None, start_idx)
         if self.elb.tail.process_future.done():
             logger.debug("tail consumer completed first")
             self._consumer_code = self.elb.tail.process_future.result()
             await self._complete_upstream()
         elif current_head.process_future.done():
-            logger.debug("head producer completed first as expected")
+            logger.debug(
+                "head producer completed first as expected", name=current_head.string_id
+            )
             await self._handle_head_completed(current_head, start_idx)
         else:
             logger.warning("Intermediate block in sequence failed.")
@@ -497,6 +511,10 @@ class ELBExecutionManager:
 
         if current_head is self.elb.head:
             self._producer_code = current_head.process_future.result()
+        else:
+            self._intermediate_codes[
+                current_head.string_id
+            ] = current_head.process_future.result()
 
         await asyncio.wait([current_head.proxy_stdout(), current_head.proxy_stderr()])
         # Close next inline stdin so downstream can cascade and complete naturally
@@ -526,14 +544,17 @@ class ELBExecutionManager:
             await block.stop()
 
 
-def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
+def _check_exit_codes(
+    producer_code: int, consumer_code: int, intermediate_codes: Dict[str, int]
+) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
 
     Args:
         producer_code: exit code of the producer (tap)
         consumer_code: exit code of the consumer (target)
+        intermediate_codes: exit codes of the intermediate blocks (mappers)
     Raises:
-        RunnerError: if the producer or consumer exit codes are non-zero
+        RunnerError: if the producer, consumer, or mapper exit codes are non-zero
     """
     if producer_code and consumer_code:
         raise RunnerError(
@@ -546,3 +567,11 @@ def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
 
     if consumer_code:
         raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
+
+    failed_mappers = []
+    for mapper_id in intermediate_codes.keys():
+        if intermediate_codes[mapper_id]:
+            failed_mappers.append({mapper_id: intermediate_codes[mapper_id]})
+
+    if failed_mappers:
+        raise RunnerError("Mappers failed", failed_mappers)

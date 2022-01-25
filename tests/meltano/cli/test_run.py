@@ -111,7 +111,7 @@ def mapper_process(process_mock_factory, mapper):
 
     # Have `mapper.wait` take 1s to make sure the mapper always finishes after the tap but before the target
     async def wait_mock():
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
         return mapper.wait.return_value
 
     mapper.wait.side_effect = wait_mock
@@ -315,7 +315,7 @@ class TestCliRunScratchpadOne:
             return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
-            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
@@ -1021,14 +1021,33 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 1
             assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
 
-        # duplicate mapping name - should also fail
+        # create duplicate mapping name - should also fail
         project_add_service.add(
             PluginType.MAPPERS,
-            "mapper-mock2",
+            "mapper-dupe1",
             inherit_from=mapper.name,
             mappings=[
                 {
-                    "name": "mock-mapping-0",
+                    "name": "mock-mapping-dupe",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email1",
+                                "tap_stream_name": "commits1",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                }
+            ],
+        )
+        project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-dupe2",
+            inherit_from=mapper.name,
+            mappings=[
+                {
+                    "name": "mock-mapping-dupe",
                     "config": {
                         "transformations": [
                             {
@@ -1042,7 +1061,7 @@ class TestCliRunScratchpadOne:
             ],
         )
 
-        args = ["run", tap.name, "mock-mapping-0", target.name]
+        args = ["run", tap.name, "mock-mapping-dupe", target.name]
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -1056,7 +1075,7 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 1
             assert (
-                "Error: Ambiguous mapping name mock-mapping-0, found multiple matches."
+                "Error: Ambiguous mapping name mock-mapping-dupe, found multiple matches."
                 in result.stderr
             )
 
@@ -1107,11 +1126,9 @@ class TestCliRunScratchpadOne:
             "meltano.core.transform_add_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-            result = cli_runner.invoke(cli, args)
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
 
-            assert "Intermediate block (likely a mapper) failed." in str(
-                result.exception
-            )
+            assert "Mappers failed" in str(result.exception)
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -1124,13 +1141,6 @@ class TestCliRunScratchpadOne:
             completed_events = matcher.find_by_event("Block run completed.")
             assert len(completed_events) == 1
             assert completed_events[0].get("success") is False
-
-            # or is hack to work around python 3.6 failures
-            assert (
-                completed_events[0].get("err") == "RunnerError('Extractor failed',)"
-                or "RunnerError('Extractor failed')"
-            )
-            assert completed_events[0].get("exit_codes").get("extractors") == 1
 
             # the tap should have completed successfully
             matcher.event_matches("tap done")
