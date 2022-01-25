@@ -1,0 +1,32 @@
+image: ruby:2.3
+
+variables:
+  JEKYLL_ENV: production
+  LC_ALL: C.UTF-8
+  ALGOLIA_API_KEY: $ALGOLIA_API_KEY
+
+before_script:
+  - bundle install
+  - npm install
+
+test:
+  stage: test
+  script:
+  - bundle exec jekyll build -d test
+  - bundle exec jekyll build && bundle exec htmlproofer --log-level :debug ./_site/ --assume_extension --http_status_ignore 503 --url-ignore "/www.linkedin.com/,/localhost/"
+  artifacts:
+    paths:
+    - test
+  except:
+  - master
+
+pages:
+  stage: deploy
+  script:
+  - bundle exec jekyll build -d public
+  - bundle exec jekyll algolia
+  artifacts:
+    paths:
+    - public
+  only:
+  - master

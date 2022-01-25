@@ -1,7 +1,0 @@
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-<IfModule mod_headers.c>
-Header set Cache-Control "private"
-</IfModule>
