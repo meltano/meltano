@@ -87,9 +87,9 @@ def tap_process(process_mock_factory, tap):
 def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
 
-    # Have `target.wait` take 1s to make sure the tap always finishes before the target
+    # Have `target.wait` take 2s to make sure the tap always finishes before the target
     async def wait_mock():
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         return target.wait.return_value
 
     target.wait.side_effect = wait_mock
@@ -108,8 +108,22 @@ def target_process(process_mock_factory, target):
 @pytest.fixture()
 def mapper_process(process_mock_factory, mapper):
     mapper = process_mock_factory(mapper)
-    mapper.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
-    mapper.wait = CoroutineMock(return_value=0)
+
+    # Have `mapper.wait` take 1s to make sure the mapper always finishes after the tap but before the target
+    async def wait_mock():
+        await asyncio.sleep(2)
+        return mapper.wait.return_value
+
+    mapper.wait.side_effect = wait_mock
+
+    mapper.stdout.at_eof.side_effect = (False, False, False, True)
+    mapper.stdout.readline = CoroutineMock(
+        side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
+    )
+    mapper.stderr.at_eof.side_effect = (False, False, False, True)
+    mapper.stderr.readline = CoroutineMock(
+        side_effect=(b"mapper starting\n", b"mapper running\n", b"mapper done\n")
+    )
     return mapper
 
 
@@ -1045,3 +1059,101 @@ class TestCliRunScratchpadOne:
                 "Error: Ambiguous mapping name mock-mapping-0, found multiple matches."
                 in result.stderr
             )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_elb_mapper_failure(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        mapper,
+        dbt,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+
+        # in this scenario, the map fails on the second read. Target should still complete, but dbt should not.
+        args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
+
+        mapper_process.wait.return_value = 1
+        mapper_process.returncode = 1
+        mapper_process.stderr.readline.side_effect = (
+            b"mapper starting\n",
+            b"mapper running\n",
+            b"mapper failure\n",
+        )
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process, dbt_process)
+        )
+
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            assert (
+                "Intermediate block (likely a mapper) failed."
+                in str(result.exception)
+            )
+            assert result.exit_code == 1
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("found ExtractLoadBlocks set")
+            assert (
+                matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
+                == "transformers"
+            )
+
+            completed_events = matcher.find_by_event("Block run completed.")
+            assert len(completed_events) == 1
+            assert completed_events[0].get("success") is False
+
+            # or is hack to work around python 3.6 failures
+            assert (
+                completed_events[0].get("err") == "RunnerError('Extractor failed',)"
+                or "RunnerError('Extractor failed')"
+            )
+            assert completed_events[0].get("exit_codes").get("extractors") == 1
+
+            # the tap should have completed successfully
+            matcher.event_matches("tap done")
+
+            # we should see a debug line for from the run manager indicating a intermediate block failed
+            matcher.event_matches("Intermediate block in sequence failed.")
+
+            # the failed block should have been the mapper
+            mapper_stop_event = matcher.find_by_event("mapper failure")
+            assert len(mapper_stop_event) == 1
+            assert mapper_stop_event[0].get("name") == mapper.name
+            assert mapper_stop_event[0].get("cmd_type") == "elb"
+            assert mapper_stop_event[0].get("stdio") == "stderr"
+
+            # target should have attempted to complete
+            target_stop_event = matcher.find_by_event("target done")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+
+            # dbt should not have run at all
+            assert not matcher.event_matches("dbt starting")
+            assert not matcher.event_matches("dbt running")
+            assert not matcher.event_matches("dbt done")
