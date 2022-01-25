@@ -422,6 +422,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         project_plugins_service,
+        job_logging_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -443,6 +444,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Extractor failed" in str(result.exception)
+            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -453,7 +455,11 @@ class TestCliEltScratchpadOne:
 
             assert exception_logged(
                 result.stdout + result.stderr,
-                CliError("ELT could not be completed: Extractor failed"),
+                CliError(
+                    "ELT could not be completed: Extractor failed\n"
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                ),
             )
 
             assert_log_lines(
@@ -484,6 +490,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         project_plugins_service,
+        job_logging_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -524,6 +531,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
+            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -533,7 +541,11 @@ class TestCliEltScratchpadOne:
             )
             assert exception_logged(
                 result.stdout + result.stderr,
-                CliError("ELT could not be completed: Loader failed"),
+                CliError(
+                    "ELT could not be completed: Loader failed\n"
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                ),
             )
 
             assert_log_lines(
@@ -564,6 +576,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         project_plugins_service,
+        job_logging_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -585,6 +598,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
+            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -595,7 +609,11 @@ class TestCliEltScratchpadOne:
             )
             assert exception_logged(
                 result.stdout + result.stderr,
-                CliError("ELT could not be completed: Loader failed"),
+                CliError(
+                    "ELT could not be completed: Loader failed\n"
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                ),
             )
 
             assert_log_lines(
@@ -626,6 +644,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         project_plugins_service,
+        job_logging_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -654,6 +673,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Extractor and loader failed" in str(result.exception)
+            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -666,7 +686,11 @@ class TestCliEltScratchpadOne:
 
             assert exception_logged(
                 result.stdout + result.stderr,
-                CliError("ELT could not be completed: Extractor and loader failed"),
+                CliError(
+                    "ELT could not be completed: Extractor and loader failed\n"
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                ),
             )
 
             assert_log_lines(
@@ -697,6 +721,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         project_plugins_service,
+        job_logging_service,
     ):
         job_id = "pytest_test_elt"
         args = ["elt", "--job_id", job_id, tap.name, target.name]
@@ -732,6 +757,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Output line length limit exceeded" in str(result.exception)
+            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -749,7 +775,9 @@ class TestCliEltScratchpadOne:
             assert exception_logged(
                 result.stdout + result.stderr,
                 CliError(
-                    "ELT could not be completed: Output line length limit exceeded"
+                    "ELT could not be completed: Output line length limit exceeded\n"
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
                 ),
             )
 
@@ -1060,8 +1088,10 @@ class TestCliEltScratchpadTwo:
         dbt_process,
         tap_mock_transform,
         project_plugins_service,
+        job_logging_service,
     ):
-        args = ["elt", tap.name, target.name, "--transform", "run"]
+        job_id = "pytest_test_elt"
+        args = ["elt", "--job_id", job_id, tap.name, target.name, "--transform", "run"]
 
         dbt_process.wait.return_value = 1
         dbt_process.returncode = 1
@@ -1092,6 +1122,7 @@ class TestCliEltScratchpadTwo:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "`dbt run` failed" in str(result.exception)
+            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -1103,7 +1134,12 @@ class TestCliEltScratchpadTwo:
                 ],
             )
             assert exception_logged(
-                result.stderr, CliError("ELT could not be completed: `dbt run` failed")
+                result.stderr,
+                CliError(
+                    "ELT could not be completed: `dbt run` failed\n"
+                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
+                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                ),
             )
 
             assert_log_lines(

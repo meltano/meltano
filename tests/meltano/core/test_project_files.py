@@ -1,4 +1,28 @@
+import os
+import tempfile
+from pathlib import Path
+
 import pytest  # noqa: F401
+
+
+@pytest.fixture
+def cd_temp_subdir():
+    original_dir = Path.cwd()
+    with tempfile.TemporaryDirectory(dir=original_dir) as name:
+        new_dir = Path(name).resolve()
+        os.chdir(new_dir)
+        yield new_dir
+    os.chdir(original_dir)
+
+
+@pytest.fixture
+def cd_temp_dir():
+    original_dir = Path.cwd()
+    with tempfile.TemporaryDirectory() as name:
+        new_dir = Path(name).resolve()
+        os.chdir(new_dir)
+        yield new_dir
+    os.chdir(original_dir)
 
 
 class TestProjectFiles:
@@ -28,6 +52,21 @@ class TestProjectFiles:
                 {"name": "test-meltano-environment", "env": {"TEST": "TEST-MELTANO"}}
             ],
         }
+        assert project_files.include_paths == [
+            (project_files.root / "subconfig_2.yml"),
+            (project_files.root / "subfolder" / "subconfig_1.yml"),
+        ]
+
+    def test_resolve_from_subdir(self, project_files, cd_temp_subdir):
+        assert Path.cwd() == cd_temp_subdir
+        assert cd_temp_subdir.parent == project_files.root
+        assert project_files.include_paths == [
+            (project_files.root / "subconfig_2.yml"),
+            (project_files.root / "subfolder" / "subconfig_1.yml"),
+        ]
+
+    def test_resolve_from_any_dir(self, project_files, cd_temp_dir):
+        assert Path.cwd() == cd_temp_dir
         assert project_files.include_paths == [
             (project_files.root / "subconfig_2.yml"),
             (project_files.root / "subfolder" / "subconfig_1.yml"),
