@@ -650,7 +650,7 @@
                 },
                 "env": {
                     "type": "string",
-                    "description": "An environment variable that will be initialized with the setting's value whenever the plugin is invoked.",
+                    "description": "An environment variable that will be initialized with the setting's value whenever the plugin is invoked. This is used to inject environment variables into the plugin's execution context. If the named environment variable is already defined at runtime, Meltano will use the passed value from context instead of the configured value.",
                     "examples": [
                         "DBT_PROFILES_DIR",
                         "GE_HOME"
