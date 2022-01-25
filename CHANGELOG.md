@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3176](https://gitlab.com/meltano/meltano/-/issues/3176) Support dbt v1.0
+
 ### Fixes
 
 ### Breaks
