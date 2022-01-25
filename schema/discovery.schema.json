@@ -621,7 +621,6 @@
                 }
             ]
         },
-
         "base_setting": {
             "type": "object",
             "required": [
