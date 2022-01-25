@@ -3063,7 +3063,12 @@ transformers:
     namespace: dbt
     docs: https://meltano.com/docs/transforms.html
     repo: https://github.com/fishtown-analytics/dbt
-    pip_url: dbt~=1.0.0
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-postgres~=1.0.0
+      dbt-redshift~=1.0.0
+      dbt-snowflake~=1.0.0
+      dbt-bigquery~=1.0.0
     settings:
       - name: project_dir
         value: $MELTANO_PROJECT_ROOT/transform
