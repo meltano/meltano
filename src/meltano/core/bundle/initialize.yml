@@ -2,6 +2,9 @@ meltano.yml: |
   version: 1
 README.md: ""
 requirements.txt: ""
+output/.gitignore: |
+  *
+  !.gitignore
 .gitignore: |
   /venv
   /.meltano
