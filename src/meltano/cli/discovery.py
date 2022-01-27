@@ -15,12 +15,17 @@ from . import cli
 from .params import pass_project
 
 
-@cli.command()
+@cli.command(short_help="List the available discoverable plugins and their variants.")
 @click.argument(
     "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )
 @pass_project()
 def discover(project, plugin_type):
+    """
+    List the available discoverable plugins and their variants.
+
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#discover
+    """
     discover_service = PluginDiscoveryService(project)
     if plugin_type == "all":
         plugin_types = list(PluginType)

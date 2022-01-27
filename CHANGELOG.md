@@ -12,12 +12,45 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3176](https://gitlab.com/meltano/meltano/-/issues/3176) Support dbt v1.0
+
 ### Fixes
 
-- [#3132](https://gitlab.com/meltano/meltano/-/issues/3132) Bump `pyhumps` dependency to fix a bug in converting `SCREAMING_SNAKE_CASE` variables in the API.
+- [#3181](https://gitlab.com/meltano/meltano/-/issues/3181) Create an empty `output/` folder in new Meltano projects.
 
 ### Breaks
 
+
+## 1.92.0 - (2022-01-21)
+---
+
+### Changes
+
+- [#2991](https://gitlab.com/meltano/meltano/-/issues/2991) Remove support for python 3.6. Bumps the base docker image to 3.8.
+
+### Fixes
+
+- [#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
+- [#3115](https://gitlab.com/meltano/meltano/-/issues/3115) Ensure multi-yaml `include_paths` are correctly referenced even if Meltano is not called from the root directory.
+- [#3167](https://gitlab.com/meltano/meltano/-/issues/3167) Add sub-schema for meltano.yml environments.
+- [#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
+- [#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
+
+[#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
+
+## 1.91.0 - (2022-01-13)
+---
+
+### New
+
+- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Published JSON Schemas for `meltano.yml` and `discovery.yml`. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
+- [#3001](https://gitlab.com/meltano/meltano/-/issues/3001) Always print log advice on ELT failure.
+
+### Fixes
+
+- [#3132](https://gitlab.com/meltano/meltano/-/issues/3132) Bump `pyhumps` dependency to fix a bug in converting `SCREAMING_SNAKE_CASE` variables in the API.
+- [#3116](https://gitlab.com/meltano/meltano/-/issues/3116) Fix a unicode decode issue during discovery when debug logging is enabled.
+- [#2716](https://gitlab.com/meltano/meltano/-/issues/2716) Add `--help `docs for all Meltano CLI commands and options.
 
 ## 1.90.1 - (2021-12-16)
 ---

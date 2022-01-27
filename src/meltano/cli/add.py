@@ -17,14 +17,39 @@ from .params import pass_project
 from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 
 
-@cli.command()
+@cli.command(short_help="Add a plugin to your project.")
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
-@click.option("--inherit-from")
-@click.option("--variant")
-@click.option("--as", "as_name")
-@click.option("--custom", is_flag=True)
-@click.option("--include-related", is_flag=True)
+@click.option(
+    "--inherit-from",
+    help=(
+        "Add a plugin inheriting from an existing plugin in the project"
+        + " or a discoverable plugin identified, by name."
+    ),
+)
+@click.option(
+    "--variant",
+    help="Add a specific (non-default) variant of the identified discoverable plugin.",
+)
+@click.option(
+    "--as",
+    "as_name",
+    help=(
+        "Shorthand for '--inherit-from', that can be used to add a discoverable "
+        + "plugin to your project with a different name. "
+        + "Usage:\b\n\nadd <type> <inherit-from> --as <name>"
+    ),
+)
+@click.option(
+    "--custom",
+    is_flag=True,
+    help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
+)
+@click.option(
+    "--include-related",
+    is_flag=True,
+    help="Also add transform, dashboard, and model plugins related to the identified discoverable extractor.",
+)
 @pass_project()
 @click.pass_context
 def add(
@@ -37,7 +62,11 @@ def add(
     as_name=None,
     **flags,
 ):
-    """Add a plugin to your project."""
+    """
+    Add a plugin to your project.
+
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#add
+    """
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 

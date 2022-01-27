@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body>
+
+    {% include header.html %}
+
+    <div class="container is-fluid">
+      <div class="columns">
+        <div class="column is-2">
+            <aside class="menu is-fullheight is-narrow-mobile is-hidden-mobile">
+              {% if site.collections %}
+                {% for collection in site.collections %}
+                  {% if collection.label != "posts" %}
+                    <p class="menu-label"> 
+                    {% if collection.icon %}
+                      {% assign icon = collection.icon %}
+                      <span class="icon"><i class="fas {{ icon }}"></i></span>
+                    {% else %}
+                      <span class="icon"><i class="fas fa-book-open"></i></span>
+                    {% endif %}
+                    
+                    {{ collection.label | capitalize }}
+                    </p>
+                    <ul class="menu-list">
+                      {% assign items = site[collection.label] | sort: "weight" %}
+                      {% for item in items %}
+                        <li>
+                          <a href="{{ item.url }}" class="{% if item.url == page.url %}is-active{% endif %}">
+                           {{ item.title }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                      </ul>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </aside> 
+
+
+
+            </div>
+            <div class="column is-9">
+
+                {% include breadcrumbs.html %}
+
+                <!-- TODO: This creates nested sections that throw off padding -->
+                <section class="section content">
+                  <h1>{{ page.title }}</h1>
+
+                  {{ content | toc }}
+                </section>
+                
+            </div>
+        </div>
+    </div>
+
+    {% include footer.html %}
+
+
+  </body>
+
+</html>

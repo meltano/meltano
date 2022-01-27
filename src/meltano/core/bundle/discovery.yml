@@ -1548,7 +1548,7 @@ extractors:
           label: Include Anonymous Visitors
           description: Defines whether or not to include anonymous visitors in the results.
           kind: boolean
-          default: false
+          value: false
           value_post_processor: stringify
         - name: start_date
           label: Start Date
@@ -1821,7 +1821,7 @@ extractors:
           label: Sync Start Date
           description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
         - name: channels
-          labels: Channels to Sync
+          label: Channels to Sync
           kind: array
           description: By default the tap will sync all channels it has been invited to, but this can be overriden to limit it ot specific channels. Note this needs to be channel ID, not the name, as recommended by the Slack API. To get the ID for a channel, either use the Slack API or find it in the URL.
           placeholder: Ex. ["abc123", "def456"]
@@ -2923,9 +2923,11 @@ loaders:
       pip_url: pipelinewise-target-redshift
       executable: target-redshift
       capabilities:
-        - catalog
-        - discover
-        - state
+        - activate-version
+        - soft-delete
+        - hard-delete
+        - datatype-failsafe
+        - record-flattening
       dialect: redshift
       target_schema: $TARGET_REDSHIFT_SCHEMA
       settings_group_validation:
@@ -3060,8 +3062,13 @@ transformers:
   - name: dbt
     namespace: dbt
     docs: https://meltano.com/docs/transforms.html
-    repo: https://github.com/fishtown-analytics/dbt
-    pip_url: dbt==0.21.1
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-postgres~=1.0.0
+      dbt-redshift~=1.0.0
+      dbt-snowflake~=1.0.0
+      dbt-bigquery~=1.0.0
     settings:
       - name: project_dir
         value: $MELTANO_PROJECT_ROOT/transform

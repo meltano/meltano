@@ -1,0 +1,9 @@
+_site
+.sass-cache
+.jekyll-metadata
+public/
+.jekyll-cache
+.ruby-version
+.DS_Store
+SCRATCH
+node_modules/

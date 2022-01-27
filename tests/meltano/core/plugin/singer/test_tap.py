@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import subprocess
+import sys
 from contextlib import contextmanager
 
 import pytest
@@ -841,3 +842,41 @@ class TestSingerTap:
             await subject.run_discovery(invoker, catalog_path)
 
         assert not catalog_path.exists(), "Catalog should not be present."
+
+    @pytest.mark.asyncio
+    async def test_run_discovery_utf8_output(
+        self,
+        plugin_invoker_factory,
+        session,
+        subject,
+        elt_context_builder,
+        project_plugins_service,
+    ):
+
+        process_mock = mock.Mock()
+        process_mock.name = subject.name
+        # we need to exit successfully to not trigger error handling
+        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.returncode = 0
+        process_mock.stderr.at_eof.side_effect = (False, True)
+        test_string = "Hello world, Καλημέρα κόσμε, コンニチハ".encode()
+        process_mock.stderr.readline = CoroutineMock(return_value=test_string)
+        process_mock.stdout.at_eof.side_effect = (True, True)
+        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+
+        invoker = plugin_invoker_factory(subject)
+        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        catalog_path = invoker.files["catalog"]
+
+        assert sys.getdefaultencoding() == "utf-8"
+
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+        ), mock.patch("sys.getdefaultencoding", return_value="ascii"):
+            with pytest.raises(UnicodeDecodeError):
+                await subject.run_discovery(invoker, catalog_path)
+
+        with mock.patch(
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+        ):
+            await subject.run_discovery(invoker, catalog_path)
