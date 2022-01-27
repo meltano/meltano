@@ -3311,7 +3311,10 @@ utilities:
         args: lint
         description: Lint SQL in transform models
 mappers:
-  - name: piplinewise-transform-field
-    namespace: pipelinewise_transform_field
-    pip_url: pipelinewise-transform-field
-    executable: transform-field
+  - name: transform-field
+    namespace: transform_field
+    variants:
+    - name: transferwise
+      pip_url: pipelinewise-transform-field
+      repo: https://github.com/transferwise/pipelinewise-transform-field
+      executable: transform-field

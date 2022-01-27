@@ -198,9 +198,14 @@ def discovery():  # noqa: WPS213
         {
             "name": "mapper-mock",
             "namespace": "mapper_mock",
-            "pip_url": "mapper-mock",
-            "package_name": "mapper_mock",
-            "executable": "mapper-mock-cmd",
+            "variants": [
+                {
+                    "name": "meltano",
+                    "executable": "mapper-mock-cmd",
+                    "pip_url": "mapper-mock",
+                    "package_name": "mapper-mock",
+                }
+            ]
         }
     )
 
@@ -478,6 +483,7 @@ def mapper(project_add_service):
         return project_add_service.add(
             PluginType.MAPPERS,
             "mapper-mock",
+            variant="meltano",
             mappings=[
                 {
                     "name": "mock-mapping-0",
