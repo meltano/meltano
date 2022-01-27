@@ -3310,3 +3310,23 @@ utilities:
       lint:
         args: lint
         description: Lint SQL in transform models
+  - name: notebook
+    namespace: notebook
+    pip_url: git+https://github.com/Matatika/notebook@v0.2.1
+    commands:
+      run:
+        args: run $MELTANO_UTILIZE_PATH
+        description: Run one/many notebooks, saving their executed state.
+      convert:
+        args: convert $MELTANO_UTILIZE_PATH -f $MELTANO_UTILIZE_FORMAT
+        description: Convert one/many notebooks to a selected format.
+      run-convert:
+        args: run $MELTANO_UTILIZE_PATH -f $MELTANO_UTILIZE_FORMAT
+        description: Run and convert one/many notebooks to a selected format.
+      run-convert-config:
+        args: run $MELTANO_UTILIZE_PATH -f $MELTANO_UTILIZE_FORMAT -c $MELTANO_UTILIZE_CONFIG
+        description: Run and convert one/many notebooks to a selected format with a config.
+    settings:
+      - name: path
+      - name: format
+      - name: config
