@@ -485,10 +485,10 @@ def update_pipeline_schedule() -> Response:
     schedule = schedule_service.find_namespace_schedule(plugin_namespace)
 
     if "interval" in payload:
-        schedule.interval = payload["interval"]
+        schedule.interval = payload.get("interval")
 
     if "transform" in payload:
-        schedule.transform = payload["transform"]
+        schedule.transform = payload.get("transform")
 
     schedule_service.update_schedule(schedule)
 
