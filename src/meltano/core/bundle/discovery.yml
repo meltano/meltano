@@ -3062,7 +3062,7 @@ transformers:
   - name: dbt
     namespace: dbt
     docs: https://meltano.com/docs/transforms.html
-    repo: https://github.com/fishtown-analytics/dbt
+    repo: https://github.com/dbt-labs/dbt-core
     pip_url: >
       dbt-core~=1.0.0
       dbt-postgres~=1.0.0
