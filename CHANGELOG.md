@@ -12,13 +12,25 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.92.1 - (2022-01-28)
+---
+
+### Changes
+
 - [#3176](https://gitlab.com/meltano/meltano/-/issues/3176) Support dbt v1.0
+- [!2504](https://gitlab.com/meltano/meltano/-/merge_requests/2504) Reorganized pipeline edit buttons in the UI
+- [!2464](https://gitlab.com/meltano/meltano/-/merge_requests/2464) Bump version of 'flatten-dict' library dependency. _Thanks to **[Robin Grenholm](https://gitlab.com/rgrenholm)**_ !
 
 ### Fixes
 
 - [#3181](https://gitlab.com/meltano/meltano/-/issues/3181) Create an empty `output/` folder in new Meltano projects.
-
-### Breaks
+- [#3180](https://gitlab.com/meltano/meltano/-/issues/3180) Fix env usage in discovery.yml and JSON schema
+- [#3169](https://gitlab.com/meltano/meltano/-/issues/3169) Meltano Upgrade CTA in UI has unnecessary link
 
 
 ## 1.92.0 - (2022-01-21)
