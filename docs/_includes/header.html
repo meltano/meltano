@@ -1,0 +1,41 @@
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+      <a class="navbar-item" href="https://meltano.com">
+          <img src="/images/meltano-logo.png" alt="The Meltano logo with Meltano written in purple" width="112" height="28">
+      </a>
+      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+      </a>
+  </div>
+  <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="{{ site.url }}"> Home </a>
+
+        {% if site.collections %}
+          {% for collection in site.collections %}
+            {% if collection.label != "posts" %}
+              <a class="navbar-item" href="/{{ collection.label }}"> {{ collection.name }} </a>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        
+        <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link"> Get Help </a>
+            <div class="navbar-dropdown">
+                <a class="navbar-item" href="https://meltano.com/slack"> Slack Community </a>
+                <a class="navbar-item" href="https://meltano.com/slack"> Support </a>
+                <hr class="navbar-divider">
+                <a class="navbar-item" href="https://gitlab.com/meltano/meltano/issues/"> Report a Bug </a>
+            </div>
+        </div>
+
+      </div>
+      <div class="navbar-end">
+          <a href="/search" class="navbar-item"><i class="fas fa-search"></i></a>
+          <a href="https://gitlab.com/meltano/handbook" class="navbar-item"><i class="fab fa-gitlab"></i></a>
+          <a href="https://meltano.com/slack" class="navbar-item"><i class="fab fa-slack"></i></a>
+      </div>
+  </div>
+</nav>
