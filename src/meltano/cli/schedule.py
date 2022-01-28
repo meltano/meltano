@@ -25,7 +25,7 @@ def schedule(project, ctx):
     """
     Manage pipeline schedules.
 
-    Read more at https://meltano.com/docs/command-line-interface.html#schedule
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#schedule
     """
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
@@ -48,7 +48,7 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
     EXTRACTOR:\tWhich extractor should be used
     LOADER:\tWhich loader should be used
     INTERVAL:\tCron-like syntax to specify the schedule interval (@daily, @hourly, etc…)
-    """  # noqa: D301
+    """
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 

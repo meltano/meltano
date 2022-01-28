@@ -1,0 +1,23 @@
+---
+layout: default
+toc: false
+---
+<div id="search-searchbar">
+
+</div>
+
+<div class="post-list" id="search-hits">
+  {% if site.collections %}
+    {% for collection in site.collections %}
+      {% if collection.label != "posts" %}
+        <div class="post-item">
+          <h2>
+            <a class="post-link" href="/{{ collection.label }}">
+              {{ collection.label | capitalize }}
+            </a>
+          </h2>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
