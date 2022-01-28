@@ -33,7 +33,7 @@ export default {
         <th>
           Last Run
         </th>
-        <th class="has-text-right">
+        <th class="actions">
           Actions
         </th>
       </template>
@@ -41,4 +41,8 @@ export default {
   </thead>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.actions {
+  padding-left: 2.3em;
+}
+</style>

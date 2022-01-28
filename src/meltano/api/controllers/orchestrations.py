@@ -481,10 +481,15 @@ def update_pipeline_schedule() -> Response:
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    interval = payload["interval"]
     plugin_namespace = payload["plugin_namespace"]
     schedule = schedule_service.find_namespace_schedule(plugin_namespace)
-    schedule.interval = interval
+
+    if "interval" in payload:
+        schedule.interval = payload.get("interval")
+
+    if "transform" in payload:
+        schedule.transform = payload.get("transform")
+
     schedule_service.update_schedule(schedule)
 
     schedule = dict(schedule)
