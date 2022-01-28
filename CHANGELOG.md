@@ -12,13 +12,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.92.1 - (2022-01-28)
+---
+
+### Changes
+
 - [#3176](https://gitlab.com/meltano/meltano/-/issues/3176) Support dbt v1.0
 
 ### Fixes
 
 - [#3181](https://gitlab.com/meltano/meltano/-/issues/3181) Create an empty `output/` folder in new Meltano projects.
-
-### Breaks
 
 
 ## 1.92.0 - (2022-01-21)
