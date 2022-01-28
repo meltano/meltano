@@ -29,6 +29,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3181](https://gitlab.com/meltano/meltano/-/issues/3181) Create an empty `output/` folder in new Meltano projects.
+- [#3180](https://gitlab.com/meltano/meltano/-/issues/3180) Fix env usage in discovery.yml and JSON schema
+- [#3169](https://gitlab.com/meltano/meltano/-/issues/3169) Meltano Upgrade CTA in UI has unnecessary link
 
 
 ## 1.92.0 - (2022-01-21)
