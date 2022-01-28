@@ -222,7 +222,7 @@ Loaders (Singer targets) take in data and state messages from extractors and are
 
 Meltano stores this pipeline state in its [system database](/concepts/project#system-database), identified by the [`meltano elt`](/reference/command-line-interface#elt) run's Job ID defined with the `--job_id` argument. The Job ID should be a unique string identifier for the pipeline and must be present in each execution in order for incremental replication to work.
 
-When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same Job ID that generated a state. If found, this state is then passed along to the extractor.
+When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same Job ID that generated a state. If a successful pipeline run is found, its state is then passed along to the extractor. If one or more failed (incomplete) pipelines are found, their returned partial state is merged with the last successful pipeline run, to produce an up-to-date STATE artifact from the incomplete pipeline runs, before being passed along to the extractor. This works as Singer Targets are expected to emit [STATE messages](https://hub.meltano.com/singer/spec#state-files) [only after persisting data for a given stream](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md).
 
 Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
 
