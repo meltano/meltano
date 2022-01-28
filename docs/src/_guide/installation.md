@@ -147,7 +147,7 @@ Once you have Docker installed, running, and have pulled the pre-built image you
 ```bash
 cd /your/projects/directory
 
-docker run -v $(pwd):/projects \
+docker run -v "$(pwd)":/projects \
              -w /projects \
              meltano/meltano init yourprojectname
 ```
@@ -161,7 +161,7 @@ cd yourprojectname
 We can then start the Meltano UI. Since `ui` is the default command, we can omit it.
 
 ```bash
-docker run -v $(pwd):/project \
+docker run -v "$(pwd)":/project \
              -w /project \
              -p 5000:5000 \
              meltano/meltano
