@@ -23,6 +23,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#3176](https://gitlab.com/meltano/meltano/-/issues/3176) Support dbt v1.0
+- [!2504](https://gitlab.com/meltano/meltano/-/merge_requests/2504) Reorganized pipeline edit buttons in the UI
+- [!2464](https://gitlab.com/meltano/meltano/-/merge_requests/2464) Bump version of 'flatten-dict' library dependency. _Thanks to **[Robin Grenholm](https://gitlab.com/rgrenholm)**_ !
 
 ### Fixes
 
