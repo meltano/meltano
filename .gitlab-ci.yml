@@ -22,9 +22,6 @@ include:
   - local: .gitlab/ci/docker_prod.gitlab-ci.yml
   - local: .gitlab/ci/docker_license_finder.gitlab-ci.yml
 
-  # docs
-  - local: .gitlab/ci/docs.gitlab-ci.yml
-
   # test
   - local: .gitlab/ci/test.gitlab-ci.yml
   - local: .gitlab/ci/test_webapp.gitlab-ci.yml

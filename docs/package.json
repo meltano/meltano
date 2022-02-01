@@ -2,7 +2,7 @@
   "name": "meltano.com",
   "author": "Meltano Team & Contributors <meltano@gitlab.com>",
   "license": "MIT",
-  "version": "1.92.0",
+  "version": "1.93.0",
   "description": "https://meltano.com",
   "main": "index.js",
   "scripts": {
@@ -32,9 +32,7 @@
     "vuepress-plugin-container": "^2.1.4"
   },
   "dependencies": {
-    "vue-intercom": "^1.0.14",
-    "vuepress-intercom": "^1.0.3",
-    "vuepress-plugin-google-tag-manager": "^0.0.4",
-    "vuepress-plugin-sitemap": "^2.3.0"
+    "bulma": "^0.9.3",
+    "bulma-timeline": "^3.0.4"
   }
 }
