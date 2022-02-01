@@ -159,9 +159,8 @@ class ProjectPluginsService:
         """
         found: List[ProjectPlugin] = []
         for plugin in self.get_plugins_of_type(PluginType.MAPPERS):
-            for mapping in plugin.extra_config.get("_mappings", []):
-                if mapping.get("name", None) == mapping_name:
-                    found.append(self.ensure_parent(plugin))
+            if plugin.extra_config.get("_mapping_name") == mapping_name:
+                found.append(self.ensure_parent(plugin))
         if not found:
             raise PluginNotFoundError(mapping_name)
         return found

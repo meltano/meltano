@@ -616,7 +616,21 @@
                         "settings": {},
                         "docs": {},
                         "settings_group_validation": {},
-                        "commands": {}
+                        "commands": {},
+                        "variants": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "allOf": [
+                                    {
+                                        "$ref": "#/definitions/variants_base"
+                                    },
+                                    {
+                                        "$ref": "#/definitions/variant_base"
+                                    }
+                                ]
+                            }
+                        }
                     }
                 }
             ]

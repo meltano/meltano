@@ -205,7 +205,7 @@ def discovery():  # noqa: WPS213
                     "pip_url": "mapper-mock",
                     "package_name": "mapper-mock",
                 }
-            ]
+            ],
         }
     )
 
