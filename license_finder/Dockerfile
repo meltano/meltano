@@ -1,6 +1,9 @@
 FROM registry.gitlab.com/gitlab-org/security-products/analyzers/license-finder:3 as license_finder_python
 
-# Python install, from https://github.com/docker-library/python/blob/master/3.8/buster/slim/Dockerfile
+# Python is required to install Poetry in order to generate a `requirements.txt`
+# file from our `pyproject.toml`, for LicenseFinder to work.
+# The following is copied verbatum from the `buster-slim` python image.
+# https://github.com/docker-library/python/blob/master/3.8/buster/slim/Dockerfile
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
