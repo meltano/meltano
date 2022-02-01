@@ -77,7 +77,7 @@ class MeltanoFile(Canonical):
             A list of `ProjectPlugin` instances.
         """
         mapping_plugins: List[ProjectPlugin] = []
-        for mapping in mapper.get("mappings"):
+        for mapping in mapper.get("mappings", []):
             raw_mapping_plugin = copy.deepcopy(mapper)
             raw_mapping_plugin["mapping_name"] = mapping.get("name")
             raw_mapping_plugin["config"] = mapping.get("config")
