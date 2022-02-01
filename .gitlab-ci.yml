@@ -6,6 +6,7 @@ stages:
   - docs
   - build-base
   - build-meltano
+  - pre-test
   - test
   - publish
   - distribute
@@ -19,6 +20,7 @@ include:
 
   # build-meltano
   - local: .gitlab/ci/docker_prod.gitlab-ci.yml
+  - local: .gitlab/ci/docker_license_finder.gitlab-ci.yml
 
   # test
   - local: .gitlab/ci/test.gitlab-ci.yml
@@ -26,6 +28,7 @@ include:
   - local: .gitlab/ci/sample_code.gitlab-ci.yml
   - local: .gitlab/ci/demo_project.gitlab-ci.yml
   - local: .gitlab/ci/sast.gitlab-ci.yml
+  - local: .gitlab/ci/license_scanning.gitlab-ci.yml
 
   # publish
   - local: .gitlab/ci/publish.gitlab-ci.yml
