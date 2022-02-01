@@ -3312,7 +3312,7 @@ utilities:
         description: Lint SQL in transform models
   - name: notebook
     namespace: notebook
-    pip_url: git+https://github.com/Matatika/notebook@v0.2.1
+    pip_url: git+https://github.com/Matatika/notebook@v0.2.2
     commands:
       run:
         args: run $MELTANO_UTILIZE_PATH
