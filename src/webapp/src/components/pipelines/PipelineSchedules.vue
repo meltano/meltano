@@ -154,16 +154,7 @@ export default {
                       </select>
                     </span>
                   </div>
-                  <div v-if="pipeline.interval === '@other'" class="control">
-                    <button
-                      class="button is-small tooltip is-tooltip-right"
-                      data-tooltip="Set the CRON interval you'd like"
-                      @click="setCRONInterval()"
-                    >
-                      Set Interval
-                    </button>
-                  </div>
-                  <div v-if="pipeline.interval !== '@other'" class="control">
+                  <div class="control">
                     <button
                       class="button is-small tooltip is-tooltip-right"
                       :class="{ 'is-loading': pipeline.isRunning }"
@@ -241,6 +232,15 @@ export default {
                   is-tooltip-left
                   custom-class="is-small"
                 />
+                <div v-if="pipeline.interval === '@other'" class="control">
+                  <button
+                    class="button is-small tooltip is-tooltip-right is-info"
+                    data-tooltip="Set the CRON interval you'd like"
+                    @click="setCRONInterval()"
+                  >
+                    Set Interval
+                  </button>
+                </div>
                 <Dropdown
                   :button-classes="
                     `is-small is-danger is-outlined ${

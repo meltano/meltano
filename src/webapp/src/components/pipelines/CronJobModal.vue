@@ -23,7 +23,7 @@ export default {
 <template>
   <div class="modal is-active">
     <div class="modal-background"></div>
-    <div class="modal-card is-wide">
+    <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">Variable CRON job</p>
         <button aria-label="close" class="delete" @click="close"></button>
@@ -32,7 +32,7 @@ export default {
         <!-- <v-app>
           <v-content> -->
         <VueCronEditorBuefy v-model="cronExpression" />
-        {{ cronExpression }}
+        <!-- {{ cronExpression }} -->
         <!-- </v-content>
         </v-app> -->
       </section>
@@ -53,4 +53,17 @@ export default {
   </div>
 </template>
 
-<style></style>
+<style lang="scss">
+.enable-bulma .tabs li.is-active a {
+  color: #464acb;
+}
+.enable-bulma .centered-checkbox-group {
+  width: 62%;
+}
+
+.enable-bulma .card {
+  box-shadow: none;
+  display: flex;
+  justify-content: center;
+}
+</style>
