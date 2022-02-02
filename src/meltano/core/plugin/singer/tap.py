@@ -40,9 +40,10 @@ async def _stream_redirect(
     stream: asyncio.StreamReader, file_like_obj, write_str=False
 ):
     """Redirect stream to a file like obj."""
+    encoding = sys.getdefaultencoding()
     while not stream.at_eof():
         data = await stream.readline()
-        file_like_obj.write(data.decode("ascii") if write_str else data)
+        file_like_obj.write(data.decode(encoding) if write_str else data)
 
 
 def _debug_logging_handler(
@@ -279,7 +280,6 @@ class SingerTap(SingerPlugin):
         """
         catalog_path = plugin_invoker.files["catalog"]
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
-
         if catalog_path.exists():
             try:
                 cached_key = catalog_cache_key_path.read_text()

@@ -266,7 +266,11 @@ const actions = {
       isSaving: true
     })
     return orchestrationsApi.updatePipelineSchedule(payload).then(response => {
-      const updatedPipeline = Object.assign({}, payload.pipeline, response.data)
+      const editableItems = {
+        interval: response.data.interval,
+        transform: response.data.transform
+      }
+      const updatedPipeline = Object.assign({}, payload.pipeline, editableItems)
       commit('setPipelineStatus', {
         pipeline: updatedPipeline,
         ...updatedPipeline,

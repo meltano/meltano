@@ -5,7 +5,7 @@ import json
 import logging
 import os
 import uuid
-from typing import Dict
+from typing import Dict, List, Tuple
 
 import requests
 import yaml
@@ -216,3 +216,32 @@ class GoogleAnalyticsTracker:
     def track_meltano_ui(self, debug: bool = False) -> None:
         action = f"meltano ui"
         event = self.track_event(category="meltano ui", action=action, debug=debug)
+
+    def track_meltano_test(
+        self,
+        plugin_tests: Tuple[str],
+        debug: bool = False,
+        **flags: Dict[str, bool],
+    ) -> None:
+        """Track invocations of `meltano test`."""
+        action = "meltano test"
+
+        if flags["all_tests"]:
+            action = f"{action} --all"
+
+        for plugin_test in plugin_tests:
+            action = f"{action} {plugin_test}"
+
+        self.track_event(
+            category="meltano test",
+            action=action,
+            debug=debug,
+        )
+
+    def track_meltano_run(self, blocks: List[str], debug: bool = False) -> None:
+        """Track invocations of `meltano run`."""
+        self.track_event(
+            category="meltano run",
+            action=f"meltano run {' '.join(blocks)}",
+            debug=debug,
+        )

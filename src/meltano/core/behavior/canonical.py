@@ -3,7 +3,7 @@ from typing import Type, TypeVar
 
 import yaml
 
-T = TypeVar("T")  # noqa: WPS111
+T = TypeVar("T")
 
 
 class Canonical:

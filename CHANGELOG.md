@@ -17,6 +17,76 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 1.92.1 - (2022-01-28)
+---
+
+### Changes
+
+- [#3176](https://gitlab.com/meltano/meltano/-/issues/3176) Support dbt v1.0
+- [!2504](https://gitlab.com/meltano/meltano/-/merge_requests/2504) Reorganized pipeline edit buttons in the UI
+- [!2464](https://gitlab.com/meltano/meltano/-/merge_requests/2464) Bump version of 'flatten-dict' library dependency. _Thanks to **[Robin Grenholm](https://gitlab.com/rgrenholm)**_ !
+
+### Fixes
+
+- [#3181](https://gitlab.com/meltano/meltano/-/issues/3181) Create an empty `output/` folder in new Meltano projects.
+- [#3180](https://gitlab.com/meltano/meltano/-/issues/3180) Fix env usage in discovery.yml and JSON schema
+- [#3169](https://gitlab.com/meltano/meltano/-/issues/3169) Meltano Upgrade CTA in UI has unnecessary link
+
+
+## 1.92.0 - (2022-01-21)
+---
+
+### Changes
+
+- [#2991](https://gitlab.com/meltano/meltano/-/issues/2991) Remove support for python 3.6. Bumps the base docker image to 3.8.
+
+### Fixes
+
+- [#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
+- [#3115](https://gitlab.com/meltano/meltano/-/issues/3115) Ensure multi-yaml `include_paths` are correctly referenced even if Meltano is not called from the root directory.
+- [#3167](https://gitlab.com/meltano/meltano/-/issues/3167) Add sub-schema for meltano.yml environments.
+- [#3024](https://gitlab.com/meltano/meltano/-/issues/3024) Make `meltano upgrade` work when Meltano is installed with pipx.
+- [#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
+
+[#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
+
+## 1.91.0 - (2022-01-13)
+---
+
+### New
+
+- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Published JSON Schemas for `meltano.yml` and `discovery.yml`. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
+- [#3001](https://gitlab.com/meltano/meltano/-/issues/3001) Always print log advice on ELT failure.
+
+### Fixes
+
+- [#3132](https://gitlab.com/meltano/meltano/-/issues/3132) Bump `pyhumps` dependency to fix a bug in converting `SCREAMING_SNAKE_CASE` variables in the API.
+- [#3116](https://gitlab.com/meltano/meltano/-/issues/3116) Fix a unicode decode issue during discovery when debug logging is enabled.
+- [#2716](https://gitlab.com/meltano/meltano/-/issues/2716) Add `--help `docs for all Meltano CLI commands and options.
+
+## 1.90.1 - (2021-12-16)
+---
+
+### Fixes
+
+- [#3124](https://gitlab.com/meltano/meltano/-/issues/3124) Fix an error in `meltano run` invocations where tap discover calls triggered an exception.
+
+
+## 1.90.0 - (2021-12-15)
+---
+
+### New
+
+- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://meltano.com/docs/command-line-interface.html#run) command.
+- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://meltano.com/docs/command-line-interface.html#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
+
+### Changes
+
+- [#2967](https://gitlab.com/meltano/meltano/-/issues/2967) Set the `meltanolabs` variant as the default tap-google-analytics extractor.
+- [#3085](https://gitlab.com/meltano/meltano/-/issues/3085), [#3111](https://gitlab.com/meltano/meltano/-/issues/3111) Upgrade `target-bigquery` default variant `adswerve` to [`0.11.3`](https://github.com/adswerve/target-bigquery/releases/tag/0.11.3).
+- [#3113](https://gitlab.com/meltano/meltano/-/issues/3113) Pin tag [`v1.4.27`](https://gitlab.com/meltano/tap-salesforce/-/tags/v1.4.27) of `tap-salesforce` default variant `meltano`.
+- [#3119](https://gitlab.com/meltano/meltano/-/issues/3119) Bump `meltano` variant of `tap-salesforce` to tag [`v1.5.0`](https://gitlab.com/meltano/tap-salesforce/-/tags/v1.5.0).
+
 ## 1.89.0 - (2021-12-02)
 ---
 

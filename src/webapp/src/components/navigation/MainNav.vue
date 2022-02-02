@@ -287,14 +287,6 @@ export default {
                       >
                       to see what is updated by the version.
                     </p>
-                    <p class="is-italic">
-                      This information will be inlined here in the future via
-                      <a
-                        href="https://gitlab.com/meltano/meltano/issues/961"
-                        target="_blank"
-                        >#961</a
-                      >
-                    </p>
                   </div>
                   <div class="dropdown-item">
                     <div class="level">

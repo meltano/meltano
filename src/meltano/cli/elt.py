@@ -34,36 +34,36 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.command()
+@cli.command(short_help="Run an ELT pipeline to Extract, Load, and Transform data.")
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
     "--full-refresh",
-    help="Perform a full refresh (ignore state left behind by any previous runs)",
+    help="Perform a full refresh (ignore state left behind by any previous runs).",
     is_flag=True,
 )
 @click.option(
     "--select",
     "-s",
-    help="Select only these specific entities for extraction",
+    help="Select only these specific entities for extraction.",
     multiple=True,
     default=[],
 )
 @click.option(
     "--exclude",
     "-e",
-    help="Exclude these specific entities from extraction",
+    help="Exclude these specific entities from extraction.",
     multiple=True,
     default=[],
 )
-@click.option("--catalog", help="Extractor catalog file")
-@click.option("--state", help="Extractor state file")
+@click.option("--catalog", help="Extractor catalog file.")
+@click.option("--state", help="Extractor state file.")
 @click.option(
     "--dump",
     type=click.Choice(DUMPABLES.keys()),
-    help="Dump content of pipeline-specific generated file",
+    help="Dump content of pipeline-specific generated file.",
 )
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
@@ -71,7 +71,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @click.option(
     "--force",
     "-f",
-    help="Force a new run even when a pipeline with the same Job ID is already running",
+    help="Force a new run even when a pipeline with the same Job ID is already running.",
     is_flag=True,
 )
 @pass_project(migrate=True)
@@ -92,12 +92,15 @@ async def elt(
     force,
 ):
     """
-    meltano elt EXTRACTOR_NAME LOADER_NAME
+    Run an ELT pipeline to Extract, Load, and Transform data.
 
-    extractor_name: Which extractor should be used in this extraction
-    loader_name: Which loader should be used in this extraction
+    meltano elt '<extractor_name>' '<loader_name>'
+
+    extractor_name: extractor to be used in this pipeline.
+    loader_name: loader to be used in this pipeline.
+
+    \b\nRead more at https://meltano.com/docs/command-line-interface.html#elt
     """
-
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
@@ -109,7 +112,6 @@ async def elt(
     session = Session()
     try:
         plugins_service = ProjectPluginsService(project)
-
         context_builder = _elt_context_builder(
             project,
             job,
@@ -247,7 +249,11 @@ async def _run_elt(log, context_builder, output_logger):
             else:
                 log.info("Transformation skipped.")
         except RunnerError as err:
-            raise CliError(f"ELT could not be completed: {err}") from err
+            raise CliError(
+                f"ELT could not be completed: {err}\n"
+                + f"For more detailed log messages, check the generated log file '{output_logger.file}' "
+                + "or re-run the command using the '--log-level=debug' CLI flag."
+            ) from err
 
 
 async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa: WPS231

@@ -150,23 +150,21 @@ docs/serve: docs/build
 
 .PHONY: lint show_lint
 
-BLACK_RUN = poetry run black src/meltano tests/
+TOX_RUN = poetry run tox -e
 ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
-FLAKEHELL_RUN = poetry run flakehell lint src/ tests/
-ISORT_RUN = poetry run isort --recursive --settings-path pyproject.toml
+JSON_YML_VALIDATE = poetry run python src/meltano/core/utils/validate_json_schema.py
+
+args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
 lint_python:
-	${ISORT_RUN} --apply
-	${BLACK_RUN}
-	${FLAKEHELL_RUN}
+	${JSON_YML_VALIDATE}
+	${TOX_RUN} fix -- $(call args)
 
 lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN} --fix
 
 show_lint_python:
-	${ISORT_RUN} --check-only --diff
-	${BLACK_RUN} --check --diff
-	${FLAKEHELL_RUN}
+	${TOX_RUN} lint -- $(call args)
 
 show_lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN}
