@@ -62,7 +62,7 @@ def assert_transformer_env(transformer, env):
         == env["MELTANO_LOAD__TARGET_SCHEMA"]
         == env["TARGET_POSTGRES_SCHEMA"]
         == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
-        == env["MELTANO_EXTRACTOR_NAMESPACE"]  # noqa: WPS228
+        == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
     assert env["MELTANO_TRANSFORM_MODELS"] == env["DBT_MODELS"]
 
