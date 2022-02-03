@@ -103,6 +103,8 @@ per_file_ignores =
         WPS430
         # Allow protected attribute usage in test methods
         WPS437
+        # Allow too long compare > 3
+        WPS228
     !tests/*:
         T
     scripts/*:

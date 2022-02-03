@@ -1,6 +1,7 @@
 import os
 
 import pytest
+
 from meltano.core.plugin import PluginType, Variant
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
@@ -21,12 +22,12 @@ def assert_loader_env(loader, env):
 
     assert (
         env["MELTANO_LOAD_HOST"]
-        == env["PG_ADDRESS"]
-        == os.getenv("PG_ADDRESS", "localhost")
+        == env["TARGET_POSTGRES_HOST"]
+        == os.getenv("TARGET_POSTGRES_HOST", "localhost")
     )
     assert (
         env["MELTANO_LOAD_DEFAULT_TARGET_SCHEMA"]
-        == env["PG_SCHEMA"]
+        == env["TARGET_POSTGRES_SCHEMA"]
         == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
@@ -59,9 +60,9 @@ def assert_transformer_env(transformer, env):
         env["MELTANO_TRANSFORM_SOURCE_SCHEMA"]
         == env["DBT_SOURCE_SCHEMA"]
         == env["MELTANO_LOAD__TARGET_SCHEMA"]
-        == env["PG_SCHEMA"]
+        == env["TARGET_POSTGRES_SCHEMA"]
         == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
-        == env["MELTANO_EXTRACTOR_NAMESPACE"]
+        == env["MELTANO_EXTRACTOR_NAMESPACE"]  # noqa: WPS228
     )
     assert env["MELTANO_TRANSFORM_MODELS"] == env["DBT_MODELS"]
 

@@ -94,7 +94,7 @@ Additionally, the following variables describing the [loader](/concepts/plugins#
 - `MELTANO_LOADER_NAME`: the loader's `name`, e.g. `target-postgres`
 - `MELTANO_LOADER_NAMESPACE`: the loader's `namespace`, e.g. `postgres`
 - `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings and [extras](/guide/configuration#plugin-extras), e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting, and `MELTANO_LOAD__DIALECT` for the [`dialect` extra](/concepts/plugins#dialect-extra)
-- `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `PG_ADDRESS` for the `host` setting
+- `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`
 
 #### Transform variables
 

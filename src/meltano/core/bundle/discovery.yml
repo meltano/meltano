@@ -3009,7 +3009,7 @@ transforms:
     pip_url: 'https://gitlab.com/meltano/dbt-tap-gitlab.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
-      ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE', False) }}"
+      ultimate_license: "false"
   - name: tap-google-analytics
     namespace: tap_google_analytics
     variant: meltano

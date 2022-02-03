@@ -907,7 +907,7 @@ meltano invoke airflow webserver
 # Add `-D` to run the scheduler in the background:
 meltano invoke airflow webserver -D
 ```
-  
+
 1. Create `melty` the Admin user for logging in.
 
 ```bash
@@ -936,7 +936,7 @@ meltano add transformer dbt
 ```
 
 1. Once dbt has been installed in your Meltano project you will see the `/transform` directory populated with dbt artifacts.
-    
+
 These artifacts are installed via the [dbt file bundle](https://gitlab.com/meltano/files-dbt/).
 For more about file bundles, refer to the [Plugin File bundles](/concepts/plugins#file-bundles).
 
@@ -966,7 +966,7 @@ sources:
 ```
 
 The organization of your dbt project is up to you but if you'd like to run a specific set of models as part of a Meltano ELT pipeline it can be done via `meltano elt tap target --transform=run` which requires the model directory to match the extractor's name using snake_case (i.e. tap_gitlab) so it can automatically find your models. Running as part of a pipeline allows Meltano to simplify dbt configuration by inferring some of your settings based on the pipeline tap and target.
-    
+
 See more in the [Data Transformation (T) guide - transform in your ELT pipeline](/guide/transformation#transform-in-your-elt-pipeline).
 
 1. Then add a model file with your SQL transformation logic.
@@ -1007,7 +1007,7 @@ meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgr
 Or alternatively you can run dbt directly using the `meltano invoke`, which requires more settings to be defined prior to running:
 
 - First add the following configs to your dbt settings:
-  
+
 ```bash
 meltano config dbt set target postgres
 meltano config dbt set source_schema public
@@ -1021,16 +1021,16 @@ environments:
   config:
     ...
   env:
-    PG_ADDRESS: localhost
-    PG_PORT: '5432'
-    PG_USERNAME: meltano
-    PG_DATABASE: warehouse
+    TARGET_POSTGRES_HOST: localhost
+    TARGET_POSTGRES_PORT: '5432'
+    TARGET_POSTGRES_USER: meltano
+    TARGET_POSTGRES_DBNAME: warehouse
 ```
 
 - And finally add the postgres password to your `.env` file so that it doesnt get checked into git:
 
 ```
-PG_PASSWORD="meltano"
+TARGET_POSTGRES_PASSWORD="meltano"
 ```
 
 - After these configurations are set you can run the dbt models using `invoke`:
