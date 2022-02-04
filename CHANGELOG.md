@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+ - [#1587](https://gitlab.com/meltano/meltano/-/issues/1587) Add "Retry" button to pipeline logs view and list when run failed
+
 ### Changes
 
 ### Fixes
