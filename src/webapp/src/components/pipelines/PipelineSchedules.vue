@@ -2,6 +2,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import Vue from 'vue'
 
+import Pipeline from '@/components/pipelines/Pipeline'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
 import ExploreButton from '@/components/analyze/ExploreButton'
@@ -16,7 +17,8 @@ export default {
     ConnectorLogo,
     Dropdown,
     ExploreButton,
-    ScheduleTableHead
+    ScheduleTableHead,
+    Pipeline
   },
   filters: {
     capitalize
@@ -109,6 +111,9 @@ export default {
       <ScheduleTableHead has-actions has-start-date />
       <tbody>
         <template v-for="pipeline in pipelines">
+          <pipeline :key="pipeline.name" :pipeline="pipeline" />
+        </template>
+        <!-- <template v-for="pipeline in pipelines">
           <tr :key="pipeline.name">
             <td>
               {{ pipeline.name }}
@@ -212,7 +217,7 @@ export default {
                   v-if="pipeline.isRunning || pipeline.endedAt"
                   class="button is-small is-outlined is-fullwidth h-space-between"
                   :class="{
-                    'tooltip is-tooltip-left': pipeline.hasEverSucceeded
+                    'tooltip is-tooltip-top': pipeline.hasEverSucceeded
                   }"
                   :data-tooltip="
                     `${
@@ -246,19 +251,24 @@ export default {
               </p>
             </td>
             <td>
-              <div class="buttons">
-                <button
-                  class="button is-small tooltip is-tooltip-top is-info"
-                  :class="{ 'is-loading': pipeline.isRunning }"
-                  :disabled="getIsDisabled(pipeline)"
-                  data-tooltip="Manually run this pipeline once"
-                  @click="runELT(pipeline)"
-                >
-                  <span>Run Now</span>
-                  <span class="icon is-small">
-                    <font-awesome-icon icon="rocket"></font-awesome-icon>
-                  </span>
-                </button>
+              <div
+                class="buttons"
+                :class="{ 'bing-bong': pipeline.interval === 'Other' }"
+              >
+                <div class="control">
+                  <button
+                    class="button is-small tooltip is-tooltip-top is-info"
+                    :class="{ 'is-loading': pipeline.isRunning }"
+                    :disabled="getIsDisabled(pipeline)"
+                    data-tooltip="Manually run this pipeline once"
+                    @click="runELT(pipeline)"
+                  >
+                    <span>Run Now</span>
+                    <span class="icon is-small">
+                      <font-awesome-icon icon="rocket"></font-awesome-icon>
+                    </span>
+                  </button>
+                </div>
                 <ExploreButton
                   :pipeline="pipeline"
                   is-tooltip-left
@@ -266,7 +276,7 @@ export default {
                 />
                 <div v-if="pipeline.interval === '@other'" class="control">
                   <button
-                    class="button is-small tooltip is-tooltip-right is-info"
+                    class="button is-small tooltip is-tooltip-top is-info"
                     data-tooltip="Set the CRON interval you'd like"
                     @click="setCRONInterval()"
                   >
@@ -284,6 +294,7 @@ export default {
                   icon-open="trash-alt"
                   icon-close="caret-up"
                   is-right-aligned
+                  text-is="Delete Pipeline"
                 >
                   <div class="dropdown-content is-unselectable">
                     <div class="dropdown-item">
@@ -313,7 +324,7 @@ export default {
               </div>
             </td>
           </tr>
-        </template>
+        </template> -->
       </tbody>
     </table>
     <div v-if="isModal">
@@ -323,6 +334,9 @@ export default {
 </template>
 <style lang="scss" scoped>
 .buttons {
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  .control {
+    margin-right: 10px;
+  }
 }
 </style>

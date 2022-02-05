@@ -14,6 +14,7 @@ export default {
     },
     saveInterval(expression) {
       console.log(expression)
+      console.log(`i am at this pipeline: ${this.pipeline.name}`)
       this.close()
     }
   }
@@ -29,12 +30,7 @@ export default {
         <button aria-label="close" class="delete" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
-        <!-- <v-app>
-          <v-content> -->
         <VueCronEditorBuefy v-model="cronExpression" />
-        <!-- {{ cronExpression }} -->
-        <!-- </v-content>
-        </v-app> -->
       </section>
       <footer class="modal-card-foot field is-grouped is-grouped-right">
         <button class="button" @click="close">Cancel</button>

@@ -5,11 +5,15 @@ import _ from 'lodash'
 
 import { PIPELINE_INTERVAL_OPTIONS, TRANSFORM_OPTIONS } from '@/utils/constants'
 import capitalize from '@/filters/capitalize'
+import VueCronEditorBuefy from 'vue-cron-editor-buefy'
 
 export default {
   name: 'CreatePipelineScheduleModal',
   filters: {
     capitalize
+  },
+  components: {
+    VueCronEditorBuefy
   },
   data() {
     return {
@@ -21,8 +25,10 @@ export default {
         loader: '',
         transform: 'skip',
         interval: '',
-        isRunning: false
-      }
+        isRunning: false,
+        CRONInterval: '*/1 * * * *'
+      },
+      cronExpression: '*/1 * * * *'
     }
   },
   computed: {
@@ -33,6 +39,9 @@ export default {
     },
     intervalOptions() {
       return PIPELINE_INTERVAL_OPTIONS
+    },
+    otherInterval() {
+      return (this.pipeline.CRONInterval = this.cronExpression)
     },
     isSaveable() {
       const hasOwns = []
@@ -60,6 +69,15 @@ export default {
       )
     }
   },
+  // watch: {
+  //   otherInterval() {
+  //     console.log(
+  //       `this changed to ${this.cronExpression} and the regular is ${this.pipeline.CRONInterval} but it may be ${this.CRONInterval}`
+  //     )
+  //     // Vue.set(this.CRONInterval, this.otherInterval)
+  //     // this.pipeline.CRONInterval = this.cronExpression
+  //   }
+  // },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
       this.isLoaded = true
@@ -218,6 +236,14 @@ export default {
                 type="text"
               />
             </div>
+          </div>
+          <div
+            v-if="pipeline.interval === '@other'"
+            class="column is-fullwidth"
+          >
+            <small class="has-text-interactive-navigation">Step 4a</small>
+            <h4>CRON Interval</h4>
+            <VueCronEditorBuefy v-model="cronExpression" />
           </div>
           <div class="column is-full">
             <p v-if="showTransformWarning" class="has-text-grey">
