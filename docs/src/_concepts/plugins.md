@@ -794,7 +794,8 @@ and any additional packages can be added too by configuring a custom `pip_url` f
 the `great_expectations` utility:
 
 ```bash
-meltano config great_expectations set pip_url "great_expectations[redshift]"
+# set the _pip_url extra setting
+meltano config great_expectations set _pip_url "great_expectations[redshift]"
 # re-install the great_expectations plugin for changes to take effect
 meltano install utility great_expectations
 ```
