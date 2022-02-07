@@ -3302,7 +3302,7 @@ utilities:
       lint:
         args: lint
         description: Lint SQL in transform models
-  - name: great-expectations
+  - name: great_expectations
     namespace: great_expectations
     pip_url: great_expectations
     executable: great_expectations
