@@ -101,7 +101,7 @@ const router = new Router({
           }
         },
         {
-          path: 'cronJobSettings',
+          path: 'cron-job-settings',
           name: 'cronJobSettings',
           components: {
             default: Pipelines,

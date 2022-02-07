@@ -68,21 +68,25 @@ export default {
           'extractors',
           pipeline.extractor
         ).namespace
-        this.updatePipelineSchedule({
-          [item]: newPipelineValue,
-          pipeline,
-          pluginNamespace
-        })
-          .then(() =>
-            Vue.toasted.global.success(
-              `Pipeline successfully updated - ${pipeline.name}`
+        if (newPipelineValue === '@other') {
+          this.setCRONInterval(pipeline.jobId)
+        } else {
+          this.updatePipelineSchedule({
+            [item]: newPipelineValue,
+            pipeline,
+            pluginNamespace
+          })
+            .then(() =>
+              Vue.toasted.global.success(
+                `Pipeline successfully updated - ${pipeline.name}`
+              )
             )
-          )
-          .catch(this.$error.handle)
+            .catch(this.$error.handle)
+        }
       }
     },
-    setCRONInterval() {
-      this.$router.push({ name: 'cronJobSettings' })
+    setCRONInterval(jobId) {
+      this.$router.push({ name: 'cronJobSettings', params: { jobId } })
     },
     removePipeline(pipeline) {
       this.deletePipelineSchedule(pipeline)
@@ -165,10 +169,6 @@ export default {
               <select
                 :disabled="getIsDisabled(pipeline)"
                 :value="pipeline.interval"
-                :class="{
-                  'tooltip is-tooltip-top': pipeline.interval === '@other'
-                }"
-                data-tooltip="hi maude"
                 @input="onChangeItem($event, pipeline, 'interval')"
               >
                 <option
@@ -259,7 +259,7 @@ export default {
           <button
             class="button is-small tooltip is-tooltip-top is-warning"
             data-tooltip="Set the CRON interval you'd like"
-            @click="setCRONInterval()"
+            @click="setCRONInterval(pipeline.jobId)"
           >
             <span>Set Interval</span>
             <span class="icon is-small">

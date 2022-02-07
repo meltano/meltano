@@ -1,4 +1,7 @@
 <script>
+import { mapActions, mapState } from 'vuex'
+import Vue from 'vue'
+// Used https://github.com/karoletrych/vue-cron-editor for the CRON editor
 import VueCronEditorBuefy from 'vue-cron-editor-buefy'
 export default {
   name: 'CronJobModal',
@@ -6,16 +9,44 @@ export default {
     VueCronEditorBuefy
   },
   data: () => ({
-    cronExpression: '*/1 * * * *'
+    cronExpression: '*/1 * * * *',
+    isLoaded: false,
+    isSaving: false
   }),
+  computed: {
+    ...mapState('orchestration', ['pipelines']),
+    relatedPipeline() {
+      return this.pipelines.find(pipeline => pipeline.name === this.jobId)
+    }
+  },
+  created() {
+    this.jobId = this.$route.params.jobId
+  },
   methods: {
+    ...mapActions('orchestration', ['updatePipelineSchedule']),
     close() {
       this.$router.push({ name: 'pipelines' })
     },
     saveInterval(expression) {
-      console.log(expression)
-      console.log(`i am at this pipeline: ${this.pipeline.name}`)
-      this.close()
+      const pipeline = this.relatedPipeline
+      this.isSaving = true
+      this.updatePipelineSchedule({
+        interval: '@other',
+        CRONInterval: expression,
+        pipeline
+      })
+        .then(() => {
+          Vue.toasted.global.success(
+            `Pipeline successfully updated - ${this.pipeline.name}`
+          )
+          this.close()
+        })
+        .catch(error => {
+          Vue.toasted.global.error(error.response.data.code)
+        })
+        .finally(() => {
+          this.isSaving = false
+        })
     }
   }
 }

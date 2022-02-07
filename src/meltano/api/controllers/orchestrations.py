@@ -490,6 +490,9 @@ def update_pipeline_schedule() -> Response:
     if "transform" in payload:
         schedule.transform = payload.get("transform")
 
+    if "CRONInterval" in payload:
+        schedule.cron_interval = payload.get("CRONInterval")
+
     schedule_service.update_schedule(schedule)
 
     schedule = dict(schedule)
