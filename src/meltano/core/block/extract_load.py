@@ -34,6 +34,7 @@ class ELBContext:
         plugins_service: ProjectPluginsService = None,
         session: Session = None,
         job: Optional[Job] = None,
+        state: Optional[str] = None,
         base_output_logger: Optional[OutputLogger] = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -43,6 +44,7 @@ class ELBContext:
             plugins_service: The plugins service to use.
             session: The session to use.
             job: The job within this context should run.
+            state: Optional state to use.
             base_output_logger: The base logger to use.
         """
         self.project = project
@@ -50,6 +52,7 @@ class ELBContext:
 
         self.session = session
         self.job = job
+        self.state = state
 
         self.base_output_logger = base_output_logger
 
@@ -191,6 +194,11 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             self.context.project,
             config_service=self.context.plugins_service.config_service,
         )
+
+        job = Job(
+            job_id=f'{self.head.string_id}-{self.tail.string_id}',
+        )
+        self.context.job = job
 
         log_file = "run.log"
         if self.context.job:
