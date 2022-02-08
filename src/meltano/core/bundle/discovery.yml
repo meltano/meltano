@@ -3294,6 +3294,10 @@ files:
     namespace: gitlab_ci
     repo: https://gitlab.com/meltano/files-gitlab-ci
     pip_url: git+https://gitlab.com/meltano/files-gitlab-ci.git
+  - name: great-expectations
+    namespace: great_expectations
+    repo: https://gitlab.com/meltano/files-great-expectations
+    pip_url: git+https://gitlab.com/meltano/files-great-expectations
 utilities:
   - name: sqlfluff
     namespace: sqlfluff
