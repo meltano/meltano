@@ -199,7 +199,8 @@ class PluginInstallService:
                 status=PluginInstallStatus.RUNNING,
             )
         )
-        if not plugin.is_installable():
+
+        if not plugin.is_installable() or self._is_mapping(plugin):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -259,6 +260,13 @@ class PluginInstallService:
             compiler.compile()
         except Exception:
             pass
+
+    @staticmethod
+    def _is_mapping(plugin: ProjectPlugin) -> bool:
+        """Check if a plugin is a mapping as mappings are not installed."""
+        return plugin.type == PluginType.MAPPERS and not plugin.extra_config.get(
+            "_mapper"
+        )
 
 
 class PipPluginInstaller:
