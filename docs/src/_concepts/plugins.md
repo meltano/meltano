@@ -776,9 +776,9 @@ meltano invoke sqlfluff --help
 
 ##### Great Expectations
 
-[Great Expectations]() helps data teams eliminate pipeline debt, through data testing, documentation, and profiling. From the documentation:
+[Great Expectations](https://docs.greatexpectations.io/docs/) helps data teams eliminate pipeline debt, through data testing, documentation, and profiling. From the documentation:
 
-> Great Expectations is the leading tool for validating, documenting, and profiling your data to maintain quality and improve communication between teams. Head over to our getting started tutorial.
+> Great Expectations is the leading tool for validating, documenting, and profiling your data to maintain quality and improve communication between teams. Head over to our [getting started](https://docs.greatexpectations.io/docs/tutorials/getting_started/intro) tutorial.
 
 Install with Meltano:
 
@@ -789,13 +789,13 @@ meltano invoke great_expectations --help
 ```
 
 If you are using Great Expectations to validate data in a database or warehouse, you
-might need to install the appropriate drivers. Common options are supported as pip extras,
-and any additional packages can be added too by configuring a custom `pip_url` for
-the `great_expectations` utility:
+might need to install the appropriate drivers. Common options are supported by Great Expectations
+as pip extras, and any additional packages you may want can be added too by configuring
+a custom `pip_url` for the `great_expectations` utility:
 
 ```bash
 # set the _pip_url extra setting
-meltano config great_expectations set _pip_url "great_expectations[redshift]"
+meltano config great_expectations set _pip_url "great_expectations[redshift]; awscli"
 # re-install the great_expectations plugin for changes to take effect
 meltano install utility great_expectations
 ```
