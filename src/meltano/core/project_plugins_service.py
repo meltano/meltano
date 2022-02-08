@@ -153,14 +153,14 @@ class ProjectPluginsService:
         Args:
             mapping_name: The name of the mapping to find.
         Returns:
-            The mapper plugins with the specified mapping name.
+            The mapping plugins with the specified mapping name.
         Raises
             PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
         """
         found: List[ProjectPlugin] = []
-        for plugin in self.get_plugins_of_type(PluginType.MAPPERS):
+        for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPINGS, ensure_parent=True):
             if plugin.extra_config.get("_mapping_name") == mapping_name:
-                found.append(self.ensure_parent(plugin))
+                found.append(plugin)
         if not found:
             raise PluginNotFoundError(mapping_name)
         return found

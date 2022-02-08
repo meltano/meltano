@@ -26,7 +26,7 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
     return plugin.type not in {
         PluginType.EXTRACTORS,
         PluginType.LOADERS,
-        PluginType.MAPPERS,
+        PluginType.MAPPINGS,
     }
 
 
@@ -108,7 +108,7 @@ class BlockParser:  # noqa: D101
             if plugin is None:
                 raise click.ClickException(f"Block {name} not found")
 
-            if plugin.type == PluginType.MAPPERS:
+            if plugin.type == PluginType.MAPPINGS:
                 self._mappings_ref[idx] = parsed_name
 
             self._plugins.append(plugin)
@@ -228,7 +228,7 @@ class BlockParser:  # noqa: D101
 
             self.log.debug("found block", block_type=plugin.type, index=next_block)
 
-            if plugin.type == PluginType.MAPPERS:
+            if plugin.type == PluginType.MAPPINGS:
                 self.log.info(
                     "found mapper",
                     plugin_type=plugin.type,
@@ -256,7 +256,7 @@ class BlockParser:  # noqa: D101
                     plugin_name=plugin.name,
                 )
                 raise BlockSetValidationError(
-                    f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}."
+                    f"Expected {PluginType.MAPPINGS} or {PluginType.LOADERS}."
                 )
         raise Exception("Found no end in block set!")
 
