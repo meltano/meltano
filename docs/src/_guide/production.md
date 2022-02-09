@@ -24,7 +24,7 @@ Additionally, you may want to [run Meltano UI and configure it for production](#
 If you're [containerizing your Meltano project](/guide/containerization),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
 We also provide a [Helm Chart](https://gitlab.com/meltano/infra/helm-meltano/-/tree/master/meltano) for deploying a containerized instance of the Meltano UI to [Kubernetes](https://kubernetes.io).
-More on that [below](#kubernetes)
+More on that [in the Kubernetes section](#kubernetes).
 
 ## SaaS Hosting Options
 
