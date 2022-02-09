@@ -3134,6 +3134,18 @@ transformers:
       - name: profiles_dir
         env: DBT_PROFILES_DIR
         value: $MELTANO_PROJECT_ROOT/transform/profile
+      - name: target
+        description: Should be 'dev', 'beta', or 'prod'. Users may also add custom target entries as needed within their `profiles.yml` file.
+        # Target DB and Schema names may have their defaults defined in `profiles.yml`.
+        # These are not necessarily the same as DBT's source schema and source DB for raw data.
+      - name: target_database
+        kind: string
+        env: DBT_TARGET_DATABASE
+      - name: target_schema
+        kind: string
+        env: DBT_TARGET_SCHEMA
+        # Redshift connection settings are set via `config:` blocks and mapped to `profiles.yml`
+        # TODO: ...
   - name: dbt-snowflake
     # TODO: Confirm `dbt` vs dbt_snowflake` as namespace.
     namespace: dbt_snowflake
@@ -3152,11 +3164,16 @@ transformers:
         env: DBT_PROFILES_DIR
         value: $MELTANO_PROJECT_ROOT/transform/profile
       - name: target
-        description: Should be 'prod' or 'devtest', or another entry specified in `profiles.yml`
-        # These Snowflake settings are set via `config:` blocks and mapped to `profiles.yml`
-      - name: snowflake_role
+        description: Should be 'dev', 'beta', or 'prod'. Users may also add custom target entries as needed within their `profiles.yml` file.
+        # Target DB and Schema names may have their defaults defined in `profiles.yml`.
+        # These are not necessarily the same as DBT's source schema and source DB for raw data.
+      - name: target_database
         kind: string
-        env: DBT_SNOWFLAKE_ROLE
+        env: DBT_TARGET_DATABASE
+      - name: target_schema
+        kind: string
+        env: DBT_TARGET_SCHEMA
+        # Snowflake connection settings are set via `config:` blocks and mapped to `profiles.yml`
       - name: snowflake_account
         kind: string
         env: DBT_SNOWFLAKE_ACCOUNT
@@ -3166,9 +3183,12 @@ transformers:
       - name: snowflake_password
         kind: password
         env: DBT_SNOWFLAKE_PASSWORD
-      - name: snowflake_region
+      - name: snowflake_role
         kind: string
-        env: DBT_SNOWFLAKE_REGION
+        env: DBT_SNOWFLAKE_ROLE
+      - name: snowflake_warehouse
+        kind: string
+        env: DBT_SNOWFLAKE_WAREHOUSE
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
