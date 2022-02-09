@@ -87,6 +87,13 @@ class TestPluginInvoker:
         assert exec_args[0].endswith("utility-mock")
         assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
+    def test_container_exec_args(self, plugin_invoker):
+        exec_args = plugin_invoker.exec_args(command="containerized")
+
+        assert exec_args[0:3] == ["docker", "run", "--rm"]
+        assert exec_args[3:5] == ["-p", "5000:5000"]
+        assert exec_args[-1] == "mock-utils/mock"
+
     @pytest.mark.asyncio
     async def test_undefined_env_var(self, plugin_invoker):
         with pytest.raises(UndefinedEnvVarError) as err:

@@ -190,6 +190,13 @@ def discovery():
                     "args": "--option $ENV_VAR_ARG",
                     "executable": "other-utility",
                 },
+                "containerized": {
+                    "args": "",
+                    "container_spec": {
+                        "image": "mock-utils/mock",
+                        "ports": ["5000:5000"],
+                    },
+                },
             },
         }
     )

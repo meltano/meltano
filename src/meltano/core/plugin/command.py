@@ -3,6 +3,7 @@ import shlex
 from typing import Dict, Optional, Type, TypeVar
 
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.container.container_spec import ContainerSpec
 from meltano.core.error import Error
 from meltano.core.utils import expand_env_vars
 
@@ -28,9 +29,18 @@ class Command(Canonical):
         args: str,
         description: Optional[str] = None,
         executable: Optional[str] = None,
+        container_spec: Optional[dict] = None,
     ):
         """Initialize a Command."""
-        super().__init__(args=args, description=description, executable=executable)
+        super().__init__(
+            args=args,
+            description=description,
+            executable=executable,
+        )
+        if container_spec is not None:
+            self.container_spec = ContainerSpec(**container_spec)
+        else:
+            self.container_spec = None
 
     def expanded_args(self, name, env):
         """

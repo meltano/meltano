@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 from async_generator import asynccontextmanager
+from meltano.core.container.container_service import ContainerService
 from meltano.core.logging.utils import SubprocessOutputWriter
 
 from .error import Error
@@ -208,6 +209,9 @@ class PluginInvoker:
             plugin_args = command_config.expanded_args(command, env)
             if command_config.executable:
                 executable = self.exec_path(command_config.executable)
+            elif command_config.container_spec:
+                container_service = ContainerService(command_config.container_spec)
+                return container_service.build_command()
         else:
             plugin_args = self.plugin.exec_args(self)
 
