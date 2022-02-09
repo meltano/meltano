@@ -23,11 +23,13 @@ Additionally, you may want to [run Meltano UI and configure it for production](#
 
 If you're [containerizing your Meltano project](/guide/containerization),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
+We also provide a [Helm Chart](https://gitlab.com/meltano/infra/helm-meltano/-/tree/master/meltano) for deploying a containerized instance of the Meltano UI to [Kubernetes](https://kubernetes.io).
+More on that [in the Kubernetes section](#kubernetes).
 
 ## SaaS Hosting Options
 
 Meltano currently does not offer project hosting as a paid offering.
-We recommend users look at [Singerly](https://www.singerly.co/), [Astronomer.io](https://www.astronomer.io/), or [Google Cloud Composer](https://cloud.google.com/composer/) as options for hosting and running your Meltano project. 
+We recommend users look at [Singerly](https://www.singerly.co/), [Astronomer.io](https://www.astronomer.io/), or [Google Cloud Composer](https://cloud.google.com/composer/) as options for hosting and running your Meltano project.
 
 ## Your Meltano project
 
@@ -270,3 +272,17 @@ the [`project_readonly` setting](/reference/settings#project-readonly) will be
 [enabled by default](https://gitlab.com/meltano/files-docker/-/blob/master/bundle/Dockerfile#L17)
 using the `MELTANO_PROJECT_READONLY` environment variable,
 since any changes to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) would not be persisted outside the container.
+
+### Kubernetes
+
+Hosting a containerized instance of the Meltano UI on [Kubernetes](https://kubernetes.io) is made easy using the provided [Meltano Helm Chart](https://gitlab.com/meltano/infra/helm-meltano/-/tree/master/meltano).
+Try it out via the [Helm](https://helm.sh) CLI:
+
+```bash
+# add the meltano-ui helm repository
+helm repo add meltano https://meltano.gitlab.io/infra/helm-meltano/meltano-ui
+# view available Chart versions
+helm search repo meltano-ui
+# deploy 🚀
+helm install meltano-ui/meltano-ui --generate-name
+```
