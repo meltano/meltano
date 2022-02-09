@@ -3092,6 +3092,83 @@ transformers:
       test:
         args: test
         description: Runs tests on data in deployed models.
+  - name: dbt-bigquery
+    namespace: dbt_bigquery
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-bigquery~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profile
+  - name: dbt-postgres
+    namespace: dbt_postgres
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-postgres~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profile
+  - name: dbt-redshift
+    namespace: dbt_redshift
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-redshift~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profile
+  - name: dbt-snowflake
+    # TODO: Confirm `dbt` vs dbt_snowflake` as namespace.
+    namespace: dbt_snowflake
+    # TODO: Confirm inherit_from works within `discovery.yml`.
+    # If not, `commands` will need to be defined again for each version of the transformer.
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-snowflake~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profile
+      - name: target
+        description: Should be 'prod' or 'devtest', or another entry specified in `profiles.yml`
+        # These Snowflake settings are set via `config:` blocks and mapped to `profiles.yml`
+      - name: snowflake_role
+        kind: string
+        env: DBT_SNOWFLAKE_ROLE
+      - name: snowflake_account
+        kind: string
+        env: DBT_SNOWFLAKE_ACCOUNT
+      - name: snowflake_user
+        kind: string
+        env: DBT_SNOWFLAKE_USER
+      - name: snowflake_password
+        kind: password
+        env: DBT_SNOWFLAKE_PASSWORD
+      - name: snowflake_region
+        kind: string
+        env: DBT_SNOWFLAKE_REGION
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
@@ -3278,10 +3355,37 @@ files:
       orchestrate/dags/meltano.py: true
   - name: dbt
     namespace: dbt
+    description: |
+      This generic dbt files bundle pairs with the generic `dbt` transformer plugin (now 
+      deprecated). Please use an adapter-specific dbt plugin and files bundle.
     repo: https://gitlab.com/meltano/files-dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git@config-version-2
     update:
       transform/profile/profiles.yml: true
+  - name: dbt-bigquery
+    namespace: dbt_bigquery
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git@bigquery-1.x
+    update:
+      transform/profile/profiles.yml: false
+  - name: dbt-postgres
+    namespace: dbt_postgres
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git@postgres-1.x
+    update:
+      transform/profile/profiles.yml: false
+  - name: dbt-redshift
+    namespace: dbt_redshift
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git@redshift-1.x
+    update:
+      transform/profile/profiles.yml: false
+  - name: dbt-snowflake
+    namespace: dbt_snowflake
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git@snowflake-1.x
+    update:
+      transform/profile/profiles.yml: false
   - name: docker
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
