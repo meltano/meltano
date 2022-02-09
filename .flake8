@@ -149,3 +149,8 @@ per_file_ignores =
     **/__init__.py:
         # Allow for using __init__.py to promote imports to the module namespace
         F401
+    src/meltano/__init__.py
+        # Found `__init__.py` module with logic
+        WPS412
+        # Missing docstring in public package
+        D104
