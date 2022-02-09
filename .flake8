@@ -152,5 +152,5 @@ per_file_ignores =
     src/meltano/__init__.py:
         # Found `__init__.py` module with logic
         WPS412
-        # Missing docstring in public package
-        D104
+        # Found wrong metadata variable
+        WPS410
