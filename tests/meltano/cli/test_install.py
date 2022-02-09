@@ -177,15 +177,24 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             assert install_plugin_mock.call_count == 1
-            assert install_plugin_mock.mock_calls[0].args[0] == project
-            seen_plugins = install_plugin_mock.mock_calls[0].args[1]
-            assert dbt in seen_plugins
-            assert tap_gitlab in seen_plugins
-            assert target in seen_plugins
-            assert tap in seen_plugins
-            assert mapper in seen_plugins
-            assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] == 10
-            assert not install_plugin_mock.mock_calls[0].kwargs["clean"]
+
+            commands = [
+                args
+                for _, args, kwargs in install_plugin_mock.mock_calls
+                if args and isinstance(args, tuple)
+            ]
+            kwargs = install_plugin_mock.mock_calls[0][2]
+            assert len(commands) == 1
+
+            assert commands[0][0] == project
+            for cli_arg in (dbt, tap_gitlab, target, tap, mapper):
+                assert cli_arg in commands[0][1]
+
+            assert kwargs["parallelism"] == 10
+            assert not kwargs["clean"]
+
+            mappers = [m for m in commands[0][1] if m == mapper]
+            assert len(mappers) == 3
 
     def test_clean_install(
         self,
@@ -208,12 +217,21 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             assert install_plugin_mock.call_count == 1
-            assert install_plugin_mock.mock_calls[0].args[0] == project
-            seen_plugins = install_plugin_mock.mock_calls[0].args[1]
-            assert dbt in seen_plugins
-            assert tap_gitlab in seen_plugins
-            assert target in seen_plugins
-            assert tap in seen_plugins
-            assert mapper in seen_plugins
-            assert not install_plugin_mock.mock_calls[0].kwargs["parallelism"]
-            assert install_plugin_mock.mock_calls[0].kwargs["clean"]
+
+            commands = [
+                args
+                for _, args, kwargs in install_plugin_mock.mock_calls
+                if args and isinstance(args, tuple)
+            ]
+            kwargs = install_plugin_mock.mock_calls[0][2]
+            assert len(commands) == 1
+
+            assert commands[0][0] == project
+            for cli_arg in (dbt, tap_gitlab, target, tap, mapper):
+                assert cli_arg in commands[0][1]
+
+            assert not kwargs["parallelism"]
+            assert kwargs["clean"]
+
+            mappers = [m for m in commands[0][1] if m == mapper]
+            assert len(mappers) == 3
