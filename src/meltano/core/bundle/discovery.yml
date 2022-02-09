@@ -3444,32 +3444,22 @@ files:
       deprecated). Please use an adapter-specific dbt plugin and files bundle.
     repo: https://gitlab.com/meltano/files-dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git@config-version-2
-    update:
-      transform/profile/profiles.yml: true
   - name: dbt-bigquery
     namespace: dbt_bigquery
     repo: https://gitlab.com/meltano/files-dbt
-    pip_url: git+https://gitlab.com/meltano/files-dbt.git@bigquery-1.x
-    update:
-      transform/profile/profiles.yml: false
+    pip_url: git+https://gitlab.com/meltano/files-dbt-bigquery.git@v1.0
   - name: dbt-postgres
     namespace: dbt_postgres
     repo: https://gitlab.com/meltano/files-dbt
-    pip_url: git+https://gitlab.com/meltano/files-dbt.git@postgres-1.x
-    update:
-      transform/profile/profiles.yml: false
+    pip_url: git+https://gitlab.com/meltano/files-dbt-postgres.git@v1.0
   - name: dbt-redshift
     namespace: dbt_redshift
     repo: https://gitlab.com/meltano/files-dbt
-    pip_url: git+https://gitlab.com/meltano/files-dbt.git@redshift-1.x
-    update:
-      transform/profile/profiles.yml: false
+    pip_url: git+https://gitlab.com/meltano/files-dbt-redshift.git@v1.0
   - name: dbt-snowflake
     namespace: dbt_snowflake
     repo: https://gitlab.com/meltano/files-dbt
-    pip_url: git+https://gitlab.com/meltano/files-dbt.git@snowflake-1.x
-    update:
-      transform/profile/profiles.yml: false
+    pip_url: git+https://gitlab.com/meltano/files-dbt-snowflake.git@v1.0
   - name: docker
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
