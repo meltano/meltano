@@ -9,7 +9,7 @@ class ContainerService:
     def __init__(self, spec: ContainerSpec):
         self.spec = spec
 
-    def build_command(self) -> list[str]:
+    def build_command(self, *, extra_env: dict = None) -> list[str]:
         result = ["docker", "run", "--rm"]
 
         for port_mapping in self.spec.ports:
@@ -20,6 +20,10 @@ class ContainerService:
 
         for env_var, value in self.spec.env.items():
             result.extend(["-e", f"{env_var}={value}"])
+
+        if extra_env:
+            for env_var, value in extra_env.items():
+                result.extend(["-e", f"{env_var}={value}"])
 
         if self.spec.entrypoint:
             result.extend(["--entrypoint", self.spec.entrypoint])
