@@ -124,9 +124,9 @@ transforms:
 - name: tap-gitlab
   pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
   vars:
-    entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
-    generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
-    region_table: "{{ env_var('PG_SCHEMA') }}.region"
+    entry_table: "{{ env_var('TARGET_POSTGRES_SCHEMA') }}.entry"
+    generationmix_table: "{{ env_var('TARGET_POSTGRES_SCHEMA') }}.generationmix"
+    region_table: "{{ env_var('TARGET_POSTGRES_SCHEMA') }}.region"
 {% endraw %}
 ```
 

@@ -52,15 +52,10 @@ plugins:
     pip_url: tap-postgres==0.0.61
     settings:
       - name: dbname
-        env: TAP_PG_DATABASE
       - name: host
-        env: TAP_PG_ADDRESS
       - name: password
-        env: TAP_PG_PASSWORD
       - name: port
-        env: TAP_PG_PORT
       - name: user
-        env: TAP_PG_USERNAME
     config:
       default_replication_method: FULL_TABLE
       include_schemas_in_destination_stream_name: true
@@ -73,17 +68,17 @@ And finally create a .env file in your project directory (i.e. tap-postgres). We
 **.env**
 
 ```bash
-export TAP_PG_DATABASE=my_source_db
-export TAP_PG_ADDRESS=localhost
-export TAP_PG_PORT=5432
-export TAP_PG_USERNAME=source_username
-export TAP_PG_PASSWORD=source_password
+export TAP_POSTGRES_DBNAME=my_source_db
+export TAP_POSTGRES_HOST=localhost
+export TAP_POSTGRES_PORT=5432
+export TAP_POSTGRES_USER=source_username
+export TAP_POSTGRES_PASSWORD=source_password
 
-export PG_DATABASE=my_target_db
-export PG_PASSWORD=target_password
-export PG_USERNAME=target_username
-export PG_ADDRESS=localhost
-export PG_PORT=5432
+export TARGET_POSTGRES_DBNAME=my_target_db
+export TARGET_POSTGRES_PASSWORD=target_password
+export TARGET_POSTGRES_USER=target_username
+export TARGET_POSTGRES_HOST=localhost
+export TARGET_POSTGRES_PORT=5432
 ```
 
 Let's make sure that everything has been set correctly:
