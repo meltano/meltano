@@ -6,9 +6,10 @@ import sys
 from distutils import dir_util
 from pathlib import Path
 
-import meltano.core.bundle
 import pytest
 import yaml
+
+from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService
@@ -44,7 +45,7 @@ def compatible_copy_tree(source: Path, destination: Path):
 
 @pytest.fixture(scope="class")
 def discovery():
-    with meltano.core.bundle.find("discovery.yml").open() as base:
+    with bundle.find("discovery.yml").open() as base:
         discovery = yaml.safe_load(base)
 
     discovery[PluginType.EXTRACTORS].append(
@@ -250,14 +251,14 @@ def plugin_invoker_factory(
 
 @pytest.fixture(scope="class")
 def add_model(project, plugin_install_service, project_add_service):
-    MODELS = [
+    models = [
         "model-carbon-intensity",
         "model-gitflix",
         "model-salesforce",
         "model-gitlab",
     ]
 
-    for model in MODELS:
+    for model in models:
         plugin = project_add_service.add(PluginType.MODELS, model)
         plugin_install_service.install_plugin(plugin)
 
@@ -268,11 +269,11 @@ def add_model(project, plugin_install_service, project_add_service):
         meltano["plugins"]["models"] = [
             model_def
             for model_def in meltano["plugins"]["models"]
-            if model_def["name"] not in MODELS
+            if model_def["name"] not in models
         ]
 
-    for model in MODELS:
-        shutil.rmtree(project.model_dir(model))
+    for created_model in models:
+        shutil.rmtree(project.model_dir(created_model))
 
 
 @pytest.fixture(scope="class")
@@ -363,7 +364,8 @@ def alternative_target(project_add_service):
 
 @pytest.fixture(scope="class")
 def dbt(project_add_service):
-    try:
+    try:  # noqa: WPS229
+        project_add_service.add(PluginType.FILES, "dbt")
         return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
     except PluginAlreadyAddedException as err:
         return err.plugin
