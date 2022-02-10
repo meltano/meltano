@@ -364,8 +364,7 @@ def alternative_target(project_add_service):
 
 @pytest.fixture(scope="class")
 def dbt(project_add_service):
-    try:  # noqa: WPS229
-        project_add_service.add(PluginType.FILES, "dbt")
+    try:
         return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
     except PluginAlreadyAddedException as err:
         return err.plugin
