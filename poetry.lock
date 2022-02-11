@@ -7,6 +7,18 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "aiodocker"
+version = "0.21.0"
+description = "Docker API client for asyncio"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+aiohttp = ">=3.6"
+typing-extensions = ">=3.6.5"
+
+[[package]]
 name = "aiohttp"
 version = "3.7.4.post0"
 description = "Async http client/server framework (asyncio)"
@@ -2055,13 +2067,17 @@ infra = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "6e4dde4d6ec50e8f8db083b234d10fe78972530bf247d1ea6f77df16a07d37b1"
+content-hash = "4c547e2b064dcffdfb81792fccc5676dd65c6d025b1750619e5ee6e74d6486b6"
 
 [metadata.files]
 aenum = [
     {file = "aenum-2.1.2-py2-none-any.whl", hash = "sha256:7a77c205c4bc9d7fe9bd73b3193002d724aebf5909fa0d297534208953891ec8"},
     {file = "aenum-2.1.2-py3-none-any.whl", hash = "sha256:3df9b84cce5dc9ed77c337079f97b66c44c0053eb87d6f4d46b888dc45801e38"},
     {file = "aenum-2.1.2.tar.gz", hash = "sha256:a3208e4b28db3a7b232ff69b934aef2ea1bf27286d9978e1e597d46f490e4687"},
+]
+aiodocker = [
+    {file = "aiodocker-0.21.0-py3-none-any.whl", hash = "sha256:6fe00135bb7dc40a407669d3157ecdfd856f3737d939df54f40a479d40cf7bdc"},
+    {file = "aiodocker-0.21.0.tar.gz", hash = "sha256:1f2e6db6377195962bb676d4822f6e3a0c525e1b5d60b8ebbab68230bff3d227"},
 ]
 aiohttp = [
     {file = "aiohttp-3.7.4.post0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:3cf75f7cdc2397ed4442594b935a11ed5569961333d49b7539ea741be2cc79d5"},

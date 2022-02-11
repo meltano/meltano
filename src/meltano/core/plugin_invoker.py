@@ -3,7 +3,7 @@ import enum
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Generator, List, Optional, Union
 
 from async_generator import asynccontextmanager
 
@@ -210,9 +210,6 @@ class PluginInvoker:
             plugin_args = command_config.expanded_args(command, env)
             if command_config.executable:
                 executable = self.exec_path(command_config.executable)
-            elif command_config.container_spec:
-                container_service = ContainerService(command_config.container_spec)
-                return container_service.build_command(extra_env=env)
         else:
             plugin_args = self.plugin.exec_args(self)
 
@@ -258,7 +255,7 @@ class PluginInvoker:
         env: Optional[Dict[str, Any]] = None,
         command: Optional[str] = None,
         **kwargs,
-    ):
+    ) -> Generator[List[str], Dict[str, Any], Dict[str, Any]]:
         env = env or {}
 
         if require_preparation and not self._prepared:
@@ -289,6 +286,31 @@ class PluginInvoker:
                 **popen_options,
                 env=popen_env,
             )
+
+    async def invoke_docker(self, *args, plugin_command: str, **kwargs) -> int:
+        """Invoke a containerized command.
+
+        Args:
+            plugin_command: Plugin command name.
+
+        Raises:
+            ValueError: If the command doesn't declare a container spec.
+
+        Returns:
+            The container run exit code.
+        """
+        command_config = self.find_command(plugin_command)
+
+        if not command_config.container_spec:
+            raise ValueError("Command is missing a container spec")
+
+        spec = command_config.container_spec
+        service = ContainerService()
+
+        async with self._invoke(*args, **kwargs) as (args, options, env):
+            info = await service.run_container(spec, "testing", env=env)
+
+        return info["State"]["ExitCode"]
 
     async def dump(self, file_id: str) -> str:
         """Dump a plugin file by id."""

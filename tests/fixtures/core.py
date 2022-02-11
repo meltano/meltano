@@ -194,7 +194,9 @@ def discovery():
                     "args": "",
                     "container_spec": {
                         "image": "mock-utils/mock",
-                        "ports": ["5000:5000"],
+                        "ports": {
+                            "5000": "5000",
+                        },
                     },
                 },
             },

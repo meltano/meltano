@@ -3,6 +3,8 @@ import sys
 from typing import Tuple
 
 import click
+from sqlalchemy.orm import sessionmaker
+
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
@@ -82,13 +84,25 @@ def invoke(
 
 
 async def _invoke(
-    invoker, project, plugin_name, plugin_args, session, dump, command_name
+    invoker: PluginInvoker,
+    project: Project,
+    plugin_name: str,
+    plugin_args: str,
+    session: sessionmaker,
+    dump: str,
+    command_name: str,
 ):
     try:
         async with invoker.prepared(session):
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
+            elif command_name is not None:
+                logger.info("Running containerized command '%s'", command_name)
+                return await invoker.invoke_docker(
+                    *plugin_args,
+                    plugin_command=command_name,
+                )
             else:
                 handle = await invoker.invoke_async(*plugin_args, command=command_name)
                 with propagate_stop_signals(handle):

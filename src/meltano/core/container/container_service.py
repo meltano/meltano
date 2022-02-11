@@ -2,40 +2,50 @@
 
 from __future__ import annotations
 
+from aiodocker import Docker
+from structlog.stdlib import get_logger
+
 from .container_spec import ContainerSpec
+
+logger = get_logger(__name__)
 
 
 class ContainerService:
-    def __init__(self, spec: ContainerSpec):
-        self.spec = spec
+    """[summary]."""
 
-    def build_command(self, *, extra_env: dict = None) -> list[str]:
-        result = ["docker", "run", "--rm"]
+    async def run_container(
+        self,
+        spec: ContainerSpec,
+        name: str,
+        *,
+        env: dict = None,
+        pull: bool = False,
+    ) -> dict:
+        """Run a Docker container.
 
-        for port_mapping in self.spec.ports:
-            result.extend(["-p", port_mapping])
+        Args:
+            docker: Docker session.
+            name: Container name.
+            env: Environment for the
+            pull: Pull image from registry.
 
-        for volume_mapping in self.spec.volumes:
-            result.extend(["-v", volume_mapping])
+        Returns:
+            Docker container information after execution.
+        """
+        async with Docker() as docker:
+            if pull:
+                await docker.images.pull(spec.image)
 
-        for env_var, value in self.spec.env.items():
-            result.extend(["-e", f"{env_var}={value}"])
+            config = spec.get_docker_config(additional_env=env)
+            container = await docker.containers.run(config, name=name)
 
-        if extra_env:
-            for env_var, value in extra_env.items():
-                result.extend(["-e", f"{env_var}={value}"])
+            try:
+                async for line in container.log(follow=True, stdout=True):
+                    logger.info(line.rstrip())
 
-        if self.spec.entrypoint:
-            result.extend(["--entrypoint", self.spec.entrypoint])
+                await container.wait()
+                info = await container.show()
+            finally:
+                await container.delete(force=True)
 
-        result.extend(["--name", "todo"])
-
-        # Detached mode
-        # result.append("-d")
-
-        result.append(self.spec.image)
-
-        if self.spec.command:
-            result.append(self.spec.command)
-
-        return result
+        return info
