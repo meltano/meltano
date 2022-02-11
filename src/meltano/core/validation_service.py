@@ -4,14 +4,16 @@ from abc import ABCMeta, abstractmethod
 from enum import Enum
 from typing import Dict, Type, TypeVar
 
+from sqlalchemy.orm.session import sessionmaker
+
+from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from sqlalchemy.orm.session import sessionmaker
 
 EXIT_CODE_OK = 0
 
-T = TypeVar("T")
+T = TypeVar("T")  # noqa: WPS111
 
 
 class ValidationOutcome(str, Enum):
@@ -22,12 +24,23 @@ class ValidationOutcome(str, Enum):
 
     @property
     def color(self) -> str:
-        """Return terminal color for this outcome."""
+        """Return terminal color for this outcome.
+
+        Returns:
+            The string name of a color for this outcome.
+        """
         return "green" if self == self.SUCCESS else "red"
 
     @classmethod
     def from_exit_code(cls, exit_code: int):
-        """Create validation outcome from an exit code."""
+        """Create validation outcome from an exit code.
+
+        Args:
+            exit_code: Exit code of this of this outcome.
+
+        Returns:
+            A string name of this outcome ("SUCCESS or "FAILURE")
+        """
         return cls.SUCCESS if exit_code == EXIT_CODE_OK else cls.FAILURE
 
 
@@ -39,13 +52,22 @@ class ValidationsRunner(metaclass=ABCMeta):
         invoker: PluginInvoker,
         tests_selection: Dict[str, bool],
     ) -> None:
-        """Create a validators runner for a plugin."""
+        """Create a validators runner for a plugin.
+
+        Args:
+            invoker: PluginInvoker to be used with this ValidationsRunner.
+            tests_selection: Dict of selected tests.
+        """
         self.invoker = invoker
         self.tests_selection = tests_selection
 
     @property
     def plugin_name(self) -> str:
-        """Get underlying plugin name."""
+        """Get underlying plugin name.
+
+        Returns:
+            The name of the plugin to run.
+        """
         return self.invoker.plugin.name
 
     def select_test(self, name: str) -> None:
@@ -111,9 +133,14 @@ class ValidationsRunner(metaclass=ABCMeta):
                 },
             )
             for plugin in plugins_service.plugins()
+            if plugin.type is not PluginType.FILES
         }
 
     @abstractmethod
     async def run_test(self, name: str):
-        """Run a test command."""
-        ...
+        """Run a test command.
+
+        Args:
+            name: Test name.
+        """
+        raise NotImplementedError

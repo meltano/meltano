@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3190](https://gitlab.com/meltano/meltano/-/issues/3190) Fix `meltano test` bug where plugin name clashes with file bundle name
+
 ### Breaks
 
 
