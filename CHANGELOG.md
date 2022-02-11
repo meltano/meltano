@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [!2525](https://gitlab.com/meltano/meltano/-/merge_requests/2525) Updates the discovery_url default setting to use https://discovery.meltano.com/discovery.yml
+
 ### Fixes
 
 ### Breaks
