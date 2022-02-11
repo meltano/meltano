@@ -813,7 +813,9 @@ meltano run <extractor> <loader> <other_plugins>
 # For example:
 meltano run tap-gitlab target-postgres
 meltano run tap-gitlab target-postgres dbt:test dbt:run
-```Or directly using the `meltano invoke`, which requires more settings to be defined prior to running
+```
+
+Or directly using the `meltano invoke`, which requires more settings to be defined prior to running
 
 ## Next steps
 
