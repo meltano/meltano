@@ -50,6 +50,9 @@ collections:
   tutorials:
     output: true
     name: "Tutorials"
+  contribute:
+    output: true
+    name: "Contribute"
   posts:
     output: false
 
