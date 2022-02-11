@@ -12,22 +12,24 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [!2525](https://gitlab.com/meltano/meltano/-/merge_requests/2525) Updates the discovery_url default setting to use https://discovery.meltano.com/discovery.yml
-
 ### Fixes
 
 ### Breaks
 
 
-## 1.93.1 - (2022-02-11)
+## 1.95.0 - (2022-02-11)
 ---
+
+### Changes
+
+- [!2525](https://gitlab.com/meltano/meltano/-/merge_requests/2525) Updates the `discovery_url` default setting to use https://discovery.meltano.com/discovery.yml
 
 ### Fixes
 
 - [#3190](https://gitlab.com/meltano/meltano/-/issues/3190) Fix `meltano test` bug where plugin name clashes with file bundle name
 
 
-## 1.93.0 - (2022-02-04)
+## 1.94.0 - (2022-02-04)
 ---
 
 ### New
@@ -35,7 +37,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
  - [#1587](https://gitlab.com/meltano/meltano/-/issues/1587) Add "Retry" button to pipeline logs view and list when run failed
 
 
-## 1.92.1 - (2022-01-28)
+## 1.93.0 - (2022-01-28)
 ---
 
 ### Changes
