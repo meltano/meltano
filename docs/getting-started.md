@@ -207,7 +207,7 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
 
     This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-    ```yml{3-5}
+    ```yml
     plugins:
     extractors:
     - name: tap-gitlab
@@ -239,7 +239,7 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
 
         This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-        ```yml{3-14}
+        ```yml
         plugins:
           extractors:
           - name: tap-covid-19
@@ -333,7 +333,7 @@ extractors:
 
     This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-    ```yml{5-7}
+    ```yml
     environments:
     - name: dev
       config:
@@ -428,7 +428,7 @@ to improve performance and save on bandwidth and storage.
 
     This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-    ```yml{4-10}
+    ```yml
     plugins:
       extractors:
       - name: tap-gitlab
@@ -525,7 +525,7 @@ Most database extractors, on the other hand, support two or more of the followin
 
         This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-        ```yml{4-13}
+        ```yml
         environments:
         - name: dev
           config:
@@ -593,7 +593,7 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
 
         This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-        ```yml{3-5}
+        ```yml
         plugins:
         loaders:
         - name: target-postgres
@@ -625,7 +625,7 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
 
         This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-        ```yml{3-10}
+        ```yml
         plugins:
           loaders:
           - name: target-bigquery
@@ -714,7 +714,7 @@ loaders:
 
     This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-    ```yml{5-10}
+    ```yml
     plugins:
       loaders:
       - name: target-postgres
@@ -848,7 +848,7 @@ To have scheduled runs pick up where your [earlier manual run](#run-a-data-integ
 
 This will add the new schedule to your [`meltano.yml` project file](/concepts/project#schedules):
 
-```yml{2-6}
+```yml
 schedules:
 - name: gitlab-to-postgres
   extractor: tap-gitlab
@@ -875,7 +875,7 @@ schedules:
 
     This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-    ```yml{3-4}
+    ```yml
     plugins:
       orchestrators:
       - name: airflow
@@ -906,7 +906,7 @@ schedules:
     # Add `-D` to run the scheduler in the background:
     meltano invoke airflow webserver -D
     ```
-  
+
 1. Create `melty` the Admin user for logging in.
 
     ```bash
@@ -965,7 +965,7 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
     ```
 
     The organization of your dbt project is up to you but if you'd like to run a specific set of models as part of a Meltano ELT pipeline it can be done via `meltano elt tap target --transform=run` which requires the model directory to match the extractor's name using snake_case (i.e. tap_gitlab) so it can automatically find your models. Running as part of a pipeline allows Meltano to simplify dbt configuration by inferring some of your settings based on the pipeline tap and target.
-        
+
     See more in the [Data Transformation (T) guide - transform in your ELT pipeline](/guide/transformation#transform-in-your-elt-pipeline).
 
 1. Then add a model file with your SQL transformation logic.
@@ -1006,7 +1006,7 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
     Or alternatively you can run dbt directly using the `meltano invoke`, which requires more settings to be defined prior to running:
 
     - First add the following configs to your dbt settings:
-      
+
         ```bash
         meltano config dbt set target postgres
         meltano config dbt set source_schema public
