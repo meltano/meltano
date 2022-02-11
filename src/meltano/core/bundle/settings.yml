@@ -19,7 +19,7 @@ settings:
   value: false
   env_specific: true
 - name: discovery_url
-  value: https://www.meltano.com/discovery.yml
+  value: https://discovery.meltano.com/discovery.yml
 - name: discovery_url_auth
 - name: elt.buffer_size
   kind: integer
