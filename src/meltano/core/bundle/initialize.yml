@@ -2,23 +2,8 @@ meltano.yml: |
   version: 1
   environments:
   - name: dev
-    config:
-      plugins:
-        extractors:
-        - name: example-extractor-name
-          config:
-            start_date: '2022-01-01'
-    env:
-      EXAMPLE_ENV_NAME: example_env_value
+  - name: staging
   - name: prod
-    config:
-      plugins:
-        extractors:
-        - name: example-extractor-name
-          config:
-            start_date: '2021-01-01'
-    env:
-      EXAMPLE_ENV_NAME: example_env_value
 README.md: ""
 requirements.txt: ""
 output/.gitignore: |

@@ -146,6 +146,13 @@ per_file_ignores =
     src/meltano/core/project_files.py:
         # Dict manipulation requires lots of string constant references
         WPS226
+    src/meltano/core/project_init_service.py:
+        # Found string constant over-use: blue > 3
+        WPS226
+        # Found too long ``try`` body length: 3 > 1
+        WPS229
+        # Found too many expressions: 27 > 9
+        WPS213
     **/__init__.py:
         # Allow for using __init__.py to promote imports to the module namespace
         F401
