@@ -6,6 +6,9 @@
 # Default
 * @DouweM @aaronsteers
 
+# Web App
+/src/webapp/ @alex1126
+
 # Docs
 /docs/ @meltano/core-team
 /CONTRIBUTING.md @meltano/core-team
