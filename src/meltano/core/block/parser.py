@@ -26,6 +26,7 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
     return plugin.type not in {
         PluginType.EXTRACTORS,
         PluginType.LOADERS,
+        PluginType.MAPPINGS,
         PluginType.MAPPERS,
     }
 
@@ -239,9 +240,6 @@ class BlockParser:  # noqa: D101
                 blocks.append(
                     builder.make_block(
                         plugin,
-                        plugin_config_overrides=self._get_mapping_config(
-                            next_block, plugin
-                        ),
                     )
                 )
             elif plugin.type == PluginType.LOADERS:
@@ -259,33 +257,3 @@ class BlockParser:  # noqa: D101
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}."
                 )
         raise Exception("Found no end in block set!")
-
-    def _get_mapping_config(self, block_index: int, plugin: ProjectPlugin) -> Dict:
-        """
-        Get the mapping config from a plugin for a given block index.
-
-        Args:
-            block_index: Index of the block.
-            plugin: Plugin to get mapping config from.
-        Returns:
-            Mapping config.
-        Raises:
-            BlockSetValidationError: If mapping config is not found.
-        """
-        requested_mapping = self._mappings_ref.get(block_index)
-        mapping_config = None
-        for mapping in plugin.config_with_extras.get("_mappings", []):
-            if mapping.get("name") == requested_mapping:
-                mapping_config = mapping.get("config")
-
-        if mapping_config is None:
-            self.log.warning(
-                "No mapping config found for mapping",
-                mapping=requested_mapping,
-                plugin_name=plugin.name,
-            )
-            raise BlockSetValidationError(
-                f"Expected config for {requested_mapping} in {plugin.name}."
-            )
-
-        return mapping_config

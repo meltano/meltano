@@ -232,6 +232,9 @@ pyflakes = ["-F401"]  # Allow for using __init__.py to promote imports to the mo
 [tool.flakehell.exceptions."src/meltano/core/project_files.py"]
 wemake-python-styleguide = ["-WPS226"] # Dict manipulation requires lots of string constant references
 
+[tool.flakehell.exceptions."src/meltano/core/plugin/singer/"]
+wemake-python-styleguide = ["-WPS226"] # The word "config" is frequently used and threshold for warning is low
+
 [tool.flakehell.exceptions."src/meltano/core/block"]
 flake8-docstrings = ["-D101"] # Don't require docstrings in public class since init methods are documented
 wemake-python-styleguide = [

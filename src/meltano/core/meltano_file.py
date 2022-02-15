@@ -42,6 +42,9 @@ class MeltanoFile(Canonical):
         for plugin_type, raw_plugins in plugins.items():
             if plugin_type == PluginType.MAPPERS:  # noqa: WPS441 - false positive
                 for mapper in raw_plugins:
+                    plugin_type_plugins[PluginType.MAPPERS].append(
+                        ProjectPlugin(PluginType.MAPPERS, **mapper)
+                    )
                     plugin_type_plugins[PluginType.MAPPERS].extend(
                         self.get_plugins_for_mappings(mapper)
                     )
@@ -79,6 +82,7 @@ class MeltanoFile(Canonical):
         mapping_plugins: List[ProjectPlugin] = []
         for mapping in mapper.get("mappings", []):
             raw_mapping_plugin = copy.deepcopy(mapper)
+            raw_mapping_plugin["mapper"] = False
             raw_mapping_plugin["mapping_name"] = mapping.get("name")
             raw_mapping_plugin["config"] = mapping.get("config")
             mapping_plugins.append(

@@ -3,11 +3,12 @@
 This module contains the SingerMapper class as well as a supporting methods.
 """
 import json
+from typing import Optional
 
 import structlog
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 
 from . import PluginType, SingerPlugin
 
@@ -19,7 +20,17 @@ class SingerMapper(SingerPlugin):
 
     __plugin_type__ = PluginType.MAPPERS
 
-    EXTRA_SETTINGS = [SettingDefinition(name="_mappings")]
+    EXTRA_SETTINGS = [
+        SettingDefinition(
+            name="_mappings", kind=SettingKind.ARRAY, aliases=["mappings"], value={}
+        ),
+        SettingDefinition(
+            name="_mapping_name",
+            kind=SettingKind.STRING,
+            aliases=["mapping_name"],
+            value=None,
+        ),
+    ]
 
     def exec_args(self, plugin_invoker: PluginInvoker):
         """Return the arguments to be passed to the plugin's executable."""
@@ -34,12 +45,22 @@ class SingerMapper(SingerPlugin):
     async def before_configure(self, invoker: PluginInvoker, session):
         """Create configuration file."""
         config_path = invoker.files["config"]
+
+        config_payload: dict = {}
         with open(config_path, "w") as config_file:
-            config = invoker.plugin_config_override or invoker.plugin.config
-            json.dump(config, config_file, indent=2)
+            config_payload = self._get_mapping_config(invoker.plugin.extra_config)
+            json.dump(config_payload, config_file, indent=2)
 
         logger.debug(
             "Created configuration",
             config_path=config_path,
             plugin_name=invoker.plugin.name,
+            mapping_name=invoker.plugin_config_extras["_mapping_name"],
+            mapping_config=config_payload,
         )
+
+    @staticmethod
+    def _get_mapping_config(extra_config: dict) -> Optional[dict]:
+        for mapping in extra_config.get("_mappings", []):
+            if mapping.get("name") == extra_config.get("_mapping_name"):
+                return mapping["config"]

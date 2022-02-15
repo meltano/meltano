@@ -93,14 +93,12 @@ class ELBContextBuilder:
         self,
         plugin: ProjectPlugin,
         plugin_args: Optional[List[str]] = None,
-        plugin_config_overrides: Optional[dict] = None,
     ) -> SingerBlock:
         """Create a new `SingerBlock` object, from a plugin.
 
         Args:
             plugin: The plugin to be executed.
             plugin_args: The arguments to be passed to the plugin.
-            plugin_config_overrides: Config override are used by mappers to inject the config of the requested mapping.
         Returns:
             The new `SingerBlock` object.
         """
@@ -110,7 +108,7 @@ class ELBContextBuilder:
             block_ctx=ctx,
             project=self.project,
             plugins_service=self.plugins_service,
-            plugin_invoker=self.invoker_for(ctx, plugin_config_overrides),
+            plugin_invoker=self.invoker_for(ctx),
             plugin_args=plugin_args,
         )
         self._blocks.append(block)
@@ -144,7 +142,6 @@ class ELBContextBuilder:
     def invoker_for(
         self,
         plugin_context: PluginContext,
-        plugin_config_override: Optional[Dict] = None,
     ) -> PluginInvoker:
         """Create an invoker for a plugin from a PluginContext."""
         return invoker_factory(
@@ -154,7 +151,6 @@ class ELBContextBuilder:
             run_dir=self.elt_run_dir,
             plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
-            plugin_config_override=plugin_config_override,
         )
 
     @property

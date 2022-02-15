@@ -33,7 +33,15 @@ class TestCliInstall:
             )
 
     def test_install_type(
-        self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
+        self,
+        project,
+        tap,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
+        project_plugins_service,
     ):
         with mock.patch(
             "meltano.cli.install.ProjectPluginsService",
@@ -61,8 +69,32 @@ class TestCliInstall:
                 project, [target], parallelism=None, clean=False
             )
 
+        with mock.patch(
+            "meltano.cli.install.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
+            install_plugin_mock_m.return_value = True
+
+            result = cli_runner.invoke(cli, ["install", "mappers"])
+            assert_cli_runner(result)
+
+            assert install_plugin_mock_m.call_count == 1
+            seen_mappers = install_plugin_mock_m.call_args[0][1]
+            assert len(seen_mappers) == 3
+            assert seen_mappers[0] == mapper
+            assert not seen_mappers[1].extra_config.get("_mapper")
+            assert not seen_mappers[2].extra_config.get("_mapper")
+
     def test_install_type_name(
-        self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
+        self,
+        project,
+        tap,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
+        project_plugins_service,
     ):
         with mock.patch(
             "meltano.cli.install.ProjectPluginsService",
@@ -90,6 +122,22 @@ class TestCliInstall:
                 project, [target], parallelism=None, clean=False
             )
 
+        with mock.patch(
+            "meltano.cli.install.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
+            install_plugin_mock_m.return_value = True
+
+            result = cli_runner.invoke(cli, ["install", "mapper", mapper.name])
+            assert_cli_runner(result)
+
+            assert install_plugin_mock_m.call_count == 1
+            seen_mappers = install_plugin_mock_m.call_args[0][1]
+            assert len(seen_mappers) == 3
+            assert seen_mappers[0] == mapper
+            assert not seen_mappers[1].extra_config.get("_mapper")
+            assert not seen_mappers[2].extra_config.get("_mapper")
+
     def test_install_multiple(
         self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
     ):
@@ -109,7 +157,15 @@ class TestCliInstall:
             )
 
     def test_install_parallel(
-        self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
+        self,
+        project,
+        tap,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
+        project_plugins_service,
     ):
         with mock.patch(
             "meltano.cli.install.ProjectPluginsService",
@@ -120,12 +176,36 @@ class TestCliInstall:
             result = cli_runner.invoke(cli, ["install", "--parallelism=10"])
             assert_cli_runner(result)
 
-            install_plugin_mock.assert_called_once_with(
-                project, [dbt, target, tap_gitlab, tap], parallelism=10, clean=False
-            )
+            assert install_plugin_mock.call_count == 1
+
+            commands = [
+                args
+                for _, args, kwargs in install_plugin_mock.mock_calls
+                if args and isinstance(args, tuple)
+            ]
+            kwargs = install_plugin_mock.mock_calls[0][2]
+            assert len(commands) == 1
+
+            assert commands[0][0] == project
+            for cli_arg in (dbt, tap_gitlab, target, tap, mapper):
+                assert cli_arg in commands[0][1]
+
+            assert kwargs["parallelism"] == 10
+            assert not kwargs["clean"]
+
+            mappers = [m for m in commands[0][1] if m == mapper]
+            assert len(mappers) == 3
 
     def test_clean_install(
-        self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
+        self,
+        project,
+        tap,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
+        project_plugins_service,
     ):
         with mock.patch(
             "meltano.cli.install.ProjectPluginsService",
@@ -136,6 +216,22 @@ class TestCliInstall:
             result = cli_runner.invoke(cli, ["install", "--clean"])
             assert_cli_runner(result)
 
-            install_plugin_mock.assert_called_once_with(
-                project, [dbt, target, tap_gitlab, tap], parallelism=None, clean=True
-            )
+            assert install_plugin_mock.call_count == 1
+
+            commands = [
+                args
+                for _, args, kwargs in install_plugin_mock.mock_calls
+                if args and isinstance(args, tuple)
+            ]
+            kwargs = install_plugin_mock.mock_calls[0][2]
+            assert len(commands) == 1
+
+            assert commands[0][0] == project
+            for cli_arg in (dbt, tap_gitlab, target, tap, mapper):
+                assert cli_arg in commands[0][1]
+
+            assert not kwargs["parallelism"]
+            assert kwargs["clean"]
+
+            mappers = [m for m in commands[0][1] if m == mapper]
+            assert len(mappers) == 3
