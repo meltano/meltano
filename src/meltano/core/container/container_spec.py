@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shlex
 from typing import Any
 
 from meltano.core.behavior.canonical import Canonical
@@ -65,7 +66,7 @@ class ContainerSpec(Canonical):
             env_config.extend(env_mapping_to_docker(additional_env))
 
         return {
-            "Cmd": self.command,
+            "Cmd": shlex.split(self.command) if self.command else None,
             "Image": self.image,
             "Env": env_config,
             "HostConfig": {
