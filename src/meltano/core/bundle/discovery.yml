@@ -7,7 +7,7 @@ extractors:
     label: Google Ads
     description: Advertising Platform
     namespace: tap_adwords
-    variants: 
+    variants:
     - name: singer-io
       docs: 'https://hub.meltano.com/extractors/adwords.html'
       repo: https://github.com/singer-io/tap-adwords
@@ -217,7 +217,7 @@ extractors:
           label: OAuth Client Secret
           description: Your Google OAuth Client Secret
           placeholder: Ex. *****************
-  
+
         - name: refresh_token
           kind: oauth
           oauth:
@@ -230,7 +230,7 @@ extractors:
           label: Account ID(s)
           placeholder: Ex. 1234567890,1234567891,1234567892
           description: A comma-separated list of Ad Account IDs to replicate data from
-  
+
         - name: start_date
           kind: date_iso8601
           description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
@@ -242,7 +242,7 @@ extractors:
           label: User Agent for your OAuth Client
           placeholder: Ex. tap-adwords via Meltano <user@example.com>
           description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
-  
+
         - name: conversion_window_days
           kind: integer
           value: 0
@@ -478,7 +478,7 @@ extractors:
           label: OAuth Client Secret
           description: Your Google OAuth Client Secret
           placeholder: Ex. *****************
-  
+
         - name: refresh_token
           kind: oauth
           oauth:
@@ -491,7 +491,7 @@ extractors:
           label: Account ID(s)
           placeholder: Ex. 1234567890,1234567891,1234567892
           description: A comma-separated list of Ad Account IDs to replicate data from
-  
+
         - name: start_date
           kind: date_iso8601
           description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
@@ -503,7 +503,7 @@ extractors:
           label: User Agent for your OAuth Client
           placeholder: Ex. tap-adwords via Meltano <user@example.com>
           description: The User Agent for your OAuth Client (used in requests made to the AdWords API)
-  
+
         - name: conversion_window_days
           kind: integer
           value: 0
@@ -558,7 +558,7 @@ extractors:
     label: BigQuery
     description: BigQuery data warehouse extractor
     namespace: tap_bigquery
-    variants: 
+    variants:
     - name: anelendata
       docs: https://hub.meltano.com/extractors/bigquery.html
       repo: https://github.com/anelendata/tap-bigquery
@@ -743,7 +743,7 @@ extractors:
           kind: password
         - name: refresh_token
           kind: password
-  
+
         - name: customer_id
           label: Customer ID
         - name: account_ids
@@ -959,7 +959,7 @@ extractors:
     label: GitLab
     description: Single application for the entire DevOps lifecycle
     namespace: tap_gitlab
-    variants: 
+    variants:
     - name: meltanolabs
       docs: 'https://hub.meltano.com/extractors/gitlab.html'
       repo: https://github.com/MeltanoLabs/tap-gitlab
@@ -1190,7 +1190,7 @@ extractors:
           env_aliases: [GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN]
           kind: password
           label: OAuth Refresh Token
-  
+
         - name: view_id
           env_aliases: [GOOGLE_ANALYTICS_API_VIEW_ID]
           label: View ID
@@ -1199,7 +1199,7 @@ extractors:
           env_aliases: [GOOGLE_ANALYTICS_API_REPORTS]
           label: Reports
           placeholder: Ex. my_report_definition.json
-  
+
         - name: start_date
           env_aliases: [GOOGLE_ANALYTICS_API_START_DATE]
           kind: date_iso8601
@@ -1498,7 +1498,7 @@ extractors:
           kind: boolean
           value: false
           value_post_processor: stringify
-  
+
         - name: filter_dbs
           description: Comma separated list of schemas to extract tables only from particular schemas and to improve data extraction performance
         - name: session_sqls
@@ -1589,7 +1589,7 @@ extractors:
           value: false
           value_post_processor: stringify
           description: Using SSL via postgres `sslmode='require'` option. If the server does not accept SSL connections or the client certificate is not recognized the connection will fail
-  
+
         - name: filter_schemas
           description: Scan only the specified comma-separated schemas to improve the performance of data extraction
         - name: default_replication_method
@@ -1674,18 +1674,18 @@ extractors:
           placeholder: Ex. *****************
           description: Your Salesforce Account access token
           documentation: https://hub.meltano.com/extractors/salesforce.html#salesforce-setup
-  
+
         - name: client_id
           label: Client ID
         - name: client_secret
           kind: password
         - name: refresh_token
           kind: password
-  
+
         - name: start_date
           kind: date_iso8601
           description: Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.
-  
+
         - name: is_sandbox
           kind: boolean
           value: false
@@ -2944,7 +2944,7 @@ loaders:
         env_aliases: [TARGET_REDSHIFT_SCHEMA]
         value: $MELTANO_EXTRACT__LOAD_SCHEMA
         description: Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema.
-  
+
       # Optional settings
       - name: aws_profile
         label: AWS profile name
@@ -3294,6 +3294,10 @@ files:
     namespace: gitlab_ci
     repo: https://gitlab.com/meltano/files-gitlab-ci
     pip_url: git+https://gitlab.com/meltano/files-gitlab-ci.git
+  - name: great_expectations
+    namespace: great_expectations
+    repo: https://gitlab.com/meltano/files-great-expectations
+    pip_url: git+https://gitlab.com/meltano/files-great-expectations
 utilities:
   - name: sqlfluff
     namespace: sqlfluff
@@ -3302,3 +3306,11 @@ utilities:
       lint:
         args: lint
         description: Lint SQL in transform models
+  - name: great_expectations
+    namespace: great_expectations
+    pip_url: great_expectations
+    executable: great_expectations
+    settings:
+      - name: ge_home
+        value: $MELTANO_PROJECT_ROOT/utilities/great_expectations
+        env: GE_HOME
