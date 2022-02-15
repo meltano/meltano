@@ -40,7 +40,7 @@ class ContainerService:
             container = await docker.containers.run(config, name=name)
 
             try:
-                async for line in container.log(follow=True, stdout=True):
+                async for line in container.log(follow=True, stdout=True, stderr=True):
                     logger.info(line.rstrip())
 
                 await container.wait()
