@@ -44,6 +44,11 @@ logger = logging.getLogger(__name__)
 )
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
+@click.option(
+    "--containers",
+    is_flag=True,
+    help="Force execution of plugins as containers.",
+)
 @pass_project(migrate=True)
 def invoke(
     project: Project,
@@ -52,6 +57,7 @@ def invoke(
     list_commands: bool,
     plugin_name: str,
     plugin_args: Tuple[str, ...],
+    containers: bool = False,
 ):
     """
     Invoke a plugin's executable with specified arguments.
@@ -78,7 +84,16 @@ def invoke(
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
     exit_code = run_async(
-        _invoke(invoker, project, plugin_name, plugin_args, session, dump, command_name)
+        _invoke(
+            invoker,
+            project,
+            plugin_name,
+            plugin_args,
+            session,
+            dump,
+            command_name,
+            containers,
+        )
     )
     sys.exit(exit_code)
 
@@ -91,13 +106,14 @@ async def _invoke(
     session: sessionmaker,
     dump: str,
     command_name: str,
+    containers: bool,
 ):
     try:
         async with invoker.prepared(session):
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
-            elif command_name is not None:
+            elif containers and command_name is not None:
                 logger.info("Running containerized command '%s'", command_name)
                 return await invoker.invoke_docker(
                     *plugin_args,
