@@ -2,7 +2,6 @@
 
 import pytest
 
-from meltano.core.container.container_service import ContainerService
 from meltano.core.container.container_spec import ContainerSpec
 
 
@@ -15,7 +14,8 @@ def spec() -> ContainerSpec:
 
 
 class TestContainerService:
-    def test_docker_config(self, spec: ContainerSpec):
+    @pytest.mark.asyncio
+    async def test_docker_config(self, spec: ContainerSpec):
         config = spec.get_docker_config()
         assert config == {
             "Cmd": None,
