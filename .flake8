@@ -103,6 +103,10 @@ per_file_ignores =
         WPS430
         # Allow protected attribute usage in test methods
         WPS437
+        # Found module with too many imports
+        WPS201
+        # Found too many module members
+        WPS202
     !tests/*:
         T
     scripts/*:
