@@ -3294,7 +3294,7 @@ files:
     namespace: gitlab_ci
     repo: https://gitlab.com/meltano/files-gitlab-ci
     pip_url: git+https://gitlab.com/meltano/files-gitlab-ci.git
-  - name: great-expectations
+  - name: great_expectations
     namespace: great_expectations
     repo: https://gitlab.com/meltano/files-great-expectations
     pip_url: git+https://gitlab.com/meltano/files-great-expectations
@@ -3306,7 +3306,7 @@ utilities:
       lint:
         args: lint
         description: Lint SQL in transform models
-  - name: great-expectations
+  - name: great_expectations
     namespace: great_expectations
     pip_url: great_expectations
     executable: great_expectations
