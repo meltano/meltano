@@ -7,7 +7,7 @@ from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 import structlog
 from async_generator import asynccontextmanager
 from meltano.core.elt_context import PluginContext
-from meltano.core.job import Job
+from meltano.core.job import Job, JobFinder
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -23,6 +23,8 @@ from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
 from .singer import SingerBlock
+from ..job.stale_job_failer import StaleJobFailer
+from ...cli import CliError
 
 logger = structlog.getLogger(__name__)
 
@@ -53,6 +55,7 @@ class ELBContext:
         self.session = session
         self.job = job
         self.state = state
+        self.full_refresh = False
 
         self.base_output_logger = base_output_logger
 
@@ -276,12 +279,24 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Raises:
             RunnerError if failures are encountered during execution.
+            CliError if the underlying pipeline/job is already running.
         """
-        async with self._start_blocks(session):
-            await self._link_io()
-            manager = ELBExecutionManager(self)
-            await manager.run()
-            return True
+        job = self.context.job
+        StaleJobFailer(job.job_id).fail_stale_jobs(session)
+
+        existing = JobFinder(job.job_id).latest_running(session)
+        if existing:
+            raise CliError(
+                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                + "To ignore this check use the '--force' option."
+            )
+
+        async with job.run(session):
+            async with self._start_blocks(session):
+                await self._link_io()
+                manager = ELBExecutionManager(self)
+                await manager.run()
+                return True
 
     @staticmethod
     async def terminate(self, graceful: bool = False) -> bool:
@@ -345,7 +360,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         try:  # noqa:  WPS229
             for block in self.blocks:
-                await block.pre({"session": session})
+                await block.pre(self.context)
                 await block.start()
             yield
         finally:

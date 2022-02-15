@@ -466,3 +466,82 @@ class TestExtractLoadBlocks:
                 match=r"^.*: intermediate blocks must be producers AND consumers",
             ):
                 elb.validate_set()
+
+    @pytest.mark.asyncio
+    async def test_elb_job_context(
+        self,
+        session,
+        subject,
+        tap_config_dir,
+        mapper_config_dir,
+        target_config_dir,
+        tap,
+        mapper,
+        target,
+        tap_process,
+        mapper_process,
+        target_process,
+        plugin_invoker_factory,
+        elb_context,
+    ):
+        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stdout.at_eof.side_effect = (False, False, True)
+        tap_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        mapper_process.sterr.at_eof.side_effect = True
+        mapper_process.stdout.at_eof.side_effect = (False, False, True)
+        mapper_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "mapper-value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        mapper_invoker = plugin_invoker_factory(mapper, config_dir=mapper_config_dir)
+        target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process)
+        )
+        with mock.patch.object(
+                PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async:
+            blocks = (
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
+                ),
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=mapper_invoker,
+                    plugin_args=[],
+                ),
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=target_invoker,
+                    plugin_args=[],
+                ),
+            )
+
+            elb = ExtractLoadBlocks(elb_context, blocks)
+            elb.validate_set()
+
+            assert elb.context.job.job_id == "tap-mock-target-mock"
+
+            # just to be sure, we'll double check the job_id is the same for each block
+            for block in blocks:
+                assert block.context.job.job_id == "tap-mock-target-mock"
+
