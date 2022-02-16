@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--containers",
     is_flag=True,
-    help="Force execution of plugins as containers.",
+    help="Execute plugins using containers where possible.",
 )
 @pass_project(migrate=True)
 def invoke(
