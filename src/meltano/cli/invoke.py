@@ -110,12 +110,19 @@ async def _invoke(
     command_name: str,
     containers: bool,
 ):
+    if command_name is not None:
+        command = invoker.find_command(command_name)
+
     try:
         async with invoker.prepared(session):
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
-            elif containers and command_name is not None:
+            elif (  # noqa: WPS337
+                containers
+                and command_name is not None
+                and command.container_spec is not None
+            ):
                 return await invoker.invoke_docker(
                     command_name,
                     *plugin_args,
