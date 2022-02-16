@@ -103,13 +103,13 @@ Currently, `meltano invoke` gives you raw access to the underlying plugin after 
 View 'meltano' dags:
 
 ```bash
-meltano invoke airflow list_dags
+meltano invoke airflow dags list
 ```
 
 Manually trigger a task to run:
 
 ```bash
-meltano invoke airflow run --raw meltano extract_load $(date -I)
+meltano invoke airflow tasks run --raw meltano extract_load $(date -I)
 ```
 
 Start the Airflow UI: (will start in a separate browser)
@@ -127,7 +127,7 @@ meltano invoke airflow scheduler -D
 Trigger a dag run:
 
 ```bash
-meltano invoke airflow trigger_dag meltano
+meltano invoke airflow dags trigger meltano
 ```
 
 Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano will facade more of these feature to create a seamless experience using this orchestrator. Please refer to the [Airflow documentation](https://airflow.apache.org/) for more in-depth knowledge about Airflow.
