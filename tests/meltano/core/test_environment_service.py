@@ -1,4 +1,5 @@
 import pytest
+
 from meltano.core.environment import Environment
 from meltano.core.environment_service import (
     EnvironmentAlreadyExistsError,
@@ -18,10 +19,15 @@ class TestEnvironmentService:
 
     def test_add_environment(self, subject: EnvironmentService):
         count = 10
-
         environments = [Environment(f"environment_{idx}") for idx in range(count)]
         for environment in environments:
             subject.add_environment(environment)
+
+        # default environments are added to initialised projects
+        default_environments = [
+            Environment(name) for name in ("dev", "staging", "prod")
+        ]
+        environments = default_environments + environments
 
         assert subject.list_environments() == environments
 
@@ -29,7 +35,7 @@ class TestEnvironmentService:
             EnvironmentAlreadyExistsError,
             match="An Environment named 'environment_0' already exists.",
         ):
-            subject.add_environment(environments[0])
+            subject.add_environment(environments[3])
 
     def test_remove_environment(
         self,
