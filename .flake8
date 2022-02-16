@@ -54,6 +54,8 @@ ignore =
     WPS306
     # Allow assignment expressions (walrus operator :=)
     WPS332
+    # Allow 'incorrect' order of methods in a class
+    WPS338
     # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
     WPS348
     # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`

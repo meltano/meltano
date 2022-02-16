@@ -7,14 +7,19 @@ from meltano.core.container.container_spec import ContainerSpec
 from meltano.core.error import Error
 from meltano.core.utils import expand_env_vars
 
-T = TypeVar("T")
+TCommand = TypeVar("TCommand")
 
 
 class UndefinedEnvVarError(Error):
     """Occurs when an environment variable is used as a command argument but is not set."""
 
     def __init__(self, command_name, var):
-        """Initialize UndefinedEnvVarError."""
+        """Initialize UndefinedEnvVarError.
+
+        Args:
+            command_name: Plugin command name.
+            var: Environment variable name.
+        """
         super().__init__(
             f"Command '{command_name}' referenced unset environment variable '{var}' in an argument. "
             + "Set the environment variable or update the command definition."
@@ -31,7 +36,14 @@ class Command(Canonical):
         executable: Optional[str] = None,
         container_spec: Optional[dict] = None,
     ):
-        """Initialize a Command."""
+        """Initialize a Command.
+
+        Args:
+            args: Command arguments.
+            description: Command description.
+            executable: Optional command executable.
+            container_spec: Container specification for this command.
+        """
         super().__init__(
             args=args,
             description=description,
@@ -43,10 +55,17 @@ class Command(Canonical):
             self.container_spec = None
 
     def expanded_args(self, name, env):
-        """
-        Replace any env var arguments with their values.
+        """Replace any env var arguments with their values.
 
-        :raises UndefinedEnvVarError: if an env var argument is not set
+        Args:
+            name: Command name.
+            env: Mapping of environment variables to expand the command.
+
+        Returns:
+            List of expanded command parts.
+
+        Raises:
+            UndefinedEnvVarError: if an env var argument is not set
         """
         expanded = []
         for arg in shlex.split(self.args):
@@ -59,12 +78,23 @@ class Command(Canonical):
         return expanded
 
     def canonical(self):
-        """Serialize the command."""
+        """Serialize the command.
+
+        Returns:
+            Python object.
+        """
         return Command.as_canonical(self)
 
     @classmethod
     def as_canonical(cls, target):
-        """Serialize the target command."""
+        """Serialize the target command.
+
+        Args:
+            target: Target object type.
+
+        Returns:
+            Python object.
+        """
         canonical = super().as_canonical(target)
         # if there are only args, flatten the object
         # to the short form
@@ -75,7 +105,14 @@ class Command(Canonical):
 
     @classmethod
     def parse(cls, obj):
-        """Deserialize data into a Command."""
+        """Deserialize data into a Command.
+
+        Args:
+            obj: Raw Python object.
+
+        Returns:
+            Command instance.
+        """
         if isinstance(obj, str):
             # allow setting the arguments as the value
             # without a description
@@ -84,8 +121,15 @@ class Command(Canonical):
         return super().parse(obj)
 
     @classmethod
-    def parse_all(cls: Type[T], obj: Optional[dict]) -> Dict[str, T]:
-        """Deserialize commands data into a dict of Commands."""
+    def parse_all(cls: Type[TCommand], obj: Optional[dict]) -> Dict[str, TCommand]:
+        """Deserialize commands data into a dict of Commands.
+
+        Args:
+            obj: Raw Python object.
+
+        Returns:
+            Mapping of command names to instances.
+        """
         if obj is not None:
             return {name: Command.parse(cmd) for name, cmd in obj.items()}
 

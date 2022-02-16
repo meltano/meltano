@@ -26,24 +26,28 @@ logger = get_logger(__name__)
 
 
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
-    cls = PluginInvoker
+    cls = PluginInvoker  # noqa: WPS117
 
-    if hasattr(plugin, "invoker_class"):
-        cls = plugin.invoker_class
+    if hasattr(plugin, "invoker_class"):  # noqa: WPS421
+        cls = plugin.invoker_class  # noqa: WPS117
 
-    invoker = cls(project, plugin, *args, **kwargs)
-
-    return invoker
+    return cls(project, plugin, *args, **kwargs)
 
 
 class InvokerError(Error):
-    pass
+    """Generic plugin invoker error."""
 
 
 class ExecutableNotFoundError(InvokerError):
-    """Occurs when the executable could not be found"""
+    """Occurs when the executable could not be found."""
 
-    def __init__(self, plugin: PluginRef, executable):
+    def __init__(self, plugin: PluginRef, executable: str):
+        """Initialize ExecutableNotFoundError.
+
+        Args:
+            plugin: Meltano plugin reference.
+            executable: Plugin command executable.
+        """
         super().__init__(
             f"Executable '{executable}' could not be found. "
             f"{plugin.type.descriptor.capitalize()} '{plugin.name}' may not have been installed yet using `meltano install {plugin.type.singular} {plugin.name}`, or the executable name may be incorrect."
@@ -51,21 +55,28 @@ class ExecutableNotFoundError(InvokerError):
 
 
 class InvokerNotPreparedError(InvokerError):
-    """Occurs when `invoke` is called before `prepare`"""
-
-    pass
+    """Occurs when `invoke` is called before `prepare`."""
 
 
 class UnknownCommandError(InvokerError):
     """Occurs when `invoke` is called in command mode with an undefined command."""
 
     def __init__(self, plugin: PluginRef, command):
-        """Initialize UnknownCommandError."""
+        """Initialize UnknownCommandError.
+
+        Args:
+            plugin: Meltano plugin reference.
+            command: Plugin command name.
+        """
         self.plugin = plugin
         self.command = command
 
     def __str__(self):
-        """Return error message."""
+        """Return error message.
+
+        Returns:
+            String representation of this exception.
+        """
         if self.plugin.supported_commands:
             supported_commands = ", ".join(self.plugin.supported_commands)
             desc = f"supports the following commands: {supported_commands}"
@@ -80,7 +91,7 @@ class UnknownCommandError(InvokerError):
         )
 
 
-class PluginInvoker:
+class PluginInvoker:  # noqa: WPS214, WPS230
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
     class StdioSource(str, enum.Enum):  # noqa: WPS431
@@ -90,7 +101,7 @@ class PluginInvoker:
         STDOUT = "stdout"
         STDERR = "stderr"
 
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         project: Project,
         plugin: ProjectPlugin,
@@ -103,6 +114,20 @@ class PluginInvoker:
         plugin_config_service: PluginConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
     ):
+        """Create a new plugin invoker.
+
+        Args:
+            project: Meltano Project.
+            plugin: Meltano Plugin.
+            context: Invocation context. Defaults to None.
+            output_handlers: Logging and output handlers. Defaults to None.
+            run_dir: Execution directory. Defaults to None.
+            config_dir: Configuration files directory. Defaults to None.
+            venv_service: Virtual Environment manager. Defaults to None.
+            plugins_service: Plugin manager. Defaults to None.
+            plugin_config_service: Plugin Configuration manager. Defaults to None.
+            plugin_settings_service: Plugin Settings manager. Defaults to None.
+        """
         self.project = project
         self.plugin = plugin
         self.context = context
@@ -150,7 +175,11 @@ class PluginInvoker:
         }
 
     async def prepare(self, session):
-        """Prepare plugin config."""
+        """Prepare plugin config.
+
+        Args:
+            session: Database session.
+        """
         self.plugin_config = self.settings_service.as_dict(
             extras=False, session=session
         )
@@ -178,7 +207,14 @@ class PluginInvoker:
 
     @asynccontextmanager
     async def prepared(self, session):
-        """Context manager that prepares plugin config , yielding to the caller, and then resetting the config."""
+        """Context manager that prepares plugin config.
+
+        Args:
+            session: Database session.
+
+        Yields:
+            Yields to the caller, then resetting the config.
+        """
         try:
             await self.prepare(session)
             yield
@@ -186,10 +222,15 @@ class PluginInvoker:
             await self.cleanup()
 
     def exec_path(self, executable: Optional[str] = None) -> Union[str, Path]:
-        """
-        Return the absolute path to the executable.
+        """Return the absolute path to the executable.
 
         Uses the plugin executable if none is specified.
+
+        Args:
+            executable: Optional executable string.
+
+        Returns:
+            Full path to the executable.
         """
         executable = executable or self.plugin.executable
         if not self.venv_service:
@@ -206,7 +247,13 @@ class PluginInvoker:
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable.
 
-        Raises `UnknownCommandError` if requested command is not defined.
+        Args:
+            args: Optional plugin args.
+            command: Plugin command name.
+            env: Environment variables
+
+        Returns:
+            List of plugin invocation arguments.
         """
         env = env or {}
         executable = self.exec_path()
@@ -221,13 +268,28 @@ class PluginInvoker:
         return [str(arg) for arg in (executable, *plugin_args, *args)]
 
     def find_command(self, name):
-        """Find a Command by name. Raises `UnknownCommandError` if not defined."""
+        """Find a Command by name.
+
+        Args:
+            name: Command name.
+
+        Returns:
+            Command instance.
+
+        Raises:
+            UnknownCommandError: If command is not defined.
+        """
         try:
             return self.plugin.all_commands[name]
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
     def env(self):
+        """Environment variable mapping.
+
+        Returns:
+            Dictionary of environment variables.
+        """
         env = {
             **self.project.dotenv_env,
             **self.settings_service.env,
@@ -249,7 +311,11 @@ class PluginInvoker:
         return env
 
     def Popen_options(self) -> Dict[str, Any]:  # noqa: N802
-        """Get options for subprocess.Popen."""
+        """Get options for subprocess.Popen.
+
+        Returns:
+            Mapping of subprocess options.
+        """
         return {}
 
     @asynccontextmanager
@@ -260,7 +326,7 @@ class PluginInvoker:
         env: Optional[Dict[str, Any]] = None,
         command: Optional[str] = None,
         **kwargs,
-    ) -> Generator[List[str], Dict[str, Any], Dict[str, Any]]:
+    ) -> Generator[List[str], Dict[str, Any], Dict[str, Any]]:  # noqa: WPS221
         env = env or {}
 
         if require_preparation and not self._prepared:
@@ -281,6 +347,15 @@ class PluginInvoker:
                 ) from err
 
     async def invoke_async(self, *args, **kwargs):
+        """Invoke a command.
+
+        Args:
+            args: Positional arguments.
+            kwargs: Keyword arguments.
+
+        Returns:
+            Subprocess.
+        """
         async with self._invoke(*args, **kwargs) as (
             popen_args,
             popen_options,
@@ -322,7 +397,14 @@ class PluginInvoker:
         return info["State"]["ExitCode"]
 
     async def dump(self, file_id: str) -> str:
-        """Dump a plugin file by id."""
+        """Dump a plugin file by id.
+
+        Args:
+            file_id: Dump this file identifier.
+
+        Returns:
+            File contents.
+        """
         try:
             if file_id != "config":
                 async with self._invoke():
