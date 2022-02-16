@@ -116,13 +116,16 @@ class TestCliInvoke:
         container.show.assert_called_once()
         container.delete.assert_called_once()
 
-        args = docker_context.containers.run.call_args[0]
-        assert args[0]["Cmd"] is None
-        assert args[0]["Image"] == "mock-utils/mock"
-        assert "SOME_ENV=value" in args[0]["Env"]
+        args, kwargs = docker_context.containers.run.call_args
+        container_config = args[0]
+        assert container_config["Cmd"] is None
+        assert container_config["Image"] == "mock-utils/mock"
+        assert "SOME_ENV=value" in container_config["Env"]
 
-        port_bindings = args[0]["HostConfig"]["PortBindings"]
+        port_bindings = container_config["HostConfig"]["PortBindings"]
         assert port_bindings == {"5000": [{"HostPort": "5000"}]}
+
+        assert kwargs["name"] == "meltano-utility-mock--containerized"
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(

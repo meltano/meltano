@@ -391,8 +391,8 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         logger.debug("Running containerized command", command=plugin_command)
         async with self._invoke(*args, **kwargs) as (proc_args, _, proc_env):
-            # TODO: generate container name?
-            info = await service.run_container(spec, "testing", env=proc_env)
+            name = f"meltano-{self.plugin.name}--{plugin_command}"
+            info = await service.run_container(spec, name, env=proc_env)
 
         return info["State"]["ExitCode"]
 
