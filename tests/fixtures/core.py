@@ -198,6 +198,7 @@ def discovery():
                         "ports": {
                             "5000": "5000",
                         },
+                        "volumes": ["$MELTANO_PROJECT_ROOT/example/:/usr/app/"],
                     },
                 },
             },

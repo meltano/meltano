@@ -6,6 +6,7 @@ import shlex
 from typing import Any
 
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.utils import expand_env_vars
 
 
 def env_mapping_to_docker(mapping: dict[str, Any]) -> list[str]:
@@ -66,11 +67,14 @@ class ContainerSpec(Canonical):
         """
         env_config = []
 
-        if self.env:
-            env_config.extend(env_mapping_to_docker(self.env))
+        env = {**self.env}
 
         if additional_env:
-            env_config.extend(env_mapping_to_docker(additional_env))
+            env.update(additional_env)
+
+        env_config = env_mapping_to_docker(env)
+
+        volumes = [expand_env_vars(bind, env) for bind in self.volumes]
 
         return {
             "Cmd": shlex.split(self.command) if self.command else None,
@@ -81,6 +85,6 @@ class ContainerSpec(Canonical):
                     container_port: [{"HostPort": host_port}]
                     for host_port, container_port in self.ports.items()
                 },
-                "Binds": self.volumes,
+                "Binds": volumes,
             },
         }

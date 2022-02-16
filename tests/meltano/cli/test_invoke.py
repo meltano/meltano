@@ -87,7 +87,12 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    def test_invoke_command_containerized(self, cli_runner, mock_invoke_containers):
+    def test_invoke_command_containerized(
+        self,
+        project,
+        cli_runner,
+        mock_invoke_containers,
+    ):
         async def async_generator(*args, **kwargs):
             yield "Line 1"
             yield "Line 2"
@@ -124,6 +129,10 @@ class TestCliInvoke:
 
         port_bindings = container_config["HostConfig"]["PortBindings"]
         assert port_bindings == {"5000": [{"HostPort": "5000"}]}
+
+        # Check volume env var expansion
+        volume_binds = container_config["HostConfig"]["Binds"]
+        assert str(project.root) in volume_binds[0]
 
         assert kwargs["name"] == "meltano-utility-mock--containerized"
 
