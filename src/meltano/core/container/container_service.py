@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from aiodocker import Docker
+import aiodocker
 from structlog.stdlib import get_logger
 
 from .container_spec import ContainerSpec
@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 
 
 class ContainerService:
-    """[summary]."""
+    """Wrapper for container interaction."""
 
     async def run_container(
         self,
@@ -32,7 +32,7 @@ class ContainerService:
         Returns:
             Docker container information after execution.
         """
-        async with Docker() as docker:
+        async with aiodocker.Docker() as docker:
             if pull:
                 await docker.images.pull(spec.image)
 

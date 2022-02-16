@@ -2,9 +2,9 @@ import asyncio
 import json
 
 import pytest
-from aiodocker.containers import DockerContainers
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
+from unittest import mock
 
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
@@ -12,25 +12,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import GoogleAnalyticsTracker
-
-
-class MockContainer:
-    def __init__(self, *args, **kwargs):
-        """Create a mock container object."""
-        pass
-
-    async def log(self, *args, **kwargs):
-        for line in iter([]):
-            yield line
-
-    async def wait(self, *args, **kwargs):
-        pass
-
-    async def show(self, *args, **kwargs):
-        return {"State": {"ExitCode": 0}}
-
-    async def delete(self, *args, **kwargs):
-        pass
 
 
 @pytest.fixture(scope="class")
@@ -63,8 +44,6 @@ class TestCliInvoke:
 
     @pytest.fixture
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
-        mock_container = MockContainer({}, name="testing")
-
         with patch.object(
             GoogleAnalyticsTracker, "track_data", return_value=None
         ), patch(
@@ -72,10 +51,9 @@ class TestCliInvoke:
             return_value=plugin_invoker_factory,
         ), patch.object(
             ProjectPluginsService, "find_plugin", return_value=utility
-        ), patch.object(
-            DockerContainers,
-            "run",
-            return_value=mock_container,
+        ), mock.patch(
+            "aiodocker.Docker",
+            autospec=True,
         ) as invoke_async:
             yield invoke_async
 
@@ -110,6 +88,21 @@ class TestCliInvoke:
         assert args[1:] == ("--option", "arg")
 
     def test_invoke_command_containerized(self, cli_runner, mock_invoke_containers):
+        async def async_generator(*args, **kwargs):
+            yield "Line 1"
+            yield "Line 2"
+
+        docker = mock_invoke_containers.return_value
+        docker_context = mock.AsyncMock()
+        docker.__aenter__.return_value = docker_context
+
+        container = mock.AsyncMock()
+        docker_context.containers.run.return_value = container
+
+        container.log = mock.Mock()
+        container.log.return_value = async_generator()
+        container.show.return_value = {"State": {"ExitCode": 0}}
+
         res = cli_runner.invoke(
             cli,
             ["invoke", "--containers", "utility-mock:containerized"],
@@ -117,9 +110,13 @@ class TestCliInvoke:
         )
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
-        mock_invoke_containers.assert_called_once()
+        docker_context.containers.run.assert_called_once()
+        container.log.assert_called_once()
+        container.wait.assert_called_once()
+        container.show.assert_called_once()
+        container.delete.assert_called_once()
 
-        args = mock_invoke_containers.call_args[0]
+        args = docker_context.containers.run.call_args[0]
         assert args[0]["Cmd"] is None
         assert args[0]["Image"] == "mock-utils/mock"
         assert "SOME_ENV=value" in args[0]["Env"]

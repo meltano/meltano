@@ -16,6 +16,7 @@ def spec() -> ContainerSpec:
 class TestContainerService:
     @pytest.mark.asyncio
     async def test_docker_config(self, spec: ContainerSpec):
+        """Check Docker container config from container spec."""
         config = spec.get_docker_config()
         assert config == {
             "Cmd": None,
