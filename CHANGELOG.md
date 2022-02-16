@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2454](https://gitlab.com/meltano/meltano/-/issues/2454) Added Great Expectations utility
+
 ### Changes
 
 - [!2525](https://gitlab.com/meltano/meltano/-/merge_requests/2525) Updates the discovery_url default setting to use https://discovery.meltano.com/discovery.yml
