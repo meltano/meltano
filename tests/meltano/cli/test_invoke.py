@@ -1,10 +1,10 @@
 import asyncio
 import json
 
+import mock
 import pytest
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
-from unittest import mock
 
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
