@@ -1,5 +1,5 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
-# See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
+# See https://docs.meltano.com/the-project/contributor-guide#discoveryyml-version for more information.
 version: 19
 
 extractors:
@@ -3048,7 +3048,7 @@ loaders:
 transformers:
   - name: dbt
     namespace: dbt
-    docs: https://meltano.com/docs/transforms.html
+    docs: https://docs.meltano.com/guide/transformation
     repo: https://github.com/dbt-labs/dbt-core
     pip_url: >
       dbt-core~=1.0.0
@@ -3250,7 +3250,7 @@ dashboards:
 orchestrators:
   - name: airflow
     namespace: airflow
-    docs: https://meltano.com/docs/orchestration.html
+    docs: https://docs.meltano.com/guide/orchestration
     repo: https://github.com/apache/airflow
     pip_url: 'apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.1.2/constraints-${MELTANO__PYTHON_VERSION}.txt'
     settings:
