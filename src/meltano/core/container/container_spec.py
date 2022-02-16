@@ -14,7 +14,7 @@ def env_mapping_to_docker(mapping: dict[str, Any]) -> list[str]:
     Args:
         mapping: Dictionary of environment variables.
 
-    Return:
+    Returns:
         A list of <ENVVAR>=<VALUE> expression.
 
     >>> env_mapping_to_docker({"MY_VAR": "my_value", "DBT_TARGET": "postgres"})
@@ -36,7 +36,7 @@ class ContainerSpec(Canonical):
         volumes: list[str] | None = None,
         env: dict[str, Any] | None = None,
     ):
-        """A container specification.
+        """Create a new container specification.
 
         Args:
             image: Container image.
@@ -56,7 +56,14 @@ class ContainerSpec(Canonical):
         self.env = env or {}
 
     def get_docker_config(self, *, additional_env: dict = None) -> dict:
-        """Build a container configuration dictionary."""
+        """Build a container configuration dictionary.
+
+        Args:
+            additional_env: Extend container environment with this mapping.
+
+        Returns:
+            Dictionary with container config.
+        """
         env_config = []
 
         if self.env:

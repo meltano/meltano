@@ -24,9 +24,9 @@ class ContainerService:
         """Run a Docker container.
 
         Args:
-            docker: Docker session.
+            spec: Command container spec.
             name: Container name.
-            env: Environment for the
+            env: Environment mapping for the container run.
             pull: Pull image from registry.
 
         Returns:
@@ -39,13 +39,15 @@ class ContainerService:
             config = spec.get_docker_config(additional_env=env)
             container = await docker.containers.run(config, name=name)
 
-            try:
-                async for line in container.log(follow=True, stdout=True, stderr=True):
-                    logger.info(line.rstrip())
+            async for line in container.log(follow=True, stdout=True, stderr=True):
+                logger.info(line.rstrip())
 
+            try:
                 await container.wait()
-                info = await container.show()
+            except Exception as exc:
+                logger.exception("Container run failed", exc_info=exc)
             finally:
+                info = await container.show()
                 await container.delete(force=True)
 
         return info

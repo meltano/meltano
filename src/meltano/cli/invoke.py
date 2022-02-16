@@ -1,3 +1,5 @@
+"""CLI command `meltano invoke`."""
+
 import logging
 import sys
 from typing import Tuple
@@ -71,7 +73,7 @@ def invoke(
 
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
-    _, Session = project_engine(project)
+    _, Session = project_engine(project)  # noqa: N806
     session = Session()
     plugins_service = ProjectPluginsService(project)
     plugin = plugins_service.find_plugin(
@@ -114,10 +116,9 @@ async def _invoke(
                 await dump_file(invoker, dump)
                 exit_code = 0
             elif containers and command_name is not None:
-                logger.info("Running containerized command '%s'", command_name)
                 return await invoker.invoke_docker(
+                    command_name,
                     *plugin_args,
-                    plugin_command=command_name,
                 )
             else:
                 handle = await invoker.invoke_async(*plugin_args, command=command_name)
@@ -162,8 +163,8 @@ async def dump_file(invoker: PluginInvoker, file_id: str):
     """Dump file."""
     try:
         content = await invoker.dump(file_id)
-        print(content)
     except FileNotFoundError as err:
         raise CliError(f"Could not find {file_id}") from err
     except Exception as err:
         raise CliError(f"Could not dump {file_id}: {err}") from err
+    print(content)  # noqa: WPS421

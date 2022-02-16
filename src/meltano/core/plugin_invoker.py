@@ -1,3 +1,5 @@
+"""Plugin invoker class."""
+
 import asyncio
 import enum
 import logging
@@ -6,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Union
 
 from async_generator import asynccontextmanager
+from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
 from meltano.core.logging.utils import SubprocessOutputWriter
@@ -18,6 +21,8 @@ from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
 from .venv_service import VenvService, VirtualEnv
+
+logger = get_logger(__name__)
 
 
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
@@ -287,11 +292,13 @@ class PluginInvoker:
                 env=popen_env,
             )
 
-    async def invoke_docker(self, *args, plugin_command: str, **kwargs) -> int:
+    async def invoke_docker(self, plugin_command: str, *args, **kwargs) -> int:
         """Invoke a containerized command.
 
         Args:
             plugin_command: Plugin command name.
+            args: Command line invocation arguments.
+            kwargs: Command line invocation keyword arguments.
 
         Raises:
             ValueError: If the command doesn't declare a container spec.
@@ -307,8 +314,10 @@ class PluginInvoker:
         spec = command_config.container_spec
         service = ContainerService()
 
-        async with self._invoke(*args, **kwargs) as (args, options, env):
-            info = await service.run_container(spec, "testing", env=env)
+        logger.debug("Running containerized command", command=plugin_command)
+        async with self._invoke(*args, **kwargs) as (proc_args, _, proc_env):
+            # TODO: generate container name?
+            info = await service.run_container(spec, "testing", env=proc_env)
 
         return info["State"]["ExitCode"]
 

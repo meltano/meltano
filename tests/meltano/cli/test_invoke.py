@@ -5,6 +5,7 @@ import pytest
 from aiodocker.containers import DockerContainers
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
+
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -15,10 +16,11 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 class MockContainer:
     def __init__(self, *args, **kwargs):
+        """Create a mock container object."""
         pass
 
     async def log(self, *args, **kwargs):
-        for line in []:
+        for line in iter([]):
             yield line
 
     async def wait(self, *args, **kwargs):
@@ -120,8 +122,10 @@ class TestCliInvoke:
         args = mock_invoke_containers.call_args[0]
         assert args[0]["Cmd"] is None
         assert args[0]["Image"] == "mock-utils/mock"
-        assert args[0]["HostConfig"]["PortBindings"]["5000"] == [{"HostPort": "5000"}]
         assert "SOME_ENV=value" in args[0]["Env"]
+
+        port_bindings = args[0]["HostConfig"]["PortBindings"]
+        assert port_bindings == {"5000": [{"HostPort": "5000"}]}
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
