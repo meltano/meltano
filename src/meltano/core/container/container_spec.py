@@ -65,13 +65,13 @@ class ContainerSpec(Canonical):
         Returns:
             Dictionary with container config.
         """
-        env_config = []
 
-        env = {**self.env}
+        env = {}
 
         if additional_env:
             env.update(additional_env)
 
+        env.update(self.env)
         env_config = env_mapping_to_docker(env)
 
         volumes = [expand_env_vars(bind, env) for bind in self.volumes]
