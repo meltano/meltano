@@ -106,6 +106,7 @@ To learn how to add an inheriting plugin to your project using an [inheriting pl
 Meltano supports the following types of plugins:
 
 - [**Extractors**](#extractors) pull data out of arbitrary data sources.
+- [**Mappers**](#mappers) perform stream map transforms on data between extractors and loaders.
 - [**Loaders**](#loaders) load extracted data into arbitrary data destinations.
 - [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
 - [**Models**](#models) describe the schema of the data being analyzed and the ways different tables can be joined.
@@ -114,7 +115,6 @@ Meltano supports the following types of plugins:
 - [**Transformers**](#transformers) run transforms.
 - [**File bundles**](#file-bundles) bundle files you may want in your project.
 - [**Utilities**](#utilities) perform arbitrary tasks provided by [pip packages](https://pip.pypa.io/en/stable/) with executables.
-- [**Mappers**](#mappers) perform stream map transforms on data between taps and targets.
 
 ### Extractors
 
@@ -811,7 +811,7 @@ To learn more about mapper 'transform-field', visit https://github.com/transferw
 ```
 
 Mappers are unique in that after install you don't invoke them directly. Instead you define `mappings` by name and add a config object for each mapping.
-This config object is passed the mapper when the **mapping name** is called as part of a [`meltano run`](/reference/command-line-interface#run) invocation.
+This config object is passed to the mapper when the **mapping name** is called as part of a [`meltano run`](/reference/command-line-interface#run) invocation.
 Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead. 
 Additionally, the requirements for the config object itself will vary by plugin.
 

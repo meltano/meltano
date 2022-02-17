@@ -603,7 +603,7 @@ meltano remove loader target-postgres target-csv
 
 Run a set of command blocks in series.
 
-Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_mappinh some_target some_plugin:some_cmd` and
+Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_mapping some_target some_plugin:some_cmd` and
 are run in the order they are specified from left to right. A failure in any block will cause the entire run to abort.
 
 Multiple commmand blocks can be chained together or repeated, and tap/target pairs will automatically be linked to
