@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2299](https://gitlab.com/meltano/meltano/-/issues/2299) Introduces stream map support for `meltano run` via a new Singer compatible Mapper plugin type.
+
 ### Changes
 
 - [#3176](https://gitlab.com/meltano/meltano/-/issues/3176) Support dbt v1.0
