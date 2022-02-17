@@ -617,6 +617,7 @@
                         "docs": {},
                         "settings_group_validation": {},
                         "commands": {},
+                        "variant": {},
                         "variants": {
                             "type": "array",
                             "items": {
