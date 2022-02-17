@@ -3323,3 +3323,9 @@ mappers:
       pip_url: pipelinewise-transform-field
       repo: https://github.com/transferwise/pipelinewise-transform-field
       executable: transform-field
+  - name: meltano-map-transformer
+    namespace: meltano_map_transformer
+    variant: meltano
+    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
+    repo: https://github.com/MeltanoLabs/meltano-map-transform
+    executable: meltano-map-transformer

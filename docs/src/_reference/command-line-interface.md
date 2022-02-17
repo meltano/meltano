@@ -603,7 +603,7 @@ meltano remove loader target-postgres target-csv
 
 Run a set of command blocks in series.
 
-Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_target some_plugin:some_cmd` and
+Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_mappinh some_target some_plugin:some_cmd` and
 are run in the order they are specified from left to right. A failure in any block will cause the entire run to abort.
 
 Multiple commmand blocks can be chained together or repeated, and tap/target pairs will automatically be linked to
@@ -623,6 +623,7 @@ meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run
 meltano run tap-gitlab target-postgres tap-salesforce target-mysql
 meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
+meltano run tap-gitlab one-mapping another-mapping target-postgres
 ```
 
 ## `schedule`

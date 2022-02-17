@@ -71,17 +71,17 @@ class MeltanoFile(Canonical):
         return [Environment.parse(obj) for obj in environments]
 
     @staticmethod
-    def get_plugins_for_mappings(mapper: Dict) -> List[ProjectPlugin]:
-        """Mapper plugins are a special case. They are not a single plugin, but actually a list of plugins generated from the mapping configs.
+    def get_plugins_for_mappings(mapper_config: Dict) -> List[ProjectPlugin]:
+        """Mapper plugins are a special case. They are not a single plugin, but actually a list of plugins generated from the mapping config defined within the mapper config.
 
         Args:
-            mapper: A mapper entry.
+            mapper_config: The dict representation of a mapper config found in in meltano.yml.
         Returns:
             A list of `ProjectPlugin` instances.
         """
         mapping_plugins: List[ProjectPlugin] = []
-        for mapping in mapper.get("mappings", []):
-            raw_mapping_plugin = copy.deepcopy(mapper)
+        for mapping in mapper_config.get("mappings", []):
+            raw_mapping_plugin = copy.deepcopy(mapper_config)
             raw_mapping_plugin["mapper"] = False
             raw_mapping_plugin["mapping_name"] = mapping.get("name")
             raw_mapping_plugin["config"] = mapping.get("config")
