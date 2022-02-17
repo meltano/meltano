@@ -37,6 +37,8 @@ class ContainerService:
                 await docker.images.pull(spec.image)
 
             config = spec.get_docker_config(additional_env=env)
+
+            logger.info("Running command in container", container_name=name)
             container = await docker.containers.run(config, name=name)
 
             async for line in container.log(follow=True, stdout=True, stderr=True):
