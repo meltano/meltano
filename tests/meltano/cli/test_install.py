@@ -79,11 +79,15 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             assert install_plugin_mock_m.call_count == 1
-            seen_mappers = install_plugin_mock_m.call_args[0][1]
-            assert len(seen_mappers) == 3
-            assert seen_mappers[0] == mapper
-            assert not seen_mappers[1].extra_config.get("_mapper")
-            assert not seen_mappers[2].extra_config.get("_mapper")
+            seen_plugins = install_plugin_mock_m.call_args[0][1]
+            assert len(seen_plugins) == 3
+            assert mapper in seen_plugins
+            mappings_seen = 0
+            for found in seen_plugins:
+                assert found == mapper
+                if found.extra_config.get("_mapping"):
+                    mappings_seen += 1
+            assert mappings_seen == 2
 
     def test_install_type_name(
         self,
@@ -132,11 +136,15 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             assert install_plugin_mock_m.call_count == 1
-            seen_mappers = install_plugin_mock_m.call_args[0][1]
-            assert len(seen_mappers) == 3
-            assert seen_mappers[0] == mapper
-            assert not seen_mappers[1].extra_config.get("_mapper")
-            assert not seen_mappers[2].extra_config.get("_mapper")
+            seen_plugins = install_plugin_mock_m.call_args[0][1]
+            assert len(seen_plugins) == 3
+            assert mapper in seen_plugins
+            mappings_seen = 0
+            for found in seen_plugins:
+                assert found == mapper
+                if found.extra_config.get("_mapping"):
+                    mappings_seen += 1
+            assert mappings_seen == 2
 
     def test_install_multiple(
         self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service

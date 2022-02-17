@@ -49,12 +49,14 @@ class TestMeltanoFile:
         plugins = meltano_file.get_plugins_for_mappings(test_config)
         assert len(plugins) == 2
 
+        assert plugins[0].extra_config.get("_mapping")
         assert (
             plugins[0].extra_config.get("_mapping_name")
             == test_config["mappings"][0]["name"]
         )
         assert plugins[0].config == test_config["mappings"][0]["config"]
 
+        assert plugins[1].extra_config.get("_mapping")
         assert (
             plugins[1].extra_config.get("_mapping_name")
             == test_config["mappings"][1]["name"]

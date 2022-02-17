@@ -82,7 +82,7 @@ class MeltanoFile(Canonical):
         mapping_plugins: List[ProjectPlugin] = []
         for mapping in mapper_config.get("mappings", []):
             raw_mapping_plugin = copy.deepcopy(mapper_config)
-            raw_mapping_plugin["mapper"] = False
+            raw_mapping_plugin["mapping"] = True
             raw_mapping_plugin["mapping_name"] = mapping.get("name")
             raw_mapping_plugin["config"] = mapping.get("config")
             mapping_plugins.append(
