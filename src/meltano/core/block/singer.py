@@ -17,8 +17,8 @@ from meltano.core.runner import RunnerError
 
 from .ioblock import IOBlock
 
-PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPINGS, PluginType.MAPPERS)
-CONSUMERS = (PluginType.LOADERS, PluginType.MAPPINGS, PluginType.MAPPERS)
+PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPERS)
+CONSUMERS = (PluginType.LOADERS, PluginType.MAPPERS)
 
 
 class InvokerBase:  # noqa: WPS230

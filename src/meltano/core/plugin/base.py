@@ -72,8 +72,6 @@ class PluginType(YAMLEnum):
             return "utilize"
         if self is self.__class__.MAPPERS:
             return "map"
-        if self is self.__class__.MAPPINGS:
-            return "mapping"  # technically not a verb, but it's the same as "map"
 
         return self.value[:-3]
 

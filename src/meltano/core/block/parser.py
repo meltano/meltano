@@ -26,7 +26,6 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
     return plugin.type not in {
         PluginType.EXTRACTORS,
         PluginType.LOADERS,
-        PluginType.MAPPINGS,
         PluginType.MAPPERS,
     }
 
