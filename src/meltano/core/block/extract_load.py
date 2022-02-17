@@ -6,8 +6,10 @@ from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
+
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
+from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -23,8 +25,6 @@ from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
 from .singer import SingerBlock
-from ..job.stale_job_failer import StaleJobFailer
-from ...cli import CliError
 
 logger = structlog.getLogger(__name__)
 
