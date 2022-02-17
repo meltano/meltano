@@ -134,7 +134,7 @@ class TestCliInvoke:
         volume_binds = container_config["HostConfig"]["Binds"]
         assert str(project.root) in volume_binds[0]
 
-        assert kwargs["name"] == "meltano-utility-mock--containerized"
+        assert kwargs["name"].startswith("meltano-utility-mock--containerized")
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(

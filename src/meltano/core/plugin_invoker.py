@@ -4,6 +4,7 @@ import asyncio
 import enum
 import logging
 import os
+import uuid
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Union
 
@@ -391,7 +392,10 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         logger.debug("Running containerized command", command=plugin_command)
         async with self._invoke(*args, **kwargs) as (proc_args, _, proc_env):
-            name = f"meltano-{self.plugin.name}--{plugin_command}"
+            plugin_name = self.plugin.name
+            random_id = uuid.uuid4()
+            name = f"meltano-{plugin_name}--{plugin_command}-{random_id}"
+
             info = await service.run_container(spec, name, env=proc_env)
 
         return info["State"]["ExitCode"]
