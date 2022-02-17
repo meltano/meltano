@@ -573,6 +573,14 @@ To see what commands a plugin supports, use `--list-command`:
 meltano invoke --list-commands dbt
 ```
 
+### Containerized commands
+
+To execute plugins inside containers, use the `--containers` flag:
+
+```bash
+meltano invoke --containers dbt:compile
+```
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
@@ -618,8 +626,8 @@ perform EL work.
 ### How to use
 
 ```bash
-meltano run tap-gitlab target-postgres 
-meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run 
+meltano run tap-gitlab target-postgres
+meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run
 meltano run tap-gitlab target-postgres tap-salesforce target-mysql
 meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
