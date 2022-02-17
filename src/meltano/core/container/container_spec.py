@@ -65,7 +65,6 @@ class ContainerSpec(Canonical):
         Returns:
             Dictionary with container config.
         """
-
         env = {}
 
         if additional_env:

@@ -46,6 +46,8 @@ ignore =
     WPS110
     # Allow upper-case constants in Enum subclasses
     WPS115
+    # Allow "too many"
+    WPS211
     # Allow local folder imports (import .module)
     WPS300
     # Allow f-strings
@@ -60,6 +62,8 @@ ignore =
     WPS348
     # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
     WPS420
+    # Allow nested classes
+    WPS431
     # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
     WPS600
     # Allow using @staticmethod
@@ -76,7 +80,7 @@ inline_quotes = double
 max_line_length = 88
 show_source = true
 extended_default_ignore = []
-max_imports = 16
+max_imports = 20
 docstring_style = google
 
 per_file_ignores =

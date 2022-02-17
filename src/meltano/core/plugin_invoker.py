@@ -27,6 +27,17 @@ logger = get_logger(__name__)
 
 
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
+    """Instantiate a plugin invoker from a project plugin.
+
+    Args:
+        project: Meltano project.
+        plugin: Plugin instance.
+        args: Invoker constructor positional arguments.
+        kwargs: Invoker constructor keyword arguments.
+
+    Returns:
+        A plugin invoker.
+    """
     cls = PluginInvoker  # noqa: WPS117
 
     if hasattr(plugin, "invoker_class"):  # noqa: WPS421
@@ -49,9 +60,14 @@ class ExecutableNotFoundError(InvokerError):
             plugin: Meltano plugin reference.
             executable: Plugin command executable.
         """
+        plugin_type_descriptor = plugin.type.descriptor.capitalize()
+        plugin_type = plugin.type.singular
         super().__init__(
             f"Executable '{executable}' could not be found. "
-            f"{plugin.type.descriptor.capitalize()} '{plugin.name}' may not have been installed yet using `meltano install {plugin.type.singular} {plugin.name}`, or the executable name may be incorrect."
+            + f"{plugin_type_descriptor} '{plugin.name}' may not have"
+            + "been installed yet using "
+            + f"`meltano install {plugin_type} {plugin.name}`, "
+            + "or the executable name may be incorrect."
         )
 
 
@@ -83,10 +99,12 @@ class UnknownCommandError(InvokerError):
             desc = f"supports the following commands: {supported_commands}"
         else:
             desc = "does not define any commands."
+        plugin_type_descriptor = self.plugin.type.descriptor.capitalize()
+        plugin_name = self.plugin.name
         return " ".join(
             [
                 f"Command '{self.command}' could not be found.",
-                f"{self.plugin.type.descriptor.capitalize()} '{self.plugin.name}'",
+                f"{plugin_type_descriptor} '{plugin_name}'",
                 desc,
             ]
         )
@@ -95,14 +113,14 @@ class UnknownCommandError(InvokerError):
 class PluginInvoker:  # noqa: WPS214, WPS230
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
-    class StdioSource(str, enum.Enum):  # noqa: WPS431
+    class StdioSource(str, enum.Enum):
         """Describes the available unix style std io sources."""
 
         STDIN = "stdin"
         STDOUT = "stdout"
         STDERR = "stderr"
 
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         project: Project,
         plugin: ProjectPlugin,
@@ -162,12 +180,22 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
     @property
     def capabilities(self):
-        # we want to make sure the capabilites are immutable from the `PluginInvoker` interface
+        """Get plugin immutable capabilities.
+
+        Makes sure the capabilities are immutable from the `PluginInvoker` interface.
+
+        Returns:
+            The set of plugin capabilities.
+        """
         return frozenset(self.plugin.capabilities)
 
     @property
     def files(self) -> Dict[str, Path]:
-        """Get all config and output files of the plugin."""
+        """Get all config and output files of the plugin.
+
+        Returns:
+            A mapping of file IDs to file names.
+        """
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
 
         return {
@@ -216,7 +244,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Yields:
             Yields to the caller, then resetting the config.
         """
-        try:
+        try:  # noqa: WPS229. Allow try body of length > 1.
             await self.prepare(session)
             yield
         finally:
@@ -408,16 +436,19 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         Returns:
             File contents.
+
+        Raises:
+            __cause__: If file is not found.
         """
-        try:
+        try:  # noqa: WPS229. Allow try body of length > 1.
             if file_id != "config":
                 async with self._invoke():
                     return self.files[file_id].read_text()
 
             return self.files[file_id].read_text()
-        except ExecutableNotFoundError as err:
+        except ExecutableNotFoundError as err:  # noqa: WPS329. Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__
+            raise err.__cause__  # noqa: WPS609. Allow accessing magic attribute.
 
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.

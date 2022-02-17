@@ -95,11 +95,11 @@ class TestCliInvoke:
     ):
         async def async_generator(*args, **kwargs):
             yield "Line 1"
-            yield "Line 2"
+            yield "Line 2"  # noqa: WPS354
 
         docker = mock_invoke_containers.return_value
         docker_context = mock.AsyncMock()
-        docker.__aenter__.return_value = docker_context
+        docker.__aenter__.return_value = docker_context  # noqa: WPS609
 
         container = mock.AsyncMock()
         docker_context.containers.run.return_value = container
