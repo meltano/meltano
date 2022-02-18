@@ -2,12 +2,26 @@
 
 from __future__ import annotations
 
+import asyncio
+import signal
+
 import aiodocker
+from aiodocker.containers import DockerContainer
 from structlog.stdlib import get_logger
 
 from .container_spec import ContainerSpec
 
 logger = get_logger(__name__)
+
+
+def stop_container(container: DockerContainer):
+    """Stop a Docker container.
+
+    Args:
+        container: Running container.
+    """
+    logger.info("Stopping container", container_id=container.id)
+    asyncio.ensure_future(container.stop())
 
 
 class ContainerService:
@@ -40,6 +54,9 @@ class ContainerService:
 
             logger.info("Running command in container", container_name=name)
             container = await docker.containers.run(config, name=name)
+            loop = asyncio.get_running_loop()
+            loop.add_signal_handler(signal.SIGINT, lambda: stop_container(container))
+            loop.add_signal_handler(signal.SIGTERM, lambda: stop_container(container))
 
             async for line in container.log(follow=True, stdout=True, stderr=True):
                 logger.info(line.rstrip())
