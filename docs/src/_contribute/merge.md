@@ -5,13 +5,6 @@ layout: doc
 weight: 3
 ---
 
-## Merge Requests
-
-<div class="notification is-info">
-  <p><strong>Searching for something to work on?</strong></p>
-  <p>Start off by looking at our <a href="https://gitlab.com/groups/meltano/-/issues?scope=all&state=opened&label_name[]=Accepting%20Merge%20Requests">"Accepting Merge Requests"</a> label. Keep in mind that this is only a suggestion: all improvements are welcome.</p>
-</div>
-
 Meltano uses an approval workflow for all merge requests.
 
 1. Create your merge request
