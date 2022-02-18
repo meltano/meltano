@@ -4,8 +4,6 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Optional, Tuple
 
 import structlog
-from sqlalchemy.orm import Session
-
 from meltano.core.elt_context import PluginContext
 from meltano.core.logging import OutputLogger
 from meltano.core.logging.utils import SubprocessOutputWriter
@@ -14,6 +12,7 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
+from sqlalchemy.orm import Session
 
 from .singer import InvokerBase
 

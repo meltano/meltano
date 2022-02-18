@@ -4,9 +4,8 @@ from typing import List, Optional
 
 import pytest
 import structlog
-from asynctest import CoroutineMock, mock
-
 from asserts import assert_cli_runner
+from asynctest import CoroutineMock, mock
 from meltano.cli import CliError, cli
 from meltano.core.job import Job, State
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN

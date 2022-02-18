@@ -1,5 +1,4 @@
 import pytest
-
 from meltano.core.plugin import PluginType
 
 

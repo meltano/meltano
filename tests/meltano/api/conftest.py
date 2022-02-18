@@ -1,5 +1,4 @@
 import pytest
-
 from meltano.api.models import db as _db
 
 

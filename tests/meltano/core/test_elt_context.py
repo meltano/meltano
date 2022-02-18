@@ -1,7 +1,6 @@
 import os
 
 import pytest
-
 from meltano.core.plugin import PluginType, Variant
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 

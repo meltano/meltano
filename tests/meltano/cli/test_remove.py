@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType

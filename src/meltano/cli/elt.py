@@ -5,8 +5,6 @@ from contextlib import contextmanager
 
 import click
 from async_generator import asynccontextmanager
-from structlog import stdlib as structlog_stdlib
-
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -20,6 +18,7 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
+from structlog import stdlib as structlog_stdlib
 
 from . import cli
 from .params import pass_project

@@ -5,7 +5,6 @@ import re
 from typing import Dict, Optional, Union
 
 import yaml
-
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject

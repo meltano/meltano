@@ -6,7 +6,6 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock, Mock
-
 from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import (
     ELBContext,

@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 import psutil
 import pytest
-
 from meltano.core.job.job import (
     HEARTBEAT_VALID_MINUTES,
     HEARTBEATLESS_JOB_VALID_HOURS,

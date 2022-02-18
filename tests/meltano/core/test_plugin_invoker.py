@@ -3,7 +3,6 @@ from unittest import mock
 
 import dotenv
 import pytest
-
 from meltano.core.plugin.command import UndefinedEnvVarError
 from meltano.core.plugin_invoker import UnknownCommandError
 from meltano.core.venv_service import VirtualEnv

@@ -2,13 +2,12 @@ from flask import jsonify, request
 from flask_principal import Need, Permission
 from flask_restful import Api, Resource, fields, marshal, marshal_with
 from flask_security import roles_required
-from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import Forbidden
-
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models.security import Role, RolePermissions, RolesUsers, User, db
 from meltano.api.security import users
 from meltano.api.security.auth import block_if_readonly
+from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import Forbidden
 
 from .settings_helper import SettingsHelper
 

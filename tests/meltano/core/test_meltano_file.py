@@ -1,6 +1,5 @@
 import pytest
 import yaml
-
 from meltano.core.meltano_file import MeltanoFile
 
 

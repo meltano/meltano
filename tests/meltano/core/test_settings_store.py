@@ -2,7 +2,6 @@ from contextlib import contextmanager
 from unittest import mock
 
 import pytest
-
 from meltano.core.environment import Environment
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.settings_service import SettingsService

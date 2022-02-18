@@ -2,9 +2,8 @@ import logging
 import os
 from contextlib import contextmanager
 
-import yaml
-
 import meltano.core.bundle as bundle
+import yaml
 
 from .project import Project
 from .setting_definition import SettingDefinition

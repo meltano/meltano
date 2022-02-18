@@ -6,7 +6,6 @@ from pathlib import Path
 import markdown
 from flask import jsonify, request
 from flask_principal import Need
-
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.json import freeze_keys
 from meltano.api.security.auth import permit

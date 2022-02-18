@@ -6,7 +6,6 @@ import json
 from typing import Optional
 
 import structlog
-
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind

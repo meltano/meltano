@@ -3,7 +3,6 @@ from typing import Dict, Generator, List, Optional, Tuple, Union
 
 import click
 import structlog
-
 from meltano.core.block.blockset import BlockSet, BlockSetValidationError
 from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
 from meltano.core.block.ioblock import IOBlock
@@ -21,7 +20,6 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
 
     Args:
         plugin: Plugin to check.
-
     Returns:
         True if plugin is a command block.
     """
@@ -41,12 +39,11 @@ def generate_job_id(
         project: Project to retrieve active environment from.
         consumer: Consumer block.
         producer: Producer block.
-
     Returns:
         Job id or None if project active environment is not set.
     """
     if project.active_environment:
-        return f"{project.active_environment.name}-{consumer.string_id}-{producer.string_id}"  # noqa: WPS237
+        return f"{project.active_environment.name}-{consumer.string_id}-{producer.string_id}"
     return None
 
 
@@ -58,7 +55,6 @@ def validate_block_sets(
     Args:
         log: Logger to use in the event of a validation error.
         blocks: A list of blocks.
-
     Returns:
         True if all blocks are valid, False otherwise.
     """
@@ -89,9 +85,6 @@ class BlockParser:  # noqa: D101
             project: Project to use.
             blocks: List of block names to parse.
             session: Optional session to use.
-
-        Raises:
-            ClickException: If a block name is not found.
         """
         self.log = log
         self.project = project
@@ -132,11 +125,8 @@ class BlockParser:  # noqa: D101
         Args:
             offset: Offset to start from.
 
-        Yields:
+        Returns:
             Generator of blocks (either BlockSet or PluginCommandBlock).
-
-        Raises:
-            BlockSetValidationError: If unknown command is found or if a unexpected block sequence is found.
         """
         cur = offset
         while cur < len(self._plugins):
@@ -160,8 +150,8 @@ class BlockParser:  # noqa: D101
                 )
                 cur += 1
             else:
-                raise BlockSetValidationError(
-                    f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{plugin.name}'"  # noqa: WPS237
+                raise Exception(
+                    f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{plugin.name}'"
                 )
 
     def _find_plugin_or_mapping(self, name: str) -> Optional[ProjectPlugin]:
@@ -169,11 +159,9 @@ class BlockParser:  # noqa: D101
 
         Args:
             name: Name of the plugin or mapping.
-
         Returns:
             The actual plugin.
-
-        Raises:
+        Raises
             ClickException: If mapping name returns multiple matches.
         """
         try:
@@ -205,13 +193,9 @@ class BlockParser:  # noqa: D101
 
         Args:
             offset: Optional starting offset for search.
-
         Returns:
             The ExtractLoad object.
             Offset for remaining plugins.
-
-        Raises:
-            BlockSetValidationError: If the block set is not valid.
         """
         blocks: List[SingerBlock] = []
 
@@ -271,4 +255,4 @@ class BlockParser:  # noqa: D101
                 raise BlockSetValidationError(
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}."
                 )
-        raise BlockSetValidationError("Found no end in block set!")
+        raise Exception("Found no end in block set!")

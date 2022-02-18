@@ -1,5 +1,4 @@
 from asynctest import mock
-
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.parser import generate_job_id, is_command_block
 from meltano.core.environment import Environment

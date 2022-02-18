@@ -1,8 +1,7 @@
 import json
 
-from asynctest import CoroutineMock, mock
-
 from asserts import assert_cli_runner
+from asynctest import CoroutineMock, mock
 from meltano.cli import cli
 
 

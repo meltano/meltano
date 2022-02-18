@@ -4,7 +4,6 @@ from unittest import mock
 
 import dotenv
 import pytest
-
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import (
