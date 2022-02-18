@@ -10,6 +10,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.96.0 - (2022-02-18)
+---
+
+### New
+
 - [#2299](https://gitlab.com/meltano/meltano/-/issues/2299) Introduces stream map support for `meltano run` via a new Singer compatible Mapper plugin type.
 - [#2205](https://gitlab.com/meltano/meltano/-/issues/2205) Add Docker support via a new `container_spec` option for plugin commands.
 - [#2454](https://gitlab.com/meltano/meltano/-/issues/2454) Added support for the Great Expectations data validation utility.
@@ -21,8 +33,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3257](https://gitlab.com/meltano/meltano/-/issues/3257) Resolves installation failures by pinning `MarkupSafe` library version to `<2.1.0`.
-
-### Breaks
 
 
 ## 1.95.0 - (2022-02-11)
