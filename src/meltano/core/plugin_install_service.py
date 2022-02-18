@@ -1,7 +1,6 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 import asyncio
 import functools
-import logging
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
@@ -12,9 +11,7 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from .compiler.project_compiler import ProjectCompiler
 from .error import AsyncSubprocessError, PluginInstallError, PluginInstallWarning
 from .plugin import PluginType
-from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
-from .project_add_service import ProjectAddService
 from .project_plugins_service import ProjectPluginsService
 from .utils import noop, run_async
 from .venv_service import VenvService

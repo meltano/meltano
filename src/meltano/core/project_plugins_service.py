@@ -54,7 +54,11 @@ class ProjectPluginsService:
 
     @contextmanager
     def update_environments(self):
-        """Update Meltano environments in `meltano.yml`."""
+        """Update Meltano environments in `meltano.yml`.
+
+        Yields:
+            The updated environments.
+        """
         with self.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.environments
 
@@ -69,7 +73,7 @@ class ProjectPluginsService:
             pass
 
         with self.update_plugins() as plugins:
-            if not plugin.type in plugins:
+            if plugin.type not in plugins:
                 plugins[plugin.type] = []
 
             plugins[plugin.type].append(plugin)
@@ -77,7 +81,14 @@ class ProjectPluginsService:
         return plugin
 
     def remove_from_file(self, plugin: ProjectPlugin):
-        """Remove plugin from `meltano.yml`."""
+        """Remove plugin from `meltano.yml`.
+
+        Args:
+            plugin: The plugin to remove.
+
+        Returns:
+            The removed plugin.
+        """
         # Will raise if the plugin isn't actually in the file
         self.get_plugin(plugin)
 
@@ -86,7 +97,15 @@ class ProjectPluginsService:
 
         return plugin
 
-    def has_plugin(self, plugin_name: str):
+    def has_plugin(self, plugin_name: str) -> bool:
+        """Check if plugin exists for the given name.
+
+        Args:
+            plugin_name: The name of the plugin to check for.
+
+        Returns:
+            True if the plugin exists, False otherwise.
+        """
         try:
             self.find_plugin(plugin_name)
             return True
@@ -100,6 +119,21 @@ class ProjectPluginsService:
         invokable=None,
         configurable=None,
     ) -> ProjectPlugin:
+        """
+        Find a plugin.
+
+        Args:
+            plugin_name: The name of the plugin to find.
+            plugin_type: Optionally the type of plugin.
+            invokable: Optionally limit the search to invokable plugins.
+            configurable: Optionally limit the search to configurable plugins.
+
+        Returns:
+            The plugin.
+
+        Raises:
+            PluginNotFoundError: If the plugin is not found.
+        """
         if "@" in plugin_name:
             plugin_name, profile_name = plugin_name.split("@", 2)
             logger.warning(
@@ -138,6 +172,16 @@ class ProjectPluginsService:
 
         For example, PluginType.EXTRACTORS and namespace tap_custom
         will return the extractor for the tap-custom plugin.
+
+        Args:
+            plugin_type: The type of plugin to find.
+            namespace: The namespace of the plugin.
+
+        Returns:
+            The plugin if found.
+
+        Raises:
+            PluginNotFoundError: If no plugin is found.
         """
         try:
             return next(
@@ -153,9 +197,11 @@ class ProjectPluginsService:
 
         Args:
             mapping_name: The name of the mapping to find.
+
         Returns:
             The mapping plugins with the specified mapping name.
-        Raises
+
+        Raises:
             PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
         """
         found: List[ProjectPlugin] = []
@@ -167,6 +213,17 @@ class ProjectPluginsService:
         return found
 
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
+        """Get a plugin using its PluginRef.
+
+        Args:
+            plugin_ref: The plugin reference to use.
+
+        Returns:
+            The plugin if found.
+
+        Raises:
+            PluginNotFoundError: If the plugin is not found.
+        """
         try:
             plugin = next(
                 plugin
@@ -186,6 +243,7 @@ class ProjectPluginsService:
         Args:
             plugin_type: The type of the plugins to return.
             ensure_parent: If True, ensure that plugin has a parent plugin set.
+
         Returns:
             A list of plugins of the specified plugin type.
         """
@@ -198,7 +256,14 @@ class ProjectPluginsService:
         return plugins
 
     def plugins_by_type(self, ensure_parent=True):
-        """Return plugins grouped by type."""
+        """Return plugins grouped by type.
+
+        Args:
+            ensure_parent: If True, ensure that plugin has a parent plugin set.
+
+        Returns:
+            A dict of plugins grouped by type.
+        """
         return {
             plugin_type: self.get_plugins_of_type(
                 plugin_type, ensure_parent=ensure_parent
@@ -207,7 +272,14 @@ class ProjectPluginsService:
         }
 
     def plugins(self, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:
-        """Return all plugins."""
+        """Return all plugins.
+
+        Args:
+            ensure_parent: If True, ensure that plugin has a parent plugin set.
+
+        Yields:
+            A generator of all plugins.
+        """
         yield from (
             plugin
             for _, plugins in self.plugins_by_type(ensure_parent=ensure_parent).items()
@@ -226,7 +298,14 @@ class ProjectPluginsService:
             return outdated
 
     def update_environment_plugin(self, plugin: EnvironmentPluginConfig) -> None:
-        """Update a plugin configuration inside a Meltano environment."""
+        """Update a plugin configuration inside a Meltano environment.
+
+        Args:
+            plugin: The plugin configuration to update.
+
+        Returns:
+            None
+        """
         environments: List[Environment]
         environment = self.project.active_environment
 
@@ -257,8 +336,18 @@ class ProjectPluginsService:
 
             return p_outdated
 
-    def get_parent(self, plugin: ProjectPlugin):
-        """Get plugin's parent plugin."""
+    def get_parent(self, plugin: ProjectPlugin) -> Optional[ProjectPlugin]:
+        """Get plugin's parent plugin.
+
+        Args:
+            plugin: The plugin to get the parent of.
+
+        Returns:
+            The parent plugin or None if the plugin has no parent.
+
+        Raises:
+            PluginParentNotFoundError: If the plugin has a parent but it can not be found.
+        """
         if plugin.inherit_from and not plugin.is_variant_set:
             try:
                 return self.find_plugin(
@@ -275,8 +364,15 @@ class ProjectPluginsService:
 
             raise
 
-    def ensure_parent(self, plugin: ProjectPlugin):
-        """Ensure that plugin has a parent set."""
+    def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
+        """Ensure that plugin has a parent set.
+
+        Args:
+            plugin: To set the parent of if necessary.
+
+        Returns:
+            The plugin (updated if necessary).
+        """
         if not plugin.parent:
             plugin.parent = self.get_parent(plugin)
 
