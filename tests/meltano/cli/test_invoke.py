@@ -1,9 +1,11 @@
 import asyncio
 import json
 
+import mock
 import pytest
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
+
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -40,6 +42,21 @@ class TestCliInvoke:
         ) as invoke_async:
             yield invoke_async
 
+    @pytest.fixture
+    def mock_invoke_containers(self, utility, plugin_invoker_factory):
+        with patch.object(
+            GoogleAnalyticsTracker, "track_data", return_value=None
+        ), patch(
+            "meltano.core.plugin_invoker.invoker_factory",
+            return_value=plugin_invoker_factory,
+        ), patch.object(
+            ProjectPluginsService, "find_plugin", return_value=utility
+        ), mock.patch(
+            "aiodocker.Docker",
+            autospec=True,
+        ) as invoke_async:
+            yield invoke_async
+
     def test_invoke(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(cli, ["invoke", "utility-mock"])
 
@@ -69,6 +86,55 @@ class TestCliInvoke:
         args = mock_invoke.call_args[0]
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
+
+    def test_invoke_command_containerized(
+        self,
+        project,
+        cli_runner,
+        mock_invoke_containers,
+    ):
+        async def async_generator(*args, **kwargs):
+            yield "Line 1"
+            yield "Line 2"  # noqa: WPS354
+
+        docker = mock_invoke_containers.return_value
+        docker_context = mock.AsyncMock()
+        docker.__aenter__.return_value = docker_context  # noqa: WPS609
+
+        container = mock.AsyncMock()
+        docker_context.containers.run.return_value = container
+
+        container.log = mock.Mock()
+        container.log.return_value = async_generator()
+        container.show.return_value = {"State": {"ExitCode": 0}}
+
+        res = cli_runner.invoke(
+            cli,
+            ["invoke", "--containers", "utility-mock:containerized"],
+            env={"SOME_ENV": "value"},
+        )
+
+        assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
+        docker_context.containers.run.assert_called_once()
+        container.log.assert_called_once()
+        container.wait.assert_called_once()
+        container.show.assert_called_once()
+        container.delete.assert_called_once()
+
+        args, kwargs = docker_context.containers.run.call_args
+        container_config = args[0]
+        assert container_config["Cmd"] is None
+        assert container_config["Image"] == "mock-utils/mock"
+        assert "SOME_ENV=value" in container_config["Env"]
+
+        port_bindings = container_config["HostConfig"]["PortBindings"]
+        assert port_bindings == {"5000": [{"HostPort": "5000"}]}
+
+        # Check volume env var expansion
+        volume_binds = container_config["HostConfig"]["Binds"]
+        assert str(project.root) in volume_binds[0]
+
+        assert kwargs["name"].startswith("meltano-utility-mock--containerized")
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
