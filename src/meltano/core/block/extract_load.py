@@ -1,11 +1,12 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 import logging
-from asyncio import Task
 from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
+from sqlalchemy.orm import Session
+
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
@@ -17,7 +18,6 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from sqlalchemy.orm import Session
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -28,6 +28,8 @@ logger = structlog.getLogger(__name__)
 
 
 class ELBContext:
+    """ELBContext holds the context for ELB BlockSets."""
+
     def __init__(
         self,
         project: Project,
@@ -55,12 +57,18 @@ class ELBContext:
 
     @property
     def elt_run_dir(self) -> str:
-        """Obtain the run directory for the current job."""
+        """Obtain the run directory for the current job.
+
+        Returns:
+            The run directory for the current job.
+        """
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
 
 class ELBContextBuilder:
+    """Build up ELBContexts for ExtractLoadBlocks."""
+
     def __init__(
         self,
         project: Project,
@@ -74,7 +82,7 @@ class ELBContextBuilder:
             project: the meltano project for the context.
             plugins_service: the plugins service for the context.
             session: the database session for the context.
-            job:
+            job: the job for this ELT run.
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
@@ -96,6 +104,7 @@ class ELBContextBuilder:
         Args:
             plugin: The plugin to be executed.
             plugin_args: The arguments to be passed to the plugin.
+
         Returns:
             The new `SingerBlock` object.
         """
@@ -122,6 +131,7 @@ class ELBContextBuilder:
         Args:
             plugin: The plugin to create the context for.
             env: Environment override dictionary. Defaults to None.
+
         Returns:
             A new `PluginContext` object.
         """
@@ -140,7 +150,14 @@ class ELBContextBuilder:
         self,
         plugin_context: PluginContext,
     ) -> PluginInvoker:
-        """Create an invoker for a plugin from a PluginContext."""
+        """Create an invoker for a plugin from a PluginContext.
+
+        Args:
+            plugin_context: The plugin context to pass to the invoker_factory.
+
+        Returns:
+            A new `PluginInvoker` object.
+        """
         return invoker_factory(
             self.project,
             plugin_context.plugin,
@@ -152,12 +169,20 @@ class ELBContextBuilder:
 
     @property
     def elt_run_dir(self) -> str:
-        """Get the run directory for the current job."""
+        """Get the run directory for the current job.
+
+        Returns:
+            The run directory for the current job.
+        """
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
     def context(self) -> ELBContext:
-        """Create an ELBContext object from the current builder state."""
+        """Create an ELBContext object from the current builder state.
+
+        Returns:
+            A new `ELBContext` object.
+        """
         return ELBContext(
             project=self.project,
             plugins_service=self.plugins_service,
@@ -203,13 +228,24 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         self._errors = []
 
     def index_last_input_done(self) -> int:
-        """Return index of the block furthest from the start that has exited and required input."""
+        """Return index of the block furthest from the start that has exited and required input.
+
+        Returns:
+            The index of the block furthest from the start that has exited and required input.
+        """
         for idx, block in reversed(list(enumerate(self.blocks))):
             if block.requires_input and block.proxy_stderr.done():
                 return idx
 
     def upstream_complete(self, index: int) -> bool:
-        """Return whether blocks upstream from a given block index are already done."""
+        """Return whether blocks upstream from a given block index are already done.
+
+        Args:
+            index: The index of the block to check upstream from.
+
+        Returns:
+            True if all upstream blocks are done, False otherwise.
+        """
         for idx, block in enumerate(self.blocks):
             if idx >= index:
                 return True
@@ -218,18 +254,23 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             return False
 
     async def upstream_stop(self, index) -> None:
-        """Stop all blocks upstream of a given index."""
+        """Stop all blocks upstream of a given index.
+
+        Args:
+            index: The index of the block to stop upstream from.
+        """
         for block in reversed(self.blocks[:index]):
             await block.stop()
 
     async def process_wait(
-        self, output_exception_future: Optional[Task], subset: int = None
-    ) -> Set[Task]:
+        self, output_exception_future: Optional[asyncio.Task], subset: int = None
+    ) -> Set[asyncio.Task]:
         """Wait on all process futures in the block set.
 
         Args:
             output_exception_future: additional future to wait on for output exceptions.
             subset: the subset of blocks to wait on.
+
         Returns:
             The set of all process futures + optional output exception futures.
         """
@@ -243,10 +284,11 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         )
         return done
 
-    def validate_set(self) -> None:  # noqa: WPS231
+    def validate_set(self) -> None:  # noqa: WPS231, WPS238
         """Validate a ExtractLoad block set to ensure its valid and runnable.
 
-        Raises: BlockSetValidationError on validation failure
+        Raises:
+            BlockSetValidationError: if the block set is not valid.
         """
         if not self.blocks:
             raise BlockSetValidationError("No blocks in set.")
@@ -266,6 +308,12 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     async def run(self, session) -> bool:
         """Build the IO chain and execute the actual ELT task.
 
+        Args:
+            session: the session to use for this run.
+
+        Returns:
+            True if the task completed successfully, False otherwise.
+
         Raises:
             RunnerError if failures are encountered during execution.
         """
@@ -275,7 +323,6 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             await manager.run()
             return True
 
-    @staticmethod
     async def terminate(self, graceful: bool = False) -> bool:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
 
@@ -283,8 +330,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Args:
             graceful: Whether or not the BlockSet should try to gracefully quit.
-        Returns:
-            Whether or not the BlockSet terminated successfully.
+
+        Raises:
+            NotImplementedError: if graceful termination is not implemented.
         """
         if graceful:
             raise NotImplementedError
@@ -293,39 +341,63 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             block.stop(kill=True)
 
     @property
-    def process_futures(self) -> List[Task]:
-        """Return the futures of the blocks subprocess calls."""
+    def process_futures(self) -> List[asyncio.Task]:
+        """Return the futures of the blocks subprocess calls.
+
+        Returns:
+            The list of all process futures.
+        """
         if self._process_futures is None:
             self._process_futures = [block.process_future for block in self.blocks]
         return self._process_futures
 
     @property
-    def stdout_futures(self) -> List[Task]:
-        """Access the futures of the blocks stdout proxy tasks."""
+    def stdout_futures(self) -> List[asyncio.Task]:
+        """Access the futures of the blocks stdout proxy tasks.
+
+        Returns:
+            The list of all stdout futures.
+        """
         if self._stdout_futures is None:
             self._stdout_futures = [block.proxy_stdout() for block in self.blocks]
         return self._stdout_futures
 
     @property
-    def stderr_futures(self) -> List[Task]:
-        """Access the futures of the blocks stderr proxy tasks."""
+    def stderr_futures(self) -> List[asyncio.Task]:
+        """Access the futures of the blocks stderr proxy tasks.
+
+        Returns:
+            The list of all stderr futures.
+        """
         if self._stderr_futures is None:
             self._stderr_futures = [block.proxy_stderr() for block in self.blocks]
         return self._stderr_futures
 
     @property
     def head(self) -> IOBlock:
-        """Obtain the first block in the block set."""
+        """Obtain the first block in the block set.
+
+        Returns:
+            The first block in the block set.
+        """
         return self.blocks[0]
 
     @property
     def tail(self) -> IOBlock:
-        """Obtain the last block in the block set."""
+        """Obtain the last block in the block set.
+
+        Returns:
+            The last block in the block set.
+        """
         return self.blocks[-1]
 
     @property
     def intermediate(self) -> Tuple[IOBlock]:
-        """Obtain the intermediate blocks in the set - excluding the first and last block."""
+        """Obtain the intermediate blocks in the set - excluding the first and last block.
+
+        Returns:
+            The intermediate blocks in the block set.
+        """
         return self.blocks[1:-1]
 
     @asynccontextmanager
@@ -334,6 +406,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Args:
             session: The session to use for the blocks.
+
+        Yields:
+            None
         """
         try:  # noqa:  WPS229
             for block in self.blocks:
@@ -409,10 +484,8 @@ class ELBExecutionManager:
         """Run is used to actually perform the execution of the ExtractLoadBlock set.
 
         That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
-        stopping blocks or waiting for IO to complete as appropriate.
-
-        Raises:
-            RunnerError: if any blocks in the set finished with a non 0 exit code
+        stopping blocks or waiting for IO to complete as appropriate. Expect a RunnerError to be raised if any of
+        the blocks exit with a non 0 exit code.
         """
         await self._wait_for_process_completion(self.elb.head)
         _check_exit_codes(
@@ -443,8 +516,13 @@ class ELBExecutionManager:
 
         Args:
             current_head: The current head block
+
+        Returns:
+            A tuple of the producer exit code and the consumer exit code
+
         Raises:
             RunnerError: if any intermediate blocks failed.
+            exception: if any of the output futures encountered an exception.
         """
         start_idx = self.elb.blocks.index(current_head)
         remaining_blocks = self.elb.blocks[start_idx:]
@@ -540,7 +618,7 @@ class ELBExecutionManager:
             await block.stop()
 
 
-def _check_exit_codes(
+def _check_exit_codes(  # noqa: WPS238
     producer_code: int, consumer_code: int, intermediate_codes: Dict[str, int]
 ) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
@@ -549,6 +627,7 @@ def _check_exit_codes(
         producer_code: exit code of the producer (tap)
         consumer_code: exit code of the consumer (target)
         intermediate_codes: exit codes of the intermediate blocks (mappers)
+
     Raises:
         RunnerError: if the producer, consumer, or mapper exit codes are non-zero
     """
