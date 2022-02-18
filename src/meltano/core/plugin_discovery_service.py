@@ -6,10 +6,11 @@ import shutil
 from copy import deepcopy
 from typing import Dict, Iterable, List, Optional
 
-import meltano
-import meltano.core.bundle as bundle
 import requests
 import yaml
+
+import meltano
+import meltano.core.bundle as bundle
 
 from .behavior.canonical import Canonical
 from .behavior.versioned import IncompatibleVersionError, Versioned
@@ -36,7 +37,7 @@ class DiscoveryUnavailableError(Exception):
 
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
-VERSION = 19
+VERSION = 20
 
 
 class DiscoveryFile(Canonical):

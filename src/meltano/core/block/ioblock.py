@@ -99,3 +99,8 @@ class IOBlock(metaclass=ABCMeta):
     async def post(self) -> None:
         """Execute post-stop tasks."""
         pass
+
+    @abstractmethod
+    async def close_stdin(self) -> None:
+        """Close the underlying stdin if the block is a producer."""
+        pass

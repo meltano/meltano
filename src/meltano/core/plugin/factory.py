@@ -21,6 +21,7 @@ base_plugin_classes = {
     PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
     PluginType.FILES: lazy_import(".file", "FilePlugin"),
     PluginType.UTILITIES: lazy_import(".utility", "UtilityPlugin"),
+    PluginType.MAPPERS: lazy_import(".singer", "SingerMapper"),
 }
 
 

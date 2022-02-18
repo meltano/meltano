@@ -5,6 +5,7 @@ import re
 from typing import Dict, Optional, Union
 
 import yaml
+
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
@@ -43,6 +44,8 @@ class PluginType(YAMLEnum):
     TRANSFORMERS = "transformers"
     FILES = "files"
     UTILITIES = "utilities"
+    MAPPERS = "mappers"
+    MAPPINGS = "mappings"
 
     def __str__(self):
         return self.value
@@ -68,6 +71,8 @@ class PluginType(YAMLEnum):
             return self.singular
         if self is self.__class__.UTILITIES:
             return "utilize"
+        if self is self.__class__.MAPPERS:
+            return "map"
 
         return self.value[:-3]
 
