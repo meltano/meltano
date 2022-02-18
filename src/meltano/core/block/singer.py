@@ -3,6 +3,7 @@
 import asyncio
 from asyncio import StreamWriter, Task
 from asyncio.subprocess import Process
+from contextlib import suppress
 from typing import Dict, Optional, Tuple
 
 from meltano.core.logging import capture_subprocess_output
@@ -15,6 +16,9 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 
 from .ioblock import IOBlock
+
+PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPERS)
+CONSUMERS = (PluginType.LOADERS, PluginType.MAPPERS)
 
 
 class InvokerBase:  # noqa: WPS230
@@ -164,6 +168,13 @@ class InvokerBase:  # noqa: WPS230
             return None
         return self.process_handle.stdin
 
+    async def close_stdin(self) -> None:
+        """Close the underlying process stdin if the block is a producer."""
+        if self.producer:
+            self.process_handle.stdin.close()
+            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
+                await self.process_handle.stdin.wait_closed()
+
     def stdout_link(self, dst: SubprocessOutputWriter):
         """Use stdout_link to instruct block to link/write stdout content to dst.
 
@@ -234,7 +245,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
         Currently if the underlying plugin is of type extractor, it is a producer.
         """
-        return self.invoker.plugin.type == PluginType.EXTRACTORS
+        return self.invoker.plugin.type in PRODUCERS
 
     @property
     def consumer(self) -> bool:
@@ -242,7 +253,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
         Currently if the underlying plugin is of type loader, it is a consumer.
         """
-        return self.invoker.plugin.type == PluginType.LOADERS
+        return self.invoker.plugin.type in CONSUMERS
 
     async def start(self):
         """Start the SingerBlock by invoking the underlying plugin.

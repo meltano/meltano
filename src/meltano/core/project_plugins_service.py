@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from typing import Generator, List, Optional
 
 import structlog
+
 from meltano.core.environment import Environment, EnvironmentPluginConfig
 
 from .config_service import ConfigService
@@ -147,6 +148,24 @@ class ProjectPluginsService:
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
 
+    def find_plugins_by_mapping_name(self, mapping_name: str) -> List[ProjectPlugin]:
+        """Search for plugins with the specified mapping name present in  their mappings config.
+
+        Args:
+            mapping_name: The name of the mapping to find.
+        Returns:
+            The mapping plugins with the specified mapping name.
+        Raises
+            PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
+        """
+        found: List[ProjectPlugin] = []
+        for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPERS):
+            if plugin.extra_config.get("_mapping_name") == mapping_name:
+                found.append(plugin)
+        if not found:
+            raise PluginNotFoundError(mapping_name)
+        return found
+
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         try:
             plugin = next(
@@ -159,8 +178,17 @@ class ProjectPluginsService:
         except StopIteration as stop:
             raise PluginNotFoundError(plugin_ref) from stop
 
-    def get_plugins_of_type(self, plugin_type, ensure_parent=True):
-        """Return plugins of specified type."""
+    def get_plugins_of_type(
+        self, plugin_type: PluginType, ensure_parent=True
+    ) -> List[ProjectPlugin]:
+        """Return plugins of specified type.
+
+        Args:
+            plugin_type: The type of the plugins to return.
+            ensure_parent: If True, ensure that plugin has a parent plugin set.
+        Returns:
+            A list of plugins of the specified plugin type.
+        """
         plugins = self.current_plugins[plugin_type]
 
         if ensure_parent:

@@ -44,7 +44,7 @@ def compatible_copy_tree(source: Path, destination: Path):
 
 
 @pytest.fixture(scope="class")
-def discovery():
+def discovery():  # noqa: WPS213
     with bundle.find("discovery.yml").open() as base:
         discovery = yaml.safe_load(base)
 
@@ -202,6 +202,21 @@ def discovery():
                     },
                 },
             },
+        }
+    )
+
+    discovery[PluginType.MAPPERS].append(
+        {
+            "name": "mapper-mock",
+            "namespace": "mapper_mock",
+            "variants": [
+                {
+                    "name": "meltano",
+                    "executable": "mapper-mock-cmd",
+                    "pip_url": "mapper-mock",
+                    "package_name": "mapper-mock",
+                }
+            ],
         }
     )
 
@@ -471,3 +486,41 @@ def project_files(test_dir):
     os.chdir(test_dir)
     shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")
+
+
+@pytest.fixture(scope="class")
+def mapper(project_add_service):
+    try:
+        return project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-mock",
+            variant="meltano",
+            mappings=[
+                {
+                    "name": "mock-mapping-0",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email",
+                                "tap_stream_name": "commits",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "name": "mock-mapping-1",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "given_name",
+                                "tap_stream_name": "users",
+                                "type": "lowercase",
+                            }
+                        ]
+                    },
+                },
+            ],
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
