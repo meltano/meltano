@@ -82,8 +82,8 @@ class PluginType(YAMLEnum):
 
     @classmethod
     def cli_arguments(cls):
-        args = [type.singular for type in cls]
-        args.extend([type for type in cls])
+        args = [plugin_type.singular for plugin_type in cls]
+        args.extend([plugin_type for plugin_type in cls])
         return args
 
     @classmethod
@@ -173,8 +173,8 @@ class PluginDefinition(PluginRef):
 
         self._defaults["label"] = lambda p: p.name
 
-        def default_logo_url(p):
-            short_name = re.sub(r"^(tap|target)-", "", p.name)
+        def default_logo_url(plugin):
+            short_name = re.sub(r"^(tap|target)-", "", plugin.name)
             return f"/static/logos/{short_name}-logo.png"
 
         self._defaults["logo_url"] = default_logo_url
