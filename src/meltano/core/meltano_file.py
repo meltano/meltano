@@ -1,9 +1,6 @@
 import copy
 from typing import Dict, Iterable, List
 
-import yaml
-
-from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
@@ -35,8 +32,8 @@ class MeltanoFile(Canonical):
         """Parse the meltano.yml file and return it as `ProjectPlugin` instances."""
         plugin_type_plugins = Canonical()
 
-        for plugin_type in PluginType:
-            plugin_type_plugins[plugin_type] = []
+        for ptype in PluginType:
+            plugin_type_plugins[ptype] = []
 
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
