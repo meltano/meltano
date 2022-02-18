@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2299](https://gitlab.com/meltano/meltano/-/issues/2299) Introduces stream map support for `meltano run` via a new Singer compatible Mapper plugin type.
 - [#2205](https://gitlab.com/meltano/meltano/-/issues/2205) Add `container_spec` for commands
 - [#2454](https://gitlab.com/meltano/meltano/-/issues/2454) Added Great Expectations utility
 

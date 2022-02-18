@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://docs.meltano.com/the-project/contributor-guide#discoveryyml-version for more information.
-version: 19
+version: 20
 
 extractors:
   - name: tap-adwords
@@ -3314,3 +3314,17 @@ utilities:
       - name: ge_home
         value: $MELTANO_PROJECT_ROOT/utilities/great_expectations
         env: GE_HOME
+mappers:
+  - name: transform-field
+    namespace: transform_field
+    variants:
+    - name: transferwise
+      pip_url: pipelinewise-transform-field
+      repo: https://github.com/transferwise/pipelinewise-transform-field
+      executable: transform-field
+  - name: meltano-map-transformer
+    namespace: meltano_map_transformer
+    variant: meltano
+    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
+    repo: https://github.com/MeltanoLabs/meltano-map-transform
+    executable: meltano-map-transformer
