@@ -46,6 +46,8 @@ ignore =
     WPS110
     # Allow upper-case constants in Enum subclasses
     WPS115
+    # Allow "too many"
+    WPS211
     # Allow local folder imports (import .module)
     WPS300
     # Allow f-strings
@@ -54,10 +56,14 @@ ignore =
     WPS306
     # Allow assignment expressions (walrus operator :=)
     WPS332
+    # Allow 'incorrect' order of methods in a class
+    WPS338
     # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
     WPS348
     # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
     WPS420
+    # Allow nested classes
+    WPS431
     # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
     WPS600
     # Allow using @staticmethod
@@ -74,7 +80,7 @@ inline_quotes = double
 max_line_length = 88
 show_source = true
 extended_default_ignore = []
-max_imports = 16
+max_imports = 20
 docstring_style = google
 
 per_file_ignores =
@@ -97,6 +103,8 @@ per_file_ignores =
         WPS214
         # Don't warn on too many string constants in test methods
         WPS226
+        # Context manager with too many assignments
+        WPS316
         # Allow outer scope name shadowing for fixtures
         WPS442
         # Allow nested functions in test methods
@@ -113,8 +121,12 @@ per_file_ignores =
         # Allow for print function calls
         WPS421
     src/meltano/cli/*:
+        # Allow backslashes in dosctrings
+        D301
         # Don't require docstrings in click commands
         DAR
+        # Allow ending block quote without a blank line
+        RST201
         # Allow many local variables, since these aid in string building
         WPS210
         # Allow many arguments, since these often represent CLI arguments

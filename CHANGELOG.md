@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2205](https://gitlab.com/meltano/meltano/-/issues/2205) Add `container_spec` for commands
 - [#2454](https://gitlab.com/meltano/meltano/-/issues/2454) Added Great Expectations utility
 
 ### Changes

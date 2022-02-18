@@ -189,7 +189,92 @@
                     },
                     "commands": {
                         "type": "object",
-                        "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable."
+                        "required": ["args"],
+                        "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "args": {
+                                    "type": "string",
+                                    "description": "Command arguments"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "description": "Documentation displayed when listing commands"
+                                },
+                                "executable": {
+                                    "type": "string",
+                                    "description": "Override the plugin's executable for this command"
+                                },
+                                "container_spec": {
+                                    "type": "object",
+                                    "required": ["image"],
+                                    "description": "Container specification for this command",
+                                    "properties": {
+                                        "image": {
+                                            "type": "string",
+                                            "description": "Container image",
+                                            "examples": [
+                                                "ghcr.io/dbt-labs/dbt-postgres:latest"
+                                            ]
+                                        },
+                                        "command": {
+                                            "type": "string",
+                                            "description": "Container command",
+                                            "examples": [
+                                                "list",
+                                                "test",
+                                                "compile"
+                                            ]
+                                        },
+                                        "entrypoint": {
+                                            "type": "string",
+                                            "description": "Container entrypoint"
+                                        },
+                                        "ports": {
+                                            "type": "object",
+                                            "description": "Mapping of host to container ports",
+                                            "propertyNames": {
+                                                "type": "string"
+                                            },
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            },
+                                            "examples": [
+                                                {
+                                                    "5000": "5000"
+                                                }
+                                            ]
+                                        },
+                                        "volumes": {
+                                            "type": "array",
+                                            "description": "Array of volumes to mount during container execution",
+                                            "items": {
+                                                "type": "string",
+                                                "examples": [
+                                                    "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+                                                ]
+                                            }
+                                        },
+                                        "env": {
+                                            "type": "object",
+                                            "description": "Mapping to environment variable to set inside the container. These take precedence over Meltano own runtime environment variables.",
+                                            "propertyNames": {
+                                                "type": "string"
+                                            },
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            },
+                                            "examples": [
+                                                {
+                                                    "DBT_PROFILES_DIR": "/usr/app/profile/"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },

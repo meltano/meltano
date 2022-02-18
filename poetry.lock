@@ -7,6 +7,18 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "aiodocker"
+version = "0.21.0"
+description = "Docker API client for asyncio"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+aiohttp = ">=3.6"
+typing-extensions = ">=3.6.5"
+
+[[package]]
 name = "aiohttp"
 version = "3.7.4.post0"
 description = "Async http client/server framework (asyncio)"
@@ -1092,6 +1104,19 @@ docs = ["Flask-Sphinx-Themes (>=1.0.1)", "Sphinx (>=1.4.2)"]
 tests = ["Flask-CLI (>=0.4.0)", "Flask-Mongoengine (>=0.7.0)", "Flask-Peewee (>=0.6.5)", "Flask-SQLAlchemy (>=1.0)", "bcrypt (>=1.0.2)", "check-manifest (>=0.25)", "coverage (>=4.0)", "isort (>=4.2.2)", "mock (>=1.3.0)", "mongoengine (>=0.10.0)", "pony (>=0.7.1)", "pydocstyle (>=1.0.0)", "pytest-cache (>=1.0)", "pytest-cov (>=2.4.0)", "pytest-flakes (>=1.0.1)", "pytest-pep8 (>=1.0.6)", "pytest-translations (>=2.0.0)", "pytest (>=3.3.0)", "sqlalchemy (>=0.8.0)"]
 
 [[package]]
+name = "mock"
+version = "4.0.3"
+description = "Rolling backport of unittest.mock for all Pythons"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+build = ["twine", "wheel", "blurb"]
+docs = ["sphinx"]
+test = ["pytest (<5.4)", "pytest-cov"]
+
+[[package]]
 name = "monotonic"
 version = "1.6"
 description = "An implementation of time.monotonic() for Python 2 & < 3.3"
@@ -2055,13 +2080,17 @@ infra = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "6e4dde4d6ec50e8f8db083b234d10fe78972530bf247d1ea6f77df16a07d37b1"
+content-hash = "5befa71d2ad49331a10101c46a8bb25b57a2f787bbc3ab6b478cb41bea06f029"
 
 [metadata.files]
 aenum = [
     {file = "aenum-2.1.2-py2-none-any.whl", hash = "sha256:7a77c205c4bc9d7fe9bd73b3193002d724aebf5909fa0d297534208953891ec8"},
     {file = "aenum-2.1.2-py3-none-any.whl", hash = "sha256:3df9b84cce5dc9ed77c337079f97b66c44c0053eb87d6f4d46b888dc45801e38"},
     {file = "aenum-2.1.2.tar.gz", hash = "sha256:a3208e4b28db3a7b232ff69b934aef2ea1bf27286d9978e1e597d46f490e4687"},
+]
+aiodocker = [
+    {file = "aiodocker-0.21.0-py3-none-any.whl", hash = "sha256:6fe00135bb7dc40a407669d3157ecdfd856f3737d939df54f40a479d40cf7bdc"},
+    {file = "aiodocker-0.21.0.tar.gz", hash = "sha256:1f2e6db6377195962bb676d4822f6e3a0c525e1b5d60b8ebbab68230bff3d227"},
 ]
 aiohttp = [
     {file = "aiohttp-3.7.4.post0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:3cf75f7cdc2397ed4442594b935a11ed5569961333d49b7539ea741be2cc79d5"},
@@ -2666,6 +2695,10 @@ mccabe = [
 ]
 meltano-flask-security = [
     {file = "meltano-flask-security-0.1.0.tar.gz", hash = "sha256:5926152dc424a764825517ca3530a9bdbc367b7e56cc09ad9ec6510961d6c2cc"},
+]
+mock = [
+    {file = "mock-4.0.3-py3-none-any.whl", hash = "sha256:122fcb64ee37cfad5b3f48d7a7d51875d7031aaf3d8be7c42e2bee25044eee62"},
+    {file = "mock-4.0.3.tar.gz", hash = "sha256:7d3fbbde18228f4ff2f1f119a45cdffa458b4c0dee32eb4d2bb2f82554bac7bc"},
 ]
 monotonic = [
     {file = "monotonic-1.6-py2.py3-none-any.whl", hash = "sha256:68687e19a14f11f26d140dd5c86f3dba4bf5df58003000ed467e0e2a69bca96c"},
