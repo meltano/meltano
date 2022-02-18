@@ -1,9 +1,6 @@
 import copy
 from typing import Dict, Iterable, List
 
-import yaml
-
-from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
