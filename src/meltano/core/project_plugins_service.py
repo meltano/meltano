@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from typing import Generator, List, Optional
 
 import structlog
+
 from meltano.core.environment import Environment, EnvironmentPluginConfig
 
 from .config_service import ConfigService

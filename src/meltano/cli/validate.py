@@ -6,13 +6,14 @@ from typing import Dict, Iterable, Tuple
 
 import click
 import structlog
+from sqlalchemy.orm.session import sessionmaker
+
 from meltano.cli.utils import propagate_stop_signals
 from meltano.core.db import project_engine
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
-from sqlalchemy.orm.session import sessionmaker
 
 from . import cli
 from .params import pass_project

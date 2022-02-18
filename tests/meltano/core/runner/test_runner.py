@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock
+
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output

@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+
 from meltano.api.controllers.sql_helper import SqlHelper, UnsupportedConnectionDialect
 from meltano.core.plugin import PluginRef, PluginType
 

@@ -2,8 +2,9 @@ import os
 import shutil
 from copy import copy
 
-import meltano
 import pytest
+
+import meltano
 from meltano.cli import cli
 from meltano.core.project import PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService

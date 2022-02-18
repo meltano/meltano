@@ -3,6 +3,7 @@ import os
 from urllib.parse import urlparse
 
 import click
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_discovery_service import (
     DiscoveryInvalidError,

@@ -9,6 +9,9 @@ from typing import Dict, List
 
 import networkx as nx
 import sqlparse
+from networkx.readwrite import json_graph
+from pyhocon import ConfigFactory
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.model import Package
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
@@ -22,8 +25,6 @@ from meltano.core.sql.base import (
 )
 from meltano.core.sql.design_helper import PypikaJoinExecutor
 from meltano.core.utils import NotFound, find_named, slugify
-from networkx.readwrite import json_graph
-from pyhocon import ConfigFactory
 
 
 class MeltanoAnalysisFileParserError(Exception):

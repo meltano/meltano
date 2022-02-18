@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pytest
+
 from meltano.core.job.finder import JobFinder
 from meltano.core.job.job import (
     HEARTBEAT_VALID_MINUTES,

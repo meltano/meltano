@@ -2,6 +2,7 @@ import itertools
 from contextlib import contextmanager
 
 import click
+
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 from . import cli

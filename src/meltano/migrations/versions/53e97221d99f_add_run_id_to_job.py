@@ -11,6 +11,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm
 import sqlalchemy.types as types
 from alembic import op
+
 from meltano.migrations import GUID
 
 # revision identifiers, used by Alembic.

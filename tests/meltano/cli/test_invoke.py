@@ -4,6 +4,7 @@ import json
 import pytest
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
+
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin

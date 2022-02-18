@@ -2,6 +2,7 @@ import os
 
 import pytest
 from click.testing import CliRunner
+
 from meltano.cli import cli
 from meltano.core.project import Project, ProjectNotFound
 
