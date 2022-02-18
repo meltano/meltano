@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shlex
+from collections import defaultdict
 from typing import Any
 
 from meltano.core.behavior.canonical import Canonical
@@ -75,15 +76,25 @@ class ContainerSpec(Canonical):
 
         volumes = [expand_env_vars(bind, env) for bind in self.volumes]
 
+        exposed_ports = {}
+        port_bindings = defaultdict(list)
+
+        for host_port, container_port in self.ports.items():
+            exposed_ports[container_port] = {}
+            port_bindings[container_port].append(
+                {
+                    "HostPort": host_port,
+                    "HostIP": "0.0.0.0",  # noqa: S104. Binding to all interfaces is OK.
+                }
+            )
+
         return {
             "Cmd": shlex.split(self.command) if self.command else None,
             "Image": self.image,
             "Env": env_config,
+            "ExposedPorts": exposed_ports,
             "HostConfig": {
-                "PortBindings": {
-                    container_port: [{"HostPort": host_port}]
-                    for host_port, container_port in self.ports.items()
-                },
+                "PortBindings": port_bindings,
                 "Binds": volumes,
             },
         }

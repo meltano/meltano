@@ -231,6 +231,26 @@ Commands can specify a `container_spec` for containerized execution. To execute 
           DBT_PROFILES_DIR: /usr/app/profile/
         volumes:
           - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+    docs-generate:
+      args: docs generate
+      container_spec:
+        command: docs generate
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+    docs-serve:
+      args: docs serve
+      container_spec:
+        command: docs serve --no-browser
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+        ports:
+          "8080": "8080/tcp"
 ```
 
 ### Schedules
