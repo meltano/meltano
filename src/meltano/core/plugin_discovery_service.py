@@ -1,9 +1,6 @@
 import io
 import logging
-import os
 import re
-import shutil
-from copy import deepcopy
 from typing import Dict, Iterable, List, Optional
 
 import requests
@@ -14,25 +11,20 @@ import meltano.core.bundle as bundle
 
 from .behavior.canonical import Canonical
 from .behavior.versioned import IncompatibleVersionError, Versioned
-from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType, Variant
+from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
 from .plugin.error import PluginNotFoundError
 from .plugin.factory import base_plugin_factory
 from .plugin.project_plugin import ProjectPlugin
 from .project_settings_service import ProjectSettingsService
-from .setting_definition import SettingDefinition
 from .utils import NotFound, find_named
 
 
 class DiscoveryInvalidError(Exception):
     """Occurs when the discovery.yml fails to be parsed."""
 
-    pass
-
 
 class DiscoveryUnavailableError(Exception):
     """Occurs when the discovery.yml cannot be found or downloaded."""
-
-    pass
 
 
 # Increment this version number whenever the schema of discovery.yml is changed.
@@ -44,8 +36,8 @@ class DiscoveryFile(Canonical):
     def __init__(self, version=1, **plugins):
         super().__init__(version=int(version))
 
-        for plugin_type in PluginType:
-            self[plugin_type] = []
+        for ptype in PluginType:
+            self[ptype] = []
 
         for plugin_type, raw_plugins in plugins.items():
             for raw_plugin in raw_plugins:
