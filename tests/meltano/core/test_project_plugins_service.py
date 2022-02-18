@@ -1,4 +1,5 @@
 import pytest
+
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin

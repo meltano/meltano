@@ -5,6 +5,7 @@ from typing import List, Optional
 import pytest
 import structlog
 from asynctest import CoroutineMock, mock
+
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
