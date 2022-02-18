@@ -87,7 +87,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    def test_invoke_command_containerized(
+    def test_invoke_command_containerized(  # noqa: WPS210
         self,
         project,
         cli_runner,
@@ -128,13 +128,22 @@ class TestCliInvoke:
         assert "SOME_ENV=value" in container_config["Env"]
 
         port_bindings = container_config["HostConfig"]["PortBindings"]
-        assert port_bindings == {"5000": [{"HostPort": "5000"}]}
+        assert port_bindings == {
+            "5000": [{"HostPort": "5000", "HostIP": "0.0.0.0"}]  # noqa: S104
+        }
+
+        exposed_ports = container_config["ExposedPorts"]
+        assert exposed_ports == {"5000": {}}
 
         # Check volume env var expansion
         volume_binds = container_config["HostConfig"]["Binds"]
         assert str(project.root) in volume_binds[0]
 
         assert kwargs["name"].startswith("meltano-utility-mock--containerized")
+
+        # Check env var expansion in volumes
+        volume_bindings = args[0]["HostConfig"]["Binds"]
+        assert volume_bindings[0].startswith(str(project.root))
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(

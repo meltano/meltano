@@ -56,7 +56,6 @@ class ContainerService:
             container = await docker.containers.run(config, name=name)
             loop = asyncio.get_running_loop()
             loop.add_signal_handler(signal.SIGINT, lambda: stop_container(container))
-            loop.add_signal_handler(signal.SIGTERM, lambda: stop_container(container))
 
             async for line in container.log(follow=True, stdout=True, stderr=True):
                 logger.info(line.rstrip())
@@ -67,6 +66,7 @@ class ContainerService:
                 logger.exception("Container run failed", exc_info=exc)
             finally:
                 info = await container.show()
+                loop.remove_signal_handler(signal.SIGINT)
                 await container.delete(force=True)
 
         return info

@@ -1,5 +1,7 @@
 """Test container commands."""
 
+from collections import defaultdict
+
 import pytest
 
 from meltano.core.container.container_spec import ContainerSpec
@@ -22,10 +24,16 @@ class TestContainerService:
             "Cmd": None,
             "Image": "lightdash/lightdash",
             "Env": [],
+            "ExposedPorts": {"8000": {}},
             "HostConfig": {
-                "PortBindings": {
-                    "8000": [{"HostPort": "8080"}],
-                },
+                "PortBindings": defaultdict(
+                    list,
+                    {
+                        "8000": [
+                            {"HostPort": "8080", "HostIP": "0.0.0.0"}  # noqa: S104
+                        ],
+                    },
+                ),
                 "Binds": [],
             },
         }
