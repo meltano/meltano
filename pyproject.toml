@@ -57,6 +57,7 @@ sqlparse = "^0.3.0"
 watchdog = "^0.9.0"
 werkzeug = "^1"
 structlog = "^21.2.0"
+aiodocker = "^0.21.0"
 
 [tool.poetry.extras]
 infra = ["ansible"]
@@ -80,6 +81,7 @@ colorama = "^0.4.4"
 isort = "^5.10.1"
 pyupgrade = "^2.29.1"
 tox = "^3.24.4"
+mock = "^4.0.3"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
