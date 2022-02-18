@@ -1,0 +1,167 @@
+[flake8]
+select =
+    # flake8-bandit
+    S
+    # flake-brokenline
+    N
+    # flake8-bugbear
+    B
+    # flake8-comprehensions
+    C4
+    # flake8-debugger
+    T
+    # flake8-docstrings
+    D
+    # flake8-eradicate
+    E80
+    # flake8-rst-docstrings
+    RST
+    # flake8-string-format
+    P
+    # mccabe
+    C90
+    # pep8-naming
+    N
+    # pycodestyle
+    E
+    W
+    # pyflakes
+    F
+    # wemake-python-styleguide
+    WPS
+    # darglint
+    DAR
+
+ignore =
+    # flake8-bandit
+    # Allow subprocess module to be used
+    S404
+    # pycodestyle
+    # Allow for line breaks where Black decides are valid
+    W503
+    # Allow for long lines since we delegate to Black for enforcement
+    E501
+    # wemake-python-styleguide
+    # Allow blacklisted variable names that can be clear enough in method context
+    WPS110
+    # Allow upper-case constants in Enum subclasses
+    WPS115
+    # Allow local folder imports (import .module)
+    WPS300
+    # Allow f-strings
+    WPS305
+    # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration
+    WPS306
+    # Allow assignment expressions (walrus operator :=)
+    WPS332
+    # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
+    WPS348
+    # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
+    WPS420
+    # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
+    WPS600
+    # Allow using @staticmethod
+    WPS602
+    # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
+    WPS212
+
+exclude =
+    .venv
+    venv
+    *.md
+    src/webapp/node_modules/
+inline_quotes = double
+max_line_length = 88
+show_source = true
+extended_default_ignore = []
+max_imports = 16
+docstring_style = google
+
+per_file_ignores =
+    tests/*:
+        # Don't warn on use of asserts in tests
+        S101
+        # Don't require docstrings in tests
+        DAR101
+        D100
+        D101
+        D102
+        D103
+        # Don't warn on overused expressions in test methods
+        WPS204
+        # Don't warn on too many arguments in test methods
+        WPS211
+        # Don't warn on too many `assert` statements in test methods
+        WPS218
+        # Don't warn on too many methods in test modules
+        WPS214
+        # Don't warn on too many string constants in test methods
+        WPS226
+        # Allow outer scope name shadowing for fixtures
+        WPS442
+        # Allow nested functions in test methods
+        WPS430
+        # Allow protected attribute usage in test methods
+        WPS437
+        # Found module with too many imports
+        WPS201
+        # Found too many module members
+        WPS202
+    !tests/*:
+        T
+    scripts/*:
+        # Allow for print function calls
+        WPS421
+    src/meltano/cli/*:
+        # Don't require docstrings in click commands
+        DAR
+        # Allow many local variables, since these aid in string building
+        WPS210
+        # Allow many arguments, since these often represent CLI arguments
+        WPS211
+        # Allow many expressions, since string building requires them
+        WPS213
+        # Allow many decorators, since `click` uses them to define the CLI
+        WPS216
+        # Allow many module members
+        WPS202
+    src/meltano/migrations/versions/*:
+        # Don't class docstrings in migrations
+        D101
+        # Don't require function docstrings in migrations
+        D103
+        # Don't require periods in the first lines of dosctrings
+        D400
+        # Allow uppercase variable names
+        N806
+        # Allow module names starting with numbers
+        WPS102
+        # Allow long filenames
+        WPS118
+        # Allow expression "overuse"
+        WPS204
+        # Allow string constant "overuse"
+        WPS226
+        # Allow "magic" numbers
+        WPS432
+    src/meltano/core/job/job.py:
+        # Class attributes can be used as instance attributes in sqlalchemy.declarative model
+        WPS601
+    src/meltano/core/project_files.py:
+        # Dict manipulation requires lots of string constant references
+        WPS226
+    src/meltano/core/project_init_service.py:
+        # Found string constant over-use: blue > 3
+        WPS226
+        # Found too long ``try`` body length: 3 > 1
+        WPS229
+        # Found too many expressions: 27 > 9
+        WPS213
+    **/__init__.py:
+        # Allow for using __init__.py to promote imports to the module namespace
+        F401
+    src/meltano/__init__.py:
+        # Found `__init__.py` module with logic
+        WPS412
+        # Found wrong metadata variable
+        WPS410

@@ -1,4 +1,6 @@
 import pytest
+
+from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.validation_service import ValidationsRunner
 
@@ -35,6 +37,7 @@ class TestValidationsRunner:
     def test_collect_tests(self, project: Project):
         collected = MockValidationsRunner.collect(project, select_all=False)
 
+        assert collected["dbt"].invoker.plugin.type == PluginType.TRANSFORMERS
         assert "test" in collected["dbt"].tests_selection
         assert not collected["dbt"].tests_selection["test"]
 
