@@ -11,9 +11,14 @@ body {
 }
 
 .navbar {
+  background-color: #3438bf;
   border-bottom: 1px solid #eaecef;
   margin-bottom: 1rem;
   min-height: 4rem;
+}
+
+.navbar a {
+  color: #ffffff;
 }
 
 .navbar-item img {
