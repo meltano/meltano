@@ -6,6 +6,8 @@ from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
+from sqlalchemy.orm import Session
+
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
@@ -17,7 +19,6 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from sqlalchemy.orm import Session
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error

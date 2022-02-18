@@ -6,10 +6,11 @@ import shutil
 from copy import deepcopy
 from typing import Dict, Iterable, List, Optional
 
-import meltano
-import meltano.core.bundle as bundle
 import requests
 import yaml
+
+import meltano
+import meltano.core.bundle as bundle
 
 from .behavior.canonical import Canonical
 from .behavior.versioned import IncompatibleVersionError, Versioned

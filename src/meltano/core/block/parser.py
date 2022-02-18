@@ -3,6 +3,7 @@ from typing import Dict, Generator, List, Optional, Tuple, Union
 
 import click
 import structlog
+
 from meltano.core.block.blockset import BlockSet, BlockSetValidationError
 from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
 from meltano.core.block.ioblock import IOBlock
