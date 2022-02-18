@@ -188,7 +188,9 @@ class InvokerBase:  # noqa: WPS230
         """
         if self._process_future is None:
             if self.process_handle is None:
-                raise ProcessWaitError("No process to wait, process not running running")
+                raise ProcessWaitError(
+                    "No process to wait, process not running running"
+                )
             self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future
 
