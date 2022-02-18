@@ -114,3 +114,7 @@ body {
   display: none;
 }
 
+.menu-list a.is-active {
+    background-color: #3438bf;
+    color: #fff;
+}
