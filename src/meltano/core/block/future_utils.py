@@ -60,6 +60,6 @@ def handle_producer_line_length_limit_error(
         "To let this message be processed, increase the 'elt.buffer_size' setting to at least double the size of the largest expected message, and try again."
     )
     logging.error(
-        "To learn more, visit https://www.meltano.com/docs/settings.html#elt-buffer-size"
+        "To learn more, visit https://docs.meltano.com/reference/settings#eltbuffer_size"
     )
     raise RunnerError("Output line length limit exceeded") from exception
