@@ -50,6 +50,11 @@ meltano add files docker
 docker build --tag meltano-demo-project:dev .
 ```
 
+Files added to your project include a `Dockerfile` inheriting `FROM` the public [`meltano/meltano:latest`](https://hub.docker.com/r/meltano/meltano/tags) image available on [Docker Hub](https://hub.docker.com).
+This can be customized to use another public mirror (e.g. [registry.gitlab.com/meltano/meltano:latest](https://gitlab.com/groups/meltano/-/container_registries/189256?orderBy=NAME&sort=asc&search[]=latest&search[]=) in GitLab Registry), a private mirror (e.g. `your-company/meltano:latest`), a specific version of Meltano (e.g. `meltano/meltano:v1.55.0`), or Python 3.8 or 3.9 (e.g. `meltano/meltano:latest-python3.8` or `meltano/meltano:v1.55.0-python3.9`) by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg).
+
+> Note: Using an alternative public mirror (such as [registry.gitlab.com/meltano/meltano:latest](https://gitlab.com/groups/meltano/-/container_registries/189256?orderBy=NAME&sort=asc&search[]=latest&search[]=)), or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
+
 The built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
 will be [the `meltano` command](/reference/command-line-interface),
 meaning that you can provide `meltano` subcommands and arguments like `elt ...` and `invoke airflow ...` directly to
