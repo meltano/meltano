@@ -1,7 +1,7 @@
 """Defines helpers related to the system database."""
 
-import time
 import logging
+import time
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
