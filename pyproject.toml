@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "1.95.0"
+version = "1.96.0"
 description = "Meltano"
 authors = ["Meltano Team and Contributors <meltano@gitlab.com>"]
 license = "MIT"
@@ -58,6 +58,7 @@ watchdog = "^0.9.0"
 werkzeug = "^1"
 structlog = "^21.2.0"
 aiodocker = "^0.21.0"
+MarkupSafe = "<2.1.0"
 
 [tool.poetry.extras]
 infra = ["ansible"]

@@ -21,11 +21,6 @@
 
 lint_python:
   extends: .fast_test
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
   parallel:
     matrix:
       # Lint only on 'primary' python version:
@@ -33,13 +28,9 @@ lint_python:
   before_script: []
   script:
     - |
-      if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
-        git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME;
-        echo "Comparing to $CI_MERGE_REQUEST_TARGET_BRANCH_NAME";
-        REF="origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}";
-      else
-        REF=""
-      fi
+      git fetch origin $CI_DEFAULT_BRANCH;
+      echo "Comparing to $CI_DEFAULT_BRANCH";
+      REF="origin/${CI_DEFAULT_BRANCH}";
     - 'declare FILES=$(git diff --name-only ${CI_COMMIT_SHA} $REF | grep "\.py$")'
     - |
       if [ -n "${FILES}" ]; then

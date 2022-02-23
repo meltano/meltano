@@ -1,7 +1,6 @@
 """SingerBlock wraps singer plugins to implement the IOBlock interface."""
 
 import asyncio
-from asyncio import StreamWriter, Task
 from asyncio.subprocess import Process
 from contextlib import suppress
 from typing import Dict, Optional, Tuple
@@ -20,6 +19,17 @@ from .ioblock import IOBlock
 PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPERS)
 CONSUMERS = (PluginType.LOADERS, PluginType.MAPPERS)
 
+<<<<<<< HEAD
+=======
+
+class IOLinkError(Exception):
+    """Raised when an IO link is not possible."""
+
+
+class ProcessWaitError(Exception):
+    """Raised when a process can be waited on."""
+
+>>>>>>> master
 
 class InvokerBase:  # noqa: WPS230
     """Base class for creating IOBlock's built on top of existing Meltano plugins."""
@@ -37,6 +47,7 @@ class InvokerBase:  # noqa: WPS230
         Args:
             block_ctx: context that should be used for this instance to do things like obtaining project settings.
             project: that should be used to obtain the ProjectSettingsService.
+            plugins_service: that configured plugins service.
             plugin_invoker: the actual plugin invoker.
             command: the optional command to invoke.
         """
@@ -54,22 +65,34 @@ class InvokerBase:  # noqa: WPS230
         self.err_outputs = []
 
         self.process_handle: Process = None
-        self._process_future: Task = None
-        self._stdout_future: Task = None
-        self._stderr_future: Task = None
+        self._process_future: asyncio.Task = None
+        self._stdout_future: asyncio.Task = None
+        self._stderr_future: asyncio.Task = None
 
     @property
     def command(self) -> Optional[str]:
-        """Command is the specific plugin command to use when invoking the plugin (if any)."""
+        """Command is the specific plugin command to use when invoking the plugin (if any).
+
+        Returns:
+            The command to use when invoking the plugin.
+        """
         return self._command
 
     @property
     def string_id(self) -> str:
-        """Return a string identifier for this block."""
+        """Return a string identifier for this block.
+
+        Returns:
+            A string identifier for this block.
+        """
         return self.invoker.plugin.name
 
     async def start(self, *args, **kwargs):
         """Invoke the process asynchronously.
+
+        Args:
+            args: arguments to pass to the process invoker.
+            kwargs: keyword arguments to pass to the process invoker.
 
         Raises:
             RunnerError: If the plugin process can not start.
@@ -111,14 +134,17 @@ class InvokerBase:  # noqa: WPS230
         if self._stderr_future is not None:
             self._stderr_future.cancel()
 
-    def proxy_stdout(self) -> Task:
+    def proxy_stdout(self) -> asyncio.Task:
         """Start proxying stdout to the linked stdout destinations.
 
+        Returns:
+            The stdout proxy future.
+
         Raises:
-            RunnerError: If the processes is not running and so - there is no IO to proxy.
+            IOLinkError: If the processes is not running and so - there is no IO to proxy.
         """
         if self.process_handle is None:
-            raise RunnerError("No IO to proxy, process not running")
+            raise IOLinkError("No IO to proxy, process not running")
 
         if self._stdout_future is None:
             outputs = self._merge_outputs(self.invoker.StdioSource.STDOUT, self.outputs)
@@ -128,14 +154,17 @@ class InvokerBase:  # noqa: WPS230
             )
         return self._stdout_future
 
-    def proxy_stderr(self) -> Task:
+    def proxy_stderr(self) -> asyncio.Task:
         """Start proxying stderr to the linked stderr destinations.
 
+        Returns:
+            The stderr proxy future.
+
         Raises:
-            RunnerError: If the processes is not running and so - there is no IO to proxy.
+            IOLinkError: If the processes is not running and so - there is no IO to proxy.
         """
         if self.process_handle is None:
-            raise Exception("No IO to proxy, process not running")
+            raise IOLinkError("No IO to proxy, process not running")
 
         if self._stderr_future is None:
             err_outputs = self._merge_outputs(self.invoker.StdioSource.STDERR, self.err_outputs)
@@ -144,30 +173,45 @@ class InvokerBase:  # noqa: WPS230
             )
         return self._stderr_future
 
+<<<<<<< HEAD
 
 
     def proxy_io(self) -> Tuple[Task, Task]:
+=======
+    def proxy_io(self) -> Tuple[asyncio.Task, asyncio.Task]:
+>>>>>>> master
         """Start proxying stdout AND stderr to the respectively linked destinations.
 
-        Raises:
-            RunnerError: If the processes is not running and so - there is no IO to proxy.
-
-        Returns: proxy_stdout Task and proxy_stderr Task
+        Returns:
+            proxy_stdout asyncio.Task and proxy_stderr asyncio.Task
         """
         return self.proxy_stdout(), self.proxy_stderr()
 
     @property
-    def process_future(self) -> Task:
-        """Return the future of the underlying process wait() call."""
+    def process_future(self) -> asyncio.Task:
+        """Return the future of the underlying process wait() call.
+
+        Returns:
+            The future of the underlying process wait() calls.
+
+        Raises:
+            ProcessWaitError: If the process is not running.
+        """
         if self._process_future is None:
             if self.process_handle is None:
-                raise Exception("No process to wait, process not running running")
+                raise ProcessWaitError(
+                    "No process to wait, process not running running"
+                )
             self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future
 
     @property
-    def stdin(self) -> Optional[StreamWriter]:
-        """Return stdin of the underlying process."""
+    def stdin(self) -> Optional[asyncio.StreamWriter]:
+        """Return stdin of the underlying process.
+
+        Returns:
+            The stdin of the underlying process.
+        """
         if self.process_handle is None:
             return None
         return self.process_handle.stdin
@@ -179,32 +223,51 @@ class InvokerBase:  # noqa: WPS230
             with suppress(AttributeError):  # `wait_closed` is Python 3.7+
                 await self.process_handle.stdin.wait_closed()
 
+<<<<<<< HEAD
     def stdout_link(self, dst: SubprocessOutputWriter):
+=======
+    def stdout_link(self, dst: SubprocessOutputWriter) -> None:
+>>>>>>> master
         """Use stdout_link to instruct block to link/write stdout content to dst.
 
         Args:
             dst:  The destination stdout output should be written too.
+
+        Raises:
+            IOLinkError: If the IO is already in flight.
         """
         if self._stdout_future is None:
             self.outputs.append(dst)
         else:
-            raise Exception("IO capture already in flight")
+            raise IOLinkError("IO capture already in flight")
 
     def stderr_link(self, dst: SubprocessOutputWriter):
         """Use stderr_link to instruct block to link/write stderr content to dst.
 
         Args:
             dst:  The destination stderr output should be written too.
+
+        Raises:
+            IOLinkError: If the IO is already in flight.
         """
         if self._stderr_future is None:
             self.err_outputs.append(dst)
         else:
-            raise Exception("IO capture already in flight")
+            raise IOLinkError("IO capture already in flight")
 
     async def pre(self, context: Dict) -> None:
+<<<<<<< HEAD
         """Pre triggers preparation of the underlying plugin."""
         self.invoker.context = context
         await self.invoker.prepare(context.session)
+=======
+        """Pre triggers preparation of the underlying plugin.
+
+        Args:
+            context: The context to obtain the session from when the invoker is prepared.
+        """
+        await self.invoker.prepare(context.get("session"))
+>>>>>>> master
 
     async def post(self) -> None:
         """Post triggers resetting the underlying plugin config."""
@@ -240,6 +303,7 @@ class SingerBlock(InvokerBase, IOBlock):
         Args:
             block_ctx: the block context.
             project:  the project to use to obtain project settings.
+            plugins_service: the plugins service.
             plugin_invoker: the plugin invoker.
             plugin_args: any additional plugin args that should be used.
         """
@@ -257,6 +321,9 @@ class SingerBlock(InvokerBase, IOBlock):
         """Whether or not this plugin is a producer.
 
         Currently if the underlying plugin is of type extractor, it is a producer.
+
+        Returns:
+            True if the underlying plugin is a producer, False otherwise.
         """
         return self.invoker.plugin.type in PRODUCERS
 
@@ -265,6 +332,9 @@ class SingerBlock(InvokerBase, IOBlock):
         """Whether or not this plugin is a consumer.
 
         Currently if the underlying plugin is of type loader, it is a consumer.
+
+        Returns:
+            True if the plugin is a consumer, False otherwise.
         """
         return self.invoker.plugin.type in CONSUMERS
 
