@@ -7,6 +7,8 @@ from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 import structlog
 from async_generator import asynccontextmanager
 
+from sqlalchemy.orm import Session
+
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
@@ -278,15 +280,15 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """Build the IO chain and execute the actual ELT task.
 
         Raises:
-            RunnerError if failures are encountered during execution.
-            CliError if the underlying pipeline/job is already running.
+            RunnerError: if failures are encountered during execution or if the underlying pipeline/job
+            is already running.
         """
         job = self.context.job
         StaleJobFailer(job.job_id).fail_stale_jobs(session)
 
         existing = JobFinder(job.job_id).latest_running(session)
         if existing:
-            raise CliError(
+            raise RunnerError(
                 f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
                 + "To ignore this check use the '--force' option."
             )
@@ -360,7 +362,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         try:  # noqa:  WPS229
             for block in self.blocks:
-                await block.pre(self.context)
+                await block.pre({"session": session})
                 await block.start()
             yield
         finally:

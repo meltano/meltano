@@ -214,6 +214,45 @@ Commands can optionally specify some documentation displayed when [listing comma
       args: run
 ```
 
+##### Containerized commands
+
+Commands can specify a `container_spec` for containerized execution. To execute containerized commands where possible, use the [`--containers`](/reference/command-line-interface#containerized-commands) flag.
+
+```yaml
+- name: dbt
+  pip_url: dbt-core~=1.0.1 dbt-postgres~=1.0.1
+  commands:
+    compile:
+      args: compile
+      container_spec:
+        command: compile
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+    docs-generate:
+      args: docs generate
+      container_spec:
+        command: docs generate
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+    docs-serve:
+      args: docs serve
+      container_spec:
+        command: docs serve --no-browser
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+        ports:
+          "8080": "8080/tcp"
+```
+
 ### Schedules
 
 Your project's pipeline schedules,

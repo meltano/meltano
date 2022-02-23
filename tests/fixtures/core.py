@@ -6,9 +6,10 @@ import sys
 from distutils import dir_util
 from pathlib import Path
 
-import meltano.core.bundle
 import pytest
 import yaml
+
+from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService
@@ -44,7 +45,7 @@ def compatible_copy_tree(source: Path, destination: Path):
 
 @pytest.fixture(scope="class")
 def discovery():  # noqa: WPS213
-    with meltano.core.bundle.find("discovery.yml").open() as base:
+    with bundle.find("discovery.yml").open() as base:
         discovery = yaml.safe_load(base)
 
     discovery[PluginType.EXTRACTORS].append(
@@ -190,6 +191,16 @@ def discovery():  # noqa: WPS213
                     "args": "--option $ENV_VAR_ARG",
                     "executable": "other-utility",
                 },
+                "containerized": {
+                    "args": "",
+                    "container_spec": {
+                        "image": "mock-utils/mock",
+                        "ports": {
+                            "5000": "5000",
+                        },
+                        "volumes": ["$MELTANO_PROJECT_ROOT/example/:/usr/app/"],
+                    },
+                },
             },
         }
     )
@@ -265,14 +276,14 @@ def plugin_invoker_factory(
 
 @pytest.fixture(scope="class")
 def add_model(project, plugin_install_service, project_add_service):
-    MODELS = [
+    models = [
         "model-carbon-intensity",
         "model-gitflix",
         "model-salesforce",
         "model-gitlab",
     ]
 
-    for model in MODELS:
+    for model in models:
         plugin = project_add_service.add(PluginType.MODELS, model)
         plugin_install_service.install_plugin(plugin)
 
@@ -283,11 +294,11 @@ def add_model(project, plugin_install_service, project_add_service):
         meltano["plugins"]["models"] = [
             model_def
             for model_def in meltano["plugins"]["models"]
-            if model_def["name"] not in MODELS
+            if model_def["name"] not in models
         ]
 
-    for model in MODELS:
-        shutil.rmtree(project.model_dir(model))
+    for created_model in models:
+        shutil.rmtree(project.model_dir(created_model))
 
 
 @pytest.fixture(scope="class")

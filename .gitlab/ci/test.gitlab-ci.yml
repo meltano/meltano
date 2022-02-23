@@ -21,21 +21,44 @@
 
 lint_python:
   extends: .fast_test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
   parallel:
     matrix:
       # Lint only on 'primary' python version:
       - PYTHON_IMAGE_VERSION: ["3.8"]
+  before_script: []
   script:
-    - make show_lint_python
+    - |
+      if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]; then
+        git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME;
+        echo "Comparing to $CI_MERGE_REQUEST_TARGET_BRANCH_NAME";
+        REF="origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}";
+      else
+        REF=""
+      fi
+    - 'declare FILES=$(git diff --name-only ${CI_COMMIT_SHA} $REF | grep "\.py$")'
+    - |
+      if [ -n "${FILES}" ]; then
+        echo "Changed files are\n$FILES";
+        pip install poetry;
+        poetry install --no-root;
+        make show_lint_python $(echo $FILES | xargs);
+      else
+        echo "Nothing to lint"
+      fi
 
-lint_all:
+lint_eslint:
   extends: .test
   parallel:
     matrix:
       # Lint only on 'primary' python version:
       - PYTHON_IMAGE_VERSION: ["3.8"]
   script:
-    - make show_lint
+    - make show_lint_eslint
 
 .pytest:
   extends: .test

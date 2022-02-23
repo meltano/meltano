@@ -617,6 +617,7 @@
                         "docs": {},
                         "settings_group_validation": {},
                         "commands": {},
+                        "variant": {},
                         "variants": {
                             "type": "array",
                             "items": {
@@ -723,10 +724,10 @@
                 },
                 "env": {
                     "type": "string",
-                    "description": "Deprecated. An environment variable name this setting can be configured with",
+                    "description": "An environment variable that will be initialized with the setting's value whenever the plugin is invoked. This is used to inject environment variables into the plugin's execution context. If the named environment variable is already defined at runtime, Meltano will use the passed value from context instead of the configured value.",
                     "examples": [
-                        "GITLAB_API_TOKEN",
-                        "FACEBOOK_ADS_ACCESS_TOKEN"
+                        "DBT_PROFILES_DIR",
+                        "GE_HOME"
                     ]
                 },
                 "env_aliases": {

@@ -5,6 +5,7 @@ import re
 from typing import Dict, Optional, Union
 
 import yaml
+
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
@@ -72,8 +73,6 @@ class PluginType(YAMLEnum):
             return "utilize"
         if self is self.__class__.MAPPERS:
             return "map"
-        if self is self.__class__.MAPPINGS:
-            return "mapping"  # technically not a verb, but it's the same as "map"
 
         return self.value[:-3]
 

@@ -263,10 +263,12 @@ class PluginInstallService:
 
     @staticmethod
     def _is_mapping(plugin: ProjectPlugin) -> bool:
-        """Check if a plugin is a mapping as mappings are not installed."""
-        return plugin.type == PluginType.MAPPERS and not plugin.extra_config.get(
-            "_mapper"
-        )
+        """Check if a plugin is a mapping as mappings are not installed.
+
+        Mappings are PluginType.MAPPERS with extra attribute of `_mapping` which will indicate
+        that this instance of the plugin is actually a mapping - and should not be installed.
+        """
+        return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
 
 
 class PipPluginInstaller:
