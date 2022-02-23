@@ -169,11 +169,17 @@ class BlockParser:  # noqa: D101
 
         Args:
             name: Name of the plugin or mapping.
+<<<<<<< HEAD
+        Returns:
+            The actual plugin.
+        Raises
+=======
 
         Returns:
             The actual plugin.
 
         Raises:
+>>>>>>> master
             ClickException: If mapping name returns multiple matches.
         """
         try:
@@ -241,9 +247,15 @@ class BlockParser:  # noqa: D101
                     plugin_type=plugin.type,
                 )
                 return None, offset + next_block
+<<<<<<< HEAD
 
             self.log.debug("found block", block_type=plugin.type, index=next_block)
 
+=======
+
+            self.log.debug("found block", block_type=plugin.type, index=next_block)
+
+>>>>>>> master
             if plugin.type == PluginType.MAPPERS:
                 self.log.info(
                     "found mapper",

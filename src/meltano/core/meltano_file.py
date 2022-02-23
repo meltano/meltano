@@ -1,6 +1,12 @@
 import copy
 from typing import Dict, Iterable, List
 
+<<<<<<< HEAD
+import yaml
+
+from meltano.core.behavior import NameEq
+=======
+>>>>>>> master
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType

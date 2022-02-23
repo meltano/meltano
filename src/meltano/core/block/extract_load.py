@@ -1,14 +1,23 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 import logging
+<<<<<<< HEAD
+from asyncio import Task
+=======
+>>>>>>> master
 from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
+<<<<<<< HEAD
+
+=======
+>>>>>>> master
 from sqlalchemy.orm import Session
 
 from meltano.core.elt_context import PluginContext
-from meltano.core.job import Job
+from meltano.core.job import Job, JobFinder
+from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -36,6 +45,7 @@ class ELBContext:
         plugins_service: ProjectPluginsService = None,
         session: Session = None,
         job: Optional[Job] = None,
+        state: Optional[str] = None,
         base_output_logger: Optional[OutputLogger] = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -45,6 +55,7 @@ class ELBContext:
             plugins_service: The plugins service to use.
             session: The session to use.
             job: The job within this context should run.
+            state: Optional state to use.
             base_output_logger: The base logger to use.
         """
         self.project = project
@@ -52,6 +63,8 @@ class ELBContext:
 
         self.session = session
         self.job = job
+        self.state = state
+        self.full_refresh = False
 
         self.base_output_logger = base_output_logger
 
@@ -131,7 +144,10 @@ class ELBContextBuilder:
         Args:
             plugin: The plugin to create the context for.
             env: Environment override dictionary. Defaults to None.
+<<<<<<< HEAD
+=======
 
+>>>>>>> master
         Returns:
             A new `PluginContext` object.
         """
@@ -150,6 +166,9 @@ class ELBContextBuilder:
         self,
         plugin_context: PluginContext,
     ) -> PluginInvoker:
+<<<<<<< HEAD
+        """Create an invoker for a plugin from a PluginContext."""
+=======
         """Create an invoker for a plugin from a PluginContext.
 
         Args:
@@ -158,6 +177,7 @@ class ELBContextBuilder:
         Returns:
             A new `PluginInvoker` object.
         """
+>>>>>>> master
         return invoker_factory(
             self.project,
             plugin_context.plugin,
@@ -213,6 +233,11 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             config_service=self.context.plugins_service.config_service,
         )
 
+        job = Job(
+            job_id=f'{self.head.string_id}-{self.tail.string_id}',
+        )
+        self.context.job = job
+
         log_file = "run.log"
         if self.context.job:
             job_logging_service = JobLoggingService(self.context.project)
@@ -254,23 +279,35 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             return False
 
     async def upstream_stop(self, index) -> None:
+<<<<<<< HEAD
+        """Stop all blocks upstream of a given index."""
+=======
         """Stop all blocks upstream of a given index.
 
         Args:
             index: The index of the block to stop upstream from.
         """
+>>>>>>> master
         for block in reversed(self.blocks[:index]):
             await block.stop()
 
     async def process_wait(
+<<<<<<< HEAD
+        self, output_exception_future: Optional[Task], subset: int = None
+    ) -> Set[Task]:
+=======
         self, output_exception_future: Optional[asyncio.Task], subset: int = None
     ) -> Set[asyncio.Task]:
+>>>>>>> master
         """Wait on all process futures in the block set.
 
         Args:
             output_exception_future: additional future to wait on for output exceptions.
             subset: the subset of blocks to wait on.
+<<<<<<< HEAD
+=======
 
+>>>>>>> master
         Returns:
             The set of all process futures + optional output exception futures.
         """
@@ -315,13 +352,33 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             True if the task completed successfully, False otherwise.
 
         Raises:
-            RunnerError if failures are encountered during execution.
+            RunnerError: if failures are encountered during execution or if the underlying pipeline/job
+            is already running.
         """
+<<<<<<< HEAD
+        job = self.context.job
+        StaleJobFailer(job.job_id).fail_stale_jobs(session)
+
+        existing = JobFinder(job.job_id).latest_running(session)
+        if existing:
+            raise RunnerError(
+                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                + "To ignore this check use the '--force' option."
+            )
+
+        async with job.run(session):
+            async with self._start_blocks(session):
+                await self._link_io()
+                manager = ELBExecutionManager(self)
+                await manager.run()
+                return True
+=======
         async with self._start_blocks(session):
             await self._link_io()
             manager = ELBExecutionManager(self)
             await manager.run()
             return True
+>>>>>>> master
 
     async def terminate(self, graceful: bool = False) -> bool:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
@@ -463,6 +520,33 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
 class ELBExecutionManager:
     """Execution manager for ExtractLoadBlock sets."""
+<<<<<<< HEAD
+
+    def __init__(self, elb: ExtractLoadBlocks) -> None:
+        """Initialize the ELBExecutionManager which will handle the actual runtime management of the block set.
+
+        Args:
+            elb: The ExtractLoadBlocks to manage.
+        """
+        self.elb = elb
+        self.stream_buffer_size = self.elb.project_settings_service.get(
+            "elt.buffer_size"
+        )
+        self.line_length_limit = self.stream_buffer_size // 2
+
+        self._producer_code = None
+        self._consumer_code = None
+        self._intermediate_codes: Dict[str, int] = {}
+
+    async def run(self) -> None:
+        """Run is used to actually perform the execution of the ExtractLoadBlock set.
+
+        That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
+        stopping blocks or waiting for IO to complete as appropriate.
+
+        Raises:
+            RunnerError: if any blocks in the set finished with a non 0 exit code
+=======
 
     def __init__(self, elb: ExtractLoadBlocks) -> None:
         """Initialize the ELBExecutionManager which will handle the actual runtime management of the block set.
@@ -486,6 +570,7 @@ class ELBExecutionManager:
         That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
         stopping blocks or waiting for IO to complete as appropriate. Expect a RunnerError to be raised if any of
         the blocks exit with a non 0 exit code.
+>>>>>>> master
         """
         await self._wait_for_process_completion(self.elb.head)
         _check_exit_codes(
@@ -513,6 +598,13 @@ class ELBExecutionManager:
         self, current_head: IOBlock
     ) -> Tuple[int, int]:
         """Wait for the current head block to complete or for an error to occur.
+<<<<<<< HEAD
+
+        Args:
+            current_head: The current head block
+        Raises:
+            RunnerError: if any intermediate blocks failed.
+=======
 
         Args:
             current_head: The current head block
@@ -523,6 +615,7 @@ class ELBExecutionManager:
         Raises:
             RunnerError: if any intermediate blocks failed.
             exception: if any of the output futures encountered an exception.
+>>>>>>> master
         """
         start_idx = self.elb.blocks.index(current_head)
         remaining_blocks = self.elb.blocks[start_idx:]
@@ -618,7 +711,11 @@ class ELBExecutionManager:
             await block.stop()
 
 
+<<<<<<< HEAD
+def _check_exit_codes(
+=======
 def _check_exit_codes(  # noqa: WPS238
+>>>>>>> master
     producer_code: int, consumer_code: int, intermediate_codes: Dict[str, int]
 ) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
@@ -627,7 +724,10 @@ def _check_exit_codes(  # noqa: WPS238
         producer_code: exit code of the producer (tap)
         consumer_code: exit code of the consumer (target)
         intermediate_codes: exit codes of the intermediate blocks (mappers)
+<<<<<<< HEAD
+=======
 
+>>>>>>> master
     Raises:
         RunnerError: if the producer, consumer, or mapper exit codes are non-zero
     """

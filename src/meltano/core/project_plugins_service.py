@@ -197,11 +197,17 @@ class ProjectPluginsService:
 
         Args:
             mapping_name: The name of the mapping to find.
+<<<<<<< HEAD
+        Returns:
+            The mapping plugins with the specified mapping name.
+        Raises
+=======
 
         Returns:
             The mapping plugins with the specified mapping name.
 
         Raises:
+>>>>>>> master
             PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
         """
         found: List[ProjectPlugin] = []
@@ -243,7 +249,10 @@ class ProjectPluginsService:
         Args:
             plugin_type: The type of the plugins to return.
             ensure_parent: If True, ensure that plugin has a parent plugin set.
+<<<<<<< HEAD
+=======
 
+>>>>>>> master
         Returns:
             A list of plugins of the specified plugin type.
         """
