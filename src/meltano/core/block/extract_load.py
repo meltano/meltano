@@ -1,14 +1,17 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 import logging
+
 from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
+
 from sqlalchemy.orm import Session
 
 from meltano.core.elt_context import PluginContext
-from meltano.core.job import Job
+from meltano.core.job import Job, JobFinder
+from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -27,7 +30,7 @@ from .singer import SingerBlock
 logger = structlog.getLogger(__name__)
 
 
-class ELBContext:
+class ELBContext:  # noqa: WPS230
     """ELBContext holds the context for ELB BlockSets."""
 
     def __init__(
@@ -36,6 +39,7 @@ class ELBContext:
         plugins_service: ProjectPluginsService = None,
         session: Session = None,
         job: Optional[Job] = None,
+        state: Optional[str] = None,
         base_output_logger: Optional[OutputLogger] = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -45,6 +49,7 @@ class ELBContext:
             plugins_service: The plugins service to use.
             session: The session to use.
             job: The job within this context should run.
+            state: Optional state to use.
             base_output_logger: The base logger to use.
         """
         self.project = project
@@ -52,6 +57,8 @@ class ELBContext:
 
         self.session = session
         self.job = job
+        self.state = state
+        self.full_refresh = False
 
         self.base_output_logger = base_output_logger
 
@@ -213,6 +220,11 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             config_service=self.context.plugins_service.config_service,
         )
 
+        job = Job(
+            job_id=f'{self.head.string_id}-{self.tail.string_id}',  # noqa: WPS237
+        )
+        self.context.job = job
+
         log_file = "run.log"
         if self.context.job:
             job_logging_service = JobLoggingService(self.context.project)
@@ -315,13 +327,24 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             True if the task completed successfully, False otherwise.
 
         Raises:
-            RunnerError if failures are encountered during execution.
+            RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
-        async with self._start_blocks(session):
-            await self._link_io()
-            manager = ELBExecutionManager(self)
-            await manager.run()
-            return True
+        job = self.context.job
+        StaleJobFailer(job.job_id).fail_stale_jobs(session)
+
+        existing = JobFinder(job.job_id).latest_running(session)
+        if existing:
+            raise RunnerError(
+                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                + "To ignore this check use the '--force' option."
+            )
+
+        async with job.run(session):
+            async with self._start_blocks(session):
+                await self._link_io()
+                manager = ELBExecutionManager(self)
+                await manager.run()
+                return True
 
     async def terminate(self, graceful: bool = False) -> bool:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.

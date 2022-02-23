@@ -28,7 +28,7 @@ class ProcessWaitError(Exception):
     """Raised when a process can be waited on."""
 
 
-class InvokerBase:  # noqa: WPS230
+class InvokerBase:  # noqa: WPS230, WPS214
     """Base class for creating IOBlock's built on top of existing Meltano plugins."""
 
     def __init__(
@@ -144,9 +144,10 @@ class InvokerBase:  # noqa: WPS230
             raise IOLinkError("No IO to proxy, process not running")
 
         if self._stdout_future is None:
+            outputs = self._merge_outputs(self.invoker.StdioSource.STDOUT, self.outputs)
             self._stdout_future = asyncio.ensure_future(
                 # forward subproc stdout to downstream (i.e. targets stdin, loggers)
-                capture_subprocess_output(self.process_handle.stdout, *self.outputs)
+                capture_subprocess_output(self.process_handle.stdout, *outputs)
             )
         return self._stdout_future
 
@@ -163,8 +164,9 @@ class InvokerBase:  # noqa: WPS230
             raise IOLinkError("No IO to proxy, process not running")
 
         if self._stderr_future is None:
+            err_outputs = self._merge_outputs(self.invoker.StdioSource.STDERR, self.err_outputs)
             self._stderr_future = asyncio.ensure_future(
-                capture_subprocess_output(self.process_handle.stderr, *self.err_outputs)
+                capture_subprocess_output(self.process_handle.stderr, *err_outputs)
             )
         return self._stderr_future
 
@@ -246,6 +248,7 @@ class InvokerBase:  # noqa: WPS230
         Args:
             context: The context to obtain the session from when the invoker is prepared.
         """
+        self.invoker.context = context
         await self.invoker.prepare(context.get("session"))
 
     async def post(self) -> None:
@@ -256,6 +259,14 @@ class InvokerBase:  # noqa: WPS230
             # TODO: should we preserve these on a failure ?
             # the invoker prepared context manager was able to clean up the configs
             pass
+
+    def _merge_outputs(self, source: str, outputs: []) -> []:
+        if not self.invoker.output_handlers:
+            return outputs
+
+        merged_outputs = self.invoker.output_handlers.get(source, [])
+        merged_outputs.extend(outputs)
+        return merged_outputs
 
 
 class SingerBlock(InvokerBase, IOBlock):
