@@ -22,7 +22,7 @@ event structure and send identical events to both services.
 
 ## Consequences
 
-This is a known, sub-optimal path that isn't the proper way to add snowplow events.
+This decision does not yet take full advantage of Snowplow metadata features.
 This is done to get the end-to-end snowplow pipelines flowing and reporting switched from GA to Snowplow.
 
 We will go forward after this is in place to refactor all of the event reporting to get better structure overall.
