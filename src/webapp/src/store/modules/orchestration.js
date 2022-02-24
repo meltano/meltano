@@ -268,8 +268,7 @@ const actions = {
     return orchestrationsApi.updatePipelineSchedule(payload).then(response => {
       const editableItems = {
         interval: response.data.interval,
-        transform: response.data.transform,
-        CRONInterval: response.data.CRONInterval
+        transform: response.data.transform
       }
       const updatedPipeline = Object.assign({}, payload.pipeline, editableItems)
       commit('setPipelineStatus', {

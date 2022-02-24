@@ -25,8 +25,7 @@ export default {
         loader: '',
         transform: 'skip',
         interval: '',
-        isRunning: false,
-        CRONInterval: '*/1 * * * *'
+        isRunning: false
       },
       cronExpression: '*/1 * * * *'
     }
@@ -39,9 +38,6 @@ export default {
     },
     intervalOptions() {
       return PIPELINE_INTERVAL_OPTIONS
-    },
-    otherInterval() {
-      return (this.pipeline.CRONInterval = this.cronExpression)
     },
     isSaveable() {
       const hasOwns = []
@@ -69,15 +65,6 @@ export default {
       )
     }
   },
-  // watch: {
-  //   otherInterval() {
-  //     console.log(
-  //       `this changed to ${this.cronExpression} and the regular is ${this.pipeline.CRONInterval} but it may be ${this.CRONInterval}`
-  //     )
-  //     // Vue.set(this.CRONInterval, this.otherInterval)
-  //     // this.pipeline.CRONInterval = this.cronExpression
-  //   }
-  // },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
       this.isLoaded = true
@@ -92,7 +79,10 @@ export default {
     })
   },
   methods: {
-    ...mapActions('orchestration', ['savePipelineSchedule']),
+    ...mapActions('orchestration', [
+      'savePipelineSchedule',
+      'getPipelineSchedules'
+    ]),
     onExtractorLoaderChange() {
       if (!this.pipeline.extractor || !this.pipeline.loader) {
         return
@@ -105,9 +95,15 @@ export default {
     },
     save() {
       this.isSaving = true
+      if (this.pipeline.interval === '@other') {
+        this.pipeline.interval = this.cronExpression
+      }
       this.savePipelineSchedule({
         pipeline: this.pipeline
       })
+        .then(() => {
+          this.getPipelineSchedules()
+        })
         .then(() => {
           Vue.toasted.global.success(`Pipeline Saved - ${this.pipeline.name}`)
           this.close()
@@ -242,7 +238,11 @@ export default {
             class="column is-fullwidth"
           >
             <small class="has-text-interactive-navigation">Step 4a</small>
-            <h4>CRON Interval</h4>
+            <h4 class="current-cron-expression">
+              This is your current CRON expression
+              <code>{{ cronExpression }}</code
+              >.
+            </h4>
             <VueCronEditorBuefy v-model="cronExpression" />
           </div>
           <div class="column is-full">
@@ -273,5 +273,13 @@ export default {
 <style lang="scss" scoped>
 .control {
   margin: 0.5rem 0;
+}
+
+.columns .is-fullwidth {
+  padding-right: 0;
+}
+
+.current-cron-expression {
+  margin-bottom: 10px;
 }
 </style>

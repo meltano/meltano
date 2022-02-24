@@ -21,6 +21,11 @@ export default {
   props: {
     pipeline: { type: Object, default: () => {} }
   },
+  data() {
+    return {
+      defaultCronInterval: '*/1 * * * *'
+    }
+  },
   computed: {
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
     intervalOptions() {
@@ -56,7 +61,8 @@ export default {
   methods: {
     ...mapActions('orchestration', [
       'deletePipelineSchedule',
-      'updatePipelineSchedule'
+      'updatePipelineSchedule',
+      'getPipelineSchedules'
     ]),
     goToLog(jobId) {
       this.$router.push({ name: 'runLog', params: { jobId } })
@@ -69,8 +75,16 @@ export default {
           pipeline.extractor
         ).namespace
         if (newPipelineValue === '@other') {
-          this.setCRONInterval(pipeline.jobId)
+          const jobId = pipeline.jobId
+          const cronDefault = this.defaultCronInterval
+          this.$router.push({
+            name: 'cronJobSettings',
+            params: { jobId, cronDefault }
+          })
         } else {
+          if (item === 'interval' && newPipelineValue != '@other') {
+            this.pipeline.cronExpression = null
+          }
           this.updatePipelineSchedule({
             [item]: newPipelineValue,
             pipeline,
@@ -85,11 +99,17 @@ export default {
         }
       }
     },
-    setCRONInterval(jobId) {
-      this.$router.push({ name: 'cronJobSettings', params: { jobId } })
+    setCRONInterval(jobId, cronInterval) {
+      this.$router.push({
+        name: 'cronJobSettings',
+        params: { jobId, cronInterval }
+      })
     },
     removePipeline(pipeline) {
       this.deletePipelineSchedule(pipeline)
+        .then(() => {
+          this.getPipelineSchedules()
+        })
         .then(() =>
           Vue.toasted.global.success(
             `Pipeline successfully removed - ${pipeline.name}`
@@ -259,11 +279,13 @@ export default {
           <button
             class="button is-small tooltip is-tooltip-top is-warning"
             data-tooltip="Set the CRON interval you'd like"
-            @click="setCRONInterval(pipeline.jobId)"
+            :class="{ 'is-loading': pipeline.isRunning }"
+            :disabled="getIsDisabled(pipeline)"
+            @click="setCRONInterval(pipeline.jobId, pipeline.cronExpression)"
           >
-            <span>Set Interval</span>
+            <span>Interval Details</span>
             <span class="icon is-small">
-              <font-awesome-icon icon="wrench"></font-awesome-icon>
+              <font-awesome-icon icon="cog"></font-awesome-icon>
             </span>
           </button>
         </div>

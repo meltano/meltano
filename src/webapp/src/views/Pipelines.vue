@@ -5,6 +5,8 @@ import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
 
 import RouterViewLayout from '@/views/RouterViewLayout'
 
+import _ from 'lodash'
+
 export default {
   name: 'Pipelines',
   components: {
@@ -18,6 +20,7 @@ export default {
   },
   computed: {
     ...mapGetters('orchestration', ['getHasPipelines', 'getSortedPipelines']),
+    ...mapGetters('plugins', ['getInstalledPlugin']),
     ...mapState('plugins', ['installedPlugins']),
     getModalName() {
       return this.$route.name
@@ -35,6 +38,17 @@ export default {
     },
     isModal() {
       return this.$route.meta.isModal
+    },
+    cloneDeepPipelines() {
+      return _.cloneDeep(this.getSortedPipelines).map(pipeline => {
+        if (pipeline.interval.includes('*')) {
+          pipeline.cronExpression = pipeline.interval
+          pipeline.interval = '@other'
+          return pipeline
+        } else {
+          return pipeline
+        }
+      })
     }
   },
   created() {
@@ -45,7 +59,10 @@ export default {
     )
   },
   methods: {
-    ...mapActions('orchestration', ['getPipelineSchedules']),
+    ...mapActions('orchestration', [
+      'getPipelineSchedules',
+      'updatePipelineSchedule'
+    ]),
     ...mapActions('plugins', ['getInstalledPlugins'])
   }
 }
@@ -77,7 +94,7 @@ export default {
           <div v-else>
             <PipelineSchedules
               v-if="getHasPipelines"
-              :pipelines="getSortedPipelines"
+              :pipelines="cloneDeepPipelines"
             />
             <div v-else class="box">
               <p>

@@ -21,6 +21,7 @@ import {
   faCheckCircle,
   faChevronDown,
   faChevronUp,
+  faCog,
   faCompass,
   faDatabase,
   faDotCircle,
@@ -92,6 +93,7 @@ export default {
     library.add(faCheckCircle)
     library.add(faChevronDown)
     library.add(faChevronUp)
+    library.add(faCog)
     library.add(faCompass)
     library.add(faDatabase)
     library.add(faDotCircle)
