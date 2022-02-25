@@ -4,10 +4,10 @@
   image:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_IMAGE_VERSION
     entrypoint: [""]
-    except:
-      changes:
-        - docs/src/**/*
-        - docs/adr/**/*
+  except:
+    changes:
+      - docs/src/**/*
+      - docs/adr/**/*
   before_script:
     - pip install poetry
 
