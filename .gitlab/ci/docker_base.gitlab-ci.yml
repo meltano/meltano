@@ -31,5 +31,6 @@ meltano_base:
 meltano_base_forks:
   extends: .build_base
   except:
-    - branches@meltano/meltano
-    - tags@meltano/meltano
+    refs:
+      - branches@meltano/meltano
+      - tags@meltano/meltano

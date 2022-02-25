@@ -21,6 +21,7 @@ demo_project_forks:
       --form ref=master
       https://gitlab.com/api/v4/projects/meltano%2fdemo-project/trigger/pipeline
   except:
-    - branches@meltano/meltano
-    - tags@meltano/meltano
+    refs:
+      - branches@meltano/meltano
+      - tags@meltano/meltano
   when: manual
