@@ -3,7 +3,6 @@ variables:
   LICENSE_FINDER_CLI_OPTS: "--enabled-package-managers=pip --python-version=3 --decisions-file=license_finder/dependency_decisions.yml"
 
 license_scanning:
-  extends: .skip_docs_rules
   stage: test
   image:
     name: "$CI_REGISTRY_IMAGE/license_finder:latest"
@@ -31,6 +30,11 @@ license_scanning:
       - license_management.log
   dependencies: []
   rules:
+    - changes:
+        - .gitlab/**/*
+        - docs/src/**/*
+        - docs/adr/**/*
+      when: never
     - if: $LICENSE_MANAGEMENT_DISABLED
       when: never
     - if: $CI_COMMIT_BRANCH &&
