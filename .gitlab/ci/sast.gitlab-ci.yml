@@ -2,6 +2,8 @@ include:
   - template: Security/SAST.gitlab-ci.yml
 
 sast:
+  extends:
+    - .skip_docs
   variables:
     SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
 
