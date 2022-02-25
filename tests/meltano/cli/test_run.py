@@ -5,6 +5,7 @@ from typing import List, Optional
 import pytest
 import structlog
 from asynctest import CoroutineMock, mock
+
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
@@ -87,9 +88,9 @@ def tap_process(process_mock_factory, tap):
 def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
 
-    # Have `target.wait` take 1s to make sure the tap always finishes before the target
+    # Have `target.wait` take 2s to make sure the tap always finishes before the target
     async def wait_mock():
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         return target.wait.return_value
 
     target.wait.side_effect = wait_mock
@@ -103,6 +104,28 @@ def target_process(process_mock_factory, target):
         side_effect=(b"target starting\n", b"target running\n", b"target done\n")
     )
     return target
+
+
+@pytest.fixture()
+def mapper_process(process_mock_factory, mapper):
+    mapper = process_mock_factory(mapper)
+
+    # Have `mapper.wait` take 1s to make sure the mapper always finishes after the tap but before the target
+    async def wait_mock():
+        await asyncio.sleep(1)
+        return mapper.wait.return_value
+
+    mapper.wait.side_effect = wait_mock
+
+    mapper.stdout.at_eof.side_effect = (False, False, False, True)
+    mapper.stdout.readline = CoroutineMock(
+        side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
+    )
+    mapper.stderr.at_eof.side_effect = (False, False, False, True)
+    mapper.stderr.readline = CoroutineMock(
+        side_effect=(b"mapper starting\n", b"mapper running\n", b"mapper done\n")
+    )
+    return mapper
 
 
 @pytest.fixture()
@@ -268,20 +291,22 @@ class TestCliRunScratchpadOne:
         project,
         tap,
         target,
+        mapper,
         dbt,
         tap_process,
         target_process,
+        mapper_process,
         dbt_process,
         project_plugins_service,
         job_logging_service,
     ):
         # exit cleanly when everything is fine
         create_subprocess_exec = CoroutineMock(
-            side_effect=(tap_process, target_process)
+            side_effect=(tap_process, mapper_process, target_process)
         )
 
         # Verify that a vanilla ELB run works
-        args = ["run", tap.name, target.name]
+        args = ["run", tap.name, "mock-mapping-0", target.name]
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -291,7 +316,7 @@ class TestCliRunScratchpadOne:
             return_value=project_plugins_service,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
-            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
@@ -348,17 +373,19 @@ class TestCliRunScratchpadOne:
         project,
         tap,
         target,
+        mapper,
         dbt,
         tap_process,
         target_process,
+        mapper_process,
         dbt_process,
         project_plugins_service,
         job_logging_service,
     ):
         invoke_async = CoroutineMock(
-            side_effect=(tap_process, target_process, dbt_process)
+            side_effect=(tap_process, mapper_process, target_process, dbt_process)
         )
-        args = ["run", tap.name, target.name, "dbt:run"]
+        args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -375,6 +402,12 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches(
                 "found ExtractLoadBlocks set"
             )  # tap/target pair
+
+            # make sure mapper was found and at its expected positions
+            for ev in matcher.find_by_event("found block"):
+                if ev.get("block_type") == "mappers":
+                    assert ev.get("index") == 1
+
             assert (
                 matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
                 == "transformers"
@@ -944,3 +977,193 @@ class TestCliRunScratchpadOne:
                 == "RunnerError('Output line length limit exceeded',)"
                 or "RunnerError('Output line length limit exceeded')"
             )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_mapper_config(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        mapper,
+        dbt,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+        project_add_service,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process)
+        )
+
+        # no mapper should be found
+        args = ["run", tap.name, "not-a-valid-mapping-name", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 1
+            assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
+
+        # create duplicate mapping name - should also fail
+        project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-dupe1",
+            inherit_from=mapper.name,
+            mappings=[
+                {
+                    "name": "mock-mapping-dupe",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email1",
+                                "tap_stream_name": "commits1",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                }
+            ],
+        )
+        project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-dupe2",
+            inherit_from=mapper.name,
+            mappings=[
+                {
+                    "name": "mock-mapping-dupe",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email1",
+                                "tap_stream_name": "commits1",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                }
+            ],
+        )
+
+        args = ["run", tap.name, "mock-mapping-dupe", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 1
+            assert (
+                "Error: Ambiguous mapping name mock-mapping-dupe, found multiple matches."
+                in result.stderr
+            )
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_elb_mapper_failure(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        mapper,
+        dbt,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+
+        # in this scenario, the map fails on the second read. Target should still complete, but dbt should not.
+        args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
+
+        mapper_process.wait.return_value = 1
+        mapper_process.returncode = 1
+        mapper_process.stderr.readline.side_effect = (
+            b"mapper starting\n",
+            b"mapper running\n",
+            b"mapper failure\n",
+        )
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process, dbt_process)
+        )
+
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+
+            assert "Mappers failed" in str(result.exception)
+            assert result.exit_code == 1
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("found ExtractLoadBlocks set")
+            assert (
+                matcher.find_by_event("found PluginCommand")[0].get("plugin_type")
+                == "transformers"
+            )
+
+            completed_events = matcher.find_by_event("Block run completed.")
+            assert len(completed_events) == 1
+            assert completed_events[0].get("success") is False
+
+            # the tap should have completed successfully
+            matcher.event_matches("tap done")
+
+            # we should see a debug line for from the run manager indicating a intermediate block failed
+            matcher.event_matches("Intermediate block in sequence failed.")
+
+            # the failed block should have been the mapper
+            mapper_stop_event = matcher.find_by_event("mapper failure")
+            assert len(mapper_stop_event) == 1
+            assert mapper_stop_event[0].get("name") == mapper.name
+            assert mapper_stop_event[0].get("cmd_type") == "elb"
+            assert mapper_stop_event[0].get("stdio") == "stderr"
+
+            # target should have attempted to complete
+            target_stop_event = matcher.find_by_event("target done")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+
+            # dbt should not have run at all
+            assert not matcher.event_matches("dbt starting")
+            assert not matcher.event_matches("dbt running")
+            assert not matcher.event_matches("dbt done")

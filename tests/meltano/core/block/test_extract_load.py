@@ -6,6 +6,7 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock, Mock
+
 from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import (
     ELBContext,
@@ -129,6 +130,12 @@ class TestExtractLoadBlocks:
         return tap_config_dir
 
     @pytest.fixture()
+    def mapper_config_dir(self, mkdtemp, tap):
+        mapper_config_dir = mkdtemp()
+        create_plugin_files(mapper_config_dir, tap)
+        return mapper_config_dir
+
+    @pytest.fixture()
     def target_config_dir(self, mkdtemp, target):
         target_config_dir = mkdtemp()
         create_plugin_files(target_config_dir, target)
@@ -163,6 +170,13 @@ class TestExtractLoadBlocks:
         return tap
 
     @pytest.fixture()
+    def mapper_process(self, process_mock_factory, mapper):
+        mapper = process_mock_factory(mapper)
+        mapper.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
+        mapper.wait = CoroutineMock(return_value=0)
+        return mapper
+
+    @pytest.fixture()
     def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
         target.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
@@ -170,21 +184,23 @@ class TestExtractLoadBlocks:
         return target
 
     @pytest.mark.asyncio
-    async def test_extract_load_block(
+    async def test_link_io(
         self,
         session,
         subject,
         tap_config_dir,
         target_config_dir,
+        mapper_config_dir,
         tap,
         target,
+        mapper,
         tap_process,
         target_process,
+        mapper_process,
         plugin_invoker_factory,
         elb_context,
         log,
     ):
-
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = CoroutineMock(
@@ -194,10 +210,115 @@ class TestExtractLoadBlocks:
             )
         )
 
+        mapper_process.sterr.at_eof.side_effect = True
+        mapper_process.stdout.at_eof.side_effect = (False, False, True)
+        mapper_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "mapper-mocked-value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        mapper_invoker = plugin_invoker_factory(mapper, config_dir=mapper_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process)
+        )
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async:
+            blocks = (
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
+                ),
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=mapper_invoker,
+                    plugin_args=[],
+                ),
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=target_invoker,
+                    plugin_args=[],
+                ),
+            )
+
+            elb = ExtractLoadBlocks(elb_context, blocks)
+            elb.validate_set()
+
+            for block in elb.blocks:
+                await block.pre({"session": session})
+                await block.start()
+
+            await elb._link_io()
+
+            # explicitly check the counts of each block's output to ensure they are linked
+            # count is going to be logger + 1 for next blocks stdin
+            assert len(elb.blocks[0].outputs) == 2
+
+            # block0 should write output to block1 stdin
+            assert elb.blocks[1].stdin in elb.blocks[0].outputs
+
+            assert len(elb.blocks[2].outputs) == 1  # logger only
+            # block1 should write output to block2 stdin
+            assert elb.blocks[2].stdin in elb.blocks[1].outputs
+
+            # block2 should write output to logger and no where else
+            assert len(elb.blocks[2].outputs) == 1
+
+    @pytest.mark.asyncio
+    async def test_extract_load_block(
+        self,
+        session,
+        subject,
+        tap_config_dir,
+        target_config_dir,
+        mapper_config_dir,
+        tap,
+        target,
+        mapper,
+        tap_process,
+        target_process,
+        mapper_process,
+        plugin_invoker_factory,
+        elb_context,
+        log,
+    ):
+        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stdout.at_eof.side_effect = (False, False, True)
+        tap_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        mapper_process.sterr.at_eof.side_effect = True
+        mapper_process.stdout.at_eof.side_effect = (False, False, True)
+        mapper_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "mapper-value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        mapper_invoker = plugin_invoker_factory(mapper, config_dir=mapper_config_dir)
+        target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process)
+        )
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async:
@@ -208,6 +329,13 @@ class TestExtractLoadBlocks:
                     project=elb_context.project,
                     plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
+                    plugin_args=[],
+                ),
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=mapper_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
@@ -225,8 +353,17 @@ class TestExtractLoadBlocks:
 
             assert tap_process.wait.called
             assert tap_process.stdout.readline.called
+
+            assert mapper_process.wait.called
+            assert mapper_process.stdout.readline.called
+            assert mapper_process.stdin.writeline.called
+
             assert target_process.wait.called
             assert target_process.stdin.writeline.called
+
+            # sanity check to verify that we saw mapper output and not tap output
+            first_write = target_process.stdin.writeline.call_args_list[0]
+            assert "mapper" in first_write[0][0]
 
     @pytest.mark.asyncio
     async def test_elb_validation(

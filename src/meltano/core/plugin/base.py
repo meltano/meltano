@@ -5,6 +5,7 @@ import re
 from typing import Dict, Optional, Union
 
 import yaml
+
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
@@ -43,6 +44,8 @@ class PluginType(YAMLEnum):
     TRANSFORMERS = "transformers"
     FILES = "files"
     UTILITIES = "utilities"
+    MAPPERS = "mappers"
+    MAPPINGS = "mappings"
 
     def __str__(self):
         return self.value
@@ -68,6 +71,8 @@ class PluginType(YAMLEnum):
             return self.singular
         if self is self.__class__.UTILITIES:
             return "utilize"
+        if self is self.__class__.MAPPERS:
+            return "map"
 
         return self.value[:-3]
 
@@ -77,8 +82,8 @@ class PluginType(YAMLEnum):
 
     @classmethod
     def cli_arguments(cls):
-        args = [type.singular for type in cls]
-        args.extend([type for type in cls])
+        args = [plugin_type.singular for plugin_type in cls]
+        args.extend([plugin_type for plugin_type in cls])
         return args
 
     @classmethod
@@ -168,8 +173,8 @@ class PluginDefinition(PluginRef):
 
         self._defaults["label"] = lambda p: p.name
 
-        def default_logo_url(p):
-            short_name = re.sub(r"^(tap|target)-", "", p.name)
+        def default_logo_url(plugin):
+            short_name = re.sub(r"^(tap|target)-", "", plugin.name)
             return f"/static/logos/{short_name}-logo.png"
 
         self._defaults["logo_url"] = default_logo_url

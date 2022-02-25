@@ -1,12 +1,12 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 import logging
-from asyncio import Task
-from contextlib import suppress
-from typing import AsyncIterator, List, Optional, Set, Tuple
+from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
+from sqlalchemy.orm import Session
+
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job
 from meltano.core.logging import JobLoggingService, OutputLogger
@@ -18,7 +18,6 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from sqlalchemy.orm import Session
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -29,6 +28,8 @@ logger = structlog.getLogger(__name__)
 
 
 class ELBContext:
+    """ELBContext holds the context for ELB BlockSets."""
+
     def __init__(
         self,
         project: Project,
@@ -56,12 +57,18 @@ class ELBContext:
 
     @property
     def elt_run_dir(self) -> str:
-        """Obtain the run directory for the current job."""
+        """Obtain the run directory for the current job.
+
+        Returns:
+            The run directory for the current job.
+        """
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
 
 class ELBContextBuilder:
+    """Build up ELBContexts for ExtractLoadBlocks."""
+
     def __init__(
         self,
         project: Project,
@@ -75,7 +82,7 @@ class ELBContextBuilder:
             project: the meltano project for the context.
             plugins_service: the plugins service for the context.
             session: the database session for the context.
-            job:
+            job: the job for this ELT run.
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
@@ -88,13 +95,16 @@ class ELBContextBuilder:
         self._base_output_logger = None
 
     def make_block(
-        self, plugin: ProjectPlugin, plugin_args: Optional[List[str]] = None
+        self,
+        plugin: ProjectPlugin,
+        plugin_args: Optional[List[str]] = None,
     ) -> SingerBlock:
         """Create a new `SingerBlock` object, from a plugin.
 
         Args:
             plugin: The plugin to be executed.
             plugin_args: The arguments to be passed to the plugin.
+
         Returns:
             The new `SingerBlock` object.
         """
@@ -115,14 +125,12 @@ class ELBContextBuilder:
         self,
         plugin: ProjectPlugin,
         env: dict = None,
-        config: dict = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
         Args:
             plugin: The plugin to create the context for.
             env: Environment override dictionary. Defaults to None.
-            config: Plugin configuration override dictionary. Defaults to None.
 
         Returns:
             A new `PluginContext` object.
@@ -134,13 +142,22 @@ class ELBContextBuilder:
                 plugin,
                 plugins_service=self.plugins_service,
                 env_override=env,
-                config_override=config,
             ),
             session=self.session,
         )
 
-    def invoker_for(self, plugin_context: PluginContext) -> PluginInvoker:
-        """Create an invoker for a plugin from a PluginContext."""
+    def invoker_for(
+        self,
+        plugin_context: PluginContext,
+    ) -> PluginInvoker:
+        """Create an invoker for a plugin from a PluginContext.
+
+        Args:
+            plugin_context: The plugin context to pass to the invoker_factory.
+
+        Returns:
+            A new `PluginInvoker` object.
+        """
         return invoker_factory(
             self.project,
             plugin_context.plugin,
@@ -152,12 +169,20 @@ class ELBContextBuilder:
 
     @property
     def elt_run_dir(self) -> str:
-        """Get the run directory for the current job."""
+        """Get the run directory for the current job.
+
+        Returns:
+            The run directory for the current job.
+        """
         if self.job:
             return self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
     def context(self) -> ELBContext:
-        """Create an ELBContext object from the current builder state."""
+        """Create an ELBContext object from the current builder state.
+
+        Returns:
+            A new `ELBContext` object.
+        """
         return ELBContext(
             project=self.project,
             plugins_service=self.plugins_service,
@@ -203,13 +228,24 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         self._errors = []
 
     def index_last_input_done(self) -> int:
-        """Return index of the block furthest from the start that has exited and required input."""
+        """Return index of the block furthest from the start that has exited and required input.
+
+        Returns:
+            The index of the block furthest from the start that has exited and required input.
+        """
         for idx, block in reversed(list(enumerate(self.blocks))):
             if block.requires_input and block.proxy_stderr.done():
                 return idx
 
     def upstream_complete(self, index: int) -> bool:
-        """Return whether blocks upstream from a given block index are already done."""
+        """Return whether blocks upstream from a given block index are already done.
+
+        Args:
+            index: The index of the block to check upstream from.
+
+        Returns:
+            True if all upstream blocks are done, False otherwise.
+        """
         for idx, block in enumerate(self.blocks):
             if idx >= index:
                 return True
@@ -217,20 +253,42 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 continue
             return False
 
+    async def upstream_stop(self, index) -> None:
+        """Stop all blocks upstream of a given index.
+
+        Args:
+            index: The index of the block to stop upstream from.
+        """
+        for block in reversed(self.blocks[:index]):
+            await block.stop()
+
     async def process_wait(
-        self, output_exception_future: Task, subset: int = None
-    ) -> Set[Task]:
-        """Wait on all process futures in the block set."""
+        self, output_exception_future: Optional[asyncio.Task], subset: int = None
+    ) -> Set[asyncio.Task]:
+        """Wait on all process futures in the block set.
+
+        Args:
+            output_exception_future: additional future to wait on for output exceptions.
+            subset: the subset of blocks to wait on.
+
+        Returns:
+            The set of all process futures + optional output exception futures.
+        """
+        futures = list(self.process_futures[subset:])
+        if output_exception_future:
+            futures.append(output_exception_future)
+
         done, _ = await asyncio.wait(
-            [*self.process_futures[:subset], output_exception_future],
+            futures,
             return_when=asyncio.FIRST_COMPLETED,
         )
         return done
 
-    def validate_set(self) -> None:  # noqa: WPS231
+    def validate_set(self) -> None:  # noqa: WPS231, WPS238
         """Validate a ExtractLoad block set to ensure its valid and runnable.
 
-        Raises: BlockSetValidationError on validation failure
+        Raises:
+            BlockSetValidationError: if the block set is not valid.
         """
         if not self.blocks:
             raise BlockSetValidationError("No blocks in set.")
@@ -250,15 +308,21 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     async def run(self, session) -> bool:
         """Build the IO chain and execute the actual ELT task.
 
+        Args:
+            session: the session to use for this run.
+
+        Returns:
+            True if the task completed successfully, False otherwise.
+
         Raises:
             RunnerError if failures are encountered during execution.
         """
         async with self._start_blocks(session):
             await self._link_io()
-            await run(self, self.project_settings_service)
+            manager = ELBExecutionManager(self)
+            await manager.run()
             return True
 
-    @staticmethod
     async def terminate(self, graceful: bool = False) -> bool:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
 
@@ -266,8 +330,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Args:
             graceful: Whether or not the BlockSet should try to gracefully quit.
-        Returns:
-            Whether or not the BlockSet terminated successfully.
+
+        Raises:
+            NotImplementedError: if graceful termination is not implemented.
         """
         if graceful:
             raise NotImplementedError
@@ -276,39 +341,63 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             block.stop(kill=True)
 
     @property
-    def process_futures(self) -> List[Task]:
-        """Return the futures of the blocks subprocess calls."""
+    def process_futures(self) -> List[asyncio.Task]:
+        """Return the futures of the blocks subprocess calls.
+
+        Returns:
+            The list of all process futures.
+        """
         if self._process_futures is None:
             self._process_futures = [block.process_future for block in self.blocks]
         return self._process_futures
 
     @property
-    def stdout_futures(self) -> List[Task]:
-        """Access the futures of the blocks stdout proxy tasks."""
+    def stdout_futures(self) -> List[asyncio.Task]:
+        """Access the futures of the blocks stdout proxy tasks.
+
+        Returns:
+            The list of all stdout futures.
+        """
         if self._stdout_futures is None:
             self._stdout_futures = [block.proxy_stdout() for block in self.blocks]
         return self._stdout_futures
 
     @property
-    def stderr_futures(self) -> List[Task]:
-        """Access the futures of the blocks stderr proxy tasks."""
+    def stderr_futures(self) -> List[asyncio.Task]:
+        """Access the futures of the blocks stderr proxy tasks.
+
+        Returns:
+            The list of all stderr futures.
+        """
         if self._stderr_futures is None:
             self._stderr_futures = [block.proxy_stderr() for block in self.blocks]
         return self._stderr_futures
 
     @property
     def head(self) -> IOBlock:
-        """Obtain the first block in the block set."""
+        """Obtain the first block in the block set.
+
+        Returns:
+            The first block in the block set.
+        """
         return self.blocks[0]
 
     @property
     def tail(self) -> IOBlock:
-        """Obtain the last block in the block set."""
+        """Obtain the last block in the block set.
+
+        Returns:
+            The last block in the block set.
+        """
         return self.blocks[-1]
 
     @property
     def intermediate(self) -> Tuple[IOBlock]:
-        """Obtain the intermediate blocks in the set - excluding the first and last block."""
+        """Obtain the intermediate blocks in the set - excluding the first and last block.
+
+        Returns:
+            The intermediate blocks in the block set.
+        """
         return self.blocks[1:-1]
 
     @asynccontextmanager
@@ -317,6 +406,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Args:
             session: The session to use for the blocks.
+
+        Yields:
+            None
         """
         try:  # noqa:  WPS229
             for block in self.blocks:
@@ -325,11 +417,6 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             yield
         finally:
             await self._cleanup()
-
-    async def _upstream_stop(self, index) -> None:
-        """Stop all blocks upstream of a given index."""
-        for block in reversed(self.blocks[:index]):
-            await block.stop()
 
     async def _cleanup(self) -> None:
         for block in self.blocks:
@@ -374,132 +461,175 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     )
 
 
-async def run(  # noqa: WPS217
-    elb: ExtractLoadBlocks, project_settings_service: ProjectSettingsService
-) -> None:
-    """Run is used to actually perform the execution of the ExtractLoadBlock set.
+class ELBExecutionManager:
+    """Execution manager for ExtractLoadBlock sets."""
 
-    That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
-    stopping blocks or waiting for IO to complete as appropriate.
+    def __init__(self, elb: ExtractLoadBlocks) -> None:
+        """Initialize the ELBExecutionManager which will handle the actual runtime management of the block set.
 
-    This is a bit forward looking in that tt also contains rough shims and todos to account for multiple intermediate
-    blocks (i.e. steam map transforms).
-
-    Args:
-        elb: The ExtractLoadBlock set to run.
-        project_settings_service: The project settings service to use.
-    Raises:
-        RunnerError: if any blocks in the set finished with a non 0 exit code
-    """
-    stream_buffer_size = project_settings_service.get("elt.buffer_size")
-    line_length_limit = stream_buffer_size // 2
-
-    output_exception_future = asyncio.ensure_future(
-        asyncio.wait(
-            [*elb.stdout_futures, *elb.stderr_futures],
-            return_when=asyncio.FIRST_EXCEPTION,
+        Args:
+            elb: The ExtractLoadBlocks to manage.
+        """
+        self.elb = elb
+        self.stream_buffer_size = self.elb.project_settings_service.get(
+            "elt.buffer_size"
         )
-    )
+        self.line_length_limit = self.stream_buffer_size // 2
 
-    done = await elb.process_wait(output_exception_future)
+        self._producer_code = None
+        self._consumer_code = None
+        self._intermediate_codes: Dict[str, int] = {}
 
-    output_futures_failed = first_failed_future(output_exception_future, done)
-    if output_futures_failed:
-        # Special behavior for the producer stdout handler raising a line length limit error.
-        if elb.head.proxy_stdout() == output_futures_failed:
-            handle_producer_line_length_limit_error(
-                output_futures_failed.exception(),
-                line_length_limit=line_length_limit,
-                stream_buffer_size=stream_buffer_size,
+    async def run(self) -> None:
+        """Run is used to actually perform the execution of the ExtractLoadBlock set.
+
+        That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
+        stopping blocks or waiting for IO to complete as appropriate. Expect a RunnerError to be raised if any of
+        the blocks exit with a non 0 exit code.
+        """
+        await self._wait_for_process_completion(self.elb.head)
+        _check_exit_codes(
+            self._producer_code, self._consumer_code, self._intermediate_codes
+        )
+
+    async def _complete_upstream(self) -> None:
+        """Wait for the upstream blocks to complete."""
+        producer = self.elb.head
+        consumer = self.elb.tail
+
+        if self.elb.upstream_complete(len(self.elb.blocks) - 1):
+            self._producer_code = producer.process_future.result()
+        else:
+            # If the last consumer (target) completes before the upstream producers, it failed before processing all
+            # output. So we should kill the upstream producers and cancel output processing since there's no final
+            # destination to forward output to.
+            await self.elb.upstream_stop(len(self.elb.blocks) - 1)
+            # Pretend the producer (tap) finished successfully since it didn't itself fail
+            self._producer_code = 0
+        # Wait for all buffered consumer (target) output to be processed
+        await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
+
+    async def _wait_for_process_completion(  # noqa: WPS213 WPS217
+        self, current_head: IOBlock
+    ) -> Tuple[int, int]:
+        """Wait for the current head block to complete or for an error to occur.
+
+        Args:
+            current_head: The current head block
+
+        Returns:
+            A tuple of the producer exit code and the consumer exit code
+
+        Raises:
+            RunnerError: if any intermediate blocks failed.
+            exception: if any of the output futures encountered an exception.
+        """
+        start_idx = self.elb.blocks.index(current_head)
+        remaining_blocks = self.elb.blocks[start_idx:]
+
+        if remaining_blocks is None or current_head == self.elb.tail:
+            return
+
+        stdout_futures = [block.proxy_stdout() for block in remaining_blocks]
+        stderr_futures = [block.proxy_stderr() for block in remaining_blocks]
+
+        output_exception_future = asyncio.ensure_future(
+            asyncio.wait(
+                [*stdout_futures, *stderr_futures],
+                return_when=asyncio.FIRST_EXCEPTION,
             )
-        raise output_futures_failed.exception()
-    else:
-        # If all of the output handlers completed without raising an exception,
-        # we still need to wait for all of the underlying block processes to complete.
-        done, _ = await asyncio.wait(
-            elb.process_futures,
-            return_when=asyncio.FIRST_COMPLETED,
         )
 
-    producer = elb.head
-    consumer = elb.tail
+        logger.debug("waiting for process completion or exception")
+        done = await self.elb.process_wait(output_exception_future, start_idx)
 
-    if consumer.process_future.done():
-        consumer_code = consumer.process_future.result()
-        producer_code = await _complete_upstream(elb)
-    elif producer.process_future.done():
-        producer_code = producer.process_future.result()
-        consumer_code = await _complete_downstream(elb)
-    else:  # would imply that a (not yet implemented) inline transformer finished first
-        await producer.stop()
-        producer_code = 1
-        await consumer.stop()
-        consumer_code = 1
-        raise RunnerError(
-            "Unexpected completion sequence in ExtractLoadBlock. Assume extractor and loader failed",
-            {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
-        )
+        output_futures_failed = first_failed_future(output_exception_future, done)
+        if output_futures_failed:
+            # Special behavior for a producer stdout handler raising a line length limit error.
+            if self.elb.head.proxy_stdout() == output_futures_failed:
+                handle_producer_line_length_limit_error(
+                    output_futures_failed.exception(),
+                    line_length_limit=self.line_length_limit,
+                    stream_buffer_size=self.stream_buffer_size,
+                )
+            raise output_futures_failed.exception()
+        else:
+            # If all the output handlers completed without raising an exception,
+            # we still need to wait for all the underlying block processes to complete.
+            # note that since all output handlers completed we DO NOT need to wait for any output futures!
+            done = await self.elb.process_wait(None, start_idx)
+        if self.elb.tail.process_future.done():
+            logger.debug("tail consumer completed first")
+            self._consumer_code = self.elb.tail.process_future.result()
+            await self._complete_upstream()
+        elif current_head.process_future.done():
+            logger.debug(
+                "head producer completed first as expected", name=current_head.string_id
+            )
+            await self._handle_head_completed(current_head, start_idx)
+        else:
+            logger.warning("Intermediate block in sequence failed.")
+            await self._stop_all_blocks(start_idx)
+            raise RunnerError(
+                "Unexpected completion sequence in ExtractLoadBlock set. Intermediate block (likely a mapper) failed.",
+                {
+                    PluginType.EXTRACTORS: 1,
+                    PluginType.LOADERS: 1,
+                },
+            )
 
-    _check_exit_codes(producer_code, consumer_code)
+    async def _handle_head_completed(
+        self, current_head: IOBlock, start_idx: int
+    ) -> None:
+        next_head = self.elb.blocks[start_idx + 1]
+
+        if current_head is self.elb.head:
+            self._producer_code = current_head.process_future.result()
+        else:
+            self._intermediate_codes[
+                current_head.string_id
+            ] = current_head.process_future.result()
+
+        await asyncio.wait([current_head.proxy_stdout(), current_head.proxy_stderr()])
+        # Close next inline stdin so downstream can cascade and complete naturally
+        next_head.stdin.close()
+        await next_head.stdin.wait_closed()
+
+        if next_head is self.elb.tail:
+            logger.debug("tail consumer is next block, wrapping up")
+            # Wait for all buffered target output to be processed
+            await asyncio.wait([next_head.proxy_stdout(), next_head.proxy_stderr()])
+
+            # Wait for target process future to complete
+            await next_head.process_future
+            self._consumer_code = next_head.process_future.result()
+            return  # break our recursion
+
+        await self._wait_for_process_completion(next_head)
+
+    async def _stop_all_blocks(self, idx: int = 0) -> None:
+        """Close stdin and stop all blocks inclusive of index.
+
+        Args:
+            idx: starting index of the block's to stop.
+        """
+        for block in self.elb.blocks[idx:]:
+            await block.close_stdin()
+            await block.stop()
 
 
-async def _complete_upstream(elb: ExtractLoadBlocks) -> int:
-    """Wait for the upstream blocks to complete and return the exit code."""
-    producer = elb.head
-    consumer = elb.tail
-
-    # TODO: when introducing inline transformers, we'll need to switch to upstream_complete(index) to verify
-    # everything upstream completed.
-    if elb.upstream_complete(len(elb.blocks) - 1):
-        producer_code = producer.process_future.result()
-    else:
-        # If the consumer (target) completes before the upstream producers, it failed before processing all output
-        # So we should kill the upstream producers and cancel output processing since theres no final destination
-        # to forward output to.
-
-        # TODO: when introducing inline transformers, we'll need to switch to upstream_stop() to stop
-        # everything upstream. I haven't done that yet to keep the door open for a refactor when add stream maps.
-
-        await producer.stop()
-        # Pretend the producer (tap) finished successfully since it didn't itself fail
-        producer_code = 0
-
-    # Wait for all buffered consumer (target) output to be processed
-    await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
-
-    return producer_code
-
-
-async def _complete_downstream(elb: ExtractLoadBlocks) -> int:
-    """Wait for the downstream blocks to complete and return the exit code."""
-    producer = elb.head
-    consumer = elb.tail
-
-    # If the tap completes before the target, the target should have a chance to process all tap output
-    # Wait for all buffered tap output to be processed
-    await asyncio.wait([producer.proxy_stdout(), producer.proxy_stderr()])
-
-    # Close target stdin so process can complete naturally
-    consumer.stdin.close()
-    with suppress(AttributeError):  # `wait_closed` is Python 3.7+
-        await consumer.stdin.wait_closed()
-
-    # Wait for all buffered target output to be processed
-    await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
-
-    # Wait for target process future to complete
-    await consumer.process_future
-    return consumer.process_future.result()
-
-
-def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
+def _check_exit_codes(  # noqa: WPS238
+    producer_code: int, consumer_code: int, intermediate_codes: Dict[str, int]
+) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
 
     Args:
         producer_code: exit code of the producer (tap)
         consumer_code: exit code of the consumer (target)
+        intermediate_codes: exit codes of the intermediate blocks (mappers)
+
     Raises:
-        RunnerError: if the producer or consumer exit codes are non-zero
+        RunnerError: if the producer, consumer, or mapper exit codes are non-zero
     """
     if producer_code and consumer_code:
         raise RunnerError(
@@ -512,3 +642,11 @@ def _check_exit_codes(producer_code: int, consumer_code: int) -> None:
 
     if consumer_code:
         raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
+
+    failed_mappers = []
+    for mapper_id in intermediate_codes.keys():
+        if intermediate_codes[mapper_id]:
+            failed_mappers.append({mapper_id: intermediate_codes[mapper_id]})
+
+    if failed_mappers:
+        raise RunnerError("Mappers failed", failed_mappers)

@@ -106,6 +106,7 @@ To learn how to add an inheriting plugin to your project using an [inheriting pl
 Meltano supports the following types of plugins:
 
 - [**Extractors**](#extractors) pull data out of arbitrary data sources.
+- [**Mappers**](#mappers) perform stream map transforms on data between extractors and loaders.
 - [**Loaders**](#loaders) load extracted data into arbitrary data destinations.
 - [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
 - [**Models**](#models) describe the schema of the data being analyzed and the ways different tables can be joined.
@@ -755,7 +756,54 @@ export DBT__UPDATE='{"transform/dbt_project.yml": false}'
 
 ### Utilities
 
-If none of the other plugin types address your needs, any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility:
+If none of the other plugin types address your needs, any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility.
+Meltano includes a selection of discoverable utilities, or you can easily add your own custom utility.
+
+#### Discoverable Utilities
+
+##### SQLFluff
+
+[SQLFluff](https://docs.sqlfluff.com/en/stable/) is a linting tool for SQL files, often used with dbt to enforce SQL code standards. From the documentation:
+
+> Bored of not having a good SQL linter that works with whichever dialect you’re working with? SQLFluff is an extensible and modular linter designed to help you write good SQL and catch errors and bad SQL before it hits your database.
+
+Install with Meltano:
+
+```bash
+meltano add utility sqlfluff
+# now try it out!
+meltano invoke sqlfluff --help
+```
+
+##### Great Expectations
+
+[Great Expectations](https://docs.greatexpectations.io/docs/) helps data teams eliminate pipeline debt, through data testing, documentation, and profiling. From the documentation:
+
+> Great Expectations is the leading tool for validating, documenting, and profiling your data to maintain quality and improve communication between teams. Head over to our [getting started](https://docs.greatexpectations.io/docs/tutorials/getting_started/intro) tutorial.
+
+Install with Meltano:
+
+```bash
+meltano add utility great_expectations
+# now try it out!
+meltano invoke great_expectations --help
+```
+
+If you are using Great Expectations to validate data in a database or warehouse, you
+might need to install the appropriate drivers. Common options are supported by Great Expectations
+as pip extras, and any additional packages you may want can be added too by configuring
+a custom `pip_url` for the `great_expectations` utility:
+
+```bash
+# set the _pip_url extra setting
+meltano config great_expectations set _pip_url "great_expectations[redshift]; awscli"
+# re-install the great_expectations plugin for changes to take effect
+meltano install utility great_expectations
+```
+
+#### Custom Utilities
+
+Any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a custom utility.
 
 ```bash
 meltano add --custom utility <plugin>
@@ -778,3 +826,96 @@ meltano invoke yoyo new ./migrations -m "Add column to foo"
 
 The benefit of doing this as opposed to adding the package to `requirements.txt` or running `pip install <package>` directly is that any packages installed this way benefit from Meltano's [virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) isolation.
 This avoids dependency conflicts between packages.
+
+### Mappers
+
+Mappers allow you to transform or manipulate data after extraction and before loading. Common applications include:
+
+- Streams/properties can be aliased to provide custom naming downstream.
+- Stream records can be filtered based on any user-defined logic.
+- Properties can be transformed inline (i.e. converting types, sanitizing PII data).
+- Properties can be removed from the stream.
+- New properties can be added to the stream.
+
+Note that mappers are currently only available when using [`meltano run`](/reference/command-line-interface#run).
+
+##### How to use
+
+You can install mappers like any other other plugin using [`meltano add`](/reference/command-line-interface#add):
+
+```bash
+
+$ meltano discover mappers
+Mappers
+transform-field
+meltano-map-transformer
+
+$ meltano add mapper transform-field
+Installing mapper 'transform-field'...
+Installed mapper 'transform-field'
+
+To learn more about mapper 'transform-field', visit https://github.com/transferwise/pipelinewise-transform-field
+```
+
+Mappers are unique in that after install you don't invoke them directly. Instead you define `mappings` by name and add a config object for each mapping.
+This config object is passed to the mapper when the **mapping name** is called as part of a [`meltano run`](/reference/command-line-interface#run) invocation.
+Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead. 
+Additionally, the requirements for the config object itself will vary by plugin.
+
+So given a mapper with mappings configured like so:
+
+```yaml
+  mappers:
+  - name: transform-field
+    variant: transferwise
+    pip_url: pipelinewise-transform-field
+    executable: transform-field
+    mappings:
+    - name: hide-gitlab-secrets
+      config:
+        transformations:
+          - field_id: "author_email"
+            tap_stream_name: "commits"
+            type: "MASK-HIDDEN"
+          - field_id: "committer_email"
+            tap_stream_name: "commits"
+            type: "MASK-HIDDEN"
+    - name: null-created-at
+      config:
+        transformations:
+          - field_id: "created_at"
+            tap_stream_name: "accounts"
+            type: "SET-NULL"
+```
+
+You can then invoke the mappings by name: 
+
+```bash
+
+# hide-gitlab-secrets will resolve to mapping with the same name. In this case, that mapping will perform two actions.
+# Transform the "author_email" field in the "commits" stream and hide the email address.
+# Transform the "committer_email" field in the "commits" stream and hide the email address.
+$ meltano run tap-gitlab hide-gitlab-secrets target-jsonl
+
+# null-created-at will resolve to mapping with the same name. In this case, that mapping will perform one action.
+# Transform the "created_at" field in the "accounts" stream and set it to null.
+$ meltano run tap-someapi null-created-at target-jsonl
+```
+
+You can also invoke multiple mappings at once in series: 
+
+```bash
+$ tap-someapi fix-null-id fix-country-code target-jsonl
+```
+
+Each mapping will execute in a unique process instance of the mapper plugin. That means that you can also
+call mappings that leverage the same plugin at multiple locations numerous times within the run invocation:
+
+```bash
+
+# Fix any null country codes using transform-field mapper.
+# Set the customers region based on their country code using your own mapper.
+# Mask the id if the customer is in the EU region using transform-field mapper.
+$ tap-someapi fix-null-country set-region-from-country  mask-id-if-eu target-jsonl
+```
+

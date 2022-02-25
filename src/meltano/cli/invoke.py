@@ -1,8 +1,12 @@
+"""CLI command `meltano invoke`."""
+
 import logging
 import sys
 from typing import Tuple
 
 import click
+from sqlalchemy.orm import sessionmaker
+
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
@@ -42,6 +46,11 @@ logger = logging.getLogger(__name__)
 )
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
+@click.option(
+    "--containers",
+    is_flag=True,
+    help="Execute plugins using containers where possible.",
+)
 @pass_project(migrate=True)
 def invoke(
     project: Project,
@@ -50,6 +59,7 @@ def invoke(
     list_commands: bool,
     plugin_name: str,
     plugin_args: Tuple[str, ...],
+    containers: bool = False,
 ):
     """
     Invoke a plugin's executable with specified arguments.
@@ -63,7 +73,7 @@ def invoke(
 
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
-    _, Session = project_engine(project)
+    _, Session = project_engine(project)  # noqa: N806
     session = Session()
     plugins_service = ProjectPluginsService(project)
     plugin = plugins_service.find_plugin(
@@ -76,19 +86,47 @@ def invoke(
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
     exit_code = run_async(
-        _invoke(invoker, project, plugin_name, plugin_args, session, dump, command_name)
+        _invoke(
+            invoker,
+            project,
+            plugin_name,
+            plugin_args,
+            session,
+            dump,
+            command_name,
+            containers,
+        )
     )
     sys.exit(exit_code)
 
 
 async def _invoke(
-    invoker, project, plugin_name, plugin_args, session, dump, command_name
+    invoker: PluginInvoker,
+    project: Project,
+    plugin_name: str,
+    plugin_args: str,
+    session: sessionmaker,
+    dump: str,
+    command_name: str,
+    containers: bool,
 ):
+    if command_name is not None:
+        command = invoker.find_command(command_name)
+
     try:
         async with invoker.prepared(session):
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
+            elif (  # noqa: WPS337
+                containers
+                and command_name is not None
+                and command.container_spec is not None
+            ):
+                return await invoker.invoke_docker(
+                    command_name,
+                    *plugin_args,
+                )
             else:
                 handle = await invoker.invoke_async(*plugin_args, command=command_name)
                 with propagate_stop_signals(handle):
@@ -132,8 +170,8 @@ async def dump_file(invoker: PluginInvoker, file_id: str):
     """Dump file."""
     try:
         content = await invoker.dump(file_id)
-        print(content)
     except FileNotFoundError as err:
         raise CliError(f"Could not find {file_id}") from err
     except Exception as err:
         raise CliError(f"Could not dump {file_id}: {err}") from err
+    print(content)  # noqa: WPS421

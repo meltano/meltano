@@ -573,6 +573,14 @@ To see what commands a plugin supports, use `--list-command`:
 meltano invoke --list-commands dbt
 ```
 
+### Containerized commands
+
+To execute plugins inside containers, use the `--containers` flag:
+
+```bash
+meltano invoke --containers dbt:compile
+```
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
@@ -603,7 +611,7 @@ meltano remove loader target-postgres target-csv
 
 Run a set of command blocks in series.
 
-Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_target some_plugin:some_cmd` and
+Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_mapping some_target some_plugin:some_cmd` and
 are run in the order they are specified from left to right. A failure in any block will cause the entire run to abort.
 
 Multiple commmand blocks can be chained together or repeated, and tap/target pairs will automatically be linked to
@@ -618,11 +626,12 @@ perform EL work.
 ### How to use
 
 ```bash
-meltano run tap-gitlab target-postgres 
-meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run 
+meltano run tap-gitlab target-postgres
+meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run
 meltano run tap-gitlab target-postgres tap-salesforce target-mysql
 meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
+meltano run tap-gitlab one-mapping another-mapping target-postgres
 ```
 
 ## `schedule`

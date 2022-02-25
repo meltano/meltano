@@ -1,7 +1,6 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 import asyncio
 import functools
-import logging
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
@@ -12,9 +11,7 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from .compiler.project_compiler import ProjectCompiler
 from .error import AsyncSubprocessError, PluginInstallError, PluginInstallWarning
 from .plugin import PluginType
-from .plugin_discovery_service import PluginDiscoveryService
 from .project import Project
-from .project_add_service import ProjectAddService
 from .project_plugins_service import ProjectPluginsService
 from .utils import noop, run_async
 from .venv_service import VenvService
@@ -199,7 +196,8 @@ class PluginInstallService:
                 status=PluginInstallStatus.RUNNING,
             )
         )
-        if not plugin.is_installable():
+
+        if not plugin.is_installable() or self._is_mapping(plugin):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -259,6 +257,15 @@ class PluginInstallService:
             compiler.compile()
         except Exception:
             pass
+
+    @staticmethod
+    def _is_mapping(plugin: ProjectPlugin) -> bool:
+        """Check if a plugin is a mapping as mappings are not installed.
+
+        Mappings are PluginType.MAPPERS with extra attribute of `_mapping` which will indicate
+        that this instance of the plugin is actually a mapping - and should not be installed.
+        """
+        return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
 
 
 class PipPluginInstaller:

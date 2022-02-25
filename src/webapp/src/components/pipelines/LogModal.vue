@@ -121,6 +121,10 @@ export default {
       this.jobPoller = poller.create(pollFn, null, 1000)
       this.jobPoller.init()
     },
+    retry() {
+      this.jobLog = null
+      this.initJobPoller()
+    },
     getHelp() {
       window.open('https://meltano.com/docs/getting-help.html')
     }
@@ -260,6 +264,12 @@ export default {
             :pipeline="relatedPipeline"
             :is-disabled="isPolling"
           />
+          <button class="button is-info" @click="retry">
+            <span>Retry</span>
+            <span class="icon is-small">
+              <font-awesome-icon icon="redo"></font-awesome-icon>
+            </span>
+          </button>
         </div>
       </footer>
     </div>
