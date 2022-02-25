@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## Unreleased
 ---
-
+- [#2463](https://gitlab.com/meltano/meltano/-/merge_requests/2463) Add CRON interval mechanism and modal to /pipelines page
 ### New
 
 ### Changes
