@@ -33,5 +33,6 @@
 .skip_docs:
   except:
     changes:
+      - .gitlab/**/*
       - docs/src/**/*
       - docs/adr/**/*
