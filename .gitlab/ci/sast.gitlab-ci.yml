@@ -2,10 +2,24 @@ include:
   - template: Security/SAST.gitlab-ci.yml
 
 sast:
-  extends:
-    - .skip_docs_rules
   variables:
     SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
+
+bandit-sast:
+  extends:
+    - .skip_docs_rules
+
+brakeman-sast:
+  extends:
+    - .skip_docs_rules
+
+eslint-sast:
+  extends:
+    - .skip_docs_rules
+
+semgrep-sast:
+  extends:
+    - .skip_docs_rules
 
 nodejs-scan-sast:
   rules:
