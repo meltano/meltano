@@ -6,20 +6,36 @@ sast:
     SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
 
 bandit-sast:
-  extends:
-    - .skip_docs_rules
+  rules:
+    - changes:
+        - .gitlab/**/*
+        - docs/src/**/*
+        - docs/adr/**/*
+      when: never
 
 brakeman-sast:
-  extends:
-    - .skip_docs_rules
+  rules:
+    - changes:
+        - .gitlab/**/*
+        - docs/src/**/*
+        - docs/adr/**/*
+      when: never
 
 eslint-sast:
-  extends:
-    - .skip_docs_rules
+  rules:
+    - changes:
+        - .gitlab/**/*
+        - docs/src/**/*
+        - docs/adr/**/*
+      when: never
 
 semgrep-sast:
-  extends:
-    - .skip_docs_rules
+  rules:
+    - changes:
+        - .gitlab/**/*
+        - docs/src/**/*
+        - docs/adr/**/*
+      when: never
 
 nodejs-scan-sast:
   rules:
