@@ -8,6 +8,10 @@ demo_project:
   only:
     - branches@meltano/meltano
     - tags@meltano/meltano
+  except:
+    changes:
+      - docs/src/**/*
+      - docs/adr/**/*
 
 demo_project_forks:
   stage: test

@@ -27,7 +27,12 @@ meltano_dev:
   only:
     - branches@meltano/meltano
   except:
-    - master
+    refs:
+      - master
+    changes:
+      - docs/src/**/*
+      - docs/adr/**/*
+
 
 # Manages:
 #  - <fork namespace>/meltano:<sha>-python<version>
