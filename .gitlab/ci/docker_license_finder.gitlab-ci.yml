@@ -1,4 +1,5 @@
 docker_licnese_finder:
+  extends: .skip_docs
   stage: build-meltano
   image: "docker:latest"
   services:
@@ -9,7 +10,3 @@ docker_licnese_finder:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build . -f license_finder/Dockerfile -t $CI_REGISTRY_IMAGE/license_finder:latest
     - docker push $CI_REGISTRY_IMAGE/license_finder:latest
-  except:
-    changes:
-      - docs/src/**/*
-      - docs/adr/**/*

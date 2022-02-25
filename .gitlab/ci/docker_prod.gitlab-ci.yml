@@ -23,16 +23,14 @@
 # Manages:
 #  - meltano/meltano:<sha>-python<version>
 meltano_dev:
-  extends: .build_prod
+  extends:
+    - .build_prod
+    - .skip_docs
   only:
     - branches@meltano/meltano
   except:
     refs:
       - master
-    changes:
-      - docs/src/**/*
-      - docs/adr/**/*
-
 
 # Manages:
 #  - <fork namespace>/meltano:<sha>-python<version>

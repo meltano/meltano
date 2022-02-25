@@ -1,4 +1,5 @@
 demo_project:
+  extends: .skip_docs
   stage: test
   variables:
     MELTANO_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python3.8
@@ -8,10 +9,6 @@ demo_project:
   only:
     - branches@meltano/meltano
     - tags@meltano/meltano
-  except:
-    changes:
-      - docs/src/**/*
-      - docs/adr/**/*
 
 demo_project_forks:
   stage: test
