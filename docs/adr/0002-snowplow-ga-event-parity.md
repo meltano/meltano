@@ -8,9 +8,9 @@ Proposed
 
 ## Context
 
-We are aiming to move away from Google Anlaytics event tracking and towards Snowplow so that we can 
+We are aiming to move away from Google Anlaytics (GA) event tracking and towards Snowplow so that we can 
 improve and increase the kind of data we're receiving from users. 
-This work is tracked in [this epic](https://gitlab.com/groups/meltano/-/epics/122). 
+This work is tracked in [epic 122](https://gitlab.com/groups/meltano/-/epics/122). 
 
 Part of the value of Snowplow is the ability to define schemas for events therby enabling a overall
 better structure and understanding of event meaning for downstream analytics use cases.
@@ -19,6 +19,9 @@ better structure and understanding of event meaning for downstream analytics use
 
 As a first iteration to gain parity between Google Anlaytics and Snowplow, we will implement a dual-reporting
 event structure and send identical events to both services. 
+
+This will enable us to have better continuity in metrics so there is no risk of data loss or misreporting.
+We will be able to validate Snowplow derived metrics with their GA equivalent prior to any GA deprecation.
 
 ## Consequences
 
