@@ -628,6 +628,12 @@ Asking for a review is asking for feedback on the implementation, not approval o
 
 Merge conflicts, failing tests and/or missing checkboxes should not be used as ground for sending back a merge request without feedback, unless specified by the reviewer.
 
+## Architectural Decision Records
+
+Meltano makes use of ADR's (Architectural Decision Records) to record architectural decisions roughly as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions). 
+In a nutshell, these are used to document architectural decisions and to provide a record of the decisions made by the team and contributors in regard to Meltano's architecture. These are held in [docs/adr](https://gitlab.com/meltano/meltano/-/tree/master/docs/adr). 
+To propose or add a new ADR, its simplest to create a new entry using [adr-tools](https://github.com/npryce/adr-tools), and then send a long a merge request for review.
+
 ## Changelog
 
 Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate the CHANGELOG.md
