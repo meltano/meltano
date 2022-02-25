@@ -4,7 +4,6 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Optional, Tuple
 
 import structlog
-from sqlalchemy.orm import Session
 
 from meltano.core.elt_context import PluginContext
 from meltano.core.logging import OutputLogger
@@ -15,6 +14,8 @@ from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 
+from ..db import project_engine
+from ..runner import RunnerError
 from .singer import InvokerBase
 
 logger = structlog.getLogger(__name__)
@@ -40,7 +41,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    async def run(self, session: Session) -> None:
+    async def run(self) -> None:
         """Run the command."""
         raise NotImplementedError
 
@@ -65,6 +66,8 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
             name: the name of the plugin/command.
             log: the OutputLogger instance to proxy output too.
             block_ctx: the block context.
+            project: the project instance.
+            plugins_service: the project plugins service.
             plugin_invoker: the plugin invoker.
             command: the command to invoke.
             command_args: any additional plugin args that should be used.
@@ -83,42 +86,54 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
 
     @property
     def name(self) -> str:
-        """Name is the underlying name of the plugin/command."""
+        """Name is the underlying name of the plugin/command.
+
+        Returns:
+            The name str.
+        """
         return self._name
 
     @property
     def command(self) -> Optional[str]:
-        """Command is the specific plugin command to use when invoking the plugin."""
+        """Command is the specific plugin command to use when invoking the plugin.
+
+        Returns:
+            The command str if any.
+        """
         return self._command
 
     @property
     def command_args(self) -> Optional[str]:
-        """Command args are the specific plugin command args to use when invoking the plugin (if any)."""
+        """Command args are the specific plugin command args to use when invoking the plugin (if any).
+
+        Returns:
+            The command args if any.
+        """
         return self._command_args
 
-    async def run(self, session: Session) -> None:
+    async def run(self) -> None:
         """Invoke a command capturing and logging produced output.
 
-        Args:
-            session: the database session, currently just passed to the invoker to prepare the plugin.
         Raises:
-            Exception: if the command fails.
+            RunnerError: if the command fails.
         """
-        async with self.invoker.prepared(session):
-            await self.start(self.command_args)
+        try:  # noqa: WPS501
+            async with self.invoker.prepared(self.context.session):
+                await self.start(self.command_args)
 
-            self.stdout_link(self._log)
-            self.stderr_link(self._log)
+                self.stdout_link(self._log)
+                self.stderr_link(self._log)
 
-            await asyncio.wait(
-                [*self.proxy_io(), self.process_future],
-                return_when=asyncio.ALL_COMPLETED,
-            )
-
+                await asyncio.wait(
+                    [*self.proxy_io(), self.process_future],
+                    return_when=asyncio.ALL_COMPLETED,
+                )
+        finally:
+            self.context.session.close()
         exitcode = self.process_future.result()
         if exitcode:
             command = self.command or self.command_args[0]
-            raise Exception(
+            raise RunnerError(
                 f"`{self.name} {command}` failed with exit code: {exitcode}"
             )
 
@@ -126,7 +141,6 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
 def plugin_command_invoker(
     plugin: ProjectPlugin,
     project: Project,
-    session: Session,
     command: Optional[str],
     command_args: Optional[List[str]] = None,
     run_dir: str = None,
@@ -137,10 +151,10 @@ def plugin_command_invoker(
     Args:
         plugin: Plugin to make command from.
         project: Project to use.
-        session: SQLAlchemy session to use.
         command: the command to invoke on the plugin i.e. `run` in dbt run.
         command_args: any additional command args that should be passed in during invocation.
         run_dir: Optional directory to run commands in.
+
     Returns:
         InvokerCommand
     """
@@ -148,6 +162,10 @@ def plugin_command_invoker(
         stdio="stderr",
         cmd_type="command",
     )
+
+    _, session_maker = project_engine(project)
+    session = session_maker()
+
     output_logger = OutputLogger("run.log")
     invoker_log = output_logger.out(plugin.name, stderr_log)
 

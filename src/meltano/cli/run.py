@@ -3,14 +3,13 @@ from typing import List, Union
 
 import click
 import structlog
+
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
-from meltano.core.db import project_engine
 from meltano.core.runner import RunnerError
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
-from sqlalchemy.orm import Session
 
 from . import CliError, cli
 from .params import pass_project
@@ -46,33 +45,25 @@ async def run(project, blocks):
     if project.active_environment is not None:
         logger.warning("Job ID generation not yet supported - running without job!")
 
-    _, session_maker = project_engine(project)
-    session = session_maker()
-
-    try:  # noqa: WPS229
-        parser = BlockParser(logger, project, blocks, session)
-        parsed_blocks = list(parser.find_blocks(0))
-        if not parsed_blocks:
-            logger.info("No valid blocks found.")
-            return
-        if validate_block_sets(logger, parsed_blocks):
-            logger.debug("All ExtractLoadBlocks validated, starting execution.")
-        else:
-            raise CliError("Some ExtractLoadBlocks set failed validation.")
-        await _run_blocks(parsed_blocks, session)
-    finally:
-        session.close()
+    parser = BlockParser(logger, project, blocks)
+    parsed_blocks = list(parser.find_blocks(0))
+    if not parsed_blocks:
+        logger.info("No valid blocks found.")
+        return
+    if validate_block_sets(logger, parsed_blocks):
+        logger.debug("All ExtractLoadBlocks validated, starting execution.")
+    else:
+        raise CliError("Some ExtractLoadBlocks set failed validation.")
+    await _run_blocks(parsed_blocks)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_run(blocks)
 
 
-async def _run_blocks(
-    parsed_blocks: List[Union[BlockSet, PluginCommandBlock]], session: Session
-) -> None:
+async def _run_blocks(parsed_blocks: List[Union[BlockSet, PluginCommandBlock]]) -> None:
     for idx, blk in enumerate(parsed_blocks):
         try:
-            await blk.run(session)
+            await blk.run()
         except RunnerError as err:
             logger.error(
                 "Block run completed.",

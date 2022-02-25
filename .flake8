@@ -177,3 +177,6 @@ per_file_ignores =
         WPS412
         # Found wrong metadata variable
         WPS410
+    src/meltano/core/block/extract_load.py:
+        # Found module with too many imports: 21 > 20
+        WPS201

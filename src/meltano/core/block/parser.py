@@ -79,7 +79,6 @@ class BlockParser:  # noqa: D101
         log: structlog.BoundLogger,
         project,
         blocks: List[str],
-        session=None,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
@@ -88,14 +87,12 @@ class BlockParser:  # noqa: D101
             log: Logger to use.
             project: Project to use.
             blocks: List of block names to parse.
-            session: Optional session to use.
 
         Raises:
             ClickException: If a block name is not found.
         """
         self.log = log
         self.project = project
-        self.session = session
 
         self._plugins_service = ProjectPluginsService(project)
         self._plugins: List[ProjectPlugin] = []
@@ -155,7 +152,6 @@ class BlockParser:  # noqa: D101
                 yield plugin_command_invoker(
                     self._plugins[cur],
                     self.project,
-                    session=self.session,
                     command=self._commands.get(plugin),
                 )
                 cur += 1
@@ -215,7 +211,7 @@ class BlockParser:  # noqa: D101
         """
         blocks: List[SingerBlock] = []
 
-        builder = ELBContextBuilder(self.project, self._plugins_service, self.session)
+        builder = ELBContextBuilder(self.project, self._plugins_service)
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:
             self.log.debug(

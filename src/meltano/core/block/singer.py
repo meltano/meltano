@@ -61,10 +61,10 @@ class InvokerBase:  # noqa: WPS230, WPS214
         self.outputs = []
         self.err_outputs = []
 
-        self.process_handle: Process = None
-        self._process_future: asyncio.Task = None
-        self._stdout_future: asyncio.Task = None
-        self._stderr_future: asyncio.Task = None
+        self.process_handle: Optional[Process] = None
+        self._process_future: Optional[asyncio.Task] = None
+        self._stdout_future: Optional[asyncio.Task] = None
+        self._stderr_future: Optional[asyncio.Task] = None
 
     @property
     def command(self) -> Optional[str]:
@@ -112,7 +112,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:
-            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+            kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:
             return
@@ -164,7 +164,9 @@ class InvokerBase:  # noqa: WPS230, WPS214
             raise IOLinkError("No IO to proxy, process not running")
 
         if self._stderr_future is None:
-            err_outputs = self._merge_outputs(self.invoker.StdioSource.STDERR, self.err_outputs)
+            err_outputs = self._merge_outputs(
+                self.invoker.StdioSource.STDERR, self.err_outputs
+            )
             self._stderr_future = asyncio.ensure_future(
                 capture_subprocess_output(self.process_handle.stderr, *err_outputs)
             )
@@ -242,14 +244,14 @@ class InvokerBase:  # noqa: WPS230, WPS214
         else:
             raise IOLinkError("IO capture already in flight")
 
-    async def pre(self, context: Dict) -> None:
+    async def pre(self, context) -> None:
         """Pre triggers preparation of the underlying plugin.
 
         Args:
-            context: The context to obtain the session from when the invoker is prepared.
+            context: The context with which to update the invoker
         """
         self.invoker.context = context
-        await self.invoker.prepare(context.get("session"))
+        await self.invoker.prepare(context.session)
 
     async def post(self) -> None:
         """Post triggers resetting the underlying plugin config."""

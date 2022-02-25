@@ -1,19 +1,17 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 import logging
-
 from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
 from async_generator import asynccontextmanager
-
 from sqlalchemy.orm import Session
 
+from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
-from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
@@ -22,6 +20,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 
+from ..plugin import PluginType
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
@@ -80,7 +79,6 @@ class ELBContextBuilder:
         self,
         project: Project,
         plugins_service: ProjectPluginsService = None,
-        session: Session = None,
         job: Optional[Job] = None,
     ):
         """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
@@ -88,12 +86,14 @@ class ELBContextBuilder:
         Args:
             project: the meltano project for the context.
             plugins_service: the plugins service for the context.
-            session: the database session for the context.
             job: the job for this ELT run.
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
-        self.session = session
+
+        _, session_maker = project_engine(project)
+        self.session = session_maker()
+
         self.job = job
 
         self._env = {}
@@ -221,7 +221,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         )
 
         job = Job(
-            job_id=f'{self.head.string_id}-{self.tail.string_id}',  # noqa: WPS237
+            job_id=f"{self.head.string_id}-{self.tail.string_id}",  # noqa: WPS237
         )
         self.context.job = job
 
@@ -317,36 +317,31 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     "intermediate blocks must be producers AND consumers"
                 )
 
-    async def run(self, session) -> bool:
+    async def run(self) -> None:
         """Build the IO chain and execute the actual ELT task.
-
-        Args:
-            session: the session to use for this run.
-
-        Returns:
-            True if the task completed successfully, False otherwise.
 
         Raises:
             RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
         job = self.context.job
-        StaleJobFailer(job.job_id).fail_stale_jobs(session)
+        StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
 
-        existing = JobFinder(job.job_id).latest_running(session)
+        existing = JobFinder(job.job_id).latest_running(self.context.session)
         if existing:
             raise RunnerError(
                 f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
                 + "To ignore this check use the '--force' option."
             )
+        try:  # noqa: WPS501
+            async with job.run(self.context.session):
+                async with self._start_blocks():
+                    await self._link_io()
+                    manager = ELBExecutionManager(self)
+                    await manager.run()
+        finally:
+            self.context.session.close()
 
-        async with job.run(session):
-            async with self._start_blocks(session):
-                await self._link_io()
-                manager = ELBExecutionManager(self)
-                await manager.run()
-                return True
-
-    async def terminate(self, graceful: bool = False) -> bool:
+    async def terminate(self, graceful: bool = False) -> None:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
 
         Not actually implemented yet.
@@ -361,7 +356,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             raise NotImplementedError
 
         for block in self.blocks:
-            block.stop(kill=True)
+            await block.stop(kill=True)
 
     @property
     def process_futures(self) -> List[asyncio.Task]:
@@ -424,18 +419,15 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self, session) -> AsyncIterator[None]:
+    async def _start_blocks(self) -> AsyncIterator[None]:
         """Start the blocks in the block set.
-
-        Args:
-            session: The session to use for the blocks.
 
         Yields:
             None
         """
         try:  # noqa:  WPS229
             for block in self.blocks:
-                await block.pre({"session": session})
+                await block.pre(self.context)
                 await block.start()
             yield
         finally:
@@ -534,7 +526,7 @@ class ELBExecutionManager:
 
     async def _wait_for_process_completion(  # noqa: WPS213 WPS217
         self, current_head: IOBlock
-    ) -> Tuple[int, int]:
+    ) -> Optional[Tuple[int, int]]:
         """Wait for the current head block to complete or for an error to occur.
 
         Args:
