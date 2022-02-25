@@ -8,7 +8,6 @@ sast:
 bandit-sast:
   rules:
     - changes:
-        - .gitlab/**/*
         - docs/src/**/*
         - docs/adr/**/*
       when: never
@@ -16,7 +15,6 @@ bandit-sast:
 brakeman-sast:
   rules:
     - changes:
-        - .gitlab/**/*
         - docs/src/**/*
         - docs/adr/**/*
       when: never
@@ -24,7 +22,6 @@ brakeman-sast:
 eslint-sast:
   rules:
     - changes:
-        - .gitlab/**/*
         - docs/src/**/*
         - docs/adr/**/*
       when: never
@@ -32,7 +29,6 @@ eslint-sast:
 semgrep-sast:
   rules:
     - changes:
-        - .gitlab/**/*
         - docs/src/**/*
         - docs/adr/**/*
       when: never

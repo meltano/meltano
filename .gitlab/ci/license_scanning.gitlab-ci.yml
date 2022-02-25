@@ -31,7 +31,6 @@ license_scanning:
   dependencies: []
   rules:
     - changes:
-        - .gitlab/**/*
         - docs/src/**/*
         - docs/adr/**/*
       when: never
