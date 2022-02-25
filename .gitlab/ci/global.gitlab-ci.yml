@@ -36,3 +36,11 @@
       - .gitlab/**/*
       - docs/src/**/*
       - docs/adr/**/*
+
+.skip_docs_rules:
+  rules:
+    - changes:
+        - .gitlab/**/*
+        - docs/src/**/*
+        - docs/adr/**/*
+      when: never

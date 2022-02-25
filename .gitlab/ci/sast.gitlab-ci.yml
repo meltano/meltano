@@ -3,7 +3,7 @@ include:
 
 sast:
   extends:
-    - .skip_docs
+    - .skip_docs_rules
   variables:
     SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
 
