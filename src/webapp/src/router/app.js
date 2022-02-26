@@ -5,6 +5,7 @@ import Explore from '@/components/analyze/Explore'
 import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
 import LogModal from '@/components/pipelines/LogModal'
 import PluginSettingsModal from '@/components/pipelines/PluginSettingsModal'
+import CronJobModal from '@/components/pipelines/CronJobModal'
 
 import Analyze from '@/views/Analyze'
 import Dashboard from '@/views/Dashboard'
@@ -97,6 +98,18 @@ const router = new Router({
           meta: {
             isModal: true,
             title: 'Meltano: Job Log'
+          }
+        },
+        {
+          path: '/cron-job-settings/:jobId',
+          name: 'cronJobSettings',
+          components: {
+            default: Pipelines,
+            cronJobSettings: CronJobModal
+          },
+          meta: {
+            isModal: true,
+            title: 'Meltano: Cron Job Settings'
           }
         }
       ]
