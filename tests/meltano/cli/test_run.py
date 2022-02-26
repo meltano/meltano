@@ -507,9 +507,12 @@ class TestCliRunScratchpadOne:
             )  # dbt
 
             completed_events = matcher.find_by_event("Block run completed.")
-            assert len(completed_events) == 1
+            assert len(completed_events) == 2
             for event in completed_events:
-                assert event.get("success")
+                if event.get("block_type") == "ExtractLoadBlocks":
+                    assert event.get("success")
+                elif event.get("block_type") == "InvokerCommand":
+                    assert event.get("success") is False
 
             tap_stop_event = matcher.find_by_event("tap done")
             assert len(tap_stop_event) == 1
