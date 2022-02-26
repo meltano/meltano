@@ -162,14 +162,28 @@ class EventMatcher:
             self.seen_events.append(parsed_line)
 
     def event_matches(self, event: str) -> bool:
-        """Search result output for an event, that matches the given event."""
+        """Search result output for an event, that matches the given event.
+
+        Args:
+            event: the event to search for.
+
+        Returns:
+            True if the event was found, False otherwise.
+        """
         for line in self.seen_events:
             matches = line.get("event") == event
             if matches:
                 return True
 
     def find_by_event(self, event: str) -> Optional[List[dict]]:
-        """Return the first matching event, that matches the given event."""
+        """Return the first matching event, that matches the given event.
+
+        Args:
+            event: the event to search for.
+
+        Returns:
+            A list of matching events.
+        """
         matches = []
         for line in self.seen_events:
             match = line.get("event") == event
