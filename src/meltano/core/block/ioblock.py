@@ -3,8 +3,6 @@ from abc import ABCMeta, abstractmethod
 from asyncio import StreamWriter, Task
 from typing import Optional, Tuple
 
-from sqlalchemy.orm import Session
-
 from meltano.core.logging.utils import SubprocessOutputWriter
 
 
@@ -120,11 +118,11 @@ class IOBlock(metaclass=ABCMeta):
         return stdout, stderr
 
     @abstractmethod
-    async def pre(self, session: Session) -> None:
+    async def pre(self, context: object) -> None:
         """Execute pre-start tasks.
 
         Args:
-            session: the sqlalchemy session to use for this execution.
+            context: invocation context to use for this execution.
         """
         pass
 

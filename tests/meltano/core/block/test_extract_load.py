@@ -49,12 +49,13 @@ def output_logger() -> OutputLogger:
 
 @pytest.fixture
 def elb_context(project, session, test_job, output_logger) -> ELBContext:
-    return ELBContext(
+    ctx = ELBContext(
         project=project,
-        session=session,
         job=test_job,
         base_output_logger=output_logger,
     )
+    ctx.session = session
+    return ctx
 
 
 class TestELBContext:
@@ -71,9 +72,10 @@ class TestELBContextBuilder:
         builder = ELBContextBuilder(
             project=project,
             plugins_service=project_plugins_service,
-            session=session,
             job=None,
         )
+        builder.session = session
+
         assert isinstance(builder.context(), ELBContext)
         assert isinstance(builder.make_block(tap).invoker.context, ELBContext)
 
@@ -84,9 +86,10 @@ class TestELBContextBuilder:
         builder = ELBContextBuilder(
             project=project,
             plugins_service=project_plugins_service,
-            session=session,
             job=None,
         )
+        builder.session = session
+
         block = builder.make_block(tap)
         assert block.string_id == tap.name
         assert block.producer
@@ -104,9 +107,10 @@ class TestELBContextBuilder:
         builder = ELBContextBuilder(
             project=project,
             plugins_service=project_plugins_service,
-            session=session,
             job=None,
         )
+        builder.session = session
+
         block = builder.make_block(tap)
         assert block.string_id == tap.name
         initial_dict = builder._env.copy()
@@ -226,9 +230,7 @@ class TestExtractLoadBlocks:
         invoke_async = CoroutineMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ):
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             blocks = (
                 SingerBlock(
                     block_ctx=elb_context,
@@ -257,7 +259,7 @@ class TestExtractLoadBlocks:
             elb.validate_set()
 
             for block in elb.blocks:
-                await block.pre({"session": session})
+                await block.pre(elb.context)
                 await block.start()
 
             await elb._link_io()
@@ -319,9 +321,7 @@ class TestExtractLoadBlocks:
         invoke_async = CoroutineMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ):
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
 
             blocks = (
                 SingerBlock(
@@ -349,7 +349,7 @@ class TestExtractLoadBlocks:
 
             elb = ExtractLoadBlocks(elb_context, blocks)
             elb.validate_set()
-            assert await elb.run(session)
+            await elb.run()
 
             assert tap_process.wait.called
             assert tap_process.stdout.readline.called
@@ -393,9 +393,7 @@ class TestExtractLoadBlocks:
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
         invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ):
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
 
             blocks = (
                 SingerBlock(
@@ -510,9 +508,7 @@ class TestExtractLoadBlocks:
         invoke_async = CoroutineMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ):
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             blocks = (
                 SingerBlock(
                     block_ctx=elb_context,
