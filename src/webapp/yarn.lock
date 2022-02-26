@@ -2098,6 +2098,13 @@ bser@^2.0.0:
   dependencies:
     node-int64 "^0.4.0"
 
+buefy@^0.8.19:
+  version "0.8.20"
+  resolved "https://registry.yarnpkg.com/buefy/-/buefy-0.8.20.tgz#75708800548220654575903d031a81fc8575b7f3"
+  integrity sha512-pg8Cn0m9cjqp2/vaKT4VIfU8KIumuX/gAT1GtearXRs56+kKqAPx3j9O8cm9W6P4jPUCHajKX6H8AqD0ram2Bg==
+  dependencies:
+    bulma "0.7.5"
+
 buffer-crc32@~0.2.3:
   version "0.2.13"
   resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-0.2.13.tgz#0d333e3f00eac50aa1454abd30ef8c2a5d9a7242"
@@ -2142,7 +2149,7 @@ bulma-tooltip@^2.0.2:
   resolved "https://registry.yarnpkg.com/bulma-tooltip/-/bulma-tooltip-2.0.2.tgz#cf0bf5ad2dc75492cbcbd4816e1a005314dc90ac"
   integrity sha512-xsqWeWV7tsUn3uH04SqJeP7/CyC1RaDVIyVzr4/sIO3friIIOi7L6jc5g7qUwDxuBQl72yH/yRPuefpXoQ4hWg==
 
-bulma@^0.7.5:
+bulma@0.7.5, bulma@^0.7.5:
   version "0.7.5"
   resolved "https://registry.yarnpkg.com/bulma/-/bulma-0.7.5.tgz#35066c37f82c088b68f94450be758fc00a967208"
   integrity sha512-cX98TIn0I6sKba/DhW0FBjtaDpxTelU166pf7ICXpCCuplHWyu6C9LYZmL5PEsnePIeJaiorsTEzzNk3Tsm1hw==
@@ -2828,6 +2835,11 @@ core-js@^2.4.0, core-js@^2.5.0, core-js@^2.6.5:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.9.tgz#6b4b214620c834152e179323727fc19741b084f2"
   integrity sha512-HOpZf6eXmnl7la+cUdMnLvUxKNqLUzJvgIziQ0DiF3JwSImNphIqdGqzj6hIKyX04MmV0poclQ7+wjWvxQyR2A==
 
+core-js@^3.3.2:
+  version "3.19.3"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.19.3.tgz#6df8142a996337503019ff3235a7022d7cdf4559"
+  integrity sha512-LeLBMgEGSsG7giquSzvgBrTS7V5UL6ks3eQlUSbN8dJStlLFiRzUm5iqsRyzUB8carhfKjkJ2vzKqE6z1Vga9g==
+
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -2873,6 +2885,16 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     ripemd160 "^2.0.0"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
+
+cron-validator@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/cron-validator/-/cron-validator-1.2.1.tgz#0f0de2de36d231a6ace0e43ffc6c0564fe6edf1a"
+  integrity sha512-RqdpGSokGFICPc8qAkT38aXqZLLanXghQTK2q7a2x2FabSwDd2ARrazd5ElEWAXzToUcMG4cZIwDH+5RM0q1mA==
+
+cronstrue@^1.94.0:
+  version "1.122.0"
+  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-1.122.0.tgz#bd6838077b476d28f61d381398b47b8c3912a126"
+  integrity sha512-PFuhZd+iPQQ0AWTXIEYX+t3nFGzBrWxmTWUKJOrsGRewaBSLKZ4I1f8s2kryU75nNxgyugZgiGh2OJsCTA/XlA==
 
 cross-spawn@^3.0.0:
   version "3.0.1"
@@ -10574,6 +10596,17 @@ vue-analytics@^5.17.2:
   version "5.17.2"
   resolved "https://registry.yarnpkg.com/vue-analytics/-/vue-analytics-5.17.2.tgz#5a43cbd907a8b5d2c27e3df5046245604fa8c83e"
   integrity sha512-Vfbn5laOG8OVetrBNRfV64y/N5VVyw1PPC4LiowZFh58UOsfsGH8w+ZZn0pyMelSZmz9uxkgG5dNnce4bwJ6jg==
+
+vue-cron-editor-buefy@^0.2.17:
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/vue-cron-editor-buefy/-/vue-cron-editor-buefy-0.2.17.tgz#679793ba3bb930e0c3bc3c71aca0fa5b0e4b8e11"
+  integrity sha512-3EjFHbyQ89dJw65QwpURlcvU1rLhg2+5vSReNNSyWFT7jrbJWj/mr5prM/6uKpcyONDfZaLD0lJRhUp9ycn4kQ==
+  dependencies:
+    buefy "^0.8.19"
+    core-js "^3.3.2"
+    cron-validator "^1.2.1"
+    cronstrue "^1.94.0"
+    vue "^2.6.10"
 
 vue-eslint-parser@^2.0.3:
   version "2.0.3"

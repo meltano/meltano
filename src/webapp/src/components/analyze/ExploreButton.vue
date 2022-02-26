@@ -46,22 +46,24 @@ export default {
 </script>
 
 <template>
-  <button
-    v-if="isAnalysisEnabled"
-    class="button is-interactive-primary tooltip"
-    :class="[
-      { 'is-loading': isDisabled, 'is-tooltip-left': isTooltipLeft },
-      customClass
-    ]"
-    :disabled="isDisabled || !getIsExplorable"
-    data-tooltip="Explore dashboards, reports, templates, and more"
-    @click="goToExplore"
-  >
-    <span>Explore</span>
-    <span class="icon is-small">
-      <font-awesome-icon icon="compass"></font-awesome-icon>
-    </span>
-  </button>
+  <div class="control">
+    <button
+      v-if="isAnalysisEnabled"
+      class="button is-interactive-primary tooltip"
+      :class="[
+        { 'is-loading': isDisabled, 'is-tooltip-top': isTooltipLeft },
+        customClass
+      ]"
+      :disabled="isDisabled || !getIsExplorable"
+      data-tooltip="Explore dashboards, reports, templates, and more"
+      @click="goToExplore"
+    >
+      <span>Explore</span>
+      <span class="icon is-small">
+        <font-awesome-icon icon="compass"></font-awesome-icon>
+      </span>
+    </button>
+  </div>
 </template>
 
 <style lang="scss"></style>

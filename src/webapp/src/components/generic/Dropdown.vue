@@ -51,6 +51,10 @@ export default {
       type: String,
       default: ''
     },
+    textIs: {
+      type: String,
+      default: ''
+    },
     tooltip: {
       type: Object,
       default: () => {
@@ -133,6 +137,7 @@ export default {
         :data-tooltip="tooltip.message"
         @click="toggleDropdown"
       >
+        <span class="text-is">{{ textIs }}</span>
         <span v-if="label" :class="labelClasses">{{ label }}</span>
         <span v-if="!isIconRemoved" class="icon is-small">
           <font-awesome-icon
