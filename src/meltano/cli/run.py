@@ -18,13 +18,24 @@ logger = structlog.getLogger(__name__)
 
 
 @cli.command(short_help="[preview] Run a set of plugins in series.")
+@click.option(
+    "--full-refresh",
+    help="Perform a full refresh (ignore state left behind by any previous runs). Applies to all jobs.",
+    is_flag=True,
+)
+@click.option(
+    "--force",
+    "-f",
+    help="Force a new run even when a pipeline with the same Job ID is already running. Applies to all jobs.",
+    is_flag=True,
+)
 @click.argument(
     "blocks",
     nargs=-1,
 )
 @pass_project(migrate=True)
 @click_run_async
-async def run(project, blocks):
+async def run(project, full_refresh, force, blocks):
     """
     Run a set of command blocks in series.
 

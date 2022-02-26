@@ -38,6 +38,9 @@ class ELBContext:  # noqa: WPS230
         plugins_service: ProjectPluginsService = None,
         session: Session = None,
         job: Optional[Job] = None,
+        dry_run: Optional[bool] = False,
+        full_refresh: Optional[bool] = False,
+        force: Optional[bool] = False,
         state: Optional[str] = None,
         base_output_logger: Optional[OutputLogger] = None,
     ):
@@ -48,6 +51,9 @@ class ELBContext:  # noqa: WPS230
             plugins_service: The plugins service to use.
             session: The session to use.
             job: The job within this context should run.
+            dry_run: Whether this is a dry run.
+            full_refresh: Whether this is a full refresh.
+            force: Whether to force the execution of the job if it is stale.
             state: Optional state to use.
             base_output_logger: The base logger to use.
         """
@@ -57,7 +63,9 @@ class ELBContext:  # noqa: WPS230
         self.session = session
         self.job = job
         self.state = state
-        self.full_refresh = False
+        self.dry_run = dry_run
+        self.full_refresh = full_refresh
+        self.force = force
 
         self.base_output_logger = base_output_logger
 
@@ -94,12 +102,74 @@ class ELBContextBuilder:
         _, session_maker = project_engine(project)
         self.session = session_maker()
 
-        self.job = job
-
+        self._job = None
+        self._dry_run = False
+        self._full_refresh = False
+        self._force = False
+        self._state = None
         self._env = {}
         self._blocks = []
 
         self._base_output_logger = None
+
+    def with_job(self, job: Job):
+        """Set the associated job for the context.
+
+        Args:
+            job: the initial job for the context.
+
+        Returns:
+            self
+        """
+        self._job = job
+        return self
+
+    def with_dry_run(self, dry_run):
+        """Set whether this is a dry run.
+
+        Args:
+            dry_run : whether this is a dry run.
+
+        Raises:
+            NotImplementedError: as this is not implemented yet.
+        """
+        raise NotImplementedError("dry_run is not implemented yet")
+
+    def with_full_refresh(self, full_refresh: bool):
+        """Set whether this is a full refresh.
+
+        Args:
+            full_refresh : whether this is a full refresh.
+
+        Returns:
+            self
+        """
+        self._full_refresh = full_refresh
+        return self
+
+    def with_state(self, state):
+        """Set the associated state for the context.
+
+        Args:
+            state: the state to use.
+
+        Returns:
+            self
+        """
+        self._state = state
+        return self
+
+    def with_force(self, force: bool):
+        """Set whether the execution of the job should be forced if it is stale.
+
+        Args:
+            force: Whether to force the execution of the job if it is stale.
+
+        Returns:
+            self
+        """
+        self._force = force
+        return self
 
     def make_block(
         self,
@@ -181,8 +251,8 @@ class ELBContextBuilder:
         Returns:
             The run directory for the current job.
         """
-        if self.job:
-            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+        if self._job:
+            return self.project.job_dir(self._job.job_id, str(self._job.run_id))
 
     def context(self) -> ELBContext:
         """Create an ELBContext object from the current builder state.
@@ -194,7 +264,11 @@ class ELBContextBuilder:
             project=self.project,
             plugins_service=self.plugins_service,
             session=self.session,
-            job=self.job,
+            job=self._job,
+            dry_run=self._dry_run,
+            full_refresh=self._full_refresh,
+            force=self._force,
+            state=self._state,
             base_output_logger=self._base_output_logger,
         )
 

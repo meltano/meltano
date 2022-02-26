@@ -79,6 +79,8 @@ class BlockParser:  # noqa: D101
         log: structlog.BoundLogger,
         project,
         blocks: List[str],
+        full_refresh: Optional[bool] = False,
+        force: Optional[bool] = False,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
@@ -87,12 +89,17 @@ class BlockParser:  # noqa: D101
             log: Logger to use.
             project: Project to use.
             blocks: List of block names to parse.
+            full_refresh: Whether to perform a full refresh (applies to all found sets).
+            force: Whether to force a run if a job is already running (applies to all found sets).
 
         Raises:
             ClickException: If a block name is not found.
         """
         self.log = log
         self.project = project
+
+        self._full_refresh = full_refresh
+        self._force = force
 
         self._plugins_service = ProjectPluginsService(project)
         self._plugins: List[ProjectPlugin] = []
@@ -211,7 +218,12 @@ class BlockParser:  # noqa: D101
         """
         blocks: List[SingerBlock] = []
 
-        builder = ELBContextBuilder(self.project, self._plugins_service)
+        base_builder = ELBContextBuilder(
+            self.project, self._plugins_service
+        )  # lint work around
+        builder = base_builder.with_force(self._force).with_full_refresh(
+            self._full_refresh
+        )
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:
             self.log.debug(
