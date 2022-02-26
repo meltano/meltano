@@ -115,8 +115,7 @@ per_file_ignores =
         WPS201
         # Found too many module members
         WPS202
-        # Don't warn on Found block variables overlap due to our mock name reuse
-        WPS440
+
     !tests/*:
         T
     scripts/*:
