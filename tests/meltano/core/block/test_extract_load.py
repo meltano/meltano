@@ -16,8 +16,10 @@ from meltano.core.block.extract_load import (
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging import OutputLogger
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.runner.singer import SingerRunner
 
 TEST_JOB_ID = "test_job"
@@ -65,6 +67,13 @@ class TestELBContext:
 
 
 class TestELBContextBuilder:
+    @pytest.fixture
+    def target_postgres(self, project_add_service):
+        try:
+            return project_add_service.add(PluginType.LOADERS, "target-postgres")
+        except PluginAlreadyAddedException as err:
+            return err.plugin
+
     def test_builder_returns_elb_context(
         self, project, session, project_plugins_service, tap, target
     ):
@@ -120,6 +129,54 @@ class TestELBContextBuilder:
         assert initial_dict.items() <= builder._env.items()
         assert builder._env.items() >= block.context.env.items()
         assert builder._env.items() >= block2.context.env.items()
+
+    @pytest.mark.asyncio
+    async def test_validate_envs(
+        self, project, session, project_plugins_service, tap, target_postgres
+    ):
+        """Ensure that expected environment variables are present."""
+        builder = ELBContextBuilder(
+            project=project,
+            plugins_service=project_plugins_service,
+            job=None,
+        )
+        builder.session = session
+
+        block = builder.make_block(tap)
+        assert block.string_id == tap.name
+        assert block.producer
+        assert not block.consumer
+
+        async with block.invoker.prepared(session):
+            tap_env = block.invoker.env()
+
+        assert tap_env["MELTANO_EXTRACTOR_NAME"] == tap.name
+        assert tap_env["MELTANO_EXTRACTOR_NAMESPACE"] == tap.namespace
+        assert tap_env["MELTANO_EXTRACTOR_VARIANT"] == tap.variant
+
+        block = builder.make_block(target_postgres)
+        assert block.string_id == target_postgres.name
+        assert block.consumer
+        assert not block.producer
+
+        async with block.invoker.prepared(session):
+            target_env = block.invoker.env()
+
+        assert target_env["MELTANO_LOADER_NAME"] == target_postgres.name
+        assert target_env["MELTANO_LOADER_NAMESPACE"] == target_postgres.namespace
+        assert target_env["MELTANO_LOADER_VARIANT"] == target_postgres.variant
+
+        assert (
+            target_env["MELTANO_LOAD_HOST"]
+            == target_env["PG_ADDRESS"]
+            == os.getenv("PG_ADDRESS", "localhost")
+        )
+        assert (
+            target_env["MELTANO_LOAD_DEFAULT_TARGET_SCHEMA"]
+            == target_env["PG_SCHEMA"]
+            == target_env["MELTANO_EXTRACT__LOAD_SCHEMA"]
+            == target_env["MELTANO_EXTRACTOR_NAMESPACE"]
+        )
 
 
 class TestExtractLoadBlocks:
