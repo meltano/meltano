@@ -5,10 +5,11 @@ from unittest import mock
 import pytest
 import structlog
 from asynctest import CoroutineMock, Mock
+from structlog.testing import capture_logs
+
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job
 from meltano.core.logging import OutputLogger
-from structlog.testing import capture_logs
 
 
 class TestSingerBlocks:
@@ -156,7 +157,9 @@ class TestSingerBlocks:
             plugin_args={"foo": "bar"},
         )
 
-        mock_tap_plugin_invoker.output_handlers = []  # we're capturing logs below directly
+        mock_tap_plugin_invoker.output_handlers = (
+            []
+        )  # we're capturing logs below directly
 
         output_log = OutputLogger(log)
         log = structlog.getLogger("test")
