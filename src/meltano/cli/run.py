@@ -56,7 +56,7 @@ async def run(project, full_refresh, force, blocks):
     if project.active_environment is not None:
         logger.warning("Job ID generation not yet supported - running without job!")
 
-    parser = BlockParser(logger, project, blocks)
+    parser = BlockParser(logger, project, blocks, full_refresh, force)
     parsed_blocks = list(parser.find_blocks(0))
     if not parsed_blocks:
         logger.info("No valid blocks found.")

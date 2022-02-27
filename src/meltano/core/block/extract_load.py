@@ -278,7 +278,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
     def __init__(
         self,
-        context: ELBContextBuilder,
+        context: ELBContext,
         blocks: Tuple[IOBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
@@ -400,12 +400,14 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         job = self.context.job
         StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
 
-        existing = JobFinder(job.job_id).latest_running(self.context.session)
-        if existing:
-            raise RunnerError(
-                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
-                + "To ignore this check use the '--force' option."
-            )
+        if not self.context.force:
+            existing = JobFinder(job.job_id).latest_running(self.context.session)
+            if existing:
+                raise RunnerError(
+                    f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                    + "To ignore this check use the '--force' option."
+                )
+
         try:  # noqa: WPS501
             async with job.run(self.context.session):
                 async with self._start_blocks():
