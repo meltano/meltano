@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple
 
 import structlog
 
+from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.logging import OutputLogger
 from meltano.core.logging.utils import SubprocessOutputWriter
@@ -13,9 +14,8 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.runner import RunnerError
 
-from ..db import project_engine
-from ..runner import RunnerError
 from .singer import InvokerBase
 
 logger = structlog.getLogger(__name__)

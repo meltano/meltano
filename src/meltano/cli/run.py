@@ -20,13 +20,13 @@ logger = structlog.getLogger(__name__)
 @cli.command(short_help="[preview] Run a set of plugins in series.")
 @click.option(
     "--full-refresh",
-    help="Perform a full refresh (ignore state left behind by any previous runs). Applies to all jobs.",
+    help="Perform a full refresh (ignore state left behind by any previous runs). Applies to all pipelines.",
     is_flag=True,
 )
 @click.option(
     "--force",
     "-f",
-    help="Force a new run even when a pipeline with the same Job ID is already running. Applies to all jobs.",
+    help="Force a new run even if a pipeline with the same Job ID is already present. Applies to all pipelines.",
     is_flag=True,
 )
 @click.argument(
@@ -53,9 +53,6 @@ async def run(project, full_refresh, force, blocks):
 
     \b\nRead more at https://meltano.com/docs/command-line-interface.html#run
     """
-    if project.active_environment is not None:
-        logger.warning("Job ID generation not yet supported - running without job!")
-
     parser = BlockParser(logger, project, blocks, full_refresh, force)
     parsed_blocks = list(parser.find_blocks(0))
     if not parsed_blocks:
