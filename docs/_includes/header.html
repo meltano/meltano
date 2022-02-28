@@ -14,7 +14,8 @@
         <a class="navbar-item" href="{{ site.url }}"> Home </a>
 
         {% if site.collections %}
-          {% for collection in site.collections %}
+          {% assign collections = site.collections | sort: 'weight' %}
+          {% for collection in collections %}
             {% if collection.label != "posts" %}
               <a class="navbar-item" href="/{{ collection.label }}"> {{ collection.name }} </a>
             {% endif %}

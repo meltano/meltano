@@ -38,21 +38,27 @@ collections:
   concepts:
     output: true
     name: "Concepts"
+    weight: 1
   guide:
     output: true
     name: "Guide"
-  reference:
-    output: true
-    name: "Reference"
-  the-project:
-    output: true
-    name: "The Project"
+    weight: 2
   tutorials:
     output: true
     name: "Tutorials"
+    weight: 3
   contribute:
     output: true
     name: "Contribute"
+    weight: 4
+  reference:
+    output: true
+    name: "Reference"
+    weight: 5
+  the-project:
+    output: true
+    name: "The Project"
+    weight: 6
   posts:
     output: false
 
