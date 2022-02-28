@@ -262,7 +262,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
             # the invoker prepared context manager was able to clean up the configs
             pass
 
-    def _merge_outputs(self, source: str, outputs: []) -> []:
+    def _merge_outputs(self, source: str, outputs: list) -> list:
         if not self.invoker.output_handlers:
             return outputs
 
