@@ -3,15 +3,23 @@
 # Ending a path in a `/` will specify the code owners for every file
 # nested in that directory, on any level
 
-# Default
-* @DouweM @aaronsteers
+[Default owners]
+* @pandemicsyn @edgarrmondragon
 
-# Docs
-/docs/ @meltano/core-team
-/CONTRIBUTING.md @meltano/core-team
-/README.md @meltano/core-team
+[Discovery owners]
+/src/meltano/core/bundle/discovery.yml @aaronsteers @pnadolny13
+
+[Web App and API owners]
+/src/webapp/ @alex1126 @pandemicsyn
+/src/meltano/api/ @pandemicsyn @alex1126
+
+[Docs owners]
+/docs/ @tayloramurphy @afolson
+/CONTRIBUTING.md @tayloramurphy @afolson
+/README.md @tayloramurphy @afolson
 
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
+[Release Ops]
 /.bumpversion.cfg @meltano/core-team
 /CHANGELOG.md @meltano/core-team
 /cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml @meltano/core-team
