@@ -295,7 +295,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         )
 
         job = Job(
-            job_id=f"{self.head.string_id}-{self.tail.string_id}",  # noqa: WPS237
+            job_id=f"{self.head.string_id}-to-{self.tail.string_id}",  # noqa: WPS237
         )
         self.context.job = job
 

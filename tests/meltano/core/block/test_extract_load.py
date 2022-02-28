@@ -593,8 +593,8 @@ class TestExtractLoadBlocks:
             elb = ExtractLoadBlocks(elb_context, blocks)
             elb.validate_set()
 
-            assert elb.context.job.job_id == "tap-mock-target-mock"
+            assert elb.context.job.job_id == "tap-mock-to-target-mock"
 
-            # just to be sure, we'll double check the job_id is the same for each block
+            # just to be sure, we'll double-check the job_id is the same for each block
             for block in blocks:
-                assert block.context.job.job_id == "tap-mock-target-mock"
+                assert block.context.job.job_id == "tap-mock-to-target-mock"
