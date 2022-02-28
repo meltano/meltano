@@ -527,7 +527,7 @@ class TestExtractLoadBlocks:
                 elb.validate_set()
 
     @pytest.mark.asyncio
-    async def test_elb_job_context(
+    async def test_elb_with_job_context(
         self,
         session,
         subject,
@@ -601,6 +601,11 @@ class TestExtractLoadBlocks:
             # just to be sure, we'll double-check the job_id is the same for each block
             for block in blocks:
                 assert block.context.job.job_id == "tap-mock-to-target-mock"
+
+            elb.run_with_job = CoroutineMock()
+
+            await elb.run()
+            assert elb.run_with_job.call_count == 1
 
 
 class TestExtractLoadUtils:
