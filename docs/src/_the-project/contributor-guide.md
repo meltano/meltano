@@ -131,7 +131,7 @@ yarn serve
 
 The development build of the Meltano UI will now be available at <http://localhost:8080/>.
 
-A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/the-project/contributor-guide#api-development) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000. 
+A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/the-project/contributor-guide#api-development) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000.
 
 
 <div class="notification is-warning">
@@ -616,7 +616,7 @@ Here is a technical breakdown:
 Meltano uses an approval workflow for all merge requests.
 
 1. Create your merge request
-1. Assign the merge request to any Meltano maintainer for a review cycle
+1. Assign the merge request to any eligible approvers as show in the Gitlab MR UI (or specified in [CODEOWNERS](https://gitlab.com/meltano/meltano/-/blob/master/.gitlab/CODEOWNERS))  for a review cycle
 1. Once the review is done the reviewer may approve the merge request or send it back for further iteration
 1. Once approved, the merge request can be merged by any Meltano maintainer
 
@@ -630,8 +630,8 @@ Merge conflicts, failing tests and/or missing checkboxes should not be used as g
 
 ## Architectural Decision Records
 
-Meltano makes use of ADR's (Architectural Decision Records) to record architectural decisions roughly as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions). 
-In a nutshell, these are used to document architectural decisions and to provide a record of the decisions made by the team and contributors in regard to Meltano's architecture. These are held in [docs/adr](https://gitlab.com/meltano/meltano/-/tree/master/docs/adr). 
+Meltano makes use of ADR's (Architectural Decision Records) to record architectural decisions roughly as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions).
+In a nutshell, these are used to document architectural decisions and to provide a record of the decisions made by the team and contributors in regard to Meltano's architecture. These are held in [docs/adr](https://gitlab.com/meltano/meltano/-/tree/master/docs/adr).
 To propose or add a new ADR, its simplest to create a new entry using [adr-tools](https://github.com/npryce/adr-tools), and then send a long a merge request for review.
 
 ## Changelog
