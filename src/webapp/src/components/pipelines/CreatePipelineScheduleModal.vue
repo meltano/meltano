@@ -5,11 +5,15 @@ import _ from 'lodash'
 
 import { PIPELINE_INTERVAL_OPTIONS, TRANSFORM_OPTIONS } from '@/utils/constants'
 import capitalize from '@/filters/capitalize'
+import VueCronEditorBuefy from 'vue-cron-editor-buefy'
 
 export default {
   name: 'CreatePipelineScheduleModal',
   filters: {
     capitalize
+  },
+  components: {
+    VueCronEditorBuefy
   },
   data() {
     return {
@@ -22,7 +26,8 @@ export default {
         transform: 'skip',
         interval: '',
         isRunning: false
-      }
+      },
+      cronExpression: '*/1 * * * *'
     }
   },
   computed: {
@@ -74,7 +79,10 @@ export default {
     })
   },
   methods: {
-    ...mapActions('orchestration', ['savePipelineSchedule']),
+    ...mapActions('orchestration', [
+      'savePipelineSchedule',
+      'getPipelineSchedules'
+    ]),
     onExtractorLoaderChange() {
       if (!this.pipeline.extractor || !this.pipeline.loader) {
         return
@@ -87,9 +95,15 @@ export default {
     },
     save() {
       this.isSaving = true
+      if (this.pipeline.interval === '@other') {
+        this.pipeline.interval = this.cronExpression
+      }
       this.savePipelineSchedule({
         pipeline: this.pipeline
       })
+        .then(() => {
+          this.getPipelineSchedules()
+        })
         .then(() => {
           Vue.toasted.global.success(`Pipeline Saved - ${this.pipeline.name}`)
           this.close()
@@ -219,6 +233,18 @@ export default {
               />
             </div>
           </div>
+          <div
+            v-if="pipeline.interval === '@other'"
+            class="column is-fullwidth"
+          >
+            <small class="has-text-interactive-navigation">Step 4a</small>
+            <h4 class="current-cron-expression">
+              This is your current CRON expression
+              <code>{{ cronExpression }}</code
+              >.
+            </h4>
+            <VueCronEditorBuefy v-model="cronExpression" />
+          </div>
           <div class="column is-full">
             <p v-if="showTransformWarning" class="has-text-grey">
               Your Meltano project does not contain a transform plugin for this
@@ -247,5 +273,13 @@ export default {
 <style lang="scss" scoped>
 .control {
   margin: 0.5rem 0;
+}
+
+.columns .is-fullwidth {
+  padding-right: 0;
+}
+
+.current-cron-expression {
+  margin-bottom: 10px;
 }
 </style>

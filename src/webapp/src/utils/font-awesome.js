@@ -21,6 +21,7 @@ import {
   faCheckCircle,
   faChevronDown,
   faChevronUp,
+  faCog,
   faCompass,
   faDatabase,
   faDotCircle,
@@ -57,7 +58,8 @@ import {
   faThLarge,
   faThList,
   faTrashAlt,
-  faUser
+  faUser,
+  faWrench
 } from '@fortawesome/free-solid-svg-icons'
 import {
   FontAwesomeIcon,
@@ -92,6 +94,7 @@ export default {
     library.add(faCheckCircle)
     library.add(faChevronDown)
     library.add(faChevronUp)
+    library.add(faCog)
     library.add(faCompass)
     library.add(faDatabase)
     library.add(faDotCircle)
@@ -129,6 +132,7 @@ export default {
     library.add(faThList)
     library.add(faTrashAlt)
     library.add(faUser)
+    library.add(faWrench)
 
     library.add(meltanoCustomChartHorizontalBar)
     library.add(meltanoCustomChartScatter)
