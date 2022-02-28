@@ -17,7 +17,9 @@ for incremental jobs. For additional backgrounds and discussions on this see:
 ## Decision
 
 We will add initial incremental job support to `meltano run`. Functionality in this iteration is limited to
-unconfigurable ID's auto-generated using the tap and target pair names and environment name (when present). Yielding the format of `{environment_name}:{tap_name}-to-{target_name}` or `{tap_name}-to-{target_name}` when no environment name is present.
+unconfigurable ID's auto-generated using the active environment name and tap and target pair names. Yielding a format of
+`{environment_name}:{tap_name}-to-{target_name}`. This behaviour is active only in the presence of an active environment.
+When running with no active environment, state is not tracked.
 
 - This version will attempt to run incrementally/save state by default. However, three top level flags are provided to alter behaviour:
   - `--no-state-update` will disable state saving for this invocation.
@@ -41,8 +43,12 @@ $ meltano run tap-gitlab target-jsonl             # id tap-gitlab-to-target-json
 $ meltano run tap-gitlab hide-emails target-jsonl # also tap-gitlab-to-target-jsonl
 ```
 
-Lastly, since the flags `--no-state-update`, `--full-refresh`, and `--force` are top level flags, users can not selectively apply these to meltano run segments e.g.:
+The flags `--no-state-update`, `--full-refresh`, and `--force` are top level flags, users can not selectively apply these to meltano run segments e.g.:
 
 ```
 $ meltano run --full-refresh tap-gitlab target-jsonl tap-salesfroce target-postgres # will perform a full refresh on both block sets.
 ```
+
+Lastly, as mentioned this version _does not_ generate a job or preserve state when running without an active environment. We've
+intentionally _excluded_ state tracking when there's no named environment as we believe its "safer" to not track than to
+track automatically but potentially incorrectly.

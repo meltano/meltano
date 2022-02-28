@@ -289,16 +289,20 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         )
 
         self.output_logger = OutputLogger(None)
-        if self.context.update_state:
-            job = Job(
-                job_id=generate_job_id(self.context.project, self.head, self.tail)
+
+        if not self.context.project.active_environment:
+            logger.warning(
+                "No active environment, running without job! See https://docs.meltano.com/reference/command-line-interface#run for details."
             )
-            self.context.job = job
+            self.context.job = None
+
+        if self.context.update_state and self.context.project.active_environment:
+            job_id = generate_job_id(self.context.project, self.head, self.tail)
+            self.context.job = Job(job_id=job_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
                 self.context.job.job_id, self.context.job.run_id
             )
-            logger.debug(f"Logging to {log_file}")
             self.output_logger = OutputLogger(log_file)
 
         self._process_futures = None
@@ -758,9 +762,11 @@ def generate_job_id(project: Project, consumer: IOBlock, producer: IOBlock) -> s
         producer: Producer block.
 
     Returns:
-        Job id or None if project active environment is not set.
-    """
-    if project.active_environment:
-        return f"{project.active_environment.name}:{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237
+        Job id string.
 
-    return f"{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237
+    Raises:
+        RunnerError: if the project does not have an active environment.
+    """
+    if not project.active_environment:
+        raise RunnerError("No active environment for invocation, but requested job id")
+    return f"{project.active_environment.name}:{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237
