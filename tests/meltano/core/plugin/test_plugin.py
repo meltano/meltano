@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.setting_definition import SettingDefinition, SettingKind
@@ -521,6 +522,8 @@ class TestPluginType:
         assert PluginType.UTILITIES.verb == "utilize"
         assert PluginType.UTILITIES.singular == "utility"
         assert PluginType.UTILITIES.verb == "utilize"
+        assert PluginType.MAPPERS.singular == "mapper"
+        assert PluginType.MAPPERS.verb == "map"
 
     def test_from_cli_argument(self):
         for plugin_type in PluginType:

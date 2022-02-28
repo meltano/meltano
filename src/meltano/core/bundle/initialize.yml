@@ -1,5 +1,9 @@
 meltano.yml: |
   version: 1
+  environments:
+  - name: dev
+  - name: staging
+  - name: prod
 README.md: ""
 requirements.txt: ""
 output/.gitignore: |

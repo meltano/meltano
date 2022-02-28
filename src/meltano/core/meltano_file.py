@@ -1,8 +1,6 @@
 import copy
 from typing import Dict, Iterable, List
 
-import yaml
-from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
@@ -34,15 +32,24 @@ class MeltanoFile(Canonical):
         """Parse the meltano.yml file and return it as `ProjectPlugin` instances."""
         plugin_type_plugins = Canonical()
 
-        for plugin_type in PluginType:
-            plugin_type_plugins[plugin_type] = []
+        for ptype in PluginType:
+            plugin_type_plugins[ptype] = []
 
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         for plugin_type, raw_plugins in plugins.items():
-            for raw_plugin in raw_plugins:
-                plugin = ProjectPlugin(PluginType(plugin_type), **raw_plugin)
-                plugin_type_plugins[plugin.type].append(plugin)
+            if plugin_type == PluginType.MAPPERS:  # noqa: WPS441 - false positive
+                for mapper in raw_plugins:
+                    plugin_type_plugins[PluginType.MAPPERS].append(
+                        ProjectPlugin(PluginType.MAPPERS, **mapper)
+                    )
+                    plugin_type_plugins[PluginType.MAPPERS].extend(
+                        self.get_plugins_for_mappings(mapper)
+                    )
+            else:
+                for raw_plugin in raw_plugins:
+                    plugin = ProjectPlugin(PluginType(plugin_type), **raw_plugin)
+                    plugin_type_plugins[plugin.type].append(plugin)
 
         return plugin_type_plugins
 
@@ -60,3 +67,23 @@ class MeltanoFile(Canonical):
             A list of `Environment` objects.
         """
         return [Environment.parse(obj) for obj in environments]
+
+    @staticmethod
+    def get_plugins_for_mappings(mapper_config: Dict) -> List[ProjectPlugin]:
+        """Mapper plugins are a special case. They are not a single plugin, but actually a list of plugins generated from the mapping config defined within the mapper config.
+
+        Args:
+            mapper_config: The dict representation of a mapper config found in in meltano.yml.
+        Returns:
+            A list of `ProjectPlugin` instances.
+        """
+        mapping_plugins: List[ProjectPlugin] = []
+        for mapping in mapper_config.get("mappings", []):
+            raw_mapping_plugin = copy.deepcopy(mapper_config)
+            raw_mapping_plugin["mapping"] = True
+            raw_mapping_plugin["mapping_name"] = mapping.get("name")
+            raw_mapping_plugin["config"] = mapping.get("config")
+            mapping_plugins.append(
+                ProjectPlugin(PluginType.MAPPERS, **raw_mapping_plugin)
+            )
+        return mapping_plugins

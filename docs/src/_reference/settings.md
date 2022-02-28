@@ -676,10 +676,10 @@ export MELTANO_NOTIFICATION=true
 ### `ui.analysis`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_ANALYSIS`
-- Default: `true`
+- Default: `false`
 
-If you are only using Meltano for data integration (and transformation),
-you can disable this setting to hide all functionality related to Analysis from the UI:
+If you are want to use Meltano for more than data integration (and transformation),
+you can enable this setting to show all functionality related to Analysis from the UI:
 - "Explore" and "Dashboards" tabs
 - "Explore" buttons in the "Pipelines" list and "Pipeline Run Log" modal
 

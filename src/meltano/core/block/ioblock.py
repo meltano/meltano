@@ -16,7 +16,13 @@ class IOBlock(metaclass=ABCMeta):
     @property
     @abstractmethod
     def stdin(self) -> Optional[StreamWriter]:
-        """If a block requires input, return the StreamWriter that should be used for writes."""
+        """If a block requires input, return the StreamWriter that should be used for writes.
+
+        Returns:
+            StreamWriter
+        Raises:
+            NotImplementedError
+        """
         raise NotImplementedError
 
     @property
@@ -39,12 +45,26 @@ class IOBlock(metaclass=ABCMeta):
 
     @abstractmethod
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
-        """Use stdout_link to instruct block to link/write stdout content to dst."""
+        """Use stdout_link to instruct block to link/write stdout content to dst.
+
+        Args:
+            dst: SubprocessOutputWriter
+
+        Raises:
+            NotImplementedError
+        """
         raise NotImplementedError
 
     @abstractmethod
     def stderr_link(self, dst: SubprocessOutputWriter) -> None:
-        """Use stderr_link to instruct block to link/write stderr content to dst."""
+        """Use stderr_link to instruct block to link/write stderr content to dst.
+
+        Args:
+            dst: SubprocessOutputWriter
+
+        Raises:
+            NotImplementedError
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -52,6 +72,9 @@ class IOBlock(metaclass=ABCMeta):
         """Start the block.
 
         Whatever that might entail (spwaning a process, spinning up a async task that will handle transforms, etc)
+
+        Raises:
+            NotImplementedError
         """
         raise NotImplementedError
 
@@ -61,6 +84,9 @@ class IOBlock(metaclass=ABCMeta):
 
         Args:
             kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+
+        Raises:
+            NotImplementedError
         """
         raise NotImplementedError
 
@@ -84,18 +110,28 @@ class IOBlock(metaclass=ABCMeta):
     def proxy_io(self) -> Tuple[Task, Task]:
         """Start proxying stdout AND stderr to the linked destinations.
 
-        Returns: proxy_stdout Task and proxy_stderr Task
+        Returns:
+            proxy_stdout Task and proxy_stderr Task
         """
         stdout = self.proxy_stdout()
         stderr = self.proxy_stderr()
         return stdout, stderr
 
     @abstractmethod
-    async def pre(self, block_ctx: dict) -> None:
-        """Execute pre-start tasks."""
+    async def pre(self, session: dict) -> None:
+        """Execute pre-start tasks.
+
+        Args:
+            session: the sqlalchemy session to use for this execution.
+        """
         pass
 
     @abstractmethod
     async def post(self) -> None:
         """Execute post-stop tasks."""
+        pass
+
+    @abstractmethod
+    async def close_stdin(self) -> None:
+        """Close the underlying stdin if the block is a producer."""
         pass
