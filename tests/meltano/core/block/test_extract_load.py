@@ -12,8 +12,11 @@ from meltano.core.block.extract_load import (
     ELBContext,
     ELBContextBuilder,
     ExtractLoadBlocks,
+    generate_job_id,
 )
+from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.singer import SingerBlock
+from meltano.core.environment import Environment
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging import OutputLogger
 from meltano.core.plugin import PluginType
@@ -598,3 +601,21 @@ class TestExtractLoadBlocks:
             # just to be sure, we'll double-check the job_id is the same for each block
             for block in blocks:
                 assert block.context.job.job_id == "tap-mock-to-target-mock"
+
+
+class TestExtractLoadUtils:
+    def test_generate_job_id(self):
+        """Verify that the job id is generated correctly when an environment is provided."""
+        block1 = mock.Mock(spec=IOBlock)
+        block1.string_id = "block1"
+
+        block2 = mock.Mock(spec=IOBlock)
+        block2.string_id = "block2"
+
+        project = mock.Mock()
+
+        project.active_environment = None
+        assert generate_job_id(project, block1, block2) == "block1-to-block2"
+
+        project.active_environment = Environment(name="test")
+        assert generate_job_id(project, block1, block2) == "test:block1-to-block2"

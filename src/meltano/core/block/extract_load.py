@@ -12,6 +12,7 @@ from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
@@ -20,7 +21,6 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 
-from ..plugin import PluginType
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
@@ -294,9 +294,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             config_service=self.context.plugins_service.config_service,
         )
 
-        job = Job(
-            job_id=f"{self.head.string_id}-to-{self.tail.string_id}",  # noqa: WPS237
-        )
+        job = Job(job_id=generate_job_id(self.context.project, self.head, self.tail))
         self.context.job = job
 
         log_file = "run.log"
@@ -741,3 +739,20 @@ def _check_exit_codes(  # noqa: WPS238
 
     if failed_mappers:
         raise RunnerError("Mappers failed", failed_mappers)
+
+
+def generate_job_id(project: Project, consumer: IOBlock, producer: IOBlock) -> str:
+    """Generate a job id based on a project active environment and consumer and producer names.
+
+    Args:
+        project: Project to retrieve active environment from.
+        consumer: Consumer block.
+        producer: Producer block.
+
+    Returns:
+        Job id or None if project active environment is not set.
+    """
+    if project.active_environment:
+        return f"{project.active_environment.name}:{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237
+
+    return f"{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237

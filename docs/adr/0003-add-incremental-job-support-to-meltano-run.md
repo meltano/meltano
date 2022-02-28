@@ -16,10 +16,8 @@ for incremental jobs. For additional backgrounds and discussions on this see:
 
 ## Decision
 
-The change that we're proposing or have agreed to implement.
-
 We will add initial incremental job support to `meltano run`. Functionality in this iteration is limited to
-unconfigurable ID's auto-generated using the tap and target pair names yielding the format of `{tap_name}-to-{target_name}`.
+unconfigurable ID's auto-generated using the tap and target pair names and environment name (when present). Yielding the format of `{environment_name}:{tap_name}-to-{target_name}`.
 
 - This version will attempt to run incrementally/save state by default. However, three top level flags are provided to alter behaviour:
   - `--no-state-update` will disable state saving for this invocation.

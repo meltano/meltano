@@ -4,16 +4,15 @@ from typing import Dict, Generator, List, Optional, Tuple, Union
 import click
 import structlog
 
-from meltano.core.block.blockset import BlockSet, BlockSetValidationError
-from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
-from meltano.core.block.ioblock import IOBlock
-from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
-from meltano.core.block.singer import CONSUMERS, SingerBlock
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
+
+from .blockset import BlockSet, BlockSetValidationError
+from .extract_load import ELBContextBuilder, ExtractLoadBlocks
+from .plugin_command import PluginCommandBlock, plugin_command_invoker
+from .singer import CONSUMERS, SingerBlock
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
@@ -30,24 +29,6 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
         PluginType.LOADERS,
         PluginType.MAPPERS,
     }
-
-
-def generate_job_id(
-    project: Project, consumer: IOBlock, producer: IOBlock
-) -> Union[str, None]:
-    """Generate a job id based on a project active environment and consumer and producer names.
-
-    Args:
-        project: Project to retrieve active environment from.
-        consumer: Consumer block.
-        producer: Producer block.
-
-    Returns:
-        Job id or None if project active environment is not set.
-    """
-    if project.active_environment:
-        return f"{project.active_environment.name}-{consumer.string_id}-{producer.string_id}"  # noqa: WPS237
-    return None
 
 
 def validate_block_sets(
