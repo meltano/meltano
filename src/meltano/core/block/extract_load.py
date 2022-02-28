@@ -294,14 +294,12 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 job_id=generate_job_id(self.context.project, self.head, self.tail)
             )
             self.context.job = job
-
-            if self.context.job:
-                job_logging_service = JobLoggingService(self.context.project)
-                log_file = job_logging_service.generate_log_name(
-                    self.context.job.job_id, self.context.job.run_id
-                )
-                logger.info(f"Logging to {log_file}")
-                self.output_logger = OutputLogger(log_file)
+            job_logging_service = JobLoggingService(self.context.project)
+            log_file = job_logging_service.generate_log_name(
+                self.context.job.job_id, self.context.job.run_id
+            )
+            logger.info(f"Logging to {log_file}")
+            self.output_logger = OutputLogger(log_file)
 
         self._process_futures = None
         self._stdout_futures = None
