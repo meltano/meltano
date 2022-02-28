@@ -319,20 +319,20 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             config_service=self.context.plugins_service.config_service,
         )
 
+        self.output_logger = OutputLogger(None)
         if self.context.update_state:
             job = Job(
                 job_id=generate_job_id(self.context.project, self.head, self.tail)
             )
             self.context.job = job
 
-            log_file = "run.log"
             if self.context.job:
                 job_logging_service = JobLoggingService(self.context.project)
                 log_file = job_logging_service.generate_log_name(
                     self.context.job.job_id, self.context.job.run_id
                 )
-
-        self.output_logger = OutputLogger(log_file)
+                logger.info(f"Logging to {log_file}")
+                self.output_logger = OutputLogger(log_file)
 
         self._process_futures = None
         self._stdout_futures = None
@@ -417,30 +417,42 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     "intermediate blocks must be producers AND consumers"
                 )
 
+    async def execute(self) -> None:
+        """Build the IO chain and execute the actual ELT task."""
+        async with self._start_blocks():
+            await self._link_io()
+            manager = ELBExecutionManager(self)
+            await manager.run()
+
     async def run(self) -> None:
-        """Build the IO chain and execute the actual ELT task.
+        """Run the ELT task."""
+        if self.context.job:
+            # TODO: legacy `meltano elt` style logging should be deprecated
+            legacy_log_handler = self.output_logger.out("meltano", logger)
+            with legacy_log_handler.redirect_logging():
+                await self.run_with_job()
+                return
+        await self.execute()
+
+    async def run_with_job(self) -> None:
+        """Run the ELT task within the context of a job.
 
         Raises:
             RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
         job = self.context.job
-
-        if job:
-            StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
-            if not self.context.force:
-                existing = JobFinder(job.job_id).latest_running(self.context.session)
-                if existing:
-                    raise RunnerError(
-                        f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
-                        + "To ignore this check use the '--force' option."
-                    )
+        StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
+        if not self.context.force:
+            existing = JobFinder(job.job_id).latest_running(self.context.session)
+            if existing:
+                raise RunnerError(
+                    f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                    + "To ignore this check use the '--force' option."
+                )
 
         try:  # noqa: WPS501
             async with job.run(self.context.session):
-                async with self._start_blocks():
-                    await self._link_io()
-                    manager = ELBExecutionManager(self)
-                    await manager.run()
+                await self.execute()
         finally:
             self.context.session.close()
 
