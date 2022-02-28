@@ -42,6 +42,7 @@ class ELBContext:  # noqa: WPS230
         full_refresh: Optional[bool] = False,
         force: Optional[bool] = False,
         state: Optional[str] = None,
+        update_state: Optional[bool] = True,
         base_output_logger: Optional[OutputLogger] = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -55,6 +56,7 @@ class ELBContext:  # noqa: WPS230
             full_refresh: Whether this is a full refresh.
             force: Whether to force the execution of the job if it is stale.
             state: Optional state to use.
+            update_state: Whether to update the state of the job.
             base_output_logger: The base logger to use.
         """
         self.project = project
@@ -62,10 +64,16 @@ class ELBContext:  # noqa: WPS230
 
         self.session = session
         self.job = job
-        self.state = state
         self.dry_run = dry_run
         self.full_refresh = full_refresh
+
         self.force = force
+        self.update_state = update_state
+
+        # not yet used but required to satisfy the interface
+        self.state = state
+        self.select_filter = []
+        self.catalog = None
 
         self.base_output_logger = base_output_logger
 
@@ -105,6 +113,7 @@ class ELBContextBuilder:
         self._job = None
         self._dry_run = False
         self._full_refresh = False
+        self._state_update = True
         self._force = False
         self._state = None
         self._env = {}
@@ -157,6 +166,21 @@ class ELBContextBuilder:
             self
         """
         self._state = state
+        return self
+
+    def with_no_state_update(self, no_state_update: bool):
+        """Set whether this run should not update state.
+
+        By default we typically attempt to track state. This allows avoiding state management.
+
+
+        Args:
+            no_state_update: whether this run should update state.
+
+        Returns:
+            self
+        """
+        self._state_update = not no_state_update
         return self
 
     def with_force(self, force: bool):
@@ -269,6 +293,7 @@ class ELBContextBuilder:
             full_refresh=self._full_refresh,
             force=self._force,
             state=self._state,
+            update_state=self._state_update,
             base_output_logger=self._base_output_logger,
         )
 
@@ -294,15 +319,18 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             config_service=self.context.plugins_service.config_service,
         )
 
-        job = Job(job_id=generate_job_id(self.context.project, self.head, self.tail))
-        self.context.job = job
-
-        log_file = "run.log"
-        if self.context.job:
-            job_logging_service = JobLoggingService(self.context.project)
-            log_file = job_logging_service.generate_log_name(
-                self.context.job.job_id, self.context.job.run_id
+        if self.context.update_state:
+            job = Job(
+                job_id=generate_job_id(self.context.project, self.head, self.tail)
             )
+            self.context.job = job
+
+            log_file = "run.log"
+            if self.context.job:
+                job_logging_service = JobLoggingService(self.context.project)
+                log_file = job_logging_service.generate_log_name(
+                    self.context.job.job_id, self.context.job.run_id
+                )
 
         self.output_logger = OutputLogger(log_file)
 
@@ -396,15 +424,16 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
         job = self.context.job
-        StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
 
-        if not self.context.force:
-            existing = JobFinder(job.job_id).latest_running(self.context.session)
-            if existing:
-                raise RunnerError(
-                    f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
-                    + "To ignore this check use the '--force' option."
-                )
+        if job:
+            StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
+            if not self.context.force:
+                existing = JobFinder(job.job_id).latest_running(self.context.session)
+                if existing:
+                    raise RunnerError(
+                        f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                        + "To ignore this check use the '--force' option."
+                    )
 
         try:  # noqa: WPS501
             async with job.run(self.context.session):

@@ -24,6 +24,11 @@ logger = structlog.getLogger(__name__)
     is_flag=True,
 )
 @click.option(
+    "--no-state-update",
+    help="Run without state saving. Applies to all pipelines.",
+    is_flag=True,
+)
+@click.option(
     "--force",
     "-f",
     help="Force a new run even if a pipeline with the same Job ID is already present. Applies to all pipelines.",
@@ -35,7 +40,7 @@ logger = structlog.getLogger(__name__)
 )
 @pass_project(migrate=True)
 @click_run_async
-async def run(project, full_refresh, force, blocks):
+async def run(project, full_refresh, no_state_update, force, blocks):
     """
     Run a set of command blocks in series.
 
@@ -53,7 +58,7 @@ async def run(project, full_refresh, force, blocks):
 
     \b\nRead more at https://meltano.com/docs/command-line-interface.html#run
     """
-    parser = BlockParser(logger, project, blocks, full_refresh, force)
+    parser = BlockParser(logger, project, blocks, full_refresh, no_state_update, force)
     parsed_blocks = list(parser.find_blocks(0))
     if not parsed_blocks:
         logger.info("No valid blocks found.")
