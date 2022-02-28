@@ -17,7 +17,7 @@ for incremental jobs. For additional backgrounds and discussions on this see:
 ## Decision
 
 We will add initial incremental job support to `meltano run`. Functionality in this iteration is limited to
-unconfigurable ID's auto-generated using the tap and target pair names and environment name (when present). Yielding the format of `{environment_name}:{tap_name}-to-{target_name}`.
+unconfigurable ID's auto-generated using the tap and target pair names and environment name (when present). Yielding the format of `{environment_name}:{tap_name}-to-{target_name}` or `{tap_name}-to-{target_name}` when no environment name is present.
 
 - This version will attempt to run incrementally/save state by default. However, three top level flags are provided to alter behaviour:
   - `--no-state-update` will disable state saving for this invocation.
@@ -33,6 +33,7 @@ unconfigurable ID's auto-generated using the tap and target pair names and envir
 `meltano run` closes in on feature parity with the legacy `elt` command, and it becomes possible to use `run` for incremental jobs.
 
 However, since users are unable to specify a custom ID `meltano run` can not yet take over for existing job's that have an ID that does not match the auto-generated string.
+This is a limitation will be alleviated with the implementation of the `meltano state` command (ref: [#2754](https://gitlab.com/meltano/meltano/-/issues/2754)) which is specifically targeted to help people migrate their existing job states to the new naming convention.
 Additionally, since mapping names are not used in ID generation users could end up with unintended ID collisions e.g:
 
 ```
