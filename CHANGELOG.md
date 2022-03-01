@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3130](https://gitlab.com/meltano/meltano/-/issues/3130) Add support for incremental jobs to `meltano run`
+
 ### Fixes
 
 ### Breaks
