@@ -53,7 +53,10 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         subject.set_user_id(str(self.client_id))
         if endpoints:
             self.snowplow_tracker = Tracker(
-                [Emitter(endpoint) for endpoint in endpoints],
+                [
+                    Emitter(endpoint, request_timeout=self.request_timeout)
+                    for endpoint in endpoints
+                ],
                 subject=subject,
             )
         else:
