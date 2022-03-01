@@ -616,7 +616,7 @@ Here is a technical breakdown:
 Meltano uses an approval workflow for all merge requests.
 
 1. Create your merge request
-1. Assign the merge request to any eligible approvers as show in the Gitlab MR UI (or specified in [CODEOWNERS](https://gitlab.com/meltano/meltano/-/blob/master/.gitlab/CODEOWNERS))  for a review cycle
+1. Assign the merge request to any eligible approvers as shown in the Gitlab MR UI (or specified in [CODEOWNERS](https://gitlab.com/meltano/meltano/-/blob/master/.gitlab/CODEOWNERS))  for a review cycle
 1. Once the review is done the reviewer may approve the merge request or send it back for further iteration
 1. Once approved, the merge request can be merged by any Meltano maintainer
 
