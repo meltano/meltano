@@ -1,8 +1,10 @@
-"""meltano run command and supporting functions."""
+"""meltano run command and supporting test functions."""
 from typing import List, Union
 
 import click
 import structlog
+from sqlalchemy.orm import Session
+
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -10,7 +12,6 @@ from meltano.core.db import project_engine
 from meltano.core.runner import RunnerError
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
-from sqlalchemy.orm import Session
 
 from . import CliError, cli
 from .params import pass_project
