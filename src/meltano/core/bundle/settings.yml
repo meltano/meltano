@@ -179,3 +179,8 @@ settings:
 - name: tracking_ids.ui_embed
   value: UA-132758957-6
   env_aliases: [MELTANO_EMBED_TRACKING_ID]
+
+# Snowplow Tracking
+- name: snowplow_endpoints
+  kind: array
+  value: ["TODO: hardcode Meltano collector endpoint"]
