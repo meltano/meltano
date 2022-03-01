@@ -199,16 +199,15 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             category: The category of the event.
             action: The action of the event.
         """
-        if self.send_anonymous_usage_stats is False:
+        if self.send_anonymous_usage_stats is False or self.snowplow_tracker is None:
             # Only send anonymous usage stats if you have explicit permission
             return
 
-        if self.snowplow_tracker:
-            self.snowplow_tracker.track_struct_event(
-                category=category,
-                action=action,
-                label=self.project_id,
-            )
+        self.snowplow_tracker.track_struct_event(
+            category=category,
+            action=action,
+            label=self.project_id,
+        )
 
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
         """Track the initialization of a Meltano project.
