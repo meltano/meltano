@@ -9,11 +9,12 @@ import uuid
 from typing import Any
 
 import requests
-from snowplow_tracker import Emitter, Subject, Tracker
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
+
+from .snowplow_tracker import get_snowplow_tracker
 
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
@@ -48,18 +49,14 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.project_id = self.load_project_id()
         self.client_id = self.load_client_id()
 
-        endpoints: list[str] = self.settings_service.get("snowplow.collector_endpoints")
-        subject = Subject()
-        subject.set_user_id(str(self.client_id))
-        if endpoints:
-            self.snowplow_tracker = Tracker(
-                [
-                    Emitter(endpoint, request_timeout=self.request_timeout)
-                    for endpoint in endpoints
-                ],
-                subject=subject,
+        try:
+            self.snowplow_tracker = get_snowplow_tracker(
+                project,
+                user_id=str(self.client_id),
+                request_timeout=self.request_timeout,
             )
-        else:
+        except ValueError as exc:
+            logging.debug("No Snowplow collector endpoints are set", exc_info=exc)
             self.snowplow_tracker = None
 
     def load_project_id(self) -> uuid.UUID:
