@@ -192,6 +192,7 @@
                         "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
                         "additionalProperties": {
                             "type": "object",
+                            "required": ["args"],
                             "properties": {
                                 "args": {
                                     "type": "string",
