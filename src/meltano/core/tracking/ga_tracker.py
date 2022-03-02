@@ -55,8 +55,8 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
                 user_id=str(self.client_id),
                 request_timeout=self.request_timeout,
             )
-        except ValueError as exc:
-            logging.debug("No Snowplow collector endpoints are set", exc_info=exc)
+        except ValueError:
+            logging.debug("No Snowplow collector endpoints are set")
             self.snowplow_tracker = None
 
     def load_project_id(self) -> uuid.UUID:
