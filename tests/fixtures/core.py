@@ -29,6 +29,7 @@ from meltano.core.project_plugins_service import (
     PluginAlreadyAddedException,
     ProjectPluginsService,
 )
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 
 PROJECT_NAME = "a_meltano_project"
@@ -452,6 +453,8 @@ def project(test_dir, project_init_service):
     # empty out the `plugins`
     with project.meltano_update() as meltano:
         meltano.plugins = Canonical()
+
+    ProjectSettingsService(project).set("snowplow.collector_endpoints", "[]")
 
     # cd into the new project root
     os.chdir(project.root)

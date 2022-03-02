@@ -48,7 +48,7 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.project_id = self.load_project_id()
         self.client_id = self.load_client_id()
 
-        endpoints: list[str] = self.settings_service.get("snowplow_endpoints")
+        endpoints: list[str] = self.settings_service.get("snowplow.collector_endpoints")
         subject = Subject()
         subject.set_user_id(str(self.client_id))
         if endpoints:
