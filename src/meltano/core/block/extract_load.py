@@ -292,7 +292,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         if not self.context.project.active_environment:
             logger.warning(
-                "No active environment, running without job! See https://docs.meltano.com/reference/command-line-interface#run for details."
+                "No active environment, proceeding with stateless run! See https://docs.meltano.com/reference/command-line-interface#run for details."
             )
             self.context.job = None
 
