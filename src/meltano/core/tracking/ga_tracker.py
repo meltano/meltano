@@ -14,7 +14,7 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
 
-from .snowplow_tracker import get_snowplow_tracker
+from .snowplow_tracker import SnowplowTracker
 
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
@@ -50,9 +50,8 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.client_id = self.load_client_id()
 
         try:
-            self.snowplow_tracker = get_snowplow_tracker(
+            self.snowplow_tracker = SnowplowTracker(
                 project,
-                user_id=str(self.client_id),
                 request_timeout=self.request_timeout,
             )
         except ValueError:
