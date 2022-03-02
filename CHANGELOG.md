@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3289](https://gitlab.com/meltano/meltano/-/issues/3289) In `target-bigquery` default variant `adswerve`, set the default of the `merge_state_messages` setting to `false` so state objects are not merged by the target.
+
 ### Breaks
 
 

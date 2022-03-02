@@ -2197,6 +2197,7 @@ loaders:
           description: Whether to merge multiple state messages from the tap into the state
             file or uses the last state message as the state file.
           label: Merge State Messages
+          value: false
         - name: table_config
           description: A path to a file containing the definition of partitioning and clustering.
           label: Table Config
