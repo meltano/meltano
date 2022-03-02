@@ -1,4 +1,4 @@
-# Meltano: your DataOps OS
+# Meltano: Your DataOps OS
 
 [![pipeline status](https://gitlab.com/meltano/meltano/badges/master/pipeline.svg)](https://gitlab.com/meltano/meltano/commits/master)
 
