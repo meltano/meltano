@@ -250,9 +250,10 @@ async def _run_elt(log, context_builder, output_logger):
                 log.info("Transformation skipped.")
         except RunnerError as err:
             raise CliError(
-                f"ELT could not be completed: {err}\n"
-                + f"For more detailed log messages, check the generated log file '{output_logger.file}' "
-                + "or re-run the command using the '--log-level=debug' CLI flag."
+                f"ELT could not be completed: {err}.\n"
+                + "For more detailed log messages re-run the command using 'meltano --log-level=debug ...' CLI flag.\n"
+                + f"Note that you can also check the generated log file at '{output_logger.file}'.\n"
+                + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging" 
             ) from err
 
 
