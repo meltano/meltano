@@ -253,7 +253,7 @@ async def _run_elt(log, context_builder, output_logger):
                 f"ELT could not be completed: {err}.\n"
                 + "For more detailed log messages re-run the command using 'meltano --log-level=debug ...' CLI flag.\n"
                 + f"Note that you can also check the generated log file at '{output_logger.file}'.\n"
-                + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging" 
+                + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging"
             ) from err
 
 

@@ -126,10 +126,14 @@ test_log_config = {
     },
 }
 
+
 def failure_help_log_suffix(job_logs_file):
-    return ("For more detailed log messages re-run the command using 'meltano --log-level=debug ...' CLI flag.\n" 
-                  + f"Note that you can also check the generated log file at '{job_logs_file}'.\n"
-                  + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging") 
+    return (
+        "For more detailed log messages re-run the command using 'meltano --log-level=debug ...' CLI flag.\n"
+        + f"Note that you can also check the generated log file at '{job_logs_file}'.\n"
+        + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging"
+    )
+
 
 @pytest.fixture(scope="class")
 def tap_mock_transform(project_add_service):
