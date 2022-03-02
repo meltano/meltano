@@ -121,7 +121,7 @@ def install_batch():
     )
 
     for result in install_results:
-        if not result.sucessful:
+        if not result.successful:
             raise PluginInstallError(result.message)
 
     return jsonify([plugin.canonical() for plugin in related_plugins])
