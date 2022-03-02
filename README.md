@@ -1,4 +1,4 @@
-# Meltano: ELT for the DataOps era
+# Meltano: your DataOps OS
 
 [![pipeline status](https://gitlab.com/meltano/meltano/badges/master/pipeline.svg)](https://gitlab.com/meltano/meltano/commits/master)
 
