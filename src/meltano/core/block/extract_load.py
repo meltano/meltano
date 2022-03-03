@@ -296,7 +296,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             )
             self.context.job = None
 
-        if self.context.update_state and self.context.project.active_environment:
+        elif self.context.update_state:
             job_id = generate_job_id(self.context.project, self.head, self.tail)
             self.context.job = Job(job_id=job_id)
             job_logging_service = JobLoggingService(self.context.project)
