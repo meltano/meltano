@@ -127,6 +127,14 @@ test_log_config = {
 }
 
 
+def failure_help_log_suffix(job_logs_file):
+    return (
+        "For more detailed log messages re-run the command using 'meltano --log-level=debug ...' CLI flag.\n"
+        + f"Note that you can also check the generated log file at '{job_logs_file}'.\n"
+        + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging"
+    )
+
+
 @pytest.fixture(scope="class")
 def tap_mock_transform(project_add_service):
     try:
@@ -456,9 +464,8 @@ class TestCliEltScratchpadOne:
             assert exception_logged(
                 result.stdout + result.stderr,
                 CliError(
-                    "ELT could not be completed: Extractor failed\n"
-                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                    "ELT could not be completed: Extractor failed.\n"
+                    + failure_help_log_suffix(job_logs_file)
                 ),
             )
 
@@ -542,9 +549,8 @@ class TestCliEltScratchpadOne:
             assert exception_logged(
                 result.stdout + result.stderr,
                 CliError(
-                    "ELT could not be completed: Loader failed\n"
-                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                    "ELT could not be completed: Loader failed.\n"
+                    + failure_help_log_suffix(job_logs_file)
                 ),
             )
 
@@ -610,9 +616,8 @@ class TestCliEltScratchpadOne:
             assert exception_logged(
                 result.stdout + result.stderr,
                 CliError(
-                    "ELT could not be completed: Loader failed\n"
-                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                    "ELT could not be completed: Loader failed.\n"
+                    + failure_help_log_suffix(job_logs_file)
                 ),
             )
 
@@ -687,9 +692,8 @@ class TestCliEltScratchpadOne:
             assert exception_logged(
                 result.stdout + result.stderr,
                 CliError(
-                    "ELT could not be completed: Extractor and loader failed\n"
-                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                    "ELT could not be completed: Extractor and loader failed.\n"
+                    + failure_help_log_suffix(job_logs_file)
                 ),
             )
 
@@ -775,9 +779,8 @@ class TestCliEltScratchpadOne:
             assert exception_logged(
                 result.stdout + result.stderr,
                 CliError(
-                    "ELT could not be completed: Output line length limit exceeded\n"
-                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                    "ELT could not be completed: Output line length limit exceeded.\n"
+                    + failure_help_log_suffix(job_logs_file)
                 ),
             )
 
@@ -1136,9 +1139,8 @@ class TestCliEltScratchpadTwo:
             assert exception_logged(
                 result.stderr,
                 CliError(
-                    "ELT could not be completed: `dbt run` failed\n"
-                    + f"For more detailed log messages, check the generated log file '{job_logs_file}' "
-                    + "or re-run the command using the '--log-level=debug' CLI flag."
+                    "ELT could not be completed: `dbt run` failed.\n"
+                    + failure_help_log_suffix(job_logs_file)
                 ),
             )
 
