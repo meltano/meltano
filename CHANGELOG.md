@@ -19,18 +19,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## 1.97.0 - (2022-03-03)
 ---
-- [#2463](https://gitlab.com/meltano/meltano/-/merge_requests/2463) Add CRON interval mechanism and modal to /pipelines page
+
 ### New
 
-- [#3017](https://gitlab.com/meltano/meltano/-/merge_requests/3017) Add Snowplow Tracking to Meltano.
+- [#2463](https://gitlab.com/meltano/meltano/-/merge_requests/2463) Add CRON interval mechanism and modal to /pipelines page.
+- [#3017](https://gitlab.com/meltano/meltano/-/issues/3017) Add Snowplow Tracking to Meltano.
 
 ### Changes
 
-- [#3130](https://gitlab.com/meltano/meltano/-/issues/3130) Add support for incremental jobs to `meltano run`
+- [#3130](https://gitlab.com/meltano/meltano/-/issues/3130) Add support for incremental jobs to `meltano run`.
+- [#3282](https://gitlab.com/meltano/meltano/-/issues/3282) Expand `meltano elt` failure information to help new users find debug logging. _Thanks, **[Derek Visch](https://gitlab.com/vischous)**!_
 
 ### Fixes
 
 - [#3289](https://gitlab.com/meltano/meltano/-/issues/3289) In `target-bigquery` default variant `adswerve`, set the default of the `merge_state_messages` setting to `false` so state objects are not merged by the target.
+- [#3301](https://gitlab.com/meltano/meltano/-/issues/3301) Fix a typo that causes requests to the `/install/batch` endpoint to fail.
 
 
 ## 1.96.0 - (2022-02-18)
