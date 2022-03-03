@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2463](https://gitlab.com/meltano/meltano/-/merge_requests/2463) Add CRON interval mechanism and modal to /pipelines page
 ### New
 
+- [#3017](https://gitlab.com/meltano/meltano/-/merge_requests/3017) Add Snowplow Tracking to Meltano.
+
 ### Changes
 
 - [#3130](https://gitlab.com/meltano/meltano/-/issues/3130) Add support for incremental jobs to `meltano run`
