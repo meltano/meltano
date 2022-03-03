@@ -35,7 +35,8 @@ def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
         [
             "notvalid:8080",
             "https://valid.endpoint:8080",
-            "file://bad.scheme"
+            "file://bad.scheme",
+            "https://other.endpoint/path/to/collector"
         ]
     """
     ProjectSettingsService(project).set("snowplow.collector_endpoints", endpoints)
@@ -52,9 +53,12 @@ def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
     assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
     assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
 
+    assert len(tracker.emitters) == 2
     assert isinstance(tracker.emitters[0], Emitter)
-    assert len(tracker.emitters) == 1
     assert tracker.emitters[0].endpoint == "https://valid.endpoint:8080/i"
+
+    assert isinstance(tracker.emitters[1], Emitter)
+    assert tracker.emitters[1].endpoint == "https://other.endpoint/path/to/collector/i"
 
 
 def test_get_snowplow_tracker_no_endpoints(project):
