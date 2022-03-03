@@ -1,8 +1,6 @@
 """This holds the actual BlockSet meta class as well as related components such as exceptions."""
 from abc import ABCMeta, abstractmethod
 
-from sqlalchemy.orm import Session
-
 
 class BlockSetValidationError(Exception):
     """Base exception when a block in a BlockSet violates the sets requirements."""
@@ -25,18 +23,16 @@ class BlockSet(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    async def run(self, session: Session) -> None:
+    async def run(self) -> None:
         """Do whatever a BlockSet is designed to do."""
         raise NotImplementedError
 
     @abstractmethod
-    async def terminate(self, graceful: bool = True) -> bool:
+    async def terminate(self, graceful: bool = True):
         """Terminate a currently executing BlockSet.
 
         Args:
-            graceful: Whether or not the BlockSet should try to gracefully quit.
-        Returns:
-            Whether or not the BlockSet terminated successfully.
+            graceful: Whether the BlockSet should try to gracefully quit.
         """
         raise NotImplementedError
 
