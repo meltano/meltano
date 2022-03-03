@@ -144,16 +144,14 @@ will hold the [plugins](/concepts/plugins) that implement the various details of
     to easily check the impact of the [`meltano` commands](/reference/command-line-interface)
     you'll run below on your project files, most notably your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
-## Add an environment
+## View and activate your environments
 
-Now that you have your very own Meltano project, it's time to create your first [environment](/concepts/environments) (i.e. dev, test, prod). This allows you to define configurations specific to the environment you're running your project in.
+As part of creating your Meltano project, we automatically added your first [environments](/concepts/environments) called `dev`, `staging` and `prod`. This allows you to define configurations specific to the environment you're running your project in.
 
-1. Add `dev`, `test`, and `prod` environments:
+1. List your available environments:
 
     ```bash
-    meltano environment add dev
-    meltano environment add test
-    meltano environment add prod
+    meltano environment list
     ```
 
 1. Activate your environment for your shell session:
@@ -162,15 +160,13 @@ Now that you have your very own Meltano project, it's time to create your first 
     export MELTANO_ENVIRONMENT=dev
     ```
 
-    Alternatively you can include the `--environment=dev` argument to each meltano command.
+    Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
 
-1. List your available environments:
+1. [optional] Add a new environment:
 
     ```bash
-    meltano environment list
+    meltano environment add <environment name>
     ```
-
-    You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
 
 ## Add an extractor to pull data from a source
 
