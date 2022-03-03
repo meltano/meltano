@@ -118,11 +118,11 @@ class IOBlock(metaclass=ABCMeta):
         return stdout, stderr
 
     @abstractmethod
-    async def pre(self, session: dict) -> None:
+    async def pre(self, context: object) -> None:
         """Execute pre-start tasks.
 
         Args:
-            session: the sqlalchemy session to use for this execution.
+            context: invocation context to use for this execution.
         """
         pass
 

@@ -7,8 +7,10 @@ import structlog
 from async_generator import asynccontextmanager
 from sqlalchemy.orm import Session
 
+from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
-from meltano.core.job import Job
+from meltano.core.job import Job, JobFinder
+from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -27,7 +29,7 @@ from .singer import SingerBlock
 logger = structlog.getLogger(__name__)
 
 
-class ELBContext:
+class ELBContext:  # noqa: WPS230
     """ELBContext holds the context for ELB BlockSets."""
 
     def __init__(
@@ -36,6 +38,9 @@ class ELBContext:
         plugins_service: ProjectPluginsService = None,
         session: Session = None,
         job: Optional[Job] = None,
+        full_refresh: Optional[bool] = False,
+        force: Optional[bool] = False,
+        update_state: Optional[bool] = True,
         base_output_logger: Optional[OutputLogger] = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -45,6 +50,9 @@ class ELBContext:
             plugins_service: The plugins service to use.
             session: The session to use.
             job: The job within this context should run.
+            full_refresh: Whether this is a full refresh.
+            force: Whether to force the execution of the job if it is stale.
+            update_state: Whether to update the state of the job.
             base_output_logger: The base logger to use.
         """
         self.project = project
@@ -52,6 +60,16 @@ class ELBContext:
 
         self.session = session
         self.job = job
+
+        self.full_refresh = full_refresh
+        self.force = force
+        self.update_state = update_state
+
+        # not yet used but required to satisfy the interface
+        self.dry_run = False
+        self.state = None
+        self.select_filter = []
+        self.catalog = None
 
         self.base_output_logger = base_output_logger
 
@@ -73,7 +91,6 @@ class ELBContextBuilder:
         self,
         project: Project,
         plugins_service: ProjectPluginsService = None,
-        session: Session = None,
         job: Optional[Job] = None,
     ):
         """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
@@ -81,18 +98,73 @@ class ELBContextBuilder:
         Args:
             project: the meltano project for the context.
             plugins_service: the plugins service for the context.
-            session: the database session for the context.
             job: the job for this ELT run.
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
-        self.session = session
-        self.job = job
 
+        _, session_maker = project_engine(project)
+        self.session = session_maker()
+
+        self._job = None
+        self._full_refresh = False
+        self._state_update = True
+        self._force = False
         self._env = {}
         self._blocks = []
 
         self._base_output_logger = None
+
+    def with_job(self, job: Job):
+        """Set the associated job for the context.
+
+        Args:
+            job: the initial job for the context.
+
+        Returns:
+            self
+        """
+        self._job = job
+        return self
+
+    def with_full_refresh(self, full_refresh: bool):
+        """Set whether this is a full refresh.
+
+        Args:
+            full_refresh : whether this is a full refresh.
+
+        Returns:
+            self
+        """
+        self._full_refresh = full_refresh
+        return self
+
+    def with_no_state_update(self, no_state_update: bool):
+        """Set whether this run should not update state.
+
+        By default we typically attempt to track state. This allows avoiding state management.
+
+
+        Args:
+            no_state_update: whether this run should update state.
+
+        Returns:
+            self
+        """
+        self._state_update = not no_state_update
+        return self
+
+    def with_force(self, force: bool):
+        """Set whether the execution of the job should be forced if it is stale.
+
+        Args:
+            force: Whether to force the execution of the job if it is stale.
+
+        Returns:
+            self
+        """
+        self._force = force
+        return self
 
     def make_block(
         self,
@@ -174,8 +246,8 @@ class ELBContextBuilder:
         Returns:
             The run directory for the current job.
         """
-        if self.job:
-            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+        if self._job:
+            return self.project.job_dir(self._job.job_id, str(self._job.run_id))
 
     def context(self) -> ELBContext:
         """Create an ELBContext object from the current builder state.
@@ -187,7 +259,10 @@ class ELBContextBuilder:
             project=self.project,
             plugins_service=self.plugins_service,
             session=self.session,
-            job=self.job,
+            job=self._job,
+            full_refresh=self._full_refresh,
+            force=self._force,
+            update_state=self._state_update,
             base_output_logger=self._base_output_logger,
         )
 
@@ -197,7 +272,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
     def __init__(
         self,
-        context: ELBContextBuilder,
+        context: ELBContext,
         blocks: Tuple[IOBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
@@ -213,14 +288,22 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             config_service=self.context.plugins_service.config_service,
         )
 
-        log_file = "run.log"
-        if self.context.job:
+        self.output_logger = OutputLogger(None)
+
+        if not self.context.project.active_environment:
+            logger.warning(
+                "No active environment, proceeding with stateless run! See https://docs.meltano.com/reference/command-line-interface#run for details."
+            )
+            self.context.job = None
+
+        elif self.context.update_state:
+            job_id = generate_job_id(self.context.project, self.head, self.tail)
+            self.context.job = Job(job_id=job_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
                 self.context.job.job_id, self.context.job.run_id
             )
-
-        self.output_logger = OutputLogger(log_file)
+            self.output_logger = OutputLogger(log_file)
 
         self._process_futures = None
         self._stdout_futures = None
@@ -305,25 +388,46 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     "intermediate blocks must be producers AND consumers"
                 )
 
-    async def run(self, session) -> bool:
-        """Build the IO chain and execute the actual ELT task.
-
-        Args:
-            session: the session to use for this run.
-
-        Returns:
-            True if the task completed successfully, False otherwise.
-
-        Raises:
-            RunnerError if failures are encountered during execution.
-        """
-        async with self._start_blocks(session):
+    async def execute(self) -> None:
+        """Build the IO chain and execute the actual ELT task."""
+        async with self._start_blocks():
             await self._link_io()
             manager = ELBExecutionManager(self)
             await manager.run()
-            return True
 
-    async def terminate(self, graceful: bool = False) -> bool:
+    async def run(self) -> None:
+        """Run the ELT task."""
+        if self.context.job:
+            # TODO: legacy `meltano elt` style logging should be deprecated
+            legacy_log_handler = self.output_logger.out("meltano", logger)
+            with legacy_log_handler.redirect_logging():
+                await self.run_with_job()
+                return
+        await self.execute()
+
+    async def run_with_job(self) -> None:
+        """Run the ELT task within the context of a job.
+
+        Raises:
+            RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
+        """
+        job = self.context.job
+        StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
+        if not self.context.force:
+            existing = JobFinder(job.job_id).latest_running(self.context.session)
+            if existing:
+                raise RunnerError(
+                    f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                    + "To ignore this check use the '--force' option."
+                )
+
+        try:  # noqa: WPS501
+            async with job.run(self.context.session):
+                await self.execute()
+        finally:
+            self.context.session.close()
+
+    async def terminate(self, graceful: bool = False) -> None:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
 
         Not actually implemented yet.
@@ -338,7 +442,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             raise NotImplementedError
 
         for block in self.blocks:
-            block.stop(kill=True)
+            await block.stop(kill=True)
 
     @property
     def process_futures(self) -> List[asyncio.Task]:
@@ -401,18 +505,15 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self, session) -> AsyncIterator[None]:
+    async def _start_blocks(self) -> AsyncIterator[None]:
         """Start the blocks in the block set.
-
-        Args:
-            session: The session to use for the blocks.
 
         Yields:
             None
         """
         try:  # noqa:  WPS229
             for block in self.blocks:
-                await block.pre({"session": session})
+                await block.pre(self.context)
                 await block.start()
             yield
         finally:
@@ -511,7 +612,7 @@ class ELBExecutionManager:
 
     async def _wait_for_process_completion(  # noqa: WPS213 WPS217
         self, current_head: IOBlock
-    ) -> Tuple[int, int]:
+    ) -> Optional[Tuple[int, int]]:
         """Wait for the current head block to complete or for an error to occur.
 
         Args:
@@ -650,3 +751,22 @@ def _check_exit_codes(  # noqa: WPS238
 
     if failed_mappers:
         raise RunnerError("Mappers failed", failed_mappers)
+
+
+def generate_job_id(project: Project, consumer: IOBlock, producer: IOBlock) -> str:
+    """Generate a job id based on a project active environment and consumer and producer names.
+
+    Args:
+        project: Project to retrieve active environment from.
+        consumer: Consumer block.
+        producer: Producer block.
+
+    Returns:
+        Job id string.
+
+    Raises:
+        RunnerError: if the project does not have an active environment.
+    """
+    if not project.active_environment:
+        raise RunnerError("No active environment for invocation, but requested job id")
+    return f"{project.active_environment.name}:{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237
