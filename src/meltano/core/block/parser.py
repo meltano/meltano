@@ -4,16 +4,15 @@ from typing import Dict, Generator, List, Optional, Tuple, Union
 import click
 import structlog
 
-from meltano.core.block.blockset import BlockSet, BlockSetValidationError
-from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
-from meltano.core.block.ioblock import IOBlock
-from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
-from meltano.core.block.singer import CONSUMERS, SingerBlock
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
+
+from .blockset import BlockSet, BlockSetValidationError
+from .extract_load import ELBContextBuilder, ExtractLoadBlocks
+from .plugin_command import PluginCommandBlock, plugin_command_invoker
+from .singer import CONSUMERS, SingerBlock
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
@@ -30,24 +29,6 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
         PluginType.LOADERS,
         PluginType.MAPPERS,
     }
-
-
-def generate_job_id(
-    project: Project, consumer: IOBlock, producer: IOBlock
-) -> Union[str, None]:
-    """Generate a job id based on a project active environment and consumer and producer names.
-
-    Args:
-        project: Project to retrieve active environment from.
-        consumer: Consumer block.
-        producer: Producer block.
-
-    Returns:
-        Job id or None if project active environment is not set.
-    """
-    if project.active_environment:
-        return f"{project.active_environment.name}-{consumer.string_id}-{producer.string_id}"  # noqa: WPS237
-    return None
 
 
 def validate_block_sets(
@@ -79,7 +60,9 @@ class BlockParser:  # noqa: D101
         log: structlog.BoundLogger,
         project,
         blocks: List[str],
-        session=None,
+        full_refresh: Optional[bool] = False,
+        no_state_update: Optional[bool] = False,
+        force: Optional[bool] = False,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
@@ -88,14 +71,19 @@ class BlockParser:  # noqa: D101
             log: Logger to use.
             project: Project to use.
             blocks: List of block names to parse.
-            session: Optional session to use.
+            full_refresh: Whether to perform a full refresh (applies to all found sets).
+            no_state_update: Whether to run with or without state updates.
+            force: Whether to force a run if a job is already running (applies to all found sets).
 
         Raises:
             ClickException: If a block name is not found.
         """
         self.log = log
         self.project = project
-        self.session = session
+
+        self._full_refresh = full_refresh
+        self._no_state_update = no_state_update
+        self._force = force
 
         self._plugins_service = ProjectPluginsService(project)
         self._plugins: List[ProjectPlugin] = []
@@ -155,7 +143,6 @@ class BlockParser:  # noqa: D101
                 yield plugin_command_invoker(
                     self._plugins[cur],
                     self.project,
-                    session=self.session,
                     command=self._commands.get(plugin),
                 )
                 cur += 1
@@ -215,7 +202,14 @@ class BlockParser:  # noqa: D101
         """
         blocks: List[SingerBlock] = []
 
-        builder = ELBContextBuilder(self.project, self._plugins_service, self.session)
+        base_builder = ELBContextBuilder(
+            self.project, self._plugins_service
+        )  # lint work around
+        builder = (
+            base_builder.with_force(self._force)
+            .with_full_refresh(self._full_refresh)
+            .with_no_state_update(self._no_state_update)
+        )
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:
             self.log.debug(
