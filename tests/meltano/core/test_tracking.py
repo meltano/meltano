@@ -1,3 +1,4 @@
+import logging
 import os
 
 import pytest
@@ -27,6 +28,33 @@ def test_get_snowplow_tracker(project):
     assert tracker.subject.standard_nv_pairs["uid"] == "some-user-id"
     assert isinstance(tracker.emitters[0], Emitter)
     assert tracker.emitters[0].endpoint == "http://mycollector:8080/i"
+
+
+def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
+    endpoints = """
+        [
+            "notvalid:8080",
+            "https://valid.endpoint:8080",
+            "file://bad.scheme"
+        ]
+    """
+    ProjectSettingsService(project).set("snowplow.collector_endpoints", endpoints)
+
+    with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
+        tracker = SnowplowTracker(project)
+
+    assert len(caplog.records) == 2
+    assert caplog.records[0].levelname == "WARNING"
+    assert caplog.records[0].msg["event"] == "invalid_snowplow_endpoint"
+    assert caplog.records[0].msg["endpoint"] == "notvalid:8080"
+
+    assert caplog.records[1].levelname == "WARNING"
+    assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
+    assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
+
+    assert isinstance(tracker.emitters[0], Emitter)
+    assert len(tracker.emitters) == 1
+    assert tracker.emitters[0].endpoint == "https://valid.endpoint:8080/i"
 
 
 def test_get_snowplow_tracker_no_endpoints(project):
