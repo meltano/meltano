@@ -12,12 +12,18 @@ from meltano.core.block.extract_load import (
     ELBContext,
     ELBContextBuilder,
     ExtractLoadBlocks,
+    generate_job_id,
 )
+from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.singer import SingerBlock
+from meltano.core.environment import Environment
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging import OutputLogger
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
 TEST_JOB_ID = "test_job"
@@ -49,12 +55,13 @@ def output_logger() -> OutputLogger:
 
 @pytest.fixture
 def elb_context(project, session, test_job, output_logger) -> ELBContext:
-    return ELBContext(
+    ctx = ELBContext(
         project=project,
-        session=session,
         job=test_job,
         base_output_logger=output_logger,
     )
+    ctx.session = session
+    return ctx
 
 
 class TestELBContext:
@@ -64,6 +71,13 @@ class TestELBContext:
 
 
 class TestELBContextBuilder:
+    @pytest.fixture
+    def target_postgres(self, project_add_service):
+        try:
+            return project_add_service.add(PluginType.LOADERS, "target-postgres")
+        except PluginAlreadyAddedException as err:
+            return err.plugin
+
     def test_builder_returns_elb_context(
         self, project, session, project_plugins_service, tap, target
     ):
@@ -71,9 +85,10 @@ class TestELBContextBuilder:
         builder = ELBContextBuilder(
             project=project,
             plugins_service=project_plugins_service,
-            session=session,
             job=None,
         )
+        builder.session = session
+
         assert isinstance(builder.context(), ELBContext)
         assert isinstance(builder.make_block(tap).invoker.context, ELBContext)
 
@@ -84,9 +99,10 @@ class TestELBContextBuilder:
         builder = ELBContextBuilder(
             project=project,
             plugins_service=project_plugins_service,
-            session=session,
             job=None,
         )
+        builder.session = session
+
         block = builder.make_block(tap)
         assert block.string_id == tap.name
         assert block.producer
@@ -104,9 +120,10 @@ class TestELBContextBuilder:
         builder = ELBContextBuilder(
             project=project,
             plugins_service=project_plugins_service,
-            session=session,
             job=None,
         )
+        builder.session = session
+
         block = builder.make_block(tap)
         assert block.string_id == tap.name
         initial_dict = builder._env.copy()
@@ -116,6 +133,54 @@ class TestELBContextBuilder:
         assert initial_dict.items() <= builder._env.items()
         assert builder._env.items() >= block.context.env.items()
         assert builder._env.items() >= block2.context.env.items()
+
+    @pytest.mark.asyncio
+    async def test_validate_envs(
+        self, project, session, project_plugins_service, tap, target_postgres
+    ):
+        """Ensure that expected environment variables are present."""
+        builder = ELBContextBuilder(
+            project=project,
+            plugins_service=project_plugins_service,
+            job=None,
+        )
+        builder.session = session
+
+        block = builder.make_block(tap)
+        assert block.string_id == tap.name
+        assert block.producer
+        assert not block.consumer
+
+        async with block.invoker.prepared(session):
+            tap_env = block.invoker.env()
+
+        assert tap_env["MELTANO_EXTRACTOR_NAME"] == tap.name
+        assert tap_env["MELTANO_EXTRACTOR_NAMESPACE"] == tap.namespace
+        assert tap_env["MELTANO_EXTRACTOR_VARIANT"] == tap.variant
+
+        block = builder.make_block(target_postgres)
+        assert block.string_id == target_postgres.name
+        assert block.consumer
+        assert not block.producer
+
+        async with block.invoker.prepared(session):
+            target_env = block.invoker.env()
+
+        assert target_env["MELTANO_LOADER_NAME"] == target_postgres.name
+        assert target_env["MELTANO_LOADER_NAMESPACE"] == target_postgres.namespace
+        assert target_env["MELTANO_LOADER_VARIANT"] == target_postgres.variant
+
+        assert (
+            target_env["MELTANO_LOAD_HOST"]
+            == target_env["PG_ADDRESS"]
+            == os.getenv("PG_ADDRESS", "localhost")
+        )
+        assert (
+            target_env["MELTANO_LOAD_DEFAULT_TARGET_SCHEMA"]
+            == target_env["PG_SCHEMA"]
+            == target_env["MELTANO_EXTRACT__LOAD_SCHEMA"]
+            == target_env["MELTANO_EXTRACTOR_NAMESPACE"]
+        )
 
 
 class TestExtractLoadBlocks:
@@ -226,9 +291,7 @@ class TestExtractLoadBlocks:
         invoke_async = CoroutineMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async:
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             blocks = (
                 SingerBlock(
                     block_ctx=elb_context,
@@ -257,7 +320,7 @@ class TestExtractLoadBlocks:
             elb.validate_set()
 
             for block in elb.blocks:
-                await block.pre({"session": session})
+                await block.pre(elb.context)
                 await block.start()
 
             await elb._link_io()
@@ -319,9 +382,7 @@ class TestExtractLoadBlocks:
         invoke_async = CoroutineMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async:
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
 
             blocks = (
                 SingerBlock(
@@ -349,7 +410,7 @@ class TestExtractLoadBlocks:
 
             elb = ExtractLoadBlocks(elb_context, blocks)
             elb.validate_set()
-            assert await elb.run(session)
+            await elb.run()
 
             assert tap_process.wait.called
             assert tap_process.stdout.readline.called
@@ -393,9 +454,7 @@ class TestExtractLoadBlocks:
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
         invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
-        with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async:
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
 
             blocks = (
                 SingerBlock(
@@ -411,7 +470,7 @@ class TestExtractLoadBlocks:
 
             with pytest.raises(
                 BlockSetValidationError,
-                match=r"^.*: last block in set should not be a producer",
+                match="^.*: last block in set should not be a producer",
             ):
                 elb.validate_set()
 
@@ -434,7 +493,7 @@ class TestExtractLoadBlocks:
             elb = ExtractLoadBlocks(elb_context, blocks)
             with pytest.raises(
                 BlockSetValidationError,
-                match=r"^.*: first block in set should not be consumer",
+                match="^.*: first block in set should not be consumer",
             ):
                 elb.validate_set()
 
@@ -464,6 +523,109 @@ class TestExtractLoadBlocks:
             elb = ExtractLoadBlocks(elb_context, blocks)
             with pytest.raises(
                 BlockSetValidationError,
-                match=r"^.*: intermediate blocks must be producers AND consumers",
+                match="^.*: intermediate blocks must be producers AND consumers",
             ):
                 elb.validate_set()
+
+    @pytest.mark.asyncio
+    async def test_elb_with_job_context(
+        self,
+        session,
+        subject,
+        tap_config_dir,
+        mapper_config_dir,
+        target_config_dir,
+        tap,
+        mapper,
+        target,
+        tap_process,
+        mapper_process,
+        target_process,
+        plugin_invoker_factory,
+        elb_context,
+        project,
+    ):
+        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stdout.at_eof.side_effect = (False, False, True)
+        tap_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        mapper_process.sterr.at_eof.side_effect = True
+        mapper_process.stdout.at_eof.side_effect = (False, False, True)
+        mapper_process.stdout.readline = CoroutineMock(
+            side_effect=(
+                b"%b" % json.dumps({"key": "mapper-value"}).encode(),
+                b"%b" % MOCK_RECORD_MESSAGE.encode(),
+            )
+        )
+
+        tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        mapper_invoker = plugin_invoker_factory(mapper, config_dir=mapper_config_dir)
+        target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
+
+        project.active_environment = Environment(name="test")
+
+        invoke_async = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process)
+        )
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
+            blocks = (
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=tap_invoker,
+                    plugin_args=[],
+                ),
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=mapper_invoker,
+                    plugin_args=[],
+                ),
+                SingerBlock(
+                    block_ctx=elb_context,
+                    project=elb_context.project,
+                    plugins_service=elb_context.plugins_service,
+                    plugin_invoker=target_invoker,
+                    plugin_args=[],
+                ),
+            )
+
+            elb = ExtractLoadBlocks(elb_context, blocks)
+            elb.validate_set()
+
+            assert elb.context.job.job_id == "test:tap-mock-to-target-mock"
+
+            # just to be sure, we'll double-check the job_id is the same for each block
+            for block in blocks:
+                assert block.context.job.job_id == "test:tap-mock-to-target-mock"
+
+            elb.run_with_job = CoroutineMock()
+
+            await elb.run()
+            assert elb.run_with_job.call_count == 1
+
+
+class TestExtractLoadUtils:
+    def test_generate_job_id(self):
+        """Verify that the job id is generated correctly when an environment is provided."""
+        block1 = mock.Mock(spec=IOBlock)
+        block1.string_id = "block1"
+
+        block2 = mock.Mock(spec=IOBlock)
+        block2.string_id = "block2"
+
+        project = mock.Mock()
+
+        project.active_environment = None
+        with pytest.raises(RunnerError):
+            assert generate_job_id(project, block1, block2) == "block1-to-block2"
+
+        project.active_environment = Environment(name="test")
+        assert generate_job_id(project, block1, block2) == "test:block1-to-block2"

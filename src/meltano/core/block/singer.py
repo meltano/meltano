@@ -28,7 +28,7 @@ class ProcessWaitError(Exception):
     """Raised when a process can be waited on."""
 
 
-class InvokerBase:  # noqa: WPS230
+class InvokerBase:  # noqa: WPS230, WPS214
     """Base class for creating IOBlock's built on top of existing Meltano plugins."""
 
     def __init__(
@@ -61,10 +61,10 @@ class InvokerBase:  # noqa: WPS230
         self.outputs = []
         self.err_outputs = []
 
-        self.process_handle: Process = None
-        self._process_future: asyncio.Task = None
-        self._stdout_future: asyncio.Task = None
-        self._stderr_future: asyncio.Task = None
+        self.process_handle: Optional[Process] = None
+        self._process_future: Optional[asyncio.Task] = None
+        self._stdout_future: Optional[asyncio.Task] = None
+        self._stderr_future: Optional[asyncio.Task] = None
 
     @property
     def command(self) -> Optional[str]:
@@ -112,7 +112,7 @@ class InvokerBase:  # noqa: WPS230
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:
-            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+            kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:
             return
@@ -144,9 +144,10 @@ class InvokerBase:  # noqa: WPS230
             raise IOLinkError("No IO to proxy, process not running")
 
         if self._stdout_future is None:
+            outputs = self._merge_outputs(self.invoker.StdioSource.STDOUT, self.outputs)
             self._stdout_future = asyncio.ensure_future(
                 # forward subproc stdout to downstream (i.e. targets stdin, loggers)
-                capture_subprocess_output(self.process_handle.stdout, *self.outputs)
+                capture_subprocess_output(self.process_handle.stdout, *outputs)
             )
         return self._stdout_future
 
@@ -163,8 +164,11 @@ class InvokerBase:  # noqa: WPS230
             raise IOLinkError("No IO to proxy, process not running")
 
         if self._stderr_future is None:
+            err_outputs = self._merge_outputs(
+                self.invoker.StdioSource.STDERR, self.err_outputs
+            )
             self._stderr_future = asyncio.ensure_future(
-                capture_subprocess_output(self.process_handle.stderr, *self.err_outputs)
+                capture_subprocess_output(self.process_handle.stderr, *err_outputs)
             )
         return self._stderr_future
 
@@ -240,13 +244,14 @@ class InvokerBase:  # noqa: WPS230
         else:
             raise IOLinkError("IO capture already in flight")
 
-    async def pre(self, context: Dict) -> None:
+    async def pre(self, context) -> None:
         """Pre triggers preparation of the underlying plugin.
 
         Args:
-            context: The context to obtain the session from when the invoker is prepared.
+            context: The context with which to update the invoker
         """
-        await self.invoker.prepare(context.get("session"))
+        self.invoker.context = context
+        await self.invoker.prepare(context.session)
 
     async def post(self) -> None:
         """Post triggers resetting the underlying plugin config."""
@@ -256,6 +261,14 @@ class InvokerBase:  # noqa: WPS230
             # TODO: should we preserve these on a failure ?
             # the invoker prepared context manager was able to clean up the configs
             pass
+
+    def _merge_outputs(self, source: str, outputs: list) -> list:
+        if not self.invoker.output_handlers:
+            return outputs
+
+        merged_outputs = self.invoker.output_handlers.get(source, [])
+        merged_outputs.extend(outputs)
+        return merged_outputs
 
 
 class SingerBlock(InvokerBase, IOBlock):
