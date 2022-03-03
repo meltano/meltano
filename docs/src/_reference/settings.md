@@ -919,7 +919,7 @@ export OAUTH_GITLAB_CLIENT_SECRET=<gitlab-client-secret>
 export OAUTH_GITLAB_SECRET=<gitlab-client-secret>
 ```
 
-## Analytics Tracking IDs
+## Analytics Tracking IDs (deprecated, will be removed in a future version)
 
 Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
 
@@ -964,3 +964,12 @@ meltano config meltano set tracking_ids ui_embed UA-123456789-3
 export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3
 export MELTANO_EMBED_TRACKING_ID=UA-123456789-3
 ```
+
+## Snowplow Tracking
+
+### `snowplow.collector_endpoints`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS`
+- Default: `["http://sp.meltano.com"]`
+
+Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
