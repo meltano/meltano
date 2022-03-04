@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 @cli.command(short_help="Create a new Meltano project.")
 @click.pass_context
-@click.argument("project_name")
+@click.argument("project_name", default="default")
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
@@ -30,10 +30,14 @@ def init(ctx, project_name, no_usage_stats):
     r"""
     Create a new Meltano project.
 
-    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#init
+    Read more at https://docs.meltano.com/reference/command-line-interface#init
 
     """
     logging.getLogger("snowplow_tracker.emitters").setLevel(logging.ERROR)
+
+    if project_name == "default":
+        click.echo("We need a project name to get started!")
+        project_name = click.prompt("Enter a name now to create a Meltano project")
 
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
