@@ -1,6 +1,4 @@
 test_meltano_ui:
-  extends:
-    - .skip_docs_rules
   stage: test
   image: node:10.16.2
   script:

@@ -1,7 +1,5 @@
 .test:
-  extends:
-    - .parallel:python_image_version
-    - .skip_docs
+  extends: .parallel:python_image_version
   stage: test
   image:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA-python$PYTHON_IMAGE_VERSION
