@@ -16,6 +16,7 @@ from . import (  # isort:skip # noqa: F401, WPS235
     add,
     config,
     discovery,
+    dragon,
     elt,
     environment,
     initialize,
