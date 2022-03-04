@@ -23,19 +23,23 @@
 # Manages:
 #  - meltano/meltano:<sha>-python<version>
 meltano_dev:
-  extends: .build_prod
+  extends:
+    - .build_prod
+    - .skip_docs
   only:
     - branches@meltano/meltano
   except:
-    - master
+    refs:
+      - master
 
 # Manages:
 #  - <fork namespace>/meltano:<sha>-python<version>
 meltano_dev_forks:
   extends: .build_prod
   except:
-    - branches@meltano/meltano
-    - tags@meltano/meltano
+    refs:
+      - branches@meltano/meltano
+      - tags@meltano/meltano
 
 # Manages:
 #  - meltano/meltano:<sha>-python<version>
