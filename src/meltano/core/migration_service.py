@@ -51,9 +51,6 @@ class MigrationService:
 
         context = MigrationContext.configure(conn)
 
-        if silent:
-            migration_logger.setLevel(original_log_level)
-
         try:
             # try to find the locked version
             HEAD = LOCK_PATH.open().read().strip()
@@ -62,6 +59,8 @@ class MigrationService:
             if not silent:
                 click.secho(f"Upgrading database to {HEAD}")
             command.upgrade(cfg, HEAD)
+            if silent:
+                migration_logger.setLevel(original_log_level)
         except FileNotFoundError:
             raise MigrationError(
                 "Cannot upgrade the system database, revision lock not found."
