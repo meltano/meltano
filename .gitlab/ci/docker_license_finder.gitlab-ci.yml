@@ -1,5 +1,4 @@
 docker_licnese_finder:
-  extends: .skip_docs
   stage: build-meltano
   image: "docker:latest"
   services:
