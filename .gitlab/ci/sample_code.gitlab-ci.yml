@@ -1,5 +1,7 @@
 .sample_code:
-  extends: .parallel:python_version
+  extends:
+    - .parallel:python_version
+    - .skip_docs
   stage: test
   image: python:$PYTHON_VERSION
   variables:
@@ -177,7 +179,8 @@ homepage_sample_code:
     when: always
 
 getting_started_sample_code:
-  extends: .sample_code
+  extends:
+    - .sample_code
   script:
     ### https://meltano.com/docs/getting-started.html#install-meltano
 
