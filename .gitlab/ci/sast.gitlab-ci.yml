@@ -5,34 +5,6 @@ sast:
   variables:
     SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
 
-bandit-sast:
-  rules:
-    - changes:
-        - docs/src/**/*
-        - docs/adr/**/*
-      when: never
-
-brakeman-sast:
-  rules:
-    - changes:
-        - docs/src/**/*
-        - docs/adr/**/*
-      when: never
-
-eslint-sast:
-  rules:
-    - changes:
-        - docs/src/**/*
-        - docs/adr/**/*
-      when: never
-
-semgrep-sast:
-  rules:
-    - changes:
-        - docs/src/**/*
-        - docs/adr/**/*
-      when: never
-
 nodejs-scan-sast:
   rules:
   - when: never
