@@ -46,7 +46,7 @@ Rotating `assignee`, on the morning of the release:
         - Open the Changelog in preview mode, mouse over each link and ensure tooltip descriptions match the resolved issue.
         - Check contributor profile links to make sure they are correct.
     3. [ ] Merge the resulting MR to `main` with the merge commit message `Release vX.Y.Z`
-    4. [ ] [Open the next `Release` issue](https://gitlab.com/meltano/meltano/-/issues/new?issue) using the `Release` template.
+    4. [ ] [Open the next `Release` issue](https://gitlab.com/meltano/meltano/-/issues/new?issuable_template=Release&issue[title]=Release%20vX.Y.Z&issue[issue_type]=issue).
 
 ### Announcements, Marketing, and Promotion
 
