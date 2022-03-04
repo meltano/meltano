@@ -3,6 +3,7 @@ import os
 
 import click
 
+from .cli_messages import GREETING
 from .db import project_engine
 from .migration_service import MigrationError, MigrationService
 from .plugin.meltano_file import MeltanoFilePlugin
@@ -51,7 +52,6 @@ class ProjectInitService:
         self.settings_service = ProjectSettingsService(self.project)
 
         self.create_files(add_discovery=add_discovery)
-        self.set_send_anonymous_usage_stats()
 
         if activate:
             Project.activate(self.project)
@@ -69,18 +69,10 @@ class ProjectInitService:
         click.secho("Creating project files...", fg="blue")
 
         plugin = MeltanoFilePlugin(discovery=add_discovery)
+        click.echo(f"  {self.project_name}/")
         for path in plugin.create_files(self.project):
-            click.secho("Created", fg="blue", nl=False)
-            click.echo(f" {self.project_name}/{path}")
-
-    def set_send_anonymous_usage_stats(self):
-        """Set Anonymous Usage Stats flag."""
-        # Ensure the value is explicitly stored in `meltano.yml`
-        self.settings_service.set(
-            "send_anonymous_usage_stats",
-            self.settings_service.get("send_anonymous_usage_stats"),
-            store=SettingValueStore.MELTANO_YML,
-        )
+            click.secho("   |--", fg="blue", nl=False)
+            click.echo(f" {path}")
 
     def create_system_database(self):
         """Create Meltano System DB.
@@ -88,23 +80,25 @@ class ProjectInitService:
         Raises:
             ProjectInitServiceError: Database initialization failed
         """
-        click.secho("Creating system database...", fg="blue")
+        click.secho("Creating system database...", fg="blue", nl=False)
 
         # register the system database connection
         engine, _ = project_engine(self.project, default=True)
 
         try:
             migration_service = MigrationService(engine)
-            migration_service.upgrade()
+            migration_service.upgrade(silent=True)
             migration_service.seed(self.project)
+            click.secho("  Done!", fg="blue")
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err
 
     def echo_instructions(self):
         """Echo Next Steps to Click CLI."""
+        click.secho(GREETING, nl=False)
         click.secho("\nProject ", nl=False)
         click.secho(self.project_name, fg="magenta", nl=False)
-        click.echo(" has been created.\n")
+        click.echo(" has been created!\n")
 
         click.echo("Meltano Environments initialized with ", nl=False)
         click.secho("dev", fg="bright_green", nl=False)
@@ -120,25 +114,11 @@ class ProjectInitService:
         )
 
         click.echo("\nNext steps:")
-        click.secho("\tcd ", nl=False)
+        click.secho("  cd ", nl=False)
         click.secho(self.project_name, fg="magenta")
-        click.echo("\tVisit ", nl=False)
+        click.echo("  Visit ", nl=False)
         click.secho("https://meltano.com/", fg="cyan", nl=False)
         click.echo(" to learn where to go from here")
-
-        click.echo()
-        click.secho("> ", fg="bright_black", nl=False)
-        click.secho(
-            "Meltano sends anonymous usage data that helps improve the product."
-        )
-        click.secho("> ", fg="bright_black", nl=False)
-        click.echo("You can opt-out for new, existing, or all projects.")
-        click.secho("> ", fg="bright_black", nl=False)
-        click.secho(
-            "https://docs.meltano.com/reference/settings#send-anonymous-usage-stats",
-            fg="cyan",
-        )
-        click.echo()
 
     def join_with_project_base(self, filename):
         """Join Path to Project base.

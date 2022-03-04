@@ -44,7 +44,7 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
 
         self.send_anonymous_usage_stats = self.settings_service.get(
-            "send_anonymous_usage_stats"
+            "send_anonymous_usage_stats", True
         )
         self.project_id = self.load_project_id()
         self.client_id = self.load_client_id()
