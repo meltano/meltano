@@ -2,6 +2,7 @@
   extends:
   - .docker_build
   - .parallel:python_version
+  - .skip_docs
   stage: build-base
   needs: []
   variables:
@@ -20,7 +21,8 @@
 # Manages:
 #  - meltano/meltano/base:<base_sha>-python<version>
 meltano_base:
-  extends: .build_base
+  extends:
+  - .build_base
   only:
     changes:
       - docker/base/Dockerfile
@@ -29,7 +31,8 @@ meltano_base:
 # Manages:
 #  - <fork namespace>/meltano/base:<base_sha>-python<version>
 meltano_base_forks:
-  extends: .build_base
+  extends:
+  - .build_base
   except:
     - branches@meltano/meltano
     - tags@meltano/meltano
