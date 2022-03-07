@@ -41,7 +41,7 @@ If enabled, Meltano will use the value of the [`project_id` setting](#project-id
 This project ID is also sent along when Meltano loads the remote `discovery.yml` manifest from the URL identified by the [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
-the Tracking IDs can be configured using the [`tracking_ids.*` settings](#analytics-tracking-ids) below.
+the Tracking IDs can be configured using the `tracking_ids.*` settings below.
 
 If you'd prefer to use Meltano _without_ sending the team this kind of data, you can disable tracking entirely using one of these methods:
 

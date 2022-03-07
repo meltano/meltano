@@ -91,7 +91,7 @@ Our end-to-end tests are currently being built with [Cypress](https://www.cypres
 
 This will kick off a Cypress application that will allow you to run tests as desired by clicking each test suite (which can be found in `/src/tests/e2e/specs/*.spec.js`)
 
-![Preview of Cypres app running](images/contributor-guide/cypTest-01.png)
+![Preview of Cypres app running](images/prerequisites/cypTest-01.png)
 
 <div class="notification is-info">
   <p><strong>In the near future, all tests can flow automatically; but there are some complications that require manual triggering due to an inability to read pipeline completion.</strong></p>

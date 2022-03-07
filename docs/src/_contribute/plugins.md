@@ -5,7 +5,6 @@ layout: doc
 weight: 10
 ---
 
-
 ## Discoverable plugins
 
 [Discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,

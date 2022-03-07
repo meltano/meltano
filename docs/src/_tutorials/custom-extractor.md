@@ -191,7 +191,7 @@ If you have gotten this far... _**Congrats!** You are now a proud Singer tap dev
 ### Make it discoverable
 
 Once you have your tap published to PyPi, consider
-[making it discoverable](/the-project/contributor-guide#making-a-custom-plugin-discoverable)
+[making it discoverable](/contribute/plugins#making-a-custom-plugin-discoverable)
 for other users of Meltano.
 
 ### Updates for production use
