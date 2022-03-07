@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3318] `meltano init` will ask for a project_name if none is passed during invocation
+
 ### Fixes
 
 ### Breaks
