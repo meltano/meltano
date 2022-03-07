@@ -35,25 +35,25 @@ defaults:
 
 # Every top level section is actually a collection. Their files are in a _folder in src/
 collections:
-  concepts:
-    output: true
-    name: "Concepts"
-    weight: 1
   guide:
     output: true
     name: "Guide"
+    weight: 1
+  concepts:
+    output: true
+    name: "Concepts"
     weight: 2
   tutorials:
     output: true
     name: "Tutorials"
     weight: 3
-  contribute:
-    output: true
-    name: "Contribute"
-    weight: 4
   reference:
     output: true
     name: "Reference"
+    weight: 4
+  contribute:
+    output: true
+    name: "Contribute"
     weight: 5
   the-project:
     output: true
