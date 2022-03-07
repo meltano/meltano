@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3316] Improve the `meltano init` experience with beautified text and cleaner logging
+- [#3317] Improve Snowplow documentation and simplify telemetry notification during `meltano init`
+
 ### Fixes
 
 ### Breaks
