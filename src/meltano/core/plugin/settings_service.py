@@ -1,11 +1,12 @@
 """Settings manager for Meltano plugins."""
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import REDACTED_VALUE  # noqa: F401
 from meltano.core.settings_service import SettingMissingError  # noqa: F401
 from meltano.core.settings_service import SettingValueStore  # noqa: F401
@@ -102,7 +103,7 @@ class PluginSettingsService(SettingsService):
         return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
-    def setting_definitions(self):
+    def setting_definitions(self) -> List[SettingDefinition]:
         """Return definitions of supported settings.
 
         Returns:
