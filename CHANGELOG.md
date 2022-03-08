@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3306](https://gitlab.com/meltano/meltano/-/issues/3306) Fix Environments bug where custom configuration values not defined as a setting or custom configuration values in the top-level plugin definition are not passed to the plugin.
+
 ### Breaks
 
 
