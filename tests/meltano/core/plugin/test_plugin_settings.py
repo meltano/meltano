@@ -200,14 +200,8 @@ class TestPluginSettingsService:
         # Expect hidden
         assert "secret" not in setting_defs_by_name
 
-    def test_as_dict(
-        self, active_environment, subject: PluginSettingsService, session, tap
-    ):
-        expected = {
-            "test": "mock",
-            "start_date": None,
-            "secure": None,
-        }
+    def test_as_dict(self, subject, session, tap):
+        expected = {"test": "mock", "start_date": None, "secure": None}
         full_config = subject.as_dict(session=session)
         redacted_config = subject.as_dict(redacted=True, session=session)
 

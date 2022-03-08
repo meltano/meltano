@@ -7,9 +7,10 @@ from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound
 
-T = TypeVar("T")
+TEnv = TypeVar("TEnv")
 
 
 class NoActiveEnvironment(Exception):
@@ -40,16 +41,29 @@ class EnvironmentPluginConfig(PluginRef):
 
     @property
     def extra_config(self):
-        """Get extra config from the Meltano environment, like `select` and `schema`."""
+        """Get extra config from the Meltano environment, like `select` and `schema`.
+
+        Returns:
+            Extra config.
+        """
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
     def config_with_extras(self):
-        """Get plugin configuration values from the Meltano environment."""
+        """Get plugin configuration values from the Meltano environment.
+
+        Returns:
+            Plugin configuration with extra values.
+        """
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
     def config_with_extras(self, new_config_with_extras: Dict[str, Any]):
+        """Set plugin configuration values from the Meltano environment.
+
+        Args:
+            new_config_with_extras: New plugin configuration with extra values.
+        """
         self.config.clear()
         self.extras.clear()
 
@@ -58,6 +72,19 @@ class EnvironmentPluginConfig(PluginRef):
                 self.extras[key[1:]] = value
             else:
                 self.config[key] = value
+
+    def get_orphan_settings(
+        self, existing: Iterable[SettingDefinition]
+    ) -> List[SettingDefinition]:
+        """Get orphan settings for this plugin.
+
+        Args:
+            existing: Existing settings.
+
+        Returns:
+            List of orphan settings.
+        """
+        return SettingDefinition.from_missing(existing, self.config)
 
 
 class EnvironmentConfig(Canonical):
@@ -68,6 +95,7 @@ class EnvironmentConfig(Canonical):
 
         Args:
             plugins: Mapping of plugin types to arrays of plugin configurations.
+            extras: Environment extras.
         """
         super().__init__(extras=extras)
         self.plugins = self.load_plugins(plugins or {})
@@ -118,8 +146,19 @@ class Environment(NameEq, Canonical):
         self.env = env or {}
 
     @classmethod
-    def find(cls: Type[T], objects: Iterable[T], name: str) -> T:
-        """Lookup an environment by name from an iterable."""
+    def find(cls: Type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
+        """Lookup an environment by name from an iterable.
+
+        Args:
+            objects: Iterable of objects to search.
+            name: Environment name.
+
+        Returns:
+            Environment object if found.
+
+        Raises:
+            NotFound: If an environment is not found.
+        """
         try:
             return next(env for env in objects if env.name == name)
         except StopIteration as stop:
