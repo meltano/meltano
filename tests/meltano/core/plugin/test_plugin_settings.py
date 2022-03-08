@@ -1,16 +1,17 @@
-from contextlib import contextmanager
 from datetime import date, datetime
-from unittest import mock
 
 import dotenv
 import pytest
-from meltano.core.plugin import PluginRef, PluginType
+
+from meltano.core.environment import Environment
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import (
     REDACTED_VALUE,
     PluginSettingsService,
     SettingValueStore,
 )
+from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
 
@@ -38,12 +39,12 @@ def env_var(plugin_discovery_service):
 
 @pytest.fixture(scope="class")
 def custom_tap(project_add_service):
-    EXPECTED = {"test": "custom", "start_date": None, "secure": None}
+    excpected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
         name="tap-custom",
         namespace="tap_custom",
-        config=EXPECTED,
+        config=excpected,
     )
     try:
         return project_add_service.add_plugin(tap)
@@ -54,6 +55,13 @@ def custom_tap(project_add_service):
 @pytest.fixture
 def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
+
+
+@pytest.fixture
+def active_environment(project: Project) -> Environment:
+    project.activate_environment("dev")
+    yield project.active_environment
+    project.active_environment = None
 
 
 class TestPluginSettingsService:
@@ -94,10 +102,13 @@ class TestPluginSettingsService:
         )
 
         # overriden via the `meltano.yml` configuration
-        subject.set("test", 42, store=SettingValueStore.MELTANO_YML, session=session)
+        test_value = 42
+        subject.set(
+            "test", test_value, store=SettingValueStore.MELTANO_YML, session=session
+        )
 
         assert subject.get_with_source("test", session=session) == (
-            42,
+            test_value,
             SettingValueStore.MELTANO_YML,
         )
 
@@ -180,7 +191,7 @@ class TestPluginSettingsService:
         subject.show_hidden = False
         subject._setting_defs = None
 
-        setting_defs_by_name = {s.name: s for s in subject.definitions()}
+        setting_defs_by_name = {sdef.name: sdef for sdef in subject.definitions()}
 
         # Regular settings
         assert "test" in setting_defs_by_name
@@ -189,14 +200,42 @@ class TestPluginSettingsService:
         # Expect hidden
         assert "secret" not in setting_defs_by_name
 
-    def test_as_dict(self, subject, session, tap):
-        EXPECTED = {"test": "mock", "start_date": None, "secure": None}
+    def test_as_dict(
+        self, active_environment, subject: PluginSettingsService, session, tap
+    ):
+        expected = {
+            "test": "mock",
+            "start_date": None,
+            "secure": None,
+        }
         full_config = subject.as_dict(session=session)
         redacted_config = subject.as_dict(redacted=True, session=session)
 
-        for k, v in EXPECTED.items():
-            assert full_config.get(k) == v
-            assert redacted_config.get(k) == v
+        for key, value in expected.items():
+            assert full_config.get(key) == value
+            assert redacted_config.get(key) == value
+
+    def test_environment_only_config(
+        self,
+        active_environment: Environment,
+        subject: PluginSettingsService,
+        project: Project,
+    ):
+        subject.set("test_environment", "THIS_IS_FROM_ENVIRONMENT")
+        by_name = {sdef.name: sdef for sdef in subject.definitions()}
+
+        assert "test_environment" in by_name
+        assert not by_name["test"].is_custom
+        assert by_name["test_environment"].is_custom
+
+        with project.meltano_update() as meltano:
+            plugin = meltano.plugins.extractors[0]
+            assert "test_environment" not in plugin.config
+
+            dev_environment = meltano.environments[0]
+            env_plugin = dev_environment.config.plugins[PluginType.EXTRACTORS][0]
+            assert dev_environment == active_environment
+            assert env_plugin.config["test_environment"] == "THIS_IS_FROM_ENVIRONMENT"
 
     def test_as_dict_process(self, subject: PluginSettingsService, tap):
         config = subject.as_dict()
@@ -290,8 +329,8 @@ class TestPluginSettingsService:
     ):
         subject = plugin_settings_service_factory(custom_tap)
         config = subject.as_env(session=session)
-        for k, v in custom_tap.config.items():
-            assert config.get(env_var(subject, k)) == v
+        for key, value in custom_tap.config.items():
+            assert config.get(env_var(subject, key)) == value
 
     def test_namespace_as_env_prefix(
         self, project, session, target, env_var, plugin_settings_service_factory
@@ -299,8 +338,8 @@ class TestPluginSettingsService:
         subject = plugin_settings_service_factory(target)
 
         def assert_env_value(value, env_var):
-            value, metadata = subject.get_with_metadata("schema")
-            assert value == value
+            read_value, metadata = subject.get_with_metadata("schema")
+            assert value == read_value
             assert metadata["env_var"] == env_var
 
         assert subject.get("schema") is None
@@ -328,13 +367,12 @@ class TestPluginSettingsService:
         config = subject.as_env(session=session)
         subject.reset(store=SettingValueStore.DOTENV)
 
+        assert config["MOCKED_SCHEMA"] == "custom_env"  # Custom `env`
+        assert config["TARGET_MOCK_SCHEMA"] == "custom_env"  # Name prefix
+        assert config["MOCK_SCHEMA"] == "custom_env"  # Namespace prefix
         assert (
-            config["MOCKED_SCHEMA"]  # Custom `env`
-            == config["TARGET_MOCK_SCHEMA"]  # Name prefix
-            == config["MOCK_SCHEMA"]  # Namespace prefix
-            == config["MELTANO_LOAD_SCHEMA"]  # Generic prefix, read-only
-            == "custom_env"
-        )
+            config["MELTANO_LOAD_SCHEMA"] == "custom_env"
+        )  # Generic prefix, read-only
 
     def test_setting_env_vars(
         self, tap, inherited_tap, alternative_target, plugin_settings_service_factory
@@ -524,7 +562,7 @@ class TestPluginSettingsService:
 
         assert config["var"] == "hello world!"
         assert config["foo"] == "42"
-        assert config["missing"] == None
+        assert config["missing"] is None
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
 
@@ -540,7 +578,9 @@ class TestPluginSettingsService:
 
         # Expansion can be disabled
         config = subject.as_dict(session=session, expand_env_vars=False)
-        assert {k: v for k, v in config.items() if k in yml_config} == yml_config
+        assert yml_config == {
+            key: value for key, value in config.items() if key in yml_config
+        }
 
     def test_nested_keys(self, session, subject, project, tap):
         def set_config(path, value):
