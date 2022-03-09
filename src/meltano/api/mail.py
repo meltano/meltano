@@ -1,42 +1,60 @@
-from enum import Enum
+"""Basic MailService that sends notifications via the sendgrid API."""
+from typing import Optional
 
 from flask_mail import Mail, Message
+from smtpapi import SMTPAPIHeader
+
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from smtpapi import SMTPAPIHeader
 
 mail = Mail()
 
 
-# From `https://app.sendgrid.com` Meltano's account
-class UnsubscribeGroup(int, Enum):
-    ELT_NOTIFICATIONS = 12751
-
-
 class MailService:
-    EventTypeUnsubscribeGroup = {
-        SubscriptionEventType.PIPELINE_MANUAL_RUN: UnsubscribeGroup.ELT_NOTIFICATIONS
-    }
+    """Basic MailService that sends notifications via the sendgrid SMTPAPI."""
 
     def __init__(self, project: Project):
+        """Initialize the MailService.
+
+        Args:
+            project: The project to use the MailService when referencing the project settings or project id.
+        """
         self.project = project
-        self.project_id = ProjectSettingsService(self.project).get("project_id")
+        self._settings = ProjectSettingsService(self.project)
 
-    def get_unsubscribe_group(self, subscription) -> UnsubscribeGroup:
-        try:
-            event_type = SubscriptionEventType(subscription.event_type)
-            return self.EventTypeUnsubscribeGroup[event_type]
-        except:
-            return None
+        self.project_id = self._settings.get("project_id")
+        self.sendgrid_unsubscribe_group_id = self._settings.get(
+            "mail.sendgrid_unsubscribe_group_id"
+        )
 
-    def create_message(self, subscription, **kwargs) -> Message:
+    def get_unsubscribe_group(self, subscription: Subscription) -> Optional[int]:
+        """Get the unsubscribe group for the given subscription.
+
+        Currently, the unsubscribe group is based on the event type, and only the SubscriptionEventType.PIPELINE_MANUAL_RUN
+        even type is actually supported.
+
+        Args:
+            subscription: The subscription to get the unsubscribe group for.
+
+        Returns:
+            The unsubscribe group id or None if the event type is not supported.
         """
-        Create the basic Message with the proper headers.
+        event_type = SubscriptionEventType(subscription.event_type)
+        if event_type == SubscriptionEventType.PIPELINE_MANUAL_RUN:
+            return self.sendgrid_unsubscribe_group_id
+        return None
 
-        Uses the SendGrid SMTPAPI.
+    def create_message(self, subscription: Subscription, **kwargs) -> Message:
+        """Create a message for the given subscription.
+
+        Args:
+            subscription: The subscription to create the message for.
+            kwargs: Additional arguments to pass to the message constructor.
+
+        Returns:
+            The created message.
         """
-
         headers = SMTPAPIHeader()
         headers.set_unique_args(
             {
