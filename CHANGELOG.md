@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3321](https://gitlab.com/meltano/meltano/-/issues/3321) Switch Snowplow tracker endpoint to https
+
 ### Fixes
 
 ### Breaks
