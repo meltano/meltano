@@ -5,13 +5,14 @@ from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from smtpapi import SMTPAPIHeader
+import os
 
 mail = Mail()
 
 
-# From `https://app.sendgrid.com` Meltano's account
+# From `https://app.sendgrid.com` Meltano's account which defaulted to 12751
 class UnsubscribeGroup(int, Enum):
-    ELT_NOTIFICATIONS = 12751
+    ELT_NOTIFICATIONS = os.getenv("ELT_UNSUB_GROUP", 12751)
 
 
 class MailService:
