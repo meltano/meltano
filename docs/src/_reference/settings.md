@@ -793,6 +793,19 @@ meltano config meltano set mail debug true
 export MAIL_DEBUG=true
 ```
 
+### `mail.sendgrid_unsubscribe_group_id`
+
+If using the sendgrid smtp api you optionally set the [sendgrid unsubscribe group](https://docs.sendgrid.com/ui/sending-email/unsubscribe-groups).
+
+- [Environment variable](/guide/configuration#configuring-settings): `MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
+- Default: `12751`
+
+```bash
+meltano config meltano set mail sendgrid_unsubscribe_group_id 42
+
+export MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
+```
+
 ## OAuth Service
 
 Meltano ships with an OAuth Service to handle the OAuth flow in the Extractors' configuration.
