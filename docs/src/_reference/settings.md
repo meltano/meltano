@@ -795,7 +795,7 @@ export MAIL_DEBUG=true
 
 ### `mail.sendgrid_unsubscribe_group_id`
 
-If your are using the SendGrid SMTP API you may optionally set the [SendGrid unsubscribe group ID](https://docs.sendgrid.com/ui/sending-email/unsubscribe-groups).
+If you are using the SendGrid SMTP API you may optionally set the [SendGrid unsubscribe group ID](https://docs.sendgrid.com/ui/sending-email/unsubscribe-groups).
 
 - [Environment variable](/guide/configuration#configuring-settings): `MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
 - Default: `12751`
