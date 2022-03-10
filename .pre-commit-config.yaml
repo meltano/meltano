@@ -7,7 +7,7 @@ repos:
     - id: trailing-whitespace
       # The `bumpversion` command fails to commit its own changes to
       # `.bumpversion.cfg` because it leaves some trailing whitespace.
-      exclude: ^\.bumpversion\.cfg$
+      exclude: (^\.bumpversion\.cfg$|cli_messages\.py)
     - id: end-of-file-fixer
     - id: check-yaml
     - id: check-added-large-files
