@@ -6,7 +6,7 @@ import click
 from meltano.core.error import SubprocessError
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import GoogleAnalyticsTracker, snowplow_tracker
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import database_uri_option
@@ -21,13 +21,13 @@ logger = logging.getLogger(__name__)
 
 @cli.command(short_help="Create a new Meltano project.")
 @click.pass_context
-@click.argument("project_name", default="default")
+@click.argument("project_name", required=False)
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
 @database_uri_option
 def init(ctx, project_name, no_usage_stats):
-    r"""
+    """
     Create a new Meltano project.
 
     Read more at https://docs.meltano.com/reference/command-line-interface#init
@@ -35,7 +35,7 @@ def init(ctx, project_name, no_usage_stats):
     """
     logging.getLogger("snowplow_tracker.emitters").setLevel(logging.ERROR)
 
-    if project_name == "default":
+    if not project_name:
         click.echo("We need a project name to get started!")
         project_name = click.prompt("Enter a name now to create a Meltano project")
 
