@@ -35,7 +35,9 @@ These are settings specific to [your Meltano project](/concepts/project).
 - [`meltano init`](/reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
-By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics. We use this data to learn about the size of our user base and the specific Meltano features they are (not yet) using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
+By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
+
+We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
 If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
 This project ID is also sent along when Meltano loads the remote `discovery.yml` manifest from the URL identified by the [`discovery_url` setting](#discovery-url).
@@ -43,10 +45,13 @@ This project ID is also sent along when Meltano loads the remote `discovery.yml`
 If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
 the Tracking IDs can be configured using the [`tracking_ids.*` settings](#analytics-tracking-ids) below.
 
+If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
+the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
+
 If you'd prefer to use Meltano _without_ sending the team this kind of data, you can disable tracking entirely using one of these methods:
 
 - When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
-- In an existing project, disable this `send_anonymous_usage_stats` setting
+- In an existing project, set the `send_anonymous_usage_stats` setting to `false`
 - To disable tracking in all projects in one go, enable the `MELTANO_DISABLE_TRACKING` environment variable
 
 When anonymous usage tracking is enabled, Meltano tracks the following events:
@@ -791,6 +796,19 @@ export MAIL_PASSWORD=meltano
 meltano config meltano set mail debug true
 
 export MAIL_DEBUG=true
+```
+
+### `mail.sendgrid_unsubscribe_group_id`
+
+If you are using the SendGrid SMTP API you may optionally set the [SendGrid unsubscribe group ID](https://docs.sendgrid.com/ui/sending-email/unsubscribe-groups).
+
+- [Environment variable](/guide/configuration#configuring-settings): `MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
+- Default: `12751`
+
+```bash
+meltano config meltano set mail sendgrid_unsubscribe_group_id 42
+
+export MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
 ```
 
 ## OAuth Service

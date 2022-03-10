@@ -115,13 +115,12 @@ will hold the [plugins](/concepts/plugins) that implement the various details of
 
     ```yml
     version: 1
-    send_anonymous_usage_stats: true
     project_id: <random UUID>
     ```
 
-    It doesn't define any [plugins](/concepts/project#plugins) or [pipeline schedules](/concepts/project#schedules) yet,
-    but note that the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats) is enabled by default.
-    To disable it, change the value to `false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
+    It doesn't define any [plugins](/concepts/project#plugins), [environments](/concepts/environments), or [pipeline schedules](/concepts/project#schedules) yet.
+    Note that the [anonymous usage stats](/reference/settings#send-anonymous-usage-stats) are enabled by default.
+    To disable collecting usage data, set `send_anonymous_usage_stats: false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
 
 1. Navigate to the newly created project directory:
 
