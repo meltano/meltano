@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3217](https://gitlab.com/meltano/meltano/-/issues/3217) Allow user to configure Sendgrid asm_group_id  _Thanks, **[@davesgonechina](https://gitlab.com/davesgonechina)**!_
+
 ### Fixes
 
 ### Breaks
