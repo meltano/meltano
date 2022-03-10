@@ -7,6 +7,7 @@ from typing import Dict, Optional
 
 import structlog
 import yaml
+
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -81,7 +82,7 @@ def default_config(log_level: str) -> dict:
                 "level": log_level.upper(),
                 "propagate": True,
             },
-        "snowplow_tracker.emitters": {
+            "snowplow_tracker.emitters": {
                 "handlers": ["console"],
                 "level": LEVELS["error"],
             },
