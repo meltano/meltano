@@ -10,7 +10,7 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 
 <div class="notification is-warning">
     <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
-    <p>To get a sense of the Meltano experience in just a few minutes, follow the <a href="https://meltano.com">examples on the homepage</a> or watch the <a href="https://meltano.com/blog/2021/04/28/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a></p>
+    <p>To get a sense of the Meltano experience in just a few minutes, follow the <a href="https://meltano.com">examples on the homepage</a> or watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a></p>
     <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
 </div>
 
@@ -22,7 +22,7 @@ Before you can get started with Meltano and the [`meltano` CLI](/reference/comma
 
 ### Local installation
 
-If you're running Linux or macOS and have [Python](https://www.python.org/) 3.6, 3.7, 3.8 or 3.9 installed,
+If you're running Linux or macOS and have [Python](https://www.python.org/) 3.7, 3.8 or 3.9 installed,
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
 inside the directory that will hold your [Meltano projects](/concepts/project).
 
@@ -65,8 +65,8 @@ you can use the [`meltano/meltano` Docker image](https://hub.docker.com/r/meltan
     docker pull meltano/meltano:latest
     ```
 
-    By default, this image comes with the oldest version of Python supported by Meltano, currently Python 3.6.
-    If you'd like to use a newer version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.8`.
+    By default, this image comes with the oldest version of Python supported by Meltano, currently Python 3.8.
+    If you'd like to use a newer version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.9`.
 
 1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available through the Docker image by viewing the version:
 
@@ -115,13 +115,12 @@ will hold the [plugins](/concepts/plugins) that implement the various details of
 
     ```yml
     version: 1
-    send_anonymous_usage_stats: true
     project_id: <random UUID>
     ```
 
-    It doesn't define any [plugins](/concepts/project#plugins) or [pipeline schedules](/concepts/project#schedules) yet,
-    but note that the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats) is enabled by default.
-    To disable it, change the value to `false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
+    It doesn't define any [plugins](/concepts/project#plugins), [environments](/concepts/environments), or [pipeline schedules](/concepts/project#schedules) yet.
+    Note that the [anonymous usage stats](/reference/settings#send-anonymous-usage-stats) are enabled by default.
+    To disable collecting usage data, set `send_anonymous_usage_stats: false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
 
 1. Navigate to the newly created project directory:
 

@@ -30,10 +30,6 @@ license_scanning:
       - license_management.log
   dependencies: []
   rules:
-    - changes:
-        - docs/src/**/*
-        - docs/adr/**/*
-      when: never
     - if: $LICENSE_MANAGEMENT_DISABLED
       when: never
     - if: $CI_COMMIT_BRANCH &&

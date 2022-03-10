@@ -29,16 +29,3 @@
   parallel:
     matrix:
       - IMAGE_TAG_SUFFIX: ["", "-python3.7", "-python3.8", "-python3.9"]
-
-.skip_docs:
-  except:
-    changes:
-      - docs/src/**/*
-      - docs/adr/**/*
-
-.skip_docs_rules:
-  rules:
-    - changes:
-        - docs/src/**/*
-        - docs/adr/**/*
-      when: never

@@ -74,6 +74,16 @@ class ProjectInitService:
             click.secho("   |--", fg="blue", nl=False)
             click.echo(f" {path}")
 
+    def set_send_anonymous_usage_stats(self):
+        """Set Anonymous Usage Stats flag."""
+        # If set to false store explicitly in `meltano.yml`
+        if not self.settings_service.get("send_anonymous_usage_stats"):
+            self.settings_service.set(
+                "send_anonymous_usage_stats",
+                self.settings_service.get("send_anonymous_usage_stats"),
+                store=SettingValueStore.MELTANO_YML,
+            )
+
     def create_system_database(self):
         """Create Meltano System DB.
 
