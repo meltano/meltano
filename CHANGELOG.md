@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#3319] Limit snowplow tracker logs to the command line to ERROR level by default
+- [#3319](https://gitlab.com/meltano/meltano/-/issues/3319) Limit snowplow tracker logs to the command line to ERROR level by default
 
 ### Fixes
 
