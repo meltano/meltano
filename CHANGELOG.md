@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3316] Improve the `meltano init` experience with beautified text and cleaner logging
 - [#3317] Improve Snowplow documentation and simplify telemetry notification during `meltano init`
+- [#3319] Limit snowplow tracker logs to the command line to ERROR level by default
 
 ### Fixes
 
