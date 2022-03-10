@@ -181,3 +181,6 @@ per_file_ignores =
     src/meltano/core/block/extract_load.py:
         # Found module with too many imports: 21 > 20
         WPS201
+    src/meltano/core/logging/utils.py:
+        # Found wrong module name
+        WPS100
