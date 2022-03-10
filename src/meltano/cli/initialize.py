@@ -33,7 +33,6 @@ def init(ctx, project_name, no_usage_stats):
     \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#init
 
     """
-    logging.getLogger("snowplow_tracker.emitters").setLevel(logging.ERROR)
 
     if ctx.obj["project"]:
         root = ctx.obj["project"].root

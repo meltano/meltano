@@ -41,9 +41,6 @@ def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
     """
     ProjectSettingsService(project).set("snowplow.collector_endpoints", endpoints)
 
-    with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
-        tracker = SnowplowTracker(project)
-
     assert len(caplog.records) == 2
     assert caplog.records[0].levelname == "WARNING"
     assert caplog.records[0].msg["event"] == "invalid_snowplow_endpoint"
