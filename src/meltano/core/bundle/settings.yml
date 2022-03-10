@@ -136,6 +136,11 @@ settings:
   value: false
   env: MAIL_DEBUG
   env_specific: true
+- name: mail.sendgrid_unsubscribe_group_id
+  kind: integer
+  value: 12751
+  env: MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID
+  env_specific: true
 
 # OAuth Service
 - name: oauth_service.url
