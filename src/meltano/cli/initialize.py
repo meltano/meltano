@@ -33,8 +33,6 @@ def init(ctx, project_name, no_usage_stats):
     Read more at https://docs.meltano.com/reference/command-line-interface#init
 
     """
-    logging.getLogger("snowplow_tracker.emitters").setLevel(logging.ERROR)
-
     if not project_name:
         click.echo("We need a project name to get started!")
         project_name = click.prompt("Enter a name now to create a Meltano project")
