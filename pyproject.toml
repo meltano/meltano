@@ -61,6 +61,7 @@ aiodocker = "^0.21.0"
 MarkupSafe = "<2.1.0"
 snowplow-tracker = "^0.10.0"
 uvicorn = {extras = ["standard"], version = "^0.17.6"}
+itsdangerous = "<2.1"
 
 [tool.poetry.extras]
 infra = ["ansible"]
