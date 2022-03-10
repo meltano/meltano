@@ -31,8 +31,7 @@ The only required property is `version`, which currently always holds the value 
 
 At the root of `meltano.yml`, and usually at the top of the file, you will find project-specific configuration.
 
-In a newly initialized project, only the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats)
-will be set.
+In a newly initialized project, a few [environments](/concepts/environments) will be populated to get you started. 
 
 To learn which settings are available, refer to the [Settings reference](/reference/settings).
 
