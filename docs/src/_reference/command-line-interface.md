@@ -431,7 +431,7 @@ The new project directory will contain:
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
-The [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats) is enabled by default, unless the `--no_usage_stats` flag is provided or the `MELTANO_DISABLE_TRACKING` environment variable is enabled.
+[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_DISABLE_TRACKING` environment variable is enabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
 ### How to use
 
