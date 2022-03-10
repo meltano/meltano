@@ -1,4 +1,4 @@
-# Holds formatted CLI messages
+"""Holds formatted CLI messages."""
 
 GREETING = """
 
