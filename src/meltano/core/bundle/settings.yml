@@ -183,4 +183,4 @@ settings:
 # Snowplow Tracking
 - name: snowplow.collector_endpoints
   kind: array
-  value: ["http://sp.meltano.com"]
+  value: ["https://sp.meltano.com"]

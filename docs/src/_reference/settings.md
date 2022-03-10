@@ -970,6 +970,6 @@ export MELTANO_EMBED_TRACKING_ID=UA-123456789-3
 ### `snowplow.collector_endpoints`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS`
-- Default: `["http://sp.meltano.com"]`
+- Default: `["https://sp.meltano.com"]`
 
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
