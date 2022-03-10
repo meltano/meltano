@@ -6,7 +6,7 @@ import click
 from meltano.core.error import SubprocessError
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import GoogleAnalyticsTracker, snowplow_tracker
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import database_uri_option

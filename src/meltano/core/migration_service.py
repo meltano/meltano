@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 
 import click
@@ -8,6 +7,7 @@ from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
+
 from meltano.api.models.security import Role, RolePermissions
 from meltano.core.db import project_engine
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR
@@ -59,6 +59,7 @@ class MigrationService:
             if not silent:
                 click.secho(f"Upgrading database to {HEAD}")
             command.upgrade(cfg, HEAD)
+
             if silent:
                 migration_logger.setLevel(original_log_level)
         except FileNotFoundError:
