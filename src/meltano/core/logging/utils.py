@@ -81,6 +81,10 @@ def default_config(log_level: str) -> dict:
                 "level": log_level.upper(),
                 "propagate": True,
             },
+        "snowplow_tracker.emitters": {
+                "handlers": ["console"],
+                "level": LEVELS["error"],
+            },
         },
     }
 
