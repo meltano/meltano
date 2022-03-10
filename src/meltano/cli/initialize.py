@@ -6,7 +6,7 @@ import click
 from meltano.core.error import SubprocessError
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import GoogleAnalyticsTracker, snowplow_tracker
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import database_uri_option
@@ -27,14 +27,12 @@ logger = logging.getLogger(__name__)
 )
 @database_uri_option
 def init(ctx, project_name, no_usage_stats):
-    r"""
+    """
     Create a new Meltano project.
 
     \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#init
 
     """
-    logging.getLogger("snowplow_tracker.emitters").setLevel(logging.ERROR)
-
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
         logging.warning(f"Found meltano project at: {root}")

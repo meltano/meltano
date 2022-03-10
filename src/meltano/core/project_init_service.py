@@ -52,6 +52,7 @@ class ProjectInitService:
         self.settings_service = ProjectSettingsService(self.project)
 
         self.create_files(add_discovery=add_discovery)
+        self.set_send_anonymous_usage_stats()
 
         if activate:
             Project.activate(self.project)
