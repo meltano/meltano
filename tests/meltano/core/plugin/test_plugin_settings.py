@@ -39,12 +39,12 @@ def env_var(plugin_discovery_service):
 
 @pytest.fixture(scope="class")
 def custom_tap(project_add_service):
-    excpected = {"test": "custom", "start_date": None, "secure": None}
+    expected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
         name="tap-custom",
         namespace="tap_custom",
-        config=excpected,
+        config=expected,
     )
     try:
         return project_add_service.add_plugin(tap)

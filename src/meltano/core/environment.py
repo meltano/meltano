@@ -78,6 +78,9 @@ class EnvironmentPluginConfig(PluginRef):
     ) -> List[SettingDefinition]:
         """Get orphan settings for this plugin.
 
+        Orphan settings are `config` entries that do not have a
+        matching parent entry within `settings`.
+
         Args:
             existing: Existing settings.
 
