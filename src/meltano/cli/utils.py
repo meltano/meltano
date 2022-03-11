@@ -3,14 +3,16 @@ import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import Optional
+from typing import List, Optional
 
 import click
+
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallState,
     PluginInstallStatus,
 )
 from meltano.core.project import Project
@@ -25,36 +27,58 @@ setup_logging()
 
 logger = logging.getLogger(__name__)
 
+RED = "red"
+GREEN = "green"
+YELLOW = "yellow"
+BLUE = "blue"
+MAGENTA = "magenta"
+
 
 class CliError(Exception):
+    """Exception that is raised when a CLI command fails."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize the exception.
+
+        Args:
+            args: Arguments to pass to the Exception constructor.
+            kwargs: Keyword arguments to pass to the Exception constructor.
+        """
         super().__init__(*args, **kwargs)
 
         self.printed = False
 
     def print(self):
+        """Print the exception message to the console."""
         if self.printed:
             return
 
         logger.debug(str(self), exc_info=True)
-        click.secho(str(self), fg="red", err=True)
+        click.secho(str(self), fg=RED, err=True)
 
         self.printed = True
 
 
 def print_added_plugin(project, plugin, related=False):
+    """Print a message indicating that a plugin was added to the project.
+
+    Args:
+        project: The project the plugin was added to.
+        plugin: The plugin that was added.
+        related: Whether the plugin was added as a related plugin.
+    """
     descriptor = plugin.type.descriptor
     if related:
         descriptor = f"related {descriptor}"
 
     if plugin.should_add_to_file():
         click.secho(
-            f"Added {descriptor} '{plugin.name}' to your Meltano project", fg="green"
+            f"Added {descriptor} '{plugin.name}' to your Meltano project", fg=GREEN
         )
     else:
         click.secho(
             f"Adding {descriptor} '{plugin.name}' to your Meltano project...",
-            fg="green",
+            fg=GREEN,
         )
 
     inherit_from = plugin.inherit_from
@@ -80,13 +104,12 @@ def print_added_plugin(project, plugin, related=False):
 def _prompt_plugin_namespace(plugin_type, plugin_name):
     click.secho(
         f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
-        fg="green",
+        fg=GREEN,
     )
     click.echo()
 
-    click.echo(
-        f"Specify the plugin's {click.style('namespace', fg='blue')}, which will serve as the:"
-    )
+    namespace_in_blue = click.style("namespace", fg=BLUE)
+    click.echo(f"Specify the plugin's {namespace_in_blue}, which will serve as the:")
     click.echo("- identifier to find related/compatible plugins")
     if plugin_type == PluginType.EXTRACTORS:
         click.echo("- default database schema (`load_schema` extra),")
@@ -102,17 +125,17 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
     click.echo()
 
     return click.prompt(
-        click.style("(namespace)", fg="blue"),
+        click.style("(namespace)", fg=BLUE),
         type=str,
         default=plugin_name.replace("-", "_"),
     )
 
 
 def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
+    pip_example_in_blue = click.style("`pip install` argument", fg=BLUE)
+
     click.echo()
-    click.echo(
-        f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
-    )
+    click.echo(f"Specify the plugin's {pip_example_in_blue}, for example:")
     click.echo("- PyPI package name:")
     click.echo(f"\t{plugin_name}")
     click.echo("- Git repository URL:")
@@ -125,7 +148,7 @@ def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     click.echo()
 
     result = click.prompt(
-        click.style("(pip_url)", fg="blue"), type=str, default=plugin_name
+        click.style("(pip_url)", fg=BLUE), type=str, default=plugin_name
     )
     return None if result == "n" else result
 
@@ -137,24 +160,28 @@ def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
         derived_from = "the plugin name"
         prompt_request = "executable path"
 
+    executable_in_blue = click.style(prompt_request, fg=BLUE)
+
     click.echo()
-    click.echo(f"Specify the plugin's {click.style(prompt_request, fg='blue')}")
+    click.echo(f"Specify the plugin's {executable_in_blue}")
     click.echo()
     click.echo(f"Default: name derived from {derived_from}")
     click.echo()
 
     plugin_basename = os.path.basename(pip_url or plugin_name)
     package_name, _ = os.path.splitext(plugin_basename)
-    return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
+    return click.prompt(click.style("(executable)", fg=BLUE), default=package_name)
 
 
 def _prompt_plugin_capabilities(plugin_type):
     if plugin_type != PluginType.EXTRACTORS:
         return []
 
+    capabilities_help = click.style("supported Singer features", fg=BLUE)
+
     click.echo()
     click.echo(
-        f"Specify the tap's {click.style('supported Singer features', fg='blue')} (executable flags), for example:"
+        f"Specify the tap's {capabilities_help} (executable flags), for example:"
     )
     click.echo("\t`catalog`: supports the `--catalog` flag")
     click.echo("\t`discover`: supports the `--discover` flag")
@@ -174,10 +201,10 @@ def _prompt_plugin_capabilities(plugin_type):
     click.echo()
 
     return click.prompt(
-        click.style("(capabilities)", fg="blue"),
+        click.style("(capabilities)", fg=BLUE),
         type=list,
-        default=[],
-        value_proc=lambda value: [word.strip() for word in value.split(",")],
+        default="",
+        value_proc=lambda value: [word.strip() for word in value.split(",") if word],
     )
 
 
@@ -185,10 +212,11 @@ def _prompt_plugin_settings(plugin_type):
     if plugin_type not in {PluginType.EXTRACTORS, PluginType.LOADERS}:
         return []
     singer_type = "tap" if plugin_type == PluginType.EXTRACTORS else "target"
+    supported_settings_help = click.style("supported settings", fg=BLUE)
 
     click.echo()
     click.echo(
-        f"Specify the {singer_type}'s {click.style('supported settings', fg='blue')} (`config.json` keys)"
+        f"Specify the {singer_type}'s {supported_settings_help} (`config.json` keys)"
     )
     click.echo()
     click.echo("Multiple setting names (keys) can be separated using commas.")
@@ -200,17 +228,17 @@ def _prompt_plugin_settings(plugin_type):
     click.echo()
     click.echo("Supported setting kinds:")
     click.echo(
-        " | ".join([click.style(kind.value, fg="magenta") for kind in SettingKind])
+        " | ".join([click.style(kind.value, fg=MAGENTA) for kind in SettingKind])
     )
     click.echo()
     click.echo(
         "- Credentials and other sensitive setting types should use the "
-        + click.style("password", fg="magenta")
+        + click.style("password", fg=MAGENTA)
         + " kind."
     )
     click.echo(
         "- If not specified, setting kind defaults to "
-        + click.style("string", fg="magenta")
+        + click.style("string", fg=MAGENTA)
         + "."
     )
     click.echo(
@@ -227,11 +255,13 @@ def _prompt_plugin_settings(plugin_type):
     settings: dict = None
     while settings is None:  # noqa:  WPS426  # allows lambda in loop
         settings_input = click.prompt(
-            click.style("(settings)", fg="blue"),
+            click.style("(settings)", fg=BLUE),
             type=list,
-            default=[],
+            default="",
             value_proc=lambda value: [
-                setting.strip().partition(":") for setting in value.split(",")
+                setting.strip().partition(":")
+                for setting in value.split(",")
+                if setting
             ],
         )
         try:
@@ -240,7 +270,7 @@ def _prompt_plugin_settings(plugin_type):
                 for name, sep, kind in settings_input
             ]
         except ValueError as ex:
-            click.secho(str(ex), fg="red")
+            click.secho(str(ex), fg=RED)
 
     return settings
 
@@ -254,6 +284,20 @@ def add_plugin(
     inherit_from=None,
     custom=False,
 ):
+    """Add a plugin to the project.
+
+    Args:
+        project: The project to add the plugin to.
+        plugin_type: The type of plugin to add.
+        plugin_name: The name of the plugin to add.
+        add_service: The service to use to add the plugin.
+        variant: The variant of the plugin to add.
+        inherit_from: The name of the plugin to inherit from.
+        custom: Whether the plugin is a custom plugin.
+
+    Returns:
+        The added plugin.
+    """
     plugin_attrs = {}
     if custom:
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
@@ -270,7 +314,7 @@ def add_plugin(
             "settings": settings,
         }
 
-    try:
+    try:  # noqa: WPS229 (allow two-line try)
         plugin = add_service.add(
             plugin_type,
             plugin_name,
@@ -281,10 +325,11 @@ def add_plugin(
         print_added_plugin(project, plugin)
     except PluginAlreadyAddedException as err:
         plugin = err.plugin
+        plugin_descriptor = plugin_type.descriptor.capitalize()
 
         click.secho(
-            f"{plugin_type.descriptor.capitalize()} '{plugin_name}' already exists in your Meltano project",
-            fg="yellow",
+            f"{plugin_descriptor} '{plugin_name}' already exists in your Meltano project",
+            fg=YELLOW,
             err=True,
         )
 
@@ -351,9 +396,27 @@ def add_plugin(
 
 
 def add_related_plugins(
-    project, plugins, add_service: ProjectAddService, plugin_types=list(PluginType)
+    project,
+    plugins,
+    add_service: ProjectAddService,
+    plugin_types: Optional[List[PluginType]] = None,
 ):
+    """Add related plugins to the project.
+
+    Args:
+        project: The project to add the plugins to.
+        plugins: The plugins to add.
+        add_service: PluginAddService instance.
+        plugin_types: The plugin types to add.
+
+    Returns:
+        The added plugins.
+    """
     added_plugins = []
+
+    if plugin_types is None:
+        plugin_types = list(PluginType)
+
     for plugin_install in plugins:
         related_plugins = add_service.add_related(
             plugin_install, plugin_types=plugin_types
@@ -367,11 +430,13 @@ def add_related_plugins(
     return added_plugins
 
 
-def install_status_update(install_state):
-    """
-    Print the status of plugin installation.
+def install_status_update(install_state: PluginInstallState):
+    """Print the status of plugin installation.
 
     Used as the callback for PluginInstallService.
+
+    Args:
+        install_state (PluginInstallState): The state of the plugin installation.
     """
     plugin = install_state.plugin
     desc = plugin.type.descriptor
@@ -379,43 +444,56 @@ def install_status_update(install_state):
         msg = f"{install_state.verb} {desc} '{plugin.name}'..."
         click.secho(msg)
     elif install_state.status is PluginInstallStatus.ERROR:
-        click.secho(install_state.message, fg="red")
+        click.secho(install_state.message, fg=RED)
         click.secho(install_state.details, err=True)
     elif install_state.status is PluginInstallStatus.WARNING:
-        click.secho(f"Warning! {install_state.message}.", fg="yellow")
+        click.secho(f"Warning! {install_state.message}.", fg=YELLOW)
     elif install_state.status is PluginInstallStatus.SUCCESS:
         msg = f"{install_state.verb} {desc} '{plugin.name}'"
-        click.secho(msg, fg="green")
+        click.secho(msg, fg=GREEN)
 
 
 def install_plugins(
     project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None, clean=False
 ):
-    """Install the provided plugins and report results to the console."""
+    """Install the provided plugins and report results to the console.
+
+    Args:
+        project: The project to install the plugins into.
+        plugins: The plugins to install.
+        reason: The reason for installing the plugins.
+        parallelism: The number of parallel processes to use.
+        clean: Whether to clean the plugin venv directory before installing.
+
+    Returns:
+        The list of installed plugins.
+    """
     install_service = PluginInstallService(
         project, status_cb=install_status_update, parallelism=parallelism, clean=clean
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
+    num_total = len(install_results)
     num_successful = len([status for status in install_results if status.successful])
     num_skipped = len([status for status in install_results if status.skipped])
-    num_failed = len(install_results) - num_successful
+    num_failed = num_total - num_successful
+    num_installed = num_successful - num_skipped
 
-    fg = "green"
+    fg = GREEN
     if num_failed >= 0 and num_successful == 0:
-        fg = "red"
+        fg = RED
     elif num_failed > 0 and num_successful > 0:
-        fg = "yellow"
+        fg = YELLOW
 
     if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
         click.secho(
-            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
+            f"{verb} {num_installed}/{num_total} plugins",
             fg=fg,
         )
     if num_skipped:
         verb = "Skipped installing"
         click.secho(
-            f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
+            f"{verb} {num_skipped}/{num_total} plugins",
             fg=fg,
         )
 
@@ -424,7 +502,14 @@ def install_plugins(
 
 @contextmanager
 def propagate_stop_signals(proc):
-    """When a stop signal is received, send it to `proc` and wait for it to terminate."""
+    """When a stop signal is received, send it to `proc` and wait for it to terminate.
+
+    Args:
+        proc: The process to send the stop signal to.
+
+    Yields:
+        Nothing.
+    """
 
     def _handler(sig, _):  # noqa: WPS430
         proc.send_signal(sig)

@@ -138,6 +138,15 @@ per_file_ignores =
         WPS216
         # Allow many module members
         WPS202
+    src/meltano/cli/utils.py:
+        # Found wrong module name (utils.py)
+        WPS100
+        # Allow "too many" module members
+        WPS202
+        # Allow "too many" expressions
+        WPS213
+        # Allow complex f-strings for prompt messages
+        ; WPS237
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
