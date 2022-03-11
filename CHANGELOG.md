@@ -28,6 +28,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3217](https://gitlab.com/meltano/meltano/-/issues/3217) Allow user to configure Sendgrid asm_group_id. _Thanks, **[@davesgonechina](https://gitlab.com/davesgonechina)**!_
 - [#3321](https://gitlab.com/meltano/meltano/-/issues/3321) Switch Snowplow tracker endpoint to `https`.
 
+### Fixes
+
+- [#3306](https://gitlab.com/meltano/meltano/-/issues/3306) Fix Environments bug where custom configuration values that were not defined either as a setting or custom configuration in the primary plugin definition were not passed to the plugin in the Environment context.
+
 
 ## 1.97.0 - (2022-03-03)
 ---
