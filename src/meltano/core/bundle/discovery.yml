@@ -3328,4 +3328,4 @@ mappers:
     variant: meltano
     pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
     repo: https://github.com/MeltanoLabs/meltano-map-transform
-    executable: meltano-map-transformer
+    executable: meltano-map-transform
