@@ -153,7 +153,7 @@ per_file_ignores =
         # Allow "too many" expressions
         WPS213
         # Allow complex f-strings for prompt messages
-        ; WPS237
+        WPS237
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
