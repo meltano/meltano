@@ -12,17 +12,25 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+### Fixes
+
+### Breaks
+
+
+## 1.98.0 - (2022-03-10)
+---
+
+### Changes
+
 - [#3316](https://gitlab.com/meltano/meltano/-/issues/3316) Improve the `meltano init` experience with beautified text and cleaner logging
 - [#3317](https://gitlab.com/meltano/meltano/-/issues/3317) Improve Snowplow documentation and simplify telemetry notification during `meltano init`
-- [#3319](https://gitlab.com/meltano/meltano/-/issues/3319) Limit snowplow tracker logs to the command line to ERROR level by default
-- [#3217](https://gitlab.com/meltano/meltano/-/issues/3217) Allow user to configure Sendgrid asm_group_id  _Thanks, **[@davesgonechina](https://gitlab.com/davesgonechina)**!_
-- [#3321](https://gitlab.com/meltano/meltano/-/issues/3321) Switch Snowplow tracker endpoint to https
+- [#3319](https://gitlab.com/meltano/meltano/-/issues/3319) Limit Snowplow tracker logs to the command line to `ERROR` level by default.
+- [#3217](https://gitlab.com/meltano/meltano/-/issues/3217) Allow user to configure Sendgrid asm_group_id. _Thanks, **[@davesgonechina](https://gitlab.com/davesgonechina)**!_
+- [#3321](https://gitlab.com/meltano/meltano/-/issues/3321) Switch Snowplow tracker endpoint to `https`.
 
 ### Fixes
 
 - [#3306](https://gitlab.com/meltano/meltano/-/issues/3306) Fix Environments bug where custom configuration values that were not defined either as a setting or custom configuration in the primary plugin definition were not passed to the plugin in the Environment context.
-
-### Breaks
 
 
 ## 1.97.0 - (2022-03-03)
