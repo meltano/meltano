@@ -82,6 +82,7 @@ show_source = true
 extended_default_ignore = []
 max_imports = 20
 docstring_style = google
+max-string-usages = 5
 
 per_file_ignores =
     tests/*:
