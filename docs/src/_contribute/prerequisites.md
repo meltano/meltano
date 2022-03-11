@@ -35,7 +35,12 @@ poetry run pre-commit install --install-hooks
 make bundle
 ```
 
-Meltano is now installed and available at `meltano`, as long as you remain in your `meltano-development` virtual environment!
+Meltano is now installed and available at `meltano`, as long as you remain in your virtual environment defined by poetry!
+If you're using VSCode to manage the terminal, you can update the interpreter to always use poetry so all meltano commands work as you expect. 
+
+You can also run meltano by prefixing all commands with `poetry run meltano...` if you're running outside of the poetry-defined virtual environment. 
+
+
 
 This means that you're ready to start Meltano CLI development. For API and UI development, read on.
 
