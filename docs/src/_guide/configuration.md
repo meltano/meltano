@@ -35,7 +35,7 @@ To determine the values of settings, Meltano will look in 4 main places (and one
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
 5. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
-   - Definitions of [discoverable plugins](/concepts/plugins#discoverable-plugins) can be found in the [`discovery.yml` manifest](/the-project/contributor-guide#discoverable-plugins).
+   - Definitions of [discoverable plugins](/concepts/plugins#discoverable-plugins) can be found in the [`discovery.yml` manifest](/contribute/plugins#discoverable-plugins).
    - [Custom plugin definitions](/concepts/project#plugins) can be found in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
    - `meltano config <plugin> list` will list the default values.
 
