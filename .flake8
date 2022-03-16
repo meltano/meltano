@@ -82,6 +82,7 @@ show_source = true
 extended_default_ignore = []
 max_imports = 20
 docstring_style = google
+max-string-usages = 5
 
 per_file_ignores =
     tests/*:
@@ -144,6 +145,15 @@ per_file_ignores =
         WPS216
         # Allow many module members
         WPS202
+    src/meltano/cli/utils.py:
+        # Found wrong module name (utils.py)
+        WPS100
+        # Allow "too many" module members
+        WPS202
+        # Allow "too many" expressions
+        WPS213
+        # Allow complex f-strings for prompt messages
+        WPS237
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
