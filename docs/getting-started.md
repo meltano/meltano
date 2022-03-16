@@ -254,7 +254,7 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
         *To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).*
 
         <div class="notification is-info">
-          <p>Once you've got the extractor working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+          <p>Once you've got the extractor working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
         </div>
 
     - If a Singer tap for your data source **doesn't exist yet**, learn how to build and use your own tap by following the ["Create and Use a Custom Extractor" tutorial](/tutorials/custom-extractor).
@@ -637,7 +637,7 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
 
 
         <div class="notification is-info">
-          <p>Once you've got the loader working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+          <p>Once you've got the loader working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
         </div>
 
     - If a Singer target for your data source **doesn't exist yet**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
