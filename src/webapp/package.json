@@ -71,5 +71,6 @@
       "vue-cli-service lint",
       "git add"
     ]
-  }
+  },
+  "packageManager": "yarn@3.2.0"
 }
