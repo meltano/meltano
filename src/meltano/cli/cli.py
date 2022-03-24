@@ -1,8 +1,9 @@
-import logging
+import logging  # noqa: D100
 import sys
-import warnings
+import warnings  # noqa: F401
 
 import click
+
 import meltano
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.logging import LEVELS, setup_logging
@@ -42,7 +43,7 @@ def cli(  # noqa: WPS231
     ctx.ensure_object(dict)
     ctx.obj["verbosity"] = verbose
 
-    try:
+    try:  # noqa: WPS229
         project = Project.find()
         setup_logging(project)
 
@@ -53,14 +54,17 @@ def cli(  # noqa: WPS231
         if project.readonly:
             logger.debug("Project is read-only.")
 
+        if project.meltano.default_environment and environment != "null":
+            project.activate_environment(project.meltano.default_environment)
+
         if environment is not None:
             project.activate_environment(environment)
             logger.info("Environment '%s' is active", environment)  # noqa: WPS323
 
         ctx.obj["project"] = project
-    except ProjectNotFound as err:
+    except ProjectNotFound:
         ctx.obj["project"] = None
-    except IncompatibleVersionError as err:
+    except IncompatibleVersionError:
         click.secho(
             "This Meltano project is incompatible with this version of `meltano`.",
             fg="yellow",

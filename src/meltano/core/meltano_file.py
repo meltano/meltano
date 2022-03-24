@@ -1,5 +1,5 @@
-import copy
-from typing import Dict, Iterable, List
+import copy  # noqa: D100
+from typing import Dict, Iterable, List, Optional
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
@@ -10,10 +10,11 @@ from meltano.core.schedule import Schedule
 VERSION = 1
 
 
-class MeltanoFile(Canonical):
-    def __init__(
+class MeltanoFile(Canonical):  # noqa: D101
+    def __init__(  # noqa: D107
         self,
         version: int = VERSION,
+        default_environment: Optional[str] = None,
         plugins: Dict[str, dict] = None,
         schedules: List[dict] = None,
         environments: List[dict] = None,
@@ -22,6 +23,7 @@ class MeltanoFile(Canonical):
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             version=version,
+            default_environment=default_environment,
             extras=extras,
             plugins=self.load_plugins(plugins or {}),
             schedules=self.load_schedules(schedules or []),
@@ -29,7 +31,7 @@ class MeltanoFile(Canonical):
         )
 
     def load_plugins(self, plugins) -> Canonical:
-        """Parse the meltano.yml file and return it as `ProjectPlugin` instances."""
+        """Parse the meltano.yml file and return it as `ProjectPlugin` instances."""  # noqa: DAR101, DAR201
         plugin_type_plugins = Canonical()
 
         for ptype in PluginType:
@@ -53,7 +55,7 @@ class MeltanoFile(Canonical):
 
         return plugin_type_plugins
 
-    def load_schedules(self, schedules) -> List[Schedule]:
+    def load_schedules(self, schedules) -> List[Schedule]:  # noqa: D102
         return list(map(Schedule.parse, schedules))
 
     @staticmethod
@@ -74,6 +76,7 @@ class MeltanoFile(Canonical):
 
         Args:
             mapper_config: The dict representation of a mapper config found in in meltano.yml.
+
         Returns:
             A list of `ProjectPlugin` instances.
         """
