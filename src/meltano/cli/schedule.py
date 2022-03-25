@@ -7,6 +7,7 @@ from pathlib import Path
 
 import click
 from click_default_group import DefaultGroup
+
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.project import Project, ProjectNotFound
@@ -60,7 +61,7 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
             session, name, extractor, loader, transform, interval, start_date
         )
 
-        tracker.track_meltano_schedule(schedule)
+        tracker.track_meltano_schedule("add", schedule)
         click.echo(f"Scheduled '{schedule.name}' at {schedule.interval}")
     except ScheduleAlreadyExistsError as serr:
         click.secho(f"Schedule '{serr.schedule.name}' already exists.", fg="yellow")
@@ -126,6 +127,9 @@ def list(ctx, format):
     finally:
         session.close()
 
+    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker.track_meltano_schedule("list")
+
 
 @schedule.command(
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
@@ -140,6 +144,9 @@ def run(ctx, name, elt_options):
 
     schedule = schedule_service.find_schedule(name)
     process = schedule_service.run(schedule, *elt_options)
+
+    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker.track_meltano_schedule("run", schedule)
 
     exitcode = process.returncode
     if exitcode:
