@@ -27,12 +27,16 @@ logger = logging.getLogger(__name__)
 
 
 class CliError(Exception):
+    """Base exception when CLI commands fail."""
+
     def __init__(self, *args, **kwargs):
+        """Create a new CliError."""
         super().__init__(*args, **kwargs)
 
         self.printed = False
 
     def print(self):
+        """Print the CLI error message to the console."""
         if self.printed:
             return
 
@@ -43,6 +47,7 @@ class CliError(Exception):
 
 
 def print_added_plugin(project, plugin, related=False):
+    """Print to the console the details of the plugin that was added."""
     descriptor = plugin.type.descriptor
     if related:
         descriptor = f"related {descriptor}"
@@ -254,6 +259,7 @@ def add_plugin(
     inherit_from=None,
     custom=False,
 ):
+    """Add plugin to project definition."""
     plugin_attrs = {}
     if custom:
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
@@ -350,6 +356,7 @@ def add_plugin(
 def add_related_plugins(
     project, plugins, add_service: ProjectAddService, plugin_types=list(PluginType)
 ):
+    """Add related plugins to based on the list of added_plugins."""
     added_plugins = []
     for plugin_install in plugins:
         related_plugins = add_service.add_related(

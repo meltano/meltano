@@ -1,12 +1,6 @@
-import json
-import logging
-import os
-import sys
-from typing import List
-from urllib.parse import urlparse
+"""Defines the CLI command `meltano add`."""
 
 import click
-import yaml
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
