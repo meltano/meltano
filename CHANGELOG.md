@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
+- [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Add anonymous tracking event coverage to `schedule` commands.
 
 ### Breaks
 
