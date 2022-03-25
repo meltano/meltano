@@ -21,6 +21,10 @@ class TestCli:
         Project.deactivate()
         shutil.rmtree(project.root)
 
+    @pytest.fixture()
+    def deactivate_project(self):
+        Project.deactivate()
+
     def test_activate_project(self, project, cli_runner, pushd):
         assert Project._default is None
 
@@ -61,9 +65,9 @@ class TestCli:
         assert cli_version.output == f"meltano, version {meltano.__version__}\n"
 
     def test_default_environment_is_activated(
-        self, project, project_files, cli_runner, pushd
+        self, deactivate_project, project_files_cli, cli_runner, pushd
     ):
-        pushd(project_files.root)
+        pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["discover"],
@@ -71,9 +75,9 @@ class TestCli:
         assert Project._default.active_environment.name == "test-meltano-environment"
 
     def test_environment_flag_overrides_default(
-        self, project, project_files, cli_runner, pushd
+        self, deactivate_project, project_files_cli, cli_runner, pushd
     ):
-        pushd(project_files.root)
+        pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["--environment", "test-subconfig-2-yml", "discover"],
@@ -81,21 +85,21 @@ class TestCli:
         assert Project._default.active_environment.name == "test-subconfig-2-yml"
 
     def test_environment_variable_overrides_default(
-        self, project, project_files, cli_runner, pushd, monkeypatch
+        self, deactivate_project, project_files_cli, cli_runner, pushd, monkeypatch
     ):
 
         monkeypatch.setenv("MELTANO_ENVIRONMENT", "test-subconfig-2-yml")
-        pushd(project_files.root)
+        pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["discover"],
         )
         assert Project._default.active_environment.name == "test-subconfig-2-yml"
 
-    def test_null_environment_overrides_default(
-        self, project, project_files, cli_runner, pushd
+    def test_no_environment_overrides_default(
+        self, deactivate_project, project_files_cli, cli_runner, pushd
     ):
-        pushd(project_files.root)
+        pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["--environment", "null", "discover"],

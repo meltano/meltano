@@ -1,10 +1,27 @@
 import os
 import shutil
+import sys
 import tempfile
+from distutils import dir_util
 from functools import partial
 from pathlib import Path
 
 import pytest
+
+
+@pytest.fixture(scope="class")
+def compatible_copy_tree():
+    """Copy files recursively from source to destination, ignoring existing dirs."""
+    # noqa: DAR201
+    def _compatible_copy_tree(source: Path, destination: Path):
+        """Copy files recursively from source to destination, ignoring existing dirs."""
+        if sys.version_info >= (3, 8):
+            # shutil.copytree option `dirs_exist_ok` was added in python3.8
+            shutil.copytree(source, destination, dirs_exist_ok=True)
+        else:
+            dir_util.copy_tree(str(source), str(destination))
+
+    return _compatible_copy_tree
 
 
 @pytest.fixture(scope="function")
@@ -24,7 +41,7 @@ def test_dir(tmp_path_factory):
     cwd = os.getcwd()
     test_dir = tmp_path_factory.mktemp("meltano_root")
 
-    try:
+    try:  # noqa: WPS229
         os.chdir(test_dir)
         yield test_dir
     finally:
@@ -47,7 +64,6 @@ def pushd(request):
 @pytest.mark.meta
 def test_pushd(mkdtemp, pushd):
     temp = mkdtemp()
-    cwd = os.getcwd()
 
     os.makedirs(temp.joinpath("a"))
     os.makedirs(temp.joinpath("a/b"))
