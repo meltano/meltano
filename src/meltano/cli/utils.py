@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from typing import Optional
 
 import click
+
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
@@ -19,7 +20,6 @@ from meltano.core.project_add_service import (
     ProjectAddService,
 )
 from meltano.core.setting_definition import SettingKind
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 setup_logging()
 
@@ -343,9 +343,6 @@ def add_plugin(
             )
 
     click.echo()
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
     return plugin
 
