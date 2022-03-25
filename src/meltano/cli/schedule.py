@@ -1,16 +1,13 @@
-import datetime
+"""Defines the CLI command `meltano schedule`."""
+
 import json
-import logging
-import os
 import sys
-from pathlib import Path
 
 import click
 from click_default_group import DefaultGroup
 
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
-from meltano.core.project import Project, ProjectNotFound
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import coerce_datetime
@@ -29,7 +26,7 @@ def schedule(project, ctx):
     \b\nRead more at https://meltano.com/docs/command-line-interface.html#schedule
     """
     ctx.obj["project"] = project
-    ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
+    ctx.obj["schedule_service"] = ScheduleService(project)
 
 
 @schedule.command(short_help="[default] Add a new schedule.")
