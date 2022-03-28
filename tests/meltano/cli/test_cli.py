@@ -67,6 +67,7 @@ class TestCli:
     def test_default_environment_is_activated(
         self, deactivate_project, project_files_cli, cli_runner, pushd
     ):
+
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -82,6 +83,7 @@ class TestCli:
             cli,
             ["--environment", "test-subconfig-2-yml", "discover"],
         )
+
         assert Project._default.active_environment.name == "test-subconfig-2-yml"
 
     def test_environment_variable_overrides_default(
@@ -96,12 +98,42 @@ class TestCli:
         )
         assert Project._default.active_environment.name == "test-subconfig-2-yml"
 
-    def test_no_environment_overrides_default(
+    def test_lower_null_environment_overrides_default(
         self, deactivate_project, project_files_cli, cli_runner, pushd
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["--environment", "null", "discover"],
+        )
+        assert Project._default.active_environment is None
+
+    def test_upper_null_environment_overrides_default(
+        self, deactivate_project, project_files_cli, cli_runner, pushd
+    ):
+        pushd(project_files_cli.root)
+        cli_runner.invoke(
+            cli,
+            ["--environment", "NULL", "discover"],
+        )
+        assert Project._default.active_environment is None
+
+    def test_no_environment_overrides_default(
+        self, deactivate_project, project_files_cli, cli_runner, pushd
+    ):
+        pushd(project_files_cli.root)
+        cli_runner.invoke(
+            cli,
+            ["--no-environment", "discover"],
+        )
+        assert Project._default.active_environment is None
+
+    def test_no_environment_and_null_environment_overrides_default(  # noqa: WPS118
+        self, deactivate_project, project_files_cli, cli_runner, pushd
+    ):
+        pushd(project_files_cli.root)
+        cli_runner.invoke(
+            cli,
+            ["--no-environment", "--environment", "null", "discover"],
         )
         assert Project._default.active_environment is None
