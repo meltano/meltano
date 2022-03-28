@@ -404,7 +404,7 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 - [`invoke`](#using-invoke-with-environments)
 - [`select`](#using-select-with-environments)
 
-If there is a value provided for `default_environment` in your `meltano.yml` these commands will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided. If you have `default_environment` set this way but would prefer to use no environment use the option `--environment null`.
+If there is a value provided for `default_environment` in your `meltano.yml` these commands will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided. If you have `default_environment` set this way but would prefer to use no environment use the option `--environment null` or use the `--no-environment` flag.
 
 ### Examples
 

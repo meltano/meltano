@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
     help="Meltano environment name.",
 )
 @click.option(
-    "--no-environment", is_flag=True, default=False, help="Ignore default environment"
+    "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
