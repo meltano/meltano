@@ -20,7 +20,7 @@
 homepage_sample_code:
   extends: .sample_code
   script:
-    ### https://meltano.com/#installation
+    ### https://docs.meltano.com/guide/installation
 
     # For these examples to work, ensure that:
     # - you are running Linux or macOS
@@ -40,7 +40,7 @@ homepage_sample_code:
     - pip3 install ..
 
 
-    ### https://meltano.com/#meltano-init
+    ### https://docs.meltano.com/concepts/project
 
     # Initialize a new Meltano project
     - meltano init demo-project
@@ -58,7 +58,7 @@ homepage_sample_code:
     ### ---
 
 
-    ### https://meltano.com/#integration
+    ### https://docs.meltano.com/guide/integration
 
     # Add GitLab extractor to your project
     - meltano add extractor tap-gitlab
@@ -85,7 +85,7 @@ homepage_sample_code:
     - head -n 1 output/tags.jsonl
 
 
-    ### https://meltano.com/#transformation
+    ### https://docs.meltano.com/guide/transformation
 
     # For these examples to work, ensure that:
     # - you have PostgreSQL running somewhere
@@ -120,7 +120,7 @@ homepage_sample_code:
     - PGPASSWORD=$TARGET_POSTGRES_PASSWORD psql -U $TARGET_POSTGRES_USER -h $TARGET_POSTGRES_HOST -p $TARGET_POSTGRES_PORT -d $TARGET_POSTGRES_DBNAME -c "SELECT * FROM analytics.gitlab_tags LIMIT 1;"
 
 
-    ### https://meltano.com/#orchestration
+    ### https://docs.meltano.com/guide/orchestration
 
     # Schedule pipelines
     - meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl @hourly
@@ -144,7 +144,7 @@ homepage_sample_code:
     # meltano invoke airflow webserver
 
 
-    ### https://meltano.com/#containerization
+    ### https://docs.meltano.com/guide/containerization
 
     # For these examples to work, ensure that
     # Docker has been installed
