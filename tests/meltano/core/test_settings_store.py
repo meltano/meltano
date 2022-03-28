@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from unittest import mock
 
 import pytest
+
 from meltano.core.environment import Environment
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.settings_service import SettingsService
@@ -36,7 +37,7 @@ class DummySettingsService(SettingsService):
 
     @property
     def docs_url(self):
-        return "https://meltano.com/docs/"
+        return "https://docs.meltano.com/"
 
     @property
     def env_prefixes(self):

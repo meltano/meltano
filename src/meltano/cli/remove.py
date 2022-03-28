@@ -1,5 +1,6 @@
 """Defines `meltano remove` command."""
 import click
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
@@ -21,7 +22,7 @@ def remove(ctx, project, plugin_type, plugin_names):
     """
     Remove plugins from your project.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#remove
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#remove
     """
     plugins = [
         ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)

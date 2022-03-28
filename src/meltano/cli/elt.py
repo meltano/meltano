@@ -5,6 +5,8 @@ from contextlib import contextmanager
 
 import click
 from async_generator import asynccontextmanager
+from structlog import stdlib as structlog_stdlib
+
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -18,7 +20,6 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
-from structlog import stdlib as structlog_stdlib
 
 from . import cli
 from .params import pass_project
@@ -99,7 +100,7 @@ async def elt(
     extractor_name: extractor to be used in this pipeline.
     loader_name: loader to be used in this pipeline.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#elt
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 

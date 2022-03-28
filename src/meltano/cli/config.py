@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 import dotenv
+
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -49,7 +50,7 @@ def config(  # noqa: WPS231
     """
     Display Meltano or plugin configuration.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#config
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
     """
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 

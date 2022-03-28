@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from typing import Optional
 
 import click
+
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
@@ -165,7 +166,7 @@ def _prompt_plugin_capabilities(plugin_type):
         "To find out what features a tap supports, reference its documentation or try one"
     )
     click.echo(
-        "of the tricks under https://meltano.com/docs/contributor-guide.html#how-to-test-a-tap."
+        "of the tricks under https://docs.meltano.com/guide/integration#troubleshooting."
     )
     click.echo()
     click.echo("Multiple capabilities can be separated using commas.")

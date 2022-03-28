@@ -152,8 +152,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://meltano.com/docs/command-line-interface.html#run) command.
-- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://meltano.com/docs/command-line-interface.html#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
+- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://docs.meltano.com/reference/command-line-interface#run) command.
+- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://docs.meltano.com/reference/command-line-interface#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
 
 ### Changes
 

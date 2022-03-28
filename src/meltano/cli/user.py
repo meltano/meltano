@@ -2,6 +2,7 @@ import logging
 
 import click
 from flask_security.utils import hash_password
+
 from meltano.api.app import create_app
 from meltano.core.utils import identity
 
@@ -18,7 +19,7 @@ def user(ctx, project):
 
     TIP: This command is only relevant when Meltano is run with authentication enabled.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#user
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#user
     """
     ctx.obj["project"] = project
 

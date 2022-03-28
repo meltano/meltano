@@ -3,6 +3,7 @@ import os
 from urllib.parse import urlparse
 
 import click
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_discovery_service import (
     DiscoveryInvalidError,
@@ -24,7 +25,7 @@ def discover(project, plugin_type):
     """
     List the available discoverable plugins and their variants.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#discover
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#discover
     """
     discover_service = PluginDiscoveryService(project)
     if plugin_type == "all":

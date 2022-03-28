@@ -1,4 +1,5 @@
 from dotenv import dotenv_values
+
 from meltano.core.settings_service import (
     SettingMissingError,
     SettingsService,
@@ -36,7 +37,7 @@ class ProjectSettingsService(SettingsService):
 
     @property
     def docs_url(self):
-        return "https://meltano.com/docs/settings.html"
+        return "https://docs.meltano.com/reference/settings"
 
     @property
     def env_prefixes(self):
