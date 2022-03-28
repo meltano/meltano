@@ -324,7 +324,7 @@
                 }
             },
             "extractors": {
-                "description": "https://meltano.com/docs/plugins.html#extractors",
+                "description": "https://docs.meltano.com/concepts/plugins#extractors",
                 "type": "object",
                 "allOf": [
                     {
@@ -380,7 +380,7 @@
                 ]
             },
             "loaders": {
-                "description": "https://meltano.com/docs/plugins.html#loaders",
+                "description": "https://docs.meltano.com/concepts/plugins#loaders",
                 "type": "object",
                 "allOf": [
                     {
@@ -431,7 +431,7 @@
                 ]
             },
             "orchestrators": {
-                "description": "https://meltano.com/docs/plugins.html#orchestrators",
+                "description": "https://docs.meltano.com/concepts/plugins#orchestrators",
                 "type": "object",
                 "allOf": [
                     {
@@ -458,7 +458,7 @@
                 ]
             },
             "transformers": {
-                "description": "https://meltano.com/docs/plugins.html#transformers",
+                "description": "https://docs.meltano.com/concepts/plugins#transforms",
                 "type": "object",
                 "allOf": [
                     {
@@ -485,7 +485,7 @@
                 ]
             },
             "files": {
-                "description": "https://meltano.com/docs/plugins.html#file-bundles",
+                "description": "https://docs.meltano.com/concepts/plugins#file-bundles",
                 "type": "object",
                 "allOf": [
                     {
@@ -518,7 +518,7 @@
                 ]
             },
             "utilities": {
-                "description": "https://meltano.com/docs/plugins.html#utilities",
+                "description": "https://docs.meltano.com/concepts/plugins#utilities",
                 "type": "object",
                 "allOf": [
                     {
@@ -545,7 +545,7 @@
                 ]
             },
             "transforms": {
-                "description": "https://meltano.com/docs/plugins.html#transforms",
+                "description": "https://docs.meltano.com/concepts/plugins#transforms",
                 "type": "object",
                 "allOf": [
                     {
@@ -580,7 +580,7 @@
                 ]
             },
             "models": {
-                "description": "https://meltano.com/docs/plugins.html#models",
+                "description": "https://docs.meltano.com/concepts/plugins#models",
                 "type": "object",
                 "allOf": [
                     {
@@ -607,7 +607,7 @@
                 ]
             },
             "dashboards": {
-                "description": "https://meltano.com/docs/plugins.html#dashboards",
+                "description": "https://docs.meltano.com/concepts/plugins#dashboards",
                 "type": "object",
                 "allOf": [
                     {
@@ -656,7 +656,7 @@
                 }
             },
             "mappers": {
-            "description": "https://meltano.com/docs/plugins.html#mappers",
+            "description": "https://docs.meltano.com/concepts/plugins#mappers",
             "type": "object",
             "allOf": [
                 {

@@ -4,15 +4,16 @@ import subprocess
 from pathlib import Path
 
 import click
-import meltano
 import psutil
 from click_default_group import DefaultGroup
+from sqlalchemy import create_engine
+
+import meltano
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.migration_service import MigrationService
 from meltano.core.project import Project
 from meltano.core.upgrade_service import UpgradeService
-from sqlalchemy import create_engine
 
 from . import cli
 from .params import pass_project
@@ -37,7 +38,7 @@ def upgrade(ctx, project):
     - Apply migrations to system database\n
     - Recompile models\n
 
-    Read more at https://meltano.com/docs/command-line-interface.html#upgrade
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
     engine, _ = project_engine(project)
     upgrade_service = UpgradeService(engine, project)
@@ -75,7 +76,7 @@ def all(ctx, pip_url, force, skip_package):
     - Apply migrations to system database\n
     - Recompile models\n
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#upgrade
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
     project = ctx.obj["project"]
     upgrade_service = ctx.obj["upgrade_service"]

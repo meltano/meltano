@@ -238,7 +238,7 @@ export default {
         <p v-if="hasDefaultDashboards" class="has-text-centered is-italic">
           If the report you're looking for is not yet included with Meltano by
           default, please
-          <a href="https://meltano.com/docs/getting-help.html">let us know</a>!
+          <a href="https://docs.meltano.com/the-project/community">let us know</a>!
         </p>
       </div>
 

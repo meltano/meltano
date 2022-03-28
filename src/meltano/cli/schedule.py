@@ -7,6 +7,7 @@ from pathlib import Path
 
 import click
 from click_default_group import DefaultGroup
+
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.project import Project, ProjectNotFound
@@ -25,7 +26,7 @@ def schedule(project, ctx):
     """
     Manage pipeline schedules.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#schedule
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)

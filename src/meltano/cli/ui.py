@@ -7,6 +7,7 @@ import subprocess
 
 import click
 from click_default_group import DefaultGroup
+
 from meltano.api.workers import APIWorker, MeltanoCompilerWorker, UIAvailableWorker
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationService
@@ -85,7 +86,7 @@ def ui(ctx, project):
     """
     Start the Meltano UI webserver.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#ui
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#ui
     """
     ctx.obj["project"] = project
 

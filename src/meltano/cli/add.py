@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 import click
 import yaml
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
@@ -65,7 +66,7 @@ def add(
     """
     Add a plugin to your project.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#add
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
