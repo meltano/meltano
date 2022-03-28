@@ -115,13 +115,12 @@ will hold the [plugins](/concepts/plugins) that implement the various details of
 
     ```yml
     version: 1
-    send_anonymous_usage_stats: true
     project_id: <random UUID>
     ```
 
-    It doesn't define any [plugins](/concepts/project#plugins) or [pipeline schedules](/concepts/project#schedules) yet,
-    but note that the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats) is enabled by default.
-    To disable it, change the value to `false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
+    It doesn't define any [plugins](/concepts/project#plugins), [environments](/concepts/environments), or [pipeline schedules](/concepts/project#schedules) yet.
+    Note that the [anonymous usage stats](/reference/settings#send-anonymous-usage-stats) are enabled by default.
+    To disable collecting usage data, set `send_anonymous_usage_stats: false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
 
 1. Navigate to the newly created project directory:
 
@@ -255,7 +254,7 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
         *To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).*
 
         <div class="notification is-info">
-          <p>Once you've got the extractor working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+          <p>Once you've got the extractor working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
         </div>
 
     - If a Singer tap for your data source **doesn't exist yet**, learn how to build and use your own tap by following the ["Create and Use a Custom Extractor" tutorial](/tutorials/custom-extractor).
@@ -638,7 +637,7 @@ by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`melt
 
 
         <div class="notification is-info">
-          <p>Once you've got the loader working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+          <p>Once you've got the loader working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
         </div>
 
     - If a Singer target for your data source **doesn't exist yet**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).

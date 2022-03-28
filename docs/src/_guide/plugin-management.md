@@ -240,7 +240,7 @@ Specify the tap's supported Singer features (executable flags), for example:
 	`state`: supports the `--state` flag
 
 To find out what features a tap supports, reference its documentation or try one
-of the tricks under https://meltano.com/the-project/contributor-guide#how-to-test-a-tap.
+of the tricks under [how to test a tap](/contribute/plugins#how-to-test-a-tap).
 
 Multiple capabilities can be separated using commas.
 
@@ -282,7 +282,7 @@ If you add the `-e` flag ahead of the local path, the package will be installed 
 
 To find out what `settings` a tap or target supports, reference the README in the repository and/or documentation.
 If the `capabilities` a tap supports (executable flags like `--discover` and `--state`) are not described there,
-you can try [one of these tricks](/the-project/contributor-guide#how-to-test-a-tap) or refer directly to the source code.
+you can try [one of these tricks](/contribute/plugins#how-to-test-a-tap) or refer directly to the source code.
 
 This will add a [custom plugin definition](/concepts/project#custom-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 
@@ -308,7 +308,7 @@ constitute the plugin's [base plugin description](/concepts/plugins#project-plug
 everything Meltano needs to know in order to be able to use the package as a plugin.
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/the-project/contributor-guide#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ### Plugin inheritance

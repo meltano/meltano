@@ -21,7 +21,7 @@ Basic functionality around [managing](/guide/plugin-management) and [configuring
 as is an experimental [Analysis](/guide/analysis) feature, but many (newer) features of the CLI do not yet have a UI equivalent.
 
 Missing functionality and other improvements are being tracked in the ["Pipeline management and monitoring UI" epic](https://gitlab.com/groups/meltano/-/epics/78),
-and [new issues and contributions](/the-project/contributor-guide) from the community are more than welcome,
+and [new issues and contributions](/contribute/) from the community are more than welcome,
 but the team is not currently [prioritizing](https://handbook.meltano.com/product/roadmap) improvements to the UI because of the heavy focus on the CLI.
 
 ## Usage during development
