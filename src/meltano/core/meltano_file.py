@@ -1,4 +1,5 @@
-import copy  # noqa: D100
+"""Module for working with meltano.yml files."""
+import copy
 from typing import Dict, Iterable, List, Optional
 
 from meltano.core.behavior.canonical import Canonical
@@ -10,16 +11,28 @@ from meltano.core.schedule import Schedule
 VERSION = 1
 
 
-class MeltanoFile(Canonical):  # noqa: D101
-    def __init__(  # noqa: D107
+class MeltanoFile(Canonical):
+    """Data and loading methods for meltano.yml files."""
+
+    def __init__(
         self,
         version: int = VERSION,
         default_environment: Optional[str] = None,
         plugins: Dict[str, dict] = None,
         schedules: List[dict] = None,
         environments: List[dict] = None,
-        **extras,
+        **extras
     ):
+        """Construct a new MeltanoFile object from meltano.yml file.
+
+        Args:
+            version: The meltano.yml version, currently always 1.
+            default_environment: The default environment to use for commands in this project.
+            plugins: Plugin configuration for this project.
+            schedules: Schedule configuration for this project.
+            environments: Environment configuration for this project.
+            extras: Additional configuration for this project.
+        """
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             version=version,
@@ -30,8 +43,15 @@ class MeltanoFile(Canonical):  # noqa: D101
             environments=self.load_environments(environments or []),
         )
 
-    def load_plugins(self, plugins) -> Canonical:
-        """Parse the meltano.yml file and return it as `ProjectPlugin` instances."""  # noqa: DAR101, DAR201
+    def load_plugins(self, plugins: Dict[str, dict]) -> Canonical:
+        """Parse the meltano.yml file and return it as `ProjectPlugin` instances.
+
+        Args:
+            plugins: Dict of plugin configurations.
+
+        Returns:
+            New ProjectPlugin instances.
+        """
         plugin_type_plugins = Canonical()
 
         for ptype in PluginType:
@@ -55,7 +75,15 @@ class MeltanoFile(Canonical):  # noqa: D101
 
         return plugin_type_plugins
 
-    def load_schedules(self, schedules) -> List[Schedule]:  # noqa: D102
+    def load_schedules(self, schedules: List[dict]) -> List[Schedule]:
+        """Parse the meltano.yml file and return it as Schedule instances.
+
+        Args:
+            schedules: List of schedule configurations.
+
+        Returns:
+            List of new Schedule instances.
+        """
         return list(map(Schedule.parse, schedules))
 
     @staticmethod

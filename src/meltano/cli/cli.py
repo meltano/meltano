@@ -60,7 +60,10 @@ def cli(  # noqa: WPS231
         if project.readonly:
             logger.debug("Project is read-only.")
 
-        if not (no_environment or (environment and environment.lower() == "null")):
+        if no_environment or (environment and environment.lower() == "null"):
+            logger.info("No environment is active")
+
+        else:
             if environment:
                 project.activate_environment(environment)
                 logger.info("Environment '%s' is active", environment)  # noqa: WPS323
