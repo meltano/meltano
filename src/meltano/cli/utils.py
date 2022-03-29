@@ -3,9 +3,10 @@ import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import Optional
+from typing import List, Optional
 
 import click
+
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
@@ -19,7 +20,6 @@ from meltano.core.project_add_service import (
     ProjectAddService,
 )
 from meltano.core.setting_definition import SettingKind
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 setup_logging()
 
@@ -27,12 +27,16 @@ logger = logging.getLogger(__name__)
 
 
 class CliError(Exception):
+    """Base exception when CLI commands fail."""
+
     def __init__(self, *args, **kwargs):
+        """Create a new CliError."""
         super().__init__(*args, **kwargs)
 
         self.printed = False
 
     def print(self):
+        """Print the CLI error message to the console."""
         if self.printed:
             return
 
@@ -43,6 +47,7 @@ class CliError(Exception):
 
 
 def print_added_plugin(project, plugin, related=False):
+    """Print to the console the details of the plugin that was added."""
     descriptor = plugin.type.descriptor
     if related:
         descriptor = f"related {descriptor}"
@@ -254,6 +259,7 @@ def add_plugin(
     inherit_from=None,
     custom=False,
 ):
+    """Add plugin to project definition."""
     plugin_attrs = {}
     if custom:
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
@@ -344,15 +350,13 @@ def add_plugin(
 
     click.echo()
 
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
-
     return plugin
 
 
 def add_related_plugins(
-    project, plugins, add_service: ProjectAddService, plugin_types=list(PluginType)
+    project, plugins, add_service: ProjectAddService, plugin_types: List[PluginType]
 ):
+    """Add related plugins to based on the list of added_plugins."""
     added_plugins = []
     for plugin_install in plugins:
         related_plugins = add_service.add_related(
