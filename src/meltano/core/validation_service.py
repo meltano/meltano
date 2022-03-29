@@ -100,6 +100,9 @@ class ValidationsRunner(metaclass=ABCMeta):
         Returns:
             A mapping of validator names to exit codes.
         """
+        if not self.tests_selection:
+            return {}
+
         results = {}
         async with self.invoker.prepared(session):
             for name, selected in self.tests_selection.items():

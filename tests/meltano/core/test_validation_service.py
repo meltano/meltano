@@ -1,4 +1,5 @@
 import pytest
+from asynctest import Mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
@@ -33,6 +34,12 @@ class TestValidationsRunner:
             "other-test": 1,
             "skipped-test": 1,
         }
+
+        noop_runner = MockValidationsRunner(invoker, {})
+        noop_runner.invoker = Mock()
+        result = await noop_runner.run_all(session)
+        assert not result
+        assert noop_runner.invoker.call_count == 0
 
     def test_collect_tests(self, project: Project):
         collected = MockValidationsRunner.collect(project, select_all=False)
