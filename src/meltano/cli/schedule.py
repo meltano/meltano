@@ -5,6 +5,7 @@ import sys
 
 import click
 from click_default_group import DefaultGroup
+from sqlalchemy.engine import Engine
 
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
@@ -16,7 +17,7 @@ from . import cli
 from .params import pass_project
 
 
-def _print_schedules_as_text(schedule_service):
+def _print_schedules_as_text(schedule_service: ScheduleService):
     for schedule_obj in schedule_service.schedules():
         transform_elt_markers = {
             "run": ("→", "→"),
@@ -29,14 +30,14 @@ def _print_schedules_as_text(schedule_service):
         )
 
 
-def _print_schedules_as_json(schedule_service):
+def _print_schedules_as_json(schedule_service: ScheduleService, engine_session: Engine):
     schedules = []
     for schedule_obj in schedule_service.schedules():
         start_date = coerce_datetime(schedule_obj.start_date)
         if start_date:
             start_date = start_date.date().isoformat()
 
-        last_successful_run = schedule_obj.last_successful_run(session)
+        last_successful_run = schedule_obj.last_successful_run(engine_session)
         last_successful_run_ended_at = (
             last_successful_run.ended_at.isoformat() if last_successful_run else None
         )
