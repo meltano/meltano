@@ -35,7 +35,12 @@ poetry run pre-commit install --install-hooks
 make bundle
 ```
 
-Meltano is now installed and available at `meltano`, as long as you remain in your `meltano-development` virtual environment!
+Meltano is now installed and available at `meltano`, as long as you remain in your virtual environment defined by poetry!
+If you're using VSCode to manage the terminal, you can update the interpreter to always use poetry so all meltano commands work as you expect. 
+
+You can also run meltano by prefixing all commands with `poetry run meltano...` if you're running outside of the poetry-defined virtual environment. 
+
+
 
 This means that you're ready to start Meltano CLI development. For API and UI development, read on.
 
@@ -91,7 +96,7 @@ Our end-to-end tests are currently being built with [Cypress](https://www.cypres
 
 This will kick off a Cypress application that will allow you to run tests as desired by clicking each test suite (which can be found in `/src/tests/e2e/specs/*.spec.js`)
 
-![Preview of Cypres app running](images/contributor-guide/cypTest-01.png)
+![Preview of Cypres app running](images/prerequisites/cypTest-01.png)
 
 <div class="notification is-info">
   <p><strong>In the near future, all tests can flow automatically; but there are some complications that require manual triggering due to an inability to read pipeline completion.</strong></p>

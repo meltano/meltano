@@ -261,7 +261,7 @@ This command can also be run in debug mode for additional information.
 In cases where the tap is not loading any streams or it does not appear to be respecting the configured [`select`](/reference/command-line-interface#select) rules, you may need to validate the capabilities of the tap.
 
 In prior versions of the Singer spec, the `--properties` option was used instead of `--catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files).
-If this is the case for a tap, ensure `properties` is set as a [capability](/the-project/contributor-guide#taps-targets-development) for the tap instead of `catalog`.
+If this is the case for a tap, ensure `properties` is set as a [capability](/contribute/plugins) for the tap instead of `catalog`.
 Then `meltano elt` will accept the catalog file and will pass it to the tap using the appropriate flag.
 
 ### Incremental Replication Not Running as Expected

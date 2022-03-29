@@ -70,6 +70,27 @@ ignore =
     WPS602
     # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
     WPS212
+    # Various WPS refactor heavy warnings to ignore that currently have a poor risk/reward tradeoff.
+    WPS100
+    WPS112
+    WPS201
+    WPS220
+    WPS221
+    WPS226
+    WPS229
+    WPS231
+    WPS232
+    WPS237
+    WPS316
+    WPS337
+    WPS352
+    WPS404
+    WPS407
+    WPS429
+    WPS430
+    WPS433
+    WPS454
+    WPS501
 
 exclude =
     .venv
@@ -99,6 +120,8 @@ per_file_ignores =
         WPS211
         # Don't warn on too many `assert` statements in test methods
         WPS218
+        # Found too many expressions
+        WPS213
         # Don't warn on too many methods in test modules
         WPS214
         # Don't warn on too many string constants in test methods
@@ -111,10 +134,14 @@ per_file_ignores =
         WPS430
         # Allow protected attribute usage in test methods
         WPS437
+        # Found block variables overlap (false positive)
+        WPS440
         # Found module with too many imports
         WPS201
         # Found too many module members
         WPS202
+        # Found boolean non-keyword argument
+        WPS425
 
     !tests/*:
         T

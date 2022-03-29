@@ -17,7 +17,7 @@ Everyone interacting in Slack, codebases, issue trackers, mailing lists, events,
 
 ### Contributor Guide
 
-We welcome contributions to the project! Please review our [Contributor Guide](/the-project/contributor-guide) on how to contribute.
+We welcome contributions to the project! Please review our [Contributor Guide](/contribute) on how to contribute.
 
 ## Demo Days
 
