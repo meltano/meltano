@@ -1,7 +1,7 @@
 ARG PYTHON_VERSION=3.8
 FROM python:$PYTHON_VERSION
 
-ENV NODE_VERSION 10
+ENV NODE_VERSION 12
 
 RUN echo "Installing system deps" \
     && apt-get update \
