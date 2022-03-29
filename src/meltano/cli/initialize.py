@@ -21,18 +21,22 @@ logger = logging.getLogger(__name__)
 
 @cli.command(short_help="Create a new Meltano project.")
 @click.pass_context
-@click.argument("project_name")
+@click.argument("project_name", required=False)
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
 @database_uri_option
 def init(ctx, project_name, no_usage_stats):
-    r"""
+    """
     Create a new Meltano project.
 
-    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#init
+    Read more at https://docs.meltano.com/reference/command-line-interface#init
 
     """
+    if not project_name:
+        click.echo("We need a project name to get started!")
+        project_name = click.prompt("Enter a name now to create a Meltano project")
+
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
         logging.warning(f"Found meltano project at: {root}")
