@@ -3,7 +3,7 @@ import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import Optional
+from typing import List, Optional
 
 import click
 
@@ -354,7 +354,7 @@ def add_plugin(
 
 
 def add_related_plugins(
-    project, plugins, add_service: ProjectAddService, plugin_types=list(PluginType)
+    project, plugins, add_service: ProjectAddService, plugin_types: List[PluginType]
 ):
     """Add related plugins to based on the list of added_plugins."""
     added_plugins = []
