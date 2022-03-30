@@ -86,6 +86,7 @@ def add(
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins = []
+    tracker = GoogleAnalyticsTracker(project)
     for plugin in plugin_names:
         plugins.append(
             add_plugin(
@@ -98,7 +99,6 @@ def add(
                 add_service=add_service,
             )
         )
-        tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
     related_plugin_types = [PluginType.FILES]
