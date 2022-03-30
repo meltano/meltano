@@ -10,17 +10,17 @@ const READONLY_INFO = {
   project_readonly: {
     label: 'Read-only project',
     tooltip: 'This Meltano project is deployed as read-only',
-    url: 'https://meltano.com/docs/settings.html#project-readonly'
+    url: 'https://docs.meltano.com/reference/settings#project-readonly'
   },
   'ui.readonly': {
     label: 'Read-only UI',
     tooltip: 'Meltano UI is running in read-only mode',
-    url: 'https://meltano.com/docs/settings.html#ui-readonly'
+    url: 'https://docs.meltano.com/reference/settings#ui-readonly'
   },
   'ui.anonymous_readonly': {
     label: 'Read-only UI',
     tooltip: 'Meltano UI is running in read-only mode until you sign in',
-    url: 'https://meltano.com/docs/settings.html#ui-anonymous-readonly'
+    url: 'https://docs.meltano.com/reference/settings#ui-anonymous-readonly'
   }
 }
 
@@ -385,7 +385,7 @@ export default {
                   class="button is-small has-background-transparent tooltip is-tooltip-left"
                   data-tooltip="I need help"
                   target="_blank"
-                  href="https://meltano.com/docs/getting-help.html"
+                  href="https://docs.meltano.com/the-project/community"
                 >
                   <span class="icon">
                     <font-awesome-icon

@@ -1,15 +1,13 @@
-import datetime
+"""Schedule management CLI."""
+
 import json
-import logging
-import os
 import sys
-from pathlib import Path
 
 import click
 from click_default_group import DefaultGroup
+
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
-from meltano.core.project import Project, ProjectNotFound
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import coerce_datetime
@@ -25,10 +23,10 @@ def schedule(project, ctx):
     """
     Manage pipeline schedules.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#schedule
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
     ctx.obj["project"] = project
-    ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
+    ctx.obj["schedule_service"] = ScheduleService(project)
 
 
 @schedule.command(short_help="[default] Add a new schedule.")
@@ -52,18 +50,20 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 
-    _, Session = project_engine(project)
+    _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
         tracker = GoogleAnalyticsTracker(schedule_service.project)
-        schedule = schedule_service.add(
+        added_schedule = schedule_service.add(
             session, name, extractor, loader, transform, interval, start_date
         )
 
-        tracker.track_meltano_schedule(schedule)
-        click.echo(f"Scheduled '{schedule.name}' at {schedule.interval}")
+        tracker.track_meltano_schedule(added_schedule)
+        click.echo(f"Scheduled '{added_schedule.name}' at {added_schedule.interval}")
     except ScheduleAlreadyExistsError as serr:
-        click.secho(f"Schedule '{serr.schedule.name}' already exists.", fg="yellow")
+        click.secho(
+            f"Schedule '{serr.added_schedule.name}' already exists.", fg="yellow"
+        )
     finally:
         session.close()
 
@@ -71,12 +71,12 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
 @schedule.command(short_help="List available schedules.")  # noqa: WPS441
 @click.option("--format", type=click.Choice(["json", "text"]), default="text")
 @click.pass_context
-def list(ctx, format):
+def list(ctx, format):  # noqa: WPS125
     """List available schedules."""
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 
-    _, Session = project_engine(project)
+    _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
         StaleJobFailer().fail_stale_jobs(session)
@@ -88,19 +88,19 @@ def list(ctx, format):
                 "skip": ("→", "x"),
             }
 
-            for schedule in schedule_service.schedules():
-                markers = transform_elt_markers[schedule.transform]
+            for txt_schedule in schedule_service.schedules():
+                markers = transform_elt_markers[txt_schedule.transform]
                 click.echo(
-                    f"[{schedule.interval}] {schedule.name}: {schedule.extractor} {markers[0]} {schedule.loader} {markers[1]} transforms"
+                    f"[{txt_schedule.interval}] {txt_schedule.name}: {txt_schedule.extractor} {markers[0]} {txt_schedule.loader} {markers[1]} transforms"
                 )
         elif format == "json":
             schedules = []
-            for schedule in schedule_service.schedules():
-                start_date = coerce_datetime(schedule.start_date)
+            for json_schedule in schedule_service.schedules():
+                start_date = coerce_datetime(json_schedule.start_date)
                 if start_date:
                     start_date = start_date.date().isoformat()
 
-                last_successful_run = schedule.last_successful_run(session)
+                last_successful_run = json_schedule.last_successful_run(session)
                 last_successful_run_ended_at = (
                     last_successful_run.ended_at.isoformat()
                     if last_successful_run
@@ -109,20 +109,20 @@ def list(ctx, format):
 
                 schedules.append(
                     {
-                        "name": schedule.name,
-                        "extractor": schedule.extractor,
-                        "loader": schedule.loader,
-                        "transform": schedule.transform,
-                        "interval": schedule.interval,
+                        "name": json_schedule.name,
+                        "extractor": json_schedule.extractor,
+                        "loader": json_schedule.loader,
+                        "transform": json_schedule.transform,
+                        "interval": json_schedule.interval,
                         "start_date": start_date,
-                        "env": schedule.env,
-                        "cron_interval": schedule.cron_interval,
+                        "env": json_schedule.env,
+                        "cron_interval": json_schedule.cron_interval,
                         "last_successful_run_ended_at": last_successful_run_ended_at,
-                        "elt_args": schedule.elt_args,
+                        "elt_args": json_schedule.elt_args,
                     }
                 )
 
-            print(json.dumps(schedules, indent=2))
+            click.echo(json.dumps(schedules, indent=2))
     finally:
         session.close()
 
@@ -138,8 +138,8 @@ def run(ctx, name, elt_options):
     """Run a schedule."""
     schedule_service = ctx.obj["schedule_service"]
 
-    schedule = schedule_service.find_schedule(name)
-    process = schedule_service.run(schedule, *elt_options)
+    this_schedule = schedule_service.find_schedule(name)
+    process = schedule_service.run(this_schedule, *elt_options)
 
     exitcode = process.returncode
     if exitcode:

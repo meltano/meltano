@@ -4,41 +4,41 @@
 
 [Meltano](https://meltano.com) is
 [open source](https://gitlab.com/meltano/meltano),
-[self-hosted](https://meltano.com/docs/production.html),
-[CLI-first](https://meltano.com/docs/command-line-interface.html),
-[debuggable](https://meltano.com/docs/command-line-interface.html#debugging), and
-[extensible](https://meltano.com/docs/plugins.html).
+[self-hosted](https://docs.meltano.com/guide/production),
+[CLI-first](https://docs.meltano.com/reference/command-line-interface),
+[debuggable](https://docs.meltano.com/reference/command-line-interface#debugging), and
+[extensible](https://docs.meltano.com/concepts/plugins).
 
-[Pipelines are code](https://meltano.com/docs/project.html),
+[Pipelines are code](https://docs.meltano.com/concepts/project),
 ready to be version controlled,
-[containerized](https://meltano.com/docs/containerization.html), and
-[deployed continuously](https://meltano.com/docs/production.html#and-onto-the-production-environment).
+[containerized](https://docs.meltano.com/guide/containerization), and
+[deployed continuously](https://docs.meltano.com/guide/production#your-meltano-project).
 Develop and test
-[locally](https://meltano.com/docs/getting-started.html#local-installation),
+[locally](https://docs.meltano.com/getting-started#install-meltano),
 then
-[deploy in production](https://meltano.com/docs/production.html)
+[deploy in production](https://docs.meltano.com/guide/production)
 along with the built-in
-[Airflow integration](https://meltano.com/docs/production.html#airflow-orchestrator),
+[Airflow integration](https://docs.meltano.com/guide/production#airflow-orchestrator),
 or inside your
-[orchestrator of choice](https://meltano.com/docs/production.html#meltano-elt).
+[orchestrator of choice](https://docs.meltano.com/guide/production#running-pipelines).
 
 Meltano [embraces](https://handbook.meltano.com/product/singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
 [extractors](https://hub.meltano.com/extractors/) and
 [loaders](https://hub.meltano.com/loaders/),
-and leverages [dbt](https://www.getdbt.com) for [transformation](https://meltano.com/docs/transforms.html).
+and leverages [dbt](https://www.getdbt.com) for [transformation](https://docs.meltano.com/guide/transformation).
 
 ## Documentation
 
-Check out the ["Getting Started" guide](https://meltano.com/docs/getting-started.html)
-or find the full documentation at <https://www.meltano.com/docs/>.
+Check out the ["Getting Started" guide](https://docs.meltano.com/getting-started)
+or find the full documentation at <https://docs.meltano.com>.
 
 ## Contributing to Meltano
 
-We welcome contributions and improvements, please see the [contribution guidelines](https://meltano.com/docs/contributor-guide.html)
+We welcome contributions and improvements, please see the [contribution guidelines](https://docs.meltano.com/contribute/)
 
 ## Responsible Disclosure Policy
 
-Please refer to the [responsible disclosure policy](https://meltano.com/docs/responsible-disclosure.html) on our website.
+Please refer to the [responsible disclosure policy](https://docs.meltano.com/the-project/responsible-disclosure) on our website.
 
 ## License
 

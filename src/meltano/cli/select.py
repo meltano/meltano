@@ -1,14 +1,12 @@
-import fnmatch
-import json
-import logging
-import os
+"""Extractor selection management CLI."""
+
 from typing import Dict
 
 import click
+
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
-from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
@@ -19,6 +17,7 @@ from .utils import CliError
 
 
 def selection_color(selection):
+    """Return the appropriate colour for given SelectionType."""
     if selection is SelectionType.SELECTED:
         return "bright_green"
     elif selection is SelectionType.AUTOMATIC:
@@ -29,14 +28,13 @@ def selection_color(selection):
 
 def selection_mark(selection):
     """
-    Returns the mark to indicate the selection type of an attribute.
+    Return the mark to indicate the selection type of an attribute.
 
     Examples:
       [automatic]
       [selected ]
       [excluded ]
     """
-
     colwidth = max(map(len, SelectionType))  # size of the longest mark
     return f"[{selection:<{colwidth}}]"
 
@@ -75,7 +73,7 @@ async def select(
     """
     Manage extractor selection patterns.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#select
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#select
     """
     try:
         if flags["list"]:
@@ -111,7 +109,7 @@ def update(
 
 async def show(project, extractor, show_all=False):
     """Show selected."""
-    _, Session = project_engine(project)
+    _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)
 
     session = Session()
@@ -134,7 +132,7 @@ async def show(project, extractor, show_all=False):
         click.secho(f"\t{select_pattern.raw}", fg=color)
 
     click.secho("\nSelected attributes:")
-    for stream, prop in (
+    for stream, prop in tuple(
         (stream, prop)
         for stream in sorted(list_all.streams)
         for prop in sorted(list_all.properties[stream.key])
