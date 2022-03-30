@@ -1,25 +1,24 @@
-"""Fun Dragon CLI command"""
-import click
+"""Fun Dragon CLI command."""
 import random
 
+import click
+
 from meltano.core.cli_messages import (
-    MELTY,
-    DRAGON_0, 
-    DRAGON_1, 
+    DRAGON_0,
+    DRAGON_1,
     DRAGON_2,
     DRAGON_3,
-    DRAGON_4
+    DRAGON_4,
+    MELTY,
 )
 
 from . import cli
 
 
-@cli.command(short_help="Spawn a dragon!")
+@cli.command(short_help="Summon a dragon!")
 @click.pass_context
 def dragon(ctx):
-    """
-    Does what it says!
-    """
+    """Summon a dragon."""
     dragon_list = [
         MELTY,
         DRAGON_0,
@@ -28,4 +27,4 @@ def dragon(ctx):
         DRAGON_3,
         DRAGON_4,
     ]
-    click.secho(random.choice(dragon_list), nl=False)
+    click.secho(random.choice(dragon_list), nl=False)  # noqa: S311
