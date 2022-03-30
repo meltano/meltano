@@ -1,18 +1,13 @@
-import logging
+"""Project Upgrade CLI."""
+
 import os
-import subprocess
-from pathlib import Path
 
 import click
-import meltano
-import psutil
 from click_default_group import DefaultGroup
+
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
-from meltano.core.migration_service import MigrationService
-from meltano.core.project import Project
 from meltano.core.upgrade_service import UpgradeService
-from sqlalchemy import create_engine
 
 from . import cli
 from .params import pass_project
@@ -37,7 +32,7 @@ def upgrade(ctx, project):
     - Apply migrations to system database\n
     - Recompile models\n
 
-    Read more at https://meltano.com/docs/command-line-interface.html#upgrade
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
     engine, _ = project_engine(project)
     upgrade_service = UpgradeService(engine, project)
@@ -64,7 +59,7 @@ def upgrade(ctx, project):
     help="Skip updating the Meltano package.",
 )
 @click.pass_context
-def all(ctx, pip_url, force, skip_package):
+def all(ctx, pip_url, force, skip_package):  # noqa: WPS125
     """
     Upgrade Meltano and your entire project to the latest version.
 
@@ -75,7 +70,7 @@ def all(ctx, pip_url, force, skip_package):
     - Apply migrations to system database\n
     - Recompile models\n
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#upgrade
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
     project = ctx.obj["project"]
     upgrade_service = ctx.obj["upgrade_service"]
@@ -89,7 +84,7 @@ def all(ctx, pip_url, force, skip_package):
         click.echo()
         upgrade_service.compile_models()
 
-        if not os.getenv("MELTANO_PACKAGE_UPGRADED", False):
+        if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):
             click.echo()
             click.secho("Your Meltano project has been upgraded!", fg="green")
     else:
