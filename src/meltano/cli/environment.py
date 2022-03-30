@@ -1,6 +1,7 @@
 """Environment management in CLI."""
 
 import click
+
 from meltano.cli.params import pass_project
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.project import Project
@@ -17,7 +18,7 @@ def meltano_environment(project: Project, ctx: click.Context):
     """
     Manage Environments.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#environment
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#environment
     """
     ctx.obj[ENVIRONMENT_SERVICE_KEY] = EnvironmentService(project)
 

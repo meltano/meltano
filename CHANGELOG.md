@@ -17,7 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
-
+- [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` trying to instantiate all plugins rather than just those for the requested tests.
 ### Breaks
 
 
@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#3318] `meltano init` will ask for a project_name if none is passed during invocation
 - [#3316](https://gitlab.com/meltano/meltano/-/issues/3316) Improve the `meltano init` experience with beautified text and cleaner logging
 - [#3317](https://gitlab.com/meltano/meltano/-/issues/3317) Improve Snowplow documentation and simplify telemetry notification during `meltano init`
 - [#3319](https://gitlab.com/meltano/meltano/-/issues/3319) Limit Snowplow tracker logs to the command line to `ERROR` level by default.
@@ -154,8 +155,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://meltano.com/docs/command-line-interface.html#run) command.
-- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://meltano.com/docs/command-line-interface.html#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
+- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://docs.meltano.com/reference/command-line-interface#run) command.
+- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://docs.meltano.com/reference/command-line-interface#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
 
 ### Changes
 
