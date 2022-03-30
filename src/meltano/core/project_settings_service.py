@@ -20,6 +20,8 @@ UI_CFG_SETTINGS = {
 class ProjectSettingsService(SettingsService):
     """Project Settings Service."""
 
+    config_override = {}
+
     def __init__(self, *args, config_service: ConfigService = None, **kwargs):
         """Instantiate ProjectSettingsService instance.
 
@@ -30,13 +32,11 @@ class ProjectSettingsService(SettingsService):
         """
         super().__init__(*args, **kwargs)
 
-        self.config_service = config_service or ConfigService(
-            self.project
-        )  # noqa: WPS601
+        self.config_service = config_service or ConfigService(self.project)
 
         self.env_override = {**self.project.env, **self.env_override}
 
-        self.config_override = {
+        self.config_override = {  # noqa: WPS601
             **self.__class__.config_override,
             **self.config_override,
         }
