@@ -4,8 +4,9 @@ from typing import List, Optional
 
 import pytest
 import structlog
-from asserts import assert_cli_runner
 from asynctest import CoroutineMock, mock
+
+from asserts import assert_cli_runner
 from meltano.cli import CliError, cli
 from meltano.core.job import Job, State
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
@@ -45,8 +46,14 @@ class LogEntry:
     def matches(self, lines: List[dict]) -> bool:
         """Find a matching log line in the provided list of log lines.
 
-        Its important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
+        It's important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
         This is because quite a few log lines have dynamic suffix segments.
+
+        Args:
+            lines: the log lines to check against
+
+        Returns:
+            True if a matching log line is found, else False
         """
         for line in lines:
 
@@ -74,6 +81,7 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
     Args:
         result_output: The click result output string to search.
         exc: The exception to search for.
+
     Returns:
         bool: Whether or not the exception was found
     """
@@ -408,8 +416,11 @@ class TestCliEltScratchpadOne:
 
             full_result = result.stdout + result.stderr
 
-            # we already test the redirect handler in test_output_logger, so we'll just verify that the # of lines matches
-            assert len(log.splitlines()) == len(full_result.splitlines())
+            # We expect a difference of 1 line because the cli emits one log
+            # line not found in the log.
+            # we already test the redirect handler in test_output_logger,
+            # so we'll just verify that the # of lines matches.
+            assert len(log.splitlines()) == len(full_result.splitlines()) - 1
             # and just to be safe - check if these debug mode only strings show up
             assert "target-mock (out)" in log
             assert "tap-mock (out)" in log
