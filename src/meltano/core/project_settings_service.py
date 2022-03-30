@@ -1,10 +1,11 @@
+"""Project Settings Service."""
+
+from typing import List
+
 from dotenv import dotenv_values
 
-from meltano.core.settings_service import (
-    SettingMissingError,
-    SettingsService,
-    SettingValueStore,
-)
+from meltano.core.setting_definition import SettingDefinition
+from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
 from .config_service import ConfigService
@@ -17,12 +18,21 @@ UI_CFG_SETTINGS = {
 
 
 class ProjectSettingsService(SettingsService):
-    config_override = {}
+    """Project Settings Service."""
 
     def __init__(self, *args, config_service: ConfigService = None, **kwargs):
+        """Instantiate ProjectSettingsService instance.
+
+        Args:
+            args: Positional arguments to pass to the superclass.
+            config_service: Project configuration service instance.
+            kwargs: Keyword arguments to pass to the superclass.
+        """
         super().__init__(*args, **kwargs)
 
-        self.config_service = config_service or ConfigService(self.project)
+        self.config_service = config_service or ConfigService(
+            self.project
+        )  # noqa: WPS601
 
         self.env_override = {**self.project.env, **self.env_override}
 
@@ -32,51 +42,106 @@ class ProjectSettingsService(SettingsService):
         }
 
     @property
-    def label(self):
+    def label(self) -> str:
+        """Return label.
+
+        Returns:
+            Project label.
+        """
         return "Meltano"
 
     @property
-    def docs_url(self):
+    def docs_url(self) -> str:
+        """Return docs URL.
+
+        Returns:
+            URL for Meltano doc site.
+        """
         return "https://docs.meltano.com/reference/settings"
 
     @property
-    def env_prefixes(self):
-        """Return prefixes for setting environment variables."""
+    def env_prefixes(self) -> List[str]:
+        """Return prefixes for setting environment variables.
+
+        Returns:
+            A list of project ENV VAR prefix strings.
+        """
         return ["meltano"]
 
     @property
-    def db_namespace(self):
-        """Return namespace for setting value records in system database."""
+    def db_namespace(self) -> str:
+        """Return namespace for setting value records in system database.
+
+        Returns:
+            Namespace for setting value records in system database.
+        """
         return "meltano"
 
     @property
-    def setting_definitions(self):
-        """Return definitions of supported settings."""
+    def setting_definitions(self) -> List[SettingDefinition]:
+        """Return definitions of supported settings.
+
+        Returns:
+            A list of defined settings.
+        """
         return self.config_service.settings
 
     @property
     def meltano_yml_config(self):
-        """Return current configuration in `meltano.yml`."""
+        """Return current configuration in `meltano.yml`.
+
+        Returns:
+            Current configuration in `meltano.yml`.
+        """
         return self.config_service.current_config
 
     @property
     def environment_config(self):
-        """Return current configuration in `meltano.yml`."""
+        """Return current configuration in `meltano.yml`.
+
+        Returns:
+            Current configuration in `meltano.yml`
+        """
         return {}
 
     def update_meltano_yml_config(self, config):
-        """Update configuration in `meltano.yml`."""
+        """Update configuration in `meltano.yml`.
+
+        Args:
+            config: Updated config.
+        """
         self.config_service.update_config(config)
 
     def update_meltano_environment_config(self, config: dict):
-        """Update environment configuration in `meltano.yml`."""
+        """Update environment configuration in `meltano.yml`.
+
+        Args:
+            config: Updated environment config.
+        """
         self.config_service.update_environment_config(config)
 
-    def process_config(self, config):
-        """Process configuration dictionary for presentation in `meltano config meltano`."""
+    def process_config(self, config) -> dict:
+        """Process configuration dictionary for presentation in `meltano config meltano`.
+
+        Args:
+            config: Config to process.
+
+        Returns:
+            Processed configuration dictionary for presentation in `meltano config meltano`.
+        """
         return nest_object(config)
 
     def get_with_metadata(self, name: str, *args, **kwargs):
+        """Return setting value with metadata.
+
+        Args:
+            name: Name of setting to get.
+            args: Positional arguments to pass to the superclass method.
+            kwargs: Keyword arguments to pass to the superclass method.
+
+        Returns:
+            Setting value with metadata.
+        """
         value, metadata = super().get_with_metadata(name, *args, **kwargs)
         source = metadata["source"]
 
@@ -90,6 +155,14 @@ class ProjectSettingsService(SettingsService):
         return value, metadata
 
     def get_from_ui_cfg(self, name: str):
+        """Return setting value from UI config.
+
+        Args:
+            name: Name of setting to get.
+
+        Returns:
+            Setting value from UI config.
+        """
         try:
             key = UI_CFG_SETTINGS[name]
             config = dotenv_values(self.project.root_dir("ui.cfg"))

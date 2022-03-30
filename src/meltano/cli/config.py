@@ -1,3 +1,5 @@
+"""Config management CLI."""
+
 import json
 import tempfile
 from pathlib import Path
@@ -66,7 +68,7 @@ def config(  # noqa: WPS231
         else:
             raise
 
-    _, Session = project_engine(project)
+    _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
         if plugin:
@@ -90,10 +92,10 @@ def config(  # noqa: WPS231
         if ctx.invoked_subcommand is None:
             if config_format == "json":
                 process = extras is not True
-                config = settings.as_dict(
+                json_config = settings.as_dict(
                     extras=extras, process=process, session=session
                 )
-                print(json.dumps(config, indent=2))
+                click.echo(json.dumps(json_config, indent=2))
             elif config_format == "env":
                 env = settings.as_env(extras=extras, session=session)
 
@@ -104,7 +106,7 @@ def config(  # noqa: WPS231
 
                     dotenv_content = Path(temp_dotenv.name).read_text()
 
-                print(dotenv_content, end="")
+                click.echo(dotenv_content)
     finally:
         session.close()
 
@@ -233,7 +235,7 @@ def reset(ctx, store):
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
-def set(ctx, setting_name, value, store):
+def set(ctx, setting_name, value, store):  # noqa: WPS125
     """Set the configurations' setting `<name>` to `<value>`."""
     store = SettingValueStore(store)
 

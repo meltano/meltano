@@ -19,7 +19,15 @@ Store = SettingValueStore
 
 
 class DummySettingsService(SettingsService):
+    """Dummy SettingsService for testing."""
+
     def __init__(self, *args, **kwargs):
+        """Instantiate new DummySettingsService instance.
+
+        Args:
+            args: Positional arguments to pass to the superclass.
+            kwargs: Keyword arguments to pass to the superclass.
+        """
         super().__init__(*args, **kwargs)
 
         self.__meltano_yml_config = {}
@@ -225,7 +233,7 @@ class TestAutoStoreManager:
         assert value == "from_default"
         assert metadata["source"] == Store.DEFAULT
         assert metadata["auto_store"] == Store.MELTANO_YML
-        assert metadata["overwritable"] == True
+        assert metadata["overwritable"] is True
 
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "active_environment", environment)
@@ -233,21 +241,21 @@ class TestAutoStoreManager:
             assert value == "from_default"
             assert metadata["source"] == Store.DEFAULT
             assert metadata["auto_store"] == Store.MELTANO_ENV
-            assert metadata["overwritable"] == True
+            assert metadata["overwritable"] is True
 
         set_value_store("from_db", Store.DB)
         value, metadata = subject.get("regular")
         assert value == "from_db"
         assert metadata["source"] == Store.DB
         assert metadata["auto_store"] == Store.DB
-        assert metadata["overwritable"] == True
+        assert metadata["overwritable"] is True
 
         set_value_store("from_meltano_yml", Store.MELTANO_YML)
         value, metadata = subject.get("regular")
         assert value == "from_meltano_yml"
         assert metadata["source"] == Store.MELTANO_YML
         assert metadata["auto_store"] == Store.MELTANO_YML
-        assert metadata["overwritable"] == True
+        assert metadata["overwritable"] is True
 
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "active_environment", environment)
@@ -256,14 +264,14 @@ class TestAutoStoreManager:
             assert value == "from_meltano_env"
             assert metadata["source"] == Store.MELTANO_ENV
             assert metadata["auto_store"] == Store.MELTANO_ENV
-            assert metadata["overwritable"] == True
+            assert metadata["overwritable"] is True
 
         set_value_store("from_dotenv", Store.DOTENV)
         value, metadata = subject.get("regular")
         assert value == "from_dotenv"
         assert metadata["source"] == Store.DOTENV
         assert metadata["auto_store"] == Store.DOTENV
-        assert metadata["overwritable"] == True
+        assert metadata["overwritable"] is True
 
         setting_def = subject.find_setting("regular")
         monkeypatch.setenv(dummy_settings_service.setting_env(setting_def), "from_env")
@@ -271,7 +279,7 @@ class TestAutoStoreManager:
         assert value == "from_env"
         assert metadata["source"] == Store.ENV
         assert metadata["auto_store"] == Store.DOTENV
-        assert metadata["overwritable"] == False
+        assert metadata["overwritable"] is False
 
         monkeypatch.setitem(
             dummy_settings_service.config_override, "regular", "from_config_override"
@@ -280,7 +288,7 @@ class TestAutoStoreManager:
         assert value == "from_config_override"
         assert metadata["source"] == Store.CONFIG_OVERRIDE
         assert metadata["auto_store"] == Store.MELTANO_YML
-        assert metadata["overwritable"] == False
+        assert metadata["overwritable"] is False
 
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "active_environment", environment)
@@ -288,14 +296,14 @@ class TestAutoStoreManager:
             assert value == "from_config_override"
             assert metadata["source"] == Store.CONFIG_OVERRIDE
             assert metadata["auto_store"] == Store.MELTANO_ENV
-            assert metadata["overwritable"] == False
+            assert metadata["overwritable"] is False
 
         monkeypatch.setattr(project, "readonly", True)
         value, metadata = subject.get("regular")
         assert value == "from_config_override"
         assert metadata["source"] == Store.CONFIG_OVERRIDE
         assert metadata["auto_store"] == Store.DB
-        assert metadata["overwritable"] == False
+        assert metadata["overwritable"] is False
 
     def test_set(
         self,

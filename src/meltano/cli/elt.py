@@ -1,4 +1,5 @@
 """Defines `meltano elt` command."""
+
 import datetime
 import logging
 from contextlib import contextmanager
@@ -12,7 +13,7 @@ from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.logging import JobLoggingService, OutputLogger
-from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
@@ -109,7 +110,7 @@ async def elt(
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
 
-    _, Session = project_engine(project)
+    _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
         plugins_service = ProjectPluginsService(project)
@@ -148,11 +149,12 @@ def _elt_context_builder(
     transform,
     dry_run=False,
     full_refresh=False,
-    select_filter=[],
+    select_filter=None,
     catalog=None,
     state=None,
     plugins_service=None,
 ):
+    select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
         transform_name = _find_transform_for_extractor(
@@ -186,7 +188,7 @@ async def dump_file(context_builder, dumpable):
         async with invoker.prepared(elt_context.session):
             content = await invoker.dump(file_id)
 
-        print(content)
+        click.echo(content)
     except FileNotFoundError as err:
         raise CliError(f"Could not find {dumpable} file for this pipeline") from err
     except Exception as err:
@@ -240,10 +242,10 @@ async def _run_elt(log, context_builder, output_logger):
         try:
             elt_context = context_builder.context()
 
-            if not elt_context.only_transform:
-                await _run_extract_load(log, elt_context, output_logger)
-            else:
+            if elt_context.only_transform:
                 log.info("Extract & load skipped.")
+            else:
+                await _run_extract_load(log, elt_context, output_logger)
 
             if elt_context.transformer:
                 await _run_transform(log, elt_context, output_logger)
@@ -276,8 +278,8 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     def nullcontext():
         yield None
 
-    extractor_out_writer = nullcontext
-    loader_out_writer = nullcontext
+    extractor_out_writer_ctxmgr = nullcontext
+    loader_out_writer_ctxmgr = nullcontext
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(
             run_id=str(elt_context.job.run_id),
@@ -291,8 +293,8 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
             f"{loader} (out)", stdout_log.bind(cmd_type="loader"), logging.DEBUG
         )
 
-        extractor_out_writer = extractor_out.line_writer
-        loader_out_writer = loader_out.line_writer
+        extractor_out_writer_ctxmgr = extractor_out.line_writer
+        loader_out_writer_ctxmgr = loader_out.line_writer
 
     log.info(
         "Running extract & load...",
@@ -301,7 +303,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     singer_runner = SingerRunner(elt_context)
     try:
         with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
-            with extractor_out_writer() as extractor_out_writer, loader_out_writer() as loader_out_writer:
+            with extractor_out_writer_ctxmgr() as extractor_out_writer, loader_out_writer_ctxmgr() as loader_out_writer:
                 await singer_runner.run(
                     **kwargs,
                     extractor_log=extractor_log_writer,
@@ -310,14 +312,14 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
                     loader_out=loader_out_writer,
                 )
     except RunnerError as err:
-        try:
+        try:  # noqa: WPS505
             code = err.exitcodes[PluginType.EXTRACTORS]
             message = extractor_log.last_line.rstrip() or "(see above)"
             log.error("Extraction failed", code=code, message=message)
         except KeyError:
             pass
 
-        try:
+        try:  # noqa: WPS505
             code = err.exitcodes[PluginType.LOADERS]
             message = loader_log.last_line.rstrip() or "(see above)"
             log.error("Loading failed", code=code, message=message)
@@ -347,7 +349,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
         with transformer_log.line_writer() as transformer_log_writer:
             await dbt_runner.run(**kwargs, log=transformer_log_writer)
     except RunnerError as err:
-        try:
+        try:  # noqa: WPS505
             code = err.exitcodes[PluginType.TRANSFORMERS]
             message = transformer_log.last_line.rstrip() or "(see above)"
             log.error("Transformation failed", code=code, message=message)
