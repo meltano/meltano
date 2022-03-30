@@ -1,12 +1,7 @@
-import json
-import logging
-import os
-import sys
-from typing import List
-from urllib.parse import urlparse
+"""Plugin Add CLI."""
 
 import click
-import yaml
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
@@ -65,7 +60,7 @@ def add(
     """
     Add a plugin to your project.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#add
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
@@ -80,11 +75,11 @@ def add(
     plugins_service = ProjectPluginsService(project)
 
     if flags["custom"]:
-        if plugin_type in (
+        if plugin_type in {
             PluginType.TRANSFORMERS,
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
-        ):
+        }:
             raise CliError(f"--custom is not supported for {plugin_type}")
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)

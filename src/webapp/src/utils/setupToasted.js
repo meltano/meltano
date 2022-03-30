@@ -31,7 +31,7 @@ export default function setup() {
       {
         text: 'Get Help',
         onClick: () => {
-          window.open('https://meltano.com/docs/getting-help.html')
+          window.open('https://docs.meltano.com/the-project/community')
         }
       },
       {
