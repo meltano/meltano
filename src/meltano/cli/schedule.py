@@ -53,12 +53,12 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
-        tracker = GoogleAnalyticsTracker(schedule_service.project)
         added_schedule = schedule_service.add(
             session, name, extractor, loader, transform, interval, start_date
         )
 
-        tracker.track_meltano_schedule(added_schedule)
+        tracker = GoogleAnalyticsTracker(schedule_service.project)
+        tracker.track_meltano_schedule("add", added_schedule)
         click.echo(f"Scheduled '{added_schedule.name}' at {added_schedule.interval}")
     except ScheduleAlreadyExistsError as serr:
         click.secho(
@@ -126,6 +126,9 @@ def list(ctx, format):  # noqa: WPS125
     finally:
         session.close()
 
+    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker.track_meltano_schedule("list")
+
 
 @schedule.command(
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
@@ -140,6 +143,9 @@ def run(ctx, name, elt_options):
 
     this_schedule = schedule_service.find_schedule(name)
     process = schedule_service.run(this_schedule, *elt_options)
+
+    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker.track_meltano_schedule("run", this_schedule)
 
     exitcode = process.returncode
     if exitcode:

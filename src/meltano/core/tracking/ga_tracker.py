@@ -288,22 +288,32 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             debug=debug,
         )
 
-    def track_meltano_schedule(self, schedule: Schedule, debug: bool = False) -> None:
+    def track_meltano_schedule(
+        self, action: str, schedule: Schedule | None = None, debug: bool = False
+    ) -> None:
         """Track a schedule event.
 
         Args:
+            action: The type of action taken on the schedule (e.g. add, run, list)
             schedule: The schedule to track.
             debug: Whether to send the event to the debug endpoint.
         """
-        self.track_event(
-            category="meltano schedule",
-            action=(
-                f"meltano schedule {schedule.name} "
-                + f"{schedule.extractor} {schedule.loader} {schedule.interval} "
-                + f"--transform={schedule.transform}"
-            ),
-            debug=debug,
-        )
+        if schedule:
+            self.track_event(
+                category="meltano schedule",
+                action=(
+                    f"meltano schedule {action} {schedule.name} "
+                    + f"{schedule.extractor} {schedule.loader} {schedule.interval} "
+                    + f"--transform={schedule.transform}"
+                ),
+                debug=debug,
+            )
+        else:
+            self.track_event(
+                category="meltano schedule",
+                action=(f"meltano schedule {action}"),
+                debug=debug,
+            )
 
     def track_meltano_select(
         self,
