@@ -21,7 +21,7 @@ class MeltanoFile(Canonical):
         plugins: Dict[str, dict] = None,
         schedules: List[dict] = None,
         environments: List[dict] = None,
-        **extras
+        **extras,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
 
