@@ -354,9 +354,13 @@ def add_plugin(
 
 
 def add_related_plugins(
-    project, plugins, add_service: ProjectAddService, plugin_types: List[PluginType]
+    project,
+    plugins,
+    add_service: ProjectAddService,
+    plugin_types: List[PluginType] = None,
 ):
     """Add related plugins to based on the list of added_plugins."""
+    plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
         related_plugins = add_service.add_related(

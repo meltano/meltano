@@ -47,9 +47,7 @@ def install(project, plugin_type, plugin_name, include_related, clean, paralleli
 
     if include_related:
         add_service = ProjectAddService(project, plugins_service=plugins_service)
-        related_plugins = add_related_plugins(
-            project, plugins, add_service=add_service, plugin_types=list(PluginType)
-        )
+        related_plugins = add_related_plugins(project, plugins, add_service=add_service)
         plugins.extend(related_plugins)
 
     # We will install the plugins in reverse order, since dependencies
