@@ -682,7 +682,7 @@ class ELBExecutionManager:
     async def _handle_head_completed(
         self, current_head: IOBlock, start_idx: int
     ) -> None:
-        next_head = self.elb.blocks[start_idx + 1]
+        next_head: IOBlock = self.elb.blocks[start_idx + 1]
 
         if current_head is self.elb.head:
             self._producer_code = current_head.process_future.result()
@@ -693,8 +693,7 @@ class ELBExecutionManager:
 
         await asyncio.wait([current_head.proxy_stdout(), current_head.proxy_stderr()])
         # Close next inline stdin so downstream can cascade and complete naturally
-        next_head.stdin.close()
-        await next_head.stdin.wait_closed()
+        await next_head.close_stdin()
 
         if next_head is self.elb.tail:
             logger.debug("tail consumer is next block, wrapping up")
