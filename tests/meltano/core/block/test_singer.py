@@ -52,6 +52,9 @@ class TestSingerBlocks:
         tap_process.stderr.at_eof.side_effect = (False, False, False, True)
         tap_process.stderr.readline = CoroutineMock(side_effect=stderr_lines)
 
+        tap_process.stdin = mock.MagicMock()
+        tap_process.stdin.wait_closed = CoroutineMock(return_value=True)
+
         tap_process.wait = CoroutineMock(return_value=0)
 
         invoker = Mock()
@@ -64,6 +67,7 @@ class TestSingerBlocks:
     def mock_target_plugin_invoker(self, process_mock_factory, target):
         target_process = process_mock_factory(target)
         target_process.stdin = mock.MagicMock()
+        target_process.stdin.wait_closed = CoroutineMock(return_value=True)
 
         invoker = Mock()
         invoker.invoke_async = CoroutineMock(return_value=target_process)
@@ -189,3 +193,34 @@ class TestSingerBlocks:
             ]
 
             assert cap_logs == expected_lines
+
+    @pytest.mark.asyncio
+    async def test_singer_block_close_stdin(
+        self, elt_context, mock_tap_plugin_invoker, mock_target_plugin_invoker
+    ):
+
+        producer = SingerBlock(
+            block_ctx=elt_context,
+            project=elt_context.project,
+            plugins_service=elt_context.plugins_service,
+            plugin_invoker=mock_tap_plugin_invoker,
+            plugin_args={"foo": "bar"},
+        )
+        assert producer.producer
+
+        await producer.start()
+        await producer.close_stdin()
+        assert producer.process_handle.stdin.wait_closed.call_count == 0
+
+        consumer = SingerBlock(
+            block_ctx=elt_context,
+            project=elt_context.project,
+            plugins_service=elt_context.plugins_service,
+            plugin_invoker=mock_target_plugin_invoker,
+            plugin_args={"foo": "bar"},
+        )
+        assert consumer.consumer
+
+        await consumer.start()
+        await consumer.close_stdin()
+        assert consumer.process_handle.stdin.wait_closed.call_count == 1
