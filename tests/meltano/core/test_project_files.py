@@ -30,6 +30,7 @@ class TestProjectFiles:
         assert project_files._meltano_file_path == (project_files.root / "meltano.yml")
         assert project_files.meltano == {
             "version": 1,
+            "default_environment": "test-meltano-environment",
             "include_paths": [
                 "./subconfig_[0-9].yml",
                 "./*/subconfig_[0-9].yml",
@@ -75,6 +76,7 @@ class TestProjectFiles:
     def test_load(self, project_files):
         expected_result = {
             "version": 1,
+            "default_environment": "test-meltano-environment",
             "include_paths": [
                 "./subconfig_[0-9].yml",
                 "./*/subconfig_[0-9].yml",
@@ -143,6 +145,7 @@ class TestProjectFiles:
 
         project_files.update(meltano_config)
         expected_result = {
+            "default_environment": "test-meltano-environment",
             "include_paths": [
                 "./subconfig_[0-9].yml",
                 "./*/subconfig_[0-9].yml",

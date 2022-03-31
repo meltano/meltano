@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#3103](https://gitlab.com/meltano/meltano/-/issues/3103) Allow users to set a default Environment in `meltano.yml`
+
 ### Changes
 
 ### Fixes
