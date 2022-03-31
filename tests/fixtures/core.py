@@ -2,8 +2,6 @@ import datetime
 import logging
 import os
 import shutil
-import sys
-from distutils import dir_util
 from pathlib import Path
 
 import pytest
@@ -33,15 +31,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 
 PROJECT_NAME = "a_meltano_project"
-
-
-def compatible_copy_tree(source: Path, destination: Path):
-    """Copy files recursively from source to destination, ignoring existing dirs."""
-    if sys.version_info >= (3, 8):
-        # shutil.copytree option `dirs_exist_ok` was added in python3.8
-        shutil.copytree(source, destination, dirs_exist_ok=True)
-    else:
-        dir_util.copy_tree(str(source), str(destination))
 
 
 @pytest.fixture(scope="class")
@@ -469,8 +458,8 @@ def project(test_dir, project_init_service):
 
 
 @pytest.fixture(scope="class")
-def project_files(test_dir):
-    project_init_service = ProjectInitService("a_multifile_meltano_project")
+def project_files(test_dir, compatible_copy_tree):
+    project_init_service = ProjectInitService("a_multifile_meltano_project_core")
     project = project_init_service.init(add_discovery=False)
     logging.debug(f"Created new project at {project.root}")
 

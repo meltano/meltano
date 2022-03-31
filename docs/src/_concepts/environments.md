@@ -73,6 +73,14 @@ export MELTANO_ENVIRONMENT=dev
 meltano elt tap-github target-sqlite
 ```
 
+### Default Environments
+
+If you have an environment that you'd like to use by default without having to pass the `--environment=<ENV>` option or set the `MELTANO_ENVIRONMENT=<ENV>` variable you can set it as the `default_environment` in your `meltano.yml`.
+
+```yaml
+default_environment: <ENV>
+```
+
 ## Example
 
 When activating an environment, you will observe different configurations are injected by Meltano

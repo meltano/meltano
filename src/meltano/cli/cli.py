@@ -1,8 +1,9 @@
-import logging
+import logging  # noqa: D100
 import sys
-import warnings
+import warnings  # noqa: F401
 
 import click
+
 import meltano
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.logging import LEVELS, setup_logging
@@ -23,10 +24,18 @@ logger = logging.getLogger(__name__)
     envvar="MELTANO_ENVIRONMENT",
     help="Meltano environment name.",
 )
+@click.option(
+    "--no-environment", is_flag=True, default=False, help="Don't use any environment."
+)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(  # noqa: WPS231
-    ctx, log_level: str, log_config: str, verbose: int, environment: str
+    ctx,
+    log_level: str,
+    log_config: str,
+    verbose: int,
+    environment: str,
+    no_environment: bool,
 ):  # noqa: WPS231
     """
     ELT for the DataOps era.
@@ -41,26 +50,33 @@ def cli(  # noqa: WPS231
 
     ctx.ensure_object(dict)
     ctx.obj["verbosity"] = verbose
-
-    try:
+    try:  # noqa: WPS229
         project = Project.find()
         setup_logging(project)
 
         readonly = ProjectSettingsService(project).get("project_readonly")
         if readonly:
             project.readonly = True
-
         if project.readonly:
             logger.debug("Project is read-only.")
 
-        if environment is not None:
+        if no_environment or (environment and environment.lower() == "null"):
+            logger.info("No environment is active")
+
+        elif environment:
             project.activate_environment(environment)
             logger.info("Environment '%s' is active", environment)  # noqa: WPS323
+        elif project.meltano.default_environment:
+            project.activate_environment(project.meltano.default_environment)
+            logger.info(
+                "Environment '%s' is active",  # noqa: WPS323
+                project.meltano.default_environment,
+            )
 
         ctx.obj["project"] = project
-    except ProjectNotFound as err:
+    except ProjectNotFound:
         ctx.obj["project"] = None
-    except IncompatibleVersionError as err:
+    except IncompatibleVersionError:
         click.secho(
             "This Meltano project is incompatible with this version of `meltano`.",
             fg="yellow",
