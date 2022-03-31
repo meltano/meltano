@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
 - [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` trying to instantiate all plugins rather than just those for the requested tests.
+- [#3347](https://gitlab.com/meltano/meltano/-/issues/3347) Fix an issue in `meltano run` on python 3.7 where an AttributeError exception would occur while closing stdin of a spawned subprocess.
+
 ### Breaks
 
 
