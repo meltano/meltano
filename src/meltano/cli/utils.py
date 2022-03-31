@@ -1,11 +1,13 @@
 """Defines helpers for use by the CLI."""
+
 import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import Optional
+from typing import List, Optional
 
 import click
+
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
@@ -19,7 +21,6 @@ from meltano.core.project_add_service import (
     ProjectAddService,
 )
 from meltano.core.setting_definition import SettingKind
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 setup_logging()
 
@@ -27,12 +28,16 @@ logger = logging.getLogger(__name__)
 
 
 class CliError(Exception):
+    """CLI Error."""
+
     def __init__(self, *args, **kwargs):
+        """Instantiate custom CLI Error exception."""
         super().__init__(*args, **kwargs)
 
         self.printed = False
 
     def print(self):
+        """Print CLI error."""
         if self.printed:
             return
 
@@ -42,7 +47,8 @@ class CliError(Exception):
         self.printed = True
 
 
-def print_added_plugin(project, plugin, related=False):
+def print_added_plugin(plugin, related=False):
+    """Print added plugin."""
     descriptor = plugin.type.descriptor
     if related:
         descriptor = f"related {descriptor}"
@@ -165,7 +171,7 @@ def _prompt_plugin_capabilities(plugin_type):
         "To find out what features a tap supports, reference its documentation or try one"
     )
     click.echo(
-        "of the tricks under https://meltano.com/docs/contributor-guide.html#how-to-test-a-tap."
+        "of the tricks under https://docs.meltano.com/guide/integration#troubleshooting."
     )
     click.echo()
     click.echo("Multiple capabilities can be separated using commas.")
@@ -254,6 +260,7 @@ def add_plugin(
     inherit_from=None,
     custom=False,
 ):
+    """Add Plugin to given Project."""
     plugin_attrs = {}
     if custom:
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
@@ -278,7 +285,7 @@ def add_plugin(
             inherit_from=inherit_from,
             **plugin_attrs,
         )
-        print_added_plugin(project, plugin)
+        print_added_plugin(plugin)
     except PluginAlreadyAddedException as err:
         plugin = err.plugin
 
@@ -344,22 +351,24 @@ def add_plugin(
 
     click.echo()
 
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
-
     return plugin
 
 
 def add_related_plugins(
-    project, plugins, add_service: ProjectAddService, plugin_types=list(PluginType)
+    project,
+    plugins,
+    add_service: ProjectAddService,
+    plugin_types: List[PluginType] = None,
 ):
+    """Add any related Plugins to the given Plugin."""
+    plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
         related_plugins = add_service.add_related(
             plugin_install, plugin_types=plugin_types
         )
         for related_plugin in related_plugins:
-            print_added_plugin(project, related_plugin, related=True)
+            print_added_plugin(related_plugin, related=True)
             click.echo()
 
         added_plugins.extend(related_plugins)

@@ -192,11 +192,11 @@ export default {
     protectedFieldUrl() {
       return setting => {
         if (setting.protected) {
-          return 'https://meltano.com/docs/contributor-guide.html#protected-settings'
+          return 'https://docs.meltano.com/contribute/plugins#protected-settings'
         } else if (this.getIsOfKindUnsupported(setting.kind)) {
-          return 'https://meltano.com/docs/project.html#plugin-configuration'
+          return 'https://docs.meltano.com/concepts/project#plugin-configuration'
         } else {
-          return 'https://meltano.com/docs/configuration.html#configuration-layers'
+          return 'https://docs.meltano.com/guide/configuration#configuration-layers'
         }
       }
     },

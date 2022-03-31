@@ -70,7 +70,7 @@ async def run(
 
     This a preview feature - its functionality and cli signature is still evolving.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#run
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
     """
     parser = BlockParser(logger, project, blocks, full_refresh, no_state_update, force)
     parsed_blocks = list(parser.find_blocks(0))

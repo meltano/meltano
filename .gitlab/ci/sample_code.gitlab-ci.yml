@@ -20,7 +20,7 @@
 homepage_sample_code:
   extends: .sample_code
   script:
-    ### https://meltano.com/#installation
+    ### https://docs.meltano.com/guide/installation
 
     # For these examples to work, ensure that:
     # - you are running Linux or macOS
@@ -40,7 +40,7 @@ homepage_sample_code:
     - pip3 install ..
 
 
-    ### https://meltano.com/#meltano-init
+    ### https://docs.meltano.com/concepts/project
 
     # Initialize a new Meltano project
     - meltano init demo-project
@@ -58,7 +58,7 @@ homepage_sample_code:
     ### ---
 
 
-    ### https://meltano.com/#integration
+    ### https://docs.meltano.com/guide/integration
 
     # Add GitLab extractor to your project
     - meltano add extractor tap-gitlab
@@ -85,7 +85,7 @@ homepage_sample_code:
     - head -n 1 output/tags.jsonl
 
 
-    ### https://meltano.com/#transformation
+    ### https://docs.meltano.com/guide/transformation
 
     # For these examples to work, ensure that:
     # - you have PostgreSQL running somewhere
@@ -120,7 +120,7 @@ homepage_sample_code:
     - PGPASSWORD=$TARGET_POSTGRES_PASSWORD psql -U $TARGET_POSTGRES_USER -h $TARGET_POSTGRES_HOST -p $TARGET_POSTGRES_PORT -d $TARGET_POSTGRES_DBNAME -c "SELECT * FROM analytics.gitlab_tags LIMIT 1;"
 
 
-    ### https://meltano.com/#orchestration
+    ### https://docs.meltano.com/guide/orchestration
 
     # Schedule pipelines
     - meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl @hourly
@@ -144,7 +144,7 @@ homepage_sample_code:
     # meltano invoke airflow webserver
 
 
-    ### https://meltano.com/#containerization
+    ### https://docs.meltano.com/guide/containerization
 
     # For these examples to work, ensure that
     # Docker has been installed
@@ -179,7 +179,7 @@ homepage_sample_code:
 getting_started_sample_code:
   extends: .sample_code
   script:
-    ### https://meltano.com/docs/getting-started.html#install-meltano
+    ### https://docs.meltano.com/getting-started#install-meltano
 
     - mkdir meltano-projects
     - cd meltano-projects
@@ -197,7 +197,7 @@ getting_started_sample_code:
     # docker run meltano/meltano --version
 
 
-    ### https://meltano.com/docs/getting-started.html#create-your-meltano-project
+    ### https://docs.meltano.com/getting-started#create-your-meltano-project
 
     - meltano init my-meltano-project
 
@@ -213,7 +213,7 @@ getting_started_sample_code:
     ### ---
 
 
-    ### https://meltano.com/docs/getting-started.html#add-an-extractor-to-pull-data-from-a-source
+    ### https://docs.meltano.com/getting-started#add-an-extractor-to-pull-data-from-a-source
 
     - meltano discover extractors
 
@@ -243,7 +243,7 @@ getting_started_sample_code:
     - meltano select tap-gitlab --list
 
 
-    ### https://meltano.com/docs/getting-started.html#add-a-loader-to-send-data-to-a-destination
+    ### https://docs.meltano.com/getting-started#add-a-loader-to-send-data-to-a-destination
 
     - meltano discover loaders
 
@@ -265,12 +265,12 @@ getting_started_sample_code:
     - meltano config target-postgres
 
 
-    ### https://meltano.com/docs/getting-started.html#run-a-data-integration-el-pipeline
+    ### https://docs.meltano.com/getting-started#run-a-data-integration-el-pipeline
 
     - meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
 
 
-    ### https://meltano.com/docs/getting-started.html#run-a-data-integration-el-pipeline
+    ### https://docs.meltano.com/getting-started#run-a-data-integration-el-pipeline
 
     - meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
 

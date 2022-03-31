@@ -10,12 +10,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#3103](https://gitlab.com/meltano/meltano/-/issues/3103) Allow users to set a default Environment in `meltano.yml`
+
 ### Changes
 
 ### Fixes
 
 - [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
 - [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` trying to instantiate all plugins rather than just those for the requested tests.
+- [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Resolve missing `schedule` commands in anonymous usage tracking.
+
 ### Breaks
 
 
@@ -153,8 +157,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://meltano.com/docs/command-line-interface.html#run) command.
-- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://meltano.com/docs/command-line-interface.html#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
+- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://docs.meltano.com/reference/command-line-interface#run) command.
+- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://docs.meltano.com/reference/command-line-interface#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
 
 ### Changes
 

@@ -1,9 +1,9 @@
-import logging
+"""User account management CLI."""
 
 import click
 from flask_security.utils import hash_password
+
 from meltano.api.app import create_app
-from meltano.core.utils import identity
 
 from . import cli
 from .params import pass_project
@@ -18,7 +18,7 @@ def user(ctx, project):
 
     TIP: This command is only relevant when Meltano is run with authentication enabled.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#user
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#user
     """
     ctx.obj["project"] = project
 
@@ -37,10 +37,11 @@ def user(ctx, project):
     "--role",
     "-G",
     multiple=True,
+    default=[],
     help="Add the user to the role. Meltano ships with two built-in roles: admin and regular.",
 )
 @click.pass_context
-def add(ctx, username, password, role=[], **flags):
+def add(ctx, username, password, role, **flags):
     """
     Create a Meltano user account.
 
@@ -61,11 +62,11 @@ def add(ctx, username, password, role=[], **flags):
             # make sure all roles exists
             roles = []
             for role_name in role:
-                r = users.find_role(role_name)
-                if not r:
+                this_role = users.find_role(role_name)
+                if not this_role:
                     raise Exception(f"Role '{role_name}' does not exists.")
 
-                roles.append(r)
+                roles.append(this_role)
 
             current_user = users.get_user(username) or users.create_user(
                 username=username
