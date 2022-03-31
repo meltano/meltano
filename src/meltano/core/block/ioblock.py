@@ -133,5 +133,5 @@ class IOBlock(metaclass=ABCMeta):
 
     @abstractmethod
     async def close_stdin(self) -> None:
-        """Close the underlying stdin if the block is a producer."""
+        """Close the underlying stdin if the block is a consumer."""
         pass
