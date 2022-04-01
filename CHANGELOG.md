@@ -10,26 +10,34 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#3103](https://gitlab.com/meltano/meltano/-/issues/3103) Allow users to set a default Environment in `meltano.yml`
-
 ### Changes
 
 ### Fixes
 
-- [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
-- [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` trying to instantiate all plugins rather than just those for the requested tests.
-- [#3347](https://gitlab.com/meltano/meltano/-/issues/3347) Fix an issue in `meltano run` on python 3.7 where an AttributeError exception would occur while closing stdin of a spawned subprocess.
-- [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Resolve missing `schedule` commands in anonymous usage tracking.
-
 ### Breaks
 
+
+## 1.99.0 - (2022-04-01)
+---
+### New
+
+- [#3103](https://gitlab.com/meltano/meltano/-/issues/3103) Allow users to set a default Environment in `meltano.yml`.
+- [#3318](https://gitlab.com/meltano/meltano/-/issues/3318) `meltano init` will ask for a project_name if none is passed during invocation.
+- [!2561](https://gitlab.com/meltano/meltano/-/merge_requests/2561) Add `dragon` command Easter egg.
+
+### Fixes
+
+- [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
+- [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` attempting to instantiate plugins that are not installed.
+- [#3347](https://gitlab.com/meltano/meltano/-/issues/3347) Fix an issue in `meltano run` on python 3.7 where an AttributeError exception would occur while closing stdin of a spawned subprocess.
+- [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Resolve missing `schedule` commands in anonymous usage tracking.
+- [#3264](https://gitlab.com/meltano/meltano/-/issues/3264) Fix broken links to http://docs.meltano.com.
 
 ## 1.98.0 - (2022-03-10)
 ---
 
 ### Changes
 
-- [#3318] `meltano init` will ask for a project_name if none is passed during invocation
 - [#3316](https://gitlab.com/meltano/meltano/-/issues/3316) Improve the `meltano init` experience with beautified text and cleaner logging
 - [#3317](https://gitlab.com/meltano/meltano/-/issues/3317) Improve Snowplow documentation and simplify telemetry notification during `meltano init`
 - [#3319](https://gitlab.com/meltano/meltano/-/issues/3319) Limit Snowplow tracker logs to the command line to `ERROR` level by default.
