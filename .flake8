@@ -86,6 +86,7 @@ ignore =
     WPS352
     WPS404
     WPS407
+    WPS412
     WPS429
     WPS430
     WPS433
@@ -211,3 +212,9 @@ per_file_ignores =
     src/meltano/core/logging/utils.py:
         # Found wrong module name
         WPS100
+    src/meltano/core/cli_messages.py:
+        # Special exceptions for cli magic
+        WPS114
+        WPS360
+        W291
+        W293
