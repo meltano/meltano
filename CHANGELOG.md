@@ -10,9 +10,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.99.0 - (2022-04-01)
+---
+
+### New
+
 - [#3103](https://gitlab.com/meltano/meltano/-/issues/3103) Allow users to set a default Environment in `meltano.yml`
 
-### Changes
 
 ### Fixes
 
@@ -20,8 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` trying to instantiate all plugins rather than just those for the requested tests.
 - [#3347](https://gitlab.com/meltano/meltano/-/issues/3347) Fix an issue in `meltano run` on python 3.7 where an AttributeError exception would occur while closing stdin of a spawned subprocess.
 - [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Resolve missing `schedule` commands in anonymous usage tracking.
-
-### Breaks
 
 
 ## 1.98.0 - (2022-03-10)
