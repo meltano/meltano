@@ -13,7 +13,7 @@
 /src/webapp/ @alex1126 @pandemicsyn
 /src/meltano/api/ @pandemicsyn @alex1126
 
-# Docs owners
+^[Docs]
 /docs/ @tayloramurphy @afolson
 /CONTRIBUTING.md @tayloramurphy @afolson
 /README.md @tayloramurphy @afolson
