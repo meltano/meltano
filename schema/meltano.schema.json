@@ -9,6 +9,10 @@
         "version": {
             "const": 1
         },
+        "default_environment": {
+            "type": "string",
+            "description": "A default environment to be used when one is not present as an argument or as an environment variable."
+        },
         "send_anonymous_usage_stats": {
             "type": "boolean",
             "description": "Share anonymous usage data with the Meltano team to help them gauge interest and allocate development time",
