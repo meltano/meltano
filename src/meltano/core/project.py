@@ -1,3 +1,5 @@
+"""Meltano Project management."""
+
 import errno
 import logging
 import os
@@ -9,13 +11,15 @@ from typing import Optional, Union
 
 import fasteners
 from dotenv import dotenv_values
+from werkzeug.utils import secure_filename
+
 from meltano.core.environment import Environment
 from meltano.core.plugin.base import PluginRef
-from werkzeug.utils import secure_filename
 
 from .behavior.versioned import Versioned
 from .error import Error
 from .meltano_file import MeltanoFile
+from .plugin.project_plugin import ProjectPlugin
 from .project_files import ProjectFiles
 from .utils import makedirs, truthy
 
@@ -27,19 +31,33 @@ PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 
 
 class ProjectNotFound(Error):
+    """Error raised when no Meltano project was detected."""
+
     def __init__(self, project):
+        """Initialize exception.
+
+        Args:
+            project: A Meltano project.
+        """
         super().__init__(
             f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
         )
 
 
 class ProjectReadonly(Error):
+    """Error raised when the user tries to modify a read-only project."""
+
     def __init__(self):
-        super().__init__(f"This Meltano project is deployed as read-only")
+        """Initialize exception."""
+        super().__init__("This Meltano project is deployed as read-only")
 
 
 def walk_parent_directories():
-    """Yield each directory starting with the current up to the root."""
+    """Yield each directory starting with the current up to the root.
+
+    Yields:
+        Parent directories.
+    """
     directory = os.getcwd()
     while True:
         yield directory
@@ -50,11 +68,8 @@ def walk_parent_directories():
         directory = parent_directory
 
 
-class Project(Versioned):
-    """
-    Represent the current Meltano project from a file-system
-    perspective.
-    """
+class Project(Versioned):  # noqa: WPS214
+    """Represent the current Meltano project from a file-system perspective."""
 
     __version__ = 1
     _activate_lock = threading.Lock()
@@ -63,6 +78,11 @@ class Project(Versioned):
     _default = None
 
     def __init__(self, root: Union[Path, str]):
+        """Initialize project.
+
+        Args:
+            root: Root directory of the project.
+        """
         self.root = Path(root).resolve()
         self.readonly = False
         self._project_files = None
@@ -81,11 +101,24 @@ class Project(Versioned):
 
     @property
     def env(self):
+        """Return a dictionary of project environment variables.
+
+        Returns:
+            A dictionary of environment variables.
+        """
         return {PROJECT_ROOT_ENV: str(self.root)}
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
     def activate(cls, project: "Project"):
+        """Activate a project.
+
+        Args:
+            project: A Meltano project.
+
+        Raises:
+            OSError: If a symbolic link cannot be created.
+        """
         project.ensure_compatible()
 
         # create a symlink to our current binary
@@ -95,10 +128,10 @@ class Project(Versioned):
                 project.run_dir().joinpath("bin").symlink_to(executable)
         except FileExistsError:
             pass
-        except OSError as e:
-            if e.errno == errno.EOPNOTSUPP:
+        except OSError as err:
+            if err.errno == errno.EOPNOTSUPP:
                 logger.warning(
-                    f"Could not create symlink: {e}\nPlease make sure that the underlying filesystem supports symlinks."
+                    f"Could not create symlink: {err}\nPlease make sure that the underlying filesystem supports symlinks."
                 )
             else:
                 raise
@@ -110,25 +143,37 @@ class Project(Versioned):
 
     @classmethod
     def deactivate(cls):
+        """Deactivate the default project."""
         cls._default = None
 
     @property
     def file_version(self):
+        """Return the version of the project file.
+
+        Returns:
+            The version of the project file.
+        """
         return self.meltano.version
 
     @classmethod  # noqa: WPS231
     @fasteners.locked(lock="_find_lock")
     def find(cls, project_root: Union[Path, str] = None, activate=True):  # noqa: WPS231
-        """
-        Find a Project.
+        """Find a Project.
 
-        project_root: The path to the root directory of the project. If not supplied,
-            infer from PROJECT_ROOT_ENV or the current working directory and it's parents.
-        activate: Save the found project so that future calls to `find` will continue to use
-            this project.
+        Args:
+            project_root: The path to the root directory of the project. If not
+                supplied, infer from PROJECT_ROOT_ENV or the current working directory
+                and its parents.
+            activate: Save the found project so that future calls to `find` will
+                continue to use this project.
 
-        raises ProjectNotFound: if the provided `project_root` is not a Meltano project, or
-            the current working directory is not a Meltano project or a subfolder of one.
+        Raises:
+            ProjectNotFound: if the provided `project_root` is not a Meltano project,
+                or the current working directory is not a Meltano project or a subfolder
+                of one.
+
+        Returns:
+            A Meltano project.
         """
         if cls._default:
             return cls._default
@@ -158,7 +203,11 @@ class Project(Versioned):
 
     @property
     def project_files(self):
-        """Return a singleton ProjectFiles file manager instance."""
+        """Return a singleton ProjectFiles file manager instance.
+
+        Returns:
+            A singleton ProjectFiles file manager instance.
+        """
         if self._project_files is None:
             self._project_files = ProjectFiles(
                 root=self.root, meltano_file_path=self.meltanofile
@@ -167,23 +216,32 @@ class Project(Versioned):
 
     @property
     def meltano(self) -> MeltanoFile:
-        """Return a copy of the current meltano config"""
+        """Return a copy of the current meltano config.
+
+        Returns:
+            A copy of the current meltano config.
+        """
         with self._meltano_rw_lock.read_lock():
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
     def meltano_update(self):
-        """
-        Yield the current meltano configuration and update the meltanofile
-        if the context ends gracefully.
-        """
+        """Update the Meltano project files.
 
+        Yield the current meltano configuration and update the meltanofile if the
+        context ends gracefully.
+
+        Raises:
+            Exception: If the context ends with an exception.
+            ProjectReadonly: If the project is read-only.
+
+        Yields:
+            The Meltano project contents.
+        """
         if self.readonly:
             raise ProjectReadonly
 
-        # fmt: off
-        with self._meltano_rw_lock.write_lock(), \
-            self._meltano_ip_lock:
+        with self._meltano_rw_lock.write_lock(), self._meltano_ip_lock:
 
             meltano_config = MeltanoFile.parse(self.project_files.load())
 
@@ -194,13 +252,28 @@ class Project(Versioned):
             except Exception as err:
                 logger.critical(f"Could not update meltano.yml: {err}")
                 raise
-        # fmt: on
 
-    def root_dir(self, *joinpaths):
+    def root_dir(self, *joinpaths: str):
+        """Return the path to a directory relative to the project root.
+
+        Args:
+            joinpaths: Paths to join with the project root.
+
+        Returns:
+            The path to the joined directory.
+        """
         return self.root.joinpath(*joinpaths)
 
     @contextmanager
     def file_update(self):
+        """Update the Meltano project files.
+
+        Raises:
+            ProjectReadonly: If the project is read-only.
+
+        Yields:
+            The Meltano project root path.
+        """
         if self.readonly:
             raise ProjectReadonly
 
@@ -208,14 +281,29 @@ class Project(Versioned):
 
     @property
     def meltanofile(self):
+        """Return the path to the Meltano file.
+
+        Returns:
+            The path to the Meltano file.
+        """
         return self.root.joinpath("meltano.yml")
 
     @property
     def dotenv(self):
+        """Return the path to the .env file.
+
+        Returns:
+            The path to the .env file.
+        """
         return self.root.joinpath(".env")
 
     @property
     def dotenv_env(self):
+        """Return the environment variables from the .env file.
+
+        Returns:
+            The environment variables from the .env file.
+        """
         return dotenv_values(self.dotenv)
 
     def activate_environment(self, name: str) -> None:
@@ -223,77 +311,213 @@ class Project(Versioned):
 
         Args:
             name: Name of the environment. Defaults to None.
-
-        Raises:
-            EnvironmentNotFound: If the named environment is not present in `meltano.yml`.
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
 
     @contextmanager
     def dotenv_update(self):
+        """Update the .env file.
+
+        Raises:
+            ProjectReadonly: if the project is readonly.
+
+        Yields:
+            The .env file path.
+        """
         if self.readonly:
             raise ProjectReadonly
 
         yield self.dotenv
 
     @makedirs
-    def meltano_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the project `.meltano` directory."""
+    def meltano_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the project `.meltano` directory.
+
+        Args:
+            joinpaths: Paths to join with the project `.meltano` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            The path to the project `.meltano` directory.
+        """
         return self.root.joinpath(".meltano", *joinpaths)
 
     @makedirs
-    def analyze_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the project `analyze` directory."""
+    def analyze_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the project `analyze` directory.
+
+        Args:
+            joinpaths: Paths to join with the project `analyze` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the project `analyze` directory.
+        """
         return self.root_dir("analyze", *joinpaths)
 
     @makedirs
-    def extract_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the project `extract` directory."""
+    def extract_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the project `extract` directory.
+
+        Args:
+            joinpaths: Paths to join with the project `extract` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the project `extract` directory.
+        """
         return self.root_dir("extract", *joinpaths)
 
     @makedirs
-    def venvs_dir(self, *prefixes, make_dirs: bool = True):
-        """Path to a `venv` directory in `.meltano`."""
+    def venvs_dir(self, *prefixes: str, make_dirs: bool = True):
+        """Path to a `venv` directory in `.meltano`.
+
+        Args:
+            prefixes: Prefixes to use to create the `venv` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the `venv` directory.
+        """
         return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
 
     @makedirs
-    def run_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the `run` directory in `.meltano`."""
+    def run_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the `run` directory in `.meltano`.
+
+        Args:
+            joinpaths: Paths to join with the `run` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the `run` directory in `.meltano`.
+        """
         return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def logs_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the `logs` directory in `.meltano`."""
+    def logs_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the `logs` directory in `.meltano`.
+
+        Args:
+            joinpaths: Paths to join with the `logs` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the `logs` directory in `.meltano`.
+        """
         return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def job_dir(self, job_id, *joinpaths, make_dirs: bool = True):
-        """Path to the `elt` directory in `.meltano/run`."""
+    def job_dir(self, job_id: str, *joinpaths, make_dirs: bool = True):
+        """Path to the `elt` directory in `.meltano/run`.
+
+        Args:
+            job_id: The job id.
+            joinpaths: Paths to join with the `elt` job directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            The path to the `elt` job directory.
+        """
         return self.run_dir(
             "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
-    def job_logs_dir(self, job_id, *joinpaths, make_dirs: bool = True):
-        """Path to the `elt` directory in `.meltano/logs`."""
+    def job_logs_dir(self, job_id: str, *joinpaths, make_dirs: bool = True):
+        """Path to the `elt` directory in `.meltano/logs`.
+
+        Args:
+            job_id: The job id.
+            joinpaths: Paths to join with the `elt` logs directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the `elt` logs directory.
+        """
         return self.logs_dir(
             "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
-    def model_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the `models` directory in `.meltano`."""
+    def model_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the `models` directory in `.meltano`.
+
+        Args:
+            joinpaths: Paths to join with the `models` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the `models` directory in `.meltano`.
+        """
         return self.meltano_dir("models", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):
-        """Path to the plugin installation directory in `.meltano`."""
+        """Path to the plugin installation directory in `.meltano`.
+
+        Args:
+            plugin: The Meltano plugin.
+            joinpaths: Paths to join with the plugin installation directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the plugin installation directory in `.meltano`.
+        """
         return self.meltano_dir(
             plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
         )
 
+    @makedirs
+    def root_plugins_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the project `plugins` directory.
+
+        Args:
+            joinpaths: Paths to join with the project `plugins` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the project `plugins` directory.
+        """
+        return self.root_dir("plugins", *joinpaths)
+
+    @makedirs
+    def plugin_lock_path(self, plugin: ProjectPlugin, make_dirs: bool = True):
+        """Path to the project lock file.
+
+        Args:
+            plugin: The Meltano plugin.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the plugin lock file.
+        """
+        filename = f"{plugin.name}"
+
+        if plugin.is_variant_set:
+            filename = f"{filename}--{plugin.variant}"
+
+        return self.root_plugins_dir(
+            plugin.type,
+            f"{filename}.yml",
+            make_dirs=make_dirs,
+        )
+
     def __eq__(self, other):
+        """Equality check.
+
+        Args:
+            other: The other project object to compare.
+
+        Returns:
+            True if the other project object is equal to this one.
+        """
         return self.root == other.root
 
     def __hash__(self):
-        return self.root.__hash__()
+        """Hash function.
+
+        Returns:
+            The hash of the project.
+        """
+        return self.root.__hash__()  # noqa: WPS609
