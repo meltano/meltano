@@ -3098,9 +3098,7 @@ transformers:
     namespace: dbt_snowflake
     docs: https://docs.meltano.com/guide/transformation
     repo: https://github.com/dbt-labs/dbt-core
-    pip_url: >
-      dbt-core~=1.0.0
-      dbt-snowflake~=1.0.0
+    pip_url: dbt-core~=1.0.0 dbt-snowflake~=1.0.0
     settings:
     - name: project_dir
       value: $MELTANO_PROJECT_ROOT/transform
@@ -3356,6 +3354,10 @@ files:
     namespace: great_expectations
     repo: https://gitlab.com/meltano/files-great-expectations
     pip_url: git+https://gitlab.com/meltano/files-great-expectations
+  - name: dbt-snowflake
+    namespace: dbt_snowflake
+    repo: https://gitlab.com/meltano/files-dbt-snowflake
+    pip_url: git+https://gitlab.com/meltano/files-dbt-snowflake
 utilities:
   - name: sqlfluff
     namespace: sqlfluff
