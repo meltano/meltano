@@ -70,6 +70,28 @@ ignore =
     WPS602
     # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
     WPS212
+    # Various WPS refactor heavy warnings to ignore that currently have a poor risk/reward tradeoff.
+    WPS100
+    WPS112
+    WPS201
+    WPS220
+    WPS221
+    WPS226
+    WPS229
+    WPS231
+    WPS232
+    WPS237
+    WPS316
+    WPS337
+    WPS352
+    WPS404
+    WPS407
+    WPS412
+    WPS429
+    WPS430
+    WPS433
+    WPS454
+    WPS501
 
 exclude =
     .venv
@@ -190,3 +212,9 @@ per_file_ignores =
     src/meltano/core/logging/utils.py:
         # Found wrong module name
         WPS100
+    src/meltano/core/cli_messages.py:
+        # Special exceptions for cli magic
+        WPS114
+        WPS360
+        W291
+        W293

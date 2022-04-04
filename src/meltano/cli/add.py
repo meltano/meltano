@@ -1,16 +1,12 @@
-import json
-import logging
-import os
-import sys
-from typing import List
-from urllib.parse import urlparse
+"""Plugin Add CLI."""
 
 import click
-import yaml
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
@@ -65,7 +61,7 @@ def add(
     """
     Add a plugin to your project.
 
-    \b\nRead more at https://meltano.com/docs/command-line-interface.html#add
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
@@ -80,27 +76,30 @@ def add(
     plugins_service = ProjectPluginsService(project)
 
     if flags["custom"]:
-        if plugin_type in (
+        if plugin_type in {
             PluginType.TRANSFORMERS,
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
-        ):
+        }:
             raise CliError(f"--custom is not supported for {plugin_type}")
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
-    plugins = [
-        add_plugin(
-            project,
-            plugin_type,
-            plugin_name,
-            inherit_from=inherit_from,
-            variant=variant,
-            custom=flags["custom"],
-            add_service=add_service,
+    plugins = []
+    tracker = GoogleAnalyticsTracker(project)
+    for plugin in plugin_names:
+        plugins.append(
+            add_plugin(
+                project,
+                plugin_type,
+                plugin,
+                inherit_from=inherit_from,
+                variant=variant,
+                custom=flags["custom"],
+                add_service=add_service,
+            )
         )
-        for plugin_name in plugin_names
-    ]
+        tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
     related_plugin_types = [PluginType.FILES]
     if flags["include_related"]:

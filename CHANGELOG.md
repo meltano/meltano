@@ -16,14 +16,28 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
+## 1.99.0 - (2022-04-01)
+---
+### New
 
-## 1.98.1 - (2022-03-12)
+- [#3103](https://gitlab.com/meltano/meltano/-/issues/3103) Allow users to set a default Environment in `meltano.yml`.
+- [#3318](https://gitlab.com/meltano/meltano/-/issues/3318) `meltano init` will ask for a project_name if none is passed during invocation.
+- [!2561](https://gitlab.com/meltano/meltano/-/merge_requests/2561) Add `dragon` command Easter egg.
+
+### Fixes
+
+- [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` attempting to instantiate plugins that are not installed.
+- [#3347](https://gitlab.com/meltano/meltano/-/issues/3347) Fix an issue in `meltano run` on python 3.7 where an AttributeError exception would occur while closing stdin of a spawned subprocess.
+- [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Resolve missing `schedule` commands in anonymous usage tracking.
+- [#3264](https://gitlab.com/meltano/meltano/-/issues/3264) Fix broken links to http://docs.meltano.com.
+
+
+## 1.98.1 - (2022-03-14)
 ---
 
 ### Fixes
 
 - [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
-
 
 ## 1.98.0 - (2022-03-10)
 ---
@@ -158,8 +172,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://meltano.com/docs/command-line-interface.html#run) command.
-- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://meltano.com/docs/command-line-interface.html#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
+- [#2301](https://gitlab.com/meltano/meltano/-/issues/2301), [#3043](https://gitlab.com/meltano/meltano/-/issues/3043) Preview release of new [`meltano run`](https://docs.meltano.com/reference/command-line-interface#run) command.
+- [#2838](https://gitlab.com/meltano/meltano/-/issues/2838) Adds the [`meltano test`](https://docs.meltano.com/reference/command-line-interface#test) command which defines first-class test and validation capabilities for Meltano plugins and projects.
 
 ### Changes
 

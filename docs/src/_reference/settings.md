@@ -43,7 +43,7 @@ If enabled, Meltano will use the value of the [`project_id` setting](#project-id
 This project ID is also sent along when Meltano loads the remote `discovery.yml` manifest from the URL identified by the [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
-the Tracking IDs can be configured using the [`tracking_ids.*` settings](#analytics-tracking-ids) below.
+the Tracking IDs can be configured using the `tracking_ids.*` settings below.
 
 If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
 the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
