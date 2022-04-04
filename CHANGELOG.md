@@ -18,7 +18,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
-
 ## 1.99.0 - (2022-04-01)
 ---
 ### New
@@ -29,11 +28,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
 - [#3233](https://gitlab.com/meltano/meltano/-/issues/3233) Fix issue related `meltano test` attempting to instantiate plugins that are not installed.
 - [#3347](https://gitlab.com/meltano/meltano/-/issues/3347) Fix an issue in `meltano run` on python 3.7 where an AttributeError exception would occur while closing stdin of a spawned subprocess.
 - [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Resolve missing `schedule` commands in anonymous usage tracking.
 - [#3264](https://gitlab.com/meltano/meltano/-/issues/3264) Fix broken links to http://docs.meltano.com.
+
+
+## 1.98.1 - (2022-03-14)
+---
+
+### Fixes
+
+- [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
 
 ## 1.98.0 - (2022-03-10)
 ---
