@@ -3093,6 +3093,63 @@ transformers:
       test:
         args: test
         description: Runs tests on data in deployed models.
+  - name: dbt-snowflake
+    executable: dbt
+    namespace: dbt_snowflake
+    docs: https://docs.meltano.com/guide/transformation
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-snowflake~=1.0.0
+    settings:
+    - name: project_dir
+      value: $MELTANO_PROJECT_ROOT/transform
+    - name: profiles_dir
+      value: $MELTANO_PROJECT_ROOT/transform/profiles/snowflake
+      # Snowflake connection settings are set via `config:` blocks and mapped to `profiles.yml`
+    - name: account
+      kind: string
+      description: The account to connect to. e.g your-company.eu-west-2.aws.snowflakecomputing.com
+    - name: user
+      kind: string
+      description: The user to connect as.
+    - name: password
+      kind: password
+      description: The user password to authenticate with.
+    - name: role
+      kind: string
+      description: The user role to assume.
+    - name: warehouse
+      kind: string
+      description: The compute warehouse to use when building models.
+    - name: database
+      kind: string
+      description: The database to create models in.
+    - name: schema
+      kind: string
+      description: The schema to build models into by default.
+    commands:
+      clean:
+        args: clean
+        description: Delete all folders in the clean-targets list (usually the dbt_modules and target directories.)
+      compile:
+        args: compile --models $DBT_MODELS
+        description: Generates executable SQL from source model, test, and analysis files. Compiled SQL files are written to the target/ directory.
+      deps:
+        args: deps
+        description: Pull the most recent version of the dependencies listed in packages.yml
+      run:
+        args: run --models $DBT_MODELS
+        description: Compile SQL and execute against the current target database.
+      seed:
+        args: seed
+        description: Load data from csv files into your data warehouse.
+      snapshot:
+        args: snapshot
+        description: Execute snapshots defined in your project.
+      test:
+        args: test
+        description: Runs tests on data in deployed models.
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
