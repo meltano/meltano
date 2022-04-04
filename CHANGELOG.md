@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3373](https://gitlab.com/meltano/meltano/-/issues/3373) Add missing `default_environment` key to the json schema definition for meltano.yml.
+
 ### Breaks
 
 
