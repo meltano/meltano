@@ -3336,8 +3336,6 @@ files:
     namespace: dbt
     repo: https://gitlab.com/meltano/files-dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git@config-version-2
-    update:
-      transform/profile/profiles.yml: true
   - name: docker
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
