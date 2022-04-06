@@ -27,10 +27,11 @@ lint_python:
       - PYTHON_IMAGE_VERSION: ["3.8"]
   before_script: []
   script:
+    - git remote add meltano https://gitlab.com/meltano/meltano.git || return 0
     - |
-      git fetch origin $CI_DEFAULT_BRANCH;
+      git fetch meltano $CI_DEFAULT_BRANCH;
       echo "Comparing to $CI_DEFAULT_BRANCH";
-      REF="origin/${CI_DEFAULT_BRANCH}";
+      REF="meltano/${CI_DEFAULT_BRANCH}";
     - 'declare FILES=$(git diff --name-only ${CI_COMMIT_SHA} $REF | grep "\.py$")'
     - |
       if [ -n "${FILES}" ]; then
