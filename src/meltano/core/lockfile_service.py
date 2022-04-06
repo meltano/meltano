@@ -1,6 +1,6 @@
 """Plugin Lockfile Service."""
 
-import yaml
+import json
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
@@ -24,4 +24,4 @@ class PluginLockfileService:
             project_plugin: The plugin definition to save.
         """
         with self.projet.plugin_lock_path(project_plugin).open("w") as lockfile:
-            yaml.dump(project_plugin, lockfile)
+            json.dump(project_plugin.canonical(), lockfile)

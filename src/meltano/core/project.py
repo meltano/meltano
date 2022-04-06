@@ -499,7 +499,7 @@ class Project(Versioned):  # noqa: WPS214
 
         return self.root_plugins_dir(
             plugin.type,
-            f"{filename}.yml",
+            f"{filename}.json",
             make_dirs=make_dirs,
         )
 
