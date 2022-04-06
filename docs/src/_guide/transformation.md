@@ -74,7 +74,7 @@ meltano --environment=dev run tap-gitlab target-snowflake dbt-snowflake:my_model
 
 ### Invoking `dbt`
 
-Dbt can also be run directly, via the [`invoke`]() command:
+Dbt can also be run directly, via the [`invoke`](/reference/command-line-interface#invoke) command:
 
 ```bash
 # run your entire dbt project
@@ -118,7 +118,7 @@ It is likely that the new `dbt_project (<adapter name>).yml` will contain change
 To complete your migration, consolidate `dbt_project.yml` and `dbt_project (<adapter name>).yml` into a single file called `dbt_project.yml`.
 As this project file will be used by both `dbt` and `dbt-<adapter>` Transformer plugins by default, you must ensure you are running an up-to-date installation of plugin `dbt` if you intend to use both adapter specific and legacy `dbt` installs together (not recommended).
 
-If you make use of [Transform]() plugins, these will continue to work as regular `dbt` packages. However adding new Transform plugins will currently (tracking at [#3382](https://gitlab.com/meltano/meltano/-/issues/3382)) re-add the legacy `dbt` Transformer plugin.
+If you make use of [Transform](/guide/transforms) plugins, these will continue to work as regular `dbt` packages. However adding new Transform plugins will currently (tracking at [#3382](https://gitlab.com/meltano/meltano/-/issues/3382)) re-add the legacy `dbt` Transformer plugin.
 To avoid this we recommend adding Transforms as regular packages directly via the dbt CLI as per the [`dbt` Packages documentation](https://docs.getdbt.com/docs/building-a-dbt-project/package-management).
 
 ### Remove the `dbt` Transformer plugin and associated files
