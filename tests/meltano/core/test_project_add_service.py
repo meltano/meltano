@@ -37,7 +37,7 @@ class TestProjectAddService:
     ):
         added = subject.add(plugin_type, plugin_name, lock=lock_plugin)
         assert added in project.meltano["plugins"][plugin_type]
-        assert project.plugin_lock_path(added).exists() == lock_plugin
+        assert project.plugin_lock_path(added).exists() is lock_plugin
 
         # Variant and pip_url are repeated in
         # canonical representation for `meltano.yml`
