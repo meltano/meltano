@@ -5,7 +5,7 @@ from meltano.cli import cli
 
 
 class TestCliUpgrade:
-    def test_upgrade(self, cli_runner):
+    def test_upgrade(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade"])
         assert_cli_runner(result)
 
@@ -26,13 +26,13 @@ class TestCliUpgrade:
                 "Meltano and your Meltano project have been upgraded!" in result.output
             )
 
-    def test_upgrade_skip_package(self, cli_runner):
+    def test_upgrade_skip_package(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
         assert_cli_runner(result)
 
         assert "Your Meltano project has been upgraded!" in result.output
 
-    def test_upgrade_package(self, cli_runner):
+    def test_upgrade_package(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "package"])
         assert_cli_runner(result)
 
@@ -41,7 +41,7 @@ class TestCliUpgrade:
         )
         assert "run `meltano upgrade --skip-package`" not in result.output
 
-    def test_upgrade_files(self, project, cli_runner):
+    def test_upgrade_files(self, session, project, cli_runner, config_service):
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
@@ -122,10 +122,10 @@ class TestCliUpgrade:
 
         assert "Updated orchestrate/dags/meltano.py" in result.output
 
-    def test_upgrade_database(self, cli_runner):
+    def test_upgrade_database(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])
         assert_cli_runner(result)
 
-    def test_upgrade_models(self, cli_runner):
+    def test_upgrade_models(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "models"])
         assert_cli_runner(result)
