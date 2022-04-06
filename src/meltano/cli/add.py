@@ -58,11 +58,6 @@ def add(
     as_name=None,
     **flags,
 ):
-    """
-    Add a plugin to your project.
-
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
-    """
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 
