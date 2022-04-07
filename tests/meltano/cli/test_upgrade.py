@@ -109,10 +109,9 @@ class TestCliUpgrade:
                 "--plugin-type",
                 "files",
                 "airflow",
-                "set",
+                "unset",
                 "_update",
                 "orchestrate/dags/meltano.py",
-                "true",
             ],
         )
         assert_cli_runner(result)
