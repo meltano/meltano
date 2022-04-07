@@ -24,4 +24,4 @@ class PluginLockfileService:
             project_plugin: The plugin definition to save.
         """
         with self.projet.plugin_lock_path(project_plugin).open("w") as lockfile:
-            json.dump(project_plugin.canonical(), lockfile)
+            json.dump(project_plugin.canonical(), lockfile, indent=2)
