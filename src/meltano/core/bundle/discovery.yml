@@ -3093,6 +3093,167 @@ transformers:
       test:
         args: test
         description: Runs tests on data in deployed models.
+  - name: dbt-bigquery
+    namespace: dbt_bigquery
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-bigquery~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profiles/bigquery
+      - name: target
+        env: DBT_TARGET
+        value: dev
+        description: Can be 'dev', 'beta', or 'prod'. Users may also add custom target entries as needed within their `profiles.yml` file. Defaults to 'dev'.
+        # Target DB and Schema names may have their defaults defined in `profiles.yml`.
+        # These are not necessarily the same as DBT's source schema and source DB for raw data.
+      - name: target_database
+        kind: string
+        env: DBT_TARGET_DATABASE
+      - name: target_schema
+        kind: string
+        env: DBT_TARGET_SCHEMA
+        # Redshift connection settings are set via `config:` blocks and mapped to `profiles.yml`
+      - name: bigquery_project_id
+        kind: string
+        env: DBT_BIGQUERY_PROJECT_ID
+      - name: bigquery_location
+        kind: string
+        env: DBT_BIGQUERY_LOCATION
+      - name: bigquery_keyfile
+        kind: string
+        env: DBT_BIGQUERY_KEYFILE
+  - name: dbt-postgres
+    namespace: dbt_postgres
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-postgres~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profiles/postgres
+      - name: target
+        env: DBT_TARGET
+        value: dev
+        description: Can be 'dev', 'beta', or 'prod'. Users may also add custom target entries as needed within their `profiles.yml` file. Defaults to 'dev'.
+        # Target DB and Schema names may have their defaults defined in `profiles.yml`.
+        # These are not necessarily the same as DBT's source schema and source DB for raw data.
+      - name: target_database
+        kind: string
+        env: DBT_TARGET_DATABASE
+      - name: target_schema
+        kind: string
+        env: DBT_TARGET_SCHEMA
+        # Redshift connection settings are set via `config:` blocks and mapped to `profiles.yml`
+      - name: postgres_host
+        kind: string
+        env: DBT_POSTGRES_HOST
+      - name: postgres_port
+        kind: integer
+        env: DBT_POSTGRES_PORT
+        value: 5432
+      - name: postgres_username
+        kind: string
+        env: DBT_POSTGRES_USERNAME
+      - name: postgres_password
+        kind: password
+        env: DBT_POSTGRES_PASSWORD
+  - name: dbt-redshift
+    namespace: dbt_redshift
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-redshift~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profiles/redshift
+      - name: target
+        env: DBT_TARGET
+        value: dev
+        description: Can be 'dev', 'beta', or 'prod'. Users may also add custom target entries as needed within their `profiles.yml` file. Defaults to 'dev'.
+        # Target DB and Schema names may have their defaults defined in `profiles.yml`.
+        # These are not necessarily the same as DBT's source schema and source DB for raw data.
+      - name: target_database
+        kind: string
+        env: DBT_TARGET_DATABASE
+      - name: target_schema
+        kind: string
+        env: DBT_TARGET_SCHEMA
+        # Redshift connection settings are set via `config:` blocks and mapped to `profiles.yml`
+      - name: redshift_host
+        kind: string
+        env: DBT_REDSHIFT_HOST
+      - name: redshift_port
+        kind: integer
+        value: 5439
+        env: DBT_REDSHIFT_PORT
+      - name: redshift_username
+        kind: string
+        env: DBT_REDSHIFT_USERNAME
+      - name: redshift_password
+        kind: string
+        env: DBT_REDSHIFT_PASSWORD
+  - name: dbt-snowflake
+    # TODO: Confirm `dbt` vs dbt_snowflake` as namespace.
+    namespace: dbt_snowflake
+    # TODO: Confirm inherit_from works within `discovery.yml`.
+    # If not, `commands` will need to be defined again for each version of the transformer.
+    inherit_from: dbt
+    docs: https://meltano.com/docs/transforms.html
+    repo: https://github.com/dbt-labs/dbt-core
+    pip_url: >
+      dbt-core~=1.0.0
+      dbt-snowflake~=1.0.0
+    settings:
+      - name: project_dir
+        value: $MELTANO_PROJECT_ROOT/transform
+      - name: profiles_dir
+        env: DBT_PROFILES_DIR
+        value: $MELTANO_PROJECT_ROOT/transform/profiles/snowflake
+      - name: target
+        env: DBT_TARGET
+        value: dev
+        description: Can be 'dev', 'beta', or 'prod'. Users may also add custom target entries as needed within their `profiles.yml` file. Defaults to 'dev'.
+        # Target DB and Schema names may have their defaults defined in `profiles.yml`.
+        # These are not necessarily the same as DBT's source schema and source DB for raw data.
+      - name: target_database
+        kind: string
+        env: DBT_TARGET_DATABASE
+      - name: target_schema
+        kind: string
+        env: DBT_TARGET_SCHEMA
+        # Snowflake connection settings are set via `config:` blocks and mapped to `profiles.yml`
+      - name: snowflake_account
+        kind: string
+        env: DBT_SNOWFLAKE_ACCOUNT
+      - name: snowflake_user
+        kind: string
+        env: DBT_SNOWFLAKE_USER
+      - name: snowflake_password
+        kind: password
+        env: DBT_SNOWFLAKE_PASSWORD
+      - name: snowflake_role
+        kind: string
+        env: DBT_SNOWFLAKE_ROLE
+      - name: snowflake_warehouse
+        kind: string
+        env: DBT_SNOWFLAKE_WAREHOUSE
 transforms:
   - name: tap-adwords
     namespace: tap_adwords
@@ -3279,10 +3440,27 @@ files:
       orchestrate/dags/meltano.py: true
   - name: dbt
     namespace: dbt
+    description: |
+      This generic dbt files bundle pairs with the generic `dbt` transformer plugin (now 
+      deprecated). Please use an adapter-specific dbt plugin and files bundle.
     repo: https://gitlab.com/meltano/files-dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git@config-version-2
-    update:
-      transform/profile/profiles.yml: true
+  - name: dbt-bigquery
+    namespace: dbt_bigquery
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt-bigquery.git@v1.0
+  - name: dbt-postgres
+    namespace: dbt_postgres
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt-postgres.git@v1.0
+  - name: dbt-redshift
+    namespace: dbt_redshift
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt-redshift.git@v1.0
+  - name: dbt-snowflake
+    namespace: dbt_snowflake
+    repo: https://gitlab.com/meltano/files-dbt
+    pip_url: git+https://gitlab.com/meltano/files-dbt-snowflake.git@v1.0
   - name: docker
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
