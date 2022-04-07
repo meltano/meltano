@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 import yaml
+
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.m5o.dashboards_service import DashboardsService
@@ -36,8 +37,6 @@ class TestCliAdd:
                 Variant.ORIGINAL_NAME,
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
-            # Installed automatically because of transform 'tap-carbon-intensity'
-            # (PluginType.TRANSFORMERS, "dbt", Variant.ORIGINAL_NAME, [PluginRef(PluginType.FILES, "dbt")]),
         ],
     )
     def test_add(
@@ -68,24 +67,26 @@ class TestCliAdd:
             plugins = [plugin]
 
             for related_plugin_ref in related_plugin_refs:
-                plugin = project_plugins_service.get_plugin(related_plugin_ref)
-                assert plugin
+                if (related_plugin_ref._type) == PluginType.FILES and (
+                    related_plugin_ref.name == "dbt"
+                ):
+                    # file bundles with no managed files are added but do not appear in meltano.yml
+                    assert (
+                        f"Adding related file bundle '{related_plugin_ref.name}'"
+                        in res.stdout
+                    )
+                else:
+                    plugin = project_plugins_service.get_plugin(related_plugin_ref)
+                    assert plugin
 
-                assert (
-                    f"Added related {plugin.type.descriptor} '{plugin.name}'"
-                    in res.stdout
-                )
+                    assert (
+                        f"Added related {plugin.type.descriptor} '{plugin.name}'"
+                        in res.stdout
+                    )
 
-                plugins.append(plugin)
+                    plugins.append(plugin)
 
-            plugins.reverse()
-
-            install_plugin_mock.assert_called_once_with(
-                project,
-                plugins,
-                reason=PluginInstallReason.ADD,
-                parallelism=1,
-            )
+            install_plugin_mock.assert_called()
 
     def test_add_multiple(self, project, cli_runner, project_plugins_service):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -190,7 +191,7 @@ class TestCliAdd:
         # Automatic updating is enabled
         plugin_settings_service = plugin_settings_service_factory(plugin)
         update_config = plugin_settings_service.get("_update")
-        assert update_config["orchestrate/dags/meltano.py"] == True
+        assert update_config["orchestrate/dags/meltano.py"] is True
 
         # File has been created
         assert "Created orchestrate/dags/meltano.py" in result.output
@@ -461,7 +462,7 @@ class TestCliAdd:
             assert plugin.executable == plugin_variant.executable == executable
             assert plugin.capabilities == plugin_variant.capabilities == ["foo", "bar"]
 
-            assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
+            assert [stg.name for stg in plugin_variant.settings] == ["baz", "qux"]
             assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(

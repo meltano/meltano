@@ -101,7 +101,7 @@ class TestCliUpgrade:
         assert "Nothing to update" in result.output
         assert file_path.read_text() != file_content
 
-        # Update file if automatic updating is enabled
+        # Update file if automatic updating is re-enabled
         result = cli_runner.invoke(
             cli,
             [
