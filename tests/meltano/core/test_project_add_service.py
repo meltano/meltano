@@ -16,13 +16,13 @@ class TestProjectAddService:
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
     @pytest.mark.parametrize(  # noqa: WPS317
-        ("plugin_type", "plugin_name", "default_variant", "lock_plugin"),
+        ("plugin_type", "plugin_name", "default_variant"),
         [
-            (PluginType.EXTRACTORS, "tap-mock", "meltano", False),
-            (PluginType.LOADERS, "target-mock", None, False),
-            (PluginType.TRANSFORMERS, "transformer-mock", None, False),
-            (PluginType.TRANSFORMS, "tap-mock-transform", None, False),
-            (PluginType.UTILITIES, "utility-mock", None, True),
+            (PluginType.EXTRACTORS, "tap-mock", "meltano"),
+            (PluginType.LOADERS, "target-mock", None),
+            (PluginType.TRANSFORMERS, "transformer-mock", None),
+            (PluginType.TRANSFORMS, "tap-mock-transform", None),
+            (PluginType.UTILITIES, "utility-mock", None),
         ],
     )
     def test_add(
@@ -30,14 +30,17 @@ class TestProjectAddService:
         plugin_type,
         plugin_name,
         default_variant,
-        lock_plugin: bool,
         subject: ProjectAddService,
         project: Project,
         plugin_discovery_service,
     ):
-        added = subject.add(plugin_type, plugin_name, lock=lock_plugin)
+        added = subject.add(plugin_type, plugin_name)
         assert added in project.meltano["plugins"][plugin_type]
-        assert project.plugin_lock_path(added).exists() is lock_plugin
+        assert project.plugin_lock_path(
+            plugin_type,
+            plugin_name,
+            variant_name=default_variant,
+        ).exists()
 
         # Variant and pip_url are repeated in
         # canonical representation for `meltano.yml`

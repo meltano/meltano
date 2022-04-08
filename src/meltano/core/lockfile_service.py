@@ -2,6 +2,7 @@
 
 import json
 
+from meltano.core.plugin.base import Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 
@@ -23,5 +24,15 @@ class PluginLockfileService:
         Args:
             project_plugin: The plugin definition to save.
         """
-        with self.projet.plugin_lock_path(project_plugin).open("w") as lockfile:
+        variant = (
+            None
+            if project_plugin.variant == Variant.DEFAULT_NAME
+            else project_plugin.variant
+        )
+        path = self.projet.plugin_lock_path(
+            project_plugin.type,
+            project_plugin.name,
+            variant_name=variant,
+        )
+        with path.open("w") as lockfile:
             json.dump(project_plugin.canonical(), lockfile, indent=2)
