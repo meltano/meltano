@@ -97,7 +97,7 @@ If you previously used the `dbt` Transformer, we recommend migrating to an adapt
 
 ### Install `dbt`
 
-This is easy to do! Following the instructions above to discover and install your chosen adapter:
+This is easy to do! Following the instructions from above to discover and install your chosen adapter:
 
 
 ```bash
