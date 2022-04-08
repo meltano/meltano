@@ -17,8 +17,6 @@ All Meltano generated projects have a `transform/` directory, which is populated
 Meltano supports installing adapter specific Transformer plugins (e.g. `dbt-snowflake`).
 If you are working from an existing Meltano project that uses the [`dbt` transformer plugin](/guide/transformation), we recommend [migrating](/guide/transformation#migrating-to-an-adapter-specific-dbt-transformer) your install to an adapter specific one (e.g. `dbt-snowflake`).
 
-To learn more about the dbt Transformer package, please see the [dbt plugin](https://hub.meltano.com/transformers/dbt) documentation on [Meltano Hub](https://hub.meltano.com).
-
 ## Install `dbt`
 
 To install an adapter-specific variant of dbt to your project, run:
