@@ -122,7 +122,7 @@ def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     click.echo("- PyPI package name:")
     click.echo(f"\t{plugin_name}")
     click.echo("- Git repository URL:")
-    click.echo(f"\tgit+https://gitlab.com/meltano/{plugin_name}.git")
+    click.echo("\tgit+https://<PLUGIN REPO URL>.git")
     click.echo("- local directory, in editable/development mode:")
     click.echo(f"\t-e extract/{plugin_name}")
     click.echo("- 'n' if using a local executable (nothing to install)")
