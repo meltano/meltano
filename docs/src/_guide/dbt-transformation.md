@@ -7,7 +7,7 @@ weight: 9
 
 <div class="notification">
   <p>In alignment with the <a href="https://docs.getdbt.com/docs/available-adapters">dbt documentation</a>, we are working towards supporting adapter specific installations of `dbt`, starting with `dbt-snowflake` (available below).</p>
-  <p>If you are interested in another adapter, all others are currently supported by the <a href="/guide/transformation">`dbt` transformer.<a></p>
+  <p>If you are interested in another adapter, all others are currently supported by the <a href="/guide/transformation">`dbt` transformer.</a></p>
   <p>You can also check in on <a href="https://gitlab.com/meltano/meltano/-/issues/3298">#3298</a> where we are tracking progress on Postgres, Redshift, Bigquery and more!</p>
 </div>
 
