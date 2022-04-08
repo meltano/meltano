@@ -8,7 +8,7 @@ weight: 5
 <div class="notification">
   <p>Using Meltano with Snowflake? Try the new <a href="/guide/dbt-transformation">adapter-specific dbt plugin (preview)</a>!</p>
   <p>If you are interested in an adapter other than Snowflake, continue with the guide below.</p>
-  <p>You can also check in on [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) where we are tracking progress on adapter-specific Postgres, Redshift, Bigquery and more!</p>
+  <p>You can also check in on <a href="https://gitlab.com/meltano/meltano/-/issues/3298">#3298</a> where we are tracking progress on adapter-specific Postgres, Redshift, Bigquery and more!</p>
 </div>
 
 Transforms in Meltano are implemented using dbt. All Meltano generated projects have a transform/ directory, which is populated with the required configuration, models, packages, etc in order to run the transformations. A transform in Meltano is simply a set of dbt models that can be installed as a package. See the [transform plugin](/concepts/plugins#transforms) docs for more details.
