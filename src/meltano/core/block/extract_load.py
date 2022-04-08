@@ -20,8 +20,9 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
+from meltano.core.state_service import StateService
 
-from .blockset import BlockSet, BlockSetValidationError
+from .blockset import BlockSetValidationError, StatefulBlockSet
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
 from .ioblock import IOBlock
 from .singer import SingerBlock
@@ -267,7 +268,7 @@ class ELBContextBuilder:
         )
 
 
-class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
+class ExtractLoadBlocks(StatefulBlockSet):  # noqa: WPS214
     """A basic BlockSet interface implementation that supports running basic EL (extract, load) patterns."""
 
     def __init__(
@@ -309,6 +310,13 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         self._stdout_futures = None
         self._stderr_futures = None
         self._errors = []
+        self._state_service = None
+
+    @property
+    def state_service(self) -> StateService:
+        if not self._state_service:
+            self._state_service = StateService(self.context.session)
+        return self.state_service
 
     def index_last_input_done(self) -> int:
         """Return index of the block furthest from the start that has exited and required input.
@@ -563,6 +571,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
 
 class ELBExecutionManager:
+
     """Execution manager for ExtractLoadBlock sets."""
 
     def __init__(self, elb: ExtractLoadBlocks) -> None:

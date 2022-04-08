@@ -90,3 +90,15 @@ class JobFinder:
     def stale(self, session):
         """Return stale jobs with the instance's job ID."""
         return self.all_stale(session).filter(Job.job_id == self.job_id)
+
+    def get_all(self, session: object, since=None):
+        """Return all jobs with the instance's job ID."""
+        query = (
+            session.query(Job)
+            .filter(Job.job_id == self.job_id)
+            .order_by(Job.ended_at.asc())
+        )
+
+        if since:
+            query = query.filter(Job.ended_at > since)
+        return query

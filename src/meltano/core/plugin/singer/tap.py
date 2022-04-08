@@ -15,8 +15,8 @@ from typing import Tuple
 
 import structlog
 from jsonschema import Draft4Validator
+
 from meltano.core.behavior.hookable import hook
-from meltano.core.job import JobFinder, Payload
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
@@ -222,28 +222,8 @@ class SingerTap(SingerPlugin):
                 ) from err
 
             return
-
         # the `state.json` is stored in the database
-        state = {}
-        incomplete_since = None
-        finder = JobFinder(elt_context.job.job_id)
-
-        state_job = finder.latest_with_payload(elt_context.session, flags=Payload.STATE)
-        if state_job:
-            logger.info(f"Found state from {state_job.started_at}.")
-            incomplete_since = state_job.ended_at
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload["singer_state"], state)
-
-        incomplete_state_jobs = finder.with_payload(
-            elt_context.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
-        )
-        for state_job in incomplete_state_jobs:
-            logger.info(
-                f"Found and merged incomplete state from {state_job.started_at}."
-            )
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload["singer_state"], state)
+        state = StateService(elt_context.session).get_state(elt_context.job.job_id)
 
         if state:
             with state_path.open("w") as state_file:

@@ -1,5 +1,5 @@
 """This holds the actual BlockSet meta class as well as related components such as exceptions."""
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 
 class BlockSetValidationError(Exception):
@@ -43,4 +43,13 @@ class BlockSet(metaclass=ABCMeta):
         Raises:
             BlockSetValidationError: on validation failure
         """
+        raise NotImplementedError
+
+
+class StatefulBlockSet(BlockSet):
+    """A BlockSet which persists state between runs."""
+
+    @abstractproperty
+    def state_service(self) -> None:
+        """The StateService managing persistent state for the blockset."""
         raise NotImplementedError

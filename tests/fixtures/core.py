@@ -424,6 +424,12 @@ def environment_service(project):
         service.remove(environment.name)
 
 
+@pytest.fixture(scope="function")
+def state_service(project):
+    service = StateService(project)
+    yield service
+
+
 @pytest.fixture(scope="class")
 def elt_context_builder(project, project_plugins_service):
     return ELTContextBuilder(project, plugins_service=project_plugins_service)
