@@ -20,7 +20,8 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
-from meltano.core.utils import file_has_data, flatten, merge
+from meltano.core.state_service import StateService
+from meltano.core.utils import file_has_data, flatten
 
 from . import PluginType, SingerPlugin
 from .catalog import (

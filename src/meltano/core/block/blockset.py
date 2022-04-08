@@ -44,12 +44,3 @@ class BlockSet(metaclass=ABCMeta):
             BlockSetValidationError: on validation failure
         """
         raise NotImplementedError
-
-
-class StatefulBlockSet(BlockSet):
-    """A BlockSet which persists state between runs."""
-
-    @abstractproperty
-    def state_service(self) -> None:
-        """The StateService managing persistent state for the blockset."""
-        raise NotImplementedError
