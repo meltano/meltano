@@ -80,3 +80,29 @@ class TestProjectAddService:
             "name": "tap-mock-inception",
             "inherit_from": "tap-mock-inherited",
         }
+
+    def test_lockfile_inherited(self, subject: ProjectAddService):
+        subject.add(
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited-new",
+            inherit_from="tap-mock",
+        )
+
+        parent_definition_path = subject.project.plugin_lock_path(
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant_name="meltano",
+        )
+        assert parent_definition_path.stem == "tap-mock--meltano"
+        assert parent_definition_path.exists()
+
+        definition_path = subject.project.plugin_lock_path(
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited-new",
+            variant_name="meltano",
+        )
+        assert definition_path.stem == "tap-mock-inherited-new--meltano"
+        assert not definition_path.exists()
+
+        matches = list(definition_path.parent.glob("tap-mock-inherited-new*"))
+        assert not matches
