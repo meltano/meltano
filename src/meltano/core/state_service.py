@@ -72,7 +72,7 @@ class StateService:
 
     @_get_or_create_job.register
     def _(self, job: str) -> Job:
-        now = datetime.utcnow()
+        now = datetime.datetime.utcnow()
         return Job(job_id=job, state=State.DUMMY, started_at=now, ended_at=now)
 
     @staticmethod
@@ -83,7 +83,7 @@ class StateService:
           state: the state to validate
 
         Raises:
-          InvalidJobStateError, JSONDecodeError
+          InvalidJobStateError, json.decoder.JSONDecodeError
         """
         state_dict = json.loads(state)
         if "singer_state" not in state_dict:
@@ -97,15 +97,18 @@ class StateService:
         Args:
           job: either an existing Job or a job_id that future runs may look up state for.
           new_state: the state to add for the given job.
+
+        Raises:
+          InvalidJobStateError, json.decoder.JSONDecodeError
         """
         self.validate_state(new_state)
-        job_to_set = self._get_or_create_job(job)
-        job.payload = new_state
+        job_to_add_to = self._get_or_create_job(job)
+        job_to_add_to.payload = json.loads(new_state)
         if new_state:
-            job.payload_flags = Payload.STATE
+            job_to_add_to.payload_flags = Payload.STATE
         else:
-            job.payload_flags = 0
-        job.save(self.session)
+            job_to_add_to.payload_flags = 0
+        job_to_add_to.save(self.session)
 
     def get_state(self, job_id: str) -> Dict:
         """Get state for job with the given job_id.
@@ -153,12 +156,23 @@ class StateService:
 
         return state
 
-    def clear_state(self, job_id: str):
+    def clear_state(self, job_id: str, save: bool = True):
         """Clear state for Job job_id.
 
         Args:
           job_id: the job_id of the job to clear state for.
         """
         finder = JobFinder(job_id)
-        for job in finder.get_all():
-            self.set_state(job, None)
+        for job in finder.get_all(self.session):
+            job.payload = {}
+            if save:
+                job.save(self.session)
+
+    def set_state(self, job_id: str, new_state: Optional[str]):
+        """Set the state for Job job_id
+
+        Args:
+          job_id: the job_id of the job to set state for
+        """
+        self.clear_state(job_id, save=False)
+        self.add_state(job_id, new_state)
