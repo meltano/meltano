@@ -1,6 +1,8 @@
 import pytest
 
 from meltano.core.plugin import PluginType, Variant
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
@@ -82,27 +84,46 @@ class TestProjectAddService:
         }
 
     def test_lockfile_inherited(self, subject: ProjectAddService):
-        subject.add(
+        child = subject.add(
             PluginType.EXTRACTORS,
             "tap-mock-inherited-new",
             inherit_from="tap-mock",
         )
+        assert isinstance(child.parent, SingerTap)
+        assert child.parent.name == "tap-mock"
 
-        parent_definition_path = subject.project.plugin_lock_path(
+        parent_path = subject.project.plugin_lock_path(
             PluginType.EXTRACTORS,
             "tap-mock",
             variant_name="meltano",
         )
-        assert parent_definition_path.stem == "tap-mock--meltano"
-        assert parent_definition_path.exists()
+        assert parent_path.stem == "tap-mock--meltano"
+        assert parent_path.exists()
 
-        definition_path = subject.project.plugin_lock_path(
-            PluginType.EXTRACTORS,
-            "tap-mock-inherited-new",
-            variant_name="meltano",
+        child_path = subject.project.plugin_lock_path(
+            child.type,
+            child.name,
+            child.variant,
         )
-        assert definition_path.stem == "tap-mock-inherited-new--meltano"
-        assert not definition_path.exists()
+        assert child_path.stem == "tap-mock-inherited-new--meltano"
+        assert not child_path.exists()
 
-        matches = list(definition_path.parent.glob("tap-mock-inherited-new*"))
+        grandchild = subject.add(
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited-new-2",
+            inherit_from="tap-mock-inherited-new",
+        )
+        assert isinstance(grandchild.parent, ProjectPlugin)
+        assert grandchild.parent.name == "tap-mock-inherited-new"
+        assert grandchild.parent.parent.name == "tap-mock"
+
+        grandchild_path = subject.project.plugin_lock_path(
+            grandchild.type,
+            grandchild.name,
+            grandchild.variant,
+        )
+        assert grandchild_path.stem == "tap-mock-inherited-new-2--meltano"
+        assert not grandchild_path.exists()
+
+        matches = list(parent_path.parent.glob("tap-mock-inherited-new*"))
         assert not matches

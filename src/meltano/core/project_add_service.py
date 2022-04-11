@@ -1,6 +1,6 @@
 """Add plugins to the project."""
 
-from .lockfile_service import PluginLockfileService
+from .lockfile_service import LockfileAlreadyExistsError, PluginLockfileService
 from .plugin import BasePlugin, PluginType, Variant
 from .plugin.project_plugin import ProjectPlugin
 from .project import Project
@@ -29,7 +29,10 @@ class ProjectAddService:
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
-        self.lockfile_service = lockfile_service or PluginLockfileService(project)
+        self.lockfile_service = lockfile_service or PluginLockfileService(
+            project,
+            self.plugins_service.discovery_service,
+        )
 
     def add(
         self,
@@ -62,12 +65,15 @@ class ProjectAddService:
             plugin.variant = parent.variant
             plugin.pip_url = parent.pip_url
 
-        plugin = self.add_plugin(plugin)
+        added = self.add_plugin(plugin)
 
-        if lock:
-            self.lockfile_service.save(plugin)
+        if lock and not added.is_custom():
+            try:
+                self.lockfile_service.save(added)
+            except LockfileAlreadyExistsError:
+                pass
 
-        return plugin
+        return added
 
     def add_plugin(self, plugin: ProjectPlugin):
         """Add a plugin to the project.
