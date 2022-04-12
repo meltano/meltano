@@ -401,18 +401,10 @@ def install_plugins(
     project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None, clean=False
 ):
     """Install the provided plugins and report results to the console."""
-    # dedupe plugins to install
-    seen_venvs = set()
-    new_plugins = []
-    for plugin in plugins:
-        if (plugin.namespace, plugin.venv_name) not in seen_venvs:
-            new_plugins.append(plugin)
-            seen_venvs.add((plugin.namespace, plugin.venv_name))
-    # install
     install_service = PluginInstallService(
         project, status_cb=install_status_update, parallelism=parallelism, clean=clean
     )
-    install_results = install_service.install_plugins(new_plugins, reason=reason)
+    install_results = install_service.install_plugins(plugins, reason=reason)
     num_successful = len([status for status in install_results if status.successful])
     num_skipped = len([status for status in install_results if status.skipped])
     num_failed = len(install_results) - num_successful
@@ -423,7 +415,7 @@ def install_plugins(
     elif num_failed > 0 and num_successful > 0:
         fg = "yellow"
 
-    if len(new_plugins) > 1:
+    if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
         click.secho(
             f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",

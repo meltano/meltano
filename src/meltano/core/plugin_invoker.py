@@ -156,7 +156,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         if plugin.pip_url or venv_service:
             self.venv_service = venv_service or VenvService(
                 project,
-                name=plugin.name,
+                name=plugin.venv_name,
                 namespace=plugin.type,
             )
         self.plugin_config_service = plugin_config_service or PluginConfigService(

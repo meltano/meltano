@@ -141,7 +141,15 @@ class PluginInstallService:
 
         Blocks until all plugins are installed.
         """
-        return run_async(self.install_plugins_async(plugins, reason=reason))
+        # dedupe plugins to install
+        seen_venvs = set()
+        new_plugins = []
+        for plugin in plugins:
+            if (plugin.namespace, plugin.venv_name) not in seen_venvs:
+                new_plugins.append(plugin)
+                seen_venvs.add((plugin.namespace, plugin.venv_name))
+        # install
+        return run_async(self.install_plugins_async(new_plugins, reason=reason))
 
     async def install_plugins_async(
         self,
