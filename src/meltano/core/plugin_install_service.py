@@ -1,6 +1,7 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 import asyncio
 import functools
+from gettext import install
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
@@ -141,15 +142,31 @@ class PluginInstallService:
 
         Blocks until all plugins are installed.
         """
-        # dedupe plugins to install
+        install_states = []
+        # dedupe plugins before install: trying to install into the same venv async will fail
         seen_venvs = set()
         new_plugins = []
         for plugin in plugins:
-            if (plugin.namespace, plugin.venv_name) not in seen_venvs:
+            if (plugin.type, plugin.venv_name) not in seen_venvs:
                 new_plugins.append(plugin)
-                seen_venvs.add((plugin.namespace, plugin.venv_name))
+                seen_venvs.add((plugin.type, plugin.venv_name))
+            else:
+                state = PluginInstallState(
+                    plugin=plugin,
+                    reason=reason,
+                    status=PluginInstallStatus.SKIPPED,
+                    message=(
+                        f"Plugin '{plugin.name}' does not require installation: "
+                        "reusing parent virtualenv"
+                    ),
+                )
+                self.status_cb(state)
+                install_states.append(state)
         # install
-        return run_async(self.install_plugins_async(new_plugins, reason=reason))
+        install_states.extend(
+            run_async(self.install_plugins_async(new_plugins, reason=reason))
+        )
+        return install_states
 
     async def install_plugins_async(
         self,
