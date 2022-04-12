@@ -5,8 +5,8 @@ layout: doc
 weight: 9
 ---
 
-<div class="notification">
-  <p>The Explore and Dashboard navigation tabs in the Meltano UI are no longer enabled by default due to Meltano's new direction towards supporting analysis plugins (i.e. Lightdash, Superset, etc.).</p>
+<div class="notification is-danger">
+  <p>The Explore and Dashboard navigation tabs in the Meltano UI are no longer enabled by default due to Meltano's new direction towards supporting analysis plugins (i.e. Lightdash, Superset, etc.). <strong>These features will be removed in Meltano v2.0.</strong></p>
   <p>For current users of these tabs, they can be re-enabled by running `meltano config set meltano ui analysis true`.</p>
 </div>
 
