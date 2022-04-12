@@ -1,9 +1,9 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 import asyncio
 import functools
-from gettext import install
 import sys
 from enum import Enum
+from gettext import install
 from multiprocessing import cpu_count
 from typing import Any, Callable, Iterable, Tuple
 
@@ -123,7 +123,9 @@ class PluginInstallService:
         self.clean = clean
 
     @staticmethod
-    def remove_duplicates(plugins: Iterable[ProjectPlugin], reason: PluginInstallReason):
+    def remove_duplicates(
+        plugins: Iterable[ProjectPlugin], reason: PluginInstallReason
+    ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
         Note: Trying to install multiple plugins into the same venv via `run_async` will fail.
@@ -132,7 +134,7 @@ class PluginInstallService:
         seen_venvs = set()
         deduped_plugins = []
         # iterate in reverse order, to keep last plugin occurrences
-        for plugin in plugins[::-1]:
+        for plugin in list(plugins)[::-1]:
             if (plugin.type, plugin.venv_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
                 seen_venvs.add((plugin.type, plugin.venv_name))
@@ -144,7 +146,7 @@ class PluginInstallService:
                     message=(
                         f"Plugin '{plugin.name}' does not require installation: "
                         "reusing parent virtualenv"
-                    )
+                    ),
                 )
                 states.append(state)
         # reverse deduped_plugins to preserve plugin original order
@@ -175,9 +177,7 @@ class PluginInstallService:
         for state in states:
             self.status_cb(state)
         # install
-        states.extend(
-            run_async(self.install_plugins_async(new_plugins, reason=reason))
-        )
+        states.extend(run_async(self.install_plugins_async(new_plugins, reason=reason)))
         return states
 
     async def install_plugins_async(
