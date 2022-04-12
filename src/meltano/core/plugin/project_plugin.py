@@ -234,3 +234,17 @@ class ProjectPlugin(PluginRef):
                 "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}"
             },
         )
+
+    @property
+    def venv_name(self):
+        """Return the venv name this plugin should use."""
+        if not self.inherit_from:
+            # No parent. Use a unique venv per plugin.
+            return self.name
+
+        if not self.pip_url or (self.parent.pip_url == self.pip_url):
+            # Use the parent's venv. Plugin is inheriting and there's no difference in pip_url.
+            return self.parent.name
+
+        # Default to unique venv per plugin.
+        return self.name

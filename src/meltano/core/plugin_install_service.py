@@ -279,7 +279,7 @@ class PipPluginInstaller:
         self.venv_service = venv_service or VenvService(
             project,
             namespace=self.plugin.type,
-            name=self.plugin.name,
+            name=self.plugin.venv_name,
         )
 
     async def install(self, reason, clean):
