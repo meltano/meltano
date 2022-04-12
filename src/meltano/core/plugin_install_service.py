@@ -122,6 +122,35 @@ class PluginInstallService:
         self.semaphore = asyncio.Semaphore(parallelism)
         self.clean = clean
 
+    @staticmethod
+    def remove_duplicates(plugins: Iterable[ProjectPlugin], reason: PluginInstallReason):
+        """Deduplicate list of plugins, keeping the last occurrences.
+
+        Note: Trying to install multiple plugins into the same venv via `run_async` will fail.
+        """
+        states = []
+        seen_venvs = set()
+        deduped_plugins = []
+        # iterate in reverse order, to keep last plugin occurrences
+        for plugin in plugins[::-1]:
+            if (plugin.type, plugin.venv_name) not in seen_venvs:
+                deduped_plugins.append(plugin)
+                seen_venvs.add((plugin.type, plugin.venv_name))
+            else:
+                state = PluginInstallState(
+                    plugin=plugin,
+                    reason=reason,
+                    status=PluginInstallStatus.SKIPPED,
+                    message=(
+                        f"Plugin '{plugin.name}' does not require installation: "
+                        "reusing parent virtualenv"
+                    )
+                )
+                states.append(state)
+        # reverse deduped_plugins to preserve plugin original order
+        deduped_plugins.reverse()
+        return states, deduped_plugins
+
     def install_all_plugins(
         self, reason=PluginInstallReason.INSTALL
     ) -> Tuple[PluginInstallState]:
@@ -142,31 +171,14 @@ class PluginInstallService:
 
         Blocks until all plugins are installed.
         """
-        install_states = []
-        # dedupe plugins before install: trying to install into the same venv async will fail
-        seen_venvs = set()
-        new_plugins = []
-        for plugin in plugins:
-            if (plugin.type, plugin.venv_name) not in seen_venvs:
-                new_plugins.append(plugin)
-                seen_venvs.add((plugin.type, plugin.venv_name))
-            else:
-                state = PluginInstallState(
-                    plugin=plugin,
-                    reason=reason,
-                    status=PluginInstallStatus.SKIPPED,
-                    message=(
-                        f"Plugin '{plugin.name}' does not require installation: "
-                        "reusing parent virtualenv"
-                    ),
-                )
-                self.status_cb(state)
-                install_states.append(state)
+        states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
+        for state in states:
+            self.status_cb(state)
         # install
-        install_states.extend(
+        states.extend(
             run_async(self.install_plugins_async(new_plugins, reason=reason))
         )
-        return install_states
+        return states
 
     async def install_plugins_async(
         self,

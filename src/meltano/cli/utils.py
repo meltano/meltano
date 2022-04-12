@@ -384,7 +384,7 @@ def install_status_update(install_state):
     """
     plugin = install_state.plugin
     desc = plugin.type.descriptor
-    if install_state.status is PluginInstallStatus.RUNNING:
+    if install_state.status in (PluginInstallStatus.RUNNING, PluginInstallStatus.SKIPPED):
         msg = f"{install_state.verb} {desc} '{plugin.name}'..."
         click.secho(msg)
     elif install_state.status is PluginInstallStatus.ERROR:
