@@ -680,10 +680,15 @@ export MELTANO_NOTIFICATION=true
 
 ### `ui.analysis`
 
+<div class="notification is-danger">
+  <p>The Explore and Dashboard navigation tabs in the Meltano UI are no longer enabled by default due to Meltano's new direction towards supporting analysis plugins (i.e. Lightdash, Superset, etc.). <strong>These features will be removed in <a href="https://gitlab.com/meltano/meltano/-/issues/3292">Meltano v2.0</a>.</strong></p>
+  <p>For current users of these tabs, they can be re-enabled by running `meltano config set meltano ui analysis true`.</p>
+</div>
+
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_ANALYSIS`
 - Default: `false`
 
-If you are want to use Meltano for more than data integration (and transformation),
+If you want to use Meltano for more than data integration (and transformation),
 you can enable this setting to show all functionality related to Analysis from the UI:
 - "Explore" and "Dashboards" tabs
 - "Explore" buttons in the "Pipelines" list and "Pipeline Run Log" modal
