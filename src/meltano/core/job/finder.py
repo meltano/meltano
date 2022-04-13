@@ -60,7 +60,7 @@ class JobFinder:
         if state:
             query = query.filter(Job.state == state)
         if exclude_state:
-            query = query.filter(Job.state != exclude_stateJJ)
+            query = query.filter(Job.state != exclude_state)
         return query
 
     def latest_with_payload(self, session, **kwargs):
