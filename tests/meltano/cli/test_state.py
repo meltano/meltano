@@ -90,7 +90,7 @@ class TestCliState:
                         ["state", "set", job_id, "--state", json.dumps(state)],
                     )
                     assert_cli_runner(result)
-                    assert state_service.get_state(job_id) == state
+                    assert state_service.get_state(job_id) == state["singer_state"]
 
     def test_set_from_file(self, mkdtemp, state_service, job_ids, payloads, cli_runner):
         tmp_path = mkdtemp()
@@ -106,17 +106,43 @@ class TestCliState:
                         cli, ["state", "set", job_id, "--input-file", filepath]
                     )
                     assert_cli_runner(result)
-                    assert state_service.get_state(job_id) == state
+                    assert state_service.get_state(job_id) == state["singer_state"]
 
-    def test_add_from_string(self, state_service, cli_runner):
+    def test_add_from_string(self, state_service, payloads, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            # TODO:
-            NotImplemented
+            job_id = "nonexistent_job_id"
+            result = cli_runner.invoke(
+                cli,
+                [
+                    "state",
+                    "add",
+                    job_id,
+                    "--state",
+                    json.dumps(payloads.mock_state_payloads[0]),
+                ],
+            )
+            assert_cli_runner(result)
+            assert (
+                state_service.get_state(job_id)
+                == payloads.mock_state_payloads[0]["singer_state"]
+            )
 
     def test_add_from_file(self, mkdtemp, state_service, job_ids, payloads, cli_runner):
+        tmp_path = mkdtemp()
+        job_id = "nonexistent_job_id"
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            # TODO:
-            NotImplemented
+            filepath = os.path.join(tmp_path, "state-file-test-add-path.json")
+            with open(filepath, "w+") as state_file:
+                json.dump(payloads.mock_state_payloads[0], state_file)
+            result = cli_runner.invoke(
+                cli, ["state", "add", job_id, "--input-file", filepath]
+            )
+
+            assert_cli_runner(result)
+            assert (
+                state_service.get_state(job_id)
+                == payloads.mock_state_payloads[0]["singer_state"]
+            )
 
     def test_get(self, state_service, cli_runner, job_ids_with_expected_states):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):

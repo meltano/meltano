@@ -546,7 +546,7 @@ def payloads(num_params):
             for j in range(num_params)
         ],
         mock_error_payload={"error": "failed"},
-        mock_empty_payload={"singer_state": {}},
+        mock_empty_payload={},
     )
     _payloads = namedtuple("payloads", mock_payloads_dict)
     return _payloads(**mock_payloads_dict)
@@ -678,7 +678,7 @@ def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):
     }
 
     for job_id, job_list in job_ids_with_jobs.items():
-        expectations[job_id] = {"singer_state": {}}
+        expectations[job_id] = {}
         seen_complete = False
         # Get latest complete non-dummy job.
         # Get all incomplete jobs since latest complete non-dummy job.
@@ -716,7 +716,10 @@ def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):
                 or (job.ended_at > latest_incomplete_job.ended_at)
             ):
                 expectations[job_id] = merge(expectations[job_id], job.payload)
-    return expectations.items()
+    return [
+        (job_id, expected_state["singer_state"])
+        for job_id, expected_state in expectations.items()
+    ]
 
 
 @pytest.fixture

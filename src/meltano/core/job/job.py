@@ -1,6 +1,5 @@
 """Defines Job model class."""
 import asyncio
-import logging
 import os
 import signal
 import uuid
@@ -8,9 +7,8 @@ from contextlib import contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 
-import sqlalchemy.types as types
 from async_generator import asynccontextmanager
-from sqlalchemy import Column
+from sqlalchemy import Column, types
 from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.core.error import Error
@@ -22,18 +20,16 @@ HEARTBEAT_VALID_MINUTES = 5
 
 
 class InconsistentStateError(Error):
-    """
-    Occur upon a wrong operation for the current state.
-    """
+    """Occur upon a wrong operation for the current state."""
 
 
 class ImpossibleTransitionError(Error):
-    """
-    Occur upon a wrong transition.
-    """
+    """Occur upon a wrong transition."""
 
 
 class State(Enum):
+    """Represents status of a Job."""
+
     IDLE = (0, ("RUNNING", "FAIL"))
     RUNNING = (1, ("SUCCESS", "FAIL"))
     SUCCESS = (2, ())
@@ -42,17 +38,34 @@ class State(Enum):
     DUMMY = (5, ())
 
     def transitions(self):
+        """Get possible next States for a job of this State.
+
+        Returns:
+            The possible states jobs in this state can be transitioned into
+        """
         return self.value[1]
 
     def __str__(self):
+        """Get a string representation of this State.
+
+        Returns:
+            the name of this State
+        """
         return self.name
 
 
 def current_trigger():
+    """Get the trigger for running job.
+
+    Returns:
+        The trigger for currently running job
+    """
     return os.getenv("MELTANO_JOB_TRIGGER")
 
 
 class Payload(IntFlag):
+    """Flag indicating whether a Job has state in its payload field."""
+
     STATE = 1
     INCOMPLETE_STATE = 2
 
@@ -74,20 +87,32 @@ class Job(SystemModel):  # noqa: WPS214
     trigger = Column(types.String, default=current_trigger)
 
     def __init__(self, **kwargs):
+        """Construct a Job.
+
+        Args:
+            kwargs: keyword args to override defaults and pass to super
+        """
         kwargs["state"] = kwargs.get("state", State.IDLE)
         kwargs["payload"] = kwargs.get("payload", {})
         kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
         super().__init__(**kwargs)
 
     def is_running(self):
+        """Return whether Job is running.
+
+        Returns:
+            bool indicating with this Job is running
+        """
         return self.state is State.RUNNING
 
     def is_stale(self):
-        """
-        Return whether job has gone stale.
+        """Return whether Job has gone stale.
 
         Running jobs with a heartbeat are considered stale after no heartbeat is recorded for 5 minutes.
         Legacy jobs without a heartbeat are considered stale after being in the running state for 24 hours.
+
+        Returns:
+            bool indicating with this Job is stale
         """
         if not self.is_running():
             return False

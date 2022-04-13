@@ -1,7 +1,7 @@
 """State management in CLI."""
 import json
 import re
-from typing import List, Optional
+from typing import Optional
 
 import click
 import structlog
@@ -13,7 +13,6 @@ from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 from . import cli
-from .params import pass_project
 
 STATE_SERVICE_KEY = "state_service"
 
@@ -21,7 +20,7 @@ logger = structlog.getLogger(__name__)
 
 
 def state_service_from_job_id(project: Project, job_id: str) -> Optional[StateService]:
-    """Instantiate by parsing a job_id"""
+    """Instantiate by parsing a job_id."""
     job_id_re = re.compile(r"^(?P<env>.+)\:(?P<tap>.+)-to-(?P<target>.+)$")
     match = job_id_re.match(job_id)
     if match:
@@ -38,7 +37,7 @@ def state_service_from_job_id(project: Project, job_id: str) -> Optional[StateSe
             blocks = [match.group("tap"), match.group("target")]
             parser = BlockParser(logger, project, blocks)
             return next(parser.find_blocks()).state_service
-        except:
+        except Exception:
             logger.warn("No plugins found for provided job_id.")
     # If provided job_id does not match convention (i.e., run via "meltano elt"),
     # use the standalone StateService in the CLI context.
@@ -59,10 +58,10 @@ def meltano_state(project: Project, ctx: click.Context):
     ctx.obj[STATE_SERVICE_KEY] = StateService(session)
 
 
-@meltano_state.command()
+@meltano_state.command(name="list")
 @click.option("--pattern", help="TODO")
 @click.pass_context
-def list(ctx: click.Context, pattern: Optional[str]):
+def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
     """List all job_ids for this project."""
     state_service = ctx.obj[STATE_SERVICE_KEY]
     states = state_service.list_state(pattern)
@@ -79,13 +78,13 @@ def list(ctx: click.Context, pattern: Optional[str]):
             click.secho(job_id, fg="yellow")
 
 
-@meltano_state.command()
+@meltano_state.command(name="add")
 @click.option("--input-file", type=click.Path(exists=True), help="TODO")
 @click.option("--state", type=str, help="TODO")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context
-def add(
+def add_state(
     ctx: click.Context,
     project: Project,
     job_id: str,
@@ -108,13 +107,13 @@ def add(
         raise ValueError("TODO: better error here")
 
 
-@meltano_state.command()
+@meltano_state.command(name="set")
 @click.option("--input-file", type=click.Path(exists=True), help="TODO")
 @click.option("--state", type=str, help="TODO")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context
-def set(
+def set_state(
     ctx: click.Context,
     project: Project,
     job_id: str,
@@ -137,11 +136,11 @@ def set(
         raise ValueError("TODO: better error here")
 
 
-@meltano_state.command()
+@meltano_state.command(name="get")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context
-def get(ctx: click.Context, project: Project, job_id: str):
+def get_state(ctx: click.Context, project: Project, job_id: str):  # noqa: WPS463
     """Get state."""
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -149,11 +148,11 @@ def get(ctx: click.Context, project: Project, job_id: str):
     click.echo(json.dumps(state_service.get_state(job_id)))
 
 
-@meltano_state.command()
+@meltano_state.command(name="clear")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context
-def clear(ctx: click.Context, project: Project, job_id: str):
+def clear_state(ctx: click.Context, project: Project, job_id: str):
     """Clear state."""
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]

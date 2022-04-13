@@ -324,7 +324,11 @@ class SingerBlock(InvokerBase, IOBlock):
 
     @property
     def has_state(self) -> bool:
-        """Whether or not this plugin has state"""
+        """Whether or not this plugin has state.
+
+        Returns:
+            bool indicating whether this plugin has state
+        """
         return "state" in self.invoker.capabilities
 
     async def start(self):

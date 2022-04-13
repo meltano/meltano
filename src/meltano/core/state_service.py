@@ -120,7 +120,7 @@ class StateService:
           Dict representing state that would be used in the next run of the given job.
         """
 
-        state = {"singer_state": {}}
+        state = {}
         incomplete_since = None
         finder = JobFinder(job_id)
 
@@ -164,7 +164,7 @@ class StateService:
             if "singer_state" in state_job.payload:
                 merge(state_job.payload, state)
 
-        return state
+        return state.get("singer_state", state)
 
     def clear_state(self, job_id: str, save: bool = True):
         """Clear state for Job job_id.

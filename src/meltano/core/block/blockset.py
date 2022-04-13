@@ -1,5 +1,5 @@
 """This holds the actual BlockSet meta class as well as related components such as exceptions."""
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 
 class BlockSetValidationError(Exception):

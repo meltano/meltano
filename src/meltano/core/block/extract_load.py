@@ -31,7 +31,7 @@ logger = structlog.getLogger(__name__)
 
 
 class BlockSetHasNoStateError(Exception):
-    """Occurs when state_service is accessed for ExtractLoadBlocks instance for which no block has state"""
+    """Occurs when state_service is accessed for ExtractLoadBlocks instance for which no block has state."""
 
 
 class ELBContext:  # noqa: WPS230
@@ -317,7 +317,11 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         self._state_service = None
 
     def has_state(self) -> bool:
-        """Check to see if any block in this BlockSet has 'state' capability"""
+        """Check to see if any block in this BlockSet has 'state' capability.
+
+        Returns:
+            bool indicating whether BlockSet has 'state' capability
+        """
         for block in self.blocks:
             if block.has_state:
                 return True
@@ -325,6 +329,14 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
     @property
     def state_service(self) -> StateService:
+        """Get StateService for managing state for this BlockSet.
+
+        Returns:
+            A StateService using this BlockSet's context's session
+
+        Raises:
+            BlockSetHasNoStateError: if no Block in this BlockSet has state capability
+        """
         if not self._state_service:
             if self.has_state():
                 self._state_service = StateService(self.context.session)
@@ -585,7 +597,6 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
 
 class ELBExecutionManager:
-
     """Execution manager for ExtractLoadBlock sets."""
 
     def __init__(self, elb: ExtractLoadBlocks) -> None:
