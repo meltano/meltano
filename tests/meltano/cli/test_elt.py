@@ -308,7 +308,9 @@ class TestCliEltScratchpadOne:
 
             # ensure there is a log of this exception
             log = job_logging_service.get_latest_log(job_id).splitlines()
-            assert "Traceback (most recent call last):" in log
+            assert any(
+                map(lambda line: "Traceback  (most recent call last):" in line, log)
+            )
             assert "Exception: This is a grave danger." in log
 
     @pytest.mark.backend("sqlite")

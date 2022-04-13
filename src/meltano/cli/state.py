@@ -1,4 +1,5 @@
 """State management in CLI."""
+import json
 import re
 from typing import List, Optional
 
@@ -9,7 +10,7 @@ from meltano.cli.params import pass_project
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.project import Project
-from meltano.core.state_service import StateService
+from meltano.core.state_service import InvalidJobStateError, StateService
 
 from . import cli
 from .params import pass_project
@@ -19,21 +20,29 @@ STATE_SERVICE_KEY = "state_service"
 logger = structlog.getLogger(__name__)
 
 
-def state_service_from_job_id(project: Project, job_id: str) -> StateService:
+def state_service_from_job_id(project: Project, job_id: str) -> Optional[StateService]:
     """Instantiate by parsing a job_id"""
     job_id_re = re.compile(r"^(?P<env>.+)\:(?P<tap>.+)-to-(?P<target>.+)$")
     match = job_id_re.match(job_id)
-    if not match:
-        raise ValueError  # TODO: better error
-    if (
-        not project.active_environment
-    ) or project.active_environment.name != match.group("env"):
-        logger.warn("Environment for job does not match current environment.")
-        project.activate_environment(match.group("env"))
-        print(project.active_environment.name)
-    blocks = [match.group("tap"), match.group("target")]
-    parser = BlockParser(logger, project, blocks)
-    return next(parser.find_blocks()).state_service
+    if match:
+        # If the job_id matches convention (i.e., job has been run via "meltano run"),
+        # try parsing into BlockSet.
+        # This way, we get BlockSet validation and raise an error if no
+        # plugin in the BlockSet has "state" capability
+        try:
+            if (
+                not project.active_environment
+            ) or project.active_environment.name != match.group("env"):
+                logger.warn("Environment for job does not match current environment.")
+            project.activate_environment(match.group("env"))
+            blocks = [match.group("tap"), match.group("target")]
+            parser = BlockParser(logger, project, blocks)
+            return next(parser.find_blocks()).state_service
+        except:
+            logger.warn("No plugins found for provided job_id.")
+    # If provided job_id does not match convention (i.e., run via "meltano elt"),
+    # use the standalone StateService in the CLI context.
+    return None
 
 
 @cli.group(name="state", short_help="Manage Singer state.")
@@ -56,10 +65,13 @@ def meltano_state(project: Project, ctx: click.Context):
 def list(ctx: click.Context, pattern: Optional[str]):
     """List all job_ids for this project."""
     state_service = ctx.obj[STATE_SERVICE_KEY]
-    states = state_service.list_state()
+    states = state_service.list_state(pattern)
+
     for job_id, state in states.items():
         if state:
-            if "error" in state:
+            try:
+                state_service.validate_state(json.dumps(state))
+            except (InvalidJobStateError, json.decoder.JSONDecodeError):
                 click.secho(job_id, fg="red")
             else:
                 click.secho(job_id, fg="green")
@@ -69,42 +81,81 @@ def list(ctx: click.Context, pattern: Optional[str]):
 
 @meltano_state.command()
 @click.option("--input-file", type=click.Path(exists=True), help="TODO")
-@click.argument("state_json_text")
+@click.option("--state", type=str, help="TODO")
 @click.argument("job_id")
+@pass_project(migrate=True)
 @click.pass_context
-def set(
+def add(
     ctx: click.Context,
+    project: Project,
     job_id: str,
-    state_json_text: Optional[str],
-    json_state_file: Optional[click.Path],
+    state: Optional[str],
+    input_file: Optional[click.Path],
 ):
-    """Set state."""
-    state_service = ctx.obj[STATE_SERVICE_KEY]
+    """Add bookmarks to existing state."""
+    state_service = (
+        state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
 
-    if input_file and state_json_text:
+    if input_file and state:
         raise ValueError("TODO: better error here")
     elif input_file:
         with open(input_file) as state_f:
-            state_service.set(job_id, state_f.read())
-    elif state_json_text:
-        state_service.set(job_id, state_json_text)
+            state_service.add_state(job_id, state_f.read())
+    elif state:
+        state_service.add_state(job_id, state)
+    else:
+        raise ValueError("TODO: better error here")
+
+
+@meltano_state.command()
+@click.option("--input-file", type=click.Path(exists=True), help="TODO")
+@click.option("--state", type=str, help="TODO")
+@click.argument("job_id")
+@pass_project(migrate=True)
+@click.pass_context
+def set(
+    ctx: click.Context,
+    project: Project,
+    job_id: str,
+    state: Optional[str],
+    input_file: Optional[click.Path],
+):
+    """Set state."""
+    state_service = (
+        state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+
+    if input_file and state:
+        raise ValueError("TODO: better error here")
+    elif input_file:
+        with open(input_file) as state_f:
+            state_service.set_state(job_id, state_f.read())
+    elif state:
+        state_service.set_state(job_id, state)
     else:
         raise ValueError("TODO: better error here")
 
 
 @meltano_state.command()
 @click.argument("job_id")
+@pass_project(migrate=True)
 @click.pass_context
-def get(ctx: click.Context, job_id: str):
+def get(ctx: click.Context, project: Project, job_id: str):
     """Get state."""
-    state_service = ctx.obj[STATE_SERVICE_KEY]
-    click.echo(state_service.get_state(job_id))
+    state_service = (
+        state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    click.echo(json.dumps(state_service.get_state(job_id)))
 
 
 @meltano_state.command()
 @click.argument("job_id")
+@pass_project(migrate=True)
 @click.pass_context
-def clear(ctx: click.Context, job_id: str):
+def clear(ctx: click.Context, project: Project, job_id: str):
     """Clear state."""
-    state_service = ctx.obj[STATE_SERVICE_KEY]
-    state_service.clear(job_id)
+    state_service = (
+        state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    state_service.clear_state(job_id)

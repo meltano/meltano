@@ -1,7 +1,9 @@
 import datetime
+import itertools
 import logging
 import os
 import shutil
+from collections import namedtuple
 from pathlib import Path
 
 import pytest
@@ -13,6 +15,7 @@ from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
+from meltano.core.job import Job, Payload, State
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -29,6 +32,8 @@ from meltano.core.project_plugins_service import (
 )
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
+from meltano.core.state_service import StateService
+from meltano.core.utils import merge
 
 PROJECT_NAME = "a_meltano_project"
 
@@ -522,3 +527,205 @@ def mapper(project_add_service):
         )
     except PluginAlreadyAddedException as err:
         return err.plugin
+
+
+def create_job_id(description: str, env: str = "dev") -> str:
+    return f"{env}:tap-{description}-to-target-{description}"
+
+
+@pytest.fixture
+def num_params():
+    return 10
+
+
+@pytest.fixture
+def payloads(num_params):
+    mock_payloads_dict = dict(
+        mock_state_payloads=[
+            {"singer_state": {f"bookmark-{j}": j + i for i in range(num_params)}}
+            for j in range(num_params)
+        ],
+        mock_error_payload={"error": "failed"},
+        mock_empty_payload={"singer_state": {}},
+    )
+    _payloads = namedtuple("payloads", mock_payloads_dict)
+    return _payloads(**mock_payloads_dict)
+
+
+@pytest.fixture
+def job_ids(num_params):
+    job_id_dict = dict(
+        single_incomplete_job_id=create_job_id("single-incomplete"),
+        single_complete_job_id=create_job_id("single-complete"),
+        multiple_incompletes_job_id=create_job_id("multiple-incompletes"),
+        multiple_completes_job_id=create_job_id("multiple-completes"),
+        single_complete_then_multiple_incompletes_job_id=create_job_id(
+            "single-complete-then-multiple-incompletes"
+        ),
+        single_incomplete_then_multiple_completes_job_id=create_job_id(
+            "single-incomplete-then-multiple-completes"
+        ),
+    )
+    _job_ids = namedtuple("job_ids", job_id_dict)
+    return _job_ids(**job_id_dict)
+
+
+@pytest.fixture
+def mock_time():
+    def _mock_time():
+        for i in itertools.count():
+            yield datetime.datetime(2022, 1, 1) + datetime.timedelta(hours=i)
+
+    return _mock_time()
+
+
+@pytest.fixture()
+def job_args():
+    job_args_dict = dict(
+        complete_job_args=dict(state=State.SUCCESS, payload_flags=Payload.STATE),
+        incomplete_job_args=dict(
+            state=State.FAIL, payload_flags=Payload.INCOMPLETE_STATE
+        ),
+    )
+    _job_args = namedtuple("job_args", job_args_dict)
+    return _job_args(**job_args_dict)
+
+
+@pytest.fixture
+def job_ids_with_jobs(job_ids, job_args, payloads, mock_time):
+    jobs = {
+        job_ids.single_incomplete_job_id: [
+            Job(
+                job_id=job_ids.single_incomplete_job_id,
+                **job_args.incomplete_job_args,
+                payload=payloads.mock_state_payloads[0],
+            )
+        ],
+        job_ids.single_complete_job_id: [
+            Job(
+                job_id=job_ids.single_complete_job_id,
+                payload=payloads.mock_state_payloads[0],
+                **job_args.complete_job_args,
+            )
+        ],
+        job_ids.multiple_incompletes_job_id: [
+            Job(
+                job_id=job_ids.multiple_incompletes_job_id,
+                **job_args.incomplete_job_args,
+                payload=payload,
+            )
+            for payload in payloads.mock_state_payloads
+        ],
+        job_ids.multiple_completes_job_id: [
+            Job(
+                job_id=job_ids.multiple_completes_job_id,
+                payload=payload,
+                **job_args.complete_job_args,
+            )
+            for payload in payloads.mock_state_payloads
+        ],
+        job_ids.single_complete_then_multiple_incompletes_job_id: [
+            Job(
+                job_id=job_ids.single_complete_then_multiple_incompletes_job_id,
+                payload=payloads.mock_state_payloads[0],
+                **job_args.complete_job_args,
+            )
+        ]
+        + [
+            Job(
+                job_id=job_ids.single_complete_then_multiple_incompletes_job_id,
+                payload=payload,
+                **job_args.incomplete_job_args,
+            )
+            for payload in payloads.mock_state_payloads[1:]
+        ],
+        job_ids.single_incomplete_then_multiple_completes_job_id: [
+            Job(
+                job_id=job_ids.single_incomplete_then_multiple_completes_job_id,
+                payload=payloads.mock_state_payloads[0],
+                **job_args.incomplete_job_args,
+            )
+        ]
+        + [
+            Job(
+                job_id=job_ids.single_incomplete_then_multiple_completes_job_id,
+                payload=payload,
+                **job_args.complete_job_args,
+            )
+            for payload in payloads.mock_state_payloads[1:]
+        ],
+    }
+    for job_list in jobs.values():
+        for job in job_list:
+            job.started_at = next(mock_time)
+            job.ended_at = next(mock_time)
+    return jobs
+
+
+@pytest.fixture
+def jobs(job_ids_with_jobs):
+    return [job for job_list in job_ids_with_jobs.values() for job in job_list]
+
+
+@pytest.fixture
+def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):
+    final_state = {}
+    for state in payloads.mock_state_payloads:
+        merge(state, final_state)
+    expectations = {
+        job_ids.single_complete_job_id: payloads.mock_state_payloads[0]["singer_state"],
+        job_ids.single_incomplete_job_id: payloads.mock_empty_payload,
+    }
+
+    for job_id, job_list in job_ids_with_jobs.items():
+        expectations[job_id] = {"singer_state": {}}
+        seen_complete = False
+        # Get latest complete non-dummy job.
+        # Get all incomplete jobs since latest complete non-dummy job.
+        # Get all dummy jobs since latest non-dummy job.
+        complete_jobs = []
+        incomplete_jobs = []
+        dummy_jobs = []
+        for job in job_list:
+            if job.state == State.DUMMY:
+                dummy_jobs.append(job)
+            elif job.payload_flags == Payload.STATE:
+                complete_jobs.append(job)
+            elif job.payload_flags == Payload.INCOMPLETE_STATE:
+                incomplete_jobs.append(job)
+        latest_complete_job = None
+        if complete_jobs:
+            latest_complete_job = max(complete_jobs, key=lambda job: job.ended_at)
+        latest_incomplete_job = None
+        if incomplete_jobs:
+            latest_incomplete_job = max(incomplete_jobs, key=lambda job: job.ended_at)
+        if latest_complete_job:
+            expectations[job_id] = merge(
+                expectations[job_id], latest_complete_job.payload
+            )
+        for job in incomplete_jobs:
+            if (not latest_complete_job) or (
+                job.ended_at > latest_complete_job.ended_at
+            ):
+                expectations[job_id] = merge(expectations[job_id], job.payload)
+        for job in dummy_jobs:
+            if (
+                not latest_complete_job or (job.ended_at > latest_complete_job.ended_at)
+            ) and (
+                (not latest_incomplete_job)
+                or (job.ended_at > latest_incomplete_job.ended_at)
+            ):
+                expectations[job_id] = merge(expectations[job_id], job.payload)
+    return expectations.items()
+
+
+@pytest.fixture
+def job_history_session(jobs, session):
+    for job in jobs:
+        job.save(session)
+    yield session
+
+
+@pytest.fixture
+def state_service(job_history_session):
+    return StateService(session=job_history_session)

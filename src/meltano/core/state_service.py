@@ -50,8 +50,8 @@ class StateService:
         query = self.session.query(Job)
         if job_id_pattern:
             query = query.filter(Job.job_id.like(job_id_pattern.replace("*", "%")))
-        for job in query:
-            states[job.job_id] = merge(job.payload, states[job.job_id])
+        for job_id in set([job.job_id for job in query]):
+            states[job_id] = self.get_state(job_id)
         return states
 
     @singledispatchmethod
@@ -120,17 +120,25 @@ class StateService:
           Dict representing state that would be used in the next run of the given job.
         """
 
-        state = {}
+        state = {"singer_state": {}}
         incomplete_since = None
         finder = JobFinder(job_id)
 
-        state_job = finder.latest_with_payload(self.session, flags=Payload.STATE)
+        # Get the state for the most recent completed job.
+        # Do not consider dummy jobs create via add_state.
+        state_job = finder.latest_with_payload(
+            self.session, flags=Payload.STATE, exclude_state=State.DUMMY
+        )
         if state_job:
             logger.info(f"Found state from {state_job.started_at}.")
             incomplete_since = state_job.ended_at
             if "singer_state" in state_job.payload:
-                merge(state_job.payload["singer_state"], state)
+                merge(state_job.payload, state)
 
+        # If there have been any incomplete jobs since the most recent completed jobs,
+        # merge the state emitted by those jobs into the state for the most recent
+        # completed job. If there are no completed jobs, get the full history of
+        # incomplete jobs and use the most recent state emitted per stream
         incomplete_state_jobs = finder.with_payload(
             self.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
         )
@@ -141,8 +149,10 @@ class StateService:
             )
             last_job_ended_at = state_job.ended_at
             if "singer_state" in state_job.payload:
-                merge(state_job.payload["singer_state"], state)
+                merge(state_job.payload, state)
 
+        # If state has been added via add_state since the
+        # most recent job, use bookmarks from those additions.
         dummy_state_jobs = finder.with_payload(
             self.session,
             flags=Payload.STATE,
@@ -152,7 +162,7 @@ class StateService:
 
         for state_job in dummy_state_jobs:
             if "singer_state" in state_job.payload:
-                merge(state_job.payload["singer_state"], state)
+                merge(state_job.payload, state)
 
         return state
 

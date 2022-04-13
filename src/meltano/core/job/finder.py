@@ -41,7 +41,9 @@ class JobFinder:
         """Find the most recent job in the running state, if any."""
         return self.running(session).order_by(Job.started_at.desc()).first()
 
-    def with_payload(self, session, flags=0, since=None, state=None):
+    def with_payload(
+        self, session, flags=0, since=None, state=None, exclude_state=None
+    ):
         query = (
             session.query(Job)
             .filter(
@@ -57,6 +59,8 @@ class JobFinder:
             query = query.filter(Job.ended_at > since)
         if state:
             query = query.filter(Job.state == state)
+        if exclude_state:
+            query = query.filter(Job.state != exclude_stateJJ)
         return query
 
     def latest_with_payload(self, session, **kwargs):
