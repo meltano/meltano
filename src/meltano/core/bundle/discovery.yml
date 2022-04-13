@@ -3104,6 +3104,8 @@ transformers:
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
       value: $MELTANO_PROJECT_ROOT/transform/profiles/snowflake
+      env_aliases:
+      - DBT_PROFILES_DIR
       # Snowflake connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: account
       kind: string
