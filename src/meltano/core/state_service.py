@@ -50,7 +50,7 @@ class StateService:
         query = self.session.query(Job)
         if job_id_pattern:
             query = query.filter(Job.job_id.like(job_id_pattern.replace("*", "%")))
-        for job_id in set([job.job_id for job in query]):
+        for job_id in {job.job_id for job in query}:
             states[job_id] = self.get_state(job_id)
         return states
 
