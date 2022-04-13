@@ -90,7 +90,7 @@ class LockedPlugin(Canonical):
         )
 
 
-class PluginLockfileService:
+class PluginLockService:
     """Plugin Lockfile Service."""
 
     def __init__(self, project: Project, discovery_service: PluginDiscoveryService):

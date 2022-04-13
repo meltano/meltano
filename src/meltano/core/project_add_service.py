@@ -1,8 +1,8 @@
 """Add plugins to the project."""
 
-from .lockfile_service import LockfileAlreadyExistsError, PluginLockfileService
 from .plugin import BasePlugin, PluginType, Variant
 from .plugin.project_plugin import ProjectPlugin
+from .plugin_lock_service import LockfileAlreadyExistsError, PluginLockService
 from .project import Project
 from .project_plugins_service import PluginAlreadyAddedException, ProjectPluginsService
 
@@ -18,18 +18,18 @@ class ProjectAddService:
         self,
         project: Project,
         plugins_service: ProjectPluginsService = None,
-        lockfile_service: PluginLockfileService = None,
+        plugin_lock_service: PluginLockService = None,
     ):
         """Create a new Project Add Service.
 
         Args:
             project: The project to add plugins to.
             plugins_service: The project plugins service.
-            lockfile_service: The plugin lockfile service.
+            plugin_lock_service: The plugin lockfile service.
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
-        self.lockfile_service = lockfile_service or PluginLockfileService(
+        self.plugin_lock_service = plugin_lock_service or PluginLockService(
             project,
             self.plugins_service.discovery_service,
         )
@@ -69,7 +69,7 @@ class ProjectAddService:
 
         if lock and not added.is_custom():
             try:
-                self.lockfile_service.save(added)
+                self.plugin_lock_service.save(added)
             except LockfileAlreadyExistsError:
                 pass
 
