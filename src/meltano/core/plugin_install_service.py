@@ -3,7 +3,6 @@ import asyncio
 import functools
 import sys
 from enum import Enum
-from gettext import install
 from multiprocessing import cpu_count
 from typing import Any, Callable, Iterable, Tuple
 
@@ -19,6 +18,8 @@ from .venv_service import VenvService
 
 
 class PluginInstallReason(str, Enum):
+    """Plugin install reason enum."""
+
     ADD = "add"
     INSTALL = "install"
     UPGRADE = "upgrade"
@@ -45,6 +46,15 @@ class PluginInstallState:
         message: str = None,
         details: str = None,
     ):
+        """Initialize PluginInstallState instance.
+
+        Args:
+            plugin: Plugin related to this install state.
+            reason: Reason for plugin install.
+            status: Status of plugin install.
+            message: Formatted install state message.
+            details: Extra details relating to install (including error details if failed).
+        """
         # TODO: use dataclasses.dataclass for this when 3.6 support is dropped
         self.plugin = plugin
         self.reason = reason
@@ -54,17 +64,29 @@ class PluginInstallState:
 
     @property
     def successful(self):
-        """If the installation completed without error."""
+        """Plugin install success status.
+
+        Returns:
+            'True' if plugin install successful.
+        """
         return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
     @property
     def skipped(self):
-        """Return 'True' if the installation was skipped / not needed."""
+        """Plugin install skipped status.
+
+        Returns:
+            'True' if the installation was skipped / not needed.
+        """
         return self.status == PluginInstallStatus.SKIPPED
 
     @property  # noqa: WPS212  # Too many return statements
     def verb(self):
-        """Verb form of status."""
+        """Verb form of status.
+
+        Returns:
+            Verb form of status.
+        """
         if self.status is PluginInstallStatus.RUNNING:
             if self.reason is PluginInstallReason.UPGRADE:
                 return "Updating"
@@ -83,16 +105,35 @@ class PluginInstallState:
 
 
 def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
-    cls = PipPluginInstaller
+    """Installer Factory.
 
-    if hasattr(plugin, "installer_class"):
-        cls = plugin.installer_class
+    Args:
+        project: Meltano Project.
+        plugin: Plugin to be installed.
+        args: Positional arguments to instantiate installer with.
+        kwargs: Keyword arguments to instantiate installer with.
 
-    return cls(project, plugin, *args, **kwargs)
+    Returns:
+        An instantiated plugin installer for the given plugin.
+    """
+    installer_class = PipPluginInstaller
+    try:
+        installer_class = plugin.installer_class
+    except AttributeError:
+        pass
+
+    return installer_class(project, plugin, *args, **kwargs)
 
 
 def with_semaphore(func):
-    """Gate access to the method using its class's semaphore."""
+    """Gate access to the method using its class's semaphore.
+
+    Args:
+        func: Function to wrap.
+
+    Returns:
+        Wrapped function.
+    """
 
     @functools.wraps(func)  # noqa: WPS430
     async def wrapper(self, *args, **kwargs):  # noqa: WPS430
@@ -103,6 +144,8 @@ def with_semaphore(func):
 
 
 class PluginInstallService:
+    """Plugin install service."""
+
     def __init__(
         self,
         project: Project,
@@ -111,6 +154,15 @@ class PluginInstallService:
         parallelism=None,
         clean=False,
     ):
+        """Initialize new PluginInstallService instance.
+
+        Args:
+            project: Meltano Project.
+            plugins_service: (optional) Project plugins service to use.
+            status_cb: (optional) Status call-back function.
+            parallelism: (optional) Number of parallel installation processes to use.
+            clean: (optional) Clean install flag.
+        """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.status_cb = status_cb
@@ -128,7 +180,15 @@ class PluginInstallService:
     ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
-        Note: Trying to install multiple plugins into the same venv via `run_async` will fail.
+        Trying to install multiple plugins into the same venv via `run_async` will fail.
+
+        Args:
+            plugins: An iterable containing plugins to dedupe.
+            reason: Plugins install reason.
+
+        Returns:
+            A tuple containing a list of PluginInstallState instance (for skipped plugins)
+            and a deduplicated list of plugins to install.
         """
         states = []
         seen_venvs = set()
@@ -145,7 +205,7 @@ class PluginInstallService:
                     status=PluginInstallStatus.SKIPPED,
                     message=(
                         f"Plugin '{plugin.name}' does not require installation: "
-                        "reusing parent virtualenv"
+                        + "reusing parent virtualenv"
                     ),
                 )
                 states.append(state)
@@ -160,6 +220,12 @@ class PluginInstallService:
         Install all the plugins for the project.
 
         Blocks until all plugins are installed.
+
+        Args:
+            reason: Plugin install reason.
+
+        Returns:
+            Install state of installed plugins.
         """
         return self.install_plugins(self.plugins_service.plugins(), reason=reason)
 
@@ -172,6 +238,13 @@ class PluginInstallService:
         Install all the provided plugins.
 
         Blocks until all plugins are installed.
+
+        Args:
+            plugins: ProjectPlugin instances to install.
+            reason: Plugin install reason.
+
+        Returns:
+            Install state of installed plugins.
         """
         states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
         for state in states:
@@ -185,7 +258,15 @@ class PluginInstallService:
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
     ) -> Tuple[PluginInstallState]:
-        """Install all the provided plugins."""
+        """Install all the provided plugins.
+
+        Args:
+            plugins: ProjectPlugin instances to install.
+            reason: Plugin install reason.
+
+        Returns:
+            Install state of installed plugins.
+        """
         results = await asyncio.gather(
             *[
                 self.install_plugin_async(plugin, reason, compile_models=False)
@@ -209,6 +290,14 @@ class PluginInstallService:
         Install a plugin.
 
         Blocks until the plugin is installed.
+
+        Args:
+            plugin: ProjectPlugin to install.
+            reason: Install reason.
+            compile_models: (optional) Compile .m50 models flag.
+
+        Returns:
+            PluginInstallState state instance.
         """
         return run_async(
             self.install_plugin_async(
@@ -225,7 +314,16 @@ class PluginInstallService:
         reason=PluginInstallReason.INSTALL,
         compile_models=True,
     ) -> PluginInstallState:
-        """Install a plugin."""
+        """Install a plugin asynchronously.
+
+        Args:
+            plugin: ProjectPlugin to install.
+            reason: Install reason.
+            compile_models: (optional) Compile .m50 models flag.
+
+        Returns:
+            PluginInstallState state instance.
+        """
         self.status_cb(
             PluginInstallState(
                 plugin=plugin,
@@ -282,36 +380,55 @@ class PluginInstallService:
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=f"{plugin.type.descriptor} '{plugin.name}' could not be installed: {err}".capitalize(),
+                message=(
+                    f"{plugin.type.descriptor} '{plugin.name}' "
+                    + f"could not be installed: {err}"
+                ).capitalize(),
                 details=await err.stderr,
             )
             self.status_cb(state)
             return state
 
     def compile_models(self):
+        """Compile .m50 models."""
         compiler = ProjectCompiler(self.project)
         try:
             compiler.compile()
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     @staticmethod
     def _is_mapping(plugin: ProjectPlugin) -> bool:
-        """Check if a plugin is a mapping as mappings are not installed.
+        """Check if a plugin is a mapping, as mappings are not installed.
 
         Mappings are PluginType.MAPPERS with extra attribute of `_mapping` which will indicate
         that this instance of the plugin is actually a mapping - and should not be installed.
+
+        Args:
+            plugin: ProjectPlugin to evaluate.
+
+        Returns:
+            A boolean determining if the given plugin is a mapping (of type PluginType.MAPPERS).
         """
         return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
 
 
 class PipPluginInstaller:
+    """Plugin installer for pip-based plugins."""
+
     def __init__(
         self,
         project,
         plugin: ProjectPlugin,
         venv_service: VenvService = None,
     ):
+        """Initialize PipPluginInstaller instance.
+
+        Args:
+            project: Meltano Project.
+            plugin: ProjectPlugin to install.
+            venv_service: (optional) VenvService instance to use when installing.
+        """
         self.plugin = plugin
         self.venv_service = venv_service or VenvService(
             project,
@@ -320,7 +437,15 @@ class PipPluginInstaller:
         )
 
     async def install(self, reason, clean):
-        """Install the plugin into the virtual environment using pip."""
+        """Install the plugin into the virtual environment using pip.
+
+        Args:
+            reason: Install reason.
+            clean: Flag to clean install.
+
+        Returns:
+            None.
+        """
         return await self.venv_service.install(
             self.plugin.formatted_pip_url, clean=clean
         )

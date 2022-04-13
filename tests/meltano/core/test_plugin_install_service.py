@@ -1,19 +1,14 @@
-import os
-import shutil
-from unittest import mock
-
 import pytest
 import yaml
 
-from meltano.core.config_service import ConfigService
 from meltano.core.plugin_install_service import PluginInstallService
 
 
 class TestPluginInstallService:
     @pytest.fixture
     def subject(self, project):
-        with open(project.meltanofile, "w") as f:
-            f.write(
+        with open(project.meltanofile, "w") as file:
+            file.write(
                 yaml.dump(
                     {
                         "plugins": {
@@ -24,8 +19,8 @@ class TestPluginInstallService:
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
-                                    "inherit_from": "tap-gitlab"
-                                }
+                                    "inherit_from": "tap-gitlab",
+                                },
                             ],
                             "loaders": [
                                 {

@@ -1,3 +1,5 @@
+"""Project Plugin Class."""
+
 import copy
 import logging
 import sys
@@ -17,20 +19,36 @@ class CyclicInheritanceError(Exception):
     """Exception raised when project plugin inherits from itself cyclicly."""
 
     def __init__(self, plugin: "ProjectPlugin", ancestor: "ProjectPlugin"):
-        """Initialize cyclic inheritance error."""
+        """Initialize cyclic inheritance error.
+
+        Args:
+            plugin: A ProjectPlugin
+            ancestor: The given ProjectPlugins' ancestor.
+        """
+        super().__init__()
+
         self.plugin = plugin
         self.ancestor = ancestor
 
     def __str__(self):
-        """Return error message."""
-        return "{type} '{name}' cannot inherit from '{ancestor}', which itself inherits from '{name}'".format(
+        """Return error message.
+
+        Returns:
+            A formatted error message string.
+        """
+        return (
+            "{type} '{name}' cannot inherit from '{ancestor}', "
+            + "which itself inherits from '{name}'"
+        ).format(
             type=self.plugin.type.descriptor.capitalize(),
             name=self.plugin.name,
             ancestor=self.ancestor.name,
         )
 
 
-class ProjectPlugin(PluginRef):
+class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and methods
+    """ProjectPlugin class."""
+
     VARIANT_ATTR = "variant"
 
     def __init__(
@@ -47,6 +65,21 @@ class ProjectPlugin(PluginRef):
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
+        """ProjectPlugin.
+
+        Args:
+            plugin_type: PluginType instance.
+            name: Plugin name.
+            inherit_from: (optional) Name of plugin to inherit from.
+            namespace: (optional) Plugin namespace.
+            variant: (optional) Plugin variant.
+            pip_url: (optional) Plugin install pip url.
+            executable: (optional) Executable name.
+            config: (optional) Plugin configuration.
+            commands: (optional) Plugin commands.
+            default_variant: (optional) Default variant for this plugin.
+            extras: Extra keyword arguments.
+        """
         super().__init__(plugin_type, name)
 
         # Attributes will be listed in meltano.yml in the order they are set on self:
@@ -117,11 +150,17 @@ class ProjectPlugin(PluginRef):
 
         if "profiles" in extras:
             logger.warning(
-                f"Plugin configuration profiles are no longer supported, ignoring `profiles` in '{name}' {plugin_type.descriptor} definition."
+                "Plugin configuration profiles are no longer supported, ignoring "
+                + f"`profiles` in '{name}' {plugin_type.descriptor} definition."
             )
 
     @property
     def parent(self):
+        """Plugins parent.
+
+        Returns:
+            Parent ProjectPlugin instance, or None if no parent.
+        """
         return self._parent
 
     @parent.setter
@@ -138,26 +177,48 @@ class ProjectPlugin(PluginRef):
 
     @property
     def is_variant_set(self):
-        """Return whether variant is set explicitly."""
+        """Check if variant is set explicitly.
+
+        Returns:
+            'True' if variant is set explicitly.
+        """
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
     def info(self):
+        """Plugin info dict.
+
+        Returns:
+            Dictionary of plugin info (name, namespace and variant)
+        """
         return {"name": self.name, "namespace": self.namespace, "variant": self.variant}
 
     @property
     def info_env(self):
+        """Plugin environment info.
+
+        Returns:
+            Dictionary of plugin info formatted as Meltano environment variables.
+        """
         # MELTANO_EXTRACTOR_...
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
 
     @property
     def all_commands(self):
-        """Return a dictonary of supported commands, including those inherited from the parent plugin."""
+        """Return all commands for this plugin.
+
+        Returns:
+            Dictionary of supported commands, including those inherited from the parent plugin.
+        """
         return {**self._parent.all_commands, **self.commands}
 
     @property
     def test_commands(self) -> Dict[str, Command]:
-        """Return the test commands for this plugin."""
+        """Return the test commands for this plugin.
+
+        Returns:
+            Dictionary of supported test commands, including those inherited from the parent plugin.
+        """
         return {
             name: command
             for name, command in self.all_commands.items()
@@ -166,24 +227,46 @@ class ProjectPlugin(PluginRef):
 
     @property
     def supported_commands(self):
-        """Return all defined commands for the plugin."""
+        """Return supported command names.
+
+        Returns:
+            All defined command names for the plugin.
+        """
         return list(self.all_commands.keys())
 
     def env_prefixes(self, for_writing=False):
+        """Return environment variable prefixes.
+
+        Args:
+            for_writing: Include parent prefix (used when writing to env vars)
+
+        Returns:
+            A list of env prefixes.
+        """
         prefixes = [self.name, self.namespace]
 
         if for_writing:
             prefixes.extend(self._parent.env_prefixes(for_writing=True))
-            prefixes.append(f"meltano_{self.type.verb}"),  # MELTANO_EXTRACT_...
+            prefixes.append(f"meltano_{self.type.verb}")  # MELTANO_EXTRACT_...
 
         return uniques_in(prefixes)
 
     @property
     def extra_config(self):
-        return {f"_{k}": v for k, v in self.extras.items()}
+        """Return plugin extra config.
+
+        Returns:
+            Dictionary of extra config.
+        """
+        return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
     def config_with_extras(self):
+        """Return config with extras.
+
+        Returns:
+            Complete config dictionary, including config extras.
+        """
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
@@ -191,14 +274,19 @@ class ProjectPlugin(PluginRef):
         self.config.clear()
         self.extras.clear()
 
-        for k, v in new_config_with_extras.items():
-            if k.startswith("_"):
-                self.extras[k[1:]] = v
+        for key, value in new_config_with_extras.items():
+            if key.startswith("_"):
+                self.extras[key[1:]] = value
             else:
-                self.config[k] = v
+                self.config[key] = value
 
     @property
     def settings(self):
+        """Return plugin settings.
+
+        Returns:
+            A list of Plugin settings, including those defined by the parent.
+        """
         existing_settings = self._parent.settings
         return [
             *existing_settings,
@@ -207,6 +295,11 @@ class ProjectPlugin(PluginRef):
 
     @property
     def extra_settings(self):
+        """Return extra settings.
+
+        Returns:
+            A list of extra SettingDefinitions, including those defined by the parent.
+        """
         existing_settings = self._parent.extra_settings
         return [
             *existing_settings,
@@ -215,19 +308,39 @@ class ProjectPlugin(PluginRef):
 
     @property
     def settings_with_extras(self):
+        """Return all settings.
+
+        Returns:
+            A complete list of SettingDefinitions, including extras.
+        """
         return [*self.settings, *self.extra_settings]
 
     def is_custom(self):
+        """Return if plugin is custom.
+
+        Returns:
+            'True' is plugin is custom.
+        """
         return self.custom_definition is not None
 
     @property
     def is_shadowing(self):
-        """Return whether this plugin is shadowing a base plugin with the same name."""
+        """Return whether this plugin is shadowing a base plugin with the same name.
+
+        Returns:
+            'True' if this plugin is shadowing a base plugin with the same name.
+        """
         return not self.inherit_from
 
     @property
     def formatted_pip_url(self):
-        """Return the formatted version of the pip_url, expanding ${MELTANO__PYTHON_VERSION} to the major.minor version string of the current runtime."""
+        """Return the formatted version of the pip_url.
+
+        Expands ${MELTANO__PYTHON_VERSION} to the major.minor version string of the current runtime.
+
+        Returns:
+            Expanded pip url string.
+        """
         return expand_env_vars(
             self.pip_url,
             {
@@ -237,7 +350,11 @@ class ProjectPlugin(PluginRef):
 
     @property
     def venv_name(self):
-        """Return the venv name this plugin should use."""
+        """Return the venv name this plugin should use.
+
+        Returns:
+            The name of this plugins parent if both pip urls are the same, else this plugins name.
+        """
         if not self.inherit_from:
             # No parent. Use a unique venv per plugin.
             return self.name
