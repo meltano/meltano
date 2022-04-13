@@ -1,5 +1,5 @@
 ---
-title: Data Transformation (T)
+title: Data Transformation
 description: Transform your data.
 layout: doc
 weight: 5
@@ -97,8 +97,8 @@ For instance your yaml file might look like this:
 
 ```yaml
 packages:
-- git: https://gitlab.com/your_repo/your-dbt-project.git
-  revision: 1.0.0
+  - git: https://gitlab.com/your_repo/your-dbt-project.git
+    revision: 1.0.0
 ```
 
 If you plan to call dbt directly using `invoke` then you have to first run `meltano invoke dbt:deps` to install your package dependencies.
@@ -107,8 +107,8 @@ Using the `--transform=run` option in your pipeline takes care of this step for 
 ## Working with Transform Plugins
 
 > **WARNING**: Transform plugins are currently de-prioritized by the Meltano project due to the difficulty of maintaining them at scale.
-Users can still install and maintain them as they please but many have grown outdated and unmaintained.
-Some users chose to install the existing transform plugins as a starting point then customize them for their own transformations.
+> Users can still install and maintain them as they please but many have grown outdated and unmaintained.
+> Some users chose to install the existing transform plugins as a starting point then customize them for their own transformations.
 
 `Transform` plugins are dbt packages that reside in their own repositories.
 
@@ -139,12 +139,12 @@ As an alternative to providing values from environment variables, you can also s
 
 ```yml
 transforms:
-- name: tap-gitlab
-  pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
-  vars:
-    entry_table: "my_raw_schema.entry"
-    generationmix_table: "my_raw_schema.generationmix"
-    region_table: "my_raw_schema.region"
+  - name: tap-gitlab
+    pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
+    vars:
+      entry_table: "my_raw_schema.entry"
+      generationmix_table: "my_raw_schema.generationmix"
+      region_table: "my_raw_schema.region"
 ```
 
 Whenever Meltano runs a new transformation, `transform/dbt_project.yml` is updated using the values provided in `meltano.yml`.

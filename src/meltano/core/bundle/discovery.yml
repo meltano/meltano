@@ -3107,7 +3107,7 @@ transformers:
       # Snowflake connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: account
       kind: string
-      description: The account to connect to. e.g your-company.eu-west-2.aws.snowflakecomputing.com
+      description: The snowflake account to connect to.
     - name: user
       kind: string
       description: The user to connect as.
