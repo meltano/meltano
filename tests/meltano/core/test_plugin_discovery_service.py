@@ -1,28 +1,24 @@
-import copy
 import json
 from contextlib import contextmanager
 from unittest import mock
 
-import meltano.core.bundle as bundle
 import pytest
 import requests
 import requests_mock
 import yaml
-from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.plugin import (
-    PluginDefinition,
-    PluginType,
-    Variant,
-    VariantNotFoundError,
-)
+
+from meltano.core import bundle
+from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
+from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import (
     VERSION,
-    DiscoveryFile,
     PluginDiscoveryService,
     PluginNotFoundError,
 )
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+
+HTTP_STATUS_TEAPOT = 418
 
 
 @pytest.fixture(scope="class")
@@ -39,13 +35,13 @@ def subject(plugin_discovery_service):
 
 @pytest.fixture
 def discovery_url_mock(subject):
-    with requests_mock.Mocker() as m:
-        m.get(subject.discovery_url, status_code=418)
+    with requests_mock.Mocker() as mocker:
+        mocker.get(subject.discovery_url, status_code=HTTP_STATUS_TEAPOT)
 
         yield
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="class")  # noqa: WPS114
 def tap_covid_19(project_add_service):
     try:
         plugin = ProjectPlugin(
@@ -64,15 +60,37 @@ def tap_covid_19(project_add_service):
 class TestPluginDiscoveryService:
     @pytest.mark.meta
     def test_discovery_url_mock(self, subject):
-        assert requests.get(subject.discovery_url).status_code == 418
+        assert requests.get(subject.discovery_url).status_code == HTTP_STATUS_TEAPOT
 
     @pytest.fixture
     def discovery_yaml(self, subject):
-        """Disable the discovery mock"""
-        with subject.project.root_dir("discovery.yml").open("w") as d:
-            yaml.dump(subject._discovery, d)
+        """Disable the discovery mock."""
+        with subject.project.root_dir("discovery.yml").open("w") as discovery_yaml:
+            yaml.dump(subject._discovery, discovery_yaml)
 
         subject._discovery = None
+
+    @pytest.fixture
+    def locked_plugin(self, subject):
+        """Disable the discovery mock.
+
+        Returns:
+            StandalonePlugin: A locked plugin.
+        """
+        definition = StandalonePlugin(
+            PluginType.EXTRACTORS,
+            "tap-locked",
+            "tap_locked",
+            variant="meltano",
+        )
+        path = subject.project.plugin_lock_path(
+            definition.plugin_type,
+            definition.name,
+            definition.variant,
+        )
+        with path.open("w") as file:
+            json.dump(definition.canonical(), file)
+        return definition
 
     def test_plugins(self, subject):
         plugins = list(subject.plugins())
@@ -91,6 +109,21 @@ class TestPluginDiscoveryService:
         plugin_def = subject.find_definition(PluginType.EXTRACTORS, "tap-mock")
         assert plugin_def.type == PluginType.EXTRACTORS
         assert plugin_def.name == "tap-mock"
+
+    def test_locked_definition(
+        self,
+        subject: PluginDiscoveryService,
+        locked_plugin: StandalonePlugin,
+    ):
+        plugin_def = subject.find_locked_definition(
+            PluginType.EXTRACTORS,
+            "tap-locked",
+            variant_name="meltano",
+        )
+        assert plugin_def.type == PluginType.EXTRACTORS
+        assert plugin_def.name == "tap-locked"
+        assert plugin_def.namespace == "tap_locked"
+        assert len(plugin_def.variants) == 1
 
     def test_find_base_plugin(self, subject):
         # If no variant is specified,
@@ -226,8 +259,8 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     @contextmanager
     def use_remote_discovery(self, discovery_yaml, subject):
-        with requests_mock.Mocker() as m:
-            m.get(subject.discovery_url, text=yaml.dump(discovery_yaml))
+        with requests_mock.Mocker() as mocker:
+            mocker.get(subject.discovery_url, text=yaml.dump(discovery_yaml))
 
             yield discovery_yaml
 
