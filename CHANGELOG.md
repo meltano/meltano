@@ -27,7 +27,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3373](https://gitlab.com/meltano/meltano/-/issues/3373) Add missing `default_environment` key to the JSON schema for `meltano.yml`.
-- [#3324](https://gitlab.com/meltano/meltano/-/issues/3324) Change example git url for custom plugin to a generic URL.
+- [#3324](https://gitlab.com/meltano/meltano/-/issues/3324) Change example git URL for custom plugin to a generic URL.
 
 ## 1.99.0 - (2022-04-01)
 ---
