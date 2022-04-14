@@ -1,7 +1,5 @@
 from unittest import mock
 
-import pytest
-import yaml
 from asserts import assert_cli_runner
 from meltano.cli import cli
 
@@ -49,17 +47,17 @@ class TestCliUpgrade:
 
         assert "Nothing to update" in result.output
 
-        result = cli_runner.invoke(cli, ["add", "files", "dbt"])
+        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
         assert_cli_runner(result)
 
         # Don't update file if unchanged
-        file_path = project.root_dir("transform/profile/profiles.yml")
+        file_path = project.root_dir("orchestrate/dags/meltano.py")
         file_content = file_path.read_text()
 
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Updating 'dbt' files in project..." in result.output
+        assert "Updating 'airflow' files in project..." in result.output
         assert "Nothing to update" in result.output
         assert file_path.read_text() == file_content
 
@@ -69,7 +67,7 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Updated transform/profile/profiles.yml" in result.output
+        assert "Updated orchestrate/dags/meltano.py" in result.output
         assert file_path.read_text() == file_content
 
         # Don't update file if unchanged
@@ -86,10 +84,10 @@ class TestCliUpgrade:
                 "config",
                 "--plugin-type",
                 "files",
-                "dbt",
+                "airflow",
                 "set",
                 "_update",
-                "transform/profile/profiles.yml",
+                "orchestrate/dags/meltano.py",
                 "false",
             ],
         )
@@ -103,18 +101,17 @@ class TestCliUpgrade:
         assert "Nothing to update" in result.output
         assert file_path.read_text() != file_content
 
-        # Update file if automatic updating is enabled
+        # Update file if automatic updating is re-enabled
         result = cli_runner.invoke(
             cli,
             [
                 "config",
                 "--plugin-type",
                 "files",
-                "dbt",
-                "set",
+                "airflow",
+                "unset",
                 "_update",
-                "transform/dbt_project.yml",
-                "true",
+                "orchestrate/dags/meltano.py",
             ],
         )
         assert_cli_runner(result)
@@ -122,10 +119,7 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Updated transform/dbt_project.yml" in result.output
-
-        file_path = project.root_dir("transform/dbt_project.yml")
-        assert "This file is managed by the 'dbt' file bundle" in file_path.read_text()
+        assert "Updated orchestrate/dags/meltano.py" in result.output
 
     def test_upgrade_database(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])
