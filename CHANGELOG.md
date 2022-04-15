@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3405](https://gitlab.com/meltano/meltano/-/issues/3405) Add missing `database_uri` key to JSON schema for `meltano.yml`
+- [#3406](https://gitlab.com/meltano/meltano/-/issues/3406) Add missing `plugins/mappers` key to JSON schema for `meltano.yml` and fix `mappings` key in mapper objects.
 
 ### Breaks
 

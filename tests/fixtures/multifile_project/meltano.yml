@@ -11,6 +11,11 @@ plugins:
   extractors:
     - name: tap-meltano-yml
 
+  mappers:
+    - name: map-meltano-yml
+      mappings:
+        - name: transform-meltano-yml
+
   loaders:
     - name: target-meltano-yml
 

@@ -59,6 +59,12 @@
                         "$ref": "#/definitions/plugins/loaders"
                     }
                 },
+                "mappers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/plugins/mappers"
+                    }
+                },
                 "orchestrators": {
                     "type": "array",
                     "items": {
@@ -658,12 +664,13 @@
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
-                        "$ref": "#/definitions/mapper_specific"
+                        "$ref": "#/definitions/plugins/mapper_specific"
                     },
                     {
                         "additionalProperties": false,
                         "properties": {
                             "name": {},
+                            "inherit_from": {},
                             "pip_url": {},
                             "repo": {},
                             "namespace": {},
@@ -673,7 +680,8 @@
                             "settings": {},
                             "docs": {},
                             "settings_group_validation": {},
-                            "commands": {}
+                            "commands": {},
+                            "mappings": {}
                         }
                     }
                 ]

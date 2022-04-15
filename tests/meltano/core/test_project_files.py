@@ -43,6 +43,12 @@ class TestProjectFiles:
             ],
             "plugins": {
                 "extractors": [{"name": "tap-meltano-yml"}],
+                "mappers": [
+                    {
+                        "name": "map-meltano-yml",
+                        "mappings": [{"name": "transform-meltano-yml"}],
+                    }
+                ],
                 "loaders": [{"name": "target-meltano-yml"}],
             },
             "schedules": [
@@ -120,6 +126,12 @@ class TestProjectFiles:
                     {"name": "tap-subconfig-2-yml"},
                     {"name": "tap-subconfig-1-yml"},
                 ],
+                "mappers": [
+                    {
+                        "name": "map-meltano-yml",
+                        "mappings": [{"name": "transform-meltano-yml"}],
+                    }
+                ],
                 "loaders": [
                     {"name": "target-meltano-yml"},
                     {"name": "target-subconfig-2-yml"},
@@ -192,6 +204,12 @@ class TestProjectFiles:
                     {"name": "tap-meltano-yml"},
                     {"name": "modified-tap-subconfig-2-yml"},
                     {"name": "tap-subconfig-1-yml"},
+                ],
+                "mappers": [
+                    {
+                        "name": "map-meltano-yml",
+                        "mappings": [{"name": "transform-meltano-yml"}],
+                    }
                 ],
                 "loaders": [
                     {"name": "target-meltano-yml"},
