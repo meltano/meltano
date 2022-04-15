@@ -35,6 +35,7 @@ class TestProjectFiles:
         assert project_files.meltano == {
             "version": 1,
             "default_environment": "test-meltano-environment",
+            "database_uri": "sqlite:///.meltano/meltano.db",
             "include_paths": [
                 "./subconfig_[0-9].yml",
                 "./*/subconfig_[0-9].yml",
@@ -107,6 +108,7 @@ class TestProjectFiles:
         expected_result = {
             "version": 1,
             "default_environment": "test-meltano-environment",
+            "database_uri": "sqlite:///.meltano/meltano.db",
             "include_paths": [
                 "./subconfig_[0-9].yml",
                 "./*/subconfig_[0-9].yml",
@@ -179,6 +181,7 @@ class TestProjectFiles:
         project_files.update(meltano_config)
         expected_result = {
             "default_environment": "test-meltano-environment",
+            "database_uri": "sqlite:///.meltano/meltano.db",
             "include_paths": [
                 "./subconfig_[0-9].yml",
                 "./*/subconfig_[0-9].yml",

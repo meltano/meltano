@@ -22,6 +22,11 @@
             "type": "string",
             "description": "A globally unique project identifier. Defaults to a Meltano-generated unique GUID for each project."
         },
+        "database_uri": {
+            "type": "string",
+            "description": "A database URI for the project system database. Defaults to a SQLite file stored at .meltano/meltano.db",
+            "default": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db"
+        },
         "environments": {
             "type": "array",
             "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",

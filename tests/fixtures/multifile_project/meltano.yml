@@ -1,5 +1,6 @@
 version: 1
 default_environment: test-meltano-environment
+database_uri: sqlite:///.meltano/meltano.db
 
 include_paths:
   - './subconfig_[0-9].yml'
