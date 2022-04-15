@@ -1,8 +1,12 @@
+import datetime
+import json
 import os
 import tempfile
 from pathlib import Path
 
 import pytest  # noqa: F401
+import yaml
+from jsonschema import validate
 
 
 @pytest.fixture
@@ -47,6 +51,7 @@ class TestProjectFiles:
                     "loader": "target-meltano-yml",
                     "transform": "skip",
                     "interval": "@once",
+                    "start_date": datetime.datetime(2020, 8, 5, 0, 0),
                 }
             ],
             "environments": [
@@ -72,6 +77,31 @@ class TestProjectFiles:
             (project_files.root / "subconfig_2.yml"),
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
+
+    def test_jsonschema(self, project_files):
+        schema_path = (
+            Path(__file__).resolve().parents[3] / "schema" / "meltano.schema.json"
+        )
+        schema_content = json.loads(schema_path.read_text())
+
+        class JsonCompatibleLoader(yaml.SafeLoader):
+            """An overrided YAML loader to create dicts compatible with jsonschema validation"""
+
+            @classmethod
+            def remove_implicit_resolver(cls, tag):
+                cls.yaml_implicit_resolvers = {
+                    key: [(t, r) for (t, r) in values if t != tag]
+                    for key, values in cls.yaml_implicit_resolvers.items()
+                }
+
+        JsonCompatibleLoader.remove_implicit_resolver("tag:yaml.org,2002:timestamp")
+
+        for config_path in [
+            project_files.root / "meltano.yml",
+        ] + project_files.include_paths:
+            with config_path.open("rt") as config_file:
+                yaml_content = yaml.load(config_file, Loader=JsonCompatibleLoader)
+            validate(instance=yaml_content, schema=schema_content)
 
     def test_load(self, project_files):
         expected_result = {
@@ -100,6 +130,7 @@ class TestProjectFiles:
                     "extractor": "tap-meltano-yml",
                     "loader": "target-meltano-yml",
                     "transform": "skip",
+                    "start_date": datetime.datetime(2020, 8, 5),
                     "interval": "@once",
                 },
                 {
@@ -107,6 +138,7 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-2-yml",
                     "loader": "target-subconfig-2-yml",
                     "transform": "skip",
+                    "start_date": datetime.datetime(2020, 8, 4),
                     "interval": "@once",
                 },
                 {
@@ -114,6 +146,7 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-1-yml",
                     "loader": "target-subconfig-1-yml",
                     "transform": "skip",
+                    "start_date": datetime.datetime(2020, 8, 6),
                     "interval": "@once",
                 },
             ],
@@ -169,6 +202,7 @@ class TestProjectFiles:
                     "interval": "@once",
                     "loader": "target-meltano-yml",
                     "name": "modified-test-meltano-yml",
+                    "start_date": datetime.datetime(2020, 8, 5),
                     "transform": "skip",
                 },
                 {
@@ -176,6 +210,7 @@ class TestProjectFiles:
                     "interval": "@once",
                     "loader": "target-subconfig-2-yml",
                     "name": "test-subconfig-2-yml",
+                    "start_date": datetime.datetime(2020, 8, 4),
                     "transform": "skip",
                 },
                 {
@@ -183,6 +218,7 @@ class TestProjectFiles:
                     "interval": "@once",
                     "loader": "target-subconfig-1-yml",
                     "name": "test-subconfig-1-yml",
+                    "start_date": datetime.datetime(2020, 8, 6),
                     "transform": "skip",
                 },
             ],
