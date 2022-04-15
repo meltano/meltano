@@ -244,11 +244,9 @@
                                             "additionalProperties": {
                                                 "type": "string"
                                             },
-                                            "examples": [
-                                                {
-                                                    "5000": "5000"
-                                                }
-                                            ]
+                                            "examples": [{
+                                                "5000": "5000"
+                                            }]
                                         },
                                         "volumes": {
                                             "type": "array",
@@ -269,11 +267,9 @@
                                             "additionalProperties": {
                                                 "type": "string"
                                             },
-                                            "examples": [
-                                                {
-                                                    "DBT_PROFILES_DIR": "/usr/app/profile/"
-                                                }
-                                            ]
+                                            "examples": [{
+                                                "DBT_PROFILES_DIR": "/usr/app/profile/"
+                                            }]
                                         }
                                     }
                                 }
@@ -330,8 +326,7 @@
             "extractors": {
                 "description": "https://docs.meltano.com/concepts/plugins#extractors",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -386,8 +381,7 @@
             "loaders": {
                 "description": "https://docs.meltano.com/concepts/plugins#loaders",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -437,8 +431,7 @@
             "orchestrators": {
                 "description": "https://docs.meltano.com/concepts/plugins#orchestrators",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -464,8 +457,7 @@
             "transformers": {
                 "description": "https://docs.meltano.com/concepts/plugins#transforms",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -491,8 +483,7 @@
             "files": {
                 "description": "https://docs.meltano.com/concepts/plugins#file-bundles",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -524,8 +515,7 @@
             "utilities": {
                 "description": "https://docs.meltano.com/concepts/plugins#utilities",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -551,8 +541,7 @@
             "transforms": {
                 "description": "https://docs.meltano.com/concepts/plugins#transforms",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -586,8 +575,7 @@
             "models": {
                 "description": "https://docs.meltano.com/concepts/plugins#models",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -613,8 +601,7 @@
             "dashboards": {
                 "description": "https://docs.meltano.com/concepts/plugins#dashboards",
                 "type": "object",
-                "allOf": [
-                    {
+                "allOf": [{
                         "$ref": "#/definitions/plugins/plugin_generic"
                     },
                     {
@@ -660,33 +647,32 @@
                 }
             },
             "mappers": {
-            "description": "https://docs.meltano.com/concepts/plugins#mappers",
-            "type": "object",
-            "allOf": [
-                {
-                    "$ref": "#/definitions/plugins/plugin_generic"
-                },
-                {
-                    "$ref": "#/definitions/mapper_specific"
-                },
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "name": {},
-                        "pip_url": {},
-                        "repo": {},
-                        "namespace": {},
-                        "label": {},
-                        "description": {},
-                        "executable": {},
-                        "settings": {},
-                        "docs": {},
-                        "settings_group_validation": {},
-                        "commands": {}
+                "description": "https://docs.meltano.com/concepts/plugins#mappers",
+                "type": "object",
+                "allOf": [{
+                        "$ref": "#/definitions/plugins/plugin_generic"
+                    },
+                    {
+                        "$ref": "#/definitions/mapper_specific"
+                    },
+                    {
+                        "additionalProperties": false,
+                        "properties": {
+                            "name": {},
+                            "pip_url": {},
+                            "repo": {},
+                            "namespace": {},
+                            "label": {},
+                            "description": {},
+                            "executable": {},
+                            "settings": {},
+                            "docs": {},
+                            "settings_group_validation": {},
+                            "commands": {}
+                        }
                     }
-                }
-            ]
-        }
+                ]
+            }
         },
         "base_setting": {
             "type": "object",
@@ -900,8 +886,7 @@
                                 "extractors": {
                                     "type": "array",
                                     "items": {
-                                        "allOf": [
-                                            {
+                                        "allOf": [{
                                                 "$ref": "#/definitions/environments/$defs/plugins"
                                             },
                                             {
