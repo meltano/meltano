@@ -58,7 +58,7 @@ class TestProjectFiles:
                     "loader": "target-meltano-yml",
                     "transform": "skip",
                     "interval": "@once",
-                    "start_date": datetime.datetime(2020, 8, 5, 0, 0),
+                    "start_date": datetime.datetime(2020, 8, 5, 0, 0),  # noqa: WPS432
                 }
             ],
             "environments": [
@@ -92,12 +92,12 @@ class TestProjectFiles:
         schema_content = json.loads(schema_path.read_text())
 
         class JsonCompatibleLoader(yaml.SafeLoader):
-            """An overrided YAML loader to create dicts compatible with jsonschema validation"""
+            """YAML loader to create dicts compatible with jsonschema validation."""
 
             @classmethod
             def remove_implicit_resolver(cls, tag):
                 cls.yaml_implicit_resolvers = {
-                    key: [(t, r) for (t, r) in values if t != tag]
+                    key: [(t, r) for (t, r) in values if t != tag]  # noqa: WPS111
                     for key, values in cls.yaml_implicit_resolvers.items()
                 }
 
@@ -107,7 +107,10 @@ class TestProjectFiles:
             project_files.root / "meltano.yml",
         ] + project_files.include_paths:
             with config_path.open("rt") as config_file:
-                yaml_content = yaml.load(config_file, Loader=JsonCompatibleLoader)
+                yaml_content = yaml.load(  # noqa: S506 (SafeLoader is subclassed)
+                    config_file,
+                    Loader=JsonCompatibleLoader,
+                )
             validate(instance=yaml_content, schema=schema_content)
 
     def test_load(self, project_files):
@@ -144,7 +147,7 @@ class TestProjectFiles:
                     "extractor": "tap-meltano-yml",
                     "loader": "target-meltano-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 5),
+                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432
                     "interval": "@once",
                 },
                 {
@@ -152,7 +155,7 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-2-yml",
                     "loader": "target-subconfig-2-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 4),
+                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432
                     "interval": "@once",
                 },
                 {
@@ -160,7 +163,7 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-1-yml",
                     "loader": "target-subconfig-1-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 6),
+                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432
                     "interval": "@once",
                 },
             ],
@@ -223,7 +226,7 @@ class TestProjectFiles:
                     "interval": "@once",
                     "loader": "target-meltano-yml",
                     "name": "modified-test-meltano-yml",
-                    "start_date": datetime.datetime(2020, 8, 5),
+                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432
                     "transform": "skip",
                 },
                 {
@@ -231,7 +234,7 @@ class TestProjectFiles:
                     "interval": "@once",
                     "loader": "target-subconfig-2-yml",
                     "name": "test-subconfig-2-yml",
-                    "start_date": datetime.datetime(2020, 8, 4),
+                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432
                     "transform": "skip",
                 },
                 {
@@ -239,7 +242,7 @@ class TestProjectFiles:
                     "interval": "@once",
                     "loader": "target-subconfig-1-yml",
                     "name": "test-subconfig-1-yml",
-                    "start_date": datetime.datetime(2020, 8, 6),
+                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432
                     "transform": "skip",
                 },
             ],
