@@ -1,5 +1,6 @@
 version: 1
 default_environment: test-meltano-environment
+database_uri: sqlite:///.meltano/meltano.db
 
 include_paths:
   - './subconfig_[0-9].yml'
@@ -10,6 +11,11 @@ plugins:
   extractors:
     - name: tap-meltano-yml
 
+  mappers:
+    - name: map-meltano-yml
+      mappings:
+        - name: transform-meltano-yml
+
   loaders:
     - name: target-meltano-yml
 
@@ -18,6 +24,7 @@ schedules:
     extractor: tap-meltano-yml
     loader: target-meltano-yml
     transform: skip
+    start_date: 2020-08-05 00:00:00
     interval: '@once'
 
 environments:
