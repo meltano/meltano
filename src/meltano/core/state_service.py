@@ -8,19 +8,18 @@ import datetime
 import json
 from collections import defaultdict
 from functools import singledispatchmethod
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
 import structlog
 
 from meltano.core.job import Job, JobFinder, Payload, State
-from meltano.core.project import Project
 from meltano.core.utils import merge
 
 logger = structlog.getLogger(__name__)
 
 
 class InvalidJobStateError(Exception):
-    """Occurs when invalid job state is parsed"""
+    """Occurs when invalid job state is parsed."""
 
 
 class StateService:
@@ -33,7 +32,7 @@ class StateService:
         """Create a StateService object.
 
         Args:
-          session: the session to use for interacting with the db
+            session: the session to use for interacting with the db
         """
         self.session = session
 
@@ -41,10 +40,10 @@ class StateService:
         """List all state found in the db.
 
         Args:
-          job_id_pattern: An optional glob-style pattern of job_ids to search for
+            job_id_pattern: An optional glob-style pattern of job_ids to search for
 
         Returns:
-          A dict with job_ids as keys and state payloads as values.
+            A dict with job_ids as keys and state payloads as values.
         """
         states = defaultdict(dict)
         query = self.session.query(Job)
@@ -59,12 +58,12 @@ class StateService:
         """If Job is passed, return it. If job_id is passed, create new and return.
 
         Args:
-          job: either an existing Job to modify state for, or a job_id
+            job: either an existing Job to modify state for, or a job_id
 
-        Returns:
-          the Job
+        Raises:
+            TypeError: if job is not of type Job or str
         """
-        raise TypeError(f"job must be of type Job or of type str")
+        raise TypeError("job must be of type Job or of type str")
 
     @_get_or_create_job.register
     def _(self, job: Job) -> Job:
@@ -80,10 +79,10 @@ class StateService:
         """Check that the given state str is valid.
 
         Args:
-          state: the state to validate
+            state: the state to validate
 
         Raises:
-          InvalidJobStateError, json.decoder.JSONDecodeError
+            InvalidJobStateError: if supplied state is not valid singer state
         """
         state_dict = json.loads(state)
         if "singer_state" not in state_dict:
@@ -92,14 +91,11 @@ class StateService:
             )
 
     def add_state(self, job: Union[Job, str], new_state: Optional[str]):
-        """Set state for the given Job.
+        """Add state for the given Job.
 
         Args:
-          job: either an existing Job or a job_id that future runs may look up state for.
-          new_state: the state to add for the given job.
-
-        Raises:
-          InvalidJobStateError, json.decoder.JSONDecodeError
+            job: either an existing Job or a job_id that future runs may look up state for.
+            new_state: the state to add for the given job.
         """
         self.validate_state(new_state)
         job_to_add_to = self._get_or_create_job(job)
@@ -114,12 +110,11 @@ class StateService:
         """Get state for job with the given job_id.
 
         Args:
-          job_id: The job_id to get state for
+            job_id: The job_id to get state for
 
         Returns:
-          Dict representing state that would be used in the next run of the given job.
+            Dict representing state that would be used in the next run of the given job.
         """
-
         state = {}
         incomplete_since = None
         finder = JobFinder(job_id)
@@ -143,13 +138,13 @@ class StateService:
             self.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
         )
         last_job_ended_at = incomplete_since
-        for state_job in incomplete_state_jobs:
+        for incomplete_state_job in incomplete_state_jobs:
             logger.info(
                 f"Found and merged incomplete state from {state_job.started_at}."
             )
-            last_job_ended_at = state_job.ended_at
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload, state)
+            last_job_ended_at = incomplete_state_job.ended_at
+            if "singer_state" in incomplete_state_job.payload:
+                merge(incomplete_state_job.payload, state)
 
         # If state has been added via add_state since the
         # most recent job, use bookmarks from those additions.
@@ -160,9 +155,9 @@ class StateService:
             state=State.DUMMY,
         )
 
-        for state_job in dummy_state_jobs:
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload, state)
+        for dummy_state_job in dummy_state_jobs:
+            if "singer_state" in dummy_state_job.payload:
+                merge(dummy_state_job.payload, state)
 
         return state.get("singer_state", state)
 
@@ -170,7 +165,8 @@ class StateService:
         """Clear state for Job job_id.
 
         Args:
-          job_id: the job_id of the job to clear state for.
+            job_id: the job_id of the job to clear state for.
+            save: whether or not to immediately save the job
         """
         finder = JobFinder(job_id)
         for job in finder.get_all(self.session):
@@ -179,10 +175,11 @@ class StateService:
                 job.save(self.session)
 
     def set_state(self, job_id: str, new_state: Optional[str]):
-        """Set the state for Job job_id
+        """Set the state for Job job_id.
 
         Args:
-          job_id: the job_id of the job to set state for
+            job_id: the job_id of the job to set state for
+            new_state: the state to update to
         """
         self.clear_state(job_id, save=False)
         self.add_state(job_id, new_state)

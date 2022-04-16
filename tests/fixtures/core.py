@@ -534,8 +534,8 @@ def num_params():
 
 @pytest.fixture
 def payloads(num_params):
-    mock_payloads_dict = dict(
-        mock_state_payloads=[
+    mock_payloads_dict = {
+        "mock_state_payloads": [
             {
                 "singer_state": {
                     f"bookmark-{idx_i}": idx_i + idx_j for idx_j in range(num_params)
@@ -543,9 +543,9 @@ def payloads(num_params):
             }
             for idx_i in range(num_params)
         ],
-        mock_error_payload={"error": "failed"},
-        mock_empty_payload={},
-    )
+        "mock_error_payload": {"error": "failed"},
+        "mock_empty_payload": {},
+    }
     payloads = namedtuple("payloads", mock_payloads_dict)
     return payloads(**mock_payloads_dict)
 
@@ -571,7 +571,7 @@ def job_ids(num_params):
 @pytest.fixture
 def mock_time():
     def _mock_time():
-        for idx in itertools.count():
+        for idx in itertools.count():  # noqa: WPS526
             yield datetime.datetime(1, 1, 1) + datetime.timedelta(hours=idx)
 
     return _mock_time()
