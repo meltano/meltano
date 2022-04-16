@@ -1,20 +1,16 @@
-import itertools
 import json
-from collections import namedtuple
-from datetime import datetime, timedelta
 
 import pytest
 
-from meltano.core.block.extract_load import generate_job_id
-from meltano.core.job import Job, Payload, State
-from meltano.core.state_service import InvalidJobStateError, StateService
-from meltano.core.utils import merge
+from meltano.core.state_service import InvalidJobStateError
 
 
 class TestStateService:
     def test_validate_state(self, state_service):
         with pytest.raises(json.decoder.JSONDecodeError):
             state_service.validate_state("bad state")
+        with pytest.raises(InvalidJobStateError):
+            state_service.validate_state('{"root key not singer_state": {}}')
         assert (
             state_service.validate_state(
                 '{"singer_state": {"bookmarks": {"mock-stream": "mock-value"}}}'
@@ -28,7 +24,8 @@ class TestStateService:
 
     def test_list_state(self, state_service, job_ids_with_expected_states):
         assert state_service.list_state() == {
-            k: v for (k, v) in job_ids_with_expected_states
+            job_id: expected_state
+            for (job_id, expected_state) in job_ids_with_expected_states
         }
 
     def test_add_state(self, state_service, payloads):

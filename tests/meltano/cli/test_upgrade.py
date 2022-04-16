@@ -1,7 +1,5 @@
 from unittest import mock
 
-import pytest
-import yaml
 from asserts import assert_cli_runner
 from meltano.cli import cli
 

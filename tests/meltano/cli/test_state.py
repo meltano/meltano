@@ -6,7 +6,6 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli, state
-from meltano.core.block.parser import BlockParser
 
 unconventional_job_ids = [
     "unconventional",
@@ -22,13 +21,13 @@ conventional_job_ids = ["dev:tap-mock-to-target-mock", "staging:mock-to-mock"]
 
 class TestCliState:
     @pytest.mark.parametrize("job_id", unconventional_job_ids)
-    def test_state_service_from_job_id_returns_none_non_convention(
+    def test_state_service_from_job_id_returns_none_non_convention(  # noqa: WPS118
         self, project, job_id
     ):
         assert state.state_service_from_job_id(project, job_id) is None
 
     @pytest.mark.parametrize("job_id", conventional_job_ids)
-    def test_state_service_from_job_id_returns_state_service_convention(
+    def test_state_service_from_job_id_returns_state_service_convention(  # noqa: WPS118
         self, project, job_id
     ):
         with mock.patch(
@@ -84,24 +83,26 @@ class TestCliState:
     def test_set_from_string(self, state_service, job_ids, payloads, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for job_id in job_ids:
-                for state in payloads.mock_state_payloads:
+                for state_payload in payloads.mock_state_payloads:
                     result = cli_runner.invoke(
                         cli,
                         ["state", "set", job_id, "--state", json.dumps(state)],
                     )
                     assert_cli_runner(result)
-                    assert state_service.get_state(job_id) == state["singer_state"]
+                    assert (
+                        state_service.get_state(job_id) == state_payload["singer_state"]
+                    )
 
     def test_set_from_file(self, mkdtemp, state_service, job_ids, payloads, cli_runner):
         tmp_path = mkdtemp()
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for idx_i, job_id in enumerate(job_ids):
-                for idx_j, state in enumerate(payloads.mock_state_payloads):
+                for idx_j, state_payload in enumerate(payloads.mock_state_payloads):
                     filepath = os.path.join(
                         tmp_path, f"state-file-{idx_i}-{idx_j}.json"
                     )
                     with open(filepath, "w+") as state_file:
-                        json.dump(state, state_file)
+                        json.dump(state_payload, state_file)
                     result = cli_runner.invoke(
                         cli, ["state", "set", job_id, "--input-file", filepath]
                     )
@@ -156,5 +157,5 @@ class TestCliState:
             for job_id in job_ids:
                 result = cli_runner.invoke(cli, ["state", "clear", job_id])
                 assert_cli_runner(result)
-                state = state_service.get_state(job_id)
-                assert (not state) or (not state.get("singer_state"))
+                job_state = state_service.get_state(job_id)
+                assert (not job_state) or (not state.get("singer_state"))

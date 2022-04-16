@@ -37,8 +37,6 @@ class TestCliAdd:
                 Variant.ORIGINAL_NAME,
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
-            # Installed automatically because of transform 'tap-carbon-intensity'
-            # (PluginType.TRANSFORMERS, "dbt", Variant.ORIGINAL_NAME, [PluginRef(PluginType.FILES, "dbt")]),
         ],
     )
     def test_add(
@@ -191,7 +189,7 @@ class TestCliAdd:
         # Automatic updating is enabled
         plugin_settings_service = plugin_settings_service_factory(plugin)
         update_config = plugin_settings_service.get("_update")
-        assert update_config["orchestrate/dags/meltano.py"] == True
+        assert update_config["orchestrate/dags/meltano.py"] is True
 
         # File has been created
         assert "Created orchestrate/dags/meltano.py" in result.output
@@ -462,7 +460,10 @@ class TestCliAdd:
             assert plugin.executable == plugin_variant.executable == executable
             assert plugin.capabilities == plugin_variant.capabilities == ["foo", "bar"]
 
-            assert [s.name for s in plugin_variant.settings] == ["baz", "qux"]
+            assert [setting.name for setting in plugin_variant.settings] == [
+                "baz",
+                "qux",
+            ]
             assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
