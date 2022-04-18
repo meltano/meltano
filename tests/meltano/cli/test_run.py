@@ -390,13 +390,13 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        # Verify that a vanilla command plugin (dbt:run) run works
+        # Verify that requesting the same command plugin multiple time with different args works
         invoke_async = CoroutineMock(
             side_effect=(
                 dbt_process,
                 dbt_process,
             )
-        )  # dbt run
+        )
         args = ["run", "dbt:test", "dbt:run"]
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
