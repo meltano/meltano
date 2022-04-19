@@ -101,6 +101,12 @@ which can then be overridden as appropriate.
 
 To learn how to add an inheriting plugin to your project using an [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
 
+## Lock artifacts
+
+When you add a plugin to your project using `meltano add`, the [discoverable plugin definition](project#discoverable-plugin-definitions) of the plugin will be downloaded and added to your project under `plugins/<plugin_type>/<plugin_name>--<variant_name>.json`. This will ensure that the plugin's definition will be stable and version-controlled.
+
+Later invocations of the plugin will use this file to determine the settings, installation source, etc.
+
 ## Types
 
 Meltano supports the following types of plugins:
@@ -859,7 +865,7 @@ To learn more about mapper 'transform-field', visit https://github.com/transferw
 
 Mappers are unique in that after install you don't invoke them directly. Instead you define `mappings` by name and add a config object for each mapping.
 This config object is passed to the mapper when the **mapping name** is called as part of a [`meltano run`](/reference/command-line-interface#run) invocation.
-Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead. 
+Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead.
 Additionally, the requirements for the config object itself will vary by plugin.
 
 So given a mapper with mappings configured like so:
@@ -888,7 +894,7 @@ So given a mapper with mappings configured like so:
             type: "SET-NULL"
 ```
 
-You can then invoke the mappings by name: 
+You can then invoke the mappings by name:
 
 ```bash
 
@@ -902,7 +908,7 @@ $ meltano run tap-gitlab hide-gitlab-secrets target-jsonl
 $ meltano run tap-someapi null-created-at target-jsonl
 ```
 
-You can also invoke multiple mappings at once in series: 
+You can also invoke multiple mappings at once in series:
 
 ```bash
 $ tap-someapi fix-null-id fix-country-code target-jsonl
@@ -918,4 +924,3 @@ call mappings that leverage the same plugin at multiple locations numerous times
 # Mask the id if the customer is in the EU region using transform-field mapper.
 $ tap-someapi fix-null-country set-region-from-country  mask-id-if-eu target-jsonl
 ```
-
