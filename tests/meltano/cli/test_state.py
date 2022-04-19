@@ -86,7 +86,7 @@ class TestCliState:
                 for state_payload in payloads.mock_state_payloads:
                     result = cli_runner.invoke(
                         cli,
-                        ["state", "set", job_id, "--state", json.dumps(state)],
+                        ["state", "set", job_id, "--state", json.dumps(state_payload)],
                     )
                     assert_cli_runner(result)
                     assert (
@@ -107,16 +107,18 @@ class TestCliState:
                         cli, ["state", "set", job_id, "--input-file", filepath]
                     )
                     assert_cli_runner(result)
-                    assert state_service.get_state(job_id) == state["singer_state"]
+                    assert (
+                        state_service.get_state(job_id) == state_payload["singer_state"]
+                    )
 
-    def test_add_from_string(self, state_service, payloads, cli_runner):
+    def test_merge_from_string(self, state_service, payloads, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_id = "nonexistent_job_id"
             result = cli_runner.invoke(
                 cli,
                 [
                     "state",
-                    "add",
+                    "merge",
                     job_id,
                     "--state",
                     json.dumps(payloads.mock_state_payloads[0]),
@@ -128,7 +130,9 @@ class TestCliState:
                 == payloads.mock_state_payloads[0]["singer_state"]
             )
 
-    def test_add_from_file(self, mkdtemp, state_service, job_ids, payloads, cli_runner):
+    def test_merge_from_file(
+        self, mkdtemp, state_service, job_ids, payloads, cli_runner
+    ):
         tmp_path = mkdtemp()
         job_id = "nonexistent_job_id"
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
@@ -136,7 +140,7 @@ class TestCliState:
             with open(filepath, "w+") as state_file:
                 json.dump(payloads.mock_state_payloads[0], state_file)
             result = cli_runner.invoke(
-                cli, ["state", "add", job_id, "--input-file", filepath]
+                cli, ["state", "merge", job_id, "--input-file", filepath]
             )
 
             assert_cli_runner(result)

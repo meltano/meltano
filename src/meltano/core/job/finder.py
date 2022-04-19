@@ -82,9 +82,7 @@ class JobFinder:
         """
         return self.running(session).order_by(Job.started_at.desc()).first()
 
-    def with_payload(
-        self, session, flags=0, since=None, state=None, exclude_state=None
-    ):
+    def with_payload(self, session, flags=0, since=None, state=None):
         """Get all jobs for this instance's job ID matching the given args.
 
         Args:
@@ -92,7 +90,6 @@ class JobFinder:
             flags: only return jobs with these flags
             since: only return jobs which ended after this time
             state: only include jobs with state matching this state
-            exclude_state: only include jobs with state not matching this state
 
         Returns:
             All jobs matching these args.
@@ -112,8 +109,6 @@ class JobFinder:
             query = query.filter(Job.ended_at > since)
         if state:
             query = query.filter(Job.state == state)
-        if exclude_state:
-            query = query.filter(Job.state != exclude_state)
         return query
 
     def latest_with_payload(self, session, **kwargs):

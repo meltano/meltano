@@ -113,8 +113,9 @@ class Project(Versioned):  # noqa: WPS214
 
         Args:
             project: the Project to activate
+
         Raises:
-            OSerror: if project cannot be activated due to unsupported OS
+            OSError: if project cannot be activated due to unsupported OS
         """
         project.ensure_compatible()
 
@@ -168,7 +169,7 @@ class Project(Versioned):  # noqa: WPS214
 
         Raises:
             ProjectNotFound: if the provided `project_root` is not a Meltano project, or
-            the current working directory is not a Meltano project or a subfolder of one.
+                the current working directory is not a Meltano project or a subfolder of one.
         """
         if cls._default:
             return cls._default
@@ -245,7 +246,7 @@ class Project(Versioned):  # noqa: WPS214
             try:
                 meltano_config = self.project_files.update(meltano_config.canonical())
             except Exception as err:
-                logger.critical("Could not update meltano.yml: %s", err)
+                logger.critical("Could not update meltano.yml: %s", err)  # noqa: WPS323
                 raise
         # fmt: on
 
@@ -255,8 +256,8 @@ class Project(Versioned):  # noqa: WPS214
         Args:
             joinpaths: list of subdirs and/or file to join to project root.
 
-        Return:
-           project root joined with provided subdirs and/or file
+        Returns:
+            project root joined with provided subdirs and/or file
         """
         return self.root.joinpath(*joinpaths)
 
@@ -268,6 +269,9 @@ class Project(Versioned):  # noqa: WPS214
 
         Yields:
             the project root
+
+        Raises:
+            ProjectReadonly: if the project is readonly
         """
         if self.readonly:
             raise ProjectReadonly
@@ -276,7 +280,7 @@ class Project(Versioned):  # noqa: WPS214
 
     @property
     def meltanofile(self):
-        """Get the path to this project's meltano.yml
+        """Get the path to this project's meltano.yml.
 
         Returns:
             the path to this project meltano.yml
@@ -306,9 +310,6 @@ class Project(Versioned):  # noqa: WPS214
 
         Args:
             name: Name of the environment. Defaults to None.
-
-        Raises:
-            EnvironmentNotFound: If the named environment is not present in `meltano.yml`.
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
 
@@ -320,6 +321,9 @@ class Project(Versioned):  # noqa: WPS214
 
         Yields:
             the .env file
+
+        Raises:
+            ProjectReadonly: if the project is readonly
         """
         if self.readonly:
             raise ProjectReadonly
@@ -329,61 +333,71 @@ class Project(Versioned):  # noqa: WPS214
     @makedirs
     def meltano_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `.meltano` directory."""
-        return self.root.joinpath(".meltano", *joinpaths)
+        return self.root.joinpath(".meltano", *joinpaths)  # noqa: DAR101,DAR201
 
     @makedirs
     def analyze_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `analyze` directory."""
-        return self.root_dir("analyze", *joinpaths)
+        return self.root_dir("analyze", *joinpaths)  # noqa: DAR101,DAR201
 
     @makedirs
     def extract_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `extract` directory."""
-        return self.root_dir("extract", *joinpaths)
+        return self.root_dir("extract", *joinpaths)  # noqa: DAR101,DAR201
 
     @makedirs
     def venvs_dir(self, *prefixes, make_dirs: bool = True):
         """Path to a `venv` directory in `.meltano`."""
-        return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
+        return self.meltano_dir(  # noqa: DAR101,DAR201
+            *prefixes, "venv", make_dirs=make_dirs
+        )
 
     @makedirs
     def run_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the `run` directory in `.meltano`."""
-        return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
+        return self.meltano_dir(  # noqa: DAR101,DAR201
+            "run", *joinpaths, make_dirs=make_dirs
+        )
 
     @makedirs
     def logs_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the `logs` directory in `.meltano`."""
-        return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
+        return self.meltano_dir(  # noqa: DAR101,DAR201
+            "logs", *joinpaths, make_dirs=make_dirs
+        )
 
     @makedirs
     def job_dir(self, job_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/run`."""
-        return self.run_dir(
+        return self.run_dir(  # noqa: DAR101,DAR201
             "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
     def job_logs_dir(self, job_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/logs`."""
-        return self.logs_dir(
+        return self.logs_dir(  # noqa: DAR101,DAR201
             "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
     def model_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the `models` directory in `.meltano`."""
-        return self.meltano_dir("models", *joinpaths, make_dirs=make_dirs)
+        return self.meltano_dir(  # noqa: DAR101,DAR201
+            "models", *joinpaths, make_dirs=make_dirs
+        )
 
     @makedirs
     def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):
         """Path to the plugin installation directory in `.meltano`."""
-        return self.meltano_dir(
+        return self.meltano_dir(  # noqa: DAR101,DAR201
             plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
         )
 
-    def __eq__(self, other):
-        return hasattr(other, "root") and self.root == other.root
+    def __eq__(self, other):  # noqa: D105
+        return (  # noqa: DAR101,DAR201
+            hasattr(other, "root") and self.root == other.root  # noqa: WPS421
+        )
 
-    def __hash__(self):
-        return self.root.__hash__()
+    def __hash__(self):  # noqa: D105
+        return self.root.__hash__()  # noqa: DAR101,DAR201,WPS609

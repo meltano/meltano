@@ -7,7 +7,6 @@ import json
 import logging
 import shutil
 import sys
-from asyncio import Task
 from asyncio.streams import StreamReader
 from hashlib import sha1
 from pathlib import Path
@@ -40,7 +39,13 @@ logger = structlog.getLogger(__name__)
 async def _stream_redirect(
     stream: asyncio.StreamReader, file_like_obj, write_str=False
 ):
-    """Redirect stream to a file like obj."""
+    """Redirect stream to a file like obj.
+
+    Args:
+        stream: the stream to redirect
+        file_like_obj: the object to redirect the stream to
+        write_str: if True, stream is written as str
+    """
     encoding = sys.getdefaultencoding()
     while not stream.at_eof():
         data = await stream.readline()
@@ -49,8 +54,17 @@ async def _stream_redirect(
 
 def _debug_logging_handler(
     name: str, plugin_invoker: PluginInvoker, stderr: StreamReader
-) -> Task:
-    """Route debug log lines to stderr or an OutputLogger if one is present in our invocation context."""
+) -> asyncio.Task:
+    """Route debug log lines to stderr or an OutputLogger if one is present in our invocation context.
+
+    Args:
+        name: name of the plugin
+        plugin_invoker: the PluginInvoker to route log lines for
+        stderr: stderr StreamReader to route to
+
+    Returns:
+        asyncio.Task which performs the routing of log lines
+    """
     if not plugin_invoker.context or not plugin_invoker.context.base_output_logger:
         return asyncio.ensure_future(
             _stream_redirect(stderr, sys.stderr, write_str=True)
@@ -64,6 +78,14 @@ def _debug_logging_handler(
 
 
 def config_metadata_rules(config):
+    """Get metadata rules from config.
+
+    Args:
+        config: configuration dict
+
+    Returns:
+        a list of MetadataRule
+    """
     flat_config = flatten(config, "dot")
 
     rules = []
@@ -73,13 +95,13 @@ def config_metadata_rules(config):
         # <tap_stream_id>.<prop>.<subprop>.<key>
         # <tap_stream_id>.properties.<prop>.<key>
         # <tap_stream_id>.properties.<prop>.properties.<subprop>.<key>
-        tap_stream_id, *props, key = key.split(".")
+        tap_stream_id, *props, rule_key = key.split(".")
 
         rules.append(
             MetadataRule(
                 tap_stream_id=tap_stream_id,
                 breadcrumb=property_breadcrumb(props),
-                key=key,
+                key=rule_key,
                 value=value,
             )
         )
@@ -88,6 +110,14 @@ def config_metadata_rules(config):
 
 
 def config_schema_rules(config):
+    """Get schema rules from config.
+
+    Args:
+        config: configuration dict
+
+    Returns:
+        a list of SchemaRule
+    """
     return [
         SchemaRule(
             tap_stream_id=tap_stream_id,
@@ -100,6 +130,8 @@ def config_schema_rules(config):
 
 
 class SingerTap(SingerPlugin):
+    """A Plugin for Singer Taps."""
+
     __plugin_type__ = PluginType.EXTRACTORS
 
     EXTRA_SETTINGS = [
@@ -124,8 +156,13 @@ class SingerTap(SingerPlugin):
     ]
 
     def exec_args(self, plugin_invoker):
-        """
-        Return the arguments list with the complete runtime paths.
+        """Return the arguments list with the complete runtime paths.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+
+        Returns:
+            the command line arguments to be passed to the tap
         """
         args = ["--config", plugin_invoker.files["config"]]
 
@@ -153,7 +190,8 @@ class SingerTap(SingerPlugin):
 
     @property
     def config_files(self):
-        return {
+        """Get the configuration files for this tap."""
+        return {  # noqa: DAR201
             "config": f"tap.{self.instance_uuid}.config.json",
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
@@ -162,7 +200,8 @@ class SingerTap(SingerPlugin):
 
     @property
     def output_files(self):
-        return {"output": "tap.out"}
+        """Get the output files for this tap."""
+        return {"output": "tap.out"}  # noqa: DAR201
 
     @hook("before_invoke")
     async def look_up_state_hook(
@@ -170,7 +209,15 @@ class SingerTap(SingerPlugin):
         plugin_invoker: PluginInvoker,
         exec_args: Tuple[str, ...] = (),
     ):
-        """Look up state before being invoked if in sync mode."""
+        """Look up state before being invoked if in sync mode.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+            exec_args: the args being passed to the tap
+
+        Returns:
+            None
+        """
         # Use state only in sync mode (i.e. no args)
         if exec_args:
             return
@@ -183,7 +230,18 @@ class SingerTap(SingerPlugin):
     async def look_up_state(  # noqa: WPS231, WPS213
         self, plugin_invoker: PluginInvoker
     ):
-        """Look up state, cleaning up and refreshing as needed."""
+        """Look up state, cleaning up and refreshing as needed.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+
+        Returns:
+            None
+
+        Raises:
+            PluginExecutionError: if state could not be found for this plugin
+            PluginLacksCapabilityError: if this plugin does not support incremental state
+        """
         if "state" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support incremental state"
@@ -243,6 +301,9 @@ class SingerTap(SingerPlugin):
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
+
+        Returns:
+            None
         """
         # Discover only in sync mode (i.e. no args)
         if exec_args:
@@ -258,6 +319,12 @@ class SingerTap(SingerPlugin):
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
+
+        Returns:
+            None
+
+        Raises:
+            PluginExecutionError: if discovery could not be performed
         """
         catalog_path = plugin_invoker.files["catalog"]
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
@@ -267,7 +334,7 @@ class SingerTap(SingerPlugin):
                 new_cache_key = self.catalog_cache_key(plugin_invoker)
 
                 if cached_key == new_cache_key:
-                    logger.debug(f"Using cached catalog file")
+                    logger.debug("Using cached catalog file")
                     return
             except FileNotFoundError:
                 pass
@@ -300,21 +367,28 @@ class SingerTap(SingerPlugin):
         try:
             with catalog_path.open("r") as catalog_file:
                 catalog = json.load(catalog_file)
-                schema_valid = Draft4Validator.check_schema(catalog)
-        except Exception as err:
+                Draft4Validator.check_schema(catalog)
+        except Exception as err:  # noqa: WPS440
             catalog_path.unlink()
             raise PluginExecutionError(
                 f"Catalog discovery failed: invalid catalog: {err}"
             ) from err
 
-    async def run_discovery(self, plugin_invoker: PluginInvoker, catalog_path: Path):
+    async def run_discovery(  # noqa: WPS238
+        self, plugin_invoker: PluginInvoker, catalog_path: Path
+    ):  # noqa: DAR401
         """Run tap in discovery mode and store the result.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
             catalog_path: Where discovery output should be written.
+
+        Raises:
+            PluginExecutionError: if state could not be found for this plugin
+            PluginLacksCapabilityError: if this plugin does not support incremental state
+            Exception: if any other exception occurs
         """
-        if not "discover" in plugin_invoker.capabilities:
+        if "discover" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
             )
@@ -368,7 +442,15 @@ class SingerTap(SingerPlugin):
     async def apply_catalog_rules_hook(
         self, plugin_invoker: PluginInvoker, exec_args: Tuple[str, ...] = ()
     ):
-        """Apply catalog rules before invoke if in sync mode."""
+        """Apply catalog rules before invoke if in sync mode.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+            exec_args: the argumnets to pass to the tap
+
+        Returns:
+            None
+        """
         # Apply only in sync mode (i.e. no args)
         if exec_args:
             return
@@ -383,10 +465,22 @@ class SingerTap(SingerPlugin):
         plugin_invoker: PluginInvoker,
         exec_args: Tuple[str, ...] = (),
     ):
-        """Apply Singer catalog and schema rules to discovered catalog."""
+        """Apply Singer catalog and schema rules to discovered catalog.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+            exec_args: the argumnets to pass to the tap
+
+        Returns:
+            None
+
+        Raises:
+            PluginLacksCapabilityError: if plugin does not support entity selection
+            PluginExecutionError: if catalog rules could not be applied
+        """
         if (
-            not "catalog" in plugin_invoker.capabilities
-            and not "properties" in plugin_invoker.capabilities
+            "catalog" not in plugin_invoker.capabilities
+            and "properties" not in plugin_invoker.capabilities
         ):
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support entity selection or catalog metadata and schema rules"
@@ -424,28 +518,36 @@ class SingerTap(SingerPlugin):
             if metadata_rules:
                 MetadataExecutor(metadata_rules).visit(catalog)
 
-            with catalog_path.open("w") as catalog_file:
-                json.dump(catalog, catalog_file, indent=2)
+            with catalog_path.open("w") as catalog_f:
+                json.dump(catalog, catalog_f, indent=2)
 
             cache_key = self.catalog_cache_key(plugin_invoker)
             if cache_key:
                 catalog_cache_key_path.write_text(cache_key)
             else:
-                try:
+                try:  # noqa: WPS505
                     catalog_cache_key_path.unlink()
                 except FileNotFoundError:
                     pass
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                f"Applying catalog rules failed: catalog file is missing."
+                "Applying catalog rules failed: catalog file is missing."
             ) from err
-        except Exception as err:
+        except Exception as err:  # noqa: WPS440
             catalog_path.unlink()
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is invalid: {err}"
             ) from err
 
     def catalog_cache_key(self, plugin_invoker):
+        """Get a cache key for the catalog.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+
+        Returns:
+            the cache key for the catalog, if plugin catalog can be cached
+        """
         # Treat non-pip plugins as editable/dev-mode plugins and do not cache.
         if plugin_invoker.plugin.pip_url is None:
             return None
@@ -474,4 +576,4 @@ class SingerTap(SingerPlugin):
 
         key_json = json.dumps(key_dict)
 
-        return sha1(key_json.encode()).hexdigest()
+        return sha1(key_json.encode()).hexdigest()  # noqa: S303

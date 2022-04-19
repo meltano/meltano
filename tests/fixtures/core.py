@@ -684,7 +684,7 @@ def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):  # noqa:
         dummy_jobs = []
         # Get latest complete non-dummy job.
         for job in job_list:
-            if job.state == State.DUMMY:
+            if job.state == State.STATE_EDIT:
                 dummy_jobs.append(job)
             elif job.payload_flags == Payload.STATE:
                 complete_jobs.append(job)

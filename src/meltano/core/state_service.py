@@ -49,7 +49,7 @@ class StateService:
         query = self.session.query(Job)
         if job_id_pattern:
             query = query.filter(Job.job_id.like(job_id_pattern.replace("*", "%")))
-        for job_id in {job.job_id for job in query}:
+        for job_id in {job.job_id for job in query}:  # noqa: WPS335
             states[job_id] = self.get_state(job_id)
         return states
 
@@ -72,7 +72,7 @@ class StateService:
     @_get_or_create_job.register
     def _(self, job: str) -> Job:
         now = datetime.datetime.utcnow()
-        return Job(job_id=job, state=State.DUMMY, started_at=now, ended_at=now)
+        return Job(job_id=job, state=State.STATE_EDIT, started_at=now, ended_at=now)
 
     @staticmethod
     def validate_state(state: str):
@@ -90,20 +90,23 @@ class StateService:
                 "singer_state not found in top level of provided state"
             )
 
-    def add_state(self, job: Union[Job, str], new_state: Optional[str]):
+    def add_state(
+        self,
+        job: Union[Job, str],
+        new_state: Optional[str],
+        payload_flags: Payload = Payload.STATE,
+    ):
         """Add state for the given Job.
 
         Args:
             job: either an existing Job or a job_id that future runs may look up state for.
             new_state: the state to add for the given job.
+            payload_flags: the payload_flags to set for the job
         """
         self.validate_state(new_state)
         job_to_add_to = self._get_or_create_job(job)
         job_to_add_to.payload = json.loads(new_state)
-        if new_state:
-            job_to_add_to.payload_flags = Payload.STATE
-        else:
-            job_to_add_to.payload_flags = 0
+        job_to_add_to.payload_flags = payload_flags
         job_to_add_to.save(self.session)
 
     def get_state(self, job_id: str) -> Dict:
@@ -121,9 +124,7 @@ class StateService:
 
         # Get the state for the most recent completed job.
         # Do not consider dummy jobs create via add_state.
-        state_job = finder.latest_with_payload(
-            self.session, flags=Payload.STATE, exclude_state=State.DUMMY
-        )
+        state_job = finder.latest_with_payload(self.session, flags=Payload.STATE)
         if state_job:
             logger.info(f"Found state from {state_job.started_at}.")
             incomplete_since = state_job.ended_at
@@ -137,42 +138,14 @@ class StateService:
         incomplete_state_jobs = finder.with_payload(
             self.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
         )
-        last_job_ended_at = incomplete_since
         for incomplete_state_job in incomplete_state_jobs:
             logger.info(
-                f"Found and merged incomplete state from {state_job.started_at}."
+                f"Found and merged incomplete state from {incomplete_state_job.started_at}."
             )
-            last_job_ended_at = incomplete_state_job.ended_at
             if "singer_state" in incomplete_state_job.payload:
                 merge(incomplete_state_job.payload, state)
 
-        # If state has been added via add_state since the
-        # most recent job, use bookmarks from those additions.
-        dummy_state_jobs = finder.with_payload(
-            self.session,
-            flags=Payload.STATE,
-            since=last_job_ended_at,
-            state=State.DUMMY,
-        )
-
-        for dummy_state_job in dummy_state_jobs:
-            if "singer_state" in dummy_state_job.payload:
-                merge(dummy_state_job.payload, state)
-
         return state.get("singer_state", state)
-
-    def clear_state(self, job_id: str, save: bool = True):
-        """Clear state for Job job_id.
-
-        Args:
-            job_id: the job_id of the job to clear state for.
-            save: whether or not to immediately save the job
-        """
-        finder = JobFinder(job_id)
-        for job in finder.get_all(self.session):
-            job.payload = {}
-            if save:
-                job.save(self.session)
 
     def set_state(self, job_id: str, new_state: Optional[str]):
         """Set the state for Job job_id.
@@ -181,5 +154,13 @@ class StateService:
             job_id: the job_id of the job to set state for
             new_state: the state to update to
         """
-        self.clear_state(job_id, save=False)
-        self.add_state(job_id, new_state)
+        self.add_state(job_id, new_state, payload_flags=Payload.STATE)
+
+    def clear_state(self, job_id: str, save: bool = True):
+        """Clear state for Job job_id.
+
+        Args:
+            job_id: the job_id of the job to clear state for.
+            save: whether or not to immediately save the job
+        """
+        self.set_state(job_id, json.dumps({"singer_state": {}}))

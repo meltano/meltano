@@ -19,6 +19,23 @@ STATE_SERVICE_KEY = "state_service"
 logger = structlog.getLogger(__name__)
 
 
+class MutuallyExclusiveOptionsError(Exception):
+    """Occurs when mutually exclusive options are provided incorrectly."""
+
+    def __init__(self, *options: str) -> None:
+        """Instantiate the error.
+
+        Args:
+            options: the mutually exclusive options that were incorrectly provided.
+        """
+        super().__init__(*options)
+        self.options = options
+
+    def __str__(self) -> str:
+        """Represent the error as a string."""
+        return f"Must provide exactly one of: {','.join(self.options)}"
+
+
 def state_service_from_job_id(project: Project, job_id: str) -> Optional[StateService]:
     """Instantiate by parsing a job_id."""
     job_id_re = re.compile(r"^(?P<env>.+)\:(?P<tap>.+)-to-(?P<target>.+)$")
@@ -78,13 +95,13 @@ def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
             click.secho(job_id, fg="yellow")
 
 
-@meltano_state.command(name="add")
+@meltano_state.command(name="merge")
 @click.option("--input-file", type=click.Path(exists=True), help="TODO")
 @click.option("--state", type=str, help="TODO")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context
-def add_state(
+def merge_state(
     ctx: click.Context,
     project: Project,
     job_id: str,
@@ -97,14 +114,14 @@ def add_state(
     )
 
     if input_file and state:
-        raise ValueError("TODO: better error here")
+        raise MutuallyExclusiveOptionsError("--input-file", "--state")
     elif input_file:
         with open(input_file) as state_f:
             state_service.add_state(job_id, state_f.read())
     elif state:
         state_service.add_state(job_id, state)
     else:
-        raise ValueError("TODO: better error here")
+        raise MutuallyExclusiveOptionsError("--input-file", "--state")
 
 
 @meltano_state.command(name="set")
@@ -126,14 +143,14 @@ def set_state(
     )
 
     if input_file and state:
-        raise ValueError("TODO: better error here")
+        raise MutuallyExclusiveOptionsError("--input-file", "--state")
     elif input_file:
         with open(input_file) as state_f:
             state_service.set_state(job_id, state_f.read())
     elif state:
         state_service.set_state(job_id, state)
     else:
-        raise ValueError("TODO: better error here")
+        raise MutuallyExclusiveOptionsError("--input-file", "--state")
 
 
 @meltano_state.command(name="get")
