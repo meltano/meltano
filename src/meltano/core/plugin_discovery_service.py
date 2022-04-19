@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import logging
 import re
+from abc import ABCMeta, abstractmethod
 from typing import Iterable
 
 import requests
@@ -13,6 +14,7 @@ import yaml
 import meltano
 from meltano.core import bundle
 from meltano.core.plugin.base import StandalonePlugin
+from meltano.core.project import Project
 
 from .behavior.canonical import Canonical
 from .behavior.versioned import IncompatibleVersionError, Versioned
@@ -75,7 +77,74 @@ class DiscoveryFile(Canonical):
         return int(attrs.get("version", 1))
 
 
-class PluginDiscoveryService(Versioned):  # noqa: WPS214 (too many public methods)
+class PluginRepository(metaclass=ABCMeta):
+    """A generic plugin definition repository."""
+
+    @abstractmethod
+    def find_definition(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        **kwargs,
+    ) -> PluginDefinition:
+        """Find a plugin definition.
+
+        Args:
+            plugin_type: The type of plugin to find.
+            plugin_name: The name of the plugin to find.
+            kwargs: Additional arguments to pass to the finder.
+        """
+        ...  # noqa: WPS428
+
+    def find_base_plugin(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant: str | None = None,
+    ) -> BasePlugin:
+        """Get the base plugin for a project plugin.
+
+        Args:
+            plugin_type: The type of plugin to get the base plugin for.
+            plugin_name: The name of the plugin to get the base plugin for.
+            variant: The variant of the plugin to get the base plugin for.
+
+        Returns:
+            The base plugin.
+        """
+        plugin = self.find_definition(
+            plugin_type,
+            plugin_name,
+        )
+
+        return base_plugin_factory(plugin, variant)
+
+    def get_base_plugin(
+        self,
+        project_plugin: ProjectPlugin,
+        **kwargs,
+    ) -> BasePlugin:
+        """Get the base plugin for a project plugin.
+
+        Args:
+            project_plugin: The project plugin to get the base plugin for.
+            kwargs: Additional arguments to pass to the finder.
+
+        Returns:
+            The base plugin.
+        """
+        plugin = project_plugin.custom_definition or self.find_definition(
+            project_plugin.type,
+            project_plugin.inherit_from or project_plugin.name,
+            **kwargs,
+        )
+
+        return base_plugin_factory(plugin, project_plugin.variant)
+
+
+class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
+    PluginRepository, Versioned
+):
     """Discover plugin definitions."""
 
     __version__ = VERSION
@@ -364,26 +433,6 @@ class PluginDiscoveryService(Versioned):  # noqa: WPS214 (too many public method
         except NotFound as err:
             raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from err
 
-    def find_locked_definition(
-        self,
-        plugin_type: PluginType,
-        plugin_name: str,
-        variant_name: str | None = None,
-    ) -> PluginDefinition:
-        """Find a locked plugin definition.
-
-        Args:
-            plugin_type: The plugin type.
-            plugin_name: The plugin name.
-            variant_name: The plugin variant name.
-
-        Returns:
-            The plugin definition.
-        """
-        path = self.project.plugin_lock_path(plugin_type, plugin_name, variant_name)
-        standalone = StandalonePlugin.parse_json_file(path)
-        return PluginDefinition.from_standalone(standalone)
-
     def find_definition_by_namespace(
         self, plugin_type: PluginType, namespace: str
     ) -> PluginDefinition:
@@ -407,37 +456,6 @@ class PluginDiscoveryService(Versioned):  # noqa: WPS214 (too many public method
             )
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
-
-    def find_base_plugin(
-        self, plugin_type: PluginType, plugin_name: str, variant=None
-    ) -> BasePlugin:
-        """Find a base plugin by type and name.
-
-        Args:
-            plugin_type: The plugin type.
-            plugin_name: The plugin name.
-            variant: The plugin variant.
-
-        Returns:
-            The base plugin.
-        """
-        plugin = self.find_definition(plugin_type, plugin_name)
-        return base_plugin_factory(plugin, variant)
-
-    def get_base_plugin(self, project_plugin: ProjectPlugin) -> BasePlugin:
-        """Get a base plugin by project plugin.
-
-        Args:
-            project_plugin: The project plugin.
-
-        Returns:
-            The base plugin.
-        """
-        plugin = project_plugin.custom_definition or self.find_definition(
-            project_plugin.type, project_plugin.inherit_from or project_plugin.name
-        )
-
-        return base_plugin_factory(plugin, project_plugin.variant)
 
     def find_related_plugin_refs(
         self,
@@ -474,3 +492,65 @@ class PluginDiscoveryService(Versioned):  # noqa: WPS214 (too many public method
         )
 
         return related_plugin_refs
+
+
+class LockedDefinitionService(PluginRepository):
+    """PluginRepository implementation for local files."""
+
+    def __init__(self, project: Project) -> None:
+        """Initialize the service.
+
+        Args:
+            project: The Meltano project.
+        """
+        self.project = project
+
+    def find_definition(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
+    ) -> PluginDefinition:
+        """Find a locked plugin definition.
+
+        Args:
+            plugin_type: The plugin type.
+            plugin_name: The plugin name.
+            variant_name: The plugin variant name.
+
+        Returns:
+            The plugin definition.
+
+        Raises:
+            PluginNotFoundError: If the plugin definition could not be found.
+        """
+        path = self.project.plugin_lock_path(plugin_type, plugin_name, variant_name)
+        try:
+            standalone = StandalonePlugin.parse_json_file(path)
+        except FileNotFoundError as err:
+            raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from err
+        return PluginDefinition.from_standalone(standalone)
+
+    def find_base_plugin(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant: str | None = None,
+    ) -> BasePlugin:
+        """Get the base plugin for a project plugin.
+
+        Args:
+            plugin_type: The plugin type.
+            plugin_name: The plugin name.
+            variant: The plugin variant.
+
+        Returns:
+            The base plugin.
+        """
+        plugin = self.find_definition(
+            plugin_type,
+            plugin_name,
+            variant_name=variant,
+        )
+
+        return base_plugin_factory(plugin, plugin.variants[0])

@@ -9,13 +9,8 @@ import yaml
 
 from meltano.core import bundle
 from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
-from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import (
-    VERSION,
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
+from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 HTTP_STATUS_TEAPOT = 418
@@ -70,28 +65,6 @@ class TestPluginDiscoveryService:
 
         subject._discovery = None
 
-    @pytest.fixture
-    def locked_plugin(self, subject):
-        """Disable the discovery mock.
-
-        Returns:
-            StandalonePlugin: A locked plugin.
-        """
-        definition = StandalonePlugin(
-            PluginType.EXTRACTORS,
-            "tap-locked",
-            "tap_locked",
-            variant="meltano",
-        )
-        path = subject.project.plugin_lock_path(
-            definition.plugin_type,
-            definition.name,
-            definition.variant,
-        )
-        with path.open("w") as file:
-            json.dump(definition.canonical(), file)
-        return definition
-
     def test_plugins(self, subject):
         plugins = list(subject.plugins())
 
@@ -109,21 +82,6 @@ class TestPluginDiscoveryService:
         plugin_def = subject.find_definition(PluginType.EXTRACTORS, "tap-mock")
         assert plugin_def.type == PluginType.EXTRACTORS
         assert plugin_def.name == "tap-mock"
-
-    def test_locked_definition(
-        self,
-        subject: PluginDiscoveryService,
-        locked_plugin: StandalonePlugin,
-    ):
-        plugin_def = subject.find_locked_definition(
-            PluginType.EXTRACTORS,
-            "tap-locked",
-            variant_name="meltano",
-        )
-        assert plugin_def.type == PluginType.EXTRACTORS
-        assert plugin_def.name == "tap-locked"
-        assert plugin_def.namespace == "tap_locked"
-        assert len(plugin_def.variants) == 1
 
     def test_find_base_plugin(self, subject):
         # If no variant is specified,
