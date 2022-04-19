@@ -30,7 +30,7 @@ class TestCliInit:
         )
 
         meltano_dirs = (
-            project.root.joinpath(dir)
+            project.root.joinpath(meltano_dir)
             for meltano_dir in (
                 ".meltano",
                 "model",
