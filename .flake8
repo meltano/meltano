@@ -115,6 +115,8 @@ per_file_ignores =
         D101
         D102
         D103
+        # Allow underscored number name pattern (e.g. tap_covid_19)
+        WPS114
         # Don't warn on overused expressions in test methods
         WPS204
         # Don't warn on too many arguments in test methods

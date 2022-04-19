@@ -41,7 +41,7 @@ def discovery_url_mock(subject):
         yield
 
 
-@pytest.fixture(scope="class")  # noqa: WPS114
+@pytest.fixture(scope="class")
 def tap_covid_19(project_add_service):
     try:
         plugin = ProjectPlugin(
