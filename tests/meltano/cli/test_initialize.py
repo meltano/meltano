@@ -1,7 +1,5 @@
-import os
-
 import pytest
-from click.testing import CliRunner
+
 from meltano.cli import cli
 from meltano.core.project import Project, ProjectNotFound
 
@@ -31,9 +29,10 @@ class TestCliInit:
             for file in ("meltano.yml", "README.md", ".gitignore", "requirements.txt")
         )
 
-        dirs = (
+        meltano_dirs = (
             project.root.joinpath(dir)
-            for dir in (
+            for meltano_dir in (
+                ".meltano",
                 "model",
                 "extract",
                 "load",
@@ -47,8 +46,8 @@ class TestCliInit:
         for file in files:
             assert file.is_file()
 
-        for dir in dirs:
-            assert dir.is_dir()
+        for meltano_dir in meltano_dirs:
+            assert meltano_dir.is_dir()
 
         meltano_yml = project.root_dir("meltano.yml").read_text()
         assert "send_anonymous_usage_stats: false" in meltano_yml
