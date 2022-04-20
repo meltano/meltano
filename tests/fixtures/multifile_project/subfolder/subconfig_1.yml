@@ -10,6 +10,7 @@ schedules:
     extractor: tap-subconfig-1-yml
     loader: target-subconfig-1-yml
     transform: skip
+    start_date: 2020-08-06 00:00:00
     interval: '@once'
 
 environments:
