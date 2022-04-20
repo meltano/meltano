@@ -24,8 +24,6 @@ settings:
 - name: elt.buffer_size
   kind: integer
   value: 10485760 # 10 MiB
-- name: environment
-  description: Active Meltano Environment
 
 # CLI
 - name: cli.log_level

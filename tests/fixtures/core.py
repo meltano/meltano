@@ -516,3 +516,10 @@ def mapper(project_add_service):
         )
     except PluginAlreadyAddedException as err:
         return err.plugin
+
+
+@pytest.fixture
+def project_with_environment(project: Project) -> Project:
+    project.activate_environment("dev")
+    yield project
+    project.active_environment = None

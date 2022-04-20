@@ -61,18 +61,19 @@ def cli(  # noqa: WPS231
             logger.debug("Project is read-only.")
 
         # detect active environment
-        this_environment = None
+        selected_environment = None
         if no_environment or (environment and environment.lower() == "null"):
             logger.info("No environment is active")
         elif environment:
-            this_environment = environment
+            selected_environment = environment
         elif project.meltano.default_environment:
-            this_environment = project.meltano.default_environment
+            selected_environment = project.meltano.default_environment
         # activate environment
-        if this_environment:
-            project.activate_environment(this_environment)
-            ProjectSettingsService.config_override["environment"] = this_environment
-            logger.info("Environment '%s' is active", this_environment)  # noqa: WPS323
+        if selected_environment:
+            project.activate_environment(selected_environment)
+            logger.info(
+                "Environment '%s' is active", selected_environment  # noqa: WPS323
+            )
 
         ctx.obj["project"] = project
     except ProjectNotFound:
