@@ -6,8 +6,8 @@ weight: 5
 ---
 
 <div class="notification is-info">
-  <p>Using Meltano with Snowflake? Try the new <a href="/guide/dbt-transformation">adapter-specific dbt plugin (preview)</a>!</p>
-  <p>If you are interested in an adapter other than Snowflake, continue with <a href="/guide/transformation#dbt-installation-and-configuration"> the classic installation guide </a>.</p>
+  <p>Using Meltano with Snowflake? Try the new <a href="/guide/transformation#adapter-specific-dbt-transformation-preview">adapter-specific dbt plugin (preview)</a>!</p>
+  <p>If you are interested in an adapter other than Snowflake, continue with <a href="/guide/transformation#dbt-installation-and-configuration-classic"> the classic installation guide </a>.</p>
   <p>You can also check in on <a href="https://gitlab.com/meltano/meltano/-/issues/3298">#3298</a> where we are tracking progress on adapter-specific Postgres, Redshift, Bigquery and more!</p>
 </div>
 
@@ -16,7 +16,7 @@ Transformations in Meltano are implemented using dbt. All Meltano generated proj
 ## Adapter-Specific dbt Transformation (Preview)
 
 In alignment with the [dbt documentation](https://docs.getdbt.com/docs/available-adapters), we are working towards supporting adapter-specific installations of `dbt`, starting with `dbt-snowflake`.
-If you are interested in another adapter, all others are currently supported by the [`dbt` transformer](/guide/transformation).
+If you are interested in another adapter, all others are currently supported by the [`dbt` transformer](/guide/transformation#dbt-installation-and-configuration-classic).
 You can also check in on [issue #3298](https://gitlab.com/meltano/meltano/-/issues/3298) where we are tracking progress on Postgres, Redshift, Bigquery, and other adapters!
 
 ### Install `dbt`
@@ -65,11 +65,11 @@ To run a subset of your dbt project, define a [plugin command](/concepts/project
 # meltano.yml
 plugins:
   transformers:
-  - name: dbt-snowflake
-    commands:
-      my_models:
-        args: run --select +my_model_name
-        description: Run dbt, selecting model `my_model_name` and all upstream models. Read more about the dbt node selection syntax at https://docs.getdbt.com/reference/node-selection/syntax
+    - name: dbt-snowflake
+      commands:
+        my_models:
+          args: run --select +my_model_name
+          description: Run dbt, selecting model `my_model_name` and all upstream models. Read more about the dbt node selection syntax at https://docs.getdbt.com/reference/node-selection/syntax
 ```
 
 This can then be executed as follows:
@@ -140,7 +140,6 @@ meltano remove files dbt
 
 Removing a file bundle _does not_ remove any files from your `transform/` directory.
 Manually remove `transform/profiles.yml` to complete clean-up (as adapter-specific installs come with their own `profiles.yml` in `transform/profiles/<adapter name>/profiles.yml`).
-
 
 ## `dbt` Installation and Configuration (Classic)
 
@@ -284,5 +283,3 @@ packages:
 
 If you plan to call dbt directly using `invoke` then you have to first run `meltano invoke dbt:deps` to install your package dependencies.
 Using the `--transform=run` option in your pipeline takes care of this step for you automatically.
-
-
