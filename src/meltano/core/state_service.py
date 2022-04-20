@@ -7,7 +7,6 @@ which refers to a given job run's status, e.g. 'RUNNING' or 'FAILED'.
 import datetime
 import json
 from collections import defaultdict
-from functools import singledispatchmethod
 from typing import Dict, Optional, Union
 
 import structlog
@@ -53,7 +52,6 @@ class StateService:
             states[job_id] = self.get_state(job_id)
         return states
 
-    @singledispatchmethod
     def _get_or_create_job(self, job: Union[Job, str]) -> Job:
         """If Job is passed, return it. If job_id is passed, create new and return.
 
@@ -62,17 +60,16 @@ class StateService:
 
         Raises:
             TypeError: if job is not of type Job or str
+
+        Returns:
+            A new job with given job_id, or the given Job
         """
+        if isinstance(job, str):
+            now = datetime.datetime.utcnow()
+            return Job(job_id=job, state=State.STATE_EDIT, started_at=now, ended_at=now)
+        elif isinstance(job, Job):
+            return job
         raise TypeError("job must be of type Job or of type str")
-
-    @_get_or_create_job.register
-    def _(self, job: Job) -> Job:
-        return job
-
-    @_get_or_create_job.register
-    def _(self, job: str) -> Job:
-        now = datetime.datetime.utcnow()
-        return Job(job_id=job, state=State.STATE_EDIT, started_at=now, ended_at=now)
 
     @staticmethod
     def validate_state(state: str):

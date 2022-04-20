@@ -86,7 +86,14 @@ class TestCliState:
                 for state_payload in payloads.mock_state_payloads:
                     result = cli_runner.invoke(
                         cli,
-                        ["state", "set", job_id, "--state", json.dumps(state_payload)],
+                        [
+                            "state",
+                            "set",
+                            "--force",
+                            job_id,
+                            "--state",
+                            json.dumps(state_payload),
+                        ],
                     )
                     assert_cli_runner(result)
                     assert (
@@ -104,7 +111,8 @@ class TestCliState:
                     with open(filepath, "w+") as state_file:
                         json.dump(state_payload, state_file)
                     result = cli_runner.invoke(
-                        cli, ["state", "set", job_id, "--input-file", filepath]
+                        cli,
+                        ["state", "set", "--force", job_id, "--input-file", filepath],
                     )
                     assert_cli_runner(result)
                     assert (
@@ -159,7 +167,7 @@ class TestCliState:
     def test_clear(self, state_service, cli_runner, job_ids):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for job_id in job_ids:
-                result = cli_runner.invoke(cli, ["state", "clear", job_id])
+                result = cli_runner.invoke(cli, ["state", "clear", "--force", job_id])
                 assert_cli_runner(result)
                 job_state = state_service.get_state(job_id)
                 assert (not job_state) or (not state.get("singer_state"))

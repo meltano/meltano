@@ -1,6 +1,7 @@
 """State management in CLI."""
 import json
 import re
+from functools import partial, wraps
 from typing import Optional
 
 import click
@@ -34,6 +35,29 @@ class MutuallyExclusiveOptionsError(Exception):
     def __str__(self) -> str:
         """Represent the error as a string."""
         return f"Must provide exactly one of: {','.join(self.options)}"
+
+
+def _prompt_for_confirmation(prompt):
+    """Wrap destructive CLI commands which should prompt the user for confirmation."""
+
+    def wrapper(func):
+        fun = click.option("--force", is_flag=True)(func)
+
+        @wraps(func)
+        def _wrapper(force=False, *args, **kwargs):
+            if force or click.confirm(prompt):
+                return fun(*args, **kwargs, force=force)
+            else:
+                click.secho("Aborting.", fg="red")
+
+        return _wrapper
+
+    return wrapper
+
+
+prompt_for_confirmation = partial(
+    _prompt_for_confirmation, prompt="This is a destructive command. Continue?"
+)
 
 
 def state_service_from_job_id(project: Project, job_id: str) -> Optional[StateService]:
@@ -125,6 +149,7 @@ def merge_state(
 
 
 @meltano_state.command(name="set")
+@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
 @click.option("--input-file", type=click.Path(exists=True), help="TODO")
 @click.option("--state", type=str, help="TODO")
 @click.argument("job_id")
@@ -136,6 +161,7 @@ def set_state(
     job_id: str,
     state: Optional[str],
     input_file: Optional[click.Path],
+    force: bool,
 ):
     """Set state."""
     state_service = (
@@ -166,10 +192,11 @@ def get_state(ctx: click.Context, project: Project, job_id: str):  # noqa: WPS46
 
 
 @meltano_state.command(name="clear")
+@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, job_id: str):
+def clear_state(ctx: click.Context, project: Project, job_id: str, force: bool):
     """Clear state."""
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
