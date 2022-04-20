@@ -92,14 +92,11 @@ class TestCliState:
                             "set",
                             "--force",
                             job_id,
-                            "--state",
                             json.dumps(state_payload),
                         ],
                     )
                     assert_cli_runner(result)
-                    assert (
-                        state_service.get_state(job_id) == state_payload["singer_state"]
-                    )
+                    assert state_service.get_state(job_id) == state_payload
 
     def test_set_from_file(self, mkdtemp, state_service, job_ids, payloads, cli_runner):
         tmp_path = mkdtemp()
@@ -116,9 +113,7 @@ class TestCliState:
                         ["state", "set", "--force", job_id, "--input-file", filepath],
                     )
                     assert_cli_runner(result)
-                    assert (
-                        state_service.get_state(job_id) == state_payload["singer_state"]
-                    )
+                    assert state_service.get_state(job_id) == state_payload
 
     def test_merge_from_string(self, state_service, payloads, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
@@ -129,15 +124,11 @@ class TestCliState:
                     "state",
                     "merge",
                     job_id,
-                    "--state",
                     json.dumps(payloads.mock_state_payloads[0]),
                 ],
             )
             assert_cli_runner(result)
-            assert (
-                state_service.get_state(job_id)
-                == payloads.mock_state_payloads[0]["singer_state"]
-            )
+            assert state_service.get_state(job_id) == payloads.mock_state_payloads[0]
 
     def test_merge_from_file(
         self, mkdtemp, state_service, job_ids, payloads, cli_runner
@@ -153,10 +144,7 @@ class TestCliState:
             )
 
             assert_cli_runner(result)
-            assert (
-                state_service.get_state(job_id)
-                == payloads.mock_state_payloads[0]["singer_state"]
-            )
+            assert state_service.get_state(job_id) == payloads.mock_state_payloads[0]
 
     def test_merge_from_job(self, state_service, job_ids, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
@@ -186,4 +174,4 @@ class TestCliState:
                 result = cli_runner.invoke(cli, ["state", "clear", "--force", job_id])
                 assert_cli_runner(result)
                 job_state = state_service.get_state(job_id)
-                assert (not job_state) or (not state.get("singer_state"))
+                assert (not job_state) or (not job_state.get("singer_state"))

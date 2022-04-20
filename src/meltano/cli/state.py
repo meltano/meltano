@@ -101,7 +101,7 @@ def meltano_state(project: Project, ctx: click.Context):
 
 
 @meltano_state.command(name="list")
-@click.option("--pattern", help="TODO")
+@click.option("--pattern", help="A glob-style pattern to filter job IDs by.")
 @click.pass_context
 def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
     """List all job_ids for this project."""
@@ -121,12 +121,14 @@ def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
 
 
 @meltano_state.command(name="merge")
-@click.option("--from-job-id", type=str, help="merge state from another job")
+@click.option("--from-job-id", type=str, help="Merge state from an existing job.")
 @click.option(
-    "--input-file", type=click.Path(exists=True), help="merge state from a file"
+    "--input-file",
+    type=click.Path(exists=True),
+    help="Merge state from a JSON file containing Singer state.",
 )
-@click.option("--state", type=str, help="merge state from stdin")
-@click.argument("job_id")
+@click.argument("job_id", type=str)
+@click.argument("state", type=str, required=False)
 @pass_project(migrate=True)
 @click.pass_context
 def merge_state(
@@ -155,9 +157,13 @@ def merge_state(
 
 @meltano_state.command(name="set")
 @prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
-@click.option("--input-file", type=click.Path(exists=True), help="TODO")
-@click.option("--state", type=str, help="TODO")
+@click.option(
+    "--input-file",
+    type=click.Path(exists=True),
+    help="Set state from json file containing Singer state.",
+)
 @click.argument("job_id")
+@click.argument("state", type=str, required=False)
 @pass_project(migrate=True)
 @click.pass_context
 def set_state(
@@ -174,7 +180,7 @@ def set_state(
     )
 
     if input_file and state:
-        raise MutuallyExclusiveOptionsError("--input-file", "--state")
+        raise MutuallyExclusiveOptionsError("--input-file", "STATE")
     elif input_file:
         with open(input_file) as state_f:
             state_service.set_state(job_id, state_f.read())
@@ -193,11 +199,12 @@ def get_state(ctx: click.Context, project: Project, job_id: str):  # noqa: WPS46
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    click.echo(json.dumps(state_service.get_state(job_id)))
+    retrieved_state = state_service.get_state(job_id)
+    click.echo(json.dumps(retrieved_state))
 
 
 @meltano_state.command(name="clear")
-@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
+@prompt_for_confirmation(prompt="This will clear state for the job. Continue?")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context

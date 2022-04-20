@@ -91,6 +91,7 @@ class StateService:
         job: Union[Job, str],
         new_state: Optional[str],
         payload_flags: Payload = Payload.STATE,
+        validate=True,
     ):
         """Add state for the given Job.
 
@@ -98,9 +99,11 @@ class StateService:
             job: either an existing Job or a job_id that future runs may look up state for.
             new_state: the state to add for the given job.
             payload_flags: the payload_flags to set for the job
+            validate: whether to validate the supplied state
         """
         new_state_dict = json.loads(new_state)
-        self.validate_state(new_state_dict)
+        if validate:
+            self.validate_state(new_state_dict)
         job_to_add_to = self._get_or_create_job(job)
         job_to_add_to.payload = json.loads(new_state)
         job_to_add_to.payload_flags = payload_flags
@@ -142,25 +145,31 @@ class StateService:
             if "singer_state" in incomplete_state_job.payload:
                 merge(incomplete_state_job.payload, state)
 
-        return state.get("singer_state", state)
+        return state
 
-    def set_state(self, job_id: str, new_state: Optional[str]):
+    def set_state(self, job_id: str, new_state: Optional[str], validate: bool = True):
         """Set the state for Job job_id.
 
         Args:
             job_id: the job_id of the job to set state for
             new_state: the state to update to
+            validate: whether or not to validate the supplied state.
         """
-        self.add_state(job_id, new_state, payload_flags=Payload.STATE)
+        self.add_state(
+            job_id,
+            new_state,
+            payload_flags=Payload.STATE,
+            validate=validate,
+        )
 
-    def clear_state(self, job_id: str, save: bool = True):
-        """Clear state for Job job_id.
+    def clear_state(self, job_id, save: bool = True):
+        """Clear the state for Job job_id.
 
         Args:
-            job_id: the job_id of the job to clear state for.
+            job_id: the job_id of the job to clear state for
             save: whether or not to immediately save the job
         """
-        self.set_state(job_id, json.dumps({"singer_state": {}}))
+        self.set_state(job_id, json.dumps({}), validate=False)
 
     def merge_state(self, job_id_src: str, job_id_dst: str):
         """Merge state from Job job_id_src into Job job_id_dst.
@@ -170,5 +179,5 @@ class StateService:
             job_id_dst: the job_id_to merge state onto
         """
         src_state_dict = self.get_state(job_id_src)
-        src_state = json.dumps({"singer_state": src_state_dict})
+        src_state = json.dumps(src_state_dict)
         self.add_state(job_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)

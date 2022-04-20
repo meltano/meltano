@@ -672,7 +672,7 @@ def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):  # noqa:
     for state in payloads.mock_state_payloads:
         merge(state, final_state)
     expectations = {
-        job_ids.single_complete_job_id: payloads.mock_state_payloads[0]["singer_state"],
+        job_ids.single_complete_job_id: payloads.mock_state_payloads[0],
         job_ids.single_incomplete_job_id: payloads.mock_empty_payload,
     }
 
@@ -717,7 +717,7 @@ def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):  # noqa:
             ):
                 expectations[job_id] = merge(expectations[job_id], job.payload)
     return [
-        (test_job_id, expected_state["singer_state"])
+        (test_job_id, expected_state)
         for test_job_id, expected_state in expectations.items()
     ]
 
