@@ -1,7 +1,8 @@
 """State management in CLI."""
 import json
 import re
-from functools import partial, wraps
+from functools import partial, reduce, wraps
+from operator import xor
 from typing import Optional
 
 import click
@@ -120,8 +121,11 @@ def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
 
 
 @meltano_state.command(name="merge")
-@click.option("--input-file", type=click.Path(exists=True), help="TODO")
-@click.option("--state", type=str, help="TODO")
+@click.option("--from-job-id", type=str, help="merge state from another job")
+@click.option(
+    "--input-file", type=click.Path(exists=True), help="merge state from a file"
+)
+@click.option("--state", type=str, help="merge state from stdin")
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context
@@ -131,21 +135,22 @@ def merge_state(
     job_id: str,
     state: Optional[str],
     input_file: Optional[click.Path],
+    from_job_id: Optional[str],
 ):
     """Add bookmarks to existing state."""
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-
-    if input_file and state:
-        raise MutuallyExclusiveOptionsError("--input-file", "--state")
+    mutually_exclusive_options = ["--input-file", "--state", "--from-job-id"]
+    if not reduce(xor, map(bool, [state, input_file, from_job_id])):
+        raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     elif input_file:
         with open(input_file) as state_f:
             state_service.add_state(job_id, state_f.read())
     elif state:
         state_service.add_state(job_id, state)
-    else:
-        raise MutuallyExclusiveOptionsError("--input-file", "--state")
+    elif from_job_id:
+        state_service.merge_state(from_job_id, job_id)
 
 
 @meltano_state.command(name="set")

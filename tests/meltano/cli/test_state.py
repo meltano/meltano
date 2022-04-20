@@ -6,6 +6,7 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli, state
+from meltano.core.utils import merge
 
 unconventional_job_ids = [
     "unconventional",
@@ -156,6 +157,21 @@ class TestCliState:
                 state_service.get_state(job_id)
                 == payloads.mock_state_payloads[0]["singer_state"]
             )
+
+    def test_merge_from_job(self, state_service, job_ids, cli_runner):
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            job_pairs = []
+            for idx in range(0, len(job_ids) - 1, 2):
+                job_pairs.append((job_ids[idx], job_ids[idx + 1]))
+            for (job_src, job_dst) in job_pairs:
+                job_state_src = state_service.get_state(job_src)
+                job_state_dst = state_service.get_state(job_dst)
+                merged_state = merge(job_state_src, job_state_dst)
+                result = cli_runner.invoke(
+                    cli, ["state", "merge", "--from-job-id", job_src, job_dst]
+                )
+                assert_cli_runner(result)
+                assert state_service.get_state(job_dst) == merged_state
 
     def test_get(self, state_service, cli_runner, job_ids_with_expected_states):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):

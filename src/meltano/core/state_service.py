@@ -161,3 +161,14 @@ class StateService:
             save: whether or not to immediately save the job
         """
         self.set_state(job_id, json.dumps({"singer_state": {}}))
+
+    def merge_state(self, job_id_src: str, job_id_dst: str):
+        """Merge state from Job job_id_src into Job job_id_dst.
+
+        Args:
+            job_id_src: the job_id to get state from
+            job_id_dst: the job_id_to merge state onto
+        """
+        src_state_dict = self.get_state(job_id_src)
+        src_state = json.dumps({"singer_state": src_state_dict})
+        self.add_state(job_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
