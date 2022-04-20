@@ -7,7 +7,7 @@ which refers to a given job run's status, e.g. 'RUNNING' or 'FAILED'.
 import datetime
 import json
 from collections import defaultdict
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import structlog
 
@@ -72,7 +72,7 @@ class StateService:
         raise TypeError("job must be of type Job or of type str")
 
     @staticmethod
-    def validate_state(state: str):
+    def validate_state(state: Dict[str, Any]):
         """Check that the given state str is valid.
 
         Args:
@@ -81,8 +81,7 @@ class StateService:
         Raises:
             InvalidJobStateError: if supplied state is not valid singer state
         """
-        state_dict = json.loads(state)
-        if "singer_state" not in state_dict:
+        if "singer_state" not in state:
             raise InvalidJobStateError(
                 "singer_state not found in top level of provided state"
             )
@@ -100,7 +99,8 @@ class StateService:
             new_state: the state to add for the given job.
             payload_flags: the payload_flags to set for the job
         """
-        self.validate_state(new_state)
+        new_state_dict = json.loads(new_state)
+        self.validate_state(new_state_dict)
         job_to_add_to = self._get_or_create_job(job)
         job_to_add_to.payload = json.loads(new_state)
         job_to_add_to.payload_flags = payload_flags

@@ -7,13 +7,15 @@ from meltano.core.state_service import InvalidJobStateError
 
 class TestStateService:
     def test_validate_state(self, state_service):
-        with pytest.raises(json.decoder.JSONDecodeError):
-            state_service.validate_state("bad state")
         with pytest.raises(InvalidJobStateError):
-            state_service.validate_state('{"root key not singer_state": {}}')
+            state_service.validate_state(
+                json.loads('{"root key not singer_state": {}}')
+            )
         assert (
             state_service.validate_state(
-                '{"singer_state": {"bookmarks": {"mock-stream": "mock-value"}}}'
+                json.loads(
+                    '{"singer_state": {"bookmarks": {"mock-stream": "mock-value"}}}'
+                )
             )
             is None
         )
