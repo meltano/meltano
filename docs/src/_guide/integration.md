@@ -228,6 +228,8 @@ Note that if you already have a state file you'd like to use, it can be provided
 
 If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
 
+If you know the `job_id` of the relevant job, you can also manually view and edit state using [the `meltano state` CLI command](/reference/command-line-interface#state).
+
 <div class="notification is-info">
   <p><strong>Not seeing state picked up after a failed run?</strong></p>
   <p>Some loaders only emit state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.</p>

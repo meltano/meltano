@@ -286,7 +286,7 @@ class SingerTap(SingerPlugin):
 
         if state:
             with state_path.open("w") as state_file:
-                json.dump(state, state_file, indent=2)
+                json.dump(state.get("singer_state"), state_file, indent=2)
         else:
             logger.warning("No state was found, complete import.")
 
