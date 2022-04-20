@@ -88,7 +88,7 @@ class BlockParser:  # noqa: D101
         self._plugins_service = ProjectPluginsService(project)
         self._plugins: List[ProjectPlugin] = []
 
-        self._commands: Dict[ProjectPlugin, str] = {}
+        self._commands: Dict[int, str] = {}
         self._mappings_ref: Dict[int, str] = {}
 
         for idx, name in enumerate(blocks):
@@ -108,8 +108,17 @@ class BlockParser:  # noqa: D101
 
             self._plugins.append(plugin)
             if command_name:
-                self._commands[plugin] = command_name
+                self._commands[idx] = command_name
+                self.log.debug(
+                    "plugin command added for execution",
+                    commands=self._commands,
+                    command_name=command_name,
+                    plugin_name=parsed_name,
+                )
+
             self.log.debug("found plugin in cli invocation", plugin_name=plugin.name)
+
+        self.log.info("commands", commands=self._commands)
 
     def find_blocks(
         self, offset: int = 0
@@ -143,7 +152,7 @@ class BlockParser:  # noqa: D101
                 yield plugin_command_invoker(
                     self._plugins[cur],
                     self.project,
-                    command=self._commands.get(plugin),
+                    command=self._commands.get(cur),
                 )
                 cur += 1
             else:
