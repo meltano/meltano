@@ -1,14 +1,152 @@
 ---
-title: Data Transformation (T)
-description: Transform your data.
+title: Data Transformation
+description: Transform your data with dbt
 layout: doc
 weight: 5
 ---
 
-Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required
-configuration, models, packages, etc in order to run the transformations. A transform in Meltano is simply a set of dbt models that can be installed as a package. See the [transform plugin docs](/concepts/plugins#transforms) for more details.
+<div class="notification is-info">
+  <p>Using Meltano with Snowflake? Try the new <a href="/guide/transformation#adapter-specific-dbt-transformation-preview">adapter-specific dbt plugin (preview)</a>!</p>
+  <p>If you are interested in an adapter other than Snowflake, continue with <a href="/guide/transformation#dbt-installation-and-configuration-classic"> the classic installation guide </a>.</p>
+  <p>You can also check in on <a href="https://gitlab.com/meltano/meltano/-/issues/3298">#3298</a> where we are tracking progress on adapter-specific Postgres, Redshift, Bigquery and more!</p>
+</div>
 
-## `dbt` (Data Build Tool) Installation and Configuration
+Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations. A transform in Meltano is simply a set of dbt models that can be installed as a package. See the [transform plugin](/concepts/plugins#transforms) docs for more details.
+
+## Adapter-Specific dbt Transformation (Preview)
+
+In alignment with the [dbt documentation](https://docs.getdbt.com/docs/available-adapters), we are working towards supporting adapter-specific installations of `dbt`, starting with `dbt-snowflake`.
+If you are interested in another adapter, all others are currently supported by the [`dbt` transformer](/guide/transformation#dbt-installation-and-configuration-classic).
+You can also check in on [issue #3298](https://gitlab.com/meltano/meltano/-/issues/3298) where we are tracking progress on Postgres, Redshift, Bigquery, and other adapters!
+
+### Install `dbt`
+
+To install an adapter-specific variant of dbt to your project, run:
+
+```bash
+# list available transformer plugins
+meltano discover transformers
+
+# install adapter-specific dbt, e.g. for snowflake
+meltano add transformer dbt-snowflake
+```
+
+After dbt is installed you can configure it using `config` CLI commands, [Meltano environments](/concepts/environments) or environment variables:
+
+```bash
+# list available settings
+meltano config dbt-snowflake list
+
+# set the Snowflake user in the `dev` environment
+meltano --environment=dev config dbt-snowflake set user DEV_USER
+
+# set the Snowflake user in the `prod` environment
+meltano --environment=prod config dbt-snowflake set user PROD_USER
+```
+
+More details on [configuring plugins](/guide/configuration), including with [environment variables](/guide/configuration#environment-variables).
+
+### Running `dbt` in Meltano
+
+There are two ways to run adapter-specific dbt plugins using Meltano; in a pipeline using the [`run`](/reference/command-line-interface#run) command or standalone with arguments using the [`invoke`](/reference/command-line-interface#invoke) command.
+
+#### Running `dbt` as part of a Pipeline
+
+Once you have created your models in dbt, run them as part of a pipeline:
+
+```bash
+# run a complete ELT pipeline using the `dev` environment config
+meltano --environment=dev run tap-gitlab target-snowflake dbt-snowflake:run
+```
+
+To run a subset of your dbt project, define a [plugin command](/concepts/project#plugin-commands) with your desired dbt selection filters:
+
+```yaml
+# meltano.yml
+plugins:
+  transformers:
+    - name: dbt-snowflake
+      commands:
+        my_models:
+          args: run --select +my_model_name
+          description: Run dbt, selecting model `my_model_name` and all upstream models. Read more about the dbt node selection syntax at https://docs.getdbt.com/reference/node-selection/syntax
+```
+
+This can then be executed as follows:
+
+```bash
+meltano --environment=dev run tap-gitlab target-snowflake dbt-snowflake:my_models
+```
+
+#### Invoking `dbt`
+
+Dbt can also be run directly, via the [`invoke`](/reference/command-line-interface#invoke) command:
+
+```bash
+# run your entire dbt project
+meltano invoke dbt-snowflake run
+
+# run with node selection criteria
+meltano invoke dbt-snowflake run --select +my_model_name
+
+# run with a command specified in meltano.yml
+meltano invoke dbt-snowflake:my_models
+```
+
+## Migrating to an Adapter-Specific `dbt` Transformer
+
+If you previously used the `dbt` Transformer, we recommend migrating to an adapter-specific installation as per the `dbt` [available adapters documentation](https://docs.getdbt.com/docs/available-adapters).
+
+#### Install `dbt`
+
+This is easy to do! Following the instructions from above to discover and install your chosen adapter:
+
+```bash
+# list available transformer plugins
+meltano discover transformers
+
+# install adapter-specific dbt, e.g. for snowflake
+meltano add transformer dbt-snowflake
+```
+
+#### Update your `dbt_project.yml`
+
+Installation of a new Transformer will introduce two important files to your `transform/` directory:
+
+- A new `profiles.yml` file in `transform/profiles/<adapter name>/profiles.yml`
+- A new `dbt_project.yml` file in `transform/dbt_project (<adapter name>).yml`
+
+The new `profiles.yml` will only be used by adapter-specific `dbt` executions (e.g. `dbt-snowflake`), and can be customized to meet your requirements.
+Your existing `profiles.yml` will remain in use by your existing `dbt` Transformer plugin (via `elt` and `invoke`).
+
+It is likely that the new `dbt_project (<adapter name>).yml` will contain changes from your previous `dbt_project.yml` file, especially if you haven't already upgraded to [`dbt` v1.0](https://docs.getdbt.com/docs/guides/migration-guide/upgrading-to-v1.0).
+To complete your migration, consolidate `dbt_project.yml` and `dbt_project (<adapter name>).yml` into a single file called `dbt_project.yml`.
+As this project file will be used by both `dbt` and `dbt-<adapter>` Transformer plugins by default, you must ensure you are running an up-to-date installation of plugin `dbt` if you intend to use both adapter-specific and legacy `dbt` installs together (not recommended).
+
+If you make use of [Transform](/guide/transforms) plugins, these will continue to work as regular `dbt` packages. However adding new Transform plugins will currently (tracking at [#3382](https://gitlab.com/meltano/meltano/-/issues/3382)) re-add the legacy `dbt` Transformer plugin.
+To avoid this we recommend adding Transforms as regular packages directly via the dbt CLI as per the [`dbt` Packages documentation](https://docs.getdbt.com/docs/building-a-dbt-project/package-management).
+
+#### Remove the `dbt` Transformer plugin and associated files
+
+To remove the legacy `dbt` Transformer plugin, run:
+
+```bash
+# remove the transformer `dbt`
+meltano remove transformer dbt
+
+# remove the file bundle `dbt`
+meltano remove files dbt
+```
+
+Removing a file bundle _does not_ remove any files from your `transform/` directory.
+Manually remove `transform/profiles.yml` to complete clean-up (as adapter-specific installs come with their own `profiles.yml` in `transform/profiles/<adapter name>/profiles.yml`).
+
+## `dbt` Installation and Configuration (Classic)
+
+<div class="notification is-warning">
+  <p> These instructions are the classic way of installing and running dbt. </p>
+  <p> Users can still install dbt in this manner but we are prioritizing <a href="/guide/transformation#adapter-specific-dbt-transformation-preview">adapter-specific dbt plugin installations for new and existing users</a>.</p>
+</div>
 
 To learn more about the dbt Transformer package, please see the
 [dbt plugin](https://hub.meltano.com/transformers/dbt) documentation on [Meltano Hub](https://hub.meltano.com).
@@ -29,6 +167,53 @@ meltano config dbt set target postgres
 ```
 
 For more details, [pipeline environment variables](/guide/integration#pipeline-environment-variables) and [dbt transform settings](https://hub.meltano.com/transformers/dbt#settings).
+
+## Working with Transform Plugins
+
+<div class="notification is-danger">
+  <p> <b>WARNING</b>: Transform plugins are currently de-prioritized by the Meltano project due to the difficulty of maintaining them at scale.</p>
+  <p>Users can still install and maintain them as they please but many have grown outdated and unmaintained.</p>
+  <p>Some users chose to install the existing transform plugins as a starting point then customize them for their own transformations.</p>
+</div>
+
+`Transform` plugins are dbt packages that reside in their own repositories.
+
+When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml`, and loaded for usage the next time dbt runs.
+
+_**Note:** You do not have to use `transform` plugin packages in order to use dbt. Many teams instead choose to create their own custom transformations._
+
+For more information on how to build your own dbt models or to customize your project directly, see the [dbt docs](https://docs.getdbt.com/).
+
+### Configuring Transform Plugins
+
+Transform plugins may have additional configuration options in `meltano.yml`. For example, the `tap-gitlab` dbt package requires three variables, which are used for
+finding the tables where raw data has been loaded during the Extract-Load phase:
+
+```yml
+{% raw %}
+transforms:
+- name: tap-gitlab
+  pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
+  vars:
+    entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
+    generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
+    region_table: "{{ env_var('PG_SCHEMA') }}.region"
+{% endraw %}
+```
+
+As an alternative to providing values from environment variables, you can also set values directly in `meltano.yml`:
+
+```yml
+transforms:
+  - name: tap-gitlab
+    pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
+    vars:
+      entry_table: "my_raw_schema.entry"
+      generationmix_table: "my_raw_schema.generationmix"
+      region_table: "my_raw_schema.region"
+```
+
+Whenever Meltano runs a new transformation, `transform/dbt_project.yml` is updated using the values provided in `meltano.yml`.
 
 ### Running a Transform in Meltano
 
@@ -92,54 +277,9 @@ For instance your yaml file might look like this:
 
 ```yaml
 packages:
-- git: https://gitlab.com/your_repo/your-dbt-project.git
-  revision: 1.0.0
+  - git: https://gitlab.com/your_repo/your-dbt-project.git
+    revision: 1.0.0
 ```
 
 If you plan to call dbt directly using `invoke` then you have to first run `meltano invoke dbt:deps` to install your package dependencies.
 Using the `--transform=run` option in your pipeline takes care of this step for you automatically.
-
-## Working with Transform Plugins
-
-> **WARNING**: Transform plugins are currently de-prioritized by the Meltano project due to the difficulty of maintaining them at scale.
-Users can still install and maintain them as they please but many have grown outdated and unmaintained.
-Some users chose to install the existing transform plugins as a starting point then customize them for their own transformations.
-
-`Transform` plugins are dbt packages that reside in their own repositories.
-
-When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml`, and loaded for usage the next time dbt runs.
-
-_**Note:** You do not have to use `transform` plugin packages in order to use dbt. Many teams instead choose to create their own custom transformations._
-
-For more information on how to build your own dbt models or to customize your project directly, see the [dbt docs](https://docs.getdbt.com/).
-
-### Configuring Transform Plugins
-
-Transform plugins may have additional configuration options in `meltano.yml`. For example, the `tap-gitlab` dbt package requires three variables, which are used for
-finding the tables where raw data has been loaded during the Extract-Load phase:
-
-```yml
-{% raw %}
-transforms:
-- name: tap-gitlab
-  pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
-  vars:
-    entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
-    generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
-    region_table: "{{ env_var('PG_SCHEMA') }}.region"
-{% endraw %}
-```
-
-As an alternative to providing values from environment variables, you can also set values directly in `meltano.yml`:
-
-```yml
-transforms:
-- name: tap-gitlab
-  pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
-  vars:
-    entry_table: "my_raw_schema.entry"
-    generationmix_table: "my_raw_schema.generationmix"
-    region_table: "my_raw_schema.region"
-```
-
-Whenever Meltano runs a new transformation, `transform/dbt_project.yml` is updated using the values provided in `meltano.yml`.

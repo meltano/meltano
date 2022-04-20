@@ -14,10 +14,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#3373](https://gitlab.com/meltano/meltano/-/issues/3373) Add missing `default_environment` key to the json schema definition for meltano.yml.
+- [#3405](https://gitlab.com/meltano/meltano/-/issues/3405) Add missing `database_uri` key to JSON schema for `meltano.yml`
+- [#3406](https://gitlab.com/meltano/meltano/-/issues/3406) Add missing `plugins/mappers` key to JSON schema for `meltano.yml` and fix `mappings` key in mapper objects.
 
-- [#3324](https://gitlab.com/meltano/meltano/-/issues/3324) Change example git url for custom plugin to generic URL.
 ### Breaks
+
+
+## 1.100.0 - (2022-04-14)
+---
+
+### New
+
+- [#3105](https://gitlab.com/meltano/meltano/-/issues/3105) Add a Snowflake-specific dbt plugin that uses the correspondent adapter.
+
+### Fixes
+
+- [#3373](https://gitlab.com/meltano/meltano/-/issues/3373) Add missing `default_environment` key to the JSON schema for `meltano.yml`.
+- [#3324](https://gitlab.com/meltano/meltano/-/issues/3324) Change example git URL for custom plugin to a generic URL.
 
 ## 1.99.0 - (2022-04-01)
 ---
