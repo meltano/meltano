@@ -664,6 +664,15 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return config
 
+    @property
+    def definition(self) -> PluginDefinition:
+        """Return the plugin definition.
+
+        Returns:
+            The plugin definition.
+        """
+        return self._plugin_def
+
 
 class StandalonePlugin(Canonical):
     """A standalone plugin definition representing a single variant."""
@@ -740,7 +749,7 @@ class StandalonePlugin(Canonical):
             plugin_type=plugin_type,
             name=name,
             namespace=namespace,
-            variant_name=variant.name,
+            variant=variant.name,
             docs=variant.docs,
             repo=variant.repo,
             pip_url=variant.pip_url,

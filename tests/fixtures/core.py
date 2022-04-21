@@ -82,7 +82,7 @@ def discovery():  # noqa: WPS213
                             "description": "Run tests",
                         },
                         "test_extra": {
-                            "args": None,
+                            "args": "test_extra",
                             "description": "Run extra tests",
                             "executable": "test-extra",
                         },
