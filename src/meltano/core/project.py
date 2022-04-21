@@ -160,9 +160,9 @@ class Project(Versioned):  # noqa: WPS214
         """
         return self.meltano.version
 
-    @classmethod  # noqa: WPS231
+    @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Union[Path, str] = None, activate=True):  # noqa: WPS231
+    def find(cls, project_root: Union[Path, str] = None, activate=True):
         """Find a Project.
 
         Args:
@@ -339,72 +339,158 @@ class Project(Versioned):  # noqa: WPS214
 
     @makedirs
     def meltano_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the project `.meltano` directory."""
-        return self.root.joinpath(".meltano", *joinpaths)  # noqa: DAR101,DAR201
+        """Path to the project `.meltano` directory.
+
+        Args:
+            joinpaths: Paths to join to the `.meltano` directory.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `.meltano` dir optionally joined to given paths.
+        """
+        return self.root.joinpath(".meltano", *joinpaths)
 
     @makedirs
     def analyze_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the project `analyze` directory."""
-        return self.root_dir("analyze", *joinpaths)  # noqa: DAR101,DAR201
+        """Path to the project `analyze` directory.
+
+        Args:
+            joinpaths: Paths to join to the `analyze` directory.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `analyze` dir optionally joined to given paths.
+        """
+        return self.root_dir("analyze", *joinpaths)
 
     @makedirs
     def extract_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the project `extract` directory."""
-        return self.root_dir("extract", *joinpaths)  # noqa: DAR101,DAR201
+        """Path to the project `extract` directory.
+
+        Args:
+            joinpaths: Paths to join to the `extract` directory.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `extract` dir optionally joined to given paths.
+        """
+        return self.root_dir("extract", *joinpaths)
 
     @makedirs
     def venvs_dir(self, *prefixes, make_dirs: bool = True):
-        """Path to a `venv` directory in `.meltano`."""
-        return self.meltano_dir(  # noqa: DAR101,DAR201
-            *prefixes, "venv", make_dirs=make_dirs
-        )
+        """Path to a `venv` directory in `.meltano`.
+
+        Args:
+            prefixes: Paths to prepend to the `venv` directory in `.meltano`.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `venv` dir optionally prepended with given prefixes.
+        """
+        return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
 
     @makedirs
     def run_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the `run` directory in `.meltano`."""
-        return self.meltano_dir(  # noqa: DAR101,DAR201
-            "run", *joinpaths, make_dirs=make_dirs
-        )
+        """Path to the `run` directory in `.meltano`.
+
+        Args:
+            joinpaths: Paths to join to the `run` directory in `.meltano`.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `run` dir optionally joined to given paths.
+        """
+        return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def logs_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the `logs` directory in `.meltano`."""
-        return self.meltano_dir(  # noqa: DAR101,DAR201
-            "logs", *joinpaths, make_dirs=make_dirs
-        )
+        """Path to the `logs` directory in `.meltano`.
+
+        Args:
+            joinpaths: Paths to join to the `logs` directory in `.meltano`.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `logs` dir optionally joined to given paths.
+        """
+        return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def job_dir(self, job_id, *joinpaths, make_dirs: bool = True):
-        """Path to the `elt` directory in `.meltano/run`."""
-        return self.run_dir(  # noqa: DAR101,DAR201
+        """Path to the `elt` directory in `.meltano/run`.
+
+        Args:
+            job_id: Job ID of `run` dir.
+            joinpaths: Paths to join to the `elt` directory in `.meltano`.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `elt` dir optionally joined to given paths.
+        """
+        return self.run_dir(
             "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
     def job_logs_dir(self, job_id, *joinpaths, make_dirs: bool = True):
-        """Path to the `elt` directory in `.meltano/logs`."""
-        return self.logs_dir(  # noqa: DAR101,DAR201
+        """Path to the `elt` directory in `.meltano/logs`.
+
+        Args:
+            job_id: Job ID of `logs` dir.
+            joinpaths: Paths to join to the `elt` directory in `.meltano/logs`.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `elt` dir optionally joined to given paths.
+        """
+        return self.logs_dir(
             "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
     def model_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the `models` directory in `.meltano`."""
-        return self.meltano_dir(  # noqa: DAR101,DAR201
-            "models", *joinpaths, make_dirs=make_dirs
-        )
+        """Path to the `models` directory in `.meltano`.
+
+        Args:
+            joinpaths: Paths to join to the `models` directory in `.meltano`.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to `models` dir optionally joined to given paths.
+        """
+        return self.meltano_dir("models", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):
-        """Path to the plugin installation directory in `.meltano`."""
-        return self.meltano_dir(  # noqa: DAR101,DAR201
+        """Path to the plugin installation directory in `.meltano`.
+
+        Args:
+            plugin: Plugin to retrieve or create directory for.
+            joinpaths: Paths to join to the plugin installation directory in `.meltano`.
+            make_dirs: Flag to make directories if not exists.
+
+        Returns:
+            Resolved path to plugin installation dir optionally joined to given paths.
+        """
+        return self.meltano_dir(
             plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
         )
 
-    def __eq__(self, other):  # noqa: D105
-        return (  # noqa: DAR101,DAR201
-            hasattr(other, "root") and self.root == other.root  # noqa: WPS421
-        )
+    def __eq__(self, other):
+        """Project equivalence check.
 
-    def __hash__(self):  # noqa: D105
-        return self.root.__hash__()  # noqa: DAR101,DAR201,WPS609
+        Args:
+            other: The other Project instance to check against.
+
+        Returns:
+            True if Projects are equal.
+        """
+        return hasattr(other, "root") and self.root == other.root  # noqa: WPS421
+
+    def __hash__(self):
+        """Project hash.
+
+        Returns:
+            Project hash.
+        """
+        return self.root.__hash__()  # noqa: WPS609
