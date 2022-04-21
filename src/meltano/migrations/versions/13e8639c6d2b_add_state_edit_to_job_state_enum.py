@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.ext.mutable import MutableDict
 
-from meltano.migrations import IntFlag, JSONEncodedDict
+from meltano.migrations import GUID, IntFlag, JSONEncodedDict
 
 # revision identifiers, used by Alembic.
 revision = "13e8639c6d2b"
@@ -46,6 +46,8 @@ columns = [
     "ended_at",
     "payload",
     "payload_flags",
+    "run_id",
+    "trigger",
     "last_heartbeat_at",
 ]
 get_jobs_query = f"SELECT {', '.join(columns[1:])} FROM job"
@@ -59,6 +61,8 @@ table_args = [
     sa.Column("ended_at", sa.DateTime),
     sa.Column("payload", MutableDict.as_mutable(JSONEncodedDict)),
     sa.Column("payload_flags", IntFlag, default=0),
+    sa.Column("run_id", GUID),
+    sa.Column("trigger", sa.String()),
     sa.Column("last_heartbeat_at", sa.DateTime(), nullable=True),
 ]
 
