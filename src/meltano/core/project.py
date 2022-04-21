@@ -257,6 +257,7 @@ class Project(Versioned):  # noqa: WPS214
             except Exception as err:
                 logger.critical("Could not update meltano.yml: %s", err)  # noqa: WPS323
                 raise
+        # fmt: on
 
     def root_dir(self, *joinpaths):
         """Return the root directory of this project, optionally joined with path.
