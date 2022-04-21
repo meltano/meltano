@@ -10,7 +10,7 @@ weight: 10
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
 ```bash
-# Active your poetry created virtual environment if needed.
+# Activate your poetry created virtual environment if needed.
 # If you manage your virtualenv activation through other means you can omit this command.
 poetry shell
 
