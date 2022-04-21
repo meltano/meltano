@@ -143,7 +143,7 @@ cd path/to/meltano
 MELTANO_VENV=.venv tmuxinator local
 ```
 
-# Resources
+## Resources
 
 - [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)
 - [Managing environments with poetry](https://python-poetry.org/docs/managing-environments/)
