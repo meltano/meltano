@@ -1,5 +1,5 @@
 ---
-title: Data Integration
+title: Data Integration (EL)
 description: Learn how to extract and load data using Meltano and Singer taps and targets
 layout: doc
 weight: 4
@@ -109,7 +109,6 @@ Additionally, the following variables describing the [transform](/concepts/plugi
 Inside your loader or transformer's `config` object in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference them through `os.environ` as usual (assuming you're using Python).
 
 This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
-
 - Default value for the `target-postgres` and `target-snowflake` `schema` settings:
   - [`$MELTANO_EXTRACT__LOAD_SCHEMA`](/concepts/plugins#load-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
 - Default value for `dbt`'s `target` setting:
@@ -134,7 +133,7 @@ To save you a headache, Meltano can handle catalog generation for you, by lettin
 [entity selection](#selecting-entities-and-attributes-for-extraction), [metadata](#setting-metadata), and [schema](#overriding-schemas) rules that can be configured like any other setting,
 and are applied to the discovered catalog on the fly when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
-If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano elt`](/reference/command-line-interface#elt).
+If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano elt`](/reference/command-line-interface#elt).
 
 Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--catalog` option or the [`catalog` extractor extra](/concepts/plugins#catalog-extra).
 
@@ -147,7 +146,7 @@ To save on bandwidth and storage, it's usually a good idea to instruct your extr
 
 Meltano makes it easy to select specific entities and attributes for inclusion or exclusion using [`meltano select`](/reference/command-line-interface#select)
 and the [`select` extractor extra](/concepts/plugins#select-extra),
-which let you specify inclusion and exclusion rules that can contain [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) to match multiple entities and/or attributes at once.
+which let you specify inclusion and exclusion rules that can contain [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) to match multiple entities and/or attributes at once.
 
 Note that exclusion takes precedence over inclusion: if an entity or attribute is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) first.
 
@@ -166,7 +165,7 @@ which can be treated like a `_metadata` setting with
 
 Similarly, a [`schema` extractor extra](/concepts/plugins#schema-extra) is available that lets you easily override
 [Singer stream schema](https://hub.meltano.com/singer/spec#schemas) descriptions.
-Here too, [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used to match multiple entities and/or attributes at once.
+Here too, [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used to match multiple entities and/or attributes at once.
 
 ## Replication methods
 
@@ -227,7 +226,9 @@ When `meltano elt` is run a subsequent time, it will look for the most recent co
 
 Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
 
-If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
+If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
+
+If you know the `job_id` of the relevant job, you can also manually view and edit state using [the `meltano state` CLI command](/reference/command-line-interface#state).
 
 <div class="notification is-info">
   <p><strong>Not seeing state picked up after a failed run?</strong></p>

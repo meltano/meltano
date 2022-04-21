@@ -343,6 +343,16 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
 
         self.track_event(category="meltano select", action=action, debug=debug)
 
+    def track_meltano_state(self, subcommand: str, job_id: str):
+        """Track the management of Singer State.
+
+        Args:
+            subcommand: The subcommand being run (e.g. 'set' or 'clear')
+            job_id: The job_id for which state is being managed
+        """
+        action = f"meltano state {subcommand} {job_id}"
+        self.track_event(category="meltano state", action=action)
+
     def track_meltano_ui(self, debug: bool = False) -> None:
         """Track the UI start-up.
 
