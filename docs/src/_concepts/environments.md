@@ -5,7 +5,7 @@ layout: doc
 weight: 3
 ---
 
-As part of Meltano's vision to enable data teams to operate with best practices, __Environments__ allows
+As part of Meltano's vision to enable data teams to operate with best practices, **Environments** allows
 you to define custom layers of configuration within your project. That way, You can run the same commands against multiple environments,
 by passing a single environment variable or CLI option.
 
@@ -16,36 +16,36 @@ A set of environment definitions looks like this within `meltano.yml`:
 
 ```yaml
 environments:
-- name: prod
-  config:
-    plugins:
-      extractors:
-      - name: tap-github
-        config:
-          organizations: [Meltano]
-        select: ["*.*"]
-      loaders:
-      - name: target-snowflake
-        config:
-          dbname: prod
-          warehouse: prod_wh
-          batch_size_rows: 100000
-  env:
-    SOME_PROD_ONLY_SETTING: abc
-- name: dev
-  config:
-    plugins:
-      extractors:
-      - name: tap-github
-        config:
-          organizations: [MeltanoLabs]
-        select: ["repositories.*"]
-      loaders:
-      - name: target-snowflake
-        config:
-          dbname: dev
-          warehouse: dev_wh
-          batch_size_rows: 1000
+  - name: prod
+    config:
+      plugins:
+        extractors:
+          - name: tap-github
+            config:
+              organizations: [Meltano]
+            select: ["*.*"]
+        loaders:
+          - name: target-snowflake
+            config:
+              dbname: prod
+              warehouse: prod_wh
+              batch_size_rows: 100000
+    env:
+      SOME_PROD_ONLY_SETTING: abc
+  - name: dev
+    config:
+      plugins:
+        extractors:
+          - name: tap-github
+            config:
+              organizations: [MeltanoLabs]
+            select: ["repositories.*"]
+        loaders:
+          - name: target-snowflake
+            config:
+              dbname: dev
+              warehouse: dev_wh
+              batch_size_rows: 1000
 ```
 
 <div class="notification is-info">
@@ -72,6 +72,9 @@ meltano --environment=dev elt tap-github target-sqlite
 export MELTANO_ENVIRONMENT=dev
 meltano elt tap-github target-sqlite
 ```
+
+Once activated, Plugins and other processes invoked by Meltano can access the current environment via the `MELTANO_ENVIRONMENT` environment variable available in every Plugins execution environment.
+If no environment is active, the `MELTANO_ENVIRONMENT` is populated with an empty string.
 
 ### Default Environments
 
