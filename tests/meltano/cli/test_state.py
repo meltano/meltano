@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from unittest import mock
 
 import pytest
@@ -21,14 +22,14 @@ conventional_job_ids = ["dev:tap-mock-to-target-mock", "staging:mock-to-mock"]
 
 
 class TestCliState:
-    @pytest.mark.parametrize("job_id", unconventional_job_ids)
-    def test_state_service_from_job_id_returns_none_non_convention(  # noqa: WPS118
+    @pytest.mark.parametrize("job_id", unconventional_job_ids)  # noqa: WPS118
+    def test_state_service_from_job_id_returns_none_non_convention(
         self, project, job_id
     ):
         assert state.state_service_from_job_id(project, job_id) is None
 
-    @pytest.mark.parametrize("job_id", conventional_job_ids)
-    def test_state_service_from_job_id_returns_state_service_convention(  # noqa: WPS118
+    @pytest.mark.parametrize("job_id", conventional_job_ids)  # noqa: WPS118
+    def test_state_service_from_job_id_returns_state_service_convention(
         self, project, job_id
     ):
         with mock.patch(
@@ -36,9 +37,11 @@ class TestCliState:
             autospec=True,
         ) as mock_block_parser:
             state.state_service_from_job_id(project, job_id)
-            assert (
-                job_id.split(":")[1].split("-to-") in mock_block_parser.call_args.args
-            )
+            args = job_id.split(":")[1].split("-to-")
+            if sys.version_info >= (3, 8):
+                assert args in mock_block_parser.call_args.args
+            else:
+                assert args in mock_block_parser.call_args[0]
 
     @staticmethod
     def get_result_set(result):
