@@ -379,6 +379,66 @@ class TestCliRunScratchpadOne:
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
+    def test_run_multiple_commands(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        dbt,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+        # Verify that requesting the same command plugin multiple time with different args works
+        invoke_async = CoroutineMock(
+            side_effect=(
+                dbt_process,
+                dbt_process,
+            )
+        )
+        args = ["run", "dbt:test", "dbt:run"]
+        with mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ), mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert (
+                matcher.find_by_event("found plugin in cli invocation")[0].get(
+                    "plugin_name"
+                )
+                == "dbt"
+            )
+
+            command_add_events = matcher.find_by_event(
+                "plugin command added for execution"
+            )
+
+            assert len(command_add_events) == 2
+            assert invoke_async.call_count == 2
+
+            assert command_add_events[0].get("command_name") == "test"
+            assert invoke_async.mock_calls[0][2]["command"] == "test"
+
+            assert command_add_events[1].get("command_name") == "run"
+            assert invoke_async.mock_calls[1][2]["command"] == "run"
+
+            assert matcher.find_by_event("Block run completed.")[0].get("success")
+            assert matcher.find_by_event("Block run completed.")[1].get("success")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
     def test_run_complex_invocations(
         self,
         google_tracker,

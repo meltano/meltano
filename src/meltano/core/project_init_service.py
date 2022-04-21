@@ -53,13 +53,19 @@ class ProjectInitService:
 
         self.create_files(add_discovery=add_discovery)
         self.set_send_anonymous_usage_stats()
-
         if activate:
             Project.activate(self.project)
 
         self.create_system_database()
 
         return self.project
+
+    def create_dot_meltano_dir(self):
+        """Create .meltano directory."""
+        # explicitly create the .meltano directory if it doesn't exist
+        os.makedirs(self.project.meltano_dir(), exist_ok=True)
+        click.secho("   |--", fg="blue", nl=False)
+        click.echo(f" {self.project.meltano_dir().name}")
 
     def create_files(self, add_discovery=False):
         """Create project files.
@@ -68,9 +74,11 @@ class ProjectInitService:
             add_discovery: Add discovery.yml file to created project
         """
         click.secho("Creating project files...", fg="blue")
+        click.echo(f"  {self.project_name}/")
+
+        self.create_dot_meltano_dir()
 
         plugin = MeltanoFilePlugin(discovery=add_discovery)
-        click.echo(f"  {self.project_name}/")
         for path in plugin.create_files(self.project):
             click.secho("   |--", fg="blue", nl=False)
             click.echo(f" {path}")
