@@ -5,7 +5,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
     DbRemoveManager,
     InstallationRemoveManager,
-    LockedDefinitionRemoveManager,
     MeltanoYmlRemoveManager,
     PluginLocationRemoveStatus,
 )
@@ -85,7 +84,6 @@ class PluginRemoveService:
             DbRemoveManager(plugin, self.project),
             MeltanoYmlRemoveManager(plugin, self.project),
             InstallationRemoveManager(plugin, self.project),
-            LockedDefinitionRemoveManager(plugin, self.project),
         )
 
         for manager in remove_managers:
