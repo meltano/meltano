@@ -12,7 +12,7 @@ This section of the guide provides guidance on how to work with the Meltano API,
 After all of your dependencies installed, we recommend opening a new window/tab in your terminal so you can run the following commands:
 
 ```bash
-# Active your poetry created virtual environment if needed.
+# Activate your poetry created virtual environment if needed.
 # If you manage your virtualenv activation through other means you can omit this command.
 poetry shell
 
