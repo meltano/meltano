@@ -399,7 +399,6 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
             The parent plugin or None if the plugin has no parent.
 
         Raises:
-            err: If the plugin was not found in the available sources.
             PluginParentNotFoundError: If the plugin has a parent but it can not be found.
         """
         if plugin.inherit_from and not plugin.is_variant_set:
@@ -407,26 +406,16 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
                 return self.find_plugin(
                     plugin_type=plugin.type, plugin_name=plugin.inherit_from
                 )
-            except PluginNotFoundError as not_found_err:
-                err = not_found_err
-
-        try:
-            return self.locked_definition_service.get_base_plugin(
-                plugin,
-                variant_name=plugin.variant,
-            )
-        except PluginNotFoundError as lock_not_found_error:
-            err = lock_not_found_error
+            except PluginNotFoundError:
+                pass
 
         try:
             return self.discovery_service.get_base_plugin(plugin)
-        except PluginNotFoundError as discovery_err:
-            err = discovery_err
+        except PluginNotFoundError as err:
+            if plugin.inherit_from:
+                raise PluginParentNotFoundError(plugin, err) from err
 
-        if plugin.inherit_from:
-            raise PluginParentNotFoundError(plugin, err)
-
-        raise err
+            raise
 
     def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Ensure that plugin has a parent set.
