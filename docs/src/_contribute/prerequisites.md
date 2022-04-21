@@ -33,14 +33,23 @@ poetry run pre-commit install --install-hooks
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
+
+# Obtain a shell in the poetry created virtual environment
+poetry shell
 ```
 
-Meltano is now installed and available at `meltano`, as long as you remain in your virtual environment defined by poetry!
-If you're using VSCode to manage the terminal, you can update the interpreter to always use poetry so all meltano commands work as you expect. 
+Meltano is now installed and available at `meltano`, as long as you remain in your virtual environment that you access
+via `poetry shell`! Most editor's like [VSCode](https://code.visualstudio.com/) or [PyCharm](https://www.jetbrains.com/pycharm/)
+can also be configured to detect and make use of virtualenv's, or even be configured to use poetry directly. That allows
+meltano commands to work as you expect in editor based terminals, and is also typically required to enable advanced
+editors features (debugging, code hints, etc).
 
-You can also run meltano by prefixing all commands with `poetry run meltano...` if you're running outside of the poetry-defined virtual environment. 
+You can also run meltano outside of an activated virtualenv by prefixing all commands with `poetry run` , e.g.
+`poetry run meltano...`.
 
-
+Note that for users who are using pyenv with the [virtualenv plugin](https://github.com/pyenv/pyenv-virtualenv) you will
+likely not need to prefix the commands with `poetry` as poetry will default to using the pyenv activated virtual
+environment.
 
 This means that you're ready to start Meltano CLI development. For API and UI development, read on.
 
@@ -134,8 +143,12 @@ cd path/to/meltano
 MELTANO_VENV=.venv tmuxinator local
 ```
 
-### Resources
+## Resources
 
+- [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)
+- [Managing environments with poetry](https://python-poetry.org/docs/managing-environments/)
 - [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
+
+
 
 [Accepting Merge Requests]: https://gitlab.com/groups/meltano/-/issues?label_name[]=Accepting%20Merge%20Requests
