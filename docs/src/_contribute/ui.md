@@ -10,6 +10,10 @@ weight: 10
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
 ```bash
+# Active your poetry created virtual environment if needed.
+# If you manage your virtualenv activation through other means you can omit this command.
+poetry shell
+
 # Create a new Meltano project
 meltano init $PROJECT_NAME
 
@@ -31,7 +35,7 @@ yarn serve
 
 The development build of the Meltano UI will now be available at <http://localhost:8080/>.
 
-A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/contribute/api) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000. 
+A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/contribute/api) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000.
 
 
 <div class="notification is-warning">
