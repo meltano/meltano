@@ -42,7 +42,9 @@ def _prompt_for_confirmation(prompt):
     """Wrap destructive CLI commands which should prompt the user for confirmation."""
 
     def wrapper(func):
-        fun = click.option("--force", is_flag=True)(func)
+        fun = click.option(
+            "--force", is_flag=True, help="Don't prompt for confirmation."
+        )(func)
 
         @wraps(func)
         def _wrapper(force=False, *args, **kwargs):
@@ -143,7 +145,7 @@ def merge_state(
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    mutually_exclusive_options = ["--input-file", "--state", "--from-job-id"]
+    mutually_exclusive_options = ["--input-file", "STATE", "--from-job-id"]
     if not reduce(xor, map(bool, [state, input_file, from_job_id])):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     elif input_file:
@@ -178,16 +180,13 @@ def set_state(
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-
-    if input_file and state:
+    if not reduce(xor, map(bool, [state, input_file])):
         raise MutuallyExclusiveOptionsError("--input-file", "STATE")
     elif input_file:
         with open(input_file) as state_f:
             state_service.set_state(job_id, state_f.read())
     elif state:
         state_service.set_state(job_id, state)
-    else:
-        raise MutuallyExclusiveOptionsError("--input-file", "--state")
 
 
 @meltano_state.command(name="get")
