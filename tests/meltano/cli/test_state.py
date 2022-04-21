@@ -22,14 +22,14 @@ conventional_job_ids = ["dev:tap-mock-to-target-mock", "staging:mock-to-mock"]
 
 
 class TestCliState:
-    @pytest.mark.parametrize("job_id", unconventional_job_ids)  # noqa: WPS118
-    def test_state_service_from_job_id_returns_none_non_convention(
+    @pytest.mark.parametrize("job_id", unconventional_job_ids)
+    def test_state_service_from_job_id_returns_none_non_convention(  # noqa: WPS118
         self, project, job_id
     ):
         assert state.state_service_from_job_id(project, job_id) is None
 
-    @pytest.mark.parametrize("job_id", conventional_job_ids)  # noqa: WPS118
-    def test_state_service_from_job_id_returns_state_service_convention(
+    @pytest.mark.parametrize("job_id", conventional_job_ids)
+    def test_state_service_from_job_id_returns_state_service_convention(  # noqa: WPS118
         self, project, job_id
     ):
         with mock.patch(
