@@ -844,6 +844,178 @@ meltano select --exclude tap-carbon-intensity '*' 'latitude'
 
 This will exclude all `longitude` and `latitude` attributes.
 
+## `state`
+
+Manage Singer State for jobs via the CLI.
+
+For more information about how Meltano uses incremental replication state, see [the data integration guide](/guide/integration#incremental-replication-state).
+
+### clear
+
+Clear the state for a given `job_id`.
+Prompts for confirmation.
+
+#### How to use
+
+```bash
+meltano state clear [--force] <job_id>
+```
+
+#### Parameters
+
+- The `--force` option will disable confirmation prompts. _Use with caution._
+
+#### Examples
+
+```bash
+# Clear state. Meltano will prompt for confirmation.
+meltano state clear dev:tap-gitlab-to-target-jsonl
+
+# Clear state, overriding confirmation prompt.
+meltano state clear --force dev:tap-gitlab-to-target-jsonl
+```
+
+### get
+
+Retrieve state for a given `job_id`.
+
+#### How to use
+
+```bash
+meltano state get <job_id>
+```
+
+#### Examples
+
+```bash
+# Print the state that would be used in the next run of dev:tap-gitlab-to-target-jsonl
+meltano state get dev:tap-gitlab-to-target-jsonl
+```
+
+### list
+
+List all `job_ids` found in the system database.
+
+#### How to use
+
+```bash
+meltano state list [--pattern PATTERN]
+```
+
+#### Parameters
+
+- The `--pattern` option allows filtering returned job IDs by using `*` as a wildcard.
+
+<div class="notification is-info">
+  <p><code>*</code> is subject to auto-expansion in most shells: you must escape the <code>*</code> by quoting the pattern.</p>
+</div>
+
+#### Examples
+
+```bash
+# List all job IDs
+meltano state list
+
+# List only those job IDs that start with "dev:"
+meltano state list --pattern 'dev:*'
+
+# List only those job IDs that contain "tap-gitlab"
+meltano state list --pattern '*tap-gitlab*'
+```
+
+### merge
+
+Merge new state onto existing state for a job ID.
+
+<div class="notification is-info">
+	<p><strong>Not seeing merged state in the system database?</strong></p>
+	<p>Merged state is computed at <em>execution</em> time.
+	The <code>merge</code> command merely
+	adds a new <code>payload</code> to the database which is merged together with
+	existing payloads the next time state is read via <code>meltano elt</code>, <code>meltano run</code>, or <code>meltano state get</code>.
+	</p>
+</div>
+
+#### How to use
+
+```bash
+# Read state from a file
+meltano state merge  <job_id> --input-file <file>
+
+# Read state from a command-line argument
+meltano state merge <job_id> <RAW STATE JSON>
+
+# Merge state from one job into another
+meltano state merge <job_id> --from-job-id <src_job_id>
+```
+
+#### Parameters
+
+- The `--input-file` option specifies a file to read the state from.
+- The `--from-job-id` option specifies an existing job ID to read the state from.
+
+State must be provided in exactly one of these ways: via `--input-file`, via `--from-job-id`, or via a command line argument.
+
+#### Examples
+
+```bash
+# Provide state via a command-line argument.
+# The argument must be valid JSON with a top-level key of "singer_state"
+# Only the "project_123456_issues" key will be overwritten. Any other bookmarks will remain untouched.
+meltano state merge dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_123456_issues": "2020-01-01"}}'
+
+# Provide state via a file.
+# The file must contain valid JSON with a top-level key of "singer_state"
+# These two lines have the same effect as the one line above.
+echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
+meltano state merge  --input-file gitlab_state.json dev:tap-gitlab-to-target-jsonl
+
+# Provide state via an existing job.
+meltano state merge --from-job-id prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
+```
+
+### set
+
+Set state for a job.
+
+#### How to use
+
+```bash
+# Read state from a file
+# Meltano will prompt for confirmation.
+meltano state set <job_id> --input-file <file>
+
+# Read state from a file, overriding confirmation prompt.
+meltano state set --force <job_id> --input-file <file>
+
+# Read state from a command-line argument
+# Meltano will prompt for confirmation.
+meltano state set <job_id> <RAW STATE JSON>
+
+# Read state from a command-line argument, overriding confirmation prompt.
+meltano state set --force <job_id> <RAW STATE JSON>
+```
+
+#### Parameters
+
+- The `--input-file` option specifies a file to read the state from.
+- The `--force` option will disable confirmation prompts. _Use with caution._
+
+#### Examples
+
+```bash
+# Provide state via a command-line argument, overriding confirmation prompt.
+# The argument must be valid JSON with a top-level key of "singer_state"
+# ALL state will be overwritten. Only the "project_123456_issues" bookmark will be used in subsequent runs.
+meltano state set --force dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_123456_issues": "2020-01-01"}}'
+
+# Provide state via a file, overriding confirmation prompt.
+# The file must contain valid JSON with a top-level key of "singer_state"
+# These two lines have the same effect as the one line above.
+echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
+meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
+```
+
 ## `test`
 
 Run tests for one or more plugins. A test is any [command](/reference/command-line-interface#commands) with a name starting with `test`.
@@ -962,161 +1134,4 @@ It is used to check which version of Meltano currently installed.
 
 ```bash
 meltano --version
-```
-
-## `state`
-
-Manage [Singer state](/guide/integration#incremental-replication-state) for jobs via the CLI.
-
-### clear
-
-Clear the state for a given `job_id`.
-Prompts for confirmation.
-
-#### How to use
-
-```bash
-meltano state clear [--force] <job_id>
-```
-
-#### Parameters
-
-- The `--force` option will disable confirmation prompts. _Use with caution._
-
-#### Examples
-
-```bash
-# Clear state. Meltano will prompt for confirmation.
-meltano state clear dev:tap-gitlab-to-target-jsonl
-
-# Clear state, overriding confirmation prompt.
-meltano state clear --force dev:tap-gitlab-to-target-jsonl
-```
-
-### get
-
-Retrieve state for a given `job_id`.
-
-#### How to use
-
-```bash
-meltano state get <job_id>
-```
-
-#### Examples
-
-```bash
-# Print the state that would be used in the next run of dev:tap-gitlab-to-target-jsonl
-meltano state get dev:tap-gitlab-to-target-jsonl
-```
-
-### list
-
-List all `job_ids` found in the system database.
-
-#### How to use
-
-```bash
-meltano state list [--pattern PATTERN]
-```
-
-#### Parameters
-
-- The `--pattern` option allows filtering returned job IDs by using `*` as a wildcard.
-
-#### Examples
-
-```bash
-# List all job IDs
-meltano state list
-
-# List only those job IDs that start with "dev:"
-meltano state list --pattern 'dev:*'
-
-# List only those job IDs that contain "tap-gitlab"
-meltano state list --pattern '*tap-gitlab*'
-```
-
-### merge
-
-Merge new state onto existing state for a job ID.
-
-#### How to use
-
-```bash
-# Read state from a file
-meltano state merge --input-file <file> <job_id>
-
-# Read state from a command-line argument
-meltano state merge <job_id> <RAW STATE JSON>
-
-# Merge state from one job into another
-meltano state merge --from-job-id <src_job_id> <job_id>
-```
-
-#### Parameters
-
-- The `--input-file` option specifies a file to read the state from.
-- The `--from-job-id` option specifies an existing job ID to read the state from.
-
-State must be provided in exactly one of these ways: via `--input-file`, via `--from-job-id`, or via a command line argument.
-
-#### Examples
-
-```bash
-# Provide state via a command-line argument.
-# The argument must be valid JSON with a top-level key of "singer_state"
-# Only the "project_123456_issues" key will be overwritten. Any other bookmarks will remain untouched.
-meltano state merge dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_123456_issues": "2020-01-01"}}'
-
-# Provide state via a file.
-# The file must contain valid JSON with a top-level key of "singer_state"
-# These two lines have the same effect as the one line above.
-echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
-meltano state merge  --input-file gitlab_state.json dev:tap-gitlab-to-target-jsonl
-
-# Provide state via an existing job.
-meltano state merge --from-job-id prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
-```
-
-### set
-
-Set state for a job.
-
-#### How to use
-
-```bash
-# Read state from a file
-# Meltano will prompt for confirmation.
-meltano state set --input-file <file> <job_id>
-
-# Read state from a file, overriding confirmation prompt.
-meltano state set --force --input-file <file> <job_id>
-
-# Read state from a command-line argument
-# Meltano will prompt for confirmation.
-meltano state set <job_id> <RAW STATE JSON>
-
-# Read state from a command-line argument, overriding confirmation prompt.
-meltano state set --force <job_id> <RAW STATE JSON>
-```
-
-#### Parameters
-
-- The `--input-file` option specifies a file to read the state from.
-- The `--force` option will disable confirmation prompts. _Use with caution._
-
-#### Examples
-
-```bash
-# Provide state via a command-line argument, overriding confirmation prompt.
-# The argument must be valid JSON with a top-level key of "singer_state"
-# ALL state will be overwritten. Only the "project_123456_issues" bookmark will be used in subsequent runs.
-meltano state set --force dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_123456_issues": "2020-01-01"}}'
-
-# Provide state via a file, overriding confirmation prompt.
-# The file must contain valid JSON with a top-level key of "singer_state"
-# These two lines have the same effect as the one line above.
-echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
-meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
 ```

@@ -109,6 +109,7 @@ Additionally, the following variables describing the [transform](/concepts/plugi
 Inside your loader or transformer's `config` object in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), you can reference these (and other) environment variables as `$VAR` (as a single word) or `${VAR}` (inside a word). Inside your plugin, you can reference them through `os.environ` as usual (assuming you're using Python).
 
 This feature is used to dynamically configure the `target-postgres` and `target-snowflake` loaders and `dbt` transformer as appropriate, independent of the specific extractor and loader used:
+
 - Default value for the `target-postgres` and `target-snowflake` `schema` settings:
   - [`$MELTANO_EXTRACT__LOAD_SCHEMA`](/concepts/plugins#load-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
 - Default value for `dbt`'s `target` setting:
@@ -133,7 +134,7 @@ To save you a headache, Meltano can handle catalog generation for you, by lettin
 [entity selection](#selecting-entities-and-attributes-for-extraction), [metadata](#setting-metadata), and [schema](#overriding-schemas) rules that can be configured like any other setting,
 and are applied to the discovered catalog on the fly when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
-If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano elt`](/reference/command-line-interface#elt).
+If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano elt`](/reference/command-line-interface#elt).
 
 Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--catalog` option or the [`catalog` extractor extra](/concepts/plugins#catalog-extra).
 
@@ -146,7 +147,7 @@ To save on bandwidth and storage, it's usually a good idea to instruct your extr
 
 Meltano makes it easy to select specific entities and attributes for inclusion or exclusion using [`meltano select`](/reference/command-line-interface#select)
 and the [`select` extractor extra](/concepts/plugins#select-extra),
-which let you specify inclusion and exclusion rules that can contain [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) to match multiple entities and/or attributes at once.
+which let you specify inclusion and exclusion rules that can contain [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) to match multiple entities and/or attributes at once.
 
 Note that exclusion takes precedence over inclusion: if an entity or attribute is matched by an exclusion pattern, there is no way to get it back using an inclusion pattern unless the exclusion pattern is manually removed from your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) first.
 
@@ -165,7 +166,7 @@ which can be treated like a `_metadata` setting with
 
 Similarly, a [`schema` extractor extra](/concepts/plugins#schema-extra) is available that lets you easily override
 [Singer stream schema](https://hub.meltano.com/singer/spec#schemas) descriptions.
-Here too, [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used to match multiple entities and/or attributes at once.
+Here too, [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used to match multiple entities and/or attributes at once.
 
 ## Replication methods
 
@@ -222,11 +223,21 @@ Loaders (Singer targets) take in data and state messages from extractors and are
 
 Meltano stores this pipeline state in its [system database](/concepts/project#system-database), identified by the [`meltano elt`](/reference/command-line-interface#elt) run's Job ID defined with the `--job_id` argument. The Job ID should be a unique string identifier for the pipeline and must be present in each execution in order for incremental replication to work.
 
-When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same Job ID that generated a state. If a successful pipeline run is found, its state is then passed along to the extractor. If one or more failed (incomplete) pipelines are found, their returned partial state is merged with the last successful pipeline run, to produce an up-to-date STATE artifact from the incomplete pipeline runs, before being passed along to the extractor. This works as Singer Targets are expected to emit [STATE messages](https://hub.meltano.com/singer/spec#state-files) [only after persisting data for a given stream](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md).
+### Internal State Merge Logic
+
+When running Extract and Load jobs via elt or run, Meltano will look for the most recent completed pipeline run with the same Job ID that generated a state.
+If a completed pipeline state record is found, its data is then passed along to the extractor.
+If one or more partial state records are found, the partial data is merged with the last completed state, to produce an up-to-date STATE artifact which will be passed along to the extractor.
+The same merge behavior is performed whenever a user runs meltano state get, returning the merged result of the latest completed state plus any partial state records, if they exist.
+This works as Singer Targets are expected to emit [STATE messages](https://hub.meltano.com/singer/spec#state-files) [only after persisting data for a given stream](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md).
+
+Partial state records are generated when extractors fail before completion, for instance if a meltano elt operation finishes four out of five streams and is aborted before the fifth stream completes.
+Partial state records can also be inserted manually via meltano state merge.
+Unlike meltano state merge, which inserts a partial record, meltano state set will insert a new "completed" record, which causes meltano to ignore any previous state records, whether completed or partial.
 
 Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
 
-If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
+If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
 
 If you know the `job_id` of the relevant job, you can also manually view and edit state using [the `meltano state` CLI command](/reference/command-line-interface#state).
 
