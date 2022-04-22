@@ -121,7 +121,7 @@ def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
             else:
                 click.secho(job_id, fg="yellow")
     else:
-        click.secho("No job IDs found.", fg="yellow")
+        logger.info("No job IDs found.")
 
 
 @meltano_state.command(name="merge")

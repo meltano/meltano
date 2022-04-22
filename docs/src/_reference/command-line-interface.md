@@ -907,7 +907,7 @@ meltano state list [--pattern PATTERN]
 - The `--pattern` option allows filtering returned job IDs by using `*` as a wildcard.
 
 <div class="notification is-info">
-  <p><code>*</code> is subject to auto-expansion in most shells: you must escape the <code>*</code> by quoting the pattern.</p>
+  <p>"<samp>*</samp>" is subject to auto-expansion in most shells: you must escape the " <samp>*</samp>" by quoting the pattern.</p>
 </div>
 
 #### Examples
@@ -930,9 +930,9 @@ Merge new state onto existing state for a job ID.
 <div class="notification is-info">
 	<p><strong>Not seeing merged state in the system database?</strong></p>
 	<p>Merged state is computed at <em>execution</em> time.
-	The <code>merge</code> command merely
-	adds a new <code>payload</code> to the database which is merged together with
-	existing payloads the next time state is read via <code>meltano elt</code>, <code>meltano run</code>, or <code>meltano state get</code>.
+	The <samp>merge</samp> command merely
+	adds a new <samp>payload</samp> to the database which is merged together with
+	existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
 	</p>
 </div>
 

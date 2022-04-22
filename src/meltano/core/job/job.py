@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 from async_generator import asynccontextmanager
-from sqlalchemy import Column, types
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import Column, literal, types
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.core.error import Error
@@ -55,6 +55,21 @@ class State(Enum):
         return self.name
 
 
+class StateComparator(Comparator):
+    """Compare Job._state to State enums."""
+
+    def __eq__(self, other):
+        """Enable SQLAlchemy to directly compare Job.state values with State.
+
+        Args:
+            other: the State enum to compare to
+
+        Returns:
+            Comparison between __clause_element__ and SQLAlchemy literal for State name
+        """
+        return self.__clause_element__() == literal(other.name)
+
+
 def current_trigger():
     """Get the trigger for running job.
 
@@ -93,7 +108,7 @@ class Job(SystemModel):  # noqa: WPS214
         Args:
             kwargs: keyword args to override defaults and pass to super
         """
-        kwargs["_state"] = str(kwargs.pop("state", State.IDLE))
+        kwargs["_state"] = kwargs.pop("state", State.IDLE).name
         kwargs["payload"] = kwargs.get("payload", {})
         kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
         super().__init__(**kwargs)
@@ -105,8 +120,7 @@ class Job(SystemModel):  # noqa: WPS214
         Returns:
             State enum matching string value for this job state
         """
-        if self._state:
-            return State[self._state]
+        return State[self._state]
 
     @state.setter  # noqa: WPS440
     def state(self, value):
@@ -116,6 +130,18 @@ class Job(SystemModel):  # noqa: WPS214
             value: the State enum to use.
         """
         self._state = str(value)
+
+    @state.comparator  # noqa: WPS440
+    def state(cls):  # noqa: N805
+        """Use this comparison to compare Job.state to State.
+
+        See:
+            https://docs.sqlalchemy.org/en/14/orm/extensions/hybrid.html#building-custom-comparators
+
+        Returns:
+            Result of comparison
+        """
+        return StateComparator(cls._state)
 
     def is_running(self):
         """Return whether Job is running.
