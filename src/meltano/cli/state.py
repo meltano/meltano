@@ -109,17 +109,19 @@ def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
     """List all job_ids for this project."""
     state_service = ctx.obj[STATE_SERVICE_KEY]
     states = state_service.list_state(pattern)
-
-    for job_id, state in states.items():
-        if state:
-            try:
-                state_service.validate_state(json.dumps(state))
-            except (InvalidJobStateError, json.decoder.JSONDecodeError):
-                click.secho(job_id, fg="red")
+    if states:
+        for job_id, state in states.items():
+            if state:
+                try:
+                    state_service.validate_state(json.dumps(state))
+                except (InvalidJobStateError, json.decoder.JSONDecodeError):
+                    click.secho(job_id, fg="red")
+                else:
+                    click.secho(job_id, fg="green")
             else:
-                click.secho(job_id, fg="green")
-        else:
-            click.secho(job_id, fg="yellow")
+                click.secho(job_id, fg="yellow")
+    else:
+        click.secho("No job IDs found.", fg="yellow")
 
 
 @meltano_state.command(name="merge")
@@ -189,7 +191,7 @@ def set_state(
         state_service.set_state(job_id, state)
 
 
-@meltano_state.command(name="get")
+@meltano_state.command(name="get")  # noqa: WPS46
 @click.argument("job_id")
 @pass_project(migrate=True)
 @click.pass_context

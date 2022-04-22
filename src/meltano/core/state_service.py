@@ -108,6 +108,9 @@ class StateService:
         job_to_add_to.payload = json.loads(new_state)
         job_to_add_to.payload_flags = payload_flags
         job_to_add_to.save(self.session)
+        logger.debug(
+            f"Added to job {job_to_add_to.job_id} state payload {new_state_dict}"
+        )
 
     def get_state(self, job_id: str) -> Dict:
         """Get state for job with the given job_id.

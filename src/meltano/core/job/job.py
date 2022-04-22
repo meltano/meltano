@@ -9,6 +9,7 @@ from enum import Enum
 
 from async_generator import asynccontextmanager
 from sqlalchemy import Column, types
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.core.error import Error
@@ -78,7 +79,7 @@ class Job(SystemModel):  # noqa: WPS214
     id = Column(types.Integer, primary_key=True)
     job_id = Column(types.String)
     run_id = Column(GUID, nullable=False, default=uuid.uuid4)
-    state = Column(types.Enum(State, name="job_state"))
+    _state = Column(name="state", type_=types.String)
     started_at = Column(types.DateTime)
     last_heartbeat_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
@@ -92,10 +93,29 @@ class Job(SystemModel):  # noqa: WPS214
         Args:
             kwargs: keyword args to override defaults and pass to super
         """
-        kwargs["state"] = kwargs.get("state", State.IDLE)
+        kwargs["_state"] = str(kwargs.pop("state", State.IDLE))
         kwargs["payload"] = kwargs.get("payload", {})
         kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
         super().__init__(**kwargs)
+
+    @hybrid_property
+    def state(self) -> State:
+        """Get the job state as a State enum.
+
+        Returns:
+            State enum matching string value for this job state
+        """
+        if self._state:
+            return State[self._state]
+
+    @state.setter  # noqa: WPS440
+    def state(self, value):
+        """Set the _state value for this Job from a State enum.
+
+        Args:
+            value: the State enum to use.
+        """
+        self._state = str(value)
 
     def is_running(self):
         """Return whether Job is running.
