@@ -30,21 +30,31 @@ class State(Enum):
 
 
 def upgrade():
-    op.alter_column(
-        table_name="job",
-        column_name="state",
-        type_=sa.types.String,
-        existing_type=sa.Enum(State, name="job_state"),
-    )
     conn = op.get_bind()
+    # In sqlite, the field is already a varchar.
+    # "ALTER COLUMN" statements are also not supported.
+    if conn.dialect.name != "sqlite":
+        op.alter_column(
+            table_name="job",
+            column_name="state",
+            type_=sa.types.String,
+            existing_type=sa.Enum(State, name="job_state"),
+        )
+
+    # In postgresql, drop the created Enum type so that
+    # downgrade() can re-create it.
     if conn.dialect.name == "postgresql":
         conn.execute("DROP TYPE job_state;")
 
 
 def downgrade():
-    op.alter_column(
-        table_name="job",
-        column_name="state",
-        _type=sa.Enum(State, name="job_state"),
-        existing_type=sa.types.String,
-    )
+    conn = op.get_bind()
+    # In sqlite, the field is already a varchar.
+    # "ALTER COLUMN" statements are also not supported.
+    if conn.dialect.name != "sqlite":
+        op.alter_column(
+            table_name="job",
+            column_name="state",
+            _type=sa.Enum(State, name="job_state"),
+            existing_type=sa.types.String,
+        )
