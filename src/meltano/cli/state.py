@@ -11,6 +11,7 @@ import structlog
 from meltano.cli.params import pass_project
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
+from meltano.core.job import Payload
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
 
@@ -107,10 +108,13 @@ def meltano_state(project: Project, ctx: click.Context):
 
 
 @meltano_state.command(name="list")
-@click.option("--pattern", help="A glob-style pattern to filter job IDs by.")
+@click.argument("pattern", required=False)
 @click.pass_context
 def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
-    """List all job_ids for this project."""
+    """List all job_ids for this project.
+
+    Optionally pass a glob-style pattern to filter job_ids by.
+    """
     state_service = ctx.obj[STATE_SERVICE_KEY]
     states = state_service.list_state(pattern)
     if states:
@@ -156,9 +160,11 @@ def merge_state(
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     elif input_file:
         with open(input_file) as state_f:
-            state_service.add_state(job_id, state_f.read())
+            state_service.add_state(
+                job_id, state_f.read(), payload_flags=Payload.INCOMPLETE_STATE
+            )
     elif state:
-        state_service.add_state(job_id, state)
+        state_service.add_state(job_id, state, payload_flags=Payload.INCOMPLETE_STATE)
     elif from_job_id:
         state_service.merge_state(from_job_id, job_id)
 

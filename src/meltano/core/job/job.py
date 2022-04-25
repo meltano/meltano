@@ -132,7 +132,7 @@ class Job(SystemModel):  # noqa: WPS214
         self._state = str(value)
 
     @state.comparator  # noqa: WPS440
-    def state(cls):  # noqa: N805
+    def state(cls):  # noqa: N805, WPS440
         """Use this comparison to compare Job.state to State.
 
         See:

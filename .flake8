@@ -145,6 +145,8 @@ per_file_ignores =
         WPS202
         # Found boolean non-keyword argument
         WPS425
+	# Found too long name
+	WPS118
 
     !tests/*:
         T
