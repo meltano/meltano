@@ -113,8 +113,8 @@ class Job(SystemModel):  # noqa: WPS214
         kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
         super().__init__(**kwargs)
 
-    @hybrid_property  # noqa: WPS440
-    def state(self) -> State:
+    @hybrid_property
+    def state(self) -> State:  # noqa: WPS440
         """Get the job state as a State enum.
 
         Returns:
@@ -122,8 +122,8 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return State[self._state]
 
-    @state.setter  # noqa: WPS440
-    def state(self, value):
+    @state.setter
+    def state(self, value):  # noqa: WPS440
         """Set the _state value for this Job from a State enum.
 
         Args:
