@@ -968,10 +968,10 @@ meltano state merge dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_1
 # The file must contain valid JSON with a top-level key of "singer_state"
 # These two lines have the same effect as the one line above.
 echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
-meltano state merge  --input-file gitlab_state.json dev:tap-gitlab-to-target-jsonl
+meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json 
 
 # Provide state via an existing job.
-meltano state merge --from-job-id prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
+meltano state merge dev:tap-gitlab-to-target-jsonl --from-job-id prod:tap-gitlab-to-target-jsonl
 ```
 
 ### set

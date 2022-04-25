@@ -77,11 +77,11 @@ def state_service_from_job_id(project: Project, job_id: str) -> Optional[StateSe
         try:
             if not project.active_environment:
                 logger.warn(
-                    f"Running state operation for environment {match.group('env')} outside of an environment"
+                    f"Running state operation for environment '{match.group('env')}' outside of an environment"
                 )
             elif project.active_environment.name != match.group("env"):
                 logger.warn(
-                    f"Environment for state operation ({match.group('env')}) does not match current environment {project.active_environment.name}."
+                    f"Environment '{match.group('env')}' used in state operation does not match current environment '{project.active_environment.name}'."
                 )
             project.activate_environment(match.group("env"))
             blocks = [match.group("tap"), match.group("target")]
