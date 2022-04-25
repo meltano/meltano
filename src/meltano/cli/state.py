@@ -169,7 +169,7 @@ def merge_state(
     elif from_job_id:
         state_service.merge_state(from_job_id, job_id)
     logger.info(
-        f"State for {job_id} was successfully merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}"
+        f"State for {job_id} was successfully merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 
@@ -204,7 +204,7 @@ def set_state(
     elif state:
         state_service.set_state(job_id, state)
     logger.info(
-        f"State for {job_id} was successfully set at {dt.utcnow():%Y-%m-%d %H:%M:%S}"
+        f"State for {job_id} was successfully set at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 
