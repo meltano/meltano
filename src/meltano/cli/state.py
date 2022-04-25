@@ -1,6 +1,7 @@
 """State management in CLI."""
 import json
 import re
+from datetime import datetime as dt
 from functools import partial, reduce, wraps
 from operator import xor
 from typing import Optional
@@ -167,6 +168,9 @@ def merge_state(
         state_service.add_state(job_id, state, payload_flags=Payload.INCOMPLETE_STATE)
     elif from_job_id:
         state_service.merge_state(from_job_id, job_id)
+    logger.info(
+        f"State for {job_id} was successfully merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}"
+    )
 
 
 @meltano_state.command(name="set")
@@ -199,6 +203,9 @@ def set_state(
             state_service.set_state(job_id, state_f.read())
     elif state:
         state_service.set_state(job_id, state)
+    logger.info(
+        f"State for {job_id} was successfully set at {dt.utcnow():%Y-%m-%d %H:%M:%S}"
+    )
 
 
 @meltano_state.command(name="get")  # noqa: WPS46
