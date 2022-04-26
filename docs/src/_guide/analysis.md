@@ -1,5 +1,5 @@
 ---
-title: Data Analysis
+title: Analyze Plugins (Deprecated)
 description: Learn how to analyze your data and create repotrs and dashboards.
 layout: doc
 weight: 9
@@ -14,7 +14,7 @@ If you haven't already, install Meltano and create your first project by followi
 
 ## Start Meltano UI
 
-Start the [Meltano UI](/guide/ui) web server using [`meltano ui`](/reference/command-line-interface#ui):
+Start the [Meltano UI](/reference/ui) web server using [`meltano ui`](/reference/command-line-interface#ui):
 
 ```bash
 meltano ui
