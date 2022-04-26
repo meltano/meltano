@@ -20,6 +20,7 @@ To learn how to manage your project's plugins, refer to the [Plugin Management g
 
 In order to use a given package as a plugin in a [project](project),
 assuming it meets the requirements of the [plugin type](#types) in question, Meltano needs to know:
+
 1. where to find the package, typically a [pip package](https://pip.pypa.io/en/stable/) identified by its name on [PyPI](https://pypi.org/), public or private Git repository URL, or local directory path,
 2. what [settings](/guide/configuration) and other capabilities it supports, and finally
 3. what its [configuration](/guide/configuration) should be when invoked.
@@ -34,6 +35,7 @@ For example: extractors `tap-postgres--billing` and `tap-postgres--events` deriv
 or `tap-google-analytics--client-foo` and `tap-google-analytics--client-bar` derived from base extractor [`tap-google-analytics`](https://hub.meltano.com/extractors/google-analytics.html).
 
 Each plugin in a project can either:
+
 - inherit its base plugin description from a [discoverable plugin](#discoverable-plugins) that's supported out of the box,
 - define its base plugin description explicitly, making it a [custom plugin](#custom-plugins), or
 - [inherit](#plugin-inheritance) both base plugin description and configuration from another plugin in the project.
@@ -98,6 +100,9 @@ you can add a new plugin that inherits from an existing one.
 
 The new plugin will inherit its parent's [base plugin description](#project-plugins) and [configuration](/guide/configuration) as if they were defaults,
 which can then be overridden as appropriate.
+
+For performance reasons, inherited plugins with an identical `pip_url` to their parent share the parents underlying python virtualenv.
+If you would prefer to create a separate virtualenv for an inherited plugin, modify it's `pip_url` to be different to its parent.
 
 To learn how to add an inheriting plugin to your project using an [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
 
@@ -239,7 +244,7 @@ These [nested properties](/reference/command-line-interface#nested-properties) c
 Property (attribute) metadata `<key>: <value>` pairs (e.g. `{"is-replication-key": true}`) are nested under top-level entity identifiers and second-level attribute identifiers that correspond to Singer stream property names.
 These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<attribute>.<key>`.
 
-[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+[Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
 
 Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
@@ -293,7 +298,7 @@ These rules are not applied when a catalog is [provided manually](#catalog-extra
 [JSON Schema](https://json-schema.org/) descriptions for specific properties (attributes) (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values, and second-level attribute identifiers that correspond to Singer stream property names.
 These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_schema.<entity>.<attribute>` and `_schema.<entity>.<attribute>.<key>`.
 
-[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+[Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
 
 Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
@@ -344,7 +349,7 @@ that are applied to the extractor's [discovered catalog file](https://hub.meltan
 when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
-A selection rule is comprised of an entity identifier that corresponds to a Singer stream's `tap_stream_id` value, and an attribute identifier that that corresponds to a Singer stream property name, separated by a period (`.`). Rules indicating that an entity or attribute should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+A selection rule is comprised of an entity identifier that corresponds to a Singer stream's `tap_stream_id` value, and an attribute identifier that that corresponds to a Singer stream property name, separated by a period (`.`). Rules indicating that an entity or attribute should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
 
 Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
@@ -395,7 +400,7 @@ after [schema](#schema-extra), [selection](#select-extra), and [metadata](#metad
 
 It can be used to only extract records for specific matching entities, or to extract records for all entities _except_ for those specified, by letting you apply filters on top of configured [entity selection rules](#select-extra).
 
-Selection filter rules use entity identifiers that correspond to Singer stream `tap_stream_id` values. Rules indicating that an entity should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity identifiers to match multiple entities at once.
+Selection filter rules use entity identifiers that correspond to Singer stream `tap_stream_id` values. Rules indicating that an entity should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity identifiers to match multiple entities at once.
 
 Entity names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
@@ -859,36 +864,36 @@ To learn more about mapper 'transform-field', visit https://github.com/transferw
 
 Mappers are unique in that after install you don't invoke them directly. Instead you define `mappings` by name and add a config object for each mapping.
 This config object is passed to the mapper when the **mapping name** is called as part of a [`meltano run`](/reference/command-line-interface#run) invocation.
-Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead. 
+Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead.
 Additionally, the requirements for the config object itself will vary by plugin.
 
 So given a mapper with mappings configured like so:
 
 ```yaml
-  mappers:
+mappers:
   - name: transform-field
     variant: transferwise
     pip_url: pipelinewise-transform-field
     executable: transform-field
     mappings:
-    - name: hide-gitlab-secrets
-      config:
-        transformations:
-          - field_id: "author_email"
-            tap_stream_name: "commits"
-            type: "MASK-HIDDEN"
-          - field_id: "committer_email"
-            tap_stream_name: "commits"
-            type: "MASK-HIDDEN"
-    - name: null-created-at
-      config:
-        transformations:
-          - field_id: "created_at"
-            tap_stream_name: "accounts"
-            type: "SET-NULL"
+      - name: hide-gitlab-secrets
+        config:
+          transformations:
+            - field_id: "author_email"
+              tap_stream_name: "commits"
+              type: "MASK-HIDDEN"
+            - field_id: "committer_email"
+              tap_stream_name: "commits"
+              type: "MASK-HIDDEN"
+      - name: null-created-at
+        config:
+          transformations:
+            - field_id: "created_at"
+              tap_stream_name: "accounts"
+              type: "SET-NULL"
 ```
 
-You can then invoke the mappings by name: 
+You can then invoke the mappings by name:
 
 ```bash
 
@@ -902,7 +907,7 @@ $ meltano run tap-gitlab hide-gitlab-secrets target-jsonl
 $ meltano run tap-someapi null-created-at target-jsonl
 ```
 
-You can also invoke multiple mappings at once in series: 
+You can also invoke multiple mappings at once in series:
 
 ```bash
 $ tap-someapi fix-null-id fix-country-code target-jsonl
@@ -918,4 +923,3 @@ call mappings that leverage the same plugin at multiple locations numerous times
 # Mask the id if the customer is in the EU region using transform-field mapper.
 $ tap-someapi fix-null-country set-region-from-country  mask-id-if-eu target-jsonl
 ```
-
