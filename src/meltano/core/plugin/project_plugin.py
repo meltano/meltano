@@ -1,9 +1,11 @@
 """Project Plugin Class."""
 
+from __future__ import annotations
+
 import copy
 import logging
 import sys
-from typing import Dict, Optional
+from typing import Any
 
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import expand_env_vars, flatten, uniques_in
@@ -18,7 +20,7 @@ logger = logging.getLogger(__name__)
 class CyclicInheritanceError(Exception):
     """Exception raised when project plugin inherits from itself cyclicly."""
 
-    def __init__(self, plugin: "ProjectPlugin", ancestor: "ProjectPlugin"):
+    def __init__(self, plugin: ProjectPlugin, ancestor: ProjectPlugin):
         """Initialize cyclic inheritance error.
 
         Args:
@@ -55,13 +57,13 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self,
         plugin_type: PluginType,
         name: str,
-        inherit_from: Optional[str] = None,
-        namespace: Optional[str] = None,
-        variant: Optional[str] = None,
-        pip_url: Optional[str] = None,
-        executable: Optional[str] = None,
-        config: Optional[dict] = None,
-        commands: Optional[dict] = None,
+        inherit_from: str | None = None,
+        namespace: str | None = None,
+        variant: str | None = None,
+        pip_url: str | None = None,
+        executable: str | None = None,
+        config: dict | None = None,
+        commands: dict | None = None,
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
@@ -155,7 +157,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             )
 
     @property
-    def parent(self):
+    def parent(self) -> ProjectPlugin:
         """Plugins parent.
 
         Returns:
@@ -176,7 +178,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self._fallback_to = new_parent
 
     @property
-    def is_variant_set(self):
+    def is_variant_set(self) -> bool:
         """Check if variant is set explicitly.
 
         Returns:
@@ -185,7 +187,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
-    def info(self):
+    def info(self) -> dict[str, str]:
         """Plugin info dict.
 
         Returns:
@@ -194,7 +196,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return {"name": self.name, "namespace": self.namespace, "variant": self.variant}
 
     @property
-    def info_env(self):
+    def info_env(self) -> dict[str, str]:
         """Plugin environment info.
 
         Returns:
@@ -204,7 +206,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
 
     @property
-    def all_commands(self):
+    def all_commands(self) -> dict[str, Command]:
         """Return all commands for this plugin.
 
         Returns:
@@ -213,7 +215,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return {**self._parent.all_commands, **self.commands}
 
     @property
-    def test_commands(self) -> Dict[str, Command]:
+    def test_commands(self) -> dict[str, Command]:
         """Return the test commands for this plugin.
 
         Returns:
@@ -226,7 +228,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         }
 
     @property
-    def supported_commands(self):
+    def supported_commands(self) -> list[str]:
         """Return supported command names.
 
         Returns:
@@ -234,7 +236,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """
         return list(self.all_commands.keys())
 
-    def env_prefixes(self, for_writing=False):
+    def env_prefixes(self, for_writing=False) -> list[str]:
         """Return environment variable prefixes.
 
         Args:
@@ -252,7 +254,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return uniques_in(prefixes)
 
     @property
-    def extra_config(self):
+    def extra_config(self) -> list[str, Any]:
         """Return plugin extra config.
 
         Returns:
@@ -261,7 +263,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
-    def config_with_extras(self):
+    def config_with_extras(self) -> list[str, Any]:
         """Return config with extras.
 
         Returns:
@@ -281,7 +283,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 self.config[key] = value
 
     @property
-    def settings(self):
+    def settings(self) -> list[SettingDefinition]:
         """Return plugin settings.
 
         Returns:
@@ -294,7 +296,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         ]
 
     @property
-    def extra_settings(self):
+    def extra_settings(self) -> list[SettingDefinition]:
         """Return extra settings.
 
         Returns:
@@ -307,7 +309,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         ]
 
     @property
-    def settings_with_extras(self):
+    def settings_with_extras(self) -> list[SettingDefinition]:
         """Return all settings.
 
         Returns:
@@ -315,7 +317,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """
         return [*self.settings, *self.extra_settings]
 
-    def is_custom(self):
+    def is_custom(self) -> bool:
         """Return if plugin is custom.
 
         Returns:
@@ -324,7 +326,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return self.custom_definition is not None
 
     @property
-    def is_shadowing(self):
+    def is_shadowing(self) -> bool:
         """Return whether this plugin is shadowing a base plugin with the same name.
 
         Returns:
@@ -333,7 +335,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return not self.inherit_from
 
     @property
-    def formatted_pip_url(self):
+    def formatted_pip_url(self) -> str:
         """Return the formatted version of the pip_url.
 
         Expands ${MELTANO__PYTHON_VERSION} to the major.minor version string of the current runtime.
@@ -349,19 +351,16 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         )
 
     @property
-    def venv_name(self):
+    def venv_name(self) -> str:
         """Return the venv name this plugin should use.
 
         Returns:
             The name of this plugins parent if both pip urls are the same, else this plugins name.
         """
         if not self.inherit_from:
-            # No parent. Use a unique venv per plugin.
             return self.name
 
         if not self.pip_url or (self.parent.pip_url == self.pip_url):
-            # Use the parent's venv. Plugin is inheriting and there's no difference in pip_url.
             return self.parent.name
 
-        # Default to unique venv per plugin.
         return self.name

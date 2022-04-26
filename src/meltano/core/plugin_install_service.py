@@ -1,6 +1,7 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 import asyncio
 import functools
+import logging
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
@@ -15,6 +16,8 @@ from .project import Project
 from .project_plugins_service import ProjectPluginsService
 from .utils import noop, run_async
 from .venv_service import VenvService
+
+logger = logging.getLogger(__name__)
 
 
 class PluginInstallReason(str, Enum):
@@ -180,7 +183,10 @@ class PluginInstallService:
     ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
-        Trying to install multiple plugins into the same venv via `run_async` will fail.
+        Trying to install multiple plugins into the same venv via `run_async` will fail
+        due to a race condition between the duplicate installs. This is particularly
+        problematic if `clean` is set as one async `clean` operation causes the other
+        install to fail.
 
         Args:
             plugins: An iterable containing plugins to dedupe.
@@ -194,7 +200,7 @@ class PluginInstallService:
         seen_venvs = set()
         deduped_plugins = []
         # iterate in reverse order, to keep last plugin occurrences
-        for plugin in list(plugins)[::-1]:
+        for plugin in reversed(list(plugins)):
             if (plugin.type, plugin.venv_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
                 seen_venvs.add((plugin.type, plugin.venv_name))
@@ -249,7 +255,6 @@ class PluginInstallService:
         states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
         for state in states:
             self.status_cb(state)
-        # install
         states.extend(run_async(self.install_plugins_async(new_plugins, reason=reason)))
         return states
 
@@ -394,8 +399,8 @@ class PluginInstallService:
         compiler = ProjectCompiler(self.project)
         try:
             compiler.compile()
-        except Exception:  # noqa: S110
-            pass
+        except Exception as exp:  # noqa: S110
+            logger.debug("Failed to compile models: %s", exp)  # noqa: WPS323
 
     @staticmethod
     def _is_mapping(plugin: ProjectPlugin) -> bool:
