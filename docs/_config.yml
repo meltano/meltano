@@ -55,10 +55,6 @@ collections:
     output: true
     name: "Contribute"
     weight: 5
-  the-project:
-    output: true
-    name: "The Project"
-    weight: 6
   posts:
     output: false
 
