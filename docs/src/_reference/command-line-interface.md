@@ -899,7 +899,7 @@ List all `job_ids` found in the system database.
 #### How to use
 
 ```bash
-meltano state list [--pattern PATTERN]
+meltano state list [--pattern] <PATTERN>
 ```
 
 #### Parameters
@@ -917,7 +917,7 @@ meltano state list [--pattern PATTERN]
 meltano state list
 
 # List only those job IDs that start with "dev:"
-meltano state list --pattern 'dev:*'
+meltano state list 'dev:*'
 
 # List only those job IDs that contain "tap-gitlab"
 meltano state list --pattern '*tap-gitlab*'
@@ -940,7 +940,7 @@ Merge new state onto existing state for a job ID.
 
 ```bash
 # Read state from a file
-meltano state merge  <job_id> --input-file <file>
+meltano state merge <job_id> --input-file <file>
 
 # Read state from a command-line argument
 meltano state merge <job_id> <RAW STATE JSON>
@@ -968,7 +968,7 @@ meltano state merge dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_1
 # The file must contain valid JSON with a top-level key of "singer_state"
 # These two lines have the same effect as the one line above.
 echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
-meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json 
+meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
 
 # Provide state via an existing job.
 meltano state merge dev:tap-gitlab-to-target-jsonl --from-job-id prod:tap-gitlab-to-target-jsonl
