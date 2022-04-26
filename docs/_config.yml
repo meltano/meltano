@@ -25,6 +25,7 @@ plugins:
   - jekyll-toc
   - jekyll-sitemap
   - jekyll-algolia
+  - jekyll-redirect-from
 
 # Default plugin configuration
 defaults:

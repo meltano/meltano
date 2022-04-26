@@ -2,6 +2,8 @@
 title: Report Vulnerabilities
 description: Learn how to report security vulnerabilities
 layout: doc
+redirect_from:
+  - /the-project/responsible-disclosure/
 weight: 11
 ---
 
