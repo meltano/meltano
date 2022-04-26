@@ -37,7 +37,7 @@ defaults:
 collections:
   guide:
     output: true
-    name: "Guide"
+    name: "Guides"
     weight: 1
   concepts:
     output: true
