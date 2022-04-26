@@ -15,7 +15,7 @@ If the installation instructions on the [homepage](/) or the [Getting Started gu
 
 ## Local Installation
 
-In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/guide/ui).
+In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/reference/ui).
 
 ### Requirements
 

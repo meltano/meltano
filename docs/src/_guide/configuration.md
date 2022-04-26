@@ -31,7 +31,7 @@ To determine the values of settings, Meltano will look in 4 main places (and one
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy.
-3. **Your project's [**system database**](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/guide/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+3. **Your project's [**system database**](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
 5. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
@@ -271,4 +271,4 @@ The configuration of a plugin can be tested using [`meltano config <plugin> test
 
 While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
 and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
-basic plugin configuration functionality is also available in [the UI](/guide/ui#extractor-configuration).
+basic plugin configuration functionality is also available in [the UI](/reference/ui#extractor-configuration).
