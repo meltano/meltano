@@ -3,6 +3,7 @@
 import json
 import tempfile
 from pathlib import Path
+from pydoc import describe
 
 import click
 import dotenv
@@ -226,17 +227,8 @@ def reset(ctx, store):
     )
 
 
-@config.command()
-@click.argument("setting_name", nargs=-1, required=True)
-@click.argument("value")
-@click.option(
-    "--store",
-    type=click.Choice(SettingValueStore.writables()),
-    default=SettingValueStore.AUTO,
-)
-@click.pass_context
-def set(ctx, setting_name, value, store):  # noqa: WPS125
-    """Set the configurations' setting `<name>` to `<value>`."""
+def set_value(ctx, setting_name, value, store):
+    """Set value helper function."""
     store = SettingValueStore(store)
 
     try:
@@ -270,6 +262,43 @@ def set(ctx, setting_name, value, store):  # noqa: WPS125
             f"Current value is still: {current_value!r} (from {source.label})",
             fg="yellow",
         )
+
+
+def set_all_interactively(ctx, store):
+    settings = ctx.obj["settings"]
+    session = ctx.obj["session"]
+
+
+@config.command("set")
+@click.argument("setting_name", nargs=-1)
+@click.argument("value")
+@click.option(
+    "--store",
+    type=click.Choice(SettingValueStore.writables()),
+    default=SettingValueStore.AUTO,
+)
+@click.option("--all", "all_flag", is_flag=True)
+@click.option("--interactive", is_flag=True)
+@click.pass_context
+def set_(ctx, setting_name, value, store, all_flag, interactive):
+    """Set the configurations' setting `<name>` to `<value>`."""
+
+    if interactive:
+        # set interactively (new path)
+        if all_flag:
+            # process all settings interactively
+            pass
+        else:
+            # process given setting interactively
+            pass
+    else:
+        # set setting directly (old path)
+        if all_flag:
+            raise CliError(
+                f'Option "--all" specified without "--interactive". \n'
+                + 'If you meant to configure all settings, please use "meltano config set --all --interactive"'
+            )
+        set_value(ctx=ctx, setting_name=setting_name, value=value, store=store)
 
 
 @config.command("test")
