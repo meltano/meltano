@@ -49,5 +49,11 @@ We will add a new `STATE_EDIT` value to the `State` ENUM.
 Further state management features will become easier to implement because there will be an abstraction
 for associating arbitrary state with job IDs.
 
-Supporting new DBMSes may become slightly more difficult, since this migration may behave in
-unexpected ways in DBMSes that treat ENUMs differently than SQLite or Postgres.
+Attempting to apply this migration may fail or otherwise cause issues on currently-unsupported
+DBMSes (i.e. all DBMSes other than Postgres or SQLite), particularly if syntax for managing ENUM
+types differs from Postgres' syntax. However, similar migration issues are likely to arise in
+adding support for new DBMSes anyways, since this field was initially created as an ENUM.
+
+This migration makes the _end state_ of all migrations more DBMS-agnostic,
+since the SQLAlchemy String type (and underlying VARCHAR) has wider support than the current
+ENUM types.
