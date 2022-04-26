@@ -1,5 +1,5 @@
 ---
-title: Orchestrate Meltano
+title: Orchestrate Data
 description: Learn how to schedule and orchestrate your pipelines using Meltano and Airflow.
 layout: doc
 weight: 6

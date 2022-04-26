@@ -1,5 +1,5 @@
 ---
-title: Plugin Management
+title: General Usage
 description: Learn how to manage your Meltano project's plugins.
 layout: doc
 weight: 2

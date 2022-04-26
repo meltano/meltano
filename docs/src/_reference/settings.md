@@ -1,5 +1,5 @@
 ---
-title: Meltano Settings Reference
+title: Settings
 description: Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 layout: doc
 ---

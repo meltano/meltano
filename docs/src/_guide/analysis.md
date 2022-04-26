@@ -1,5 +1,5 @@
 ---
-title: Data Analysis
+title: Analyze Plugins (Deprecated)
 description: Learn how to analyze your data and create repotrs and dashboards.
 layout: doc
 weight: 9

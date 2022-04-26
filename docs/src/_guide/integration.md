@@ -1,5 +1,5 @@
 ---
-title: Data Integration
+title: Replicate Data
 description: Learn how to extract and load data using Meltano and Singer taps and targets
 layout: doc
 weight: 4

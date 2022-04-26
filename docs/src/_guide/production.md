@@ -1,5 +1,5 @@
 ---
-title: Running & Deploying Meltano in Production
+title: Run in Production
 description: Learn how to deploy your ELT pipelines in production.
 layout: doc
 weight: 8

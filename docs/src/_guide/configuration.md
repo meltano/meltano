@@ -1,5 +1,5 @@
 ---
-title: Meltano Configuration
+title: Manage Configuration
 description: Learn how to manage the configuration of your project's plugins.
 layout: doc
 weight: 3

@@ -1,5 +1,5 @@
 ---
-title: Install Meltano
+title: Installation
 description: Learn how to install Meltano locally or using Docker.
 layout: doc
 weight: 1
