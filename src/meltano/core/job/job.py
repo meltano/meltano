@@ -1,6 +1,5 @@
 """Defines Job model class."""
 import asyncio
-import logging
 import os
 import signal
 import uuid
@@ -8,62 +7,100 @@ from contextlib import contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 
-import sqlalchemy.types as types
 from async_generator import asynccontextmanager
+from sqlalchemy import Column, literal, types
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.ext.mutable import MutableDict
+
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
-from sqlalchemy import Column
-from sqlalchemy.ext.mutable import MutableDict
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
 
 
 class InconsistentStateError(Error):
-    """
-    Occur upon a wrong operation for the current state.
-    """
+    """Occur upon a wrong operation for the current state."""
 
 
 class ImpossibleTransitionError(Error):
-    """
-    Occur upon a wrong transition.
-    """
+    """Occur upon a wrong transition."""
 
 
 class State(Enum):
+    """Represents status of a Job."""
+
     IDLE = (0, ("RUNNING", "FAIL"))
     RUNNING = (1, ("SUCCESS", "FAIL"))
     SUCCESS = (2, ())
     FAIL = (3, ("RUNNING",))
     DEAD = (4, ())
+    STATE_EDIT = (5, ())
 
     def transitions(self):
+        """Get possible next States for a job of this State.
+
+        Returns:
+            The possible states jobs in this state can be transitioned into
+        """
         return self.value[1]
 
     def __str__(self):
+        """Get a string representation of this State.
+
+        Returns:
+            the name of this State
+        """
         return self.name
 
 
+class StateComparator(Comparator):
+    """Compare Job._state to State enums."""
+
+    def __eq__(self, other):
+        """Enable SQLAlchemy to directly compare Job.state values with State.
+
+        Args:
+            other: the State enum to compare to
+
+        Returns:
+            Comparison between __clause_element__ and SQLAlchemy literal for State name
+        """
+        return self.__clause_element__() == literal(other.name)
+
+
 def current_trigger():
+    """Get the trigger for running job.
+
+    Returns:
+        The trigger for currently running job
+    """
     return os.getenv("MELTANO_JOB_TRIGGER")
 
 
 class Payload(IntFlag):
+    """Flag indicating whether a Job has state in its payload field."""
+
     STATE = 1
     INCOMPLETE_STATE = 2
 
 
 class Job(SystemModel):  # noqa: WPS214
-    """Model class that represents a `meltano elt` run in the system database."""
+    """Model class that represents a `meltano elt` run in the system database.
+
+    Includes State.STATE_EDIT rows which represent CLI invocations of the
+    `meltano state` command which wrote state to the db. Queries that are
+    meant to return only actual job runs should filter out records with
+    state == State.STATE_EDIT.
+    """
 
     __tablename__ = "job"
 
     id = Column(types.Integer, primary_key=True)
     job_id = Column(types.String)
     run_id = Column(GUID, nullable=False, default=uuid.uuid4)
-    state = Column(types.Enum(State, name="job_state"))
+    _state = Column(name="state", type_=types.String)
     started_at = Column(types.DateTime)
     last_heartbeat_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
@@ -72,20 +109,62 @@ class Job(SystemModel):  # noqa: WPS214
     trigger = Column(types.String, default=current_trigger)
 
     def __init__(self, **kwargs):
-        kwargs["state"] = kwargs.get("state", State.IDLE)
+        """Construct a Job.
+
+        Args:
+            kwargs: keyword args to override defaults and pass to super
+        """
+        kwargs["_state"] = kwargs.pop("state", State.IDLE).name
         kwargs["payload"] = kwargs.get("payload", {})
         kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
         super().__init__(**kwargs)
 
+    @hybrid_property
+    def state(self) -> State:  # noqa: WPS440
+        """Get the job state as a State enum.
+
+        Returns:
+            State enum matching string value for this job state
+        """
+        return State[self._state]
+
+    @state.setter
+    def state(self, value):  # noqa: WPS440
+        """Set the _state value for this Job from a State enum.
+
+        Args:
+            value: the State enum to use.
+        """
+        self._state = str(value)
+
+    @state.comparator  # noqa: WPS440
+    def state(cls):  # noqa: N805, WPS440
+        """Use this comparison to compare Job.state to State.
+
+        See:
+            https://docs.sqlalchemy.org/en/14/orm/extensions/hybrid.html#building-custom-comparators
+
+        Returns:
+            Result of comparison
+        """
+        return StateComparator(cls._state)
+
     def is_running(self):
+        """Return whether Job is running.
+
+        Returns:
+            bool indicating whether this Job is running
+        """
         return self.state is State.RUNNING
 
     def is_stale(self):
-        """
-        Return whether job has gone stale.
+        """Return whether Job has gone stale.
 
         Running jobs with a heartbeat are considered stale after no heartbeat is recorded for 5 minutes.
         Legacy jobs without a heartbeat are considered stale after being in the running state for 24 hours.
+
+        Returns:
+            bool indicating whether this Job is stale
         """
         if not self.is_running():
             return False
@@ -100,21 +179,55 @@ class Job(SystemModel):  # noqa: WPS214
         return datetime.utcnow() - timestamp > valid_for
 
     def has_error(self):
+        """Return whether a job has failed.
+
+        Returns:
+            bool indicating whether this Job has failed
+        """
         return self.state is State.FAIL
 
     def is_complete(self):
-        return self.state in [State.SUCCESS, State.FAIL]
+        """Return whether a job has completed.
+
+        Returns:
+            bool indicating whether this job has completed
+        """
+        return self.state in {State.SUCCESS, State.FAIL}
 
     def is_success(self):
+        """Return whether a job has succeeded.
+
+        Returns:
+            a bool indicating whether this job has succeeded
+        """
         return self.state is State.SUCCESS
 
     def can_transit(self, state: State) -> bool:
+        """Return whether this job can transit into the given state.
+
+        Args:
+            state: the state to check against
+
+        Returns:
+            bool indicating whether the given state is transitable from this job's state
+        """
         if self.state is state:
             return True
 
         return state.name in self.state.transitions()
 
     def transit(self, state: State) -> (State, State):
+        """Transition this job into the given state.
+
+        Args:
+            state: the state to transition this job to
+
+        Returns:
+            a tuple with the original state and the new state
+
+        Raises:
+            ImpossibleTransitionError: when this job cannot transition into the given state
+        """
         transition = (self.state, state)
 
         if not self.can_transit(state):
@@ -129,11 +242,16 @@ class Job(SystemModel):  # noqa: WPS214
 
     @asynccontextmanager
     async def run(self, session):
-        """
-        Run wrapped code in context of a job.
+        """Run wrapped code in context of a job.
 
         Transitions state to RUNNING and SUCCESS/FAIL as appropriate and records heartbeat every second.
-        """
+
+        Args:
+            session: the session to use for writing to the db
+
+        Raises:
+            BaseException: re-raises an exception occurring in the job running in this context
+        """  # noqa: DAR301
         try:
             self.start()
             self.save(session)
@@ -144,7 +262,7 @@ class Job(SystemModel):  # noqa: WPS214
 
             self.success()
             self.save(session)
-        except BaseException as err:
+        except BaseException as err:  # noqa: WPS424
             if not self.is_running():
                 raise
 
@@ -154,21 +272,32 @@ class Job(SystemModel):  # noqa: WPS214
             raise
 
     def start(self):
+        """Mark the job has having started."""
         self.started_at = datetime.utcnow()
         self.transit(State.RUNNING)
 
     def fail(self, error=None):
+        """Mark the job as having failed.
+
+        Args:
+            error: the error to associate with the job's failure
+        """
         self.ended_at = datetime.utcnow()
         self.transit(State.FAIL)
         if error:
             self.payload.update({"error": str(error)})
 
     def success(self):
+        """Mark the job as having succeeded."""
         self.ended_at = datetime.utcnow()
         self.transit(State.SUCCESS)
 
     def fail_stale(self):
-        """Mark job as failed if it's gone stale."""
+        """Mark job as failed if it's gone stale.
+
+        Returns:
+            False if job is not stale, else True
+        """
         if not self.is_stale():
             return False
 
@@ -182,22 +311,38 @@ class Job(SystemModel):  # noqa: WPS214
         return True
 
     def __repr__(self):
-        return (
-            "<Job(id='%s', job_id='%s', state='%s', started_at='%s', ended_at='%s')>"
-            % (self.id, self.job_id, self.state, self.started_at, self.ended_at)
-        )
+        """Represent as a string.
+
+        Returns:
+            a string representation of the job
+        """
+        return f"<Job(id='{self.id}', job_id='{self.job_id}', state='{self.state}', started_at='{self.started_at}', ended_at='{self.ended_at}')>"
 
     def save(self, session):
+        """Save the job in the db.
+
+        Args:
+            session: the session to use in querying the db
+
+        Returns:
+            the saved job
+        """
         session.add(self)
         session.commit()
 
         return self
 
     def _heartbeat(self):
+        """Update last_heartbeat_at for this job in the db."""
         self.last_heartbeat_at = datetime.utcnow()
 
     async def _heartbeater(self, session):
-        while True:
+        """Heartbeat to the db every second.
+
+        Args:
+            session: the session to use for writing to the db
+        """
+        while True:  # noqa: WPS457
             self._heartbeat()
             self.save(session)
 
@@ -205,6 +350,11 @@ class Job(SystemModel):  # noqa: WPS214
 
     @asynccontextmanager
     async def _heartbeating(self, session):
+        """Provide a context for heartbeating jobs.
+
+        Args:
+            session: the session to use for writing to the db
+        """  # noqa: DAR301
         heartbeat_future = asyncio.ensure_future(self._heartbeater(session))
         try:
             yield
