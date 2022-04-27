@@ -162,7 +162,7 @@ class Project(Versioned):  # noqa: WPS214
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Union[Path, str] = None, activate=True):
+    def find(cls, project_root: Union[Path, str] = None, activate=True):  # noqa: WPS231
         """Find a Project.
 
         Args:
