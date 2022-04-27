@@ -111,6 +111,12 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         """
         return self._command_args
 
+    async def _start(self):
+        if self.command_args:
+            await self.start(self.command_args)
+        else:
+            await self.start()
+
     async def run(self) -> None:
         """Invoke a command capturing and logging produced output.
 
@@ -119,10 +125,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         """
         try:  # noqa: WPS501
             async with self.invoker.prepared(self.context.session):
-                if self.command_args:
-                    await self.start(self.command_args)
-                else:
-                    await self.start()
+                await self._start()
 
                 self.stdout_link(self._log)
                 self.stderr_link(self._log)
