@@ -279,7 +279,10 @@ def set_interactive(ctx, name, config_metadata, store, index=1, last_index=1):
     click.echo(title)
     click.echo(separator)
     click.echo()
-    click.echo(f"{indentation}Name: {name}")
+
+    click.echo(f"{indentation}Setting name: ", nl=False)
+    click.secho(f"{name}", fg="blue")
+
     if setting_def.description:
         click.echo(f"{indentation}Description: {setting_def.description}")
     if setting_def.kind:
@@ -299,10 +302,13 @@ def set_interactive(ctx, name, config_metadata, store, index=1, last_index=1):
     current_unexpanded_value = config_metadata.get("unexpanded_value")
     current_value = config_metadata["value"]
     if current_unexpanded_value:
-        click.echo(f"{indentation}Current unexpanded value: {current_unexpanded_value}")
+        click.echo(f"{indentation}Current unexpanded value: ", nl=False)
+        click.secho(f"{current_unexpanded_value}", fg="green")
+
         click.echo(f"{indentation}Current expanded value ({label}): {current_value}")
     else:
-        click.echo(f"{indentation}Current Value ({label}): {current_value}")
+        click.echo(f"{indentation}Current Value ({label}): ", nl=False)
+        click.secho(f"{current_value}", fg="green")
 
     click.echo()
     new_value = click.prompt(
@@ -311,10 +317,12 @@ def set_interactive(ctx, name, config_metadata, store, index=1, last_index=1):
 
     click.echo()
     old_value = current_unexpanded_value or current_value
-    if new_value in {"", old_value}:
+    if new_value in ("", old_value):  # noqa: WPS510
         click.secho(f"Setting '{name}' value unchanged.", fg="yellow")
     else:
-        set_value(ctx=ctx, setting_name=(name,), value=new_value, store=store)
+        set_value(
+            ctx=ctx, setting_name=tuple(name.split(".")), value=new_value, store=store
+        )
 
     click.echo()
     click.echo(separator)
@@ -363,6 +371,7 @@ def set_(ctx):
 @click.pass_context
 def setting(ctx, setting_name, value, store):
     """Set the configurations' setting `<name>` to `<value>`."""
+    set_value(ctx=ctx, setting_name=setting_name, value=value, store=store)
 
 
 @set_.command()
