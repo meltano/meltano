@@ -20,6 +20,11 @@ logger = structlog.getLogger(__name__)
 
 @cli.command(short_help="[preview] Run a set of plugins in series.")
 @click.option(
+    "--dry-run",
+    help="Do not run, just parse the invocation, validate it, and explain what would be executed.",
+    is_flag=True,
+)
+@click.option(
     "--full-refresh",
     help="Perform a full refresh (ignore state left behind by any previous runs). Applies to all pipelines.",
     is_flag=True,
@@ -43,6 +48,7 @@ logger = structlog.getLogger(__name__)
 @click_run_async
 async def run(
     project: Project,
+    dry_run: bool,
     full_refresh: bool,
     no_state_update: bool,
     force: bool,
@@ -81,14 +87,31 @@ async def run(
         logger.debug("All ExtractLoadBlocks validated, starting execution.")
     else:
         raise CliError("Some ExtractLoadBlocks set failed validation.")
-    await _run_blocks(parsed_blocks)
+    await _run_blocks(parsed_blocks, dry_run=dry_run)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_run(blocks)
 
 
-async def _run_blocks(parsed_blocks: List[Union[BlockSet, PluginCommandBlock]]) -> None:
+async def _run_blocks(
+    parsed_blocks: List[Union[BlockSet, PluginCommandBlock]], dry_run: bool
+) -> None:
     for idx, blk in enumerate(parsed_blocks):
+        if dry_run:
+            if isinstance(blk, BlockSet):
+                logger.info(
+                    f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}.",
+                    block_type=blk.__class__.__name__,
+                    comprised_of=[plugin.string_id for plugin in blk.blocks],
+                )
+            elif isinstance(blk, PluginCommandBlock):
+                logger.info(
+                    f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}.",
+                    block_type=blk.__class__.__name__,
+                    comprised_of=f"{blk.string_id}:{blk.command}",
+                )
+            continue
+
         try:
             await blk.run()
         except RunnerError as err:

@@ -644,8 +644,9 @@ meltano run tap-gitlab one-mapping another-mapping target-postgres
 #### Parameters
 
 When an active environment is present, `run` will attempt to run incrementally and save state by default.
-However, three top level flags are provided to alter behavior:
+However, four top level flags are provided to alter behavior:
 
+- `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
 - `--no-state-update` will disable state saving for this invocation.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.

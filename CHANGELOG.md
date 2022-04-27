@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#3146](https://gitlab.com/meltano/meltano/-/issues/3146) Add `--dry-run` option to `meltano run`.
+
 ### Changes
 
 ### Fixes
