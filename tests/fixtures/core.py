@@ -732,3 +732,10 @@ def job_history_session(jobs, session):
 @pytest.fixture
 def state_service(job_history_session):
     return StateService(session=job_history_session)
+
+
+@pytest.fixture
+def project_with_environment(project: Project) -> Project:
+    project.activate_environment("dev")
+    yield project
+    project.active_environment = None

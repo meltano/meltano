@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
 
-
 ## Unreleased
 ---
 
@@ -16,15 +15,28 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+### Breaks
+
+
+## 1.101.0 - (2022-04-21)
+
+---
+
+### New
+
+- [#3377](https://gitlab.com/meltano/meltano/-/issues/3377) Add active environment as variable `MELTANO_ENVIRONMENT` in Plugin execution environment.
+
+
+### Fixes
+
 - [#3405](https://gitlab.com/meltano/meltano/-/issues/3405) Add missing `database_uri` key to JSON schema for `meltano.yml`
 - [#3406](https://gitlab.com/meltano/meltano/-/issues/3406) Add missing `plugins/mappers` key to JSON schema for `meltano.yml` and fix `mappings` key in mapper objects.
 - [#3390](https://gitlab.com/meltano/meltano/-/issues/3390) Fixes bug where `meltano init` failed to create prerequisite directories.
 - [#3391](https://gitlab.com/meltano/meltano/-/issues/3391) Fixes bug where `meltano run` would invoke the wrong plugin command when the same plugin was used multiple times.
 
-### Breaks
-
 
 ## 1.100.0 - (2022-04-14)
+
 ---
 
 ### New
@@ -37,7 +49,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3324](https://gitlab.com/meltano/meltano/-/issues/3324) Change example git URL for custom plugin to a generic URL.
 
 ## 1.99.0 - (2022-04-01)
+
 ---
+
 ### New
 
 - [#3103](https://gitlab.com/meltano/meltano/-/issues/3103) Allow users to set a default Environment in `meltano.yml`.
@@ -51,8 +65,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3349](https://gitlab.com/meltano/meltano/-/issues/3349) Resolve missing `schedule` commands in anonymous usage tracking.
 - [#3264](https://gitlab.com/meltano/meltano/-/issues/3264) Fix broken links to http://docs.meltano.com.
 
-
 ## 1.98.1 - (2022-03-14)
+
 ---
 
 ### Fixes
@@ -60,6 +74,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3334](https://gitlab.com/meltano/meltano/-/issues/3334) Set the `executable` of `meltano-map-transformer` to `meltano-map-transform`.
 
 ## 1.98.0 - (2022-03-10)
+
 ---
 
 ### Changes
@@ -67,15 +82,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3316](https://gitlab.com/meltano/meltano/-/issues/3316) Improve the `meltano init` experience with beautified text and cleaner logging
 - [#3317](https://gitlab.com/meltano/meltano/-/issues/3317) Improve Snowplow documentation and simplify telemetry notification during `meltano init`
 - [#3319](https://gitlab.com/meltano/meltano/-/issues/3319) Limit Snowplow tracker logs to the command line to `ERROR` level by default.
-- [#3217](https://gitlab.com/meltano/meltano/-/issues/3217) Allow user to configure Sendgrid asm_group_id. _Thanks, **[@davesgonechina](https://gitlab.com/davesgonechina)**!_
+- [#3217](https://gitlab.com/meltano/meltano/-/issues/3217) Allow user to configure Sendgrid asm*group_id. \_Thanks, **[@davesgonechina](https://gitlab.com/davesgonechina)**!*
 - [#3321](https://gitlab.com/meltano/meltano/-/issues/3321) Switch Snowplow tracker endpoint to `https`.
 
 ### Fixes
 
 - [#3306](https://gitlab.com/meltano/meltano/-/issues/3306) Fix Environments bug where custom configuration values that were not defined either as a setting or custom configuration in the primary plugin definition were not passed to the plugin in the Environment context.
 
-
 ## 1.97.0 - (2022-03-03)
+
 ---
 
 ### New
@@ -93,8 +108,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3289](https://gitlab.com/meltano/meltano/-/issues/3289) In `target-bigquery` default variant `adswerve`, set the default of the `merge_state_messages` setting to `false` so state objects are not merged by the target.
 - [#3301](https://gitlab.com/meltano/meltano/-/issues/3301) Fix a typo that causes requests to the `/install/batch` endpoint to fail.
 
-
 ## 1.96.0 - (2022-02-18)
+
 ---
 
 ### New
@@ -111,8 +126,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3257](https://gitlab.com/meltano/meltano/-/issues/3257) Resolves installation failures by pinning `MarkupSafe` library version to `<2.1.0`.
 
-
 ## 1.95.0 - (2022-02-11)
+
 ---
 
 ### Changes
@@ -123,16 +138,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3190](https://gitlab.com/meltano/meltano/-/issues/3190) Fix `meltano test` bug where plugin name clashes with file bundle name
 
-
 ## 1.94.0 - (2022-02-04)
+
 ---
 
 ### New
 
- - [#1587](https://gitlab.com/meltano/meltano/-/issues/1587) Add "Retry" button to pipeline logs view and list when run failed
-
+- [#1587](https://gitlab.com/meltano/meltano/-/issues/1587) Add "Retry" button to pipeline logs view and list when run failed
 
 ## 1.93.0 - (2022-01-28)
+
 ---
 
 ### Changes
@@ -147,8 +162,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3180](https://gitlab.com/meltano/meltano/-/issues/3180) Fix env usage in discovery.yml and JSON schema
 - [#3169](https://gitlab.com/meltano/meltano/-/issues/3169) Meltano Upgrade CTA in UI has unnecessary link
 
-
 ## 1.92.0 - (2022-01-21)
+
 ---
 
 ### Changes
@@ -166,11 +181,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 [#3161](https://gitlab.com/meltano/meltano/-/issues/3161) Make URLs in `--help` clickable.
 
 ## 1.91.0 - (2022-01-13)
+
 ---
 
 ### New
 
-- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Published JSON Schemas for `meltano.yml` and `discovery.yml`. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR  1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
+- [#3153](https://gitlab.com/meltano/meltano/-/issues/3153) Published JSON Schemas for `meltano.yml` and `discovery.yml`. _Thanks to **[Zachary Wynegar](https://gitlab.com/zdwynegar)** for the initial [MR 1804](https://gitlab.com/meltano/meltano/-/merge_requests/1804) and inspiration this!_
 - [#3001](https://gitlab.com/meltano/meltano/-/issues/3001) Always print log advice on ELT failure.
 
 ### Fixes
@@ -180,14 +196,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2716](https://gitlab.com/meltano/meltano/-/issues/2716) Add `--help `docs for all Meltano CLI commands and options.
 
 ## 1.90.1 - (2021-12-16)
+
 ---
 
 ### Fixes
 
 - [#3124](https://gitlab.com/meltano/meltano/-/issues/3124) Fix an error in `meltano run` invocations where tap discover calls triggered an exception.
 
-
 ## 1.90.0 - (2021-12-15)
+
 ---
 
 ### New
@@ -203,6 +220,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3119](https://gitlab.com/meltano/meltano/-/issues/3119) Bump `meltano` variant of `tap-salesforce` to tag [`v1.5.0`](https://gitlab.com/meltano/tap-salesforce/-/tags/v1.5.0).
 
 ## 1.89.0 - (2021-12-02)
+
 ---
 
 ### New
@@ -216,8 +234,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2772](https://gitlab.com/meltano/meltano/-/issues/2772) Transition to a new structured log format with support for additional formats like JSON and key=value, configurable via stock python logging yaml configs.
 - [#2443](https://gitlab.com/meltano/meltano/-/issues/2443) Bump dbt version to 0.21.1
 
-
 ## 1.88.0 - (2021-11-18)
+
 ---
 
 ### New
@@ -227,6 +245,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3003](https://gitlab.com/meltano/meltano/-/issues/3003) Add `matatika` variant of tap-solarvista extractor.
 
 ## 1.87.1 - (2021-11-09)
+
 ---
 
 ### Changes
@@ -239,27 +258,25 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3047](https://gitlab.com/meltano/meltano/-/issues/3047) Don't fail if primary `meltano.yml` file is missing top-level entries.
 - [#3049](https://gitlab.com/meltano/meltano/-/issues/3049) Fix installation issues caused by breaking change in WTForms library v3.0.x.
 
-
 ## 1.87.0 - (2021-11-05)
+
 ---
 
 ### New
 
 - [#2456](https://gitlab.com/meltano/meltano/-/issues/2456) Let project plugin definitions and config be defined in multiple individual YAML files. _Thanks, **[Matthew Thurman](https://gitlab.com/mathurmag)** for the inspiration and first draft!_
 
-
 ### Breaks
 
 - [#2977](https://gitlab.com/meltano/meltano/-/issues/2977) Disable the Explore and Dashboards tabs in the UI by default.
 
-
 ## 1.86.0 - (2021-10-28)
+
 ---
 
 ### New
 
 - [#2869](https://gitlab.com/meltano/meltano/-/issues/2869) Introduce top-level "Environments" within `meltano.yml`
-
 
 ### Changes
 
@@ -271,8 +288,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3027](https://gitlab.com/meltano/meltano/-/issues/3027) Fixes an issue where elt invocation could hang if the tap produced large amounts of error output during discovery.
 
-
 ## 1.85.0 - (2021-10-21)
+
 ---
 
 ### Changes
@@ -284,13 +301,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2965](https://gitlab.com/meltano/meltano/-/issues/2965) Set `meltanolabs` as the default tap-gitlab extractor.
 - [2339](https://gitlab.com/meltano/meltano/-/merge_requests/2339) Update `elt` log format to include subtask field. Lines are now prefixed with `<name> | <subtask>` which may cause issues with existing log parsers.
 
-
 ### Fixes
 
 - [#2997](https://gitlab.com/meltano/meltano/-/issues/2997) Bump required version of `jsonschema`.
 
-
 ## 1.84.0 - (2021-10-07)
+
 ---
 
 ### New
@@ -298,21 +314,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2357](https://gitlab.com/meltano/meltano/-/merge_requests/2357) Use dbt [`v0.21.0`](https://github.com/dbt-labs/dbt/releases/tag/v0.21.0) by default for new dbt installs
 - [2363](https://gitlab.com/meltano/meltano/-/merge_requests/2363), [2360](https://gitlab.com/meltano/meltano/-/merge_requests/2360) Small branding and logo updates throughout - and introducing Melty to the community!
 
-
 ### Fixes
 
 - [2349](https://gitlab.com/meltano/meltano/-/merge_requests/2349) Fixes test extractor API endpoint to work with new PluginTestService. _Thanks, **[ReubenFrankel](https://gitlab.com/ReubenFrankel)**!_
 
-
 ## 1.83.0 - (2021-09-30)
+
 ---
 
 ### New
 
 - [#2647](https://gitlab.com/meltano/meltano/-/issues/2647) Extend `meltano select` with flag to remove rules.
 
-
 ## 1.82.0 - (2021-09-23)
+
 ---
 
 ### Changes
@@ -325,6 +340,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2881](https://gitlab.com/meltano/meltano/-/issues/2881) Send CLI error messages to `stderr`.
 
 ## 1.81.0 - (2021-09-16)
+
 ---
 
 ### New
@@ -340,21 +356,22 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2866](https://gitlab.com/meltano/meltano/-/issues/2866) Avoid running discovery when invoking a tap in a mode other than sync
 
-
 ## 1.80.1 - (2021-09-10)
+
 ---
 
 ### Fixes
 
 - [#2928](https://gitlab.com/meltano/meltano/-/issues/2928) Fix tap discovery failure when tap produces IO on stderr
 
-
 ## 1.80.0 - (2021-09-09)
+
 ---
 
 ### New
 
 - [#2906](https://gitlab.com/meltano/meltano/-/issues/2906) Increase speed of `meltano install` for already installed plugins
+
 * [#2906](https://gitlab.com/meltano/meltano/-/issues/2906) Increase speed of `meltano install` for already installed plugins
 
 ### Changes
@@ -365,8 +382,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2573](https://gitlab.com/meltano/meltano/-/issues/2573) Fix misleading error about missing `airflow.cfg` instead of missing Airflow executable
 
-
 ## 1.79.2 - (2021-09-07)
+
 ---
 
 ### Fixes
@@ -374,6 +391,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2922](https://gitlab.com/meltano/meltano/-/issues/2922) Fix error during installation of some plugins caused by a `setuptools` release. _Thanks, **[Maarten van Gijssel](https://gitlab.com/mvgijssel)**!_
 
 ## 1.79.1 - (2021-08-17)
+
 ---
 
 ### Fixes
@@ -381,8 +399,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2893](https://gitlab.com/meltano/meltano/-/issues/2893) Fix error when invoking a target outside pipeline context
 - [#2627](https://gitlab.com/meltano/meltano/-/issues/2627) Invalidate catalog cache after reinstalling a tap
 
-
 ## 1.79.0 - (2021-08-13)
+
 ---
 
 ### New
@@ -404,8 +422,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2882](https://gitlab.com/meltano/meltano/-/issues/2882) Allow multiple taps / targets to be invoked at the same time by adding a UUID to config.json
 - [#2381](https://gitlab.com/meltano/meltano/-/issues/2381) Implement selection logic for all Singer discoverable metadata (`inclusion` and `selected-by-default`)
 
-
 ## 1.78.0 - (2021-07-15)
+
 ---
 
 ### New
@@ -418,7 +436,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2821](https://gitlab.com/meltano/meltano/-/issues/2821) Add `singer-io` variant of `tap-jira`
 - [#2823](https://gitlab.com/meltano/meltano/-/issues/2823) Add `transferwise` variant of `tap-twilio`
 
-
 ### Fixes
 
 - [#2951](https://gitlab.com/meltano/meltano/-/issues/2851) Default to skipping transforms in Meltano UI pipeline creation
@@ -428,8 +445,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
-
 ## 1.77.0 - (2021-06-17)
+
 ---
 
 ### Changes
@@ -442,8 +459,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2741](https://gitlab.com/meltano/meltano/-/issues/2741) Fix duplication of config values when complex settings are applied to Singer plugins.
 
-
 ## 1.76.0 - (2021-06-10)
+
 ---
 
 ### Fixes
@@ -452,8 +469,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2773](https://gitlab.com/meltano/meltano/-/issues/2773) Fix `tap-chargebee`, `tap-intacct` and `tap-quickbooks` definitions that had `properties` capability instead of `catalog`
 - [#2784](https://gitlab.com/meltano/meltano/-/issues/2784) Fix catalog discovery error when using custom plugins with no `pip_url` set
 
-
 ## 1.75.0 - (2021-05-28)
+
 ---
 
 ### Changes
@@ -462,15 +479,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Add support for already-installed plugins by making `pip_url` optional in custom plugin definitions
 - [#2341](https://gitlab.com/meltano/meltano/-/issues/2341) Allow non-pip plugins to be declared using relative `executable` paths and `executable` programs already on the PATH
 
-
 ## 1.74.0 - (2021-05-10)
+
 ---
 
 ### New
+
 - [#2353](https://gitlab.com/meltano/meltano/-/issues/2353) Add `meltano remove` command
 
-
 ## 1.73.0 - (2021-04-29)
+
 ---
 
 ### New
@@ -482,8 +500,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2705](https://gitlab.com/meltano/meltano/-/issues/2705) Speed up `meltano install` by installing plugins in parallel
 - [#2709](https://gitlab.com/meltano/meltano/-/issues/2709) Add support for setting `kind` in settings prompt when using `meltano add --custom`
 
-
 ## 1.72.0 - (2021-04-22)
+
 ---
 
 ### New
@@ -495,6 +513,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift`
 
 ### Changes
+
 - [#2082](https://gitlab.com/meltano/meltano/-/issues/2082) Updated database_uri documentation to show how to target a PostgreSQL schema
 - [#2107](https://gitlab.com/meltano/meltano/-/issues/2107) Updated 'create a custom extractor' tutorial to use the new SDK
 
@@ -502,8 +521,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2526](https://gitlab.com/meltano/meltano/-/issues/2526) When target process fails before tap, report target output instead of `BrokenPipeError` or `ConnectionResetError`
 
-
 ## 1.71.0 - (2021-03-23)
+
 ---
 
 ### New
@@ -511,13 +530,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2544](https://gitlab.com/meltano/meltano/-/issues/2544) Add support for `utility` plugin type
 - [#2614](https://gitlab.com/meltano/meltano/-/issues/2614) Add `mashey` variant of `tap-zoom`
 
-
 ### Fixes
 
 - [#2581](https://gitlab.com/meltano/meltano/-/issues/2581) Only expand `$ALL_CAPS` env vars in `meltano.yml` config values to prevent false positive matches in passwords
 
-
 ## 1.70.0 - (2021-02-23)
+
 ---
 
 ### New
@@ -533,8 +551,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2585](https://gitlab.com/meltano/meltano/-/issues/2585) Fix bug with finding a schedule based on namespace for a custom plugin
 
-
 ## 1.69.0 - (2021-02-16)
+
 ---
 
 ### New
@@ -542,8 +560,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2558](https://gitlab.com/meltano/meltano/-/issues/2558) Add support for Airflow 2.0
 - [#2577](https://gitlab.com/meltano/meltano/-/issues/2577) Add `hotgluexyz` variant of `tap-quickbooks`
 
-
 ## 1.68.0 - (2021-02-11)
+
 ---
 
 ### New
@@ -558,8 +576,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2543](https://gitlab.com/meltano/meltano/-/issues/2543) Fix packages dependencies that claim Python 3.9 is supported when it actually isn't.
 
-
 ## 1.67.0 - (2021-01-26)
+
 ---
 
 ### Fixes
@@ -567,8 +585,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2540](https://gitlab.com/meltano/meltano/-/issues/2540) `meltano schedule run` exit code now matches exit code of wrapped `meltano elt`
 - [#2525](https://gitlab.com/meltano/meltano/-/issues/2525) `meltano schedule run` no longer requires `meltano` to be in the `PATH`
 
-
 ## 1.66.0 - (2021-01-18)
+
 ---
 
 ### New
@@ -579,50 +597,49 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2502](https://gitlab.com/meltano/meltano/-/issues/2502) Add `User-Agent` header with Meltano version to request for remote `discovery.yml` manifest (typically https://www.meltano.com/discovery.yml)
 - [#2503](https://gitlab.com/meltano/meltano/-/issues/2503) Include project ID in `X-Project-ID` header and `project_id` query param in request for remote `discovery.yml` manifest when `send_anonymous_usage_stats` setting is enabled.
 
-
 ## 1.65.0 - (2021-01-12)
+
 ---
 
 ### New
 
 - [#2392](https://gitlab.com/meltano/meltano/-/issues/2392) Add 'elt.buffer_size' setting with default value of 10MiB to let extractor output buffer size and line length limit (maximum message size) be configured as appropriate for the extractor and loader in question.
 
-
 ### Fixes
 
 - [#2501](https://gitlab.com/meltano/meltano/-/issues/2501) Don't lose `version` when caching `discovery.yml`.
 
-
 ## 1.64.1 - (2021-01-08)
+
 ---
 
 ### Fixes
 
 - [#2500](https://gitlab.com/meltano/meltano/-/issues/2500) Ensure all buffered messages (records) output by extractor make it to loader when extractor finishes early.
 
-
 ## 1.64.0 - (2021-01-07)
+
 ---
 
 ### Fixes
 
 - [#2478](https://gitlab.com/meltano/meltano/-/issues/2478) Fix runaway memory usage (and possible out-of-memory error) when extractor outputs messages at higher rate than loader can process them, by enabling flow control with a 64KB buffer size limit
 
-
 ## 1.63.0 - (2021-01-04)
+
 ---
 
 ### New
+
 - [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) Verify that system database connection is still viable when checking it out of connection pool.
 - [#2308](https://gitlab.com/meltano/meltano/-/issues/2308) Add `database_max_retries` and `database_retry_timeout` settings to configure retry attempts when the first connection to the DB fails.
-
 
 ### Fixes
 
 - [#2486](https://gitlab.com/meltano/meltano/-/issues/2486) Remove `state` capability from `tap-google-analytics` because it's not actually currently supported yet
 
-
 ## 1.62.0 - (2020-12-23)
+
 ---
 
 ### New
@@ -633,8 +650,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2479](https://gitlab.com/meltano/meltano/-/issues/2479) Use extractor `load_schema` (usually its namespace) as default for target-bigquery `dataset_id` setting, as it already is for target-snowflake and target-postgres `schema`
 
-
 ## 1.61.0 - (2020-12-09)
+
 ---
 
 ### New
@@ -652,19 +669,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2379](https://gitlab.com/meltano/meltano/-/issues/2379) Take into account schedule `env` when running pipeline from UI using "Run" button
 
-
 ## 1.60.1 - (2020-12-07)
+
 ---
 
 ### Fixes
 
 - [#2473](https://gitlab.com/meltano/meltano/-/issues/2473) Fix meltano/meltano Docker image entrypoint
 
-
 ## 1.60.0 - (2020-12-02)
+
 ---
 
 ### New
+
 - [#2367](https://gitlab.com/meltano/meltano/-/issues/2367) Adopt Poetry for dependency and build management
 
 ### Changes
@@ -677,8 +695,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2463](https://gitlab.com/meltano/meltano/-/issues/2463) Fix casting of tap-postgres `max_run_seconds`, `logical_poll_total_seconds`, and `break_at_end_lsn` setting values
 - [#2466](https://gitlab.com/meltano/meltano/-/issues/2466) Stop requiring specific version of `cryptography` that's incompatible with latest `pyOpenSSL`
 
-
 ## 1.59.0 - (2020-11-23)
+
 ---
 
 ### Changes
@@ -686,13 +704,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2450](https://gitlab.com/meltano/meltano/-/issues/2450) Remove undocumented plugin configuration profile functionality
 
 ### Fixes
+
 - [#2451](https://gitlab.com/meltano/meltano/-/issues/2451) Correctly show CLI error messages in log output
 - [#2453](https://gitlab.com/meltano/meltano/-/issues/2453) Correctly pass value of `tap-facebook`'s `insights_buffer_days` setting to tap as integer instead of boolean
 - [#2387](https://gitlab.com/meltano/meltano/-/issues/2387) Order of attributes in `meltano select --list --all` is set to alphabetical order.
 - [#2458](https://gitlab.com/meltano/meltano/-/issues/2458) Adds missing `mysql-logo.png`
 
-
 ## 1.58.0 - (2020-11-12)
+
 ---
 
 ### New
@@ -711,8 +730,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2445](https://gitlab.com/meltano/meltano/-/issues/2445) Fix 'Test Connection' and 'Save' buttons being disabled in UI Configuration modal despite required fields being populated
 - [#2307](https://gitlab.com/meltano/meltano/-/issues/2307) Fix logging into Meltano UI in Google Chrome when running without HTTPS
 
-
 ## 1.57.0 - (2020-11-10)
+
 ---
 
 ### New
@@ -732,11 +751,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-
 ### Breaks
 
-
 ## 1.56.0 - (2020-11-02)
+
 ---
 
 ### New
@@ -744,8 +762,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2374](https://gitlab.com/meltano/meltano/-/issues/2374) Add `target-bigquery` discoverable plugin definition
 - [#1956](https://gitlab.com/meltano/meltano/-/issues/1956) Add support for Python 3.8
 
-
 ## 1.55.0 - (2020-10-30)
+
 ---
 
 ### New
@@ -763,8 +781,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2391](https://gitlab.com/meltano/meltano/-/issues/2391) Add missing `max_workers` setting to `tap-salesforce` discoverable plugin definition
 - [#2400](https://gitlab.com/meltano/meltano/-/issues/2400) Constrain Airflow installation to specific set of known-to-work requirements to prevent it from breaking unexpectedly
 
-
 ## 1.54.0 - (2020-10-08)
+
 ---
 
 ### Changes
@@ -778,8 +796,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2376](https://gitlab.com/meltano/meltano/-/issues/2376) Fix `meltano elt ... --transform={run,only}` raising `PluginMissingError` when a default transform for the extractor is discoverable but not installed
 - [#2377](https://gitlab.com/meltano/meltano/-/issues/2377) Ensure arbitrary env vars defined in `.env` are passed to invoked plugins
 
-
 ## 1.53.0 - (2020-10-06)
+
 ---
 
 ### New
@@ -794,8 +812,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2372](https://gitlab.com/meltano/meltano/-/issues/2372) Upgrade `pip` and related tools to the latest version in plugin venvs
 
-
 ## 1.52.0 - (2020-09-28)
+
 ---
 
 ### Fixes
@@ -804,21 +822,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2348](https://gitlab.com/meltano/meltano/-/issues/2348) Invalidate `meltano select` catalog discovery cache when extractor configuration is changed
 
-
 ## 1.51.0 - (2020-09-21)
+
 ---
 
 ### New
 
 - [#2355](https://gitlab.com/meltano/meltano/-/issues/2355) Add `meltano elt` `--dump` option with possible values `catalog`, `state`, `extractor-config`, and `loader-config` to dump content of pipeline-specific generated file
 
-
 ### Fixes
 
 - [#2358](https://gitlab.com/meltano/meltano/-/issues/2358) Don't unintentionally deselect all attributes other than those marked `inclusion: automatic` when using extractor `select_filter` extra or `meltano elt`'s `--select <entity>` option
 
-
 ## 1.50.0 - (2020-09-17)
+
 ---
 
 ### New
@@ -832,8 +849,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2352](https://gitlab.com/meltano/meltano/-/issues/2352) `meltano elt` `--select` and `--exclude` no longer unexpectedly select entities for extraction that match the wildcard pattern but weren't selected originally.
 
-
 ## 1.49.0 - (2020-09-15)
+
 ---
 
 ### New
@@ -855,8 +872,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2278](https://gitlab.com/meltano/meltano/-/issues/2278) Stop unnecessarily prepopulating `env` on a newly added custom plugin's settings definitions
 - [#2208](https://gitlab.com/meltano/meltano/-/issues/2208) Standardize on setting env vars prefixed with plugin name, not namespace or custom `env`
 
-
 ## 1.48.0 - (2020-09-07)
+
 ---
 
 ### New
@@ -883,8 +900,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2344](https://gitlab.com/meltano/meltano/-/issues/2344) Move `meltano elt` output logs from `.meltano/run/elt` to `.meltano/logs/elt`
 - [#2342](https://gitlab.com/meltano/meltano/-/issues/2342) Store pipeline-specific generated plugin config files (`tap.config.json`, `tap.properties.json`, etc) under `.meltano/run/elt/<job_id>/<run_id>` instead of `.meltano/run/<plugin_name>`. Users who were explicitly putting a catalog file at `.meltano/run/<plugin_name>/tap.properties.json` should use `.meltano/extractors/<plugin_name>/tap.properties.json` instead.
 
-
 ## 1.47.0 - (2020-09-03)
+
 ---
 
 ### New
@@ -903,8 +920,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2235](https://gitlab.com/meltano/meltano/-/issues/2235) Make embed links accessible when not authenticated
 - [#2328](https://gitlab.com/meltano/meltano/-/issues/2328) Always convert `target-snowflake` `schema` setting value to uppercase before passing it to plugin
 
-
 ## 1.46.0 - (2020-08-27)
+
 ---
 
 ### New
@@ -916,8 +933,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2309](https://gitlab.com/meltano/meltano/-/issues/2309) Pretty print `meltano schedule list --format=json` output
 - [#2312](https://gitlab.com/meltano/meltano/-/issues/2312) Don't unnecessarily run discovery and generate catalog when running `meltano invoke <extractor> --help`, making it less likely to fail
 
-
 ## 1.45.0 - (2020-08-17)
+
 ---
 
 ### New
@@ -933,8 +950,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2268](https://gitlab.com/meltano/meltano/-/issues/2268) Fix bug causing custom plugins not to show up in `meltano discover` and have "Unknown" label in UI
 
-
 ## 1.44.0 - (2020-08-11)
+
 ---
 
 ### Fixes
@@ -942,8 +959,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2219](https://gitlab.com/meltano/meltano/-/issues/2219) Don't fail on large (record) messages output by extractors (Singer taps) by increasing subprocess output buffer size from 64KB to 1MB.
 - [#2215](https://gitlab.com/meltano/meltano/-/issues/2215) Have `meltano invoke <plugin> --help` pass `--help` flag to plugin, instead of showing `meltano invoke` help message
 
-
 ## 1.43.0 - (2020-08-04)
+
 ---
 
 ### New
@@ -963,8 +980,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2213](https://gitlab.com/meltano/meltano/-/issues/2213) Provide extra context when `meltano invoke airflow` fails because of `airflow initdb` failing
 - [!1778](https://gitlab.com/meltano/meltano/-/merge_requests/1788) Fail gracefully when `meltano install` fails to install plugin(s)
 
-
 ## 1.42.0 - (2020-07-28)
+
 ---
 
 ### New
@@ -983,8 +1000,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2166](https://gitlab.com/meltano/meltano/-/issues/2166) Don't fail on large extractor state messages by increasing loader output buffer size from 64 to 128KB
 - [#2180](https://gitlab.com/meltano/meltano/-/issues/2180) Mark pipeline job as failed when process is interrupted (SIGINT) or terminated (SIGTERM).
 
-
 ## 1.41.1 - (2020-07-23)
+
 ---
 
 ### New
@@ -1008,8 +1025,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [!1774](https://gitlab.com/meltano/meltano/-/merge_requests/1774) Fix poor performance of setting lookups using more memoization
 
-
 ## 1.41.0 - (2020-07-20)
+
 ---
 
 ### New
@@ -1027,8 +1044,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2168](https://gitlab.com/meltano/meltano/-/issues/2168) Don't select entity attributes marked as unsupported
 
-
 ## 1.40.1 - (2020-07-16)
+
 ---
 
 ### New
@@ -1049,16 +1066,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2170](https://gitlab.com/meltano/meltano/-/issues/2170) Restore support for referencing arbitrary env vars defined in `.env` from `meltano.yml` using env var expansion
 - [#2115](https://gitlab.com/meltano/meltano/-/issues/2115) Stop `meltano` commands from leaving empty `.meltano/run` directory behind when run in non-project dir
 
-
 ## 1.40.0 - (2020-07-14)
+
 ---
 
 ### New
 
 - [#2153](https://gitlab.com/meltano/meltano/-/issues/2153) Add `logo_url` property to custom extractor and loader definitions to show a custom logo in Meltano UI
 
-
 ## 1.39.1 - (2020-07-09)
+
 ---
 
 ### New
@@ -1079,8 +1096,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2151](https://gitlab.com/meltano/meltano/-/issues/2151) Fix `meltano ui` never printing `Meltano UI is now available at [URL]` if `ui.server_name` is set
 - [#2152](https://gitlab.com/meltano/meltano/-/issues/2152) Fix `meltano ui` printing all `gunicorn.error` logs twice
 
-
 ## 1.39.0 - (2020-07-07)
+
 ---
 
 ### New
@@ -1098,8 +1115,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2136](https://gitlab.com/meltano/meltano/-/issues/2136) Show error message in Analyze UI when pipeline for extractor is missing, even if extractor is installed
 - [#2131](https://gitlab.com/meltano/meltano/-/issues/2131) Have "true" environment variables take precedence over those defined in `.env`
 
-
 ## 1.38.1 - (2020-07-03)
+
 ---
 
 ### New
@@ -1115,8 +1132,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2094](https://gitlab.com/meltano/meltano/-/issues/2069) Turn "Connections" page into "Extractors" management UI
 - [#2130](https://gitlab.com/meltano/meltano/-/issues/2130) Have CLI respect `MELTANO_PROJECT_ROOT` env var when set instead of looking at current directory
 
-
 ## 1.38.0 - (2020-06-30)
+
 ---
 
 ### New
@@ -1136,16 +1153,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2105](https://gitlab.com/meltano/meltano/-/issues/2105) Stop automatically running Airflow scheduler as part of Meltano UI
 
-
 ## 1.37.1 - (2020-06-26)
+
 ---
 
 ### Fixes
 
 - [#2113](https://gitlab.com/meltano/meltano/-/issues/2113) Fix bug causing `meltano invoke airflow` to fail because `AIRFLOW_HOME` was not set correctly.
 
-
 ## 1.37.0 - (2020-06-25)
+
 ---
 
 ### New
@@ -1154,7 +1171,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2068](https://gitlab.com/meltano/meltano/-/issues/2068) Add interface to schedule new pipelines to Pipelines page
 - [#2081](https://gitlab.com/meltano/meltano/-/issues/2081) Add `url` config option to `target-postgres`
 - [#2060](https://gitlab.com/meltano/meltano/-/issues/2060) Add `--format=json` option to `meltano schedule list` so that a project's schedules can be processed programmatically
-
 
 ## 1.36.1 - (2020-06-19)
 
@@ -1165,13 +1181,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2103](https://gitlab.com/meltano/meltano/-/issues/2103) Allow nested properties to be set using `meltano config` by specifying a list of property names: `meltano config <plugin_name> set <property> <subproperty> <value>`
 - [#2026](https://gitlab.com/meltano/meltano/-/issues/2026) Allow Singer stream and property metadata to be configured using special nested `config` properties `metadata.<entity>.<key>` and `metadata.<entity>.<attribute>.<key>`.
 
-
 ### Fixes
 
 - [#2102](https://gitlab.com/meltano/meltano/-/issues/2102) Fix potential `meltano upgrade` failures by having it invoke itself with `--skip-package` after upgrading the package to ensure it always uses the latest code.
 
-
 ## 1.36.0 - (2020-06-15)
+
 ---
 
 ### New
@@ -1181,15 +1196,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Add new 'files' plugin type to allow plugin-specific files to be added to a Meltano project automatically
 - [#2090](https://gitlab.com/meltano/meltano/-/issues/2090) Allow SERVER_NAME, SECRET_KEY, and SECURITY_PASSWORD_SALT to be set using environment instead of ui.cfg
 
-
 ### Fixes
 
 - [#2096](https://gitlab.com/meltano/meltano/-/issues/2096) Remove noisy migration-related logging from CLI command output
 - [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Don't add Airflow and dbt-specific files to Meltano project until plugins are added explicitly
 - [#2089](https://gitlab.com/meltano/meltano/-/issues/2089) Don't add docker-compose.yml to Meltano project by default
 
-
 ## 1.35.1 - (2020-06-11)
+
 ---
 
 ### Changes
@@ -1201,8 +1215,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2092](https://gitlab.com/meltano/meltano/-/issues/2092) Only install plugins related to plugins of the specified type when running `meltano install <plugin_type> --include-related`
 - [#2093](https://gitlab.com/meltano/meltano/-/issues/2093) Print error when transform plugin is installed before dbt
 
-
 ## 1.35.0 - (2020-06-09)
+
 ---
 
 ### New
@@ -1224,8 +1238,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2085](https://gitlab.com/meltano/meltano/-/issues/2085) Don't change order of object and set values when meltano.yml is updated programatically
 - [#2086](https://gitlab.com/meltano/meltano/-/issues/2086) Ensure "meltano config --format=json" prints actual JSON instead of Python object
 
-
 ## 1.34.2 - (2020-05-29)
+
 ---
 
 ### Fixes
@@ -1235,16 +1249,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2075](https://gitlab.com/meltano/meltano/-/issues/2075) Update Airflow configand run `initdb` every time it is invoked
 - [#2078](https://gitlab.com/meltano/meltano/-/issues/2078) Have Airflow DAG respect non-default system database URI set through `MELTANO_DATABASE_URI` env var or `--database-uri` option
 
-
 ## 1.34.1 - (2020-05-26)
+
 ---
 
 ### Fixes
 
 - [#2063](https://gitlab.com/meltano/meltano/-/merge_requests/2063) Require `psycopg2-binary` instead of `psycopg2` so that build dependency `pg_config` doesn't need to be present on system
 
-
 ## 1.34.0 - (2020-05-26)
+
 ---
 
 ### New
@@ -1271,8 +1285,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2059](https://gitlab.com/meltano/meltano/-/issues/2059) Properly handle errors in before/after install hooks
 
-
 ## 1.33.0 - (2020-05-21)
+
 ---
 
 ### Changes
@@ -1286,16 +1300,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2043](https://gitlab.com/meltano/meltano/-/issues/2043) Use plugin name in UI when label is not set, instead of not showing anything
 - [#2044](https://gitlab.com/meltano/meltano/-/issues/2044) Don't show button to open Log Modal on Pipelines page if pipeline has never run
 
-
 ## 1.32.1 - (2020-05-15)
+
 ---
 
 ### Fixes
 
 - [#2024](https://gitlab.com/meltano/meltano/-/issues/2024) Have plugin venvs not inherit Meltano venv to prevent wrong versions of modules from being loaded
 
-
 ## 1.32.0 - (2020-05-11)
+
 ---
 
 ### New
@@ -1313,8 +1327,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2020](https://gitlab.com/meltano/meltano/-/issues/2020) Fix bug that caused `meltano select` to add `select` option to every plugin in `meltano.yml` instead of just the specified one
 - [#2021](https://gitlab.com/meltano/meltano/-/issues/2021) Only ask for capabilities when adding a custom extractor, not a loader or other plugin
 
-
 ## 1.31.0 - (2020-05-04)
+
 ---
 
 ### Changes
@@ -1326,15 +1340,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2007](https://gitlab.com/meltano/meltano/-/issues/2007) Only run 'airflow scheduler' as part of 'meltano ui' when airflow is installed
 - [#2007](https://gitlab.com/meltano/meltano/-/issues/2007) Install airflow, dbt, and target-postgres on DigitalOcean images
 
-
 ## 1.30.1 - (2020-04-23)
+
 ---
 
 ### Fixes
+
 - [#1985](https://gitlab.com/meltano/meltano/-/issues/1985) Fixed bug with Airflow installs WTForms 2.3.0 instead of 2.2.1, which is incompatible
 
-
 ## 1.30.0 - (2020-04-20)
+
 ---
 
 ### New
@@ -1346,8 +1361,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [!1611](https://gitlab.com/meltano/meltano/-/merge_requests/1611) Only show design description if it is different from design label
 
-
 ## 1.29.1 - (2020-04-16)
+
 ---
 
 ### New
@@ -1363,11 +1378,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [!1607](https://gitlab.com/meltano/meltano/-/merge_requests/1607) Move date range picker into results area of report builder interface
 - [!1608](https://gitlab.com/meltano/meltano/-/merge_requests/1608) Make report title more prominent in report builder
 
-
 ## 1.29.0 - (2020-04-13)
+
 ---
 
 ## 1.28.1 - (2020-04-09)
+
 ---
 
 ### New
@@ -1383,37 +1399,36 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1942](https://gitlab.com/meltano/meltano/-/issues/1942) Ensure navigation bar is hidden in production when docs are viewed inline
 
-
 ## 1.28.0 - (2020-04-06)
+
 ---
 
 ### New
 
 - [#1937](https://gitlab.com/meltano/meltano/-/issues/1937) Add optional `plugin_type` argument to `meltano install` to only (re)install plugins of a certain type
 
-
 ### Fixes
 
 - [#1938](https://gitlab.com/meltano/meltano/-/issues/1938) Display error message when viewing dashboard before pipeline has run
 
-
 ## 1.27.3 - (2020-04-02)
+
 ---
 
 ### Fixes
 
 - [#1938](https://gitlab.com/meltano/meltano/-/issues/1938) Fix regression causing dashboards and reports not to load when readonly mode is enabled (like on the demo instance)
 
-
 ## 1.27.2 - (2020-04-02)
+
 ---
 
 ### Fixes
 
 - [#1936](https://gitlab.com/meltano/meltano/-/issues/1936) Fix regression causing UI to fail when analytics/tracking is enabled
 
-
 ## 1.27.1 - (2020-04-02)
+
 ---
 
 ### New
@@ -1438,8 +1453,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1911](https://gitlab.com/meltano/meltano/-/issues/1911) Display "Last updated: Updating..." instead of "Last updated: 1969-12-31" on reports while pipeline is running
 - [#1910](https://gitlab.com/meltano/meltano/-/issues/1910) Fix pipeline "Start date" and report "Data starting from" off-by-1 errors caused by timezone differences
 
-
 ## 1.27.0 - (2020-03-30)
+
 ---
 
 ### Changes
@@ -1456,16 +1471,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1906](https://gitlab.com/meltano/meltano/-/issues/1906) Fix "Test Connection" for extractors that require a file to be uploaded, like Google Analytics
 - [#1931](https://gitlab.com/meltano/meltano/-/issues/1931) Validate uploaded file path when saving or testing connection settings
 
-
 ## 1.26.2 - (2020-03-26)
+
 ---
 
 ### Fixes
 
 - [#1883](https://gitlab.com/meltano/meltano/-/issues/1883) Fix dashboard and embedded reports failing to load when design has no joins
 
-
 ## 1.26.1 - (2020-03-26)
+
 ---
 
 ### Changes
@@ -1476,8 +1491,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1847](https://gitlab.com/meltano/meltano/-/issues/1847) Show date range on embedded reports and dashboards
 - [#1847](https://gitlab.com/meltano/meltano/-/issues/1847) Show date range on reports on dashboards
 
-
 ## 1.26.0 - (2020-03-23)
+
 ---
 
 ### Changes
@@ -1489,7 +1504,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1876](https://gitlab.com/meltano/meltano/-/issues/1876) Don't store Analyze UI state in report file
 - [#1877](https://gitlab.com/meltano/meltano/-/issues/1877) Allow designs to reference the same table more than once
 - [#1878](https://gitlab.com/meltano/meltano/-/issues/1878) Recompile models when meltano is upgraded
-
 
 ## 1.25.1 - (2020-03-19)
 
@@ -1510,7 +1524,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1872](https://gitlab.com/meltano/meltano/-/issues/1872) Delete state left over from different pipeline run for same extractor
 - [#1779](https://gitlab.com/meltano/meltano/-/issues/1779) Fix loading report directly by URL when design request completes before reports request
-
 
 ## 1.25.0 - (2020-03-16)
 

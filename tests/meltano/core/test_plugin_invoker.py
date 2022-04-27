@@ -34,6 +34,7 @@ class TestPluginInvoker:
 
         # Project env
         assert env["MELTANO_PROJECT_ROOT"] == str(project.root)
+        assert env["MELTANO_ENVIRONMENT"] == ""
 
         # Project settings
         assert env["MELTANO_CLI_LOG_LEVEL"] == "info"
@@ -50,6 +51,20 @@ class TestPluginInvoker:
         assert env["VIRTUAL_ENV"] == str(venv.root)
         assert env["PATH"].startswith(str(venv.bin_dir))
         assert "PYTHONPATH" not in env
+
+    @pytest.mark.asyncio
+    async def test_environment_env(
+        self, project_with_environment, tap, session, plugin_invoker_factory
+    ):
+        subject = plugin_invoker_factory(tap)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        # Project env
+        assert (
+            env["MELTANO_ENVIRONMENT"]
+            == project_with_environment.active_environment.name
+        )
 
     @pytest.mark.asyncio
     async def test_unknown_command(self, plugin_invoker):
