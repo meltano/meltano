@@ -3,10 +3,10 @@
 import json
 import tempfile
 from pathlib import Path
-from pydoc import describe
 
 import click
 import dotenv
+from click_default_group import DefaultGroup
 
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
@@ -264,41 +264,130 @@ def set_value(ctx, setting_name, value, store):
         )
 
 
-def set_all_interactively(ctx, store):
+def set_interactive(ctx, name, config_metadata, store, index=1, last_index=1):
+    """Set a single value interactively."""
+    settings = ctx.obj["settings"]
+    source = config_metadata["source"]
+    setting_def = config_metadata["setting"]
+
+    title = f"{settings.label.capitalize()} setting {index} of {last_index}"
+    separator = "-" * len(title)
+    indentation = "  "
+
+    click.echo()
+    click.echo(separator)
+    click.echo(title)
+    click.echo(separator)
+    click.echo()
+    click.echo(f"{indentation}Name: {name}")
+    if setting_def.description:
+        click.echo(f"{indentation}Description: {setting_def.description}")
+    if setting_def.kind:
+        click.echo(f"{indentation}Kind: {setting_def.kind}")
+
+    default_value = setting_def.value
+    if default_value is not None:
+        click.echo(f"{indentation}Default: {default_value}")
+
+    if source is SettingValueStore.DEFAULT:
+        label = "from default"
+    elif source is SettingValueStore.INHERITED:
+        label = f"inherited from '{settings.plugin.parent.name}'"
+    else:
+        label = f"from {source.label}"
+
+    current_unexpanded_value = config_metadata.get("unexpanded_value")
+    current_value = config_metadata["value"]
+    if current_unexpanded_value:
+        click.echo(f"{indentation}Current unexpanded value: {current_unexpanded_value}")
+        click.echo(f"{indentation}Current expanded value ({label}): {current_value}")
+    else:
+        click.echo(f"{indentation}Current Value ({label}): {current_value}")
+
+    click.echo()
+    new_value = click.prompt(
+        "New value (enter to skip)", default="", show_default=False
+    )
+
+    click.echo()
+    old_value = current_unexpanded_value or current_value
+    if new_value in {"", old_value}:
+        click.secho(f"Setting '{name}' value unchanged.", fg="yellow")
+    else:
+        set_value(ctx=ctx, setting_name=(name,), value=new_value, store=store)
+
+    click.echo()
+    click.echo(separator)
+    click.echo()
+
+    if not click.confirm("Continue to next setting?", default=True):
+        set_interactive(ctx, name, config_metadata, store, index, last_index)
+
+
+def set_all_interactive(ctx, store):
+    """Set all interactive helper."""
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
 
+    full_config = settings.config_with_metadata(session=session)
 
-@config.command("set")
-@click.argument("setting_name", nargs=-1)
+    index = 1
+    last_index = len(full_config.items())
+    for name, config_metadata in full_config.items():
+        set_interactive(
+            ctx,
+            name=name,
+            config_metadata=config_metadata,
+            store=store,
+            index=index,
+            last_index=last_index,
+        )
+        index += 1
+
+
+@config.group("set", cls=DefaultGroup, default="setting")
+@click.pass_context
+def set_(ctx):
+    """Set configuration."""
+    pass
+
+
+@set_.command()
+@click.argument("setting_name", nargs=-1, required=True)
 @click.argument("value")
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
     default=SettingValueStore.AUTO,
 )
-@click.option("--all", "all_flag", is_flag=True)
-@click.option("--interactive", is_flag=True)
 @click.pass_context
-def set_(ctx, setting_name, value, store, all_flag, interactive):
+def setting(ctx, setting_name, value, store):
     """Set the configurations' setting `<name>` to `<value>`."""
 
-    if interactive:
-        # set interactively (new path)
-        if all_flag:
-            # process all settings interactively
-            pass
-        else:
-            # process given setting interactively
-            pass
+
+@set_.command()
+@click.argument("setting_name", nargs=-1, required=False)
+@click.option(
+    "--store",
+    type=click.Choice(SettingValueStore.writables()),
+    default=SettingValueStore.AUTO,
+)
+@click.pass_context
+def interactive(ctx, setting_name=None, store=None):
+    """Set configuration interactively."""
+    settings = ctx.obj["settings"]
+
+    if setting_name:
+        name = ".".join(list(setting_name))
+        _, config_metadata = settings.get_with_metadata(name=name)
+        set_interactive(
+            ctx=ctx,
+            name=name,
+            config_metadata=config_metadata,
+            store=store,
+        )
     else:
-        # set setting directly (old path)
-        if all_flag:
-            raise CliError(
-                f'Option "--all" specified without "--interactive". \n'
-                + 'If you meant to configure all settings, please use "meltano config set --all --interactive"'
-            )
-        set_value(ctx=ctx, setting_name=setting_name, value=value, store=store)
+        set_all_interactive(ctx=ctx, store=store)
 
 
 @config.command("test")

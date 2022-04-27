@@ -166,6 +166,8 @@ per_file_ignores =
         WPS216
         # Allow many module members
         WPS202
+        # Allow 'overuse' of expressions (e.g. ctx.obj["settings"])
+        WPS204
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
