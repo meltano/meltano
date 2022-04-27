@@ -1,5 +1,5 @@
 ---
-title: Meltano Plugins
+title: Plugins
 description: Meltano takes a modular approach to data engineering and EL(T), where your project and pipelines are composed of plugins.
 layout: doc
 weight: 2
@@ -505,7 +505,7 @@ Loaders support the following [extras](/guide/configuration#plugin-extras):
 
 A loader's `dialect` [extra](/guide/configuration#plugin-extras)
 holds the name of the dialect of the target database, so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/guide/ui)'s [Analysis feature](/guide/analysis)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
 can determine the type of database to connect to.
 
 The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
@@ -543,7 +543,7 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 
 A loader's `target_schema` [extra](/guide/configuration#plugin-extras)
 holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/guide/ui)'s [Analysis feature](/guide/analysis)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
 can determine the database schema to load data from.
 
 The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
@@ -681,13 +681,13 @@ export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 
 ### Models
 
-Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/guide/ui) to aid in [data analysis](/guide/analysis).
+Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/reference/ui) to aid in [data analysis](/guide/analysis).
 They describe the schema of the data being analyzed and the ways different tables can be joined,
 and are used to automatically generate SQL queries using a point-and-click interface.
 
 ### Dashboards
 
-Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/guide/ui) dashboards and reports.
+Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/reference/ui) dashboards and reports.
 
 When a dashboard is added to your project using [`meltano add`](/reference/command-line-interface#add),
 the bundled dashboards and reports will automatically be added to your project's `analyze` directory as well.
@@ -859,7 +859,7 @@ To learn more about mapper 'transform-field', visit https://github.com/transferw
 
 Mappers are unique in that after install you don't invoke them directly. Instead you define `mappings` by name and add a config object for each mapping.
 This config object is passed to the mapper when the **mapping name** is called as part of a [`meltano run`](/reference/command-line-interface#run) invocation.
-Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead. 
+Note that this differs from other plugins, as you're not invoking a plugin name - but referencing the mapping name instead.
 Additionally, the requirements for the config object itself will vary by plugin.
 
 So given a mapper with mappings configured like so:
@@ -888,7 +888,7 @@ So given a mapper with mappings configured like so:
             type: "SET-NULL"
 ```
 
-You can then invoke the mappings by name: 
+You can then invoke the mappings by name:
 
 ```bash
 
@@ -902,7 +902,7 @@ $ meltano run tap-gitlab hide-gitlab-secrets target-jsonl
 $ meltano run tap-someapi null-created-at target-jsonl
 ```
 
-You can also invoke multiple mappings at once in series: 
+You can also invoke multiple mappings at once in series:
 
 ```bash
 $ tap-someapi fix-null-id fix-country-code target-jsonl
@@ -918,4 +918,3 @@ call mappings that leverage the same plugin at multiple locations numerous times
 # Mask the id if the customer is in the EU region using transform-field mapper.
 $ tap-someapi fix-null-country set-region-from-country  mask-id-if-eu target-jsonl
 ```
-

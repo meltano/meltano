@@ -1,5 +1,5 @@
 ---
-title: Meltano Command Line Interface Reference
+title: Command Line
 description: Meltano provides a command line interface (CLI) that makes it easy to manage your project, plugins, and EL(T) pipelines.
 layout: doc
 ---

@@ -1,5 +1,5 @@
 ---
-title: Meltano Environments
+title: Environments
 description: Environments allow data teams to manage different sets of configurations for extractors, loaders and plugins.
 layout: doc
 weight: 3
