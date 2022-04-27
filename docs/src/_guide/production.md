@@ -1,5 +1,5 @@
 ---
-title: Running & Deploying Meltano in Production
+title: Run in Production
 description: Learn how to deploy your ELT pipelines in production.
 layout: doc
 weight: 8
@@ -236,7 +236,7 @@ as trailing arguments.
 
 ## Meltano UI
 
-Now that your pipelines are running, you may want to also spin up [Meltano UI](/guide/ui),
+Now that your pipelines are running, you may want to also spin up [Meltano UI](/reference/ui),
 which lets you quickly check the status and most recent logs of your project's [scheduled pipelines](/guide/orchestration) right from your browser.
 
 You can start Meltano UI using [`meltano ui`](/reference/command-line-interface#ui) just like you would locally,
