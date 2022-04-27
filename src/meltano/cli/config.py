@@ -2,13 +2,10 @@
 
 import json
 import tempfile
-import textwrap
 from pathlib import Path
 
 import click
 import dotenv
-from click_default_group import DefaultGroup
-from prettytable import PrettyTable
 
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
@@ -24,6 +21,7 @@ from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.utils import run_async
 
 from . import cli
+from .interactive import InteractiveConfig
 from .params import pass_project
 from .utils import CliError
 
@@ -229,251 +227,6 @@ def reset(ctx, store):
     )
 
 
-def set_value(ctx, setting_name, value, store):
-    """Set value helper function."""
-    store = SettingValueStore(store)
-
-    try:
-        value = json.loads(value)
-    except json.JSONDecodeError:
-        pass
-
-    settings = ctx.obj["settings"]
-    session = ctx.obj["session"]
-
-    path = list(setting_name)
-    try:
-        value, metadata = settings.set_with_metadata(
-            path, value, store=store, session=session
-        )
-    except StoreNotSupportedError as err:
-        raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
-        ) from err
-
-    name = metadata["name"]
-    store = metadata["store"]
-    click.secho(
-        f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
-        fg="green",
-    )
-
-    current_value, source = settings.get_with_source(name, session=session)
-    if source != store:
-        click.secho(
-            f"Current value is still: {current_value!r} (from {source.label})",
-            fg="yellow",
-        )
-
-
-def unset_value(ctx, setting_name, store):
-    """Unset value helper."""
-    store = SettingValueStore(store)
-
-    settings = ctx.obj["settings"]
-    session = ctx.obj["session"]
-
-    path = list(setting_name)
-    try:
-        metadata = settings.unset(path, store=store, session=session)
-    except StoreNotSupportedError as err:
-        raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
-        ) from err
-
-    name = metadata["name"]
-    store = metadata["store"]
-    click.secho(
-        f"{settings.label.capitalize()} setting '{name}' in {store.label} was unset",
-        fg="green",
-    )
-
-    current_value, source = settings.get_with_source(name, session=session)
-    if source is not SettingValueStore.DEFAULT:
-        click.secho(
-            f"Current value is now: {current_value!r} (from {source.label})",
-            fg="yellow",
-        )
-
-
-def configure_interactive(ctx, name, config_metadata, store, index=1, last_index=1):
-    """Configure a single value interactively."""
-    settings = ctx.obj["settings"]
-    source = config_metadata["source"]
-    setting_def = config_metadata["setting"]
-
-    title = f"{settings.label.capitalize()} setting {index} of {last_index}"
-    separator = "-" * len(title)
-    indentation = "  "
-
-    click.echo()
-    click.echo(separator)
-    click.echo(title)
-    click.echo(separator)
-    click.echo()
-
-    click.echo(f"{indentation}Setting name: ", nl=False)
-    click.secho(f"{name}", fg="blue", nl=True)
-
-    if setting_def.description:
-        click.echo(f"{indentation}Description: {setting_def.description}")
-    if setting_def.kind:
-        click.echo(f"{indentation}Kind: {setting_def.kind}")
-
-    default_value = setting_def.value
-    if default_value is not None:
-        click.echo(f"{indentation}Default: {default_value}")
-
-    if source is SettingValueStore.DEFAULT:
-        label = "from default"
-    elif source is SettingValueStore.INHERITED:
-        label = f"inherited from '{settings.plugin.parent.name}'"
-    else:
-        label = f"from {source.label}"
-
-    current_unexpanded_value = config_metadata.get("unexpanded_value")
-    current_value = config_metadata["value"]
-    if current_unexpanded_value:
-        click.echo(f"{indentation}Current unexpanded value: ", nl=False)
-        click.secho(f"{current_unexpanded_value}", fg="green", nl=True)
-        if current_value != "":
-            click.echo(
-                f"{indentation}Current expanded value ({label}): {current_value}"
-            )
-    else:
-        if current_value != "":
-            click.echo(f"{indentation}Current Value ({label}): ", nl=False)
-            click.secho(f"{current_value}", fg="green", nl=True)
-
-    click.echo()
-    set_unset = click.prompt(
-        "Do you want to set or unset this setting?",
-        type=click.Choice(["set", "unset", "skip", "exit"], case_sensitive=False),
-        default="skip" if default_value else "set",
-    )
-    if set_unset == "set":
-        click.echo()
-        new_value = click.prompt(
-            "New value (enter to skip)", default="", show_default=False
-        )
-        click.echo()
-        set_value(
-            ctx=ctx,
-            setting_name=tuple(name.split(".")),
-            value=new_value,
-            store=store,
-        )
-    elif set_unset == "unset":
-        unset_value(ctx=ctx, setting_name=tuple(name.split(".")), store=store)
-    elif set_unset == "skip":
-        return "SKIPPED"
-    elif set_unset == "exit":
-        return "EXIT"
-
-    click.echo()
-    if not click.confirm("Done modifying this setting?", default=True):
-        # TODO: this doesn't work as expected as config_metadata is cached (i.e. old values appear)
-        # Need to refetch data at this point before calling configure_interactive again
-        configure_interactive(ctx, name, config_metadata, store, index, last_index)
-
-
-def configure_all_interactive(ctx, store):
-    """Configure all interactive helper."""
-    settings = ctx.obj["settings"]
-    session = ctx.obj["session"]
-    project = ctx.obj["project"]
-
-    while True:
-        click.clear()
-        full_config = settings.config_with_metadata(session=session)
-        configurable_settings = {
-            k: v
-            for k, v in full_config.items()
-            if k
-            not in {
-                "_settings",
-            }
-        }
-        num_settings = len(configurable_settings)
-
-        if project.active_environment:
-            click.echo(
-                textwrap.dedent(
-                    f"""
-                    You are now configuring {settings.label.capitalize()} in Environment '{project.active_environment.name}'.
-                    For help, please refer to plugin documentation: https://...
-                    """
-                )
-            )
-        else:
-            click.echo(
-                textwrap.dedent(
-                    f"""
-                    You are now configuring the base configuration of {settings.label.capitalize()} (i.e. without an Environment).
-                    For help, please refer to plugin documentation: https://...
-                    """
-                )
-            )
-        indentation = "  "
-        current_setting_values = "Current Setting Values"
-        separator = "-" * len(current_setting_values)
-        click.echo(separator)
-        click.echo(current_setting_values)
-        click.echo(separator)
-        click.echo()
-        setting_choices = []
-        for index, (name, config_metadata) in enumerate(configurable_settings.items()):
-            current_value = (
-                config_metadata.get("unexpanded_value") or config_metadata["value"]
-            )
-            current_value = str(current_value) if not current_value is None else ""
-            if len(current_value) > 77:
-                current_value = current_value[:77] + "..."
-            click.echo(f"{indentation}{index + 1}) ", nl=False)
-            click.secho(f"{name}: ", nl=False, fg="blue")
-            click.secho(f"{current_value}", fg="green")
-            setting_choices.append(str(index + 1))
-
-        click.echo()
-        branch = click.prompt(
-            "Would you like to configure a specific setting, or loop through all settings?",
-            type=click.Choice(["select", "all", "exit"], case_sensitive=False),
-            default="select",
-        )
-        if branch == "all":
-            for index, (name, config_metadata) in enumerate(
-                configurable_settings.items()
-            ):
-                status = configure_interactive(
-                    ctx,
-                    name=name,
-                    config_metadata=config_metadata,
-                    store=store,
-                    index=index + 1,
-                    last_index=num_settings,
-                )
-                if status == "EXIT":
-                    configure_all_interactive(ctx, store)
-
-        elif branch == "select":
-            setting_index = (
-                int(click.prompt("Setting number", type=click.Choice(setting_choices)))
-                - 1
-            )
-            name, config_metadata = list(configurable_settings.items())[setting_index]
-            status = configure_interactive(
-                ctx,
-                name=name,
-                config_metadata=config_metadata,
-                store=store,
-                index=setting_index + 1,
-                last_index=num_settings,
-            )
-        elif branch == "exit":
-            click.echo()
-            break
-
-
 @config.command("set")
 @click.argument("setting_name", nargs=-1, required=True)
 @click.argument("value")
@@ -485,7 +238,8 @@ def configure_all_interactive(ctx, store):
 @click.pass_context
 def set_(ctx, setting_name, value, store):
     """Set the configurations' setting `<name>` to `<value>`."""
-    set_value(ctx=ctx, setting_name=setting_name, value=value, store=store)
+    interaction = InteractiveConfig(ctx=ctx, store=store)
+    interaction.set_value(setting_name=setting_name, value=value)
 
 
 @config.command()
@@ -498,19 +252,13 @@ def set_(ctx, setting_name, value, store):
 @click.pass_context
 def interactive(ctx, setting_name=None, store=None):
     """Set configuration interactively."""
-    settings = ctx.obj["settings"]
+    interaction = InteractiveConfig(ctx=ctx, store=store)
 
     if setting_name:
         name = ".".join(list(setting_name))
-        _, config_metadata = settings.get_with_metadata(name=name)
-        configure_interactive(
-            ctx=ctx,
-            name=name,
-            config_metadata=config_metadata,
-            store=store,
-        )
+        interaction.configure(setting_name=name)
     else:
-        configure_all_interactive(ctx=ctx, store=store)
+        interaction.configure_all()
 
 
 @config.command("test")
@@ -546,4 +294,5 @@ def test(ctx):
 @click.pass_context
 def unset(ctx, setting_name, store):
     """Unset the configurations' setting called `<name>`."""
-    unset_value(ctx=ctx, setting_name=setting_name, store=store)
+    interaction = InteractiveConfig(ctx=ctx, store=store)
+    interaction.unset_value(setting_name=setting_name)
