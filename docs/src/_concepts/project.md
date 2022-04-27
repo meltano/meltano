@@ -1,5 +1,5 @@
 ---
-title: Meltano Projects
+title: Projects
 description: At the core of the Meltano experience is your Meltano project, which represents the single source of truth regarding your ELT pipelines.
 layout: doc
 weight: 1
@@ -31,7 +31,7 @@ The only required property is `version`, which currently always holds the value 
 
 At the root of `meltano.yml`, and usually at the top of the file, you will find project-specific configuration.
 
-In a newly initialized project, a few [environments](/concepts/environments) will be populated to get you started. 
+In a newly initialized project, a few [environments](/concepts/environments) will be populated to get you started.
 
 To learn which settings are available, refer to the [Settings reference](/reference/settings).
 
@@ -352,5 +352,5 @@ You can choose to use a different system database backend or configuration using
 While you would usually not want to modify the system database directly, knowing what's in there can aid in debugging:
 
 - `job` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
-- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/guide/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
-- `user` table: Users for [Meltano UI](/guide/ui) created using [`meltano user add`](/reference/command-line-interface#user).
+- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+- `user` table: Users for [Meltano UI](/reference/ui) created using [`meltano user add`](/reference/command-line-interface#user).
