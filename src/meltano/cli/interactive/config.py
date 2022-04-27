@@ -137,7 +137,7 @@ class InteractiveConfig:
         set_unset = click.prompt(
             "Do you want to set or unset this setting?",
             type=click.Choice(["set", "unset", "skip", "exit"], case_sensitive=False),
-            default="skip" if default_value else "set",
+            default="skip",
         )
         if set_unset == "set":
             click.echo()
@@ -158,13 +158,12 @@ class InteractiveConfig:
 
         click.echo()
         if not click.confirm("Done modifying this setting?", default=True):
-            # TODO: this doesn't work as expected as config_metadata is cached (i.e. old values appear)
-            # Need to refetch data at this point before calling configure_interactive again
             self.configure(setting_name, index, last_index)
 
     def configure_all(self):
         """Configure all settings."""
         while True:
+            click.clear()
             self._print_home_screen()
 
             click.echo()
@@ -175,13 +174,15 @@ class InteractiveConfig:
             )
             if branch == "all":
                 for index, name, _ in self.setting_choices:
+                    click.clear()
                     status = self.configure(
                         setting_name=name,
                         index=index,
                         last_index=len(self.setting_choices),
                     )
                     if status == InteractionStatus.EXIT:
-                        self.configure_all()
+                        click.clear()
+                        break
 
             elif branch == "select":
                 choice_numbers = [idx for idx, _, _ in self.setting_choices]
@@ -195,6 +196,7 @@ class InteractiveConfig:
                         if idx == setting_index
                     )
                 )
+                click.clear()
                 status = self.configure(
                     setting_name=choice_name,
                     index=setting_index,
