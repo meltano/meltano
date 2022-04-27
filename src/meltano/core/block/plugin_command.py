@@ -119,7 +119,10 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         """
         try:  # noqa: WPS501
             async with self.invoker.prepared(self.context.session):
-                await self.start(self.command_args)
+                if self.command_args:
+                    await self.start(self.command_args)
+                else:
+                    await self.start()
 
                 self.stdout_link(self._log)
                 self.stderr_link(self._log)
