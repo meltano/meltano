@@ -87,7 +87,13 @@ class Payload(IntFlag):
 
 
 class Job(SystemModel):  # noqa: WPS214
-    """Model class that represents a `meltano elt` run in the system database."""
+    """Model class that represents a `meltano elt` run in the system database.
+
+    Includes State.STATE_EDIT rows which represent CLI invocations of the
+    `meltano state` command which wrote state to the db. Queries that are
+    meant to return only actual job runs should filter out records with
+    state == State.STATE_EDIT.
+    """
 
     __tablename__ = "job"
 
