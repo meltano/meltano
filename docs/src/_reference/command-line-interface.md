@@ -13,6 +13,7 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
 
 Specifically, it will:
+
 1. add a new [plugin definition](/concepts/project#plugins) to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`, and
 2. assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
    1. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
@@ -93,6 +94,7 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
 
 When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
+
 - the [system database](/concepts/project#system-database), if the project is [deployed as read-only](/reference/settings#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
 - [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
@@ -165,7 +167,12 @@ meltano config <plugin> unset <property> <subproperty>
 This will result in the following configuration being passed on to the plugin:
 
 ```json
-{"<property>": {"<subproperty>": "<value>", "<deep>": {"<nesting>": "<value>"}}}
+{
+  "<property>": {
+    "<subproperty>": "<value>",
+    "<deep>": { "<nesting>": "<value>" }
+  }
+}
 ```
 
 ##### Dot separator
@@ -295,12 +302,13 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
 
   Notes:
+
   - The entities that are currently selected for extraction can be discovered using [`meltano select --list <extractor>`](#select).
-  - [Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in entity identifiers to match multiple entities at once.
+  - [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity identifiers to match multiple entities at once.
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/concepts/plugins#select-filter-extra).
 
-- A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually running the pipeline.
+- A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) instead of actually running the pipeline.
   This can aid in debugging [extractor catalog generation](/guide/integration#extractor-catalog-generation), [incremental replication state lookup](/guide/integration#incremental-replication-state), and [pipeline environment variables](/guide/integration#pipeline-environment-variables).
 
   Supported values are:
@@ -310,7 +318,7 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--job_id TEXT]
   - `extractor-config`: Dump the extractor [config file](https://hub.meltano.com/singer/spec#config-files) that would be passed to the tap's executable using the `--config` option.
   - `loader-config`: Dump the loader [config file](https://hub.meltano.com/singer/spec#config-files) that would be passed to the target's executable using the `--config` option.
 
-  Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano elt ... --dump=state > state.json`.
+  Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano elt ... --dump=state > state.json`.
 
 #### Examples
 
@@ -364,7 +372,7 @@ meltano            | DEBUG Invoking: ['demo-project/.meltano/loaders/target-json
 meltano            | DEBUG Env: {'MELTANO_EXTRACTOR_NAME': 'tap-gitlab', 'MELTANO_EXTRACTOR_NAMESPACE': 'tap_gitlab', 'MELTANO_EXTRACT_API_URL': 'https://gitlab.com', 'MELTANO_EXTRACT_PRIVATE_TOKEN': '', 'MELTANO_EXTRACT_GROUPS': '', 'MELTANO_EXTRACT_PROJECTS': 'meltano/meltano', 'MELTANO_EXTRACT_ULTIMATE_LICENSE': 'False', 'MELTANO_EXTRACT_START_DATE': '2021-03-01', 'TAP_GITLAB_API_URL': 'https://gitlab.com', 'GITLAB_API_TOKEN': '', 'GITLAB_API_GROUPS': '', 'GITLAB_API_PROJECTS': 'meltano/meltano', 'GITLAB_API_ULTIMATE_LICENSE': 'False', 'GITLAB_API_START_DATE': '2021-03-01', 'TARGET_JSONL_DESTINATION_PATH': 'output', 'TARGET_JSONL_DO_TIMESTAMP_FILE': 'False'}
 ```
 
-Note that the contents of these pipeline-specific generated files can also easily be dumped to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) or a file using the `--dump` option described above.
+Note that the contents of these pipeline-specific generated files can also easily be dumped to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using the `--dump` option described above.
 
 Additionally, all [Singer messages](https://hub.meltano.com/singer/spec#messages) output by the tap and target will be logged, identified by `<plugin name> (out)` prefixes:
 
@@ -407,7 +415,6 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 If there is a value provided for `default_environment` in your `meltano.yml` these commands will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided. If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
 
 ### Examples
-
 
 ```bash
 # Add a new Environment
@@ -488,19 +495,20 @@ Meltano installs plugins in parallel. The number of plugins to install in parall
 FROM ubuntu:20.04
 
 RUN apt-get update && \
-    apt-get install -y -q \
-    gcc \
-    sqlite3 \
-    libsqlite3-dev \
-    python3 \
-    python3-pip \
-    python3-venv # Add this line
+ apt-get install -y -q \
+ gcc \
+ sqlite3 \
+ libsqlite3-dev \
+ python3 \
+ python3-pip \
+ python3-venv # Add this line
 
 RUN pip3 install meltano
 
 WORKDIR /meltano
 COPY meltano.yml meltano.yml
 RUN mkdir .meltano/ && meltano install
+
 </pre>
 </div>
 
@@ -537,14 +545,14 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 meltano invoke --plugin-type=<type> <plugin> [PLUGIN_ARGS...]
 ```
 
-A `--dump` option can be passed to dump the content of a generated [config file](https://hub.meltano.com/singer/spec#config-files) or [extractor catalog file](https://hub.meltano.com/singer/spec#catalog-files) to [STDOUT](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)) instead of actually invoking the plugin:
+A `--dump` option can be passed to dump the content of a generated [config file](https://hub.meltano.com/singer/spec#config-files) or [extractor catalog file](https://hub.meltano.com/singer/spec#catalog-files) to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) instead of actually invoking the plugin:
 
 ```bash
 meltano invoke --dump=config <plugin>
 meltano invoke --dump=catalog <plugin>
 ```
 
-Like any standard output, the dumped content can be [redirected](https://en.wikipedia.org/wiki/Redirection_(computing)) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
+Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
 ### Using `invoke` with Environments
 
@@ -588,6 +596,7 @@ meltano invoke --containers dbt:compile
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
 
 Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from the:
+
 - [`meltano.yml` project file](/concepts/project)
 - Installation found in the [`.meltano` directory](/concepts/project#meltano-directory) under `.meltano/<plugin_type>/<plugin_name>`
 - `plugin_settings` table in the [system database](/concepts/project#system-database)
@@ -723,7 +732,6 @@ meltano schedule run gitlab-to-jsonl --select=commits
 
 Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
-
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 
 Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra).
@@ -734,7 +742,7 @@ Selection rules will be stored in the extractor's [`select` extra](/concepts/plu
 
 ### How to use
 
-[Unix shell-style wildcards](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) can be used in selection patterns to match multiple entities or attributes at once:
+[Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in selection patterns to match multiple entities or attributes at once:
 
 - `*`: matches any sequence of characters
 - `?`: matches one character
@@ -811,6 +819,7 @@ meltano select tap-gitlab --rm tags "*"
 meltano select tap-gitlab --rm --exclude "*" "*_url"
 meltano select tap-gitlab --rm commits id
 ```
+
 <div class="notification is-info">
   <p>Most shells parse glob syntax: you must escape the special characters in the select pattern by quoting the pattern.</p>
 </div>
@@ -835,6 +844,177 @@ meltano select --exclude tap-carbon-intensity '*' 'latitude'
 
 This will exclude all `longitude` and `latitude` attributes.
 
+## `state`
+
+Manage Singer State for jobs via the CLI.
+
+For more information about how Meltano uses incremental replication state, see [the data integration guide](/guide/integration#incremental-replication-state).
+
+### clear
+
+Clear the state for a given `job_id`.
+Prompts for confirmation.
+
+#### How to use
+
+```bash
+meltano state clear [--force] <job_id>
+```
+
+#### Parameters
+
+- The `--force` option will disable confirmation prompts. _Use with caution._
+
+#### Examples
+
+```bash
+# Clear state. Meltano will prompt for confirmation.
+meltano state clear dev:tap-gitlab-to-target-jsonl
+
+# Clear state, overriding confirmation prompt.
+meltano state clear --force dev:tap-gitlab-to-target-jsonl
+```
+
+### get
+
+Retrieve state for a given `job_id`.
+
+#### How to use
+
+```bash
+meltano state get <job_id>
+```
+
+#### Examples
+
+```bash
+# Print the state that would be used in the next run of dev:tap-gitlab-to-target-jsonl
+meltano state get dev:tap-gitlab-to-target-jsonl
+```
+
+### list
+
+List all `job_ids` found in the system database.
+
+#### How to use
+
+```bash
+meltano state list [--pattern] <PATTERN>
+```
+
+#### Parameters
+
+- The `--pattern` option allows filtering returned job IDs by using `*` as a wildcard.
+
+<div class="notification is-info">
+  <p>"<samp>*</samp>" is subject to auto-expansion in most shells: you must escape the " <samp>*</samp>" by quoting the pattern.</p>
+</div>
+
+#### Examples
+
+```bash
+# List all job IDs
+meltano state list
+
+# List only those job IDs that start with "dev:"
+meltano state list 'dev:*'
+
+# List only those job IDs that contain "tap-gitlab"
+meltano state list --pattern '*tap-gitlab*'
+```
+
+### merge
+
+Merge new state onto existing state for a job ID.
+
+<div class="notification is-info">
+	<p><strong>Not seeing merged state in the system database?</strong></p>
+	<p>Merged state is computed at <em>execution</em> time.
+	The <samp>merge</samp> command merely
+	adds a new <samp>payload</samp> to the database which is merged together with
+	existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
+	</p>
+</div>
+
+#### How to use
+
+```bash
+# Read state from a file
+meltano state merge <job_id> --input-file <file>
+
+# Read state from a command-line argument
+meltano state merge <job_id> <RAW STATE JSON>
+
+# Merge state from one job into another
+meltano state merge <job_id> --from-job-id <src_job_id>
+```
+
+#### Parameters
+
+- The `--input-file` option specifies a file to read the state from.
+- The `--from-job-id` option specifies an existing job ID to read the state from.
+
+State must be provided in exactly one of these ways: via `--input-file`, via `--from-job-id`, or via a command line argument.
+
+#### Examples
+
+```bash
+# Provide state via a command-line argument.
+# The argument must be valid JSON with a top-level key of "singer_state"
+# Only the "project_123456_issues" key will be overwritten. Any other bookmarks will remain untouched.
+meltano state merge dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_123456_issues": "2020-01-01"}}'
+
+# Provide state via a file.
+# The file must contain valid JSON with a top-level key of "singer_state"
+# These two lines have the same effect as the one line above.
+echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
+meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
+
+# Provide state via an existing job.
+meltano state merge dev:tap-gitlab-to-target-jsonl --from-job-id prod:tap-gitlab-to-target-jsonl
+```
+
+### set
+
+Set state for a job.
+
+#### How to use
+
+```bash
+# Read state from a file
+# Meltano will prompt for confirmation.
+meltano state set <job_id> --input-file <file>
+
+# Read state from a file, overriding confirmation prompt.
+meltano state set --force <job_id> --input-file <file>
+
+# Read state from a command-line argument
+# Meltano will prompt for confirmation.
+meltano state set <job_id> <RAW STATE JSON>
+
+# Read state from a command-line argument, overriding confirmation prompt.
+meltano state set --force <job_id> <RAW STATE JSON>
+```
+
+#### Parameters
+
+- The `--input-file` option specifies a file to read the state from.
+- The `--force` option will disable confirmation prompts. _Use with caution._
+
+#### Examples
+
+```bash
+# Provide state via a command-line argument, overriding confirmation prompt.
+# The argument must be valid JSON with a top-level key of "singer_state"
+# ALL state will be overwritten. Only the "project_123456_issues" bookmark will be used in subsequent runs.
+meltano state set --force dev:tap-gitlab-to-target-jsonl '{"singer_state": {"project_123456_issues": "2020-01-01"}}'
+
+# Provide state via a file, overriding confirmation prompt.
+# The file must contain valid JSON with a top-level key of "singer_state"
+# These two lines have the same effect as the one line above.
+echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
+meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
+```
 
 ## `test`
 
@@ -928,6 +1108,7 @@ meltano user add admin securepassword --role admin
 Upgrade Meltano and your Meltano project to the latest version.
 
 When called without arguments, this will:
+
 - Upgrade the `meltano` package
 - Update files [managed by](/concepts/plugins#update-extra) [file bundles](/concepts/plugins#file-bundles)
 - Apply migrations to [system database](/concepts/project#system-database)

@@ -20,6 +20,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
+from meltano.core.state_service import StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -27,6 +28,10 @@ from .ioblock import IOBlock
 from .singer import SingerBlock
 
 logger = structlog.getLogger(__name__)
+
+
+class BlockSetHasNoStateError(Exception):
+    """Occurs when state_service is accessed for ExtractLoadBlocks instance for which no block has state."""
 
 
 class ELBContext:  # noqa: WPS230
@@ -309,6 +314,35 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         self._stdout_futures = None
         self._stderr_futures = None
         self._errors = []
+        self._state_service = None
+
+    def has_state(self) -> bool:
+        """Check to see if any block in this BlockSet has 'state' capability.
+
+        Returns:
+            bool indicating whether BlockSet has 'state' capability
+        """
+        for block in self.blocks:
+            if block.has_state:
+                return True
+        return False
+
+    @property
+    def state_service(self) -> StateService:
+        """Get StateService for managing state for this BlockSet.
+
+        Returns:
+            A StateService using this BlockSet's context's session
+
+        Raises:
+            BlockSetHasNoStateError: if no Block in this BlockSet has state capability
+        """
+        if not self._state_service:
+            if self.has_state():
+                self._state_service = StateService(self.context.session)
+            else:
+                raise BlockSetHasNoStateError()
+        return self._state_service
 
     def index_last_input_done(self) -> int:
         """Return index of the block furthest from the start that has exited and required input.
