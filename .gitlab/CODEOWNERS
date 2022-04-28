@@ -14,9 +14,9 @@
 /src/meltano/api/ @pandemicsyn @alex1126
 
 ^[Docs]
-/docs/ @tayloramurphy @afolson
-/CONTRIBUTING.md @tayloramurphy @afolson
-/README.md @tayloramurphy @afolson
+/docs/ @tayloramurphy @afolson @pandemicsyn @edgarrmondragon
+/CONTRIBUTING.md @tayloramurphy @afolson @pandemicsyn @edgarrmondragon
+/README.md @tayloramurphy @afolson @pandemicsyn @edgarrmondragon
 
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
 /.bumpversion.cfg @meltano/core-team
