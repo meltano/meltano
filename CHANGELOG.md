@@ -26,6 +26,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2754](https://gitlab.com/meltano/meltano/-/issues/2754) New `meltano state` command to manage job states.
 
 
+### Fixes
+
+- [#3392](https://gitlab.com/meltano/meltano/-/issues/3392) Fixes bug in meltano ui where pipelines tab would fail to load when a pipeline had no interval set.
+
+
 ## 1.101.0 - (2022-04-21)
 
 ---
