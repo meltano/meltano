@@ -138,6 +138,9 @@ body {
 }
 
 .menu-list a.is-active {
-    background-color: #3438bf;
-    color: #fff;
+  background-color: #3438bf;
+  color: #fff;
+}
+.container .content #table-of-contents {
+  margin-bottom: 1em;
 }
