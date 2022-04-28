@@ -223,11 +223,27 @@ Loaders (Singer targets) take in data and state messages from extractors and are
 
 Meltano stores this pipeline state in its [system database](/concepts/project#system-database), identified by the [`meltano elt`](/reference/command-line-interface#elt) run's Job ID defined with the `--job_id` argument. The Job ID should be a unique string identifier for the pipeline and must be present in each execution in order for incremental replication to work.
 
-When `meltano elt` is run a subsequent time, it will look for the most recent completed (successful or failed) pipeline run with the same Job ID that generated a state. If a successful pipeline run is found, its state is then passed along to the extractor. If one or more failed (incomplete) pipelines are found, their returned partial state is merged with the last successful pipeline run, to produce an up-to-date STATE artifact from the incomplete pipeline runs, before being passed along to the extractor. This works as Singer Targets are expected to emit [STATE messages](https://hub.meltano.com/singer/spec#state-files) [only after persisting data for a given stream](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md).
+If you'd like to manually inspect a job's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
+
+If you know the `job_id` of the relevant job, you can also manually view and edit state using [the `meltano state` CLI command](/reference/command-line-interface#state).
+
+### Internal State Merge Logic
+
+When running Extract and Load jobs via [`run`](/reference/command-line-interface#run) or [`elt`](/reference/command-line-interface#elt), Meltano will pull state from the system databse from the most recently completed job where the Job ID with the same Job ID that generated a state.
+When a data replication job is executed via [`run`](/reference/command-line-interface#run) or [`elt`](/reference/command-line-interface#elt), Meltano with fetch state from the system database using the Job ID as unique key.
+If a state record from a completed job is found, its data is then passed along to the extractor.
+If one or more partial state records are found, the partial data is merged with the last completed state, to produce an up-to-date state artifact which will be passed along to the extractor.
+The same merge behavior is performed whenever a user runs [`meltano state get`](/reference/command-line-interface#state).
+This command returns the merged result of the latest completed state plus any newer partial state records, if they exist.
+This works as Singer Targets are expected to emit [STATE messages](https://hub.meltano.com/singer/spec#state-files) [only after persisting data for a given stream](https://github.com/singer-io/getting-started/blob/master/docs/CONFIG_AND_STATE.md).
+
+Partial state records are generated when extractors fail before completion.
+This can happen when a [`meltano elt`](/reference/command-line-interface#elt) execution is aborted before a particular stream completes.
+Partial state records can also be inserted manually via [`meltano state merge'](/reference/command-line-interface#state).
+
+Unlike [`meltano state merge`](/reference/command-line-interface#state),[`meltano state set`](/reference/command-line-interface#state) will insert a complete record, which causes meltano to ignore any previous state records, whether completed or partial.
 
 Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
-
-If you'd like to manually inspect a pipeline's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
 
 <div class="notification is-info">
   <p><strong>Not seeing state picked up after a failed run?</strong></p>
