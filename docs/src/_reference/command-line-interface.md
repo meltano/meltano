@@ -656,6 +656,7 @@ When an active environment is present, `run` will attempt to run incrementally a
 However, four top level flags are provided to alter behavior:
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
+(implicitly enables --log-level=debug for 'console' named handlers).
 - `--no-state-update` will disable state saving for this invocation.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
