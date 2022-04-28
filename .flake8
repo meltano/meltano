@@ -216,6 +216,8 @@ per_file_ignores =
     src/meltano/core/logging/utils.py:
         # Found wrong module name
         WPS100
+        # Found to many module members (8 > 7)
+        WPS202
     src/meltano/core/cli_messages.py:
         # Special exceptions for cli magic
         WPS114
