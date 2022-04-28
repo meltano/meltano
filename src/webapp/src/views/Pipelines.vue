@@ -41,7 +41,10 @@ export default {
     },
     cloneDeepPipelines() {
       return _.cloneDeep(this.getSortedPipelines).map(pipeline => {
-        if (pipeline.interval.includes('*')) {
+        if (!pipeline.interval) {
+          pipeline.interval = '@once'
+          return pipeline
+        } else if (pipeline.interval.includes('*')) {
           pipeline.cronExpression = pipeline.interval
           pipeline.interval = '@other'
           return pipeline
