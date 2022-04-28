@@ -1,5 +1,5 @@
 ---
-title: Data Transformation
+title: Transform Data
 description: Transform your data with dbt
 layout: doc
 weight: 5
