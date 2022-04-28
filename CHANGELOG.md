@@ -4,19 +4,26 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
 
+
 ## Unreleased
 ---
 
 ### New
-
-- [#3146](https://gitlab.com/meltano/meltano/-/issues/3146) Add `--dry-run` option to `meltano run`.
-- [#2754](https://gitlab.com/meltano/meltano/-/issues/2754) New `meltano state` command to manage job states.
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.102.0 - (2022-04-28)
+---
+
+### New
+
+- [#3146](https://gitlab.com/meltano/meltano/-/issues/3146) Add `--dry-run` option to `meltano run`.
+- [#2754](https://gitlab.com/meltano/meltano/-/issues/2754) New `meltano state` command to manage job states.
 
 
 ## 1.101.0 - (2022-04-21)
