@@ -246,7 +246,7 @@ class BlockParser:  # noqa: D101
             self.log.debug("found block", block_type=plugin.type, index=next_block)
 
             if plugin.type == PluginType.MAPPERS:
-                self.log.info(
+                self.log.debug(
                     "found mapper",
                     plugin_type=plugin.type,
                     plugin_name=plugin.name,

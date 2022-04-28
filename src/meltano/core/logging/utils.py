@@ -10,6 +10,7 @@ import structlog
 import yaml
 
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
+from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 try:
@@ -98,7 +99,7 @@ def default_config(log_level: str) -> dict:
     }
 
 
-def setup_logging(project=None, log_level=DEFAULT_LEVEL):
+def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> None:
     """Configure logging for a meltano project.
 
     Args:
@@ -136,6 +137,22 @@ def setup_logging(project=None, log_level=DEFAULT_LEVEL):
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
+
+
+def change_stream_handler_log_level(log_level: int = logging.DEBUG) -> None:
+    """Change the log level for the current root logger, but only on the stream handlers.
+
+    Most useful when you want change the log level on the fly for console output, but want to respect other aspects
+    of any potential logging.yaml sourced configs.
+
+    Args:
+        log_level: set log levels to provided level.
+    """
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    for handler in root_logger.handlers:
+        if isinstance(handler, logging.StreamHandler):
+            handler.setLevel(logging.DEBUG)
 
 
 class SubprocessOutputWriter(Protocol):
