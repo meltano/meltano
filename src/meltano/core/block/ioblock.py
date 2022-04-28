@@ -43,6 +43,12 @@ class IOBlock(metaclass=ABCMeta):
         """Return a string identifier for this block."""
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def has_state(self) -> bool:
+        """Indicate whether this block has persistent state between runs."""
+        raise NotImplementedError
+
     @abstractmethod
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst.

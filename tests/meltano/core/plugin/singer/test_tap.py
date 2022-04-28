@@ -7,6 +7,7 @@ from contextlib import contextmanager
 
 import pytest
 from asynctest import CoroutineMock, mock
+
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
@@ -624,7 +625,7 @@ class TestSingerTap:
         async with invoker.prepared(session):
             invoker.files["catalog"].open("w").write("this is invalid json")
 
-            with pytest.raises(PluginExecutionError, match=r"invalid"):
+            with pytest.raises(PluginExecutionError, match=r"invalid"):  # noqa: WPS360
                 subject.apply_catalog_rules(invoker, [])
 
     @pytest.mark.asyncio
