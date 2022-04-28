@@ -6,22 +6,28 @@ import click
 
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.cli.utils import CliError
+from meltano.core.environment_service import EnvironmentService
+from meltano.core.plugin import settings_service
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
+
+PLUGIN_COLOUR = "magenta"
+ENVIRONMENT_COLOUR = "yellow"
 
 
 class InteractiveConfig:
     """Manage Config interactively."""
 
-    def __init__(self, ctx, store, max_width=None):
+    def __init__(self, ctx, max_width=None):
         """Initialise InteractiveConfig instance."""
         self.ctx = ctx
-        self.store = SettingValueStore(store)
-
+        self.auto_store_manager = SettingValueStore("auto").manager
         self.project = self.ctx.obj["project"]
         self.settings = self.ctx.obj["settings"]
         self.session = self.ctx.obj["session"]
-
+        self.plugin = self.ctx.obj["settings"].plugin
+        self.environment_service = EnvironmentService(self.project)
         self.max_width = max_width or 77  # noqa: WPS432
 
     @property
@@ -37,69 +43,176 @@ class InteractiveConfig:
         for index, (name, config_metadata) in enumerate(
             self.configurable_settings.items()
         ):
-            current_value = (
-                config_metadata.get("unexpanded_value") or config_metadata["value"]
-            )
-            current_value = "" if current_value is None else str(current_value)
-            if len(current_value) > self.max_width:
-                current_value = f"{current_value[: self.max_width]}..."
-            setting_choices.append((str(index + 1), name, current_value))
+            description = config_metadata["setting"].description
+            description = "" if description is None else description
+            if len(description) > self.max_width:
+                description = f"{description[: self.max_width]}..."
+            setting_choices.append((str(index + 1), name, description))
         return setting_choices
 
-    def _print_home_screen(self):
-        """Print screen for this interactive."""
+    @property
+    def environment_label(self):
+        """Format the current Environment for presentation."""
         if self.project.active_environment:
-            click.echo(
-                textwrap.dedent(
-                    f"""
-                    You are now configuring {self.settings.label.capitalize()} in Environment '{self.project.active_environment.name}'.
-                    For help, please refer to plugin documentation: https://...
-                    """
-                )  # noqa: WPS355
+            return f"Environment '{self.project.active_environment.name}'"
+        return "Base (i.e. no Environment)"
+
+    def _print_home_title(self):
+        """Print title text."""
+        title = f"Configuring {self.settings.label.capitalize()} in {self.environment_label} interactively."
+        separator = "-" * len(title)
+
+        click.echo()
+        click.echo(separator)
+        click.echo("Configuring", nl=False)
+        click.secho(f" {self.settings.label.capitalize()}", nl=False, fg=PLUGIN_COLOUR)
+        click.echo(" in ", nl=False)
+        click.secho(
+            self.environment_label,
+            nl=False,
+            fg=ENVIRONMENT_COLOUR,
+        )
+        click.echo(" interactively.")
+        click.echo(separator)
+
+    def _print_home_help(self):
+        """Print help text."""
+        click.echo()
+        click.echo("  To configure settings somewhere other than ", nl=False)
+        click.secho(self.environment_label, nl=False, fg=ENVIRONMENT_COLOUR)
+        click.echo(", try:")
+        click.echo()
+        click.echo("    # list available environments")
+        click.secho("    $ meltano environment list", fg="white")
+        click.echo("    # configure environment settings interactively")
+        click.secho(
+            f"    $ meltano --environment=<environment name> config {self.plugin.name} interactive",
+            fg="white",
+        )
+        if self.project.active_environment:
+            click.echo()
+            click.echo("  Or to modify Base (i.e. no Environment), try:")
+            click.echo()
+            click.secho(
+                f"    $ meltano --no-environment config {self.plugin.name} interactive",
+                fg="white",
             )
-        else:
-            click.echo(
-                textwrap.dedent(
-                    f"""
-                    You are now configuring the base configuration of {self.settings.label.capitalize()} (i.e. without an Environment).
-                    For help, please refer to plugin documentation: https://...
-                    """
-                )  # noqa: WPS355
-            )
+        click.echo()
+        click.echo("  For more information about using Environments, take a look at")
+        click.secho("    https://docs.meltano.com/concepts/environments", fg="blue")
+
+    def _print_home_available_settings(self):
+        """Print available setting names and current values."""
         indentation = "  "
-        current_setting_values = "Current Setting Values"
+        current_setting_values = "Available Settings"
         separator = "-" * len(current_setting_values)
+        click.echo()
         click.echo(separator)
         click.echo(current_setting_values)
         click.echo(separator)
         click.echo()
-        for index, name, current_value in self.setting_choices:
+        for index, name, description in self.setting_choices:
             click.echo(f"{indentation}{index}) ", nl=False)
-            click.secho(f"{name}: ", nl=False, fg="blue")
-            click.secho(f"{current_value}", fg="green")
+            click.secho(f"{name}: ", nl=False, fg="green")
+            click.secho(f"{description}")
 
-    def configure(self, setting_name, index=None, last_index=None):
-        """Configure a single setting interactively."""
+    def _print_home_screen(self):
+        """Print screen for this interactive."""
+        self._print_home_title()
+        self._print_home_help()
+        self._print_home_available_settings()
+
+    def _print_setting_title(self, index, last_index):
+        """Print setting title."""
+        title = f"{self.settings.label.capitalize()}"
+        subtitle = ""
+        if index and last_index:
+            subtitle = f" (Setting {index} of {last_index})"
+            title = title + subtitle
+        separator_width = len(title)
+        separator = "-" * separator_width
+
+        click.echo()
+        click.echo(separator)
+        click.secho(f"{self.settings.label.capitalize()}", nl=False, fg=PLUGIN_COLOUR)
+        click.echo(f" (Setting {index} of {last_index})")
+        click.echo(separator)
+
+    def _get_value_from_store(
+        self, setting_service, setting_name, store, environment_name=None
+    ):
+        """Get setting value."""
+        try:
+            value = setting_service.get(setting_name, source=store)
+            if value:
+                return (value, store, environment_name)
+        except StoreNotSupportedError:
+            pass
+
+    def _get_settable_values(self, setting_name):
+        supported_stores = [
+            SettingValueStore.MELTANO_ENV,
+            SettingValueStore.MELTANO_YML,
+            SettingValueStore.DOTENV,
+            SettingValueStore.DB,
+        ]
+        settable_values = []
+        for store in supported_stores:
+            if store == SettingValueStore.MELTANO_ENV:
+                active_environment_name = self.project.active_environment.name
+                try:
+                    for environment in self.environment_service.list_environments():
+                        self.project.activate_environment(environment.name)
+                        settings = PluginSettingsService(
+                            project=self.project,
+                            plugin=self.settings.plugin,
+                            plugins_service=self.settings.plugins_service,
+                        )
+                        settable_value = self._get_value_from_store(
+                            setting_service=settings,
+                            setting_name=setting_name,
+                            store=store,
+                            environment_name=environment.name,
+                        )
+                        if settable_value:
+                            settable_values.append(settable_value)
+                finally:
+                    self.project.activate_environment(active_environment_name)
+            else:
+                settable_value = self._get_value_from_store(
+                    setting_service=self.settings,
+                    setting_name=setting_name,
+                    store=store,
+                )
+                if settable_value:
+                    settable_values.append(settable_value)
+        return settable_values
+
+    def _print_setting_values(self, setting_name, indentation):
+        settable_values = self._get_settable_values(setting_name=setting_name)
+
+        if settable_values:
+            click.echo()
+            click.echo(f"{indentation}Values:")
+            for value, store, environment_name in settable_values:
+                if store == SettingValueStore.MELTANO_ENV:
+                    click.echo(
+                        f"{indentation}  {store.label} ({environment_name}): {value}"
+                    )
+                else:
+                    click.echo(f"{indentation}  {store.label}: {value}")
+        else:
+            click.echo(f"{indentation}Value: (none)")
+
+    def _print_setting(self, setting_name):
+        """Print setting."""
         current_value, config_metadata = self.settings.get_with_metadata(
             name=setting_name
         )
 
-        if index and last_index:
-            title = (
-                f"{self.settings.label.capitalize()} setting {index} of {last_index}"
-            )
-        else:
-            title = f"{self.settings.label.capitalize()} setting '{setting_name}'"
-        separator = "-" * len(title)
         indentation = "  "
-
         click.echo()
-        click.echo(separator)
-        click.echo(title)
-        click.echo(separator)
-        click.echo()
-
-        click.echo(f"{indentation}Setting name: ", nl=False)
+        click.echo(f"{indentation}Name: ", nl=False)
         click.secho(f"{setting_name}", fg="blue", nl=True)
 
         setting_def = config_metadata["setting"]
@@ -112,34 +225,69 @@ class InteractiveConfig:
         if default_value is not None:
             click.echo(f"{indentation}Default: {default_value}")
 
-        source = config_metadata["source"]
-        if source is SettingValueStore.DEFAULT:
-            label = "from default"
-        elif source is SettingValueStore.INHERITED:
-            label = f"inherited from '{self.settings.plugin.parent.name}'"
-        else:
-            label = f"from {source.label}"
+        self._print_setting_values(setting_name=setting_name, indentation=indentation)
 
-        current_unexpanded_value = config_metadata.get("unexpanded_value")
-        if current_unexpanded_value:
-            click.echo(f"{indentation}Current unexpanded value: ", nl=False)
-            click.secho(f"{current_unexpanded_value}", fg="green", nl=True)
-            if current_value != "":
-                click.echo(
-                    f"{indentation}Current expanded value ({label}): {current_value}"
-                )
-        else:
-            if current_value != "":  # noqa: WPS513
-                click.echo(f"{indentation}Current Value ({label}): ", nl=False)
-                click.secho(f"{current_value}", fg="green", nl=True)
+    def _prompt_select_store(self):
+        """Choose a Store for this setting."""
+        click.echo()
+        choices = [
+            ("1", "meltano environment in meltano.yml", SettingValueStore.MELTANO_ENV),
+            ("2", "base meltano.yml (no environment)", SettingValueStore.MELTANO_YML),
+            ("3", ".env file", SettingValueStore.DOTENV),
+            ("4", "system database", SettingValueStore.DB),
+            ("5", "auto", SettingValueStore.AUTO),
+        ]
+        indentation = "  "
+        for choice in choices:
+            click.echo(f"{indentation}{choice[0]}) {choice[1]}")
+
+        click.echo()
+        chosen = click.prompt(
+            "Select store for new value",
+            type=click.Choice([chs[0] for chs in choices]),
+            default="1",
+        )
+        return next(chs[2] for chs in choices if chs[0] == chosen)
+
+    def _prompt_select_environment(self):
+        """Choose an Environment for this setting."""
+        environments = {
+            env.name: env for env in self.environment_service.list_environments()
+        }
+        choices = {
+            str(index + 1): env_name
+            for index, env_name in enumerate(environments.keys())
+        }
+        choice_keys = {value: key for key, value in choices.items()}
+        click.echo()
+        indentation = "  "
+        for index, choice in choices.items():
+            click.echo(f"{indentation}{index}) {choice}")
+        click.echo()
+        chosen = click.prompt(
+            "Select Environment for new value",
+            type=click.Choice(choices.keys()),
+            default=choice_keys[self.project.active_environment.name],
+        )
+        return environments[choices[chosen]]
+
+    def configure(self, setting_name, index=None, last_index=None):
+        """Configure a single setting interactively."""
+        self._print_setting_title(index=index, last_index=last_index)
+        self._print_setting(setting_name=setting_name)
 
         click.echo()
         set_unset = click.prompt(
-            "Do you want to set or unset this setting?",
+            "Set, unset, skip or exit this setting?",
             type=click.Choice(["set", "unset", "skip", "exit"], case_sensitive=False),
             default="skip",
         )
         if set_unset == "set":
+            store = self._prompt_select_store()
+            environment = None
+            if store == SettingValueStore.MELTANO_ENV:
+                environment = self._prompt_select_environment()
+
             click.echo()
             new_value = click.prompt(
                 "New value (enter to skip)", default="", show_default=False
@@ -148,9 +296,19 @@ class InteractiveConfig:
             self.set_value(
                 setting_name=tuple(setting_name.split(".")),
                 value=new_value,
+                store=store,
+                environment=environment,
             )
         elif set_unset == "unset":
-            self.unset_value(setting_name=tuple(setting_name.split(".")))
+            store = self._prompt_select_store()
+            environment = None
+            if store == SettingValueStore.MELTANO_ENV:
+                environment = self._prompt_select_environment()
+            self.unset_value(
+                setting_name=tuple(setting_name.split(".")),
+                store=store,
+                environment=environment,
+            )
         elif set_unset == "skip":
             return InteractionStatus.SKIP
         elif set_unset == "exit":
@@ -168,7 +326,7 @@ class InteractiveConfig:
 
             click.echo()
             branch = click.prompt(
-                "Would you like to configure a specific setting, or loop through all settings?",
+                "Select a specific setting, loop through all settings or exit?",
                 type=click.Choice(["select", "all", "exit"], case_sensitive=False),
                 default="select",
             )
@@ -206,59 +364,73 @@ class InteractiveConfig:
                 click.echo()
                 break
 
-    def set_value(self, setting_name, value):
+    def set_value(self, setting_name, value, store, environment=None):
         """Set value helper function."""
         try:
             value = json.loads(value)
         except json.JSONDecodeError:
             pass
 
+        settings = self.settings
+        if environment and store == SettingValueStore.MELTANO_ENV:
+            self.project.activate_environment(environment.name)
+            settings = PluginSettingsService(
+                project=self.project,
+                plugin=self.settings.plugin,
+                plugins_service=self.settings.plugins_service,
+            )
+
         path = list(setting_name)
         try:
-            value, metadata = self.settings.set_with_metadata(
-                path, value, store=self.store, session=self.session
+            value, metadata = settings.set_with_metadata(
+                path, value, store=store, session=self.session
             )
         except StoreNotSupportedError as err:
             raise CliError(
-                f"{self.settings.label.capitalize()} setting '{path}' could not be set in {self.store.label}: {err}"
+                f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
             ) from err
 
         name = metadata["name"]
         store = metadata["store"]
         click.secho(
-            f"{self.settings.label.capitalize()} setting '{name}' was set in {self.store.label}: {value!r}",
+            f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
             fg="green",
         )
 
-        current_value, source = self.settings.get_with_source(
-            name, session=self.session
-        )
+        current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
             click.secho(
                 f"Current value is still: {current_value!r} (from {source.label})",
                 fg="yellow",
             )
 
-    def unset_value(self, setting_name):
+    def unset_value(self, setting_name, store, environment=None):
         """Unset value helper."""
+        settings = self.settings
+        if environment and store == SettingValueStore.MELTANO_ENV:
+            self.project.activate_environment(environment.name)
+            settings = PluginSettingsService(
+                project=self.project,
+                plugin=self.settings.plugin,
+                plugins_service=self.settings.plugins_service,
+            )
+
         path = list(setting_name)
         try:
-            metadata = self.settings.unset(path, store=self.store, session=self.session)
+            metadata = settings.unset(path, store=store, session=self.session)
         except StoreNotSupportedError as err:
             raise CliError(
-                f"{self.settings.label.capitalize()} setting '{path}' in {self.store.label} could not be unset: {err}"
+                f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
             ) from err
 
         name = metadata["name"]
         store = metadata["store"]
         click.secho(
-            f"{self.settings.label.capitalize()} setting '{name}' in {store.label} was unset",
+            f"{settings.label.capitalize()} setting '{name}' in {store.label} was unset",
             fg="green",
         )
 
-        current_value, source = self.settings.get_with_source(
-            name, session=self.session
-        )
+        current_value, source = settings.get_with_source(name, session=self.session)
         if source is not SettingValueStore.DEFAULT:
             click.secho(
                 f"Current value is now: {current_value!r} (from {source.label})",
