@@ -139,11 +139,12 @@ def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> No
     )
 
 
-def change_stream_handler_log_level(log_level: int = logging.DEBUG) -> None:
-    """Change the log level for the current root logger, but only on the stream handlers.
+def change_console_log_level(log_level: int = logging.DEBUG) -> None:
+    """Change the log level for the current root logger, but only on the 'console' handler.
 
     Most useful when you want change the log level on the fly for console output, but want to respect other aspects
-    of any potential logging.yaml sourced configs.
+    of any potential logging.yaml sourced configs. Note that if a logging.yaml config without a 'console' handler
+    is used, this will not override the log level.
 
     Args:
         log_level: set log levels to provided level.
@@ -151,8 +152,8 @@ def change_stream_handler_log_level(log_level: int = logging.DEBUG) -> None:
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     for handler in root_logger.handlers:
-        if isinstance(handler, logging.StreamHandler):
-            handler.setLevel(logging.DEBUG)
+        if handler.name == "console":
+            handler.setLevel(log_level)
 
 
 class SubprocessOutputWriter(Protocol):

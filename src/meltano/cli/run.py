@@ -1,5 +1,4 @@
 """meltano run command and supporting functions."""
-import logging
 from typing import List, Union
 
 import click
@@ -8,6 +7,7 @@ import structlog
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
+from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
@@ -82,12 +82,8 @@ async def run(
     """
     if dry_run:
         if not ProjectSettingsService.config_override.get("cli.log_level"):
-            logger.info("Setting log level to 'debug' for dry run")
-            root_logger = logging.getLogger()
-            root_logger.setLevel(logging.DEBUG)
-            for handler in root_logger.handlers:
-                if isinstance(handler, logging.StreamHandler):
-                    handler.setLevel(logging.DEBUG)
+            logger.info("Setting 'console' handler log level to 'debug' for dry run")
+            change_console_log_level()
 
     parser = BlockParser(logger, project, blocks, full_refresh, no_state_update, force)
     parsed_blocks = list(parser.find_blocks(0))
