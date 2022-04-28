@@ -59,56 +59,67 @@ class InteractiveConfig:
 
     def _print_home_title(self):
         """Print title text."""
-        title = f"Configuring {self.settings.label.capitalize()} in {self.environment_label} interactively."
+        title = f"Configuring {self.settings.label.capitalize()} interactively."
         separator = "-" * len(title)
 
         click.echo()
         click.echo(separator)
         click.echo("Configuring", nl=False)
         click.secho(f" {self.settings.label.capitalize()}", nl=False, fg=PLUGIN_COLOUR)
-        click.echo(" in ", nl=False)
-        click.secho(
-            self.environment_label,
-            nl=False,
-            fg=ENVIRONMENT_COLOUR,
-        )
         click.echo(" interactively.")
         click.echo(separator)
 
     def _print_home_help(self):
         """Print help text."""
+        indentation = "  "
         click.echo()
-        click.echo("  To configure settings somewhere other than ", nl=False)
-        click.secho(self.environment_label, nl=False, fg=ENVIRONMENT_COLOUR)
-        click.echo(", try:")
-        click.echo()
-        click.echo("    # list available environments")
-        click.secho("    $ meltano environment list", fg="white")
-        click.echo("    # configure environment settings interactively")
-        click.secho(
-            f"    $ meltano --environment=<environment name> config {self.plugin.name} interactive",
-            fg="white",
+        click.echo(
+            f"{indentation}By following the prompts below, you will be guided through configuration of this plugin."
         )
-        if self.project.active_environment:
-            click.echo()
-            click.echo("  Or to modify Base (i.e. no Environment), try:")
-            click.echo()
-            click.secho(
-                f"    $ meltano --no-environment config {self.plugin.name} interactive",
-                fg="white",
-            )
         click.echo()
-        click.echo("  For more information about using Environments, take a look at")
-        click.secho("    https://docs.meltano.com/concepts/environments", fg="blue")
+        click.echo(
+            f"{indentation}Meltano is responsible for managing the configuration of all of a project’s plugins."
+        )
+        click.echo(
+            f"{indentation}It knows what settings are supported by each plugin, and how and when different"
+        )
+        click.echo(
+            f"{indentation}types of plugins expect to be fed that configuration."
+        )
+        click.echo()
+        click.echo(
+            f"{indentation}To determine the values of settings, Meltano will look in 4 main places,"
+        )
+        click.echo(f"{indentation}with each taking precedence over the next:")
+        click.echo()
+        click.echo(f"{indentation*2}1) Environment variables")
+        click.echo(f"{indentation*2}2) Your meltano.yml project file")
+        click.echo(f"{indentation*2}3) Your project's system database")
+        click.echo(
+            f"{indentation*2}4) The default values set in the plugin's settings metadata"
+        )
+        click.echo()
+        click.echo(
+            f"{indentation}Within meltano.yml (2) you can also associate configuration with a Meltano Environment,"
+        )
+        click.echo(
+            f"{indentation}allowing you to define custom layers of configuration within your project."
+        )
+        click.echo()
+        click.echo(
+            f"{indentation}You will be asked where you would like to store setting values, and optionally which Environment to use."
+        )
 
     def _print_home_available_settings(self):
         """Print available setting names and current values."""
         indentation = "  "
-        current_setting_values = "Available Settings"
-        separator = "-" * len(current_setting_values)
+        title = f"Available '{self.settings.plugin.name}' Settings"
+        separator = "-" * len(title)
         click.echo()
         click.echo(separator)
-        click.echo(current_setting_values)
+        click.echo("Available ", nl=False)
+        click.secho(f"'{self.settings.plugin.name}'", nl=False, fg=PLUGIN_COLOUR)
+        click.echo(" Settings")
         click.echo(separator)
         click.echo()
         for index, name, description in self.setting_choices:
