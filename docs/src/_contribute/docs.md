@@ -5,6 +5,13 @@ layout: doc
 weight: 10
 ---
 
+## Documentation Structure
+
+We aim to follow the [Diátaxis Framework](https://diataxis.fr/) where possible.
+This framework specifies four distinct categories: Tutorials, Explanation, How-to Guides, and Reference.
+As you contribute to the documentation, use the framework as a guide to help you decide where to add content.
+We recognize that not everything will fall into the four categories and welcome suggestions on how to improve the documentation to make it more useful for everyone.
+
 ## Checkout and Serve Docs Locally
 
 Follow the steps below to work locally with this project.
