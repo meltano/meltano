@@ -148,7 +148,3 @@ src/meltano/api/static/js
 
 # sqlite
 *.db
-
-#Test Project
-meltano-demo/
-meltano-demo/**
