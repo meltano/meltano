@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
+
 ### Breaks
 
 
@@ -24,7 +26,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3146](https://gitlab.com/meltano/meltano/-/issues/3146) Add `--dry-run` option to `meltano run`.
 - [#2754](https://gitlab.com/meltano/meltano/-/issues/2754) New `meltano state` command to manage job states.
-
 
 ### Fixes
 
