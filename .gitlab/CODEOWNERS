@@ -13,10 +13,10 @@
 /src/webapp/ @alex1126 @pandemicsyn
 /src/meltano/api/ @pandemicsyn @alex1126
 
-# Docs owners
-/docs/ @tayloramurphy @afolson
-/CONTRIBUTING.md @tayloramurphy @afolson
-/README.md @tayloramurphy @afolson
+^[Docs]
+/docs/ @afolson @tayloramurphy @pandemicsyn @edgarrmondragon
+/CONTRIBUTING.md @afolson @tayloramurphy  @pandemicsyn @edgarrmondragon
+/README.md @afolson @tayloramurphy @pandemicsyn @edgarrmondragon
 
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
 /.bumpversion.cfg @meltano/core-team
