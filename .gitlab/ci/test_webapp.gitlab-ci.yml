@@ -1,7 +1,0 @@
-test_meltano_ui:
-  stage: test
-  image: node:10.16.2
-  script:
-    - cd src/webapp
-    - yarn
-    # add e2e once ci is wired up for it
