@@ -9,6 +9,7 @@ from meltano.core.utils.pidfile import PIDFile
 
 class APIWorker(threading.Thread):
     def __init__(self, project: Project, reload=False):
+        # print("Hello from api_worker.py at line 12: def __init__(self, project: Project, reload=False):")
         super().__init__()
 
         self.project = project
@@ -16,14 +17,29 @@ class APIWorker(threading.Thread):
         self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
 
     def run(self):
-        args = ["--config", "python:meltano.api.wsgi", "--pid", str(self.pid_file)]
+        if os.name == "nt":
+            # print("Hello from api.worker.py: I am a windows machine let use Waitress")
 
-        if self.reload:
-            args += ["--reload"]
+            args = [
+                "--port=5000",
+                "--threads=1",
+                "--call",
+                "meltano.api.app:create_app",
+            ]
 
-        args += ["meltano.api.app:create_app()"]
+            MeltanoInvoker(self.project).invoke(args, command="waitress-serve")
 
-        MeltanoInvoker(self.project).invoke(args, command="gunicorn")
+        else:
+            # print("Hello from api_worker.py: I am not a windows machine lets user Gunicorn")
+
+            args = ["--config", "python:meltano.api.wsgi", "--pid", str(self.pid_file)]
+
+            if self.reload:
+                args += ["--reload"]
+
+            args += ["meltano.api.app:create_app()"]
+
+            MeltanoInvoker(self.project).invoke(args, command="gunicorn")
 
     def pid_path(self):
         return self.project.run_dir(f"gunicorn.pid")
