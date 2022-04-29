@@ -18,7 +18,7 @@ class APIWorker(threading.Thread):
 
     def run(self):
         if os.name == "nt":
-            # print("Hello from api.worker.py: I am a windows machine let use Waitress")
+            # Use Waitress when on Windows
 
             args = [
                 "--port=5000",
