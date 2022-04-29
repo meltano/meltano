@@ -30,7 +30,7 @@ class APIWorker(threading.Thread):
             MeltanoInvoker(self.project).invoke(args, command="waitress-serve")
 
         else:
-            # print("Hello from api_worker.py: I am not a windows machine lets user Gunicorn")
+            # Use Gunicorn when not on Windows
 
             args = ["--config", "python:meltano.api.wsgi", "--pid", str(self.pid_file)]
 
