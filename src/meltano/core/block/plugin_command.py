@@ -112,10 +112,8 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         return self._command_args
 
     async def _start(self):
-        if self.command_args:
-            await self.start(self.command_args)
-        else:
-            await self.start()
+        invoke_args = (self.command_args,) if self.command_args else ()
+        await self.start(*invoke_args)
 
     async def run(self) -> None:
         """Invoke a command capturing and logging produced output.
