@@ -199,8 +199,7 @@ class PluginInstallService:
         states = []
         seen_venvs = set()
         deduped_plugins = []
-        # iterate in reverse order, to keep last plugin occurrences
-        for plugin in reversed(list(plugins)):
+        for plugin in list(plugins):
             if (plugin.type, plugin.venv_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
                 seen_venvs.add((plugin.type, plugin.venv_name))
@@ -215,8 +214,6 @@ class PluginInstallService:
                     ),
                 )
                 states.append(state)
-        # reverse deduped_plugins to preserve plugin original order
-        deduped_plugins.reverse()
         return states, deduped_plugins
 
     def install_all_plugins(
