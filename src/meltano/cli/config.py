@@ -238,16 +238,22 @@ def reset(ctx, store):
 @click.pass_context
 def set_(ctx, setting_name, value, store):
     """Set the configurations' setting `<name>` to `<value>`."""
-    interaction = InteractiveConfig(ctx=ctx)
+    interaction = InteractiveConfig(ctx=ctx, store=store, extra=False)
     interaction.set_value(setting_name=setting_name, value=value, store=store)
 
 
 @config.command()
 @click.argument("setting_name", nargs=-1, required=False)
+@click.option(
+    "--store",
+    type=click.Choice(SettingValueStore.writables()),
+    default=SettingValueStore.AUTO,
+)
+@click.option("--extras", is_flag=True)
 @click.pass_context
-def interactive(ctx, setting_name=None):
+def interactive(ctx, setting_name, store, extras):
     """Set configuration interactively."""
-    interaction = InteractiveConfig(ctx=ctx)
+    interaction = InteractiveConfig(ctx=ctx, store=store, extras=extras)
 
     if setting_name:
         name = ".".join(list(setting_name))
@@ -289,5 +295,5 @@ def test(ctx):
 @click.pass_context
 def unset(ctx, setting_name, store):
     """Unset the configurations' setting called `<name>`."""
-    interaction = InteractiveConfig(ctx=ctx)
+    interaction = InteractiveConfig(ctx=ctx, store=store, extra=False)
     interaction.unset_value(setting_name=setting_name, store=store)
