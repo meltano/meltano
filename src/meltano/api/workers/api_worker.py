@@ -1,5 +1,5 @@
+"""Starts WSGI Webserver that will run the API App for a Meltano Project."""
 import os
-import subprocess
 import threading
 
 from meltano.core.meltano_invoker import MeltanoInvoker
@@ -8,8 +8,10 @@ from meltano.core.utils.pidfile import PIDFile
 
 
 class APIWorker(threading.Thread):
+    """The Base APIWorker Class."""
+
     def __init__(self, project: Project, reload=False):
-        # print("Hello from api_worker.py at line 12: def __init__(self, project: Project, reload=False):")
+        """Initializes the API Worker class with the project config."""
         super().__init__()
 
         self.project = project
@@ -17,12 +19,12 @@ class APIWorker(threading.Thread):
         self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
 
     def run(self):
+        """Starts the initalized API Workers with the WSGI Server needed for the detected OS."""
         if os.name == "nt":
             # Use Waitress when on Windows
 
             args = [
                 "--port=5000",
-                "--threads=1",
                 "--call",
                 "meltano.api.app:create_app",
             ]
@@ -42,7 +44,9 @@ class APIWorker(threading.Thread):
             MeltanoInvoker(self.project).invoke(args, command="gunicorn")
 
     def pid_path(self):
-        return self.project.run_dir(f"gunicorn.pid")
+        """Returns the path name of the gunicorn.pid file."""
+        return self.project.run_dir("gunicorn.pid")
 
     def stop(self):
+        """Terminnate active gunicorn workers that have placed a PID in the project's gunicorn.pid file."""
         self.pid_file.process.terminate()
