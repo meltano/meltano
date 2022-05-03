@@ -4,6 +4,7 @@ import threading
 
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils.pidfile import PIDFile
 
 
@@ -11,7 +12,12 @@ class APIWorker(threading.Thread):
     """The Base APIWorker Class."""
 
     def __init__(self, project: Project, reload=False):
-        """Initializes the API Worker class with the project config."""
+        """Initialize the API Worker class with the project config.
+
+        Parameters:
+            project: Project class.
+            reload: Boolean.
+        """
         super().__init__()
 
         self.project = project
@@ -19,16 +25,23 @@ class APIWorker(threading.Thread):
         self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
 
     def run(self):
-        """Starts the initalized API Workers with the WSGI Server needed for the detected OS."""
+        """Run the initalized API Workers with the WSGI Server needed for the detected OS."""
         if os.name == "nt":
             # Use Waitress when on Windows
+            settings_for_apiworker = ProjectSettingsService(self.project.find())
 
+            arg_bind_host = settings_for_apiworker.get("ui.bind_host")
+            arg_bind_port = settings_for_apiworker.get("ui.bind_port")
+            bind = f"{arg_bind_host}:{arg_bind_port}"
+
+            # Setup args for waitress-serve using bind info from the project setings service
             args = [
-                "--port=5000",
+                f"--listen={bind}",
                 "--call",
                 "meltano.api.app:create_app",
             ]
 
+            # Sart waitress-serve using the MeltanoInvoker
             MeltanoInvoker(self.project).invoke(args, command="waitress-serve")
 
         else:
@@ -44,7 +57,11 @@ class APIWorker(threading.Thread):
             MeltanoInvoker(self.project).invoke(args, command="gunicorn")
 
     def pid_path(self):
-        """Returns the path name of the gunicorn.pid file."""
+        """Give the path name of the projects gunicorn.pid file location.
+
+        Returns:
+            Path object that gives the direct locationo of the gunicorn.pid file.
+        """
         return self.project.run_dir("gunicorn.pid")
 
     def stop(self):
