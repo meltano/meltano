@@ -1244,3 +1244,59 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt starting")
             assert not matcher.event_matches("dbt running")
             assert not matcher.event_matches("dbt done")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_dry_run(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        mapper,
+        dbt,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
+        project_plugins_service,
+        job_logging_service,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = CoroutineMock(
+            side_effect=(tap_process, mapper_process, target_process)
+        )
+
+        args = ["run", "--dry-run", tap.name, "mock-mapping-0", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+
+            assert matcher.event_matches(
+                "All ExtractLoadBlocks validated, starting execution."
+            )
+
+            # we should have seen the --dry-run specific log line
+            assert matcher.event_matches("Dry run, but would have run block 1/1.")
+
+            # we should NOT see any mock done events, and definitely no block completion log lines
+            assert not matcher.find_by_event("tap done")
+            assert not matcher.find_by_event("target done")
+            assert not matcher.find_by_event("Block run completed.")
+            assert create_subprocess_exec.call_count == 0
+            assert asyncio_mock.call_count == 0

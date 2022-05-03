@@ -3,7 +3,36 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+- [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
+
+### Breaks
+
+
+## 1.102.0 - (2022-04-28)
+---
+
+### New
+
+- [#3146](https://gitlab.com/meltano/meltano/-/issues/3146) Add `--dry-run` option to `meltano run`.
+- [#2754](https://gitlab.com/meltano/meltano/-/issues/2754) New `meltano state` command to manage job states.
+
+### Fixes
+
+- [#3392](https://gitlab.com/meltano/meltano/-/issues/3392) Fixes bug in meltano ui where pipelines tab would fail to load when a pipeline had no interval set.
+
+
+## 1.101.0 - (2022-04-21)
 
 ---
 
@@ -11,7 +40,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#2490](https://gitlab.com/meltano/meltano/-/issues/2490) Inherited plugins with identical `pip_url` field values to parent now share a single venv.
 
-### Changes
 
 ### Fixes
 
@@ -31,6 +59,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3406](https://gitlab.com/meltano/meltano/-/issues/3406) Add missing `plugins/mappers` key to JSON schema for `meltano.yml` and fix `mappings` key in mapper objects.
 - [#3390](https://gitlab.com/meltano/meltano/-/issues/3390) Fixes bug where `meltano init` failed to create prerequisite directories.
 - [#3391](https://gitlab.com/meltano/meltano/-/issues/3391) Fixes bug where `meltano run` would invoke the wrong plugin command when the same plugin was used multiple times.
+
 
 ## 1.100.0 - (2022-04-14)
 

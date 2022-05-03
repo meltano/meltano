@@ -108,36 +108,65 @@ body {
   max-width: 100%;
   margin-bottom: 15px;
 }
+
 .post-item {
   margin-bottom: 30px;
 }
+
 .post-link .ais-Highlight {
   color: #111;
   font-style: normal;
   text-decoration: underline;
 }
+
 .post-breadcrumbs {
   color: #424242;
   display: block;
 }
+
 .post-breadcrumb {
   font-size: 18px;
   color: #424242;
 }
+
 .post-breadcrumb .ais-Highlight {
   font-weight: bold;
   font-style: normal;
 }
+
 .post-snippet .ais-Highlight {
   color: #2a7ae2;
   font-style: normal;
   font-weight: bold;
 }
+
 .post-snippet img {
   display: none;
 }
 
 .menu-list a.is-active {
-    background-color: #3438bf;
-    color: #fff;
+  background-color: #3438bf;
+  color: #fff;
+}
+
+.container .content #table-of-contents {
+  margin-bottom: 1em;
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+  color: #62626e;
+}
+
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h4 a:hover,
+h5 a:hover,
+h6 a:hover {
+  color: #3438bf;
 }

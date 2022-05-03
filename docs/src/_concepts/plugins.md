@@ -1,5 +1,5 @@
 ---
-title: Meltano Plugins
+title: Plugins
 description: Meltano takes a modular approach to data engineering and EL(T), where your project and pipelines are composed of plugins.
 layout: doc
 weight: 2
@@ -510,7 +510,7 @@ Loaders support the following [extras](/guide/configuration#plugin-extras):
 
 A loader's `dialect` [extra](/guide/configuration#plugin-extras)
 holds the name of the dialect of the target database, so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/guide/ui)'s [Analysis feature](/guide/analysis)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
 can determine the type of database to connect to.
 
 The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
@@ -548,7 +548,7 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 
 A loader's `target_schema` [extra](/guide/configuration#plugin-extras)
 holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/guide/ui)'s [Analysis feature](/guide/analysis)
+[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
 can determine the database schema to load data from.
 
 The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
@@ -686,13 +686,13 @@ export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 
 ### Models
 
-Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/guide/ui) to aid in [data analysis](/guide/analysis).
+Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/reference/ui) to aid in [data analysis](/guide/analysis).
 They describe the schema of the data being analyzed and the ways different tables can be joined,
 and are used to automatically generate SQL queries using a point-and-click interface.
 
 ### Dashboards
 
-Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/guide/ui) dashboards and reports.
+Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/reference/ui) dashboards and reports.
 
 When a dashboard is added to your project using [`meltano add`](/reference/command-line-interface#add),
 the bundled dashboards and reports will automatically be added to your project's `analyze` directory as well.
@@ -876,21 +876,21 @@ mappers:
     pip_url: pipelinewise-transform-field
     executable: transform-field
     mappings:
-      - name: hide-gitlab-secrets
-        config:
-          transformations:
-            - field_id: "author_email"
-              tap_stream_name: "commits"
-              type: "MASK-HIDDEN"
-            - field_id: "committer_email"
-              tap_stream_name: "commits"
-              type: "MASK-HIDDEN"
-      - name: null-created-at
-        config:
-          transformations:
-            - field_id: "created_at"
-              tap_stream_name: "accounts"
-              type: "SET-NULL"
+    - name: hide-gitlab-secrets
+      config:
+        transformations:
+          - field_id: "author_email"
+            tap_stream_name: "commits"
+            type: "MASK-HIDDEN"
+          - field_id: "committer_email"
+            tap_stream_name: "commits"
+            type: "MASK-HIDDEN"
+    - name: null-created-at
+      config:
+        transformations:
+          - field_id: "created_at"
+            tap_stream_name: "accounts"
+            type: "SET-NULL"
 ```
 
 You can then invoke the mappings by name:

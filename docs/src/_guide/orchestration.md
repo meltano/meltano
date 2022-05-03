@@ -1,5 +1,5 @@
 ---
-title: Orchestrate Meltano
+title: Orchestrate Data
 description: Learn how to schedule and orchestrate your pipelines using Meltano and Airflow.
 layout: doc
 weight: 6
@@ -9,11 +9,11 @@ Most EL(T) pipelines aren't run just once, but over and over again, to make sure
 
 To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://airflow.apache.org/).
 
-When a new pipeline schedule is created using the [UI](/guide/ui) or [CLI](/reference/command-line-interface#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [UI](/reference/ui) or [CLI](/reference/command-line-interface#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 ## Create a Schedule
 
-To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/guide/ui#pipelines), or the [`meltano schedule`  command](/reference/command-line-interface#schedule):
+To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/reference/ui#pipelines), or the [`meltano schedule`  command](/reference/command-line-interface#schedule):
 
 ```bash
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
@@ -135,4 +135,4 @@ Airflow is a full-featured orchestrator that has a lot of features that are curr
 ## Meltano UI
 
 While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface),
-basic pipeline management functionality is also available in [the UI](/guide/ui#pipelines).
+basic pipeline management functionality is also available in [the UI](/reference/ui#pipelines).

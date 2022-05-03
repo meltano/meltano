@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with ELT"
+title: "ELT vs ETL"
 description: "ELT Meaning, Advantages & More: All You Need To Know To Get Started"
 layout: doc
 weight: 11
