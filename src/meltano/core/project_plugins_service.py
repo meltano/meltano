@@ -6,6 +6,7 @@ from typing import Generator, List, Optional
 import structlog
 
 from meltano.core.environment import Environment, EnvironmentPluginConfig
+from meltano.core.plugin_lock_service import PluginLockService
 
 from .config_service import ConfigService
 from .plugin import PluginRef, PluginType
@@ -37,6 +38,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
         self,
         project: Project,
         config_service: ConfigService = None,
+        lock_service: PluginLockService = None,
         discovery_service: PluginDiscoveryService = None,
         locked_definition_service: LockedDefinitionService = None,
         use_cache=True,
@@ -46,6 +48,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
         Args:
             project: The Meltano project.
             config_service: The Meltano Config Service.
+            lock_service: The Meltano Plugin Lock Service.
             discovery_service: The Meltano Plugin Discovery Service.
             locked_definition_service: The Meltano Locked Definition Service.
             use_cache: Whether to use the plugin cache.
@@ -54,6 +57,10 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
 
         self.config_service = config_service or ConfigService(project)
         self.discovery_service = discovery_service or PluginDiscoveryService(project)
+        self.lock_service = lock_service or PluginLockService(
+            project,
+            self.discovery_service,
+        )
         self.locked_definition_service = (
             locked_definition_service or LockedDefinitionService(project)
         )

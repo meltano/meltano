@@ -3,15 +3,30 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
+
+from structlog.stdlib import get_logger
 
 from meltano.core.plugin.base import BasePlugin, StandalonePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project
 
+logger = get_logger(__name__)
+
 
 class LockfileAlreadyExistsError(Exception):
     """Raised when a plugin lockfile already exists."""
+
+    def __init__(self, message: str, path: Path):
+        """Create a new LockfileAlreadyExistsError.
+
+        Args:
+            message: The error message.
+            path: The path to the existing lockfile.
+        """
+        self.path = path
+        super().__init__(message)
 
 
 class PluginLockService:
@@ -32,12 +47,14 @@ class PluginLockService:
         project_plugin: ProjectPlugin | BasePlugin,
         *,
         overwrite: bool = False,
+        exists_ok: bool = False,
     ):
         """Save the plugin lockfile.
 
         Args:
             project_plugin: The plugin definition to save.
             overwrite: Whether to overwrite the lockfile if it already exists.
+            exists_ok: Whether raise an exception if the lockfile already exists.
 
         Raises:
             LockfileAlreadyExistsError: If the lockfile already exists and is not
@@ -68,11 +85,11 @@ class PluginLockService:
                 project_plugin.name,
             )
         else:
-            self.save(project_plugin.parent, overwrite=overwrite)
+            self.save(project_plugin.parent, overwrite=overwrite, exists_ok=True)
             return
 
-        if path.exists() and not overwrite:
-            raise LockfileAlreadyExistsError(f"Lockfile already exists: {path}")
+        if path.exists() and not overwrite and not exists_ok:
+            raise LockfileAlreadyExistsError(f"Lockfile already exists: {path}", path)
 
         variant = plugin_def.find_variant(project_plugin.variant)
         locked_def = StandalonePlugin.from_variant(
@@ -84,3 +101,5 @@ class PluginLockService:
 
         with path.open("w") as lockfile:
             json.dump(locked_def.canonical(), lockfile, indent=2)
+
+        logger.debug("Locked plugin definition", path=path)

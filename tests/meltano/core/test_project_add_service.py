@@ -36,13 +36,16 @@ class TestProjectAddService:
         project: Project,
         plugin_discovery_service,
     ):
-        added = subject.add(plugin_type, plugin_name)
-        assert added in project.meltano["plugins"][plugin_type]
-        assert project.plugin_lock_path(
+        lockfile_path = project.plugin_lock_path(
             plugin_type,
             plugin_name,
             variant_name=default_variant,
-        ).exists()
+        )
+        assert not lockfile_path.exists()
+
+        added = subject.add(plugin_type, plugin_name)
+        assert added in project.meltano["plugins"][plugin_type]
+        assert lockfile_path.exists()
 
         # Variant and pip_url are repeated in
         # canonical representation for `meltano.yml`
