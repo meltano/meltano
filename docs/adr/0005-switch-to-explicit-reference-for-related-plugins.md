@@ -15,7 +15,7 @@ As part of Meltano 2.0 we aim to make this dependency more explicit to provide t
 
 ## Decision
 
-We will add an explicit reference in the definiton of a plugin to other plugins using the `related_plugin` key. 
+We will add an explicit reference in the definition of a plugin to other plugins using a new plugin-level definition key to specify required plugin dependencies. 
 
 The ability to auto-add and install plugins based on the similarity of the name and/or namespace will be deprecated.
 
