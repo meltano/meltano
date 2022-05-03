@@ -25,6 +25,7 @@ plugins:
   - jekyll-toc
   - jekyll-sitemap
   - jekyll-algolia
+  - jekyll-redirect-from
 
 # Default plugin configuration
 defaults:
@@ -37,7 +38,7 @@ defaults:
 collections:
   guide:
     output: true
-    name: "Guide"
+    name: "Guides"
     weight: 1
   concepts:
     output: true
@@ -55,10 +56,6 @@ collections:
     output: true
     name: "Contribute"
     weight: 5
-  the-project:
-    output: true
-    name: "The Project"
-    weight: 6
   posts:
     output: false
 

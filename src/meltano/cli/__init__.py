@@ -30,6 +30,7 @@ from . import (  # isort:skip # noqa: F401, WPS235
     schedule,
     schema,
     select,
+    state,
     ui,
     upgrade,
     user,

@@ -322,6 +322,15 @@ class SingerBlock(InvokerBase, IOBlock):
         """
         return self.invoker.plugin.type in CONSUMERS
 
+    @property
+    def has_state(self) -> bool:
+        """Whether or not this plugin has state.
+
+        Returns:
+            bool indicating whether this plugin has state
+        """
+        return "state" in self.invoker.capabilities
+
     async def start(self):
         """Start the SingerBlock by invoking the underlying plugin.
 

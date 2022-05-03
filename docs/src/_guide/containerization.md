@@ -1,5 +1,5 @@
 ---
-title: Containerize Meltano
+title: Run in Containers
 description: Learn how to greatly simplify the deployment process (and prevent issues caused by inconsistencies between environments!) by wrapping your Meltano project up into a project-specific Docker container image.
 layout: doc
 weight: 7

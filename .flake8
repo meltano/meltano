@@ -60,6 +60,8 @@ ignore =
     WPS338
     # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
     WPS348
+    # Allow "overuse" of noqa comments.
+    WPS402
     # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
     WPS420
     # Allow nested classes
@@ -143,6 +145,8 @@ per_file_ignores =
         WPS202
         # Found boolean non-keyword argument
         WPS425
+	# Found too long name
+	WPS118
 
     !tests/*:
         T
@@ -214,6 +218,8 @@ per_file_ignores =
     src/meltano/core/logging/utils.py:
         # Found wrong module name
         WPS100
+        # Found to many module members (8 > 7)
+        WPS202
     src/meltano/core/cli_messages.py:
         # Special exceptions for cli magic
         WPS114
