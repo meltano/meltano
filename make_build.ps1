@@ -26,7 +26,7 @@ yarn build
 Set-Location $StartingDirectory
 If (Test-Path $API_TEMPLATES)
 {
-    Write-Output "The Folder {$API_TEMPLATES} already exists"
+    Write-Output " The Folder ./src/meltano/api/templates already exists"
 }
 else
 {
