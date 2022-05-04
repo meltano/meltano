@@ -15,6 +15,7 @@ from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginInstallStatus,
 )
+from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
@@ -348,6 +349,16 @@ def add_plugin(
             click.echo(
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new --inherit-from {plugin.name}"
             )
+    except LockfileAlreadyExistsError as exc:
+        plugin = exc.plugin
+        click.secho(
+            f"Plugin definition is already locked at {exc.path}.",
+            fg="yellow",
+            err=True,
+        )
+        click.echo(
+            "You can remove the file manually to avoid using a stale definition.",
+        )
 
     click.echo()
 

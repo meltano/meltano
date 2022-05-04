@@ -7,7 +7,7 @@ from pathlib import Path
 
 from structlog.stdlib import get_logger
 
-from meltano.core.plugin.base import BasePlugin, StandalonePlugin, Variant
+from meltano.core.plugin.base import BasePlugin, PluginRef, StandalonePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project
@@ -18,14 +18,16 @@ logger = get_logger(__name__)
 class LockfileAlreadyExistsError(Exception):
     """Raised when a plugin lockfile already exists."""
 
-    def __init__(self, message: str, path: Path):
+    def __init__(self, message: str, path: Path, plugin: PluginRef):
         """Create a new LockfileAlreadyExistsError.
 
         Args:
             message: The error message.
             path: The path to the existing lockfile.
+            plugin: The plugin that was locked.
         """
         self.path = path
+        self.plugin = plugin
         super().__init__(message)
 
 
@@ -44,7 +46,7 @@ class PluginLockService:
 
     def save(
         self,
-        project_plugin: ProjectPlugin | BasePlugin,
+        plugin: ProjectPlugin | BasePlugin,
         *,
         overwrite: bool = False,
         exists_ok: bool = False,
@@ -52,7 +54,7 @@ class PluginLockService:
         """Save the plugin lockfile.
 
         Args:
-            project_plugin: The plugin definition to save.
+            plugin: The plugin definition to save.
             overwrite: Whether to overwrite the lockfile if it already exists.
             exists_ok: Whether raise an exception if the lockfile already exists.
 
@@ -60,43 +62,46 @@ class PluginLockService:
             LockfileAlreadyExistsError: If the lockfile already exists and is not
                 flagged for overwriting.
         """
-        variant = (
-            None
-            if project_plugin.variant == Variant.DEFAULT_NAME
-            else project_plugin.variant
-        )
+        variant = None if plugin.variant == Variant.DEFAULT_NAME else plugin.variant
 
-        if isinstance(project_plugin, BasePlugin):
-            plugin_def = project_plugin.definition
+        logger.info(f"Locking a {type(plugin)}")
+
+        if isinstance(plugin, BasePlugin):
+            plugin_def = plugin.definition
             path = self.projet.plugin_lock_path(
                 plugin_def.type,
                 plugin_def.name,
                 variant_name=variant,
             )
 
-        elif project_plugin.inherit_from is None:
+        elif plugin.inherit_from is None:
             path = self.projet.plugin_lock_path(
-                project_plugin.type,
-                project_plugin.name,
+                plugin.type,
+                plugin.name,
                 variant_name=variant,
             )
             plugin_def = self.discovery_service.find_definition(
-                project_plugin.type,
-                project_plugin.name,
+                plugin.type,
+                plugin.name,
             )
         else:
-            self.save(project_plugin.parent, overwrite=overwrite, exists_ok=True)
+            # Recursively look for the parent plugin definition and lock that
+            self.save(plugin.parent, overwrite=overwrite, exists_ok=True)
             return
 
         if path.exists() and not overwrite and not exists_ok:
-            raise LockfileAlreadyExistsError(f"Lockfile already exists: {path}", path)
+            raise LockfileAlreadyExistsError(
+                f"Lockfile already exists: {path}",
+                path,
+                plugin,
+            )
 
-        variant = plugin_def.find_variant(project_plugin.variant)
+        variant = plugin_def.find_variant(plugin.variant)
         locked_def = StandalonePlugin.from_variant(
             variant,
-            project_plugin.name,
-            project_plugin.namespace,
-            project_plugin.type,
+            plugin.name,
+            plugin.namespace,
+            plugin.type,
         )
 
         with path.open("w") as lockfile:
