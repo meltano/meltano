@@ -38,6 +38,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#2490](https://gitlab.com/meltano/meltano/-/issues/2490) Inherited plugins with identical `pip_url` field values to parent now share a single venv.
+
+
+### Fixes
+
+### Breaks
+
+## 1.101.0 - (2022-04-21)
+
+---
+
+### New
+
 - [#3377](https://gitlab.com/meltano/meltano/-/issues/3377) Add active environment as variable `MELTANO_ENVIRONMENT` in Plugin execution environment.
 
 ### Fixes
