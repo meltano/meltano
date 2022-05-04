@@ -33,8 +33,6 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
     @property
     def configurable_settings(self):
         """Return settings available for interactive configuration."""
-        # If `--extras` is not specified (`False`), we still want to load both
-        # regular and extra settings, since we show custom extras.
         return self.settings.config_with_metadata(
             session=self.session, extras=self.extras
         )
@@ -274,7 +272,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             click.echo()
             click.pause()
         elif set_unset == "unset":
+            click.echo()
             self.unset_value(setting_name=tuple(name.split(".")), store=self.store)
+            click.echo()
+            click.pause()
         elif set_unset == "skip":
             return InteractionStatus.SKIP
         elif set_unset == "exit":

@@ -238,6 +238,26 @@ meltano config <plugin> unset _<extra>
 meltano config <plugin> reset
 ```
 
+### How to use: Interactive config
+
+To make configuring plugins as easy as possible, Meltano includes an interactive configuration mode.
+Follow the interactive prompts to either step through a list of available plugin settings or to select a specific setting to set/unset.
+Interactive config supports the same options as the direct `set` and `unset` (i.e. `--extras` and `--store=`).
+
+```bash
+# Configure plugin interactively
+meltano config <plugin> interactive
+
+# Configure settings for specific environment interactively
+meltano --environment=prod config <plugin> interactive
+
+# Configure settings and extras interactively
+meltano config <plugin> interactive --extras
+
+# Configure specific store interactively
+meltano config <plugin> interactive --store=meltano_yml
+```
+
 ## `discover`
 
 Lists the available [discoverable plugins](/concepts/plugins#discoverable-plugins) and their [variants](/concepts/plugins#variants).
@@ -656,7 +676,7 @@ When an active environment is present, `run` will attempt to run incrementally a
 However, four top level flags are provided to alter behavior:
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
-(implicitly enables --log-level=debug for 'console' named handlers).
+  (implicitly enables --log-level=debug for 'console' named handlers).
 - `--no-state-update` will disable state saving for this invocation.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
