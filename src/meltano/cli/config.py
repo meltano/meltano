@@ -257,7 +257,7 @@ def interactive(ctx, setting_name, store, extras):
 
     if setting_name:
         name = ".".join(list(setting_name))
-        interaction.configure(setting_name=name)
+        interaction.configure(name=name)
     else:
         interaction.configure_all()
 
