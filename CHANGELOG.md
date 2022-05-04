@@ -3,12 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [#3227](https://gitlab.com/meltano/meltano/-/issues/3227) Add interactive mode to `meltano config` command.
 
 ### Changes
 
@@ -18,8 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
-
 ## 1.102.0 - (2022-04-28)
+
 ---
 
 ### New
@@ -31,7 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3392](https://gitlab.com/meltano/meltano/-/issues/3392) Fixes bug in meltano ui where pipelines tab would fail to load when a pipeline had no interval set.
 
-
 ## 1.101.0 - (2022-04-21)
 
 ---
@@ -40,14 +40,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3377](https://gitlab.com/meltano/meltano/-/issues/3377) Add active environment as variable `MELTANO_ENVIRONMENT` in Plugin execution environment.
 
-
 ### Fixes
 
 - [#3405](https://gitlab.com/meltano/meltano/-/issues/3405) Add missing `database_uri` key to JSON schema for `meltano.yml`
 - [#3406](https://gitlab.com/meltano/meltano/-/issues/3406) Add missing `plugins/mappers` key to JSON schema for `meltano.yml` and fix `mappings` key in mapper objects.
 - [#3390](https://gitlab.com/meltano/meltano/-/issues/3390) Fixes bug where `meltano init` failed to create prerequisite directories.
 - [#3391](https://gitlab.com/meltano/meltano/-/issues/3391) Fixes bug where `meltano run` would invoke the wrong plugin command when the same plugin was used multiple times.
-
 
 ## 1.100.0 - (2022-04-14)
 
