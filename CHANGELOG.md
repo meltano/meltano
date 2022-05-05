@@ -28,6 +28,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
 
+- [#3462](https://gitlab.com/meltano/meltano/-/issues/3462) Adds missing telemetry for `meltano state`
+
+### Breaks
 
 ## 1.102.0 - (2022-04-28)
 
