@@ -21,6 +21,18 @@ MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
 DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect"
 
 
+def hash_sha256(value: str) -> str:
+    """Get the sha_256 hash of a string.
+
+    Args:
+        value: the string value to hash.
+
+    Returns:
+        The hashed value of the given string.
+    """
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
 class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
     """Event tracker for Meltano."""
 
@@ -179,7 +191,7 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         """
         if self.project.active_environment is not None:
             environment = self.project.active_environment
-            hashed_name = hashlib.sha256(environment.name.encode()).hexdigest()
+            hashed_name = hash_sha256(environment.name)
             action = f"{action} --environment={hashed_name}"
 
         event = self.event(category, action)
@@ -343,14 +355,17 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
 
         self.track_event(category="meltano select", action=action, debug=debug)
 
-    def track_meltano_state(self, subcommand: str, job_id: str):
+    def track_meltano_state(self, subcommand: str, job_id: str | None = None):
         """Track the management of Singer State.
 
         Args:
             subcommand: The subcommand being run (e.g. 'set' or 'clear')
             job_id: The job_id for which state is being managed
         """
-        action = f"meltano state {subcommand} {job_id}"
+        action = f"meltano state {subcommand}"
+        if job_id:
+            hashed_job_id = hash_sha256(job_id)
+            action = f"{action} {hashed_job_id}"
         self.track_event(category="meltano state", action=action)
 
     def track_meltano_ui(self, debug: bool = False) -> None:
