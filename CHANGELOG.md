@@ -3,11 +3,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.103.0 - (2022-05-05)
 
 ---
 
 ### New
+
+- [#2490](https://gitlab.com/meltano/meltano/-/issues/2490) Inherited plugins with identical `pip_url` field values to parent now share a single venv.
 
 ### Changes
 
@@ -16,7 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
-
 - [#3462](https://gitlab.com/meltano/meltano/-/issues/3462) Adds missing telemetry for `meltano state`
 
 ### Breaks
@@ -33,18 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3392](https://gitlab.com/meltano/meltano/-/issues/3392) Fixes bug in meltano ui where pipelines tab would fail to load when a pipeline had no interval set.
-
-## 1.101.0 - (2022-04-21)
-
----
-
-### New
-
-- [#2490](https://gitlab.com/meltano/meltano/-/issues/2490) Inherited plugins with identical `pip_url` field values to parent now share a single venv.
-
-### Fixes
-
-### Breaks
 
 ## 1.101.0 - (2022-04-21)
 
