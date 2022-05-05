@@ -188,13 +188,16 @@ def _prompt_plugin_capabilities(plugin_type):
 
 
 def _prompt_plugin_settings(plugin_type):
-    if plugin_type not in {PluginType.EXTRACTORS, PluginType.LOADERS}:
+    if plugin_type not in {
+        PluginType.EXTRACTORS,
+        PluginType.LOADERS,
+        PluginType.TRANSFORMERS,
+    }:
         return []
-    singer_type = "tap" if plugin_type == PluginType.EXTRACTORS else "target"
 
     click.echo()
     click.echo(
-        f"Specify the {singer_type}'s {click.style('supported settings', fg='blue')} (`config.json` keys)"
+        f"Specify the {plugin_type.descriptor}'s {click.style('supported settings', fg='blue')} "
     )
     click.echo()
     click.echo("Multiple setting names (keys) can be separated using commas.")
@@ -224,7 +227,7 @@ def _prompt_plugin_settings(plugin_type):
         + 'e.g. `auth.username` for `{ "auth": { "username": value } }`.'
     )
     click.echo(
-        f"- To find out what settings a {singer_type} supports, reference its documentation."
+        f"- To find out what settings a {plugin_type.descriptor} supports, reference its documentation."
     )
     click.echo()
     click.echo("Default: no settings")
