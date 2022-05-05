@@ -352,7 +352,7 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         """
         action = f"meltano state {subcommand}"
         if job_id:
-            action.append(f" {job_id}")
+            action = f"{action} {job_id}"
         self.track_event(category="meltano state", action=action)
 
     def track_meltano_ui(self, debug: bool = False) -> None:
