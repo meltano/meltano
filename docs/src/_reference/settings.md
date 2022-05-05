@@ -55,7 +55,7 @@ Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
 See more about our [anonymization standards](/reference/command-line-interface#init) and [anonymous usage stats Q&A](/reference/command-line-interface#init) below for more details.
 Also refer to the Meltano data team handbook page for our ["Philosophy of Telemetry"](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry).
 
-With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're more than welcome to disable tracking entirely using one of these methods:
+With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
 
 - When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
