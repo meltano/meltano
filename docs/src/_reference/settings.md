@@ -35,7 +35,9 @@ These are settings specific to [your Meltano project](/concepts/project).
 - [`meltano init`](/reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
-By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
+Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
+
+By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
 
 We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
@@ -48,27 +50,16 @@ the Tracking IDs can be configured using the `tracking_ids.*` settings below.
 If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
 the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
 
-If you'd prefer to use Meltano _without_ sending the team this kind of data, you can disable tracking entirely using one of these methods:
+Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
+
+See more about our [anonymization standards](/reference/settings#anonymization-standards) and [anonymous usage stats Q&A](/reference/settings#anonymous-usage-stats-qa) below for more details.
+Also refer to the Meltano data team handbook page for our ["Philosophy of Telemetry"](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry).
+
+With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
 
 - When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
 - To disable tracking in all projects in one go, enable the `MELTANO_DISABLE_TRACKING` environment variable
-
-When anonymous usage tracking is enabled, Meltano tracks the following events:
-
-- `meltano init {project name}`
-- `meltano ui`
-- `meltano elt {extractor} {loader} --transform {skip, only, run}`
-- `meltano add {extractor, loader, transform, model, transformer, orchestrator}`
-- `meltano discover {all, extractors, loaders, transforms, models, transformers, orchestrators}`
-- `meltano install`
-- `meltano invoke {plugin_name} {plugin_args}`
-- `meltano select {extractor} {entities_filter} {attributes_filter}`
-- `meltano schedule add {name} {extractor} {loader} {interval}`
-
-Beyond the invocation of these commands and the identified command line arguments, Meltano does not track any other event metadata, plugin configuration, or processed data.
-
-Finally, Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
 
 #### How to use
 
@@ -80,6 +71,57 @@ export MELTANO_DISABLE_TRACKING=true
 
 meltano init --no_usage_stats demo-project
 ```
+
+#### Anonymization Standards
+
+Unless otherwise approved, any user-entered data is anonymized client-side before being submitted to Meltano. This section describes which data is sent in clear text and which data is obfuscated via one-way hashing.
+
+We capture these in clear text:
+
+- plugin names
+- plugin variant names
+- command names
+- execution context, such as:
+  - OS version
+  - Python version
+  - project ID
+
+We anonymize these with one-way hashing before reporting:
+
+- CLI args
+- plugin config
+
+These items will never be collected or reported back to meltano:
+
+- your settings values
+- your secrets or credentials
+- the contents of your `meltano.yml` file
+
+#### Anonymous Usage Stats Q&A
+
+##### Q: What is a one way hash and how is it helpful?
+
+**A:**
+
+One-way hashing is a way of obfuscating sensitive data such that:
+
+1. The same input value always produces the same output value (aka "hash").
+2. The results are mathematically and statistically _extremely difficult_ (read: near impossible) to reverse engineer back to the source value.
+3. Hash results are extremely helpful in safely and anonymously detecting changes to a file or configuration. Without passing the entire configuration, and without providing a hacker any means of decoding/decrypting the data back to its source, we can see that a file (such as `meltano.yml`) has not changed since its last hash was generated.
+
+##### Q: Why does Meltano use hashing?
+
+**A:**
+
+Meltano hashes any fields at all which could be used by a hacker to compromise a project or user. We will never know what freeform text arguments you passed in via the command line, we won't have any data at all which could be used to compromise your environment, and whatever data we collect, we'll never sell, share, or trade your data with any third parties.
+
+##### Should I enable or disable anonymous reporting?
+
+**A:**
+
+We hope you will choose to enable reporting, because this really does help us - and it helps the Meltano community in a very real way.
+
+If you still have any concerns about keeping anonymous reporting enabled, we hope you'll share those concerns with us. You can do so by emailing `hello@meltano.com` or by logging an issue in our [Meltano Issue Tracker](https://gitlab.com/meltano/meltano/-/issues).
 
 ### <a name="project-id"></a>`project_id`
 
