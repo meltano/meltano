@@ -489,7 +489,7 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Path to the project `plugins` directory.
         """
-        return self.root_dir("plugins.lock", *joinpaths)
+        return self.root_dir("plugins", *joinpaths)
 
     @makedirs
     def plugin_lock_path(
@@ -517,7 +517,7 @@ class Project(Versioned):  # noqa: WPS214
 
         return self.root_plugins_dir(
             plugin_type,
-            f"{filename}.json",
+            f"{filename}.lock",
             make_dirs=make_dirs,
         )
 
