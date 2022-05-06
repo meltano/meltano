@@ -37,7 +37,7 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
 
-By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
+By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
 
 We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
