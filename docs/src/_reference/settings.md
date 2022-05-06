@@ -52,7 +52,7 @@ the collector endpoints can be configured using the [`snowplow.collector_endpoin
 
 Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
 
-See more about our [anonymization standards](/reference/command-line-interface#init) and [anonymous usage stats Q&A](/reference/command-line-interface#init) below for more details.
+See more about our [anonymization standards](/reference/settings#anonymization-standards) and [anonymous usage stats Q&A](/reference/settings#anonymous-usage-stats-qa) below for more details.
 Also refer to the Meltano data team handbook page for our ["Philosophy of Telemetry"](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry).
 
 With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
