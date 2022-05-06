@@ -1,5 +1,6 @@
 """Starts WSGI Webserver that will run the API App for a Meltano Project."""
-import os
+import logging
+import platform
 import threading
 
 from meltano.core.meltano_invoker import MeltanoInvoker
@@ -26,7 +27,7 @@ class APIWorker(threading.Thread):
 
     def run(self):
         """Run the initalized API Workers with the WSGI Server needed for the detected OS."""
-        if os.name == "nt":
+        if platform.system() == "Windows":
             # Use Waitress when on Windows
             settings_for_apiworker = ProjectSettingsService(self.project.find())
 
@@ -41,8 +42,13 @@ class APIWorker(threading.Thread):
                 "meltano.api.app:create_app",
             ]
 
-            # Sart waitress-serve using the MeltanoInvoker
-            MeltanoInvoker(self.project).invoke(args, command="waitress-serve")
+            # Start waitress-serve using the MeltanoInvoker
+            if self.reload:
+                logging.warning(
+                    "--reload is not available, you will need to manually stop and start Meltano UI"
+                )
+            else:
+                MeltanoInvoker(self.project).invoke(args, command="waitress-serve")
 
         else:
             # Use Gunicorn when not on Windows

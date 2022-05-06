@@ -60,7 +60,7 @@ structlog = "^21.2.0"
 aiodocker = "^0.21.0"
 MarkupSafe = "<2.1.0"
 snowplow-tracker = "^0.10.0"
-waitress = "^2.1.1"
+waitress = { version = "^2.1.1", markers = "platform_system == 'Windows'" }
 
 [tool.poetry.extras]
 infra = ["ansible"]
