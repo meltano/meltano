@@ -1,0 +1,169 @@
+getting_started_windows:
+  stage: test
+  tags:
+    - shared-windows
+    - windows
+    - windows-1809
+  before_script:
+    - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+    - choco install -y python --version=3.8.9
+    - RefreshEnv
+  variables:
+    MELTANO_DISABLE_TRACKING: "true"
+  script:
+    ### https://docs.meltano.com/guide/installation
+
+    # For these examples to work, ensure that:
+    # - you are running Linux or macOS
+    # - Python 3.7, 3.8, or 3.9 has been installed
+    - python3 --version
+
+    # Create directory for Meltano projects
+    - mkdir meltano-projects
+    - cd meltano-projects
+
+    # Install pipx package manager
+    - python3 -m pip install --user pipx 
+    - python3 -m pipx ensurepath
+    # - source ~/.bashrc #Update path to include pipx
+    - RefreshEnv #Update path to include pipx
+
+    # Install meltano using the current source code for this build
+    - pipx install ..
+
+
+    ### https://docs.meltano.com/concepts/project
+
+    # Initialize a new Meltano project
+    - meltano init demo-project
+
+    # Before using a `meltano` command, ensure that:
+    # - you have navigated to your Meltano project
+    - cd demo-project
+
+    ### ---
+    # Always use the latest discovery file
+    #- ln -s ../../src/meltano/core/bundle/discovery.yml
+    - New-Item -Type SymbolicLink -Path "discovery.yml" -Target "../../src/meltano/core/bundle/discovery.yml" -Force
+    ### ---
+
+
+    ### https://docs.meltano.com/guide/integration
+
+    # Add GitLab extractor to your project
+    - meltano add extractor tap-gitlab
+
+    # Configure tap-gitlab to extract data from...
+    # - the https://gitlab.com/meltano/meltano project
+    - meltano config tap-gitlab set projects meltano/meltano
+    # - going back to May 1st, 2020
+    - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
+
+    # Select all attributes of the "tags" entity
+    - meltano select tap-gitlab tags "*"
+
+    # Add JSONL loader
+    - meltano add loader target-jsonl
+
+    # Ensure target-jsonl output directory exists
+    - mkdir -p output
+
+    # Run data integration pipeline
+    - meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+
+    # Read latest tag
+    - head -n 1 output/tags.jsonl
+
+
+    #Remove these from the Windows Test as Services do not work. See https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html#limitations-and-known-issues
+    ### https://docs.meltano.com/guide/transformation
+    
+
+    # For these examples to work, ensure that:
+    # - you have PostgreSQL running somewhere
+    # - you have created a new database
+    # - you change the configuration below as appropriate
+
+    # Add PostgreSQL loader
+    #    - meltano add loader target-postgres --variant meltano
+
+    # Configure target-postgres through the environment
+    #   - export TARGET_POSTGRES_HOST=$POSTGRES_ADDRESS
+    #   - export TARGET_POSTGRES_PORT=$POSTGRES_PORT
+    #   - export TARGET_POSTGRES_USER=$POSTGRES_USER
+    #   - export TARGET_POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    #   - export TARGET_POSTGRES_DBNAME=$POSTGRES_DB
+    #
+    #   # Add dbt transformer and initialize dbt project
+    #   - meltano add transformer dbt
+    #
+    #   # Add PostgreSQL-compatible dbt models for tap-gitlab
+    #   - meltano add transform tap-gitlab
+    #
+    #   # Select all attributes of all entities
+    #   - meltano select tap-gitlab "*" "*"
+    #
+    #   # Run data integration and transformation pipeline
+    #   - meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+    #
+    #   # Start `psql` shell connected to warehouse database
+    #   - apt-get update -y
+    #   - apt-get install -y postgresql-client # Only do this now to ensure Meltano can be installed without PostgreSQL
+    #   - PGPASSWORD=$TARGET_POSTGRES_PASSWORD psql -U $TARGET_POSTGRES_USER -h $TARGET_POSTGRES_HOST -p $TARGET_POSTGRES_PORT -d $TARGET_POSTGRES_DBNAME -c "SELECT * FROM analytics.gitlab_tags LIMIT 1;"
+    #
+    #
+    #   ### https://docs.meltano.com/guide/orchestration
+    #
+    #   # Schedule pipelines
+    #   - meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl @hourly
+    #   - meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
+    #
+    #   # List scheduled pipelines
+    #   - meltano schedule list
+    #
+    #   # Add Airflow orchestrator
+    #   - meltano add orchestrator airflow
+    #
+    #   ### ---
+    #   # View Airflow version
+    #   - meltano invoke airflow version
+    #   ### ---
+    #
+    #   # Start the Airflow scheduler (add `-D` to background)
+    #   # meltano invoke airflow scheduler
+    #
+    #   # Start the Airflow web interface (add `-D` to background)
+    #   # meltano invoke airflow webserver
+    #
+    #
+    #   ### https://docs.meltano.com/guide/containerization
+    #
+    #   # For these examples to work, ensure that
+    #   # Docker has been installed
+    #   # docker --version
+    #
+    #   # Add Docker files to your project
+    #   - meltano add files docker
+    #
+    #   # Build Docker image containing
+    #   # Meltano, your project, and all of its plugins
+    #   # docker build --tag meltano-demo-project:dev .
+    #
+    #   # View Meltano version
+    #   # docker run meltano-demo-project:dev --version
+    #
+    #   # Run gitlab-to-jsonl pipeline with
+    #   # mounted volume to exfiltrate target-jsonl output
+    #   # docker run \
+    #   #   --volume $(pwd)/output:/project/output \
+    #   #   meltano-demo-project:dev \
+    #   #   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+    # after_script:
+    - echo "If this pipeline failed due to Gitlab API returning a non-2xx status code you can try rerunning this job."
+    - echo "If the failure persists or you're encountering another error feel free reach out via Gitlab or Slack."
+
+  artifacts:
+    paths:
+      - meltano-projects/demo-project/meltano.yml
+      - meltano-projects/demo-project/output
+    when: always
