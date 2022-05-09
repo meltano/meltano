@@ -15,6 +15,7 @@ from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 
@@ -111,12 +112,17 @@ def meltano_state(project: Project, ctx: click.Context):
 @meltano_state.command(name="list")
 @click.argument("pattern", required=False)
 @click.pass_context
-def list_state(ctx: click.Context, pattern: Optional[str]):  # noqa: WPS125
+@pass_project()
+def list_state(
+    project: Project, ctx: click.Context, pattern: Optional[str]
+):  # noqa: WPS125
     """List all job_ids for this project.
 
     Optionally pass a glob-style pattern to filter job_ids by.
     """
     state_service = ctx.obj[STATE_SERVICE_KEY]
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_state("list")
     states = state_service.list_state(pattern)
     if states:
         for job_id, state in states.items():
@@ -156,6 +162,8 @@ def merge_state(
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_state("merge", job_id)
     mutually_exclusive_options = ["--input-file", "STATE", "--from-job-id"]
     if not reduce(xor, map(bool, [state, input_file, from_job_id])):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
@@ -196,6 +204,8 @@ def set_state(
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_state("set", job_id)
     if not reduce(xor, map(bool, [state, input_file])):
         raise MutuallyExclusiveOptionsError("--input-file", "STATE")
     elif input_file:
@@ -217,6 +227,8 @@ def get_state(ctx: click.Context, project: Project, job_id: str):  # noqa: WPS46
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_state("get", job_id)
     retrieved_state = state_service.get_state(job_id)
     click.echo(json.dumps(retrieved_state))
 
@@ -231,4 +243,6 @@ def clear_state(ctx: click.Context, project: Project, job_id: str, force: bool):
     state_service = (
         state_service_from_job_id(project, job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_state("clear", job_id)
     state_service.clear_state(job_id)

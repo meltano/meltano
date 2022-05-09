@@ -119,8 +119,7 @@ _To learn more about Meltano projects, refer to the [Projects concept doc](/conc
    ```
 
    It doesn't define any [plugins](/concepts/project#plugins), [environments](/concepts/environments), or [pipeline schedules](/concepts/project#schedules) yet.
-   Note that the [anonymous usage stats](/reference/settings#send-anonymous-usage-stats) are enabled by default.
-   To disable collecting usage data, set `send_anonymous_usage_stats: false` and optionally remove the [`project_id` setting](/reference/settings#project-id).
+   Note that anonymous usage stats are enabled by default, if you're curious and want to learn more about how the product benefits from them or how to change the default settings see the [settings reference](/reference/settings#send-anonymous-usage-stats) page for more details.
 
 1. Navigate to the newly created project directory:
 
