@@ -417,6 +417,11 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
                 pass
 
         try:
+            return self.locked_definition_service.get_base_plugin(plugin)
+        except PluginNotFoundError as exc:
+            logger.debug("A plugin lockfile could not be found", exc_info=exc)
+
+        try:
             return self.discovery_service.get_base_plugin(plugin)
         except PluginNotFoundError as err:
             if plugin.inherit_from:
