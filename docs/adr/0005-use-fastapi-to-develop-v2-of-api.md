@@ -29,7 +29,7 @@ With those topics in mind, we investigated what technology we might build on for
 
 Version 2 of the meltano API will be built using FastAPI.
 
-- FastAPI has board community adoption, more so than GRPC
+- FastAPI has broad community adoption, more so than GRPC
 - FastAPI can be OpenAPI compliant and its "just python" so very approachable.
 - The overall developer experience for our contributor base will be very robust and the barrier to contribution will be quite low. FastAPI is also simple enough that even developers without prior exposure to it should find it easy to pick up and onboard to both FastAPI and our particular pattern of usage.
 - GRPC would require contributors to become familiar with protobuf for service and message definitions.
