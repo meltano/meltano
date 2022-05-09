@@ -47,7 +47,7 @@ python --version
 ```bash
 # install pipx and ensure it is on the path
 python3 -m pip install --user pipx
-pipx ensurepath
+python3 -m pipx ensurepath
 ```
 
 ::: tip Why use pipx and virtual environments?
