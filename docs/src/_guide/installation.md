@@ -41,8 +41,8 @@ python --version
 
 #### pip3 and pipx
 
-`pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
-- [`pipx`](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
+`pip` is a package installer that comes automatically with Python 3+.
+[pipx](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
 
 ```bash
 # install pipx and ensure it is on the path
@@ -53,10 +53,12 @@ source ~/.bashrc
 #Windows: refreshenv
 ```
 
-::: tip Why use pipx and virtual environments?
-_Your local environment may use a different version of Python or other dependencies that are
+<div class="notification is-info">
+  <p>Why use pipx and virtual environments?</p>
+  <p>Your local environment may use a different version of Python or other dependencies that are
 difficult to manage. The pipx installer automatically creates a virtual environment and provides a
-"clean" isolated space without version conflicts or other compatibility issues._
+"clean" isolated space without version conflicts or other compatibility issues.</p>
+</div>
 
 ### Install Meltano
 
@@ -152,16 +154,16 @@ python -m venv .venv/meltano
 
 ### Activating Your Virtual Environment
 
-Activate the virtual environment using:
+Activate the virtual environment, and upgrade pip using:
 
 ```bash
 source .venv/meltano/bin/activate
+pip install --upgrade pip
 ```
 
 If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to
 your prompt.
 
-::: tip
 Once a virtual environment is activated, it stays active until the current shell is closed. In a new
 shell, you must re-activate the virtual environment before interacting with the `meltano` command
 that will be installed in the next step.
@@ -172,14 +174,12 @@ that'll be easier to remember than the entire activation invocation:
 ```bash
 # add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
-
+ 
 # use as follows, after creating a new shell:
 meltano!
 ```
 
 You can deactivate a virtual environment by typing `deactivate` in your shell.
-
-:::
 
 ### Install Meltano into VirtualEnv
 
