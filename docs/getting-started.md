@@ -37,7 +37,7 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
 
     ```bash
     python3 -m install --user pipx
-    pipx ensurepath
+    python3 -m pipx ensurepath
     ```
 
 1. Install the [`meltano` package from PyPI](https://pypi.org/project/meltano/):
