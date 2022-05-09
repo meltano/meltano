@@ -253,16 +253,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         click.echo(separator)
         click.echo()
 
-        set_unset = click.prompt(
-            "Set, unset, skip or exit this setting?",
-            type=click.Choice(["set", "unset", "skip", "exit"], case_sensitive=False),
-            default="skip",
-        )
-        if set_unset == "set":
+        modify = click.confirm("Set this value?", default=True)
+        if modify:
             click.echo()
-            new_value = click.prompt(
-                "New value (enter to skip)", default="", show_default=False
-            )
+            new_value = click.prompt("New value", default="", show_default=False)
             click.echo()
             self.set_value(
                 setting_name=tuple(name.split(".")),
@@ -271,15 +265,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             )
             click.echo()
             click.pause()
-        elif set_unset == "unset":
-            click.echo()
-            self.unset_value(setting_name=tuple(name.split(".")), store=self.store)
-            click.echo()
-            click.pause()
-        elif set_unset == "skip":
-            return InteractionStatus.SKIP
-        elif set_unset == "exit":
-            return InteractionStatus.EXIT
+
+        return InteractionStatus.SKIP
 
     def configure_all(self):
         """Configure all settings."""
@@ -288,9 +275,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             self._print_home_screen()
 
             click.echo()
+            choices = ["all"] + [idx for idx, _, _ in self.setting_choices]
             branch = click.prompt(
                 "Select a specific setting, loop through all settings or exit?",
-                type=click.Choice(["select", "all", "exit"], case_sensitive=False),
+                type=click.Choice(choices, case_sensitive=False),
                 default="all",
             )
             if branch == "all":
@@ -307,28 +295,16 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     if status == InteractionStatus.EXIT:
                         click.clear()
                         break
-
-            elif branch == "select":
-                choice_numbers = [idx for idx, _, _ in self.setting_choices]
-                setting_index = click.prompt(
-                    "Setting number", type=click.Choice(choice_numbers)
-                )
+            else:
                 choice_name = next(
-                    (
-                        nme
-                        for idx, nme, _ in self.setting_choices
-                        if idx == setting_index
-                    )
+                    (nme for idx, nme, _ in self.setting_choices if idx == branch)
                 )
                 click.clear()
                 status = self.configure(
                     name=choice_name,
-                    index=setting_index,
+                    index=branch,
                     last_index=len(self.setting_choices),
                 )
-            elif branch == "exit":
-                click.echo()
-                break
 
     def set_value(self, setting_name, value, store):
         """Set value helper function."""
