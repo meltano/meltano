@@ -36,7 +36,7 @@ homepage_sample_code:
     - pipx ensurepath
 
     # Install meltano using the current source code for this build
-    - pipx install .
+    - pipx install ../.
 
 
     ### https://docs.meltano.com/concepts/project
@@ -183,7 +183,7 @@ getting_started_sample_code:
     - python3 -m pip install --user pipx
     - pipx ensurepath
     # Install meltano using the current source code
-    - pipx install .
+    - pipx install ../.
 
     - meltano --version
 
