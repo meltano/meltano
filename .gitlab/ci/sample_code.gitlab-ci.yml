@@ -37,7 +37,7 @@ homepage_sample_code:
     - source ~/.bashrc #Update path to include pipx
 
     # Install meltano using the current source code for this build
-    - pipx install ../.
+    - pipx install ..
 
 
     ### https://docs.meltano.com/concepts/project
@@ -186,7 +186,7 @@ getting_started_sample_code:
     - source ~/.bashrc #Update path to include pipx
 
     # Install meltano using the current source code
-    - pipx install ../.
+    - pipx install ..
 
     - meltano --version
 
