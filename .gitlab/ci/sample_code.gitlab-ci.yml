@@ -32,9 +32,9 @@ homepage_sample_code:
     - cd meltano-projects
 
     # Install pipx package manager
-    - python3 -m pip install --user pipx
+    - python3 -m pip install --user pipx 
     - python3 -m pipx ensurepath
-    - "eval $SHELL" #https://gitlab.com/meltano/meltano/-/merge_requests/1960#note_495479836
+    - source ~/.bashrc #Update path to include pipx
 
     # Install meltano using the current source code for this build
     - pipx install ../.
@@ -183,7 +183,8 @@ getting_started_sample_code:
 
     - python3 -m pip install --user pipx
     - python3 -m pipx ensurepath
-    - "eval $SHELL" #https://gitlab.com/meltano/meltano/-/merge_requests/1960#note_495479836
+    - source ~/.bashrc #Update path to include pipx
+
     # Install meltano using the current source code
     - pipx install ../.
 
