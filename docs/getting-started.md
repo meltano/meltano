@@ -36,11 +36,13 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
 1. Install the [pipx](https://pipxproject.github.io/pipx/) package manager:
 
     ```bash
+    #For Windows we want python3 to run python
+    #For Windows: doskey python3=python
     python3 -m install --user pipx
     python3 -m pipx ensurepath
     #Note that the below commands are not needed in most cases
     source ~/.bashrc 
-    #For windows: refreshenv
+    #For Windows: RefreshEnv
     ```
 
 1. Install the [`meltano` package from PyPI](https://pypi.org/project/meltano/):

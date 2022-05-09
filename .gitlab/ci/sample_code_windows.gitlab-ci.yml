@@ -16,7 +16,7 @@ getting_started_windows:
     # For these examples to work, ensure that:
     # - you are running Linux or macOS
     # - Python 3.7, 3.8, or 3.9 has been installed
-    - python3 --version
+    - doskey python3=python #Windows Alias equivalent
 
     # Create directory for Meltano projects
     - mkdir meltano-projects
