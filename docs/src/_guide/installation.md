@@ -48,6 +48,9 @@ python --version
 # install pipx and ensure it is on the path
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
+#Note that the below commands are not needed in most cases
+source ~/.bashrc 
+#Windows: refreshenv
 ```
 
 ::: tip Why use pipx and virtual environments?
