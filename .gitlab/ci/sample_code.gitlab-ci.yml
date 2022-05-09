@@ -31,13 +31,12 @@ homepage_sample_code:
     - mkdir meltano-projects
     - cd meltano-projects
 
-    # Create and activate virtual environment
-    - python3 -m venv .venv
-    - source .venv/bin/activate
+    # Install pipx package manager
+    - python3 -m pip install --user pipx
+    - pipx ensurepath
 
     # Install Meltano
-    - pip3 install -U pip
-    - pip3 install ..
+    - pipx install meltano
 
 
     ### https://docs.meltano.com/concepts/project
@@ -48,9 +47,6 @@ homepage_sample_code:
     # Before using a `meltano` command, ensure that:
     # - you have navigated to your Meltano project
     - cd demo-project
-    # - you have activated the virtual environment
-    - source ../.venv/bin/activate
-
 
     ### ---
     # Always use the latest discovery file
