@@ -15,9 +15,10 @@ Transformations in Meltano are implemented using dbt. All Meltano generated proj
 
 ## Adapter-Specific dbt Transformation (Preview)
 
-In alignment with the [dbt documentation](https://docs.getdbt.com/docs/available-adapters), we are working towards supporting adapter-specific installations of `dbt`, starting with `dbt-snowflake`.
+In alignment with the [dbt documentation](https://docs.getdbt.com/docs/available-adapters), we are working towards supporting adapter-specific installations of `dbt`.
+We currently support Snowflake, Postgres, Redshift, and BigQuery.
+
 If you are interested in another adapter, all others are currently supported by the [`dbt` transformer](/guide/transformation#dbt-installation-and-configuration-classic).
-You can also check in on [issue #3298](https://gitlab.com/meltano/meltano/-/issues/3298) where we are tracking progress on Postgres, Redshift, Bigquery, and other adapters!
 
 ### Install `dbt`
 
