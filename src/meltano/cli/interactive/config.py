@@ -117,7 +117,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         )
         click.echo()
         click.echo(
-            f"{self.indentation}Within meltano.yml (2) you can also associate configuration with a Meltano Environment,"
+            f"{self.indentation}Within meltano.yml you can also associate configuration with a Meltano Environment,"
         )
         click.echo(
             f"{self.indentation}allowing you to define custom layers of configuration within your project."
