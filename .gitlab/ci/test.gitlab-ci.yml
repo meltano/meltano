@@ -127,3 +127,15 @@ pytest_sqlite_concurrent:
   extends:
     - .pytest_sqlite
     - .pytest_concurrent
+
+pytest_windows:
+  extends:
+    - .pytest
+  tags:
+    - shared-windows
+    - windows
+    - windows-1809
+  before_script:
+    - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+    - choco install -y python --version=3.8.9
+    - RefreshEnv
