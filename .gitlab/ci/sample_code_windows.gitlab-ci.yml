@@ -16,7 +16,8 @@ getting_started_windows:
     # For these examples to work, ensure that:
     # - you are running Linux or macOS
     # - Python 3.7, 3.8, or 3.9 has been installed
-    - doskey python3=python #Windows Alias equivalent
+    # Alias Equivalent for Windows 
+    - New-Alias Python3 Python 
 
     # Create directory for Meltano projects
     - mkdir meltano-projects
@@ -26,7 +27,8 @@ getting_started_windows:
     - python3 -m pip install --user pipx 
     - python3 -m pipx ensurepath
     # - source ~/.bashrc #Update path to include pipx
-    - RefreshEnv #Update path to include pipx
+    # Update path to include pipx
+    - RefreshEnv
 
     # Install meltano using the current source code for this build
     - pipx install ..

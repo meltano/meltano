@@ -37,7 +37,7 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
 
     ```bash
     #For Windows we want python3 to run python
-    #For Windows: doskey python3=python
+    #For Windows: New-Alias Python3 Python
     python3 -m install --user pipx
     python3 -m pipx ensurepath
     #Note that the below commands are not needed in most cases
