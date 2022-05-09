@@ -34,7 +34,8 @@ homepage_sample_code:
     # Install pipx package manager
     - python3 -m pip install --user pipx 
     - python3 -m pipx ensurepath
-    - source ~/.bashrc #Update path to include pipx
+    # Update path to include pipx
+    - source ~/.bashrc
 
     # Install meltano using the current source code for this build
     - pipx install ..
