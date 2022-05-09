@@ -69,7 +69,9 @@ getting_started_windows:
     - mkdir -p output
 
     # Run data integration pipeline
-    - meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+    # https://gitlab.com/meltano/meltano/-/issues/2743 currently fails due to this, so we commented it out
+    #- meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+    - meltano run tap-gitlab target-jsonl
 
     # Read latest tag
     - head -n 1 output/tags.jsonl
