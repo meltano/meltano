@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#3468](https://gitlab.com/meltano/meltano/-/issues/3468) Fixes bug where container spec's entrypoint was not passed along to the Docker runtime.
+
 ### Breaks
 
 ## 1.103.1 - (2022-05-05)
