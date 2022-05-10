@@ -50,8 +50,11 @@ python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 #Note that the below commands are not needed in most cases
 source ~/.bashrc 
-#Windows: refreshenv
 ```
+
+<div class="notification is-info">
+    <p>For windows instead of source ~/.bashrc, you'll want to use refreshenv.</p>
+</div>
 
 <div class="notification is-info">
   <p>Why use pipx and virtual environments?</p>

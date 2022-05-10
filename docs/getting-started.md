@@ -40,8 +40,10 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
     python3 -m pipx ensurepath
     #Note that the below commands are not needed in most cases
     source ~/.bashrc 
-    #For windows: refreshenv
     ```
+    <div class="notification is-info">
+        <p>For windows instead of source ~/.bashrc, you'll want to use refreshenv.</p>
+    </div>
 
 1. Install the [`meltano` package from PyPI](https://pypi.org/project/meltano/):
 
