@@ -53,7 +53,7 @@ source ~/.bashrc
 ```
 
 <div class="notification is-info">
-    <p>For windows instead of source ~/.bashrc, you'll want to use refreshenv.</p>
+    <p>For windows instead of source ~/.bashrc, you'll want to open up a new powershell instance.</p>
 </div>
 
 <div class="notification is-info">
