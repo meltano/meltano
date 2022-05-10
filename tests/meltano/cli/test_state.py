@@ -178,6 +178,45 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst) == merged_state
 
+    def test_copy(self, state_service, job_ids, cli_runner):
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            job_pairs = []
+            for idx in range(0, len(job_ids) - 1, 2):
+                job_pairs.append((job_ids[idx], job_ids[idx + 1]))
+            for (job_src, job_dst) in job_pairs:
+                job_src_state = state_service.get_state(job_src)
+                result = cli_runner.invoke(
+                    cli,
+                    [
+                        "state",
+                        "copy",
+                        job_src,
+                        job_dst,
+                    ],
+                )
+                assert_cli_runner(result)
+                assert state_service.get_state(job_dst) == job_src_state
+
+    def test_move(self, state_service, job_ids, cli_runner):
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            job_pairs = []
+            for idx in range(0, len(job_ids) - 1, 2):
+                job_pairs.append((job_ids[idx], job_ids[idx + 1]))
+            for (job_src, job_dst) in job_pairs:
+                job_src_state = state_service.get_state(job_src)
+                result = cli_runner.invoke(
+                    cli,
+                    [
+                        "state",
+                        "move",
+                        job_src,
+                        job_dst,
+                    ],
+                )
+                assert_cli_runner(result)
+                assert state_service.get_state(job_src) == {}
+                assert state_service.get_state(job_dst) == job_src_state
+
     def test_get(self, state_service, cli_runner, job_ids_with_expected_states):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for (job_id, expected_state) in job_ids_with_expected_states:

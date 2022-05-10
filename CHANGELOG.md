@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#3452](https://gitlab.com/meltano/meltano/-/issues/3452) Add `copy` and `move` commands to `meltano state` 
 
 ### Changes
 

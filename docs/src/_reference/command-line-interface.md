@@ -976,6 +976,42 @@ meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.jso
 meltano state merge dev:tap-gitlab-to-target-jsonl --from-job-id prod:tap-gitlab-to-target-jsonl
 ```
 
+### copy
+
+Copy state from one job to another
+
+#### How to use
+
+```bash
+# Copy state from one job to another
+meltano state copy <src_job_id> <dst_job_id>
+```
+
+#### Examples
+
+```bash
+# Use prod state to update dev environemnt
+meltano state copy prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
+```
+
+### move
+
+Move state from one job to another, equivalent to a job rename
+
+#### How to use
+
+```bash
+# Move state from one job to another
+meltano move copy <src_job_id> <dst_job_id>
+```
+
+#### Examples
+
+```bash
+# Use previous state with a new tap variant, clearing the original
+meltano state move original-tap-postgres-to-target-jsonl variant-tap-postgres-to-target-jsonl
+```
+
 ### set
 
 Set state for a job.

@@ -139,6 +139,63 @@ def list_state(
         logger.info("No job IDs found.")
 
 
+@meltano_state.command(name="copy")
+@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
+@click.argument("src_job_id", type=str)
+@click.argument("dst_job_id", type=str)
+@pass_project(migrate=True)
+@click.pass_context
+def copy_state(
+    ctx: click.Context, project: Project, src_job_id: str, dst_job_id: str, force: bool
+):
+    """Copy state to another job id"""
+    # Retrieve state for copying
+    src_state_service = (
+        state_service_from_job_id(project, src_job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    dst_state_service = (
+        state_service_from_job_id(project, dst_job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_state("copy", dst_job_id)
+    src_state = src_state_service.get_state(src_job_id)
+
+    dst_state_service.set_state(dst_job_id, json.dumps(src_state))
+
+    logger.info(
+        f"State for {dst_job_id} was successfully copied from {src_job_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+    )
+
+
+@meltano_state.command(name="move")
+@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
+@click.argument("src_job_id", type=str)
+@click.argument("dst_job_id", type=str)
+@pass_project(migrate=True)
+@click.pass_context
+def move_state(
+    ctx: click.Context, project: Project, src_job_id: str, dst_job_id: str, force: bool
+):
+    """Move state to another job id, clearing the original"""
+    # Retrieve state for moveing
+    src_state_service = (
+        state_service_from_job_id(project, src_job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    dst_state_service = (
+        state_service_from_job_id(project, dst_job_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_state("move", dst_job_id)
+    src_state = src_state_service.get_state(src_job_id)
+
+    dst_state_service.set_state(dst_job_id, json.dumps(src_state))
+    src_state_service.clear_state(src_job_id)
+
+    logger.info(
+        f"State for {src_job_id} was successfully moved to {dst_job_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+    )
+
+
 @meltano_state.command(name="merge")
 @click.option("--from-job-id", type=str, help="Merge state from an existing job.")
 @click.option(
