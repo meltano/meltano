@@ -66,9 +66,6 @@ getting_started_windows:
     # Add JSONL loader
     - meltano add loader target-jsonl
 
-    # Ensure target-jsonl output directory exists
-    - mkdir -p output
-
     # Run data integration pipeline
     # https://gitlab.com/meltano/meltano/-/issues/2743 currently fails due to this, so we commented it out
     #- meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
