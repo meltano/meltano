@@ -174,7 +174,17 @@ class PluginInstallService:
             parallelism = cpu_count()
         if parallelism < 1:
             parallelism = sys.maxsize  # unbounded
-        self.semaphore = asyncio.Semaphore(parallelism)
+
+        try:
+            self.semaphore = asyncio.Semaphore(parallelism)
+        except:
+            logging.warning("self.semaphone couldn't find a events event loop")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            self.semaphore = asyncio.Semaphore(parallelism)
+        else:
+            logging.info("self.semaphone found an events event loop")
+
         self.clean = clean
 
     @staticmethod

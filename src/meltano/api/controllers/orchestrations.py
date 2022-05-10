@@ -8,6 +8,8 @@ import sqlalchemy
 from flask import Response, jsonify, make_response, request, send_file, url_for
 from flask_restful import Api, Resource, fields, marshal, marshal_with
 from flask_security import roles_required
+from werkzeug.exceptions import Conflict, UnprocessableEntity
+
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.executor import run_schedule
 from meltano.api.json import freeze_keys
@@ -41,7 +43,6 @@ from meltano.core.schedule_service import (
 )
 from meltano.core.setting_definition import SettingKind
 from meltano.core.utils import flatten, iso8601_datetime, slugify
-from werkzeug.exceptions import Conflict, UnprocessableEntity
 
 from .errors import InvalidFileNameError
 from .upload_helper import InvalidFileSizeError, InvalidFileTypeError, UploadHelper
@@ -403,6 +404,15 @@ def test_plugin_configuration(plugin_ref) -> Response:
             plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
             success, _detail = await plugin_test_service.validate()
             return success
+
+    try:
+        loop = asyncio.get_event_loop()
+    except:
+        logging.warning("asycio events event loop not found")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    else:
+        logging.info("asycio event found an events event loop")
 
     loop = asyncio.get_event_loop()
     success = loop.run_until_complete(test_extractor())
