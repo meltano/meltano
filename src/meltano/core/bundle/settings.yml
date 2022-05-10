@@ -189,3 +189,8 @@ settings:
 - name: snowplow.collector_endpoints
   kind: array
   value: ["https://sp.meltano.com"]
+
+# Feature Flags
+- name: ff.lock_files
+  kind: boolean
+  value: false

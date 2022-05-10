@@ -7,6 +7,7 @@ import structlog
 
 from meltano.core.environment import Environment, EnvironmentPluginConfig
 from meltano.core.plugin_lock_service import PluginLockService
+from meltano.core.project_settings_service import ProjectSettingsService
 
 from .config_service import ConfigService
 from .plugin import PluginRef, PluginType
@@ -41,7 +42,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
         lock_service: PluginLockService = None,
         discovery_service: PluginDiscoveryService = None,
         locked_definition_service: LockedDefinitionService = None,
-        use_cache=True,
+        use_cache: bool = True,
     ):
         """Create a new Project Plugins Service.
 
@@ -67,6 +68,9 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
 
         self._current_plugins = None
         self._use_cache = use_cache
+
+        settings_service = ProjectSettingsService(project)
+        self._use_lockfiles = settings_service.get("ff.lock_file", default=False)
 
     @property
     def current_plugins(self):
@@ -416,10 +420,11 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
             except PluginNotFoundError:
                 pass
 
-        try:
-            return self.locked_definition_service.get_base_plugin(plugin)
-        except PluginNotFoundError as exc:
-            logger.debug("A plugin lockfile could not be found", exc_info=exc)
+        if self._use_lockfiles:
+            try:
+                return self.locked_definition_service.get_base_plugin(plugin)
+            except PluginNotFoundError as exc:
+                logger.debug("A plugin lockfile could not be found", exc_info=exc)
 
         try:
             return self.discovery_service.get_base_plugin(plugin)

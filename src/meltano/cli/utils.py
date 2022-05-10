@@ -260,6 +260,7 @@ def add_plugin(
     variant=None,
     inherit_from=None,
     custom=False,
+    lock=True,
 ):
     """Add Plugin to given Project."""
     plugin_attrs = {}
@@ -284,6 +285,7 @@ def add_plugin(
             plugin_name,
             variant=variant,
             inherit_from=inherit_from,
+            lock=lock,
             **plugin_attrs,
         )
         print_added_plugin(plugin)
