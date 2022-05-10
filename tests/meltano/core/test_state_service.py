@@ -59,3 +59,22 @@ class TestStateService:
             merged_dst = merge(state_src, state_dst)
             state_service.merge_state(job_src.job_id, job_dst.job_id)
             assert merged_dst == state_service.get_state(job_dst.job_id)
+
+    def test_copy(self, job_ids, state_service):
+        job_pairs = []
+        for idx in range(0, len(job_ids) - 1, 2):
+            job_pairs.append((job_ids[idx], job_ids[idx + 1]))
+        for (job_src, job_dst) in job_pairs:
+            state_src = state_service.get_state(job_src)
+            state_service.copy_state(job_src, job_dst)
+            assert state_service.get_state(job_dst) == state_src
+
+    def test_move(self, job_ids, state_service):
+        job_pairs = []
+        for idx in range(0, len(job_ids) - 1, 2):
+            job_pairs.append((job_ids[idx], job_ids[idx + 1]))
+        for (job_src, job_dst) in job_pairs:
+            state_src = state_service.get_state(job_src)
+            state_service.move_state(job_src, job_dst)
+            assert not state_service.get_state(job_src)
+            assert state_service.get_state(job_dst) == state_src
