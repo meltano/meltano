@@ -72,8 +72,7 @@ getting_started_windows:
     - meltano run tap-gitlab target-jsonl
 
     # Read latest tag
-    - head -n 1 output/tags.jsonl
-
+    - Get-Content .\output\tags.jsonl -First 1
 
     #Remove these from the Windows Test as Services do not work. See https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html#limitations-and-known-issues
     ### https://docs.meltano.com/guide/transformation
