@@ -224,3 +224,5 @@ per_file_ignores =
         WPS360
         W291
         W293
+    src/meltano/core/settings_store.py:
+        WPS202
