@@ -1,4 +1,5 @@
 getting_started_windows:
+  extends: .windows:defaults
   stage: test
   tags:
     - shared-windows
@@ -8,8 +9,6 @@ getting_started_windows:
     - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
     - choco install -y python --version=3.8.9
     - RefreshEnv
-  variables:
-    MELTANO_DISABLE_TRACKING: "true"
   script:
     ### https://docs.meltano.com/guide/installation
 
