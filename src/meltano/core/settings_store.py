@@ -17,7 +17,7 @@ from .error import Error
 from .project import ProjectReadonly
 from .setting import Setting
 from .setting_definition import SettingDefinition, SettingMissingError
-from .utils import pop_at_path, set_at_path
+from .utils import flatten, pop_at_path, set_at_path
 
 if TYPE_CHECKING:
     from .settings_service import SettingsService
@@ -687,7 +687,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             A dictionary of flattened configuration.
         """
         if self._flat_config is None:
-            self._flat_config = self.settings_service.environment_config
+            self._flat_config = flatten(self.settings_service.environment_config, "dot")
         return self._flat_config
 
     def ensure_supported(self, method="get"):

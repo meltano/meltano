@@ -1,42 +1,43 @@
-import pytest
-from meltano.core.utils import nest, pop_at_path, set_at_path
+import pytest  # noqa: F401
+
+from meltano.core.utils import flatten, nest, pop_at_path, set_at_path
 
 
 def test_nest():
     subject = {}
 
-    b = nest(subject, "a.b")
-    b["val"] = 1
-    assert b == {"val": 1}
+    one_deep = nest(subject, "a.b")
+    one_deep["val"] = 1
+    assert one_deep == {"val": 1}
 
-    c = nest(subject, "a.b.c")
-    c["val"] = 2
-    assert b == {"val": 1, "c": {"val": 2}}
+    two_deep = nest(subject, "a.b.c")
+    two_deep["val"] = 2
+    assert two_deep == {"val": 1, "c": {"val": 2}}
 
     arr = nest(subject, "a.list", value=[])
 
-    VALUE = {"value": 1}
-    val = nest(subject, "a.value", value=VALUE)
+    start_value = {"value": 1}
+    val = nest(subject, "a.value", value=start_value)
 
-    assert subject["a"]["b"] is b
-    assert subject["a"]["b"]["c"] is c
+    assert subject["a"]["b"] is one_deep
+    assert subject["a"]["b"]["c"] is two_deep
     assert isinstance(arr, list)
     # make sure it is a copy
-    assert val == VALUE and not val is VALUE
+    assert val == start_value and val is not start_value
 
 
 def test_pop_at_path():
     subject = {}
     pop_at_path(subject, "a.b.c")
-    assert subject == {}
+    assert not subject
 
     subject = {"a": {"b": {"c": "value"}}}
     pop_at_path(subject, "a.b.c")
-    assert subject == {}
+    assert not subject
 
     subject = {"a": {"b.c": "value"}}
     pop_at_path(subject, ["a", "b.c"])
-    assert subject == {}
+    assert not subject
 
     subject = {"a": {"b": {"c": "value", "d": "value"}, "e": "value"}}
     pop_at_path(subject, "a.b.c")
@@ -46,7 +47,7 @@ def test_pop_at_path():
     assert subject == {"a": {"e": "value"}}
 
     pop_at_path(subject, "a.e")
-    assert subject == {}
+    assert not subject
 
 
 def test_set_at_path():
@@ -69,3 +70,10 @@ def test_set_at_path():
 
     set_at_path(subject, ["a", "d.e"], "value")
     assert subject == {"a": {"b": {"c": "value"}, "d.e": "value"}}
+
+
+def test_flatten():
+    example_config = {"_update": {"orchestrate/dags/meltano.py": False}}
+    expected_flat = {"_update.orchestrate/dags/meltano.py": False}
+    result = flatten(example_config, "dot")
+    assert result == expected_flat
