@@ -2108,7 +2108,7 @@ infra = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "6fd1c4c6d9f2a2529292ec2d67a9bf19f936386f8850b1f80ee9b33f8d302583"
+content-hash = "182472fce280290cdf15a274f5a85ab39971ebd4785e1c848bd6f80ec739293a"
 
 [metadata.files]
 aenum = [
