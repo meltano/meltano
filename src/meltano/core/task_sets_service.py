@@ -3,10 +3,8 @@ from typing import List
 
 import structlog
 
-from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.project import Project
-
-from .task_sets import TaskSets
+from meltano.core.task_sets import TaskSets
 
 logger = structlog.getLogger(__name__)
 
@@ -36,23 +34,6 @@ class JobNotFoundError(Exception):
         super().__init__(f"Job '{name}' was not found.")
 
 
-class JobTaskInvalidError(Exception):
-    """Occurs when a task in a TaskSet (aka job) is invalid."""
-
-    def __init__(self, name: str, error: str = None):
-        """Initialize a JobTaskInvalidError.
-
-        Args:
-            name: Name of the TaskSet (aka job) that was invalid.
-            error: Error message.
-        """
-        self.name = name
-        if error:
-            super().__init__(f"Job '{name}' has invalid task: {error}")
-        else:
-            super().__init__(f"Job '{name}' has invalid task.")
-
-
 class TaskSetsService:
     """A service for managing project TaskSets."""
 
@@ -64,7 +45,7 @@ class TaskSetsService:
         """
         self.project = project
 
-    def add(self, name: str, tasks: List[List[str]]) -> None:
+    def add(self, name: str, tasks: TaskSets) -> None:
         """Add a TaskSet to the project.
 
         Args:
@@ -73,19 +54,11 @@ class TaskSetsService:
 
         Raises:
             JobAlreadyExistsError: When a TaskSet with the same name already exists.
-            JobTaskInvalidError: When the tasks in a job are not valid.
         """
         if self.exists(name):
             raise JobAlreadyExistsError(name)
+
         with self.project.meltano_update() as meltano:
-            for blocks in tasks:
-                try:
-                    parser = BlockParser(logger, self.project, blocks)
-                    parsed_blocks = list(parser.find_blocks(0))
-                except Exception as err:
-                    raise JobTaskInvalidError(name, err) from err
-                if not validate_block_sets(logger, parsed_blocks):
-                    raise JobTaskInvalidError(name, "Block set validation failed.")
             logger.debug("Adding job", name=name, tasks=tasks)
             meltano.jobs.append(TaskSets(name=name, tasks=tasks))
 

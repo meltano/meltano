@@ -8,6 +8,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.task_sets_service import TaskSetsService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .extract_load import ELBContextBuilder, ExtractLoadBlocks
@@ -91,6 +92,10 @@ class BlockParser:  # noqa: D101
         self._commands: Dict[int, str] = {}
         self._mappings_ref: Dict[int, str] = {}
 
+        task_sets_service: TaskSetsService = TaskSetsService(project)
+
+        blocks = self._expand_jobs(blocks, task_sets_service)
+
         for idx, name in enumerate(blocks):
 
             try:
@@ -102,6 +107,11 @@ class BlockParser:  # noqa: D101
             plugin = self._find_plugin_or_mapping(parsed_name)
             if plugin is None:
                 raise click.ClickException(f"Block {name} not found")
+
+            if plugin and task_sets_service.exists(name):
+                raise click.ClickException(
+                    f"Ambiguous reference to '{name}' which matches a job name AND a plugin name."
+                )
 
             if plugin.type == PluginType.MAPPERS:
                 self._mappings_ref[idx] = parsed_name
@@ -117,6 +127,33 @@ class BlockParser:  # noqa: D101
                 )
 
             self.log.debug("found plugin in cli invocation", plugin_name=plugin.name)
+
+    def _expand_jobs(self, blocks: List[str], task_sets: TaskSetsService) -> List[str]:
+        """Expand any jobs present in a list of blocks into their raw block names.
+
+        Example:
+            Given a job named "somejob" which consists of a single task of "tap target":
+            ["somejob", "dbt:run"] -> ["tap", "target", "dbt:run"]
+
+        Args:
+            blocks: List of block names to parse.
+            task_sets: TaskSetsService to use.
+
+        Returns:
+            List of block names with jobs expanded.
+        """
+        expanded_blocks: List[str] = []
+        for name in blocks:
+            if task_sets.exists(name):
+                self.log.debug(
+                    "expanding job to tasks",
+                    job_name=name,
+                    tasks=task_sets.get(name).squashed,
+                )
+                expanded_blocks.extend(task_sets.get(name).squashed.split(" "))
+            else:
+                expanded_blocks.append(name)
+        return expanded_blocks
 
     def find_blocks(
         self, offset: int = 0

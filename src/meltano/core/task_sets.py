@@ -2,8 +2,13 @@
 from collections.abc import Iterable
 from typing import List, TypeVar, Union
 
+import structlog
+
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
+
+logger = structlog.getLogger(__name__)
+
 
 T = TypeVar("T")  # noqa: WPS111
 
@@ -19,7 +24,7 @@ def _flatten(items):
 class TaskSets(NameEq, Canonical):
     """A job is a named entity that holds one or more Task's that can be executed by meltano."""
 
-    def __init__(self, name: str, tasks: List[dict]):
+    def __init__(self, name: str, tasks: List[List[str]]):
         """Initialize a TaskSets.
 
         Args:
@@ -61,8 +66,8 @@ class TaskSets(NameEq, Canonical):
         return self._squash()
 
     @property
-    def squashed_sets(self) -> List[str]:
-        """Squash the job's tasks into discrete string representations, suitable for passing as a cli arguments.
+    def squashed_per_set(self) -> List[str]:
+        """Squash the job's tasks into perk task string representations (preserving top level list hierarchy).
 
         Returns:
             The squashed CLI arguments.
