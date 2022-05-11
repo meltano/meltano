@@ -23,7 +23,7 @@ See [#3302](https://gitlab.com/meltano/meltano/-/issues/3302#note_898109276) for
 Our top level collection in v2 of the API will be "projects", yielding a URL that looks as follows:
 
 ```
-$SERVICE_UMBERELLA/projects/$SOME_PROJECT_ID/env/$SOME_ENV
+$SERVICE_UMBRELLA/projects/$SOME_PROJECT_ID/env/$SOME_ENV
 ```
 
 
