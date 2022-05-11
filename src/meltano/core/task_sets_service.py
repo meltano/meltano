@@ -45,43 +45,21 @@ class TaskSetsService:
         """
         self.project = project
 
-    def add(self, name: str, tasks: TaskSets) -> None:
+    def add(self, task_sets: TaskSets) -> None:
         """Add a TaskSet to the project.
 
         Args:
-            name: The name of the TaskSet.
-            tasks: The tasks that should be associated with the TaskSet.
+            task_sets: The TaskSets to add.
 
         Raises:
             JobAlreadyExistsError: When a TaskSet with the same name already exists.
         """
-        if self.exists(name):
-            raise JobAlreadyExistsError(name)
+        if self.exists(task_sets.name):
+            raise JobAlreadyExistsError(task_sets.name)
 
         with self.project.meltano_update() as meltano:
-            logger.debug("Adding job", name=name, tasks=tasks)
-            meltano.jobs.append(TaskSets(name=name, tasks=tasks))
-
-    def add_from_str(self, name: str, tasks: str) -> None:
-        """Add a TaskSet to the project from a string representation of the tasks.
-
-        Example:
-            add_from_str("my_job", "tap target dbt:run") # a single task
-            add_from_str("my_job", '[tap mapper target, dbt:run, tap2 target2]) # three tasks
-
-        Args:
-            name: The name of the TaskSet.
-            tasks: The tasks that should be associated with the TaskSet.
-        """
-        if tasks.startswith("[") and tasks.endswith("]"):
-            cleaned = [
-                task.strip('"').strip(" ").split(" ")
-                for task in tasks[1:-1].split(",")
-                if task
-            ]
-            self.add(name, cleaned)
-        else:
-            self.add(name, tasks.split(" "))
+            logger.debug("adding job", name=task_sets.name, tasks=task_sets.tasks)
+            meltano.jobs.append(task_sets)
 
     def get(self, name: str) -> TaskSets:
         """Get a TaskSet by name.
@@ -122,3 +100,23 @@ class TaskSetsService:
         except JobNotFoundError:
             return False
         return True
+
+    def remove(self, name: str) -> TaskSets:
+        """Remove a TaskSet from the project.
+
+        Args:
+            name: The name of the TaskSet to remove.
+
+        Returns:
+            The removed TaskSet.
+
+        Raises:
+            JobNotFoundError: If the TaskSet with the given name does not exist.
+        """
+        for job in self.project.meltano.jobs:
+            if job.name == name:
+                with self.project.meltano_update() as meltano:
+                    logger.debug("removing job", name=job.name)
+                    meltano.jobs.remove(job)
+                return job
+        raise JobNotFoundError(name)

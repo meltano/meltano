@@ -15,7 +15,7 @@ T = TypeVar("T")  # noqa: WPS111
 
 def _flatten(items):
     for el in items:
-        if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
+        if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flatten(el)
         else:
             yield el
@@ -36,19 +36,19 @@ class TaskSets(NameEq, Canonical):
         self.name = name
         self.tasks = tasks
 
-    def _squash(self, preserve_sets: bool = False) -> Union[str, List[str]]:
+    def _squash(self, preserve_top_level: bool = False) -> Union[str, List[str]]:
         """Squash the job's tasks into invocable string representations, suitable for passing as a cli argument.
 
         Args:
-            preserve_sets: Whether to preserve the defined task sets to allow for fine grained executions.
+            preserve_top_level: Whether to preserve the defined top level task list to allow for fine grained executions.
 
         Returns:
             str: The squashed CLI argument.
         """
-        if preserve_sets:
+        if preserve_top_level:
             flattened = []
             for task in self.tasks:
-                if isinstance(task, Iterable) and not isinstance(task, (str, bytes)):
+                if isinstance(task, Iterable) and not isinstance(task, str):
                     flattened.extend(list(_flatten(task)))
                 else:
                     flattened.append(task)
@@ -72,4 +72,25 @@ class TaskSets(NameEq, Canonical):
         Returns:
             The squashed CLI arguments.
         """
-        return self._squash(preserve_sets=True)
+        return self._squash(preserve_top_level=True)
+
+
+def tasks_from_str(name: str, tasks: str) -> TaskSets:
+    """Add a TaskSet to the project from a string representation of the tasks.
+
+    Example:
+        add_from_str("my_job", "tap target dbt:run") # a single task
+        add_from_str("my_job", '[tap mapper target, dbt:run, tap2 target2]) # three tasks
+
+    Args:
+        name: The name of the TaskSet.
+        tasks: The tasks that should be associated with the TaskSet.
+
+    Returns:
+        TaskSets obj generated from the string representation.
+    """
+    if tasks.startswith("[") and tasks.endswith("]"):
+        parsed = [task.strip(" ") for task in tasks[1:-1].split(",") if task]
+        return TaskSets(name, parsed)
+
+    return TaskSets(name, [tasks])
