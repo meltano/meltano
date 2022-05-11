@@ -992,19 +992,17 @@ class DefaultStoreManager(SettingsStoreManager):
 
         Returns:
             A tuple containing the got value and accompanying metadata dictionary.
-
-        Raises:
-            StoreNotSupportedError: if no setting_def is passed.
         """
-        if not setting_def:
-            raise StoreNotSupportedError("Setting is missing")
-
-        value = setting_def.value
-        if value is None:
-            return None, {}
-
-        self.log(f"Read key '{name}' from default: {value!r}")
-        return value, {"expandable": True}
+        value = None
+        metadata = {}
+        if setting_def:
+            value = setting_def.value
+            if value is not None:
+                self.log(f"Read key '{name}' from default: {value!r}")
+                return value, {"expandable": True}
+        # As default is lowest in our order of precedence, we want it to always return
+        # a value, even if it is None.
+        return value, metadata
 
 
 class AutoStoreManager(SettingsStoreManager):
