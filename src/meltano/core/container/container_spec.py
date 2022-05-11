@@ -91,6 +91,7 @@ class ContainerSpec(Canonical):
         return {
             "Cmd": shlex.split(self.command) if self.command else None,
             "Image": self.image,
+            "Entrypoint": self.entrypoint,
             "Env": env_config,
             "ExposedPorts": exposed_ports,
             "HostConfig": {
