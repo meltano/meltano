@@ -58,7 +58,7 @@ def job(project, ctx, name: str):
 @click.option(
     "--format",
     "list_format",
-    type=click.Choice(["json", "text", "run"]),
+    type=click.Choice(["json", "text"]),
     default="text",
 )
 @click.pass_context
@@ -86,8 +86,7 @@ def list_single(ctx, list_format: str):
         click.echo(
             json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2)
         )
-    elif list_format == "run":
-        click.echo(f"meltano run {task_set.squashed}")
+
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_job("list", ctx.obj["JOB_NAME"])
 
