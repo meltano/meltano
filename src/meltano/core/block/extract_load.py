@@ -296,9 +296,6 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         self.output_logger = OutputLogger(None)
 
         if not self.context.project.active_environment:
-            logger.warning(
-                "No active environment, proceeding with stateless run! See https://docs.meltano.com/reference/command-line-interface#run for details."
-            )
             self.context.job = None
 
         elif self.context.update_state:
@@ -437,6 +434,10 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             with legacy_log_handler.redirect_logging():
                 await self.run_with_job()
                 return
+        else:
+            logger.warning(
+                "No active environment, proceeding with stateless run! See https://docs.meltano.com/reference/command-line-interface#run for details."
+            )
         await self.execute()
 
     async def run_with_job(self) -> None:

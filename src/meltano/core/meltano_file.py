@@ -7,6 +7,7 @@ from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.schedule import Schedule
+from meltano.core.task_sets import TaskSets
 
 VERSION = 1
 
@@ -21,6 +22,7 @@ class MeltanoFile(Canonical):
         plugins: Dict[str, dict] = None,
         schedules: List[dict] = None,
         environments: List[dict] = None,
+        jobs: List[dict] = None,
         **extras,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
@@ -31,6 +33,7 @@ class MeltanoFile(Canonical):
             plugins: Plugin configuration for this project.
             schedules: Schedule configuration for this project.
             environments: Environment configuration for this project.
+            jobs: Job configuration for this project.
             extras: Additional configuration for this project.
         """
         super().__init__(
@@ -41,6 +44,7 @@ class MeltanoFile(Canonical):
             plugins=self.load_plugins(plugins or {}),
             schedules=self.load_schedules(schedules or []),
             environments=self.load_environments(environments or []),
+            jobs=self.load_job_tasks(jobs or []),
         )
 
     def load_plugins(self, plugins: Dict[str, dict]) -> Canonical:
@@ -97,6 +101,18 @@ class MeltanoFile(Canonical):
             A list of `Environment` objects.
         """
         return [Environment.parse(obj) for obj in environments]
+
+    @staticmethod
+    def load_job_tasks(jobs: Iterable[dict]) -> List[TaskSets]:
+        """Parse `TaskSets` objects from python objects.
+
+        Args:
+            jobs: Sequence of job dictionaries.
+
+        Returns:
+            A list of `Job` objects.
+        """
+        return [TaskSets.parse(obj) for obj in jobs]
 
     @staticmethod
     def get_plugins_for_mappings(mapper_config: Dict) -> List[ProjectPlugin]:

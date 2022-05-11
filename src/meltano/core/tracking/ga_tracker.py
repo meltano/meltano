@@ -402,3 +402,26 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             action=f"meltano run {blocks_string}",
             debug=debug,
         )
+
+    def track_meltano_job(
+        self, action: str, job_name: str | None = None, debug: bool = False
+    ) -> None:
+        """Track a job event.
+
+        Args:
+            action: The type of action taken on the job (e.g. add, run, list)
+            job_name: The job to track.
+            debug: Whether to send the event to the debug endpoint.
+        """
+        if job_name:
+            self.track_event(
+                category="meltano job",
+                action=(f"meltano job {job_name} {action} "),
+                debug=debug,
+            )
+        else:
+            self.track_event(
+                category="meltano job",
+                action=f"meltano job {action}",
+                debug=debug,
+            )
