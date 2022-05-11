@@ -12,7 +12,7 @@ def test_nest():
 
     two_deep = nest(subject, "a.b.c")
     two_deep["val"] = 2
-    assert two_deep == {"val": 1, "c": {"val": 2}}
+    assert one_deep == {"val": 1, "c": {"val": 2}}
 
     arr = nest(subject, "a.list", value=[])
 
