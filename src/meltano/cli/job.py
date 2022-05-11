@@ -93,7 +93,7 @@ def list_single(ctx, list_format: str):
 
 
 @job.command(name="tasks", short_help="Add a new job with tasks.")
-@click.argument("tasks_list", nargs=-1)
+@click.argument("tasks_list", nargs=-1, required=True)
 @click.pass_context
 def tasks(ctx, tasks_list: List[str]):
     """Add tasks to a new job.

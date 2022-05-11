@@ -76,11 +76,14 @@ class TaskSets(NameEq, Canonical):
 
 
 def tasks_from_str(name: str, tasks: str) -> TaskSets:
-    """Add a TaskSet to the project from a string representation of the tasks.
+    """Create a TaskSets from a string representation of the tasks.
+
+    The CLI supports both a single task representation as well as pseudo-task list of representations, so this function
+    will handle either based on the presence of wrapping '[]' characters.
 
     Example:
-        add_from_str("my_job", "tap target dbt:run") # a single task
-        add_from_str("my_job", '[tap mapper target, dbt:run, tap2 target2]) # three tasks
+        tasks_from_str("my_job", "tap target dbt:run") # a single task
+        tasks_from_str("my_job", '[tap mapper target, dbt:run, tap2 target2]) # three tasks
 
     Args:
         name: The name of the TaskSet.
