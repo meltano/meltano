@@ -6,13 +6,11 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from copy import deepcopy
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import dotenv
 import sqlalchemy
 from sqlalchemy.orm import Session
-
-from meltano.core.settings_service import SettingsService
 
 from .environment import NoActiveEnvironment
 from .error import Error
@@ -20,6 +18,10 @@ from .project import ProjectReadonly
 from .setting import Setting
 from .setting_definition import SettingDefinition, SettingMissingError
 from .utils import pop_at_path, set_at_path
+
+if TYPE_CHECKING:
+    from .settings_service import SettingsService
+
 
 logger = logging.getLogger(__name__)
 
