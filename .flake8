@@ -229,3 +229,7 @@ per_file_ignores =
         RST210
         # Lots of docstrings document **kwargs
 	RST213
+    src/meltano/core/settings_store.py:
+        WPS202
+        # Found overused expression: allow settings store implementations to all return vars with the same names
+        WPS204
