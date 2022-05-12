@@ -28,48 +28,45 @@ class APIWorker(threading.Thread):
 
     def run(self):
         """Run the initalized API Workers with the WSGI Server needed for the detected OS."""
-        if platform.system() == "Windows":
-            # Use Uvicorn when on Windows
-            settings_for_apiworker = ProjectSettingsService(self.project.find())
+        # Use Uvicorn when on Windows
+        settings_for_apiworker = ProjectSettingsService(self.project.find())
 
-            arg_bind_host = str(settings_for_apiworker.get("ui.bind_host"))
-            arg_bind_port = str(settings_for_apiworker.get("ui.bind_port"))
-            arg_loglevel = str(settings_for_apiworker.get("cli.log_level"))
+        arg_bind_host = str(settings_for_apiworker.get("ui.bind_host"))
+        arg_bind_port = str(settings_for_apiworker.get("ui.bind_port"))
+        arg_loglevel = str(settings_for_apiworker.get("cli.log_level"))
 
-            # Setup args for uvicorn using bind info from the project setings service
-            args = [
-                "--host",
-                arg_bind_host,
-                "--port",
-                arg_bind_port,
-                "--loop",
-                "asyncio",
-                "--interface",
-                "wsgi",
-                "--log-level",
-                arg_loglevel,
-                "--factory",
-                "meltano.api.app:create_app",
-            ]
+        # Setup args for uvicorn using bind info from the project setings service
+        args = [
+            "--host",
+            arg_bind_host,
+            "--port",
+            arg_bind_port,
+            "--loop",
+            "asyncio",
+            "--interface",
+            "wsgi",
+            "--log-level",
+            arg_loglevel,
+        ]
 
-            # Start uvicorn using the MeltanoInvoker
-            if self.reload:
+        # Start uvicorn using the MeltanoInvoker
+        if self.reload:
+            if platform.system() == "Windows":
                 logging.warning(
                     "--reload is not available, you will need to manually stop and start Meltano UI"
                 )
+                return
             else:
-                MeltanoInvoker(self.project).invoke(args, command="uvicorn")
+                args += [
+                    "--reload",
+                ]
 
-        else:
-            # Use Gunicorn when not on Windows
-            args = ["--config", "python:meltano.api.wsgi", "--pid", str(self.pid_file)]
+        args += [
+            "--factory",
+            "meltano.api.app:create_app",
+        ]
 
-            if self.reload:
-                args += ["--reload"]
-
-            args += ["meltano.api.app:create_app()"]
-
-            MeltanoInvoker(self.project).invoke(args, command="gunicorn")
+        MeltanoInvoker(self.project).invoke(args, command="uvicorn")
 
     def pid_path(self):
         """
