@@ -79,7 +79,6 @@ def add(
 
     if flags["custom"]:
         if plugin_type in {
-            PluginType.TRANSFORMERS,
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
         }:
