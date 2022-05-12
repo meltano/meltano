@@ -21,59 +21,20 @@ from .params import pass_project
 logger = structlog.getLogger(__name__)
 
 
-@cli.group(short_help="Manage jobs.")
-@click.pass_context
-@click.argument("name", required=True)
-@pass_project(migrate=True)
-def job(project, ctx, name: str):
+def _list_single_job(
+    project: Project,
+    task_sets_service: TaskSetsService,
+    list_format: str,
+    job_name: str,
+) -> None:
+    """List a single job.
+
+    Args:
+        project: The project to use.
+        task_sets_service: The task sets service to use.
+        list_format: The format to use.
+        job_name: The job name to list.
     """
-    Manage jobs.
-
-    Example usage:
-
-    \b
-    \t# This help
-    \tmeltano job NAME --help
-    \t# List jobs in JSON format
-    \tmeltano job NAME list --format json
-    \t# Get help for a subcommand like 'list' or 'tasks'
-    \tmeltano job NAME tasks --help
-    \b
-    \t# Create a new job with a single task representing a run command
-    \tmeltano job NAME tasks <run command>
-    \t# Create a new job with multiple tasks each representing a run command
-    \tmeltano job NAME tasks '[<run command1>, <run command2>, ...]'
-    \b
-    \t# Remove a named job
-    \tmeltano job JOB_NAME remove
-
-    \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
-    """
-    ctx.obj["project"] = project
-    ctx.obj["task_sets_service"] = TaskSetsService(project)
-    ctx.obj["JOB_NAME"] = name
-
-
-@job.command(name="list", short_help="List tasks for a specific named job.")
-@click.option(
-    "--format",
-    "list_format",
-    type=click.Choice(["json", "text"]),
-    default="text",
-)
-@click.pass_context
-def list_single(ctx, list_format: str):
-    """List available jobs."""
-    job_name = ctx.obj["JOB_NAME"]
-    if not job_name:  # theoretically not possible I think but just incase
-        click.secho("Job name is required.", fg="red")
-        click.secho("Usage:", fg="red")
-        click.secho("\tmeltano job JOB_NAME list", fg="red")
-        return
-
-    project = ctx.obj["project"]
-    task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
-
     try:
         task_set = task_sets_service.get(job_name)
     except JobNotFoundError:
@@ -86,9 +47,86 @@ def list_single(ctx, list_format: str):
         click.echo(
             json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2)
         )
-
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_job("list", ctx.obj["JOB_NAME"])
+    tracker.track_meltano_job("list", job_name)
+
+
+def _list_all_jobs(
+    project: Project, task_sets_service: TaskSetsService, list_format: str
+) -> None:
+    """List all jobs.
+
+    Args:
+        project: The project to use.
+        task_sets_service: The task sets service to use.
+        list_format: The format to use.
+    """
+    if list_format == "text":
+        for task_set in task_sets_service.list():
+            click.echo(f"{task_set.name}: {task_set.tasks}")
+    elif list_format == "json":
+        click.echo(
+            json.dumps(
+                [
+                    {"job_name": tset.name, "tasks": tset.tasks}
+                    for tset in task_sets_service.list()
+                ],
+                indent=2,
+            )
+        )
+        tracker = GoogleAnalyticsTracker(project)
+        tracker.track_meltano_job("list")
+
+
+@cli.group(short_help="Manage jobs.")
+@click.pass_context
+@pass_project(migrate=True)
+def job(project, ctx):
+    """
+    Manage jobs.
+
+    Example usage:
+
+    \b
+    \t# This help
+    \tmeltano job --help
+    \t# List all jobs in JSON format
+    \tmeltano job list --format json
+    \t# List a named job
+    \tmeltano job list <job_name>
+    \b
+    \t# Create a new job with a single task representing a run command
+    \tmeltano job NAME tasks <run command>
+    \t# Create a new job with multiple tasks each representing a run command
+    \tmeltano job NAME tasks '[<run command1>, <run command2>, ...]'
+    \b
+    \t# Remove a named job
+    \tmeltano job remove <job_name>
+
+    \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
+    """
+    ctx.obj["project"] = project
+    ctx.obj["task_sets_service"] = TaskSetsService(project)
+
+
+@job.command(name="list", short_help="List job(s).")
+@click.option(
+    "--format",
+    "list_format",
+    type=click.Choice(["json", "text"]),
+    default="text",
+)
+@click.argument("job_name", required=False, default=None)
+@click.pass_context
+def list_jobs(ctx, list_format: str, job_name: str):
+    """List available jobs."""
+    project = ctx.obj["project"]
+    task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
+
+    if job_name:
+        _list_single_job(project, task_sets_service, list_format, job_name)
+    else:
+        _list_all_jobs(project, task_sets_service, list_format)
 
 
 @job.command(name="tasks", short_help="Add a new job with tasks.")
@@ -142,20 +180,14 @@ def tasks(ctx, tasks_list: List[str]):
 
 
 @job.command(name="remove", short_help="Remove a job.")
+@click.argument("job_name", required=True)
 @click.pass_context
-def remove(ctx):  # noqa: WPS442
+def remove(ctx, job_name: str):  # noqa: WPS442
     """Remove a job.
 
     Usage:
-        meltano job NAME remove
+        meltano job remove <job_name>
     """
-    job_name = ctx.obj["JOB_NAME"]
-    if not job_name:  # theoretically not possible I think but just incase
-        click.secho("Job name is required.", fg="red")
-        click.secho("Usage:", fg="red")
-        click.secho("meltano job JOB_NAME remove", fg="red")
-        return
-
     project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     task_sets = task_sets_service.remove(job_name)
