@@ -101,10 +101,10 @@ def tasks_from_str(name: str, tasks: str) -> TaskSets:  # noqa: WPS238
         raise ValueError(f"Invalid tasks string: {tasks}")
 
     if tasks.endswith("]") and not tasks.startswith("["):
-        raise ValueError(f"Invalid tasks string, missing leading ]: {tasks}")
+        raise ValueError(f"Invalid tasks string, missing leading '[': {tasks}")
 
     if tasks.startswith("[") and not tasks.endswith("]"):
-        raise ValueError(f"Invalid tasks string, missing trailing ]: {tasks}")
+        raise ValueError(f"Invalid tasks string, missing trailing ']': {tasks}")
 
     if tasks.startswith("[") and tasks.endswith("]"):
         parsed = [task.strip(" ") for task in tasks[1:-1].split(",") if task]
