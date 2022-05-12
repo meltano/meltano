@@ -33,6 +33,7 @@ from meltano.core.project_plugins_service import (
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.state_service import StateService
+from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
 PROJECT_NAME = "a_meltano_project"
@@ -401,6 +402,11 @@ def utility(project_add_service):
 @pytest.fixture(scope="class")
 def schedule_service(project, project_plugins_service):
     return ScheduleService(project, plugins_service=project_plugins_service)
+
+
+@pytest.fixture(scope="class")
+def task_sets_service(project):
+    return TaskSetsService(project)
 
 
 @pytest.fixture(scope="class")

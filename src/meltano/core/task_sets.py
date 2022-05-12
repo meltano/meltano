@@ -75,11 +75,13 @@ class TaskSets(NameEq, Canonical):
         return self._squash(preserve_top_level=True)
 
 
-def tasks_from_str(name: str, tasks: str) -> TaskSets:
+def tasks_from_str(name: str, tasks: str) -> TaskSets:  # noqa: WPS238
     """Create a TaskSets from a string representation of the tasks.
 
     The CLI supports both a single task representation as well as pseudo-task list of representations, so this function
-    will handle either based on the presence of wrapping '[]' characters.
+    will handle either based on the presence of wrapping '[]' characters. We check if the str is grossly malformed i.e.
+    has leading or trailing quotes, or unbalanced brackets, or comma without list convention, but make no other
+    attempts to validate the string.
 
     Example:
         tasks_from_str("my_job", "tap target dbt:run") # a single task
@@ -91,9 +93,24 @@ def tasks_from_str(name: str, tasks: str) -> TaskSets:
 
     Returns:
         TaskSets obj generated from the string representation.
+
+    Raises:
+        ValueError: If the string representation appears to be obviously malformed
     """
+    if tasks.strip("\"' ") != tasks:
+        raise ValueError(f"Invalid tasks string: {tasks}")
+
+    if tasks.endswith("]") and not tasks.startswith("["):
+        raise ValueError(f"Invalid tasks string, missing leading ]: {tasks}")
+
+    if tasks.startswith("[") and not tasks.endswith("]"):
+        raise ValueError(f"Invalid tasks string, missing trailing ]: {tasks}")
+
     if tasks.startswith("[") and tasks.endswith("]"):
         parsed = [task.strip(" ") for task in tasks[1:-1].split(",") if task]
         return TaskSets(name, parsed)
+
+    if "," in tasks:
+        raise ValueError(f"Invalid tasks string, non list contains comma: {tasks}")
 
     return TaskSets(name, [tasks])

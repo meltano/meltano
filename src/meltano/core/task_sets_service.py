@@ -61,6 +61,26 @@ class TaskSetsService:
             logger.debug("adding job", name=task_sets.name, tasks=task_sets.tasks)
             meltano.jobs.append(task_sets)
 
+    def remove(self, name: str) -> TaskSets:
+        """Remove a TaskSet from the project.
+
+        Args:
+            name: The name of the TaskSet to remove.
+
+        Returns:
+            The removed TaskSet.
+
+        Raises:
+            JobNotFoundError: If the TaskSet with the given name does not exist.
+        """
+        for job in self.project.meltano.jobs:
+            if job.name == name:
+                with self.project.meltano_update() as meltano:
+                    logger.debug("removing job", name=job.name)
+                    meltano.jobs.remove(job)
+                return job
+        raise JobNotFoundError(name)
+
     def get(self, name: str) -> TaskSets:
         """Get a TaskSet by name.
 
@@ -100,23 +120,3 @@ class TaskSetsService:
         except JobNotFoundError:
             return False
         return True
-
-    def remove(self, name: str) -> TaskSets:
-        """Remove a TaskSet from the project.
-
-        Args:
-            name: The name of the TaskSet to remove.
-
-        Returns:
-            The removed TaskSet.
-
-        Raises:
-            JobNotFoundError: If the TaskSet with the given name does not exist.
-        """
-        for job in self.project.meltano.jobs:
-            if job.name == name:
-                with self.project.meltano_update() as meltano:
-                    logger.debug("removing job", name=job.name)
-                    meltano.jobs.remove(job)
-                return job
-        raise JobNotFoundError(name)
