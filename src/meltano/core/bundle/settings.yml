@@ -194,3 +194,8 @@ settings:
 - name: ff.lock_files
   kind: boolean
   value: false
+
+# Feature Flags
+- name: experimental
+  kind: boolean
+  value: False
