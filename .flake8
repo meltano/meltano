@@ -224,3 +224,8 @@ per_file_ignores =
         WPS360
         W291
         W293
+    src/meltano/core/settings_service.py:
+        # Lots of docstrings reference other class methods
+        RST210
+        # Lots of docstrings document **kwargs
+	RST213
