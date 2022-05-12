@@ -60,7 +60,7 @@ structlog = "^21.2.0"
 aiodocker = "^0.21.0"
 MarkupSafe = "<2.1.0"
 snowplow-tracker = "^0.10.0"
-uvicorn = { version = "^0.17.6", markers = "platform_system == 'Windows'" }
+uvicorn = "^0.17.6"
 
 [tool.poetry.extras]
 infra = ["ansible"]
