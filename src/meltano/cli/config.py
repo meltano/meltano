@@ -235,7 +235,7 @@ def reset(ctx, store):
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
-def set_(ctx, setting_name, value, store):  # noqa: WPS125
+def set_(ctx, setting_name, value, store):
     """Set the configurations' setting `<name>` to `<value>`."""
     store = SettingValueStore(store)
 

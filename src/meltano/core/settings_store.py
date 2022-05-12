@@ -31,7 +31,12 @@ class StoreNotSupportedError(Error):
 
 
 class SettingValueStore(str, Enum):
-    """Setting Value Store."""
+    """Setting Value Store.
+
+    Note: The declaration order of stores determins store precedence when using the Auto store manager.
+            This is because the `.readables()` and `.writables()` methods return ordered lists that
+            the Auto store manager iterates over when retrieveing setting values.
+    """
 
     CONFIG_OVERRIDE = "config_override"
     ENV = "env"
@@ -68,7 +73,7 @@ class SettingValueStore(str, Enum):
         Returns:
             SettingsStoreManager for this store.
         """
-        managers = {
+        managers = {  # ordering here is not significant, other than being consistent with the order of precedence.
             self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,
             self.ENV: EnvStoreManager,
             self.DOTENV: DotEnvStoreManager,
