@@ -71,9 +71,6 @@ class SettingsService(ABC):  # noqa: WPS214
         self.show_hidden = show_hidden
 
         self.env_override = env_override or {}
-        if self.project.active_environment:
-            self.env_override.update(**self.project.active_environment.env)
-
         self.config_override = config_override or {}
 
         self._setting_defs = None
@@ -176,7 +173,16 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             the environment as a dict.
         """
-        return {**os.environ, **self.env_override}
+        result = {**os.environ, **self.env_override}
+
+        if self.project.active_environment:
+            environment_env = {
+                var: do_expand_env_vars(value, self.project.env)
+                for var, value in self.project.active_environment.env.items()
+            }
+            self.env_override.update(environment_env)
+
+        return result
 
     @classmethod
     def unredact(cls, values: dict) -> dict:
