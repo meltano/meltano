@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import re
-from os import PathLike
 
 import yaml
 
@@ -760,16 +758,3 @@ class StandalonePlugin(Canonical):
             commands=variant.commands,
             **variant.extras,
         )
-
-    @classmethod
-    def parse_json_file(cls, path: PathLike) -> StandalonePlugin:
-        """Parse a plugin definition from a JSON file.
-
-        Args:
-            path: The path to the JSON file.
-
-        Returns:
-            A standalone plugin definition.
-        """
-        with open(path) as file:
-            return cls.parse(json.load(file))
