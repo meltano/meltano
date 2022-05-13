@@ -191,6 +191,11 @@ settings:
   value: ["https://sp.meltano.com"]
 
 # Feature Flags
+- name: ff.lock_files
+  kind: boolean
+  value: false
+
+# Feature Flags
 - name: experimental
   kind: boolean
   value: False
