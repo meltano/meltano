@@ -180,7 +180,7 @@ class SettingsService(ABC):  # noqa: WPS214
                 var: do_expand_env_vars(value, self.project.env)
                 for var, value in self.project.active_environment.env.items()
             }
-            self.env_override.update(environment_env)
+            result.update(environment_env)
 
         return result
 
