@@ -39,7 +39,7 @@ Use the following command to check that you have the correct Python version inst
 python --version
 ```
 
-#### pip3 and pipx
+#### Install pipx
 
 `pip` is a package installer that comes automatically with Python 3+.
 [pipx](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
