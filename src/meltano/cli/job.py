@@ -227,12 +227,11 @@ def _validate_tasks(project: Project, task_set: TaskSets) -> bool:
     Raises:
         JobTaskInvalidError: If the job's tasks are invalid.
     """
-    blocks = task_set.squashed.split(" ")
+    blocks = task_set.flat_args
     logger.debug(
         "validating tasks",
         job=task_set.name,
         tasks=task_set.tasks,
-        squashed=task_set.squashed,
         blocks=blocks,
     )
     try:

@@ -4,6 +4,23 @@ from meltano.core.task_sets import TaskSets, tasks_from_str
 
 
 class TestTaskSets:
+    def test_squash(self):
+        tset = TaskSets(name="test", tasks=["tap target", "tap2 target2"])
+        assert tset._as_args() == ["tap", "target", "tap2", "target2"]
+
+        tset = TaskSets(
+            name="test", tasks=[["tap target"], ["some:cmd"], ["tap2 target2"]]
+        )
+        assert tset._as_args() == ["tap", "target", "some:cmd", "tap2", "target2"]
+
+        tset = TaskSets(
+            name="test", tasks=[["tap target", "some:cmd"], ["tap2 target2"]]
+        )
+        assert tset._as_args(preserve_top_level=True) == [
+            ["tap", "target", "some:cmd"],
+            ["tap2", "target2"],
+        ]
+
     def test_tasks_from_str(self):
 
         cases = [

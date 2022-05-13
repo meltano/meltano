@@ -148,9 +148,9 @@ class BlockParser:  # noqa: D101
                 self.log.debug(
                     "expanding job to tasks",
                     job_name=name,
-                    tasks=task_sets.get(name).squashed,
+                    tasks=task_sets.get(name).flat_args,
                 )
-                expanded_blocks.extend(task_sets.get(name).squashed.split(" "))
+                expanded_blocks.extend(task_sets.get(name).flat_args)
             else:
                 expanded_blocks.append(name)
         return expanded_blocks

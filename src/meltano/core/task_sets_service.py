@@ -1,5 +1,5 @@
 """Service for managing task sets (aka jobs)."""
-from typing import List
+from __future__ import annotations
 
 import structlog
 
@@ -98,7 +98,7 @@ class TaskSetsService:
                 return job
         raise JobNotFoundError(name)
 
-    def list(self) -> List[TaskSets]:
+    def list(self) -> list[TaskSets]:
         """List all TaskSets in the project.
 
         Returns:

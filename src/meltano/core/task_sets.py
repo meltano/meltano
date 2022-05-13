@@ -1,6 +1,7 @@
 """meltano tasks/jobs (not state related jobs)."""
+from __future__ import annotations
+
 from collections.abc import Iterable
-from typing import List, TypeVar, Union
 
 import structlog
 
@@ -10,21 +11,21 @@ from meltano.core.behavior.canonical import Canonical
 logger = structlog.getLogger(__name__)
 
 
-T = TypeVar("T")  # noqa: WPS111
-
-
-def _flatten(items):
+def _flat_split(items):
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
-            yield from _flatten(el)
+            yield from _flat_split(el)
         else:
-            yield el
+            if " " in el:
+                yield from _flat_split(el.split(" "))
+            else:
+                yield el
 
 
 class TaskSets(NameEq, Canonical):
     """A job is a named entity that holds one or more Task's that can be executed by meltano."""
 
-    def __init__(self, name: str, tasks: List[List[str]]):
+    def __init__(self, name: str, tasks: list[str] | list[list[str]]):
         """Initialize a TaskSets.
 
         Args:
@@ -36,49 +37,55 @@ class TaskSets(NameEq, Canonical):
         self.name = name
         self.tasks = tasks
 
-    def _squash(self, preserve_top_level: bool = False) -> Union[str, List[str]]:
-        """Squash the job's tasks into invocable string representations, suitable for passing as a cli argument.
+    def _as_args(self, preserve_top_level: bool = False) -> list[str] | list[list[str]]:
+        """Squash the job's tasks into invocable representations, suitable for passing as a cli argument.
 
         Args:
-            preserve_top_level: Whether to preserve the defined top level task list to allow for fine grained executions.
+            preserve_top_level: Whether to preserve the defined top level task list to allow for fine-grained executions.
 
         Returns:
             str: The squashed CLI argument.
         """
-        if preserve_top_level:
-            flattened = []
-            for task in self.tasks:
-                if isinstance(task, Iterable) and not isinstance(task, str):
-                    flattened.extend(list(_flatten(task)))
-                else:
-                    flattened.append(task)
-            return flattened
+        if not preserve_top_level:
+            return list(_flat_split(self.tasks))
 
-        return " ".join(_flatten(self.tasks))
+        flattened = []
+        for task in self.tasks:
+            if isinstance(task, str):
+                flattened.extend(task.split(" "))
+            else:
+                flattened.append(list(_flat_split(task)))
+        return flattened
 
     @property
-    def squashed(self) -> str:
-        """Squash the job's tasks into a singe invocable string representations, suitable for passing as a cli argument.
+    def flat_args(self) -> list[str]:
+        """Squash the job's tasks into a singe invocable representations, suitable for passing as a cli argument.
+
+        Example:
+            TaskSets(name="foo", tasks=["tap target", "some:cmd"]).flat_args -> ["tap", "target", "some:cmd"]
 
         Returns:
             The squashed CLI argument.
         """
-        return self._squash()
+        return self._as_args()
 
     @property
-    def squashed_per_set(self) -> List[str]:
-        """Squash the job's tasks into perk task string representations (preserving top level list hierarchy).
+    def flat_args_per_set(self) -> list[str] | list[list[str]]:
+        """Squash the job's tasks into perk task representations (preserving top level list hierarchy).
+
+        Example:
+            TaskSets(name="foo", tasks=[["tap trgt"], ["some:cmd"]).flat_args_per_set -> [["tap", "trgt"], ["some:cmd"]]
 
         Returns:
             The squashed CLI arguments.
         """
-        return self._squash(preserve_top_level=True)
+        return self._as_args(preserve_top_level=True)
 
 
 def tasks_from_str(name: str, tasks: str) -> TaskSets:  # noqa: WPS238
     """Create a TaskSets from a string representation of the tasks.
 
-    The CLI supports both a single task representation as well as pseudo-task list of representations, so this function
+    The CLI supports both a single task representation as well as pseudo-task lists of representations. This function
     will handle either based on the presence of wrapping '[]' characters. We check if the str is grossly malformed i.e.
     has leading or trailing quotes, or unbalanced brackets, or comma without list convention, but make no other
     attempts to validate the string.
