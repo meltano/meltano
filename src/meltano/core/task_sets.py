@@ -38,13 +38,13 @@ class TaskSets(NameEq, Canonical):
         self.tasks = tasks
 
     def _as_args(self, preserve_top_level: bool = False) -> list[str] | list[list[str]]:
-        """Squash the job's tasks into invocable representations, suitable for passing as a cli argument.
+        """Convert the job's tasks into invocable representations, suitable for passing as a cli args or block names.
 
         Args:
             preserve_top_level: Whether to preserve the defined top level task list to allow for fine-grained executions.
 
         Returns:
-            str: The squashed CLI argument.
+            The run arguments.
         """
         if not preserve_top_level:
             return list(_flat_split(self.tasks))
@@ -59,25 +59,25 @@ class TaskSets(NameEq, Canonical):
 
     @property
     def flat_args(self) -> list[str]:
-        """Squash the job's tasks into a singe invocable representations, suitable for passing as a cli argument.
+        """Convert job's tasks to a single invocable representations. For passing as a cli argument or as block names.
 
         Example:
             TaskSets(name="foo", tasks=["tap target", "some:cmd"]).flat_args -> ["tap", "target", "some:cmd"]
 
         Returns:
-            The squashed CLI argument.
+            The run arguments.
         """
         return self._as_args()
 
     @property
     def flat_args_per_set(self) -> list[str] | list[list[str]]:
-        """Squash the job's tasks into perk task representations (preserving top level list hierarchy).
+        """Convert the job's tasks into perk task representations (preserving top level list hierarchy).
 
         Example:
             TaskSets(name="foo", tasks=[["tap trgt"], ["some:cmd"]).flat_args_per_set -> [["tap", "trgt"], ["some:cmd"]]
 
         Returns:
-            The squashed CLI arguments.
+            The per-task run arguments.
         """
         return self._as_args(preserve_top_level=True)
 
