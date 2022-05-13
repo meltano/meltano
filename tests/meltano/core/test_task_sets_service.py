@@ -22,7 +22,7 @@ class TestTaskSetsService:
         return task_sets_service
 
     def test_add(self, subject: TaskSetsService, create_task_set):
-        count = 3
+        count = 10
         jobs = [create_task_set(f"test_job_{idx}") for idx in range(count)]
 
         for job in jobs:
@@ -35,12 +35,7 @@ class TestTaskSetsService:
             subject.add(jobs[0])
 
     def test_remove(self, subject: TaskSetsService, create_task_set):
-        count = 3
-        jobs = [create_task_set(f"test_job_{idx}") for idx in range(count)]
-
-        for job in jobs:
-            subject.add(job)
-
+        jobs = subject.list()
         subject.remove(jobs[0].name)
         assert subject.list() == jobs[1:]
         assert subject.exists(jobs[0].name) is False
@@ -50,11 +45,7 @@ class TestTaskSetsService:
             subject.remove(jobs[0].name)
 
     def test_get(self, subject: TaskSetsService, create_task_set):
-        count = 3
-        jobs = [create_task_set(f"test_job_{idx}") for idx in range(count)]
-
-        for job in jobs:
-            subject.add(job)
+        jobs = subject.list()
 
         assert subject.get(jobs[0].name) == jobs[0]
 
@@ -62,28 +53,18 @@ class TestTaskSetsService:
         with pytest.raises(JobNotFoundError):
             subject.get("non-existent")
 
-    def test_list(self, subject: TaskSetsService, create_task_set):
-        # empty case
-
-        empty = []
-        assert subject.list() == empty
-
-        count = 3
-        jobs = [create_task_set(f"test_job_{idx}") for idx in range(count)]
-
-        for job in jobs:
-            subject.add(job)
-
-        assert subject.list() == jobs
-
     def test_exists(self, subject: TaskSetsService, create_task_set):
-        count = 3
-        jobs = [create_task_set(f"test_job_{idx}") for idx in range(count)]
+        job = subject.list()[0]
+        assert subject.exists(job.name)
+        assert not subject.exists("non-existent")
 
-        for job in jobs:
+    def test_list(self, subject: TaskSetsService, create_task_set):
+        expected_jobs = [create_task_set(f"test_list_{idx}") for idx in range(3)]
+
+        for job in expected_jobs:
             subject.add(job)
 
-        for job in jobs:
-            assert subject.exists(job.name)
+        result = subject.list()
 
-        assert not subject.exists("non-existent")
+        for job in expected_jobs:
+            assert job in result

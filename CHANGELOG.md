@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new`meltano job` command and support for referencing jobs in `meltan run` commands.
+- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new`meltano job` command and support for referencing jobs in `meltano run` commands.
 
 ### Changes
 

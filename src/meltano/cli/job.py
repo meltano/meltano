@@ -14,7 +14,7 @@ from meltano.core.task_sets_service import (
 )
 from meltano.core.tracking import GoogleAnalyticsTracker
 
-from . import cli
+from . import CliError, cli
 from .params import pass_project
 
 logger = structlog.getLogger(__name__)
@@ -66,10 +66,12 @@ def _list_all_jobs(
     elif list_format == "json":
         click.echo(
             json.dumps(
-                [
-                    {"job_name": tset.name, "tasks": tset.tasks}
-                    for tset in task_sets_service.list()
-                ],
+                {
+                    "jobs": [
+                        {"job_name": tset.name, "tasks": tset.tasks}
+                        for tset in task_sets_service.list()
+                    ]
+                },
                 indent=2,
             )
         )
@@ -159,33 +161,18 @@ def add(ctx, job_name: str, raw_tasks: str):
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
     raw_tasks = raw_tasks.strip("'\"")
-    if "," in raw_tasks:
-        if not raw_tasks.startswith("[") or not raw_tasks.endswith("]"):
-            raise click.Bad(
-                "--tasks",
-                "Multiple tasks must be in a pseudo list enclosed by [], e.g. --tasks '[<run stmt1>, <run stmt2>, ...]'",
-            )
-
-    if raw_tasks.startswith("["):
-        if not raw_tasks.endswith("]"):
-            raise click.BadOptionUsage(
-                "--tasks",
-                "The tasks must be enclosed in square brackets, make sure you have both opening and closing brackets.",
-            )
 
     task_sets = tasks_from_str(job_name, raw_tasks)
 
     try:
         _validate_tasks(project, task_sets)
     except JobTaskInvalidError as err:
-        click.secho(f"Job '{task_sets.name}' invalid: {str(err)}", fg="red")
-        return
+        raise CliError(f"Job '{task_sets.name}' invalid: {str(err)}")
 
     try:
         task_sets_service.add(task_sets)
     except JobAlreadyExistsError as serr:
-        click.secho(f"Job '{serr.name}' already exists.", fg="yellow")
-        return
+        raise CliError(f"Job '{task_sets.name}' already exists.") from serr
 
     click.echo(f"Added job {task_sets.name}: {task_sets.tasks}")
 
