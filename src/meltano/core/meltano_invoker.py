@@ -4,23 +4,42 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .project import Project
 from .project_settings_service import ProjectSettingsService, SettingValueStore
 
 MELTANO_COMMAND = "meltano"
 
 
 class MeltanoInvoker:
+    """Class used to find and invoke all commands passed to it."""
+
     def __init__(self, project, settings_service: ProjectSettingsService = None):
+        """
+        Load the class with the project and service settings.
+
+        Parameters:
+            project: Project class
+            settings_service: ProjectSettingService Class blank
+        """
         self.project = project
         self.settings_service = settings_service or ProjectSettingsService(project)
 
     def invoke(self, args, command=MELTANO_COMMAND, env=None, **kwargs):
-        """Invoke `meltano` (or provided command) with provided args and env."""
+        """
+        Invoke meltano or other provided command.
+
+        Parameters:
+            args: list.
+            command: string containing command to invoke.
+            env: dictionary.
+            kwargs: dictionary.
+
+        Returns:
+            The complete process sting from subprocess.run().
+        """
         return subprocess.run(
             [self._executable_path(command), *args],
             **kwargs,
-            env=self._executable_env(env)
+            env=self._executable_env(env),
         )
 
     def _executable_path(self, command):
@@ -30,7 +49,12 @@ class MeltanoInvoker:
             if executable_symlink.exists():
                 return str(executable_symlink)
 
-        executable = Path(os.path.dirname(sys.executable), command)
+        if os.name == "nt":
+            command_exe = f"{command}.exe"
+            executable = Path(os.path.dirname(sys.executable), command_exe)
+        else:
+            executable = Path(os.path.dirname(sys.executable), command)
+
         if executable.exists():
             return str(executable)
 
