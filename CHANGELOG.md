@@ -11,8 +11,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new`meltano job` command and support for referencing jobs in `meltano run` commands.
+- [#3031](https://gitlab.com/meltano/meltano/-/issues/3031) Add lock artifacts during `meltano add` for stability and portability of plugin definitions.
 
 ### Changes
+- [#3385](https://gitlab.com/meltano/meltano/-/issues/3385) Add feature flags for experimental features
 
 ### Fixes
 
