@@ -150,17 +150,13 @@ def copy_state(
 ):
     """Copy state to another job id"""
     # Retrieve state for copying
-    src_state_service = (
+    state_service = (
         state_service_from_job_id(project, src_job_id) or ctx.obj[STATE_SERVICE_KEY]
-    )
-    dst_state_service = (
-        state_service_from_job_id(project, dst_job_id) or ctx.obj[STATE_SERVICE_KEY]
     )
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_state("copy", dst_job_id)
-    src_state = src_state_service.get_state(src_job_id)
 
-    dst_state_service.set_state(dst_job_id, json.dumps(src_state))
+    state_service.copy_state(src_job_id, dst_job_id)
 
     logger.info(
         f"State for {dst_job_id} was successfully copied from {src_job_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
@@ -178,18 +174,13 @@ def move_state(
 ):
     """Move state to another job id, clearing the original"""
     # Retrieve state for moveing
-    src_state_service = (
-        state_service_from_job_id(project, src_job_id) or ctx.obj[STATE_SERVICE_KEY]
-    )
-    dst_state_service = (
+    state_service = (
         state_service_from_job_id(project, dst_job_id) or ctx.obj[STATE_SERVICE_KEY]
-    )
+    ) 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_state("move", dst_job_id)
-    src_state = src_state_service.get_state(src_job_id)
 
-    dst_state_service.set_state(dst_job_id, json.dumps(src_state))
-    src_state_service.clear_state(src_job_id)
+    state_service.move_state(src_job_id, dst_job_id)
 
     logger.info(
         f"State for {src_job_id} was successfully moved to {dst_job_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323

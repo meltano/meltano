@@ -184,3 +184,26 @@ class StateService:
         src_state_dict = self.get_state(job_id_src)
         src_state = json.dumps(src_state_dict)
         self.add_state(job_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
+
+    def copy_state(self, job_id_src: str, job_id_dst: str):
+        """copy state from Job job_id_src onto Job job_id_dst.
+
+        Args:
+            job_id_src: the job_id to get state from
+            job_id_dst: the job_id_to copy state onto
+        """
+        src_state_dict = self.get_state(job_id_src)
+        src_state = json.dumps(src_state_dict)
+        self.set_state(job_id_dst, src_state)
+
+    def move_state(self, job_id_src: str, job_id_dst: str):
+        """move state from Job job_id_src to Job job_id_dst.
+
+        Args:
+            job_id_src: the job_id to get state from and clear
+            job_id_dst: the job_id_to move state onto
+        """
+        src_state_dict = self.get_state(job_id_src)
+        src_state = json.dumps(src_state_dict)
+        self.set_state(job_id_dst, src_state)
+        self.clear_state(job_id_src)
