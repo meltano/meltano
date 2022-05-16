@@ -6,6 +6,7 @@ from dotenv import dotenv_values
 
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
+from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import nest_object
 
 from .config_service import ConfigService
@@ -35,6 +36,16 @@ class ProjectSettingsService(SettingsService):
         self.config_service = config_service or ConfigService(self.project)
 
         self.env_override = {**self.project.env, **self.env_override}
+
+        if self.project.active_environment:
+            # Update this with `self.project.dotenv_env`, `self.env`, etc. to expand
+            # other environment variables in the Environment's `env`.
+            expandable_env = {**self.project.env}
+            environment_env = {
+                var: do_expand_env_vars(value, expandable_env)
+                for var, value in self.project.active_environment.env.items()
+            }
+            self.env_override.update(environment_env)
 
         self.config_override = {  # noqa: WPS601
             **self.__class__.config_override,
