@@ -45,6 +45,8 @@ class APIWorker(threading.Thread):
             "wsgi",
             "--log-level",
             arg_loglevel,
+            "--timeout-keep-alive",
+            "600",
         ]
 
         # Start uvicorn using the MeltanoInvoker
