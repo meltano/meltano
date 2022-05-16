@@ -633,6 +633,9 @@ Note that [inline mapping names](/concepts/plugins#mappers) are _not included_ w
 
 Note that if no environment is active, `meltano run` _does not_ generate a job ID and it does not track state.
 
+In addition to explicitly specifying plugin names you can also execute one or more named 
+[jobs](/reference/command-line-interface#job) alongside other commands.
+
 <div class="notification is-danger">
   <p><strong>The run command is a preview feature. Its functionality and CLI signature is still evolving.</strong></p>
   <p>During the feature preview, and similar to <code>meltano invoke dbt:[cmd]</code>, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link <a href="https://gitlab.com/meltano/meltano/-/issues/3098">#3098</a>.</p>
@@ -648,6 +651,7 @@ meltano run tap-gitlab target-postgres tap-salesforce target-mysql
 meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
 meltano run tap-gitlab one-mapping another-mapping target-postgres
+meltano run tap-gitlab target-postgres simple-job
 ```
 
 #### Parameters
@@ -686,6 +690,48 @@ meltano --environment=<ENVIRONMENT> run ...
 ```
 
 Note that if no environment is active, `meltano run` _does not_ generate a job ID and it does not track state.
+
+## `job`
+
+Use the `job` command to define one more related tasks. A job can contain a single task, or many tasks. Today all tasks
+are run sequentially. You can run a specified job by passing the job name as an argument to `meltano run`.
+
+### How to use
+
+```bash
+
+# Add a job with a singe task representing a run command
+meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
+
+# Add a new job with multiple tasks using a pseudo-list format, each item representing a run command
+meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
+
+# List all jobs
+meltano job list
+meltano job list --format=json
+
+# List a named job
+meltano job list <job_name>
+meltano job list <job_name> --format=json
+
+# Remove a named job
+meltano job remove <job_name>
+```
+
+### Examples
+
+```bash
+# a new job named "simple-demo" that contains two tasks
+meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-mysql dbt:run, tap-gitlab target-csv]"
+# list the job named "simple-demo"
+meltano job list simple-demo --format=json
+# run the job named "simple-demo" using meltano run
+meltano run simple-demo
+# run the job named "simple-demo" AND another EL pair using meltano run
+meltano run simple-demo tap-mysql target-bigquery
+# remove the job named "simple-demo"
+meltano job remove simple-demo
+```
 
 ## `schedule`
 
