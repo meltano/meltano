@@ -173,16 +173,7 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             the environment as a dict.
         """
-        result = {**os.environ, **self.env_override}
-
-        if self.project.active_environment:
-            environment_env = {
-                var: do_expand_env_vars(value, self.project.env)
-                for var, value in self.project.active_environment.env.items()
-            }
-            result.update(environment_env)
-
-        return result
+        return {**os.environ, **self.env_override}
 
     @classmethod
     def unredact(cls, values: dict) -> dict:
