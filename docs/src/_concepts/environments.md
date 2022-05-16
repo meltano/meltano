@@ -60,6 +60,18 @@ Environments are most powerful when [inheriting](plugins#plugin-inheritance) fro
 Configuration that is set in an environment can be used to add or override configuration set in the base plugin configuration.
 This enables reuse of configuration common to multiple environments while making it easy to switch configuration for a specific environment.
 
+## The `env` mapping
+
+An Environment can define an `env` mapping that will be injected to the plugin(s) environment at runtime.
+Environment variables `MELTANO_PROJECT_ROOT` and `MELTANO_ENVIRONMENT` will be expanded:
+
+```yaml
+environments:
+  - name: dev
+    env:
+      MY_ENV_VAR: $MELTANO_PROJECT_ROOT/path/to/a/file.json
+```
+
 ## Activation
 
 To use an environment, you can pass the option `--environment=<ENV>` to the CLI command, or set the `MELTANO_ENVIRONMENT=<ENV>` variable.
