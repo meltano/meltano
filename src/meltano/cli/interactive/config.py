@@ -277,7 +277,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             click.echo()
             choices = ["all"] + [idx for idx, _, _ in self.setting_choices]
             branch = click.prompt(
-                "Select a specific setting, loop through all settings or exit?",
+                "Loop through all settings, or select a specific setting by number?",
                 type=click.Choice(choices, case_sensitive=False),
                 default="all",
             )
