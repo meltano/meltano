@@ -78,7 +78,7 @@ Occasionally, during development we may also have a need for custom verbs (e.g. 
 In those case, we'll map to an appropriate HTTP verb, but the MR/issue will require justification for the use of a custom verb, and be documented in this guide.
 Where a custom verb is used, the verb will be appended to the resource as a new path segment:
 
-- MOVE
+- Move
   - HTTP POST `<collection>/<resource>/move` (we follow a more conventional style, rather than using Google's `<resource>:<verb>` style)
 
 ### Collections and resources
