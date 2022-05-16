@@ -117,6 +117,8 @@ per_file_ignores =
         D101
         D102
         D103
+        # Allow underscored number name pattern (e.g. tap_covid_19)
+        WPS114
         # Don't warn on overused expressions in test methods
         WPS204
         # Don't warn on too many arguments in test methods
@@ -226,3 +228,12 @@ per_file_ignores =
         WPS360
         W291
         W293
+    src/meltano/core/settings_service.py:
+        # Lots of docstrings reference other class methods
+        RST210
+        # Lots of docstrings document **kwargs
+	RST213
+    src/meltano/core/settings_store.py:
+        WPS202
+        # Found overused expression: allow settings store implementations to all return vars with the same names
+        WPS204

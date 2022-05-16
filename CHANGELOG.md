@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+ 
+
 ## Unreleased
 
 ---
@@ -18,6 +20,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 ## 1.102.0 - (2022-04-28)
+## 1.104.0 - (2022-05-13)
+---
+
+### New
+
+- [#3031](https://gitlab.com/meltano/meltano/-/issues/3031) Add lock artifacts during `meltano add` for stability and portability of plugin definitions.
+
+### Changes
+- [#3385](https://gitlab.com/meltano/meltano/-/issues/3385) Add feature flags for experimental features
+
+### Fixes
+
+- [#3468](https://gitlab.com/meltano/meltano/-/issues/3468) Fixes bug where container spec's entrypoint was not passed along to the Docker runtime.
+
+
 ## 1.103.1 - (2022-05-05)
 ---
 
