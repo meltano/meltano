@@ -1,6 +1,4 @@
 """Starts WSGI Webserver that will run the API App for a Meltano Project."""
-import logging
-import platform
 import threading
 
 from meltano.core.meltano_invoker import MeltanoInvoker
@@ -27,7 +25,7 @@ class APIWorker(threading.Thread):
         self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
 
     def run(self):
-        """Run the initalized API Workers with the WSGI Server needed for the detected OS."""
+        """Run the initalized API Workers with the App Server requested."""
         # Use Uvicorn when on Windows
         settings_for_apiworker = ProjectSettingsService(self.project.find())
 
@@ -51,16 +49,12 @@ class APIWorker(threading.Thread):
 
         # Start uvicorn using the MeltanoInvoker
         if self.reload:
-            if platform.system() == "Windows":
-                logging.warning(
-                    "--reload is not available, you will need to manually stop and start Meltano UI"
-                )
-                return
-            else:
-                args += [
-                    "--reload",
-                ]
 
+            args += [
+                "--reload",
+            ]
+
+        # Add the Meltano API app, factory create_app function combo to the args
         args += [
             "--factory",
             "meltano.api.app:create_app",
