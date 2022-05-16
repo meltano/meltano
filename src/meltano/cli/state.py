@@ -176,7 +176,7 @@ def move_state(
     # Retrieve state for moveing
     state_service = (
         state_service_from_job_id(project, dst_job_id) or ctx.obj[STATE_SERVICE_KEY]
-    ) 
+    )
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_state("move", dst_job_id)
 

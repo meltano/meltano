@@ -178,7 +178,7 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst) == merged_state
 
-    def test_copy(self, state_service, job_ids, cli_runner):
+    def test_copy_over_existing(self, state_service, job_ids, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_pairs = []
             for idx in range(0, len(job_ids) - 1, 2):
@@ -187,15 +187,23 @@ class TestCliState:
                 job_src_state = state_service.get_state(job_src)
                 result = cli_runner.invoke(
                     cli,
-                    [
-                        "state",
-                        "copy",
-                        job_src,
-                        job_dst,
-                    ],
+                    ["state", "copy", job_src, job_dst, "--force"],
                 )
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst) == job_src_state
+
+    def test_copy_to_new(self, state_service, job_ids, cli_runner):
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            for job_src_id in job_ids:
+                job_src_state = state_service.get_state(job_src_id)
+                job_dst_id = job_src_id + "-test-copy"
+                result = cli_runner.invoke(
+                    cli,
+                    ["state", "copy", job_src_id, job_dst_id, "--force"],
+                )
+                assert_cli_runner(result)
+                print(state_service.list_state().keys())
+                assert state_service.get_state(job_dst_id) == job_src_state
 
     def test_move(self, state_service, job_ids, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
@@ -206,12 +214,7 @@ class TestCliState:
                 job_src_state = state_service.get_state(job_src)
                 result = cli_runner.invoke(
                     cli,
-                    [
-                        "state",
-                        "move",
-                        job_src,
-                        job_dst,
-                    ],
+                    ["state", "move", job_src, job_dst, "--force"],
                 )
                 assert_cli_runner(result)
                 assert state_service.get_state(job_src) == {}
