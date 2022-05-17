@@ -554,3 +554,74 @@ class LockedDefinitionService(PluginRepository):
         )
 
         return base_plugin_factory(plugin, plugin.variants[0])
+
+
+class MeltanoHubService(PluginRepository):
+    """PluginRepository implementation for the Meltano Hub."""
+
+    def __init__(self, project: Project) -> None:
+        """Initialize the service.
+
+        Args:
+            project: The Meltano project.
+        """
+        self.project = project
+        self.session = requests.Session()
+
+    def find_definition(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
+    ) -> PluginDefinition:
+        """Find a locked plugin definition.
+
+        Args:
+            plugin_type: The plugin type.
+            plugin_name: The plugin name.
+            variant_name: The plugin variant name.
+
+        Returns:
+            The plugin definition.
+
+        Raises:
+            PluginNotFoundError: If the plugin definition could not be found.
+        """
+        base_url = "https://hub.meltano.com/meltano/api/v1"
+        url = f"{base_url}/plugins/{plugin_type}/{plugin_name}"
+
+        if variant_name:
+            url = f"{url}--{variant_name}"
+
+        response = self.session.get(url)
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as err:
+            raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from err
+
+        return PluginDefinition(**response.json(), plugin_type=plugin_type)
+
+    def find_base_plugin(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant: str | None = None,
+    ) -> BasePlugin:
+        """Get the base plugin for a project plugin.
+
+        Args:
+            plugin_type: The plugin type.
+            plugin_name: The plugin name.
+            variant: The plugin variant.
+
+        Returns:
+            The base plugin.
+        """
+        plugin = self.find_definition(
+            plugin_type,
+            plugin_name,
+            variant_name=variant,
+        )
+
+        return base_plugin_factory(plugin, plugin.variants[0])
