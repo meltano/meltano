@@ -39,6 +39,15 @@ class FeatureFlags(Enum):
         """
         return self.value
 
+    @property
+    def setting_name(self) -> str:
+        """Return the setting name for this feature flag.
+
+        Returns:
+            The setting name for this feature flag.
+        """
+        return f"{FEATURE_FLAG_PREFIX}.{self.value}"
+
 
 class FeatureNotAllowedException(Exception):
     """Occurs when a disallowed code path is run."""
