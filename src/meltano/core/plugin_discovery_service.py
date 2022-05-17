@@ -559,6 +559,8 @@ class LockedDefinitionService(PluginRepository):
 class MeltanoHubService(PluginRepository):
     """PluginRepository implementation for the Meltano Hub."""
 
+    BASE_URL = "https://hub.meltano.com/meltano/api/v1"
+
     def __init__(self, project: Project) -> None:
         """Initialize the service.
 
@@ -587,8 +589,7 @@ class MeltanoHubService(PluginRepository):
         Raises:
             PluginNotFoundError: If the plugin definition could not be found.
         """
-        base_url = "https://hub.meltano.com/meltano/api/v1"
-        url = f"{base_url}/plugins/{plugin_type}/{plugin_name}"
+        url = f"{self.BASE_URL}/plugins/{plugin_type}/{plugin_name}"
 
         if variant_name:
             url = f"{url}--{variant_name}"

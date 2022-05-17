@@ -20,7 +20,7 @@ class TestMeltanoHubService:
     def test_find_definition(self, subject: MeltanoHubService):
         responses.add(
             responses.GET,
-            "https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-mock--meltano",
+            f"{MeltanoHubService.BASE_URL}/plugins/extractors/tap-mock--meltano",
             json={
                 "name": "tap-mock",
                 "namespace": "tap_mock",
@@ -45,7 +45,7 @@ class TestMeltanoHubService:
     def test_definition_not_found(self, subject: MeltanoHubService):
         responses.add(
             responses.GET,
-            "https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-not-found",
+            f"{MeltanoHubService.BASE_URL}/plugins/extractors/tap-not-found",
             json={"error": "not found"},
             status=HTTPStatus.NOT_FOUND,
         )
