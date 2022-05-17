@@ -963,7 +963,7 @@ extractors:
     - name: meltanolabs
       docs: 'https://hub.meltano.com/extractors/gitlab.html'
       repo: https://github.com/MeltanoLabs/tap-gitlab
-      pip_url: 'git+https://github.com/MeltanoLabs/tap-gitlab.git'
+      pip_url: 'git+https://github.com/MeltanoLabs/tap-gitlab.git@main'
       capabilities:
         - catalog
         - discover

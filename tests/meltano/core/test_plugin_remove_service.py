@@ -23,7 +23,7 @@ class TestPluginRemoveService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                                    "pip_url": "https://github.com/MeltanoLabs/tap-gitlab.git@main",
                                 }
                             ],
                             "loaders": [
