@@ -633,7 +633,7 @@ Note that [inline mapping names](/concepts/plugins#mappers) are _not included_ w
 
 Note that if no environment is active, `meltano run` _does not_ generate a job ID and it does not track state.
 
-In addition to explicitly specifying plugin names you can also execute one or more named 
+In addition to explicitly specifying plugin names you can also execute one or more named
 [jobs](/reference/command-line-interface#job) alongside other commands.
 
 <div class="notification is-danger">
@@ -705,6 +705,10 @@ meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <com
 
 # Add a new job with multiple tasks using a pseudo-list format, each item representing a run command
 meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
+
+# Update an existing job with new tasks
+meltano job set <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
+meltano job set <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
 
 # List all jobs
 meltano job list

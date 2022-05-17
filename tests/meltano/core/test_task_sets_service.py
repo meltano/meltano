@@ -34,6 +34,17 @@ class TestTaskSetsService:
         with pytest.raises(JobAlreadyExistsError):
             subject.add(jobs[0])
 
+    def test_update(self, subject: TaskSetsService, create_task_set):
+        job = subject.list()[0]
+        job.tasks = ["tap-mock target-mock updated:addition"]
+        subject.update(job)
+
+        assert subject.get(job.name).tasks == ["tap-mock target-mock updated:addition"]
+
+        nonexistent = create_task_set("does-not-exist")
+        with pytest.raises(JobNotFoundError):
+            subject.update(nonexistent)
+
     def test_remove(self, subject: TaskSetsService, create_task_set):
         jobs = subject.list()
         subject.remove(jobs[0].name)

@@ -177,7 +177,58 @@ def add(ctx, job_name: str, raw_tasks: str):
     click.echo(f"Added job {task_sets.name}: {task_sets.tasks}")
 
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_job("tasks", job_name)
+    tracker.track_meltano_job("add", job_name)
+
+
+@job.command(name="set", short_help="Update an existing jobs tasks")
+@click.argument(
+    "job_name",
+    required=True,
+    default=None,
+)
+@click.option(
+    "--tasks",
+    "raw_tasks",
+    required=True,
+    default=None,
+    help="Tasks that will be run as part of this job.",
+)
+@click.pass_context
+def set_cmd(ctx, job_name: str, raw_tasks: str):
+    """Update the tasks associated with an existing job.
+
+    Example usage:
+
+    \b
+    \t# Update a job with a single task representing a single run command.
+    \tmeltano set update NAME --tasks 'tap mapper target command:arg1'
+    \b
+    \t# Update a job with multiple tasks each representing a run command.
+    \t# The list of tasks is wrapped in square brackets and each sub-task is separated by a comma.
+    \tmeltano set add NAME --tasks '[<run stmt1>, <run stmt2>, ...]'
+    """
+    project = ctx.obj["project"]
+    task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
+
+    raw_tasks = raw_tasks.strip("'\"")
+
+    task_sets = tasks_from_str(job_name, raw_tasks)
+
+    try:
+        _validate_tasks(project, task_sets)
+    except JobTaskInvalidError as err:
+        raise CliError(f"Job '{task_sets.name}' invalid: {str(err)}")
+
+    try:
+        task_sets_service.update(task_sets)
+    except JobNotFoundError:
+        click.secho(f"Job '{job_name}' does not exist.", fg="yellow")
+        return
+
+    click.echo(f"Updated job {task_sets.name}: {task_sets.tasks}")
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_job("set", job_name)
 
 
 @job.command(name="remove", short_help="Remove a job.")

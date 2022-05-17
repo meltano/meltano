@@ -88,6 +88,39 @@ class TestCliJob:
             assert res.exit_code == 1
             assert "Invalid tasks string, non list contains comma" in str(res.exception)
 
+    def test_job_set(self, session, project, cli_runner, task_sets_service):
+        # singular task with job
+        with mock.patch(
+            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+        ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "add",
+                    "job-set-mock",
+                    "--tasks",
+                    "'tap-mock target-mock'",
+                ],
+            )
+            assert_cli_runner(res)
+            assert task_sets_service.exists("job-set-mock")
+
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "job-set-mock",
+                    "--tasks",
+                    "'tap2-mock target2-mock'",
+                ],
+            )
+
+            task_sets = task_sets_service.get("job-set-mock")
+            assert task_sets.name == "job-set-mock"
+            assert task_sets.tasks == ["tap2-mock target2-mock"]
+
     def test_job_remove(self, session, project, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(

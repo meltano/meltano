@@ -81,6 +81,23 @@ class TaskSetsService:
                 return job
         raise JobNotFoundError(name)
 
+    def update(self, task_sets: TaskSets) -> None:
+        """Update a tasks.
+
+        Args:
+            task_sets: The TaskSets to update.
+
+        Raises:
+            JobNotFoundError: If the TaskSet with the given name does not exist.
+        """
+        for idx, job in enumerate(self.project.meltano.jobs):
+            if job.name == task_sets.name:
+                with self.project.meltano_update() as meltano:
+                    logger.debug("updating job", name=job.name)
+                    meltano.jobs[idx].tasks = task_sets.tasks
+                return
+        raise JobNotFoundError(task_sets.name)
+
     def get(self, name: str) -> TaskSets:
         """Get a TaskSet by name.
 
