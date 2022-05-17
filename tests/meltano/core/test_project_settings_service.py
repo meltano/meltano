@@ -1,8 +1,13 @@
 import pytest
-from meltano.core.project import Project
+
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
+)
+from meltano.core.settings_service import (
+    EXPERIMENTAL,
+    FEATURE_FLAG_PREFIX,
+    FeatureNotAllowedException,
 )
 
 
@@ -38,9 +43,9 @@ class TestProjectSettingsService:
 
         assert_value_source("from_dotenv", SettingValueStore.DOTENV)
 
-        with monkeypatch.context() as m:
+        with monkeypatch.context() as ctx:
             env_key = subject.setting_env(subject.find_setting("project_id"))
-            m.setenv(env_key, "from_env")
+            ctx.setenv(env_key, "from_env")
 
             assert_value_source("from_env", SettingValueStore.ENV)
 
@@ -64,9 +69,44 @@ class TestProjectSettingsService:
 
         assert_value_source("from_ui_cfg", SettingValueStore.ENV)
 
-        with monkeypatch.context() as m:
-            m.setenv(
+        with monkeypatch.context() as ctx:
+            ctx.setenv(
                 subject.setting_env(subject.find_setting("ui.server_name")), "from_env"
             )
 
             assert_value_source("from_env", SettingValueStore.ENV)
+
+    def test_experimental_on(self, subject, monkeypatch):
+        changed = []
+        monkeypatch.setenv("MELTANO_EXPERIMENTAL", "true")
+        with subject.feature_flag(EXPERIMENTAL):
+            changed.append(True)
+        assert changed
+
+    def test_experimental_off_by_default(self, subject, monkeypatch):
+        changed = []
+        with pytest.raises(FeatureNotAllowedException):
+            with subject.feature_flag(EXPERIMENTAL):
+                changed.append(True)
+
+    def test_feature_flag_allowed(self, subject):
+        changed = []
+        subject.set([FEATURE_FLAG_PREFIX, "allowed"], True)
+
+        @subject.feature_flag("allowed")
+        def should_run():
+            changed.append(True)
+
+        should_run()
+        assert changed
+
+    def test_feature_flag_disallowed(self, subject):
+        changed = []
+        subject.set([FEATURE_FLAG_PREFIX, "disallowed"], False)
+
+        @subject.feature_flag("disallowed")
+        def should_not_run():
+            changed.append(True)
+
+        with pytest.raises(FeatureNotAllowedException):
+            should_not_run()
