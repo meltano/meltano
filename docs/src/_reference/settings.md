@@ -173,7 +173,6 @@ If you dont target a schema then by default PostgreSQL will try to use the `publ
 postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
 ```
 
-
 ### `database_max_retries`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DATABASE_MAX_RETRIES`
@@ -226,6 +225,7 @@ can still be used to store configuration in the [system database](/concepts/proj
 but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
+
 1. it does not block write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
 2. it also affects the [CLI](/reference/command-line-interface).
 
@@ -267,6 +267,7 @@ export MELTANO_DISCOVERY_URL=false
 The value of the `Authorization` header sent when making a request to [`discovery_url`](#discovery-url).
 
 No `Authorization` header is applied under the following conditions:
+
 - `discovery_url_auth` is not set
 - `discovery_url_auth` is set to `false`, `null` or an empty string
 
@@ -310,7 +311,7 @@ meltano --log-level=debug ...
 - `meltano` CLI option: `--log-config`
 - Default: `logging.yaml`
 
-The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging *if present*.
+The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_.
 
 #### How to use
 
@@ -633,12 +634,13 @@ These settings can be used to enable certain features of [Meltano UI](/reference
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
 - Default: `false`
 
-To block all write actions in the Meltano UI, you can run it in in *read-only* mode.
+To block all write actions in the Meltano UI, you can run it in in _read-only_ mode.
 
 If you're enabling the [`ui.authentication` setting](#ui-authentication) and would
 like to only use read-only mode for anonymous users, enable the [`ui.anonymous_readonly` setting](#ui-anonymous-readonly) instead.
 
 This setting differs from the [`project_readonly` setting](#project-readonly) in two ways:
+
 1. it also blocks write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
 2. it does not affect the [CLI](/reference/command-line-interface).
 
@@ -659,6 +661,7 @@ export MELTANO_READONLY=true
 Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
 
 Additionally, you will need to:
+
 1. Ensure your configuration is secure by setting the [`ui.secret_key`](#ui-secret-key) and [`ui.password_salt`](#ui-password-salt) settings, as well as [`ui.server_name`](#ui-server-name) or [`ui.session_cookie_domain`](#ui-session-cookie-domain), manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup).
 
 2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
@@ -732,6 +735,7 @@ export MELTANO_NOTIFICATION=true
 
 If you want to use Meltano for more than data integration (and transformation),
 you can enable this setting to show all functionality related to Analysis from the UI:
+
 - "Explore" and "Dashboards" tabs
 - "Explore" buttons in the "Pipelines" list and "Pipeline Run Log" modal
 
@@ -770,13 +774,13 @@ Meltano uses [Flask-Mail](https://pythonhosted.org/Flask-Mail/) to send emails. 
 
 ### `mail.server`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_SERVER`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_SERVER`
 - Default: `localhost`
 
 ```bash
 meltano config meltano set mail server smtp.example.com
 
-export MAIL_SERVER=smtp.example.com
+export MELTANO_MAIL_SERVER=smtp.example.com
 ```
 
 ### `mail.port`
