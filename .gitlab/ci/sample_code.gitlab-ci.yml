@@ -16,6 +16,15 @@
     MELTANO_DISABLE_TRACKING: "true"
   services:
     - postgres:11
+  cache:
+  # Reuse upstream API caches globally when running EL pipelines.
+  # This cuts down CI failures due to upstream service availability.
+  - key: "global"
+    when: always
+    paths:
+    - .cache/pip
+    - ./api_caches/
+
 
 homepage_sample_code:
   extends: .sample_code
@@ -62,6 +71,12 @@ homepage_sample_code:
 
     # Add GitLab extractor to your project
     - meltano add extractor tap-gitlab
+
+    # Reinstall with SDK-based variant:
+    - meltano config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@fix-demo-project-ref
+    - meltano install tap-gitlab
+    - mkdir -p ./api_caches
+    - meltano config tap-gitlab set requests_cache_path '${MELTANO_PROJECT_ROOT}/api_caches/'
 
     # Configure tap-gitlab to extract data from...
     # - the https://gitlab.com/meltano/meltano project
@@ -218,6 +233,12 @@ getting_started_sample_code:
     - meltano discover extractors
 
     - meltano add extractor tap-gitlab
+
+    # Reinstall with SDK-based variant:
+    - meltano config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@fix-demo-project-ref
+    - meltano install tap-gitlab
+    - mkdir -p ./api_caches
+    - meltano config tap-gitlab set requests_cache_path '${MELTANO_PROJECT_ROOT}/api_caches/'
 
     - printf "tap_covid_19\ntap-covid-19\ntap-covid-19\ncatalog,discover,state\napi_token,user_agent,start_date\n" | meltano add --custom extractor tap-covid-19
 
