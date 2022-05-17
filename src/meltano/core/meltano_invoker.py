@@ -34,7 +34,7 @@ class MeltanoInvoker:
             kwargs: dictionary.
 
         Returns:
-            The complete process sting from subprocess.run().
+            A CompletedProcess class object from subprocess.run().
         """
         return subprocess.run(  # noqa: S603
             [self._executable_path(command), *args],
