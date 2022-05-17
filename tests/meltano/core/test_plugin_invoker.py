@@ -67,6 +67,18 @@ class TestPluginInvoker:
         )
 
     @pytest.mark.asyncio
+    async def test_expanded_environment_env(
+        self, project_with_environment, tap, session, plugin_invoker_factory
+    ):
+        subject = plugin_invoker_factory(tap)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        assert env["ENVIRONMENT_ENV_VAR"] == str(
+            project_with_environment.root / "file.txt"
+        )
+
+    @pytest.mark.asyncio
     async def test_unknown_command(self, plugin_invoker):
         with pytest.raises(UnknownCommandError) as err:
             await plugin_invoker.invoke_async(command="foo")
