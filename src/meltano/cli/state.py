@@ -106,7 +106,7 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session)
+    ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
 
 
 @meltano_state.command(name="list")
@@ -148,7 +148,7 @@ def list_state(
 def copy_state(
     ctx: click.Context, project: Project, src_job_id: str, dst_job_id: str, force: bool
 ):
-    """Copy state to another job id"""
+    """Copy state to another job id."""
     # Retrieve state for copying
     state_service = (
         state_service_from_job_id(project, src_job_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -172,7 +172,7 @@ def copy_state(
 def move_state(
     ctx: click.Context, project: Project, src_job_id: str, dst_job_id: str, force: bool
 ):
-    """Move state to another job id, clearing the original"""
+    """Move state to another job id, clearing the original."""
     # Retrieve state for moveing
     state_service = (
         state_service_from_job_id(project, dst_job_id) or ctx.obj[STATE_SERVICE_KEY]

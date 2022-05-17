@@ -186,7 +186,7 @@ class StateService:
         self.add_state(job_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
 
     def copy_state(self, job_id_src: str, job_id_dst: str):
-        """copy state from Job job_id_src onto Job job_id_dst.
+        """Copy state from Job job_id_src onto Job job_id_dst.
 
         Args:
             job_id_src: the job_id to get state from
@@ -197,7 +197,7 @@ class StateService:
         self.set_state(job_id_dst, src_state)
 
     def move_state(self, job_id_src: str, job_id_dst: str):
-        """move state from Job job_id_src to Job job_id_dst.
+        """Move state from Job job_id_src to Job job_id_dst.
 
         Args:
             job_id_src: the job_id to get state from and clear

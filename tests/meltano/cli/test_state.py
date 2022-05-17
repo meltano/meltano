@@ -196,13 +196,12 @@ class TestCliState:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for job_src_id in job_ids:
                 job_src_state = state_service.get_state(job_src_id)
-                job_dst_id = job_src_id + "-test-copy"
+                job_dst_id = "{0}-test-copy".format(job_src_id)
                 result = cli_runner.invoke(
                     cli,
                     ["state", "copy", job_src_id, job_dst_id, "--force"],
                 )
                 assert_cli_runner(result)
-                print(state_service.list_state().keys())
                 assert state_service.get_state(job_dst_id) == job_src_state
 
     def test_move(self, state_service, job_ids, cli_runner):
@@ -217,7 +216,7 @@ class TestCliState:
                     ["state", "move", job_src, job_dst, "--force"],
                 )
                 assert_cli_runner(result)
-                assert state_service.get_state(job_src) == {}
+                assert not state_service.get_state(job_src)
                 assert state_service.get_state(job_dst) == job_src_state
 
     def test_get(self, state_service, cli_runner, job_ids_with_expected_states):
