@@ -74,7 +74,7 @@ homepage_sample_code:
 
     # Reinstall with SDK-based variant:
     - meltano config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@fix-demo-project-ref
-    - meltano install tap-gitlab
+    - meltano install extractor tap-gitlab
     - mkdir -p ./api_caches
     - meltano config tap-gitlab set requests_cache_path '${MELTANO_PROJECT_ROOT}/api_caches/'
 
@@ -236,7 +236,7 @@ getting_started_sample_code:
 
     # Reinstall with SDK-based variant:
     - meltano config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@fix-demo-project-ref
-    - meltano install tap-gitlab
+    - meltano install extractor tap-gitlab
     - mkdir -p ./api_caches
     - meltano config tap-gitlab set requests_cache_path '${MELTANO_PROJECT_ROOT}/api_caches/'
 
