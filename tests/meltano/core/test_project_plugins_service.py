@@ -1,8 +1,37 @@
+import json
+from copy import deepcopy
+
 import pytest
 
-from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType
+from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_discovery_service import LockedDefinitionService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.settings_service import FeatureFlags
+
+
+@pytest.fixture
+def modified_lockfile(project: Project):
+    lockfile_path = project.plugin_lock_path(
+        PluginType.EXTRACTORS,
+        "tap-mock",
+        variant_name="meltano",
+    )
+    with lockfile_path.open() as lockfile:
+        original_contents = json.load(lockfile)
+
+    new_contents = deepcopy(original_contents)
+    new_contents["settings"].append({"name": "foo"})
+
+    with lockfile_path.open("w") as lockfile:
+        json.dump(new_contents, lockfile)
+
+    yield
+
+    with lockfile_path.open("w") as lockfile:
+        json.dump(original_contents, lockfile)
 
 
 class TestProjectPluginsService:
@@ -14,7 +43,9 @@ class TestProjectPluginsService:
         assert subject
 
     def test_plugins(self, subject):
-        assert all(isinstance(p.parent, BasePlugin) for p in subject.plugins())
+        assert all(
+            isinstance(plugin.parent, BasePlugin) for plugin in subject.plugins()
+        )
 
     def test_get_plugin(
         self, subject, tap, alternative_tap, inherited_tap, alternative_target
@@ -102,15 +133,46 @@ class TestProjectPluginsService:
         with pytest.raises(PluginParentNotFoundError):
             assert subject.get_parent(nonexistent_parent)
 
+    def test_get_parent_from_lockfile(
+        self,
+        subject: ProjectPluginsService,
+        tap: ProjectPlugin,
+        locked_definition_service: LockedDefinitionService,
+        modified_lockfile,
+    ):
+        expected = locked_definition_service.find_base_plugin(
+            plugin_type=PluginType.EXTRACTORS,
+            plugin_name="tap-mock",
+            variant="meltano",
+        )
+
+        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
+        result_no_ff = subject.get_parent(tap)
+        assert result_no_ff == expected
+        assert len(expected.settings) - len(result_no_ff.settings) == 1
+
+        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, True)
+        result = subject.get_parent(tap)
+        assert result == expected
+        assert result.settings == expected.settings
+        assert result.settings[-1].name == "foo"
+
+        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
+
     def test_update_plugin(self, subject, tap):
         # update a tap with a random value
         tap.config["test"] = 42
         outdated = subject.update_plugin(tap)
-        assert subject.get_plugin(tap).config["test"] == 42
+        assert (
+            subject.get_plugin(tap).config["test"]
+            == 42  # noqa: WPS432 (OK magic number)
+        )
 
         # revert back
         subject.update_plugin(outdated)
-        assert subject.get_plugin(tap).config == {}
+        assert (
+            subject.get_plugin(tap).config == {}  # noqa: WPS520 (OK compare with falsy)
+        )
 
     def test_find_plugins_by_mapping_name(self, subject, mapper):
         assert subject.find_plugins_by_mapping_name("mock-mapping-1") == [mapper]
