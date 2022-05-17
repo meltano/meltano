@@ -146,11 +146,13 @@ class TestProjectPluginsService:
             variant="meltano",
         )
 
+        # Feature flag off means definition is not retrieved from lockfile
         subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
         result_no_ff = subject.get_parent(tap)
         assert result_no_ff == expected
         assert len(expected.settings) - len(result_no_ff.settings) == 1
 
+        # Feature flag on means definition is indeed retrieved from lockfile
         subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, True)
         result = subject.get_parent(tap)
         assert result == expected
