@@ -36,7 +36,7 @@ class MeltanoInvoker:
         Returns:
             The complete process sting from subprocess.run().
         """
-        return subprocess.run(
+        return subprocess.run(  # noqa: S603
             [self._executable_path(command), *args],
             **kwargs,
             env=self._executable_env(env),
