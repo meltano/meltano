@@ -18,7 +18,7 @@ class TestPluginInstallService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://github.com/MeltanoLabs/tap-gitlab.git",
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
