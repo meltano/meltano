@@ -206,7 +206,7 @@ by checking the [Extractors list](https://hub.meltano.com/extractors/) or using 
     extractors:
     - name: tap-gitlab
       variant: meltanolabs
-      pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git@main
+      pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
     ```
 
     You can now continue to step 4.
@@ -427,7 +427,7 @@ to improve performance and save on bandwidth and storage.
       extractors:
       - name: tap-gitlab
         variant: meltanolabs
-        pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git@main
+        pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
     environments:
     - name: dev
       config:
