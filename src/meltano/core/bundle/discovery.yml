@@ -3176,6 +3176,7 @@ transformers:
       description: |
         The port to connect to.
     - name: dbname
+      alias: database
       kind: string
       description: |
         The db to connect to.
@@ -3183,6 +3184,22 @@ transformers:
       kind: string
       description: |
         The schema to use.
+    - name: keepalives_idle
+      kind: integer
+      description: |
+        Seconds between TCP keepalive packets.
+    - name: search_path
+      kind: string
+      description: |
+        Overrides the default search path.
+    - name: role
+      kind: string
+      description: |
+        Role for dbt to assume when executing queries.
+    - name: sslmode
+      type: array
+      description: |
+        sslmode used to connect to the database.
     commands:
       clean:
         args: clean
@@ -3245,6 +3262,7 @@ transformers:
       description: |
         The port to connect to.
     - name: dbname
+      alias: database
       kind: string
       description: |
         The name of the db to connect to.
@@ -3252,6 +3270,38 @@ transformers:
       kind: string
       description: |
         The schema to use.
+    - name: iam_profile
+      kind: string
+      description: |
+        The iam profile to use
+    - name: iam_duration_seconds
+      kind: integer
+      description: |
+        Duration of the iam session
+    - name: autocreate
+      kind: boolean
+      description: |
+        Whether or not to automatically create entities.
+    - name: db_groups
+      kind: array
+      description: |
+        DB groups to use.
+    - name: keepalives_idle
+      kind: integer
+      description: |
+        Seconds between TCP keepalive packets
+    - name: search_path
+      kind: string
+      description: |
+        The search path to use (use of this setting is not recommended)
+    - name: sslmode
+      kind: array
+      description: |
+        sslmode used to connect to redshift
+    - name: ra3_node
+      kind: boolean
+      description: |
+        Enables cross-database sources
     commands:
       clean:
         args: clean
@@ -3293,11 +3343,13 @@ transformers:
       description: |
         The auth method to use. One of: "oauth", "oauth-secrets", or "service-account"
     - name: project
+      alias: database
       kind: string
       description: |
         The BigQuery project ID.
     - name: dataset
       kind: string
+      alias: schema
       description: |
         The dataset to use.
     - name: refresh_token
@@ -3305,10 +3357,12 @@ transformers:
       description: |
         The refresh token, if authenticating via oauth-secrets method.
     - name: client_id
+      alias: user
       kind: string
       description: |
         The client id to use, if authenticating via oauth-secrets method.
     - name: client_secret
+      alias: password
       kind: password
       description: |
         The client secret to use, if authenticating via oauth-secrets method.
