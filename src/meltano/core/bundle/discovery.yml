@@ -3219,7 +3219,7 @@ transformers:
       env_aliases:
       - DBT_PROFILES_DIR
       # Redshift connection settings are set via `config:` blocks and mapped to `profiles.yml`
-    - name: method
+    - name: auth_method
       kind: string
       description: |
         The auth method to use (to use iam, set to "iam".
@@ -3288,7 +3288,7 @@ transformers:
       env_aliases:
       - DBT_PROFILES_DIR
       # BigQuery connection settings are set via `config:` blocks and mapped to `profiles.yml`
-    - name: method
+    - name: auth_method
       kind: string
       description: |
         The auth method to use. One of: "oauth", "oauth-secrets", or "service-account"
