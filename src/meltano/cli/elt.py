@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import platform
 from contextlib import contextmanager
 
 import click
@@ -103,13 +104,17 @@ async def elt(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    if platform.system() == "Windows":
+        raise CliError(
+            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
+        )
+
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
         job_id=job_id
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
-
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:

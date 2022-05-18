@@ -138,8 +138,9 @@ pytest_windows:
     - windows-1809
   before_script:
     - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-    - choco install -y python --version=$PYTHON_VERSION
-    - python -m pip install --user pipx 
+    - choco install python --version=$env:PYTHON_VERSION
+    - RefreshEnv
+    - python -m pip install --user pipx
     - python -m pipx ensurepath
     - RefreshEnv
     - pipx install poetry
