@@ -130,7 +130,7 @@ pytest_sqlite_concurrent:
 
 pytest_windows:
   extends:
-    - .pytest
+    - .parallel:python_image_version
     - .windows:defaults
   tags:
     - shared-windows
@@ -138,7 +138,7 @@ pytest_windows:
     - windows-1809
   before_script:
     - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-    - choco install python --version=$env:PYTHON_VERSION
+    - choco install python --version=$env:PYTHON_IMAGE_VERSION -y
     - RefreshEnv
     - python -m pip install --user pipx
     - python -m pipx ensurepath
