@@ -76,7 +76,7 @@ homepage_sample_code:
     - meltano add extractor tap-gitlab
 
     # Reinstall with SDK-based variant:
-    - meltano --no-environment config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@main
+    - meltano --no-environment config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@ignore-access-denied
     - cat meltano.yml
     - meltano --log-level=debug install --clean extractor tap-gitlab
     - echo "Cache dir is $TAP_GITLAB_REQUESTS_CACHE_PATH" && mkdir -p $TAP_GITLAB_REQUESTS_CACHE_PATH
@@ -240,7 +240,7 @@ getting_started_sample_code:
     - meltano add extractor tap-gitlab
 
     # Reinstall with SDK-based variant:
-    - meltano --no-environment config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@main
+    - meltano --no-environment config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@ignore-access-denied
     - cat meltano.yml
     - meltano --log-level=debug install --clean extractor tap-gitlab
     - echo "Cache dir is $TAP_GITLAB_REQUESTS_CACHE_PATH" && mkdir -p $TAP_GITLAB_REQUESTS_CACHE_PATH
