@@ -77,7 +77,7 @@ class PluginSettingsService(SettingsService):
         """
         return self.plugin.docs
 
-    def setting_env_vars(self, setting_def, for_writing=False):
+    def setting_env_vars(self, setting_def: SettingDefinition, for_writing=False):
         """Get environment variables for a setting.
 
         Args:
@@ -88,8 +88,9 @@ class PluginSettingsService(SettingsService):
             Environment variables for a setting.
         """
         return setting_def.env_vars(
-            self.plugin.env_prefixes(for_writing=for_writing),
+            prefixes=self.plugin.env_prefixes(for_writing=for_writing),
             include_custom=self.plugin.is_shadowing or for_writing,
+            for_writing=for_writing,
         )
 
     @property
