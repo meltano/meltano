@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import platform
 from contextlib import contextmanager
 
 import click
@@ -108,6 +109,11 @@ async def elt(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    if platform.system() == "Windows":
+        raise CliError(
+            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
+        )
+
     tracker = Tracker(project)
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
 
@@ -139,7 +145,6 @@ async def elt(
         job_id=state_id
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
-
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
