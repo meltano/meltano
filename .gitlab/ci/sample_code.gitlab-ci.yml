@@ -83,7 +83,9 @@ homepage_sample_code:
 
     # Configure tap-gitlab to extract data from...
     # - the https://gitlab.com/meltano/meltano project
+    - meltano config tap-gitlab set ignore_access_denied true    
     - meltano config tap-gitlab set projects meltano/meltano
+    - meltano config tap-gitlab set groups meltano
     # - going back to May 1st, 2020
     - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
@@ -251,7 +253,9 @@ getting_started_sample_code:
 
     - meltano config tap-gitlab list
 
+    - meltano config tap-gitlab set ignore_access_denied true    
     - meltano config tap-gitlab set projects meltano/meltano
+    - meltano config tap-gitlab set groups meltano
     - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
     - meltano config tap-gitlab
