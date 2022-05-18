@@ -1,7 +1,8 @@
 import json
 
-from asserts import assert_cli_runner
 from asynctest import CoroutineMock, mock
+
+from asserts import assert_cli_runner
 from meltano.cli import cli
 
 
@@ -49,7 +50,7 @@ class TestCliConfig:
             assert_cli_runner(result)
 
             json_config = json.loads(result.stdout)
-            assert json_config["send_anonymous_usage_stats"] == False
+            assert json_config["send_anonymous_usage_stats"] is True
             assert json_config["database_uri"] == engine_uri
             assert json_config["cli"]["log_level"] == "info"
 

@@ -170,14 +170,9 @@ class TestELBContextBuilder:
         assert target_env["MELTANO_LOADER_NAMESPACE"] == target_postgres.namespace
         assert target_env["MELTANO_LOADER_VARIANT"] == target_postgres.variant
 
-        assert (
-            target_env["MELTANO_LOAD_HOST"]
-            == target_env["PG_ADDRESS"]
-            == os.getenv("PG_ADDRESS", "localhost")
-        )
+        assert target_env["MELTANO_LOAD_HOST"] == "localhost"
         assert (
             target_env["MELTANO_LOAD_DEFAULT_TARGET_SCHEMA"]
-            == target_env["PG_SCHEMA"]
             == target_env["MELTANO_EXTRACT__LOAD_SCHEMA"]
             == target_env["MELTANO_EXTRACTOR_NAMESPACE"]
         )

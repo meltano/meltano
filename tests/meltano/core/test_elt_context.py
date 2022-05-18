@@ -1,6 +1,5 @@
-import os
-
 import pytest
+
 from meltano.core.plugin import PluginType, Variant
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
@@ -19,14 +18,9 @@ def assert_loader_env(loader, env):
     assert env["MELTANO_LOADER_NAMESPACE"] == loader.namespace
     assert env["MELTANO_LOADER_VARIANT"] == loader.variant
 
-    assert (
-        env["MELTANO_LOAD_HOST"]
-        == env["PG_ADDRESS"]
-        == os.getenv("PG_ADDRESS", "localhost")
-    )
+    assert env["MELTANO_LOAD_HOST"] == "localhost"
     assert (
         env["MELTANO_LOAD_DEFAULT_TARGET_SCHEMA"]
-        == env["PG_SCHEMA"]
         == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
         == env["MELTANO_EXTRACTOR_NAMESPACE"]
     )
@@ -36,7 +30,6 @@ def assert_transform_env(transform, env):
     assert env["MELTANO_TRANSFORM_NAME"] == transform.name
     assert env["MELTANO_TRANSFORM_NAMESPACE"] == transform.namespace
     assert env["MELTANO_TRANSFORM_VARIANT"] == Variant.ORIGINAL_NAME
-
     assert env["MELTANO_TRANSFORM__PACKAGE_NAME"] == "dbt_mock"
 
 
@@ -55,14 +48,7 @@ def assert_transformer_env(transformer, env):
         == env["DBT_TARGET_SCHEMA"]
         == "analytics"
     )
-    assert (
-        env["MELTANO_TRANSFORM_SOURCE_SCHEMA"]
-        == env["DBT_SOURCE_SCHEMA"]
-        == env["MELTANO_LOAD__TARGET_SCHEMA"]
-        == env["PG_SCHEMA"]
-        == env["MELTANO_EXTRACT__LOAD_SCHEMA"]
-        == env["MELTANO_EXTRACTOR_NAMESPACE"]
-    )
+    assert env["MELTANO_EXTRACT__LOAD_SCHEMA"] == env["MELTANO_EXTRACTOR_NAMESPACE"]
     assert env["MELTANO_TRANSFORM_MODELS"] == env["DBT_MODELS"]
 
     assert env["MELTANO_TRANSFORM__PACKAGE_NAME"] in env["DBT_MODELS"]

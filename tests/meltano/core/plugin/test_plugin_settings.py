@@ -163,22 +163,6 @@ class TestPluginSettingsService:
             SettingValueStore.DEFAULT,
         )
 
-        # Negated alias
-        monkeypatch.setenv("TAP_MOCK_DISABLED", "true")
-
-        assert subject.get_with_source("boolean", session=session) == (
-            False,
-            SettingValueStore.ENV,
-        )
-
-        # Regular alias
-        monkeypatch.setenv("TAP_MOCK_ENABLED", "on")
-
-        assert subject.get_with_source("boolean", session=session) == (
-            True,
-            SettingValueStore.ENV,
-        )
-
         # Preferred env var
         monkeypatch.setenv(env_var(subject, "boolean"), "0")
 
@@ -306,12 +290,6 @@ class TestPluginSettingsService:
         assert env_var(subject, "start_date") not in config
         assert env_var(subject, "secure") not in config
 
-        # Env aliases are present
-        assert config["TAP_MOCK_ENABLED"] == "true"
-
-        # Negated aliases are not
-        assert "TAP_MOCK_DISABLED" not in config
-
         # Generic env vars are present
         assert config["MELTANO_EXTRACT_TEST"] == "mock"
         assert config["MELTANO_EXTRACT_LIST"] == '[1, 2, 3, "4"]'
@@ -384,15 +362,11 @@ class TestPluginSettingsService:
         # For reading setting values from environment
         assert env_vars(service, "boolean") == [
             "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
-            "TAP_MOCK_ENABLED",  # Custom alias
-            "!TAP_MOCK_DISABLED",  # Custom alias
         ]
         # For writing values into the execution environment
         assert env_vars(service, "boolean", for_writing=True) == [
             "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
             "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
-            "TAP_MOCK_ENABLED",  # Custom alias
-            "!TAP_MOCK_DISABLED",  # Custom alias
         ]
 
         # Inheriting from base plugin
@@ -421,8 +395,6 @@ class TestPluginSettingsService:
             "TAP_MOCK_INHERITED_BOOLEAN",  # Name and namespace prefix
             "TAP_MOCK_BOOLEAN",  # Parent name and namespace prefix
             "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
-            "TAP_MOCK_ENABLED",  # Custom alias
-            "!TAP_MOCK_DISABLED",  # Custom alias
         ]
 
     def test_store_db(self, session, subject, tap):
@@ -486,16 +458,10 @@ class TestPluginSettingsService:
             SettingValueStore.DOTENV,
         )
 
-        dotenv.set_key(project.dotenv, "TAP_MOCK_DISABLED", "true")
-        dotenv.set_key(project.dotenv, "TAP_MOCK_ENABLED", "false")
-        assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
-
         subject.set("boolean", True, store=store)
 
         dotenv_contents = dotenv.dotenv_values(project.dotenv)
         assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "true"
-        assert "TAP_MOCK_DISABLED" not in dotenv_contents
-        assert "TAP_MOCK_ENABLED" not in dotenv_contents
         assert subject.get_with_source("boolean") == (True, SettingValueStore.DOTENV)
 
         subject.set("list", [1, 2, 3, "4"], store=store)

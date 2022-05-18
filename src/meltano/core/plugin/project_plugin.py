@@ -254,7 +254,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return uniques_in(prefixes)
 
     @property
-    def extra_config(self) -> list[str, Any]:
+    def extra_config(self) -> dict[str, Any]:
         """Return plugin extra config.
 
         Returns:
@@ -263,7 +263,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
-    def config_with_extras(self) -> list[str, Any]:
+    def config_with_extras(self) -> dict[str, Any]:
         """Return config with extras.
 
         Returns:
