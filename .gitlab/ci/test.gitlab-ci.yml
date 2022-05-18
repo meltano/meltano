@@ -136,6 +136,11 @@ pytest_windows:
     - shared-windows
     - windows
     - windows-1809
+  script:
+    - poetry run pytest -v --cov-report= --cov meltano -m $env:PYTEST_MARKERS
+    - poetry run coverage combine .coverage
+    - poetry run coverage report
+    - poetry run coverage html
   before_script:
     - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
     - choco install python --version=$env:PYTHON_IMAGE_VERSION -y
@@ -144,3 +149,6 @@ pytest_windows:
     - python -m pipx ensurepath
     - RefreshEnv
     - pipx install poetry
+    - poetry install
+  variables:
+    PYTEST_MARKERS: not concurrent
