@@ -33,7 +33,7 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
     cd meltano-projects
     ```
 
-1. Install the [pipx](https://pipxproject.github.io/pipx/) package manager:
+1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
     ```bash
     python3 -m install --user pipx
@@ -42,7 +42,7 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
     source ~/.bashrc 
     ```
     <div class="notification is-info">
-        <p>For windows instead of source ~/.bashrc, you'll want to open a new powershell instance.</p>
+        <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
     </div>
 
 1. Install the [`meltano` package from PyPI](https://pypi.org/project/meltano/):

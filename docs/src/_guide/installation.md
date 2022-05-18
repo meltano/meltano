@@ -42,7 +42,7 @@ python --version
 #### Install pipx
 
 `pip` is a package installer that comes automatically with Python 3+.
-[pipx](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
+[pipx](https://pypa.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
 
 ```bash
 # install pipx and ensure it is on the path
@@ -53,7 +53,7 @@ source ~/.bashrc
 ```
 
 <div class="notification is-info">
-    <p>For windows instead of source ~/.bashrc, you'll want to open up a new powershell instance.</p>
+    <p>For Windows, instead of source ~/.bashrc, you'll want to open up a new PowerShell instance.</p>
 </div>
 
 <div class="notification is-info">
@@ -65,7 +65,7 @@ difficult to manage. The pipx installer automatically creates a virtual environm
 
 ### Install Meltano
 
-Now that you have [pipx](https://pipxproject.github.io/pipx) installed, run the following command to install the Meltano package into its
+Now that you have [pipx](https://pypa.github.io/pipx/) installed, run the following command to install the Meltano package into its
 own pipx-backed virtual environment:
 
 ```bash
