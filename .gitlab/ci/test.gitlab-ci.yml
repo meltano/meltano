@@ -130,7 +130,7 @@ pytest_sqlite_concurrent:
 
 pytest_windows:
   extends:
-    - .parallel:python_image_version
+    - .pytest
     - .windows:defaults
   tags:
     - shared-windows
