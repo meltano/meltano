@@ -14,7 +14,11 @@ from .config_service import ConfigService
 from .plugin import PluginRef, PluginType
 from .plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import LockedDefinitionService, PluginDiscoveryService
+from .plugin_discovery_service import (
+    LockedDefinitionService,
+    MeltanoHubService,
+    PluginDiscoveryService,
+)
 from .project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -43,6 +47,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
         lock_service: PluginLockService = None,
         discovery_service: PluginDiscoveryService = None,
         locked_definition_service: LockedDefinitionService = None,
+        hub_service: MeltanoHubService = None,
         use_cache: bool = True,
     ):
         """Create a new Project Plugins Service.
@@ -53,6 +58,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
             lock_service: The Meltano Plugin Lock Service.
             discovery_service: The Meltano Plugin Discovery Service.
             locked_definition_service: The Meltano Locked Definition Service.
+            hub_service: The Meltano Hub Service.
             use_cache: Whether to use the plugin cache.
         """
         self.project = project
@@ -66,6 +72,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
         self.locked_definition_service = (
             locked_definition_service or LockedDefinitionService(project)
         )
+        self.hub_service = hub_service or MeltanoHubService(project)
 
         self._current_plugins = None
         self._use_cache = use_cache
@@ -436,7 +443,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
             logger.debug("Lockfile is feature-flagged", status=allowed)
 
         try:
-            return self.discovery_service.get_base_plugin(plugin)
+            return self.hub_service.get_base_plugin(plugin, variant_name=plugin.variant)
         except PluginNotFoundError as err:
             if plugin.inherit_from:
                 raise PluginParentNotFoundError(plugin, err) from err
