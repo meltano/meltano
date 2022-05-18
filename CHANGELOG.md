@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
+ 
 
 ## Unreleased
 ---
@@ -11,6 +11,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
+- [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+## 1.104.0 - (2022-05-13)
+---
+
+### New
+
 - [#3031](https://gitlab.com/meltano/meltano/-/issues/3031) Add lock artifacts during `meltano add` for stability and portability of plugin definitions.
 
 ### Changes
@@ -20,7 +33,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3468](https://gitlab.com/meltano/meltano/-/issues/3468) Fixes bug where container spec's entrypoint was not passed along to the Docker runtime.
 
-### Breaks
 
 ## 1.103.1 - (2022-05-05)
 ---

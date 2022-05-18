@@ -743,5 +743,8 @@ def state_service(job_history_session):
 @pytest.fixture
 def project_with_environment(project: Project) -> Project:
     project.activate_environment("dev")
+    project.active_environment.env[
+        "ENVIRONMENT_ENV_VAR"
+    ] = "${MELTANO_PROJECT_ROOT}/file.txt"
     yield project
     project.active_environment = None
