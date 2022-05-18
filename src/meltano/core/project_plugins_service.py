@@ -6,47 +6,90 @@ from typing import Generator, List, Optional
 import structlog
 
 from meltano.core.environment import Environment, EnvironmentPluginConfig
+from meltano.core.plugin_lock_service import PluginLockService
+from meltano.core.project_settings_service import ProjectSettingsService
 
 from .config_service import ConfigService
 from .plugin import PluginRef, PluginType
 from .plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import PluginDiscoveryService
+from .plugin_discovery_service import LockedDefinitionService, PluginDiscoveryService
 from .project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
 class PluginAlreadyAddedException(Exception):
+    """Raised when a plugin is already added to the project."""
+
     def __init__(self, plugin: PluginRef):
+        """Create a new Plugin Already Added Exception.
+
+        Args:
+            plugin: The plugin that was already added.
+        """
         self.plugin = plugin
         super().__init__()
 
 
-class ProjectPluginsService:
+class ProjectPluginsService:  # noqa: WPS214 (too many methods)
+    """Project Plugins Service."""
+
     def __init__(
         self,
         project: Project,
         config_service: ConfigService = None,
+        lock_service: PluginLockService = None,
         discovery_service: PluginDiscoveryService = None,
-        use_cache=True,
+        locked_definition_service: LockedDefinitionService = None,
+        use_cache: bool = True,
     ):
+        """Create a new Project Plugins Service.
+
+        Args:
+            project: The Meltano project.
+            config_service: The Meltano Config Service.
+            lock_service: The Meltano Plugin Lock Service.
+            discovery_service: The Meltano Plugin Discovery Service.
+            locked_definition_service: The Meltano Locked Definition Service.
+            use_cache: Whether to use the plugin cache.
+        """
         self.project = project
 
         self.config_service = config_service or ConfigService(project)
         self.discovery_service = discovery_service or PluginDiscoveryService(project)
+        self.lock_service = lock_service or PluginLockService(
+            project,
+            self.discovery_service,
+        )
+        self.locked_definition_service = (
+            locked_definition_service or LockedDefinitionService(project)
+        )
 
         self._current_plugins = None
         self._use_cache = use_cache
 
+        settings_service = ProjectSettingsService(project)
+        self._use_lockfiles = settings_service.get("ff.lock_file", default=False)
+
     @property
     def current_plugins(self):
+        """Return the current plugins.
+
+        Returns:
+            The current plugins.
+        """
         if self._current_plugins is None or not self._use_cache:
             self._current_plugins = self.config_service.current_meltano_yml.plugins
         return self._current_plugins
 
     @contextmanager
     def update_plugins(self):
+        """Update the current plugins.
+
+        Yields:
+            The current plugins.
+        """
         with self.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
@@ -63,6 +106,17 @@ class ProjectPluginsService:
             yield meltano_yml.environments
 
     def add_to_file(self, plugin: ProjectPlugin):
+        """Add plugin to `meltano.yml`.
+
+        Args:
+            plugin: The plugin to add.
+
+        Raises:
+            PluginAlreadyAddedException: If the plugin is already added.
+
+        Returns:
+            The added plugin.
+        """
         if not plugin.should_add_to_file():
             return plugin
 
@@ -145,7 +199,7 @@ class ProjectPluginsService:
                 plugin
                 for plugin in self.plugins(ensure_parent=False)
                 if (
-                    plugin.name == plugin_name
+                    plugin.name == plugin_name  # noqa: WPS222 (with too much logic)
                     and (plugin_type is None or plugin.type == plugin_type)
                     and (
                         invokable is None
@@ -287,10 +341,20 @@ class ProjectPluginsService:
         )
 
     def update_plugin(self, plugin: ProjectPlugin):
+        """Update a plugin.
+
+        Args:
+            plugin: The plugin to update.
+
+        Returns:
+            The outdated plugin.
+        """
         with self.update_plugins() as plugins:
             # find the proper plugin to update
             idx, outdated = next(
-                (i, it) for i, it in enumerate(plugins[plugin.type]) if it == plugin
+                (idx, plg)
+                for idx, plg in enumerate(plugins[plugin.type])
+                if plg == plugin
             )
 
             plugins[plugin.type][idx] = plugin
@@ -355,6 +419,12 @@ class ProjectPluginsService:
                 )
             except PluginNotFoundError:
                 pass
+
+        if self._use_lockfiles:
+            try:
+                return self.locked_definition_service.get_base_plugin(plugin)
+            except PluginNotFoundError as exc:
+                logger.debug("A plugin lockfile could not be found", exc_info=exc)
 
         try:
             return self.discovery_service.get_base_plugin(plugin)

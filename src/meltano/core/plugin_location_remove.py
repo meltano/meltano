@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 
 import sqlalchemy
+
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -27,7 +28,12 @@ class PluginLocationRemoveManager(ABC):
     """Handle removal of a plugin from a given location."""
 
     def __init__(self, plugin: ProjectPlugin, location):
-        """Construct a PluginLocationRemoveManager instance."""
+        """Construct a PluginLocationRemoveManager instance.
+
+        Args:
+            plugin: The plugin to remove.
+            location: The location to remove the plugin from.
+        """
         self.plugin = plugin
         self.plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
         self.location = location
@@ -41,17 +47,29 @@ class PluginLocationRemoveManager(ABC):
 
     @property
     def plugin_removed(self) -> bool:
-        """Wether or not the plugin was successfully removed."""
+        """Wether or not the plugin was successfully removed.
+
+        Returns:
+            True if the plugin was successfully removed, False otherwise.
+        """
         return self.remove_status is PluginLocationRemoveStatus.REMOVED
 
     @property
     def plugin_not_found(self) -> bool:
-        """Wether or not the plugin was not found to remove."""
+        """Wether or not the plugin was not found to remove.
+
+        Returns:
+            True if the plugin was not found, False otherwise.
+        """
         return self.remove_status is PluginLocationRemoveStatus.NOT_FOUND
 
     @property
     def plugin_error(self) -> bool:
-        """Wether or not an error was encountered the plugin removal process."""
+        """Wether or not an error was encountered the plugin removal process.
+
+        Returns:
+            True if an error was encountered, False otherwise.
+        """
         return self.remove_status is PluginLocationRemoveStatus.ERROR
 
 
@@ -59,13 +77,22 @@ class DbRemoveManager(PluginLocationRemoveManager):
     """Handle removal of a plugin's settings from the system database `plugin_settings` table."""
 
     def __init__(self, plugin, project):
-        """Construct a DbRemoveManager instance."""
+        """Construct a DbRemoveManager instance.
+
+        Args:
+            plugin: The plugin to remove.
+            project: The Meltano project.
+        """
         super().__init__(plugin, "system database")
         self.plugins_settings_service = PluginSettingsService(project, plugin)
         self.session = project_engine(project)[1]
 
     def remove(self):
-        """Remove the plugin's settings from the system database `plugin_settings` table."""
+        """Remove the plugin's settings from the system database `plugin_settings` table.
+
+        Returns:
+            The remove status.
+        """
         session = self.session()
         try:
             self.plugins_settings_service.reset(
@@ -83,7 +110,12 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
     """Handle removal of a plugin from `meltano.yml`."""
 
     def __init__(self, plugin, project: Project):
-        """Construct a MeltanoYmlRemoveManager instance."""
+        """Construct a MeltanoYmlRemoveManager instance.
+
+        Args:
+            plugin: The plugin to remove.
+            project: The Meltano project.
+        """
         super().__init__(plugin, str(project.meltanofile.relative_to(project.root)))
         self.project_plugins_service = ProjectPluginsService(project)
 
@@ -102,11 +134,45 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
         self.remove_status = PluginLocationRemoveStatus.REMOVED
 
 
+class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
+    """Handle removal of a plugin locked definition from `plugins/`."""
+
+    def __init__(self, plugin, project: Project):
+        """Construct a LockedDefinitionRemoveManager instance.
+
+        Args:
+            plugin: The plugin to remove.
+            project: The Meltano project.
+        """
+        path = project.plugin_lock_path(plugin.type, plugin.name, plugin.variant)
+        super().__init__(plugin, str(path))
+        self.path = path
+
+    def remove(self):
+        """Remove the plugin from `plugins/`."""
+        try:
+            self.path.unlink()
+        except FileNotFoundError:
+            self.remove_status = PluginLocationRemoveStatus.NOT_FOUND
+            return
+        except OSError as err:
+            self.remove_status = PluginLocationRemoveStatus.ERROR
+            self.message = err.strerror
+            return
+
+        self.remove_status = PluginLocationRemoveStatus.REMOVED
+
+
 class InstallationRemoveManager(PluginLocationRemoveManager):
     """Handle removal of a plugin installation from `.meltano`."""
 
     def __init__(self, plugin, project: Project):
-        """Construct a InstallationRemoveManager instance."""
+        """Construct a InstallationRemoveManager instance.
+
+        Args:
+            plugin: The plugin to remove.
+            project: The Meltano project.
+        """
         path = project.plugin_dir(plugin, make_dirs=False)
         super().__init__(plugin, str(path.parent.relative_to(project.root)))
         self.path = path
