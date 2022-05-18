@@ -432,8 +432,8 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
                     )
                 except PluginNotFoundError as exc:
                     logger.debug("A plugin lockfile could not be found", exc_info=exc)
-            else:
-                logger.debug("Lockfiles feature is not enabled")
+
+            logger.debug("Lockfile is feature-flagged", status=allowed)
 
         try:
             return self.discovery_service.get_base_plugin(plugin)
