@@ -3,7 +3,6 @@ settings:
 - name: send_anonymous_usage_stats
   kind: boolean
   value: true
-  env_aliases: ["!MELTANO_DISABLE_TRACKING"]
 - name: project_id
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
@@ -47,12 +46,10 @@ settings:
 # UI server
 - name: ui.bind_host
   value: "0.0.0.0"
-  env_aliases: [MELTANO_API_HOSTNAME]
   env_specific: true
 - name: ui.bind_port
   kind: integer
   value: 5000
-  env_aliases: [MELTANO_API_PORT, PORT]
   env_specific: true
 - name: ui.server_name
   env_specific: true
@@ -71,23 +68,19 @@ settings:
 - name: ui.workers
   kind: integer
   value: 4
-  env_aliases: [WORKERS, WEB_CONCURRENCY]
   env_specific: true
 - name: ui.forwarded_allow_ips
   value: "127.0.0.1"
-  env_aliases: [FORWARDED_ALLOW_IPS]
   env_specific: true
 
 # UI features
 - name: ui.readonly
   kind: boolean
   value: false
-  env_aliases: [MELTANO_READONLY]
   env_specific: true
 - name: ui.authentication
   kind: boolean
   value: false
-  env_aliases: [MELTANO_AUTHENTICATION]
   env_specific: true
 - name: ui.anonymous_readonly
   kind: boolean
@@ -96,7 +89,6 @@ settings:
 - name: ui.notification
   kind: boolean
   value: false
-  env_aliases: [MELTANO_NOTIFICATION]
   env_specific: true
 - name: ui.analysis
   kind: boolean
@@ -155,35 +147,28 @@ settings:
   env_specific: true
 - name: oauth_service.google_adwords.client_id
   env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-  env_aliases: [TAP_ADWORDS_OAUTH_CLIENT_ID]
   env_specific: true
 - name: oauth_service.google_adwords.client_secret
   kind: password
   env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
-  env_aliases: [TAP_ADWORDS_OAUTH_CLIENT_SECRET]
   env_specific: true
 
 # OAuth Single-Sign-On
 - name: oauth.gitlab.client_id
   env: OAUTH_GITLAB_CLIENT_ID
-  env_aliases: [OAUTH_GITLAB_APPLICATION_ID]
   env_specific: true
 - name: oauth.gitlab.client_secret
   kind: password
   env: OAUTH_GITLAB_CLIENT_SECRET
   env_specific: true
-  env_aliases: [OAUTH_GITLAB_SECRET]
 
 # Analytics Tracking IDs
 - name: tracking_ids.cli
   value: UA-132758957-3
-  env_aliases: [MELTANO_CLI_TRACKING_ID]
 - name: tracking_ids.ui
   value: UA-132758957-2
-  env_aliases: [MELTANO_UI_TRACKING_ID]
 - name: tracking_ids.ui_embed
   value: UA-132758957-6
-  env_aliases: [MELTANO_EMBED_TRACKING_ID]
 
 # Snowplow Tracking
 - name: snowplow.collector_endpoints

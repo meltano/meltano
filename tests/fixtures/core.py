@@ -68,11 +68,7 @@ def discovery():  # noqa: WPS213
                             "value": {"nested": "from_default"},
                         },
                         {"name": "hidden", "kind": "hidden", "value": 42},
-                        {
-                            "name": "boolean",
-                            "kind": "boolean",
-                            "env_aliases": ["TAP_MOCK_ENABLED", "!TAP_MOCK_DISABLED"],
-                        },
+                        {"name": "boolean", "kind": "boolean"},
                         {"name": "auth.username"},
                         {"name": "auth.password", "kind": "password"},
                     ],

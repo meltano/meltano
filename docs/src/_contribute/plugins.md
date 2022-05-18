@@ -36,6 +36,7 @@ It is recommended to add a `label`, `logo_url`, and `description` to the plugin 
 Most of the time, variant definitions should also have a `settings` array with [setting definitions](#setting-definitions).
 
 Additionally:
+
 - `capabilities` should be specified for extractor variants,
 - non-default variant executable names can be specified using `executable`, and
 - default values for [plugin extras](/guide/configuration#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
@@ -61,7 +62,7 @@ Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `s
     - name: setting_name # Required (must match the connector setting name)
       aliases: [alternative_setting_name] # Optional (alternative names that can be used in `meltano.yml` and with `meltano config set`)
       label: Setting Name # Optional (human friendly text display of the setting name)
-      value: '' # Optional (Use to set a default value)
+      value: "" # Optional (Use to set a default value)
       placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
       kind: string # Optional (Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden`)
       description: Setting description # Optional (Use to provide inline context)
@@ -69,7 +70,6 @@ Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `s
       documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
       env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
-      env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
       value_processor: nest_object # Optional (Modify value after loading it from source: env, meltano.yml, system database. Target type needs to match `kind`. Options: `nest_object`, `upcase_string`)
       value_post_processor: stringify # Optional (Modify loaded value before passing it to plugin. Target type does not need to match `kind`. Options: `stringify`)
 ```
