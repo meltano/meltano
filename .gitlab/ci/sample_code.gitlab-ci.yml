@@ -77,7 +77,8 @@ homepage_sample_code:
 
     # Reinstall with SDK-based variant:
     - meltano config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@main
-    - meltano install --clean extractor tap-gitlab
+    - cat meltano.yml
+    - meltano --log-level=debug install --clean extractor tap-gitlab
     - echo "Cache dir is $TAP_GITLAB_REQUESTS_CACHE_PATH" && mkdir -p $TAP_GITLAB_REQUESTS_CACHE_PATH
 
     # Configure tap-gitlab to extract data from...
@@ -240,7 +241,8 @@ getting_started_sample_code:
 
     # Reinstall with SDK-based variant:
     - meltano config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@main
-    - meltano install --clean extractor tap-gitlab
+    - cat meltano.yml
+    - meltano --log-level=debug install --clean extractor tap-gitlab
     - echo "Cache dir is $TAP_GITLAB_REQUESTS_CACHE_PATH" && mkdir -p $TAP_GITLAB_REQUESTS_CACHE_PATH
 
     - printf "tap_covid_19\ntap-covid-19\ntap-covid-19\ncatalog,discover,state\napi_token,user_agent,start_date\n" | meltano add --custom extractor tap-covid-19
