@@ -785,81 +785,81 @@ export MELTANO_MAIL_SERVER=smtp.example.com
 
 ### `mail.port`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_PORT`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_PORT`
 - Default: `1025`
 
 ```bash
 meltano config meltano set mail port 25
 
-export MAIL_PORT=25
+export MELTANO_MAIL_PORT=25
 ```
 
 ### `mail.default_sender`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_DEFAULT_SENDER`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_DEFAULT_SENDER`
 - Default: `"Meltano" <bot@meltano.com>`
 
 ```bash
 meltano config meltano set mail default_sender '"Example Meltano" <bot@meltano.example.com>'
 
-export MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
+export MELTANO_MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
 ```
 
 ### `mail.use_tls`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_USE_TLS`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_USE_TLS`
 - Default: `false`
 
 ```bash
 meltano config meltano set mail use_tls true
 
-export MAIL_USE_TLS=true
+export MELTANO_MAIL_USE_TLS=true
 ```
 
 ### `mail.username`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_USERNAME`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_USERNAME`
 - Default: None
 
 ```bash
 meltano config meltano set mail username meltano
 
-export MAIL_USERNAME=meltano
+export MELTANO_MAIL_USERNAME=meltano
 ```
 
 ### `mail.password`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_PASSWORD`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_PASSWORD`
 - Default: None
 
 ```bash
 meltano config meltano set mail password meltano
 
-export MAIL_PASSWORD=meltano
+export MELTANO_MAIL_PASSWORD=meltano
 ```
 
 ### `mail.debug`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_DEBUG`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_DEBUG`
 - Default: `false`
 
 ```bash
 meltano config meltano set mail debug true
 
-export MAIL_DEBUG=true
+export MELTANO_MAIL_DEBUG=true
 ```
 
 ### `mail.sendgrid_unsubscribe_group_id`
 
 If you are using the SendGrid SMTP API you may optionally set the [SendGrid unsubscribe group ID](https://docs.sendgrid.com/ui/sending-email/unsubscribe-groups).
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
 - Default: `12751`
 
 ```bash
 meltano config meltano set mail sendgrid_unsubscribe_group_id 42
 
-export MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
+export MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
 ```
 
 ## OAuth Service

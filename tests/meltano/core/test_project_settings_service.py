@@ -1,5 +1,5 @@
 import pytest
-from meltano.core.project import Project
+
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
@@ -38,9 +38,9 @@ class TestProjectSettingsService:
 
         assert_value_source("from_dotenv", SettingValueStore.DOTENV)
 
-        with monkeypatch.context() as m:
+        with monkeypatch.context() as mky:
             env_key = subject.setting_env(subject.find_setting("project_id"))
-            m.setenv(env_key, "from_env")
+            mky.setenv(env_key, "from_env")
 
             assert_value_source("from_env", SettingValueStore.ENV)
 
@@ -64,8 +64,8 @@ class TestProjectSettingsService:
 
         assert_value_source("from_ui_cfg", SettingValueStore.ENV)
 
-        with monkeypatch.context() as m:
-            m.setenv(
+        with monkeypatch.context() as mky:
+            mky.setenv(
                 subject.setting_env(subject.find_setting("ui.server_name")), "from_env"
             )
 
