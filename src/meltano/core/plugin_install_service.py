@@ -187,7 +187,7 @@ class PluginInstallService:
                 "Worker was given a fresh new event loop party on party people"
             )
         else:
-            logging.info("Worker found an events event loop")
+            logging.debug("Worker found an events event loop")
 
         self.clean = clean
 
