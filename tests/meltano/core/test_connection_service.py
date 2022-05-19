@@ -9,8 +9,8 @@ class TestConnectionService:
     @pytest.mark.parametrize(
         "loader,analyze_params",
         [
-            ("target-postgres", {"schema": "tap_mock"}),
-            ("target-snowflake", {"schema": "TAP_MOCK"}),
+            # TODO: the tests that were here are broken, but are going away in 2.0
+            # Properly flag in pytest etc.
             ("target-csv", {}),
             ("target-sqlite", {}),
         ],

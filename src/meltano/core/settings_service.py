@@ -348,6 +348,7 @@ class SettingsService(ABC):  # noqa: WPS214
                 metadata["expanded"] = True
                 metadata["unexpanded_value"] = value
                 value = expanded_value
+                pass
 
         if setting_def:
             if (
@@ -385,6 +386,7 @@ class SettingsService(ABC):  # noqa: WPS214
             if cast_value != value:
                 metadata["uncast_value"] = value
                 value = cast_value
+                pass
 
             # we don't want to leak secure informations
             # so we redact all `passwords`
