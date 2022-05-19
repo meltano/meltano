@@ -31,7 +31,7 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 ### <a name="send-anonymous-usage-stats"></a>`send_anonymous_usage_stats`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`, alias: `!MELTANO_DISABLE_TRACKING` (implies value `false`)
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
 - [`meltano init`](/reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
@@ -59,7 +59,7 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 
 - When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
-- To disable tracking in all projects in one go, enable the `MELTANO_DISABLE_TRACKING` environment variable
+- To disable tracking in all projects in one go, disable the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable
 
 #### How to use
 
@@ -67,7 +67,6 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 meltano config meltano set send_anonymous_usage_stats false
 
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
-export MELTANO_DISABLE_TRACKING=true
 
 meltano init --no_usage_stats demo-project
 ```
@@ -173,7 +172,6 @@ If you dont target a schema then by default PostgreSQL will try to use the `publ
 postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
 ```
 
-
 ### `database_max_retries`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DATABASE_MAX_RETRIES`
@@ -226,6 +224,7 @@ can still be used to store configuration in the [system database](/concepts/proj
 but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
+
 1. it does not block write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
 2. it also affects the [CLI](/reference/command-line-interface).
 
@@ -267,6 +266,7 @@ export MELTANO_DISCOVERY_URL=false
 The value of the `Authorization` header sent when making a request to [`discovery_url`](#discovery-url).
 
 No `Authorization` header is applied under the following conditions:
+
 - `discovery_url_auth` is not set
 - `discovery_url_auth` is set to `false`, `null` or an empty string
 
@@ -310,7 +310,7 @@ meltano --log-level=debug ...
 - `meltano` CLI option: `--log-config`
 - Default: `logging.yaml`
 
-The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging *if present*.
+The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_.
 
 #### How to use
 
@@ -633,12 +633,13 @@ These settings can be used to enable certain features of [Meltano UI](/reference
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
 - Default: `false`
 
-To block all write actions in the Meltano UI, you can run it in in *read-only* mode.
+To block all write actions in the Meltano UI, you can run it in in _read-only_ mode.
 
 If you're enabling the [`ui.authentication` setting](#ui-authentication) and would
 like to only use read-only mode for anonymous users, enable the [`ui.anonymous_readonly` setting](#ui-anonymous-readonly) instead.
 
 This setting differs from the [`project_readonly` setting](#project-readonly) in two ways:
+
 1. it also blocks write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
 2. it does not affect the [CLI](/reference/command-line-interface).
 
@@ -659,6 +660,7 @@ export MELTANO_READONLY=true
 Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
 
 Additionally, you will need to:
+
 1. Ensure your configuration is secure by setting the [`ui.secret_key`](#ui-secret-key) and [`ui.password_salt`](#ui-password-salt) settings, as well as [`ui.server_name`](#ui-server-name) or [`ui.session_cookie_domain`](#ui-session-cookie-domain), manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup).
 
 2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
@@ -732,6 +734,7 @@ export MELTANO_NOTIFICATION=true
 
 If you want to use Meltano for more than data integration (and transformation),
 you can enable this setting to show all functionality related to Analysis from the UI:
+
 - "Explore" and "Dashboards" tabs
 - "Explore" buttons in the "Pipelines" list and "Pipeline Run Log" modal
 
