@@ -13,28 +13,6 @@ from meltano.core.behavior.canonical import Canonical
 
 logger = structlog.getLogger(__name__)
 
-TASKS_JSON_SCHEMA2 = {
-    "oneOf": [{"type": "string"}, {"$ref": "#/$defs/all-the-things"}],
-    "$defs": {
-        "all-the-things": {
-            "type": "array",
-            "items": {
-                "oneOf": [
-                    {"type": "string"},
-                    {
-                        "type": "array",
-                        "items": {
-                            "oneOf": [
-                                {"type": "string"},
-                            ]
-                        },
-                    },
-                ]
-            },
-        },
-    },
-}
-
 
 TASKS_JSON_SCHEMA = {
     "oneOf": [
