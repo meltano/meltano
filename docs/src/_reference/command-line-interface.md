@@ -703,7 +703,7 @@ are run sequentially. You can run a specified job by passing the job name as an 
 # Add a job with a single task representing a run command
 meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
 
-# Add a new job with multiple tasks by passing arrays in yaml format, where each item representing a run command. 
+# Add a new job with multiple tasks by passing arrays in yaml format, where each item representing a run command.
 meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
 
 # Update an existing job with new tasks
