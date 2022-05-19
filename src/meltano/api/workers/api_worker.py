@@ -6,6 +6,7 @@ import threading
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils.pidfile import PIDFile
 
 
@@ -25,89 +26,99 @@ class APIWorker(threading.Thread):
         self.project = project
         self.reload = reload
         self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
-        self.start_uvicorn = ProjectSettingsService(self.project.find()).get(
-            "ff.start_uvicorn", False
-        )
+        self.settings_service = ProjectSettingsService(self.project.find())
 
     def run(self):
         """Run the initalized API Workers with the App Server requested."""
-        # Use Uvicorn when on Windows
-        if platform.system() == "Windows":
-            if self.start_uvicorn:
-                logging.info(
-                    "Thank you for setting ff.start_uvicorn. Tell your friends to give it a try."
-                )
-            else:
-                logging.error("Windows OS detected auto setting ff.start_uvicorn")
-                logging.error(
-                    "Add ff.start_uvicorn: True to your meltano.yml to supress this error"
-                )
-                self.start_uvicorn = True
+        with self.settings_service.feature_flag(
+            FeatureFlags.STARTUVICORN, raise_error=False
+        ) as allow:
 
-        # Start uvicorn to serve API and Ui
-        if self.start_uvicorn:
-            settings_for_apiworker = ProjectSettingsService(self.project.find())
+            start_uvicorn = allow
 
-            arg_bind_host = str(settings_for_apiworker.get("ui.bind_host"))
-            arg_bind_port = str(settings_for_apiworker.get("ui.bind_port"))
-            arg_loglevel = str(settings_for_apiworker.get("cli.log_level"))
-            arg_forwarded_allow_ips = str(
-                settings_for_apiworker.get("ui.forwarded_allow_ips")
-            )
-
-            # If windows and 127.0.0.1 only allowed changing bind host to accomidate
+            # Use Uvicorn when on Windows
             if platform.system() == "Windows":
-                if (
-                    arg_forwarded_allow_ips == "127.0.0.1"
-                    and arg_bind_host == "0.0.0.0"  # noqa: S104
-                ):
-                    # If left at 0.0.0.0 the server will respond to any request receieved on any interface
-                    arg_bind_host = "127.0.0.1"
+                if start_uvicorn:
+                    logging.info(
+                        "Thank you for setting ff.start_uvicorn. Tell your friends to give it a try."
+                    )
+                else:
+                    logging.error("Windows OS detected auto setting ff.start_uvicorn")
+                    logging.error(
+                        "Add ff.start_uvicorn: True to your meltano.yml to supress this error"
+                    )
+                    start_uvicorn = True
 
-            # Setup args for uvicorn using bind info from the project setings service
-            args = [
-                "--host",
-                arg_bind_host,
-                "--port",
-                arg_bind_port,
-                "--loop",
-                "asyncio",
-                "--interface",
-                "wsgi",
-                "--log-level",
-                arg_loglevel,
-                "--forwarded-allow-ips",
-                arg_forwarded_allow_ips,
-                "--timeout-keep-alive",
-                "600",
-            ]
+            # Start uvicorn to serve API and Ui
+            if start_uvicorn:
+                settings_for_apiworker = self.settings_service
 
-            # Start uvicorn using the MeltanoInvoker
-            if self.reload:
+                arg_bind_host = str(settings_for_apiworker.get("ui.bind_host"))
+                arg_bind_port = str(settings_for_apiworker.get("ui.bind_port"))
+                arg_loglevel = str(settings_for_apiworker.get("cli.log_level"))
+                arg_forwarded_allow_ips = str(
+                    settings_for_apiworker.get("ui.forwarded_allow_ips")
+                )
 
-                args += [
-                    "--reload",
+                # If windows and 127.0.0.1 only allowed changing bind host to accomidate
+                if platform.system() == "Windows":
+                    if (
+                        arg_forwarded_allow_ips == "127.0.0.1"
+                        and arg_bind_host == "0.0.0.0"  # noqa: S104
+                    ):
+                        # If left at 0.0.0.0 the server will respond to any request receieved on any interface
+                        arg_bind_host = "127.0.0.1"
+
+                # Setup args for uvicorn using bind info from the project setings service
+                args = [
+                    "--host",
+                    arg_bind_host,
+                    "--port",
+                    arg_bind_port,
+                    "--loop",
+                    "asyncio",
+                    "--interface",
+                    "wsgi",
+                    "--log-level",
+                    arg_loglevel,
+                    "--forwarded-allow-ips",
+                    arg_forwarded_allow_ips,
+                    "--timeout-keep-alive",
+                    "600",
                 ]
 
-            # Add the Meltano API app, factory create_app function combo to the args
-            args += [
-                "--factory",
-                "meltano.api.app:create_app",
-            ]
+                # Add reload argument if reload is true
+                if self.reload:
 
-            MeltanoInvoker(self.project).invoke(args, command="uvicorn")
+                    args += [
+                        "--reload",
+                    ]
 
-        else:
-            # Use Gunicorn when feature flag start_uvicorn is not set
+                # Add the Meltano API app, factory create_app function combo to the args
+                args += [
+                    "--factory",
+                    "meltano.api.app:create_app",
+                ]
 
-            args = ["--config", "python:meltano.api.wsgi", "--pid", str(self.pid_file)]
+                # Start uvicorn using the MeltanoInvoker
+                MeltanoInvoker(self.project).invoke(args, command="uvicorn")
 
-            if self.reload:
-                args += ["--reload"]
+            else:
+                # Use Gunicorn when feature flag start_uvicorn is not set
 
-            args += ["meltano.api.app:create_app()"]
+                args = [
+                    "--config",
+                    "python:meltano.api.wsgi",
+                    "--pid",
+                    str(self.pid_file),
+                ]
 
-            MeltanoInvoker(self.project).invoke(args, command="gunicorn")
+                if self.reload:
+                    args += ["--reload"]
+
+                args += ["meltano.api.app:create_app()"]
+
+                MeltanoInvoker(self.project).invoke(args, command="gunicorn")
 
     def pid_path(self):
         """
