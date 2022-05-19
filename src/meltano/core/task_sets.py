@@ -22,7 +22,7 @@ TASKS_JSON_SCHEMA = {
             "items": {
                 "oneOf": [
                     {"type": "string"},
-                    {"type": "array", "items": {"oneOf": [{"type": "string"}]}},
+                    {"type": "array", "items": {"type": "string"}},
                 ]
             },
         },
