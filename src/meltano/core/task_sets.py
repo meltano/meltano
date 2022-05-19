@@ -134,7 +134,7 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
     try:
         tasks = yaml.safe_load(yaml_str)
     except yaml.parser.ParserError as yerr:
-        raise InvalidTasksError(name, f"Failed to parse yaml: {yerr}")
+        raise InvalidTasksError(name, f"Failed to parse yaml '{yaml_str}': {yerr}")
 
     try:
         validate(instance=tasks, schema=TASKS_JSON_SCHEMA)
