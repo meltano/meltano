@@ -35,7 +35,7 @@ class TestCliJob:
                     "add",
                     "job-mock2",
                     "--tasks",
-                    "'[tap-mock target-mock, tap-mock2 target-mock2]'",
+                    "['tap-mock target-mock', 'tap-mock2 target-mock2']",
                 ],
             )
             assert_cli_runner(res)
@@ -52,41 +52,41 @@ class TestCliJob:
                     "add",
                     "job-mock2",
                     "--tasks",
-                    "'[tap-mock target-mock, tap-mock2 target-mock2]'",
+                    "['tap-mock target-mock', 'tap-mock2 target-mock2']",
                 ],
             )
             assert res.exit_code == 1
             assert "Job 'job-mock2' already exists" in str(res.exception)
 
-            # invalid task - unbalanced brackets
+            # invalid task - schema validation fails
             res = cli_runner.invoke(
                 cli,
                 [
                     "job",
                     "add",
-                    "job-mock2",
+                    "job-mock-bad-schema",
                     "--tasks",
-                    "'tap-mock target-mock, tap-mock2 target-mock2]'",
+                    '["tap-gitlab target-jsonl", "dbt:run", 5]',
                 ],
                 catch_exceptions=True,
             )
             assert res.exit_code == 1
-            assert "Invalid tasks string, missing leading" in str(res.exception)
+            assert "Failed to validate task schema" in str(res.exception)
 
-            # invalid task - unbracketed list
+            # invalid task - yaml parsing failure
             res = cli_runner.invoke(
                 cli,
                 [
                     "job",
                     "add",
-                    "job-mock2",
+                    "job-mock-bad-yaml",
                     "--tasks",
-                    "'tap-mock target-mock, tap-mock2 target-mock2'",
+                    "['tap-mock target-mock'",
                 ],
                 catch_exceptions=True,
             )
             assert res.exit_code == 1
-            assert "Invalid tasks string, non list contains comma" in str(res.exception)
+            assert "Failed to parse yaml" in str(res.exception)
 
     def test_job_set(self, session, project, cli_runner, task_sets_service):
         # singular task with job

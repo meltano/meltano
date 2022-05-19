@@ -6,7 +6,7 @@ import structlog
 
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.project import Project
-from meltano.core.task_sets import TaskSets, tasks_from_str
+from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
     JobAlreadyExistsError,
     JobNotFoundError,
@@ -96,10 +96,13 @@ def job(project, ctx):
     \t# List a named job
     \tmeltano job list <job_name>
     \b
-    \t# Create a new job with a single task representing a run command
-    \tmeltano job NAME tasks <run command>
-    \t# Create a new job with multiple tasks each representing a run command
-    \tmeltano job NAME tasks '[<run command1>, <run command2>, ...]'
+    \t# Create a new job with a single task representing a single run command.
+    \tmeltano job add NAME --tasks 'tap mapper target command:arg1'
+    \b
+    \t# Create a new job with multiple tasks each representing a run command.
+    \t# The list of tasks must be yaml formatted and consist of a list of strings, list of string lists, or mix of both.
+    \tmeltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
+    \tmeltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     \b
     \t# Remove a named job
     \tmeltano job remove <job_name>
@@ -154,20 +157,22 @@ def add(ctx, job_name: str, raw_tasks: str):
     \tmeltano job add NAME --tasks 'tap mapper target command:arg1'
     \b
     \t# Create a new job with multiple tasks each representing a run command.
-    \t# The list of tasks is wrapped in square brackets and each sub-task is separated by a comma.
-    \tmeltano job add NAME --tasks '[<run stmt1>, <run stmt2>, ...]'
+    \t# The list of tasks must be yaml formatted and consist of a list of strings, list of string lists, or mix of both.
+    \tmeltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
+    \tmeltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """
     project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
-    raw_tasks = raw_tasks.strip("'\"")
-
-    task_sets = tasks_from_str(job_name, raw_tasks)
+    try:
+        task_sets = tasks_from_yaml_str(job_name, raw_tasks)
+    except InvalidTasksError as yerr:
+        raise CliError(yerr)
 
     try:
         _validate_tasks(project, task_sets)
-    except JobTaskInvalidError as err:
-        raise CliError(f"Job '{task_sets.name}' invalid: {str(err)}")
+    except InvalidTasksError as err:
+        raise CliError(err)
 
     try:
         task_sets_service.add(task_sets)
@@ -201,23 +206,22 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
 
     \b
     \t# Update a job with a single task representing a single run command.
-    \tmeltano set update NAME --tasks 'tap mapper target command:arg1'
+    \tmeltano job set NAME --tasks 'tap mapper target command:arg1'
     \b
     \t# Update a job with multiple tasks each representing a run command.
-    \t# The list of tasks is wrapped in square brackets and each sub-task is separated by a comma.
-    \tmeltano set add NAME --tasks '[<run stmt1>, <run stmt2>, ...]'
+    \t# The list of tasks must be yaml formatted and consist of a list of strings, list string lists, or mix of both.
+    \tmeltano job set NAME --tasks '["tap mapper target", "tap2 target2", ...]'
+    \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """
     project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
-    raw_tasks = raw_tasks.strip("'\"")
-
-    task_sets = tasks_from_str(job_name, raw_tasks)
+    task_sets = tasks_from_yaml_str(job_name, raw_tasks)
 
     try:
         _validate_tasks(project, task_sets)
-    except JobTaskInvalidError as err:
-        raise CliError(f"Job '{task_sets.name}' invalid: {str(err)}")
+    except InvalidTasksError as err:
+        raise CliError(err)
 
     try:
         task_sets_service.update(task_sets)
@@ -248,23 +252,6 @@ def remove(ctx, job_name: str):  # noqa: WPS442
     tracker.track_meltano_job("remove", job_name)
 
 
-class JobTaskInvalidError(Exception):
-    """Occurs when a task in a TaskSet (aka job) is invalid."""
-
-    def __init__(self, name: str, error: str = None):
-        """Initialize a JobTaskInvalidError.
-
-        Args:
-            name: Name of the TaskSet (aka job) that was invalid.
-            error: Error message.
-        """
-        self.name = name
-        if error:
-            super().__init__(f"Job '{name}' has invalid task: {error}")
-        else:
-            super().__init__(f"Job '{name}' has invalid task.")
-
-
 def _validate_tasks(project: Project, task_set: TaskSets) -> bool:
     """Validate the job's tasks by attempting to parse them into valid Blocks and using the Block's validation logic.
 
@@ -276,20 +263,25 @@ def _validate_tasks(project: Project, task_set: TaskSets) -> bool:
         True if the job's tasks are valid.
 
     Raises:
-        JobTaskInvalidError: If the job's tasks are invalid.
+        InvalidTasksError: If the job's tasks are invalid.
     """
-    blocks = task_set.flat_args
-    logger.debug(
-        "validating tasks",
-        job=task_set.name,
-        tasks=task_set.tasks,
-        blocks=blocks,
-    )
-    try:
-        bparser = BlockParser(logger, project, blocks)
-        parsed_blocks = list(bparser.find_blocks(0))
-    except Exception as err:
-        raise JobTaskInvalidError(blocks, err) from err
-    if not validate_block_sets(logger, parsed_blocks):
-        raise JobTaskInvalidError(blocks, "Block set validation failed.")
+    logger.debug("validating job tasks", job=task_set.name, tasks=task_set.tasks)
+    for task in task_set.flat_args_per_set:
+        blocks = task
+        logger.debug(
+            "validating tasks",
+            job=task_set.name,
+            task=task,
+            blocks=blocks,
+        )
+        try:
+            block_parser = BlockParser(logger, project, blocks)
+            parsed_blocks = list(block_parser.find_blocks(0))
+        except Exception as err:
+            raise InvalidTasksError(task_set.name, err)
+        if not validate_block_sets(logger, parsed_blocks):
+            raise InvalidTasksError(
+                task_set.name,
+                "BlockSet validation failed.",
+            )
     return True

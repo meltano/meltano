@@ -1,6 +1,6 @@
 import pytest
 
-from meltano.core.task_sets import TaskSets, tasks_from_str
+from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 
 
 class TestTaskSets:
@@ -21,7 +21,7 @@ class TestTaskSets:
             ["tap2", "target2"],
         ]
 
-    def test_tasks_from_str(self):
+    def test_tasks_from_yaml_str(self):
 
         cases = [
             ("generic", "tap target", TaskSets(name="generic", tasks=["tap target"])),
@@ -36,28 +36,34 @@ class TestTaskSets:
                 TaskSets(name="multiple-lists", tasks=["tap target", "tap2 target2"]),
             ),
             (
-                "multiple-lists-with-spaces",
-                "[tap target,  tap2 target2]",
+                "multiple-lists-quoted",
+                "['tap target', 'tap2 target2']",
                 TaskSets(
-                    name="multiple-lists-with-spaces",
+                    name="multiple-lists-quoted",
                     tasks=["tap target", "tap2 target2"],
+                ),
+            ),
+            (
+                "nested-mixed-lists",
+                "[['tap target', 'tap2 target2'], 'cmd1']",
+                TaskSets(
+                    name="nested-mixed-lists",
+                    tasks=[["tap target", "tap2 target2"], "cmd1"],
                 ),
             ),
         ]
 
         for name, task_str, expected in cases:
-            tset = tasks_from_str(name, task_str)
+            tset = tasks_from_yaml_str(name, task_str)
             assert tset.name == expected.name
             assert tset.tasks == expected.tasks
 
         obvious_edge_cases = [
-            ("single-quoted-list", "'[tap target]'"),
-            ("double-quoted-list", '"[tap target]"'),
-            ("no-leading-bracket", "tap target]"),
-            ("no-trailing-bracket", "[tap target"),
-            ("comma-without-list", "tap target, tap2 target2"),
+            ("bad-yaml", "['tap target'"),
+            ("too-many-levels", "[[['tap target']]]"),
+            ("non-string-list", "['tap target', 5"),
         ]
 
         for name, task_str in obvious_edge_cases:
-            with pytest.raises(ValueError):
-                tasks_from_str(name, task_str)
+            with pytest.raises(InvalidTasksError):
+                tasks_from_yaml_str(name, task_str)

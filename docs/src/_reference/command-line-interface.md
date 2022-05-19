@@ -700,10 +700,10 @@ are run sequentially. You can run a specified job by passing the job name as an 
 
 ```bash
 
-# Add a job with a singe task representing a run command
+# Add a job with a single task representing a run command
 meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
 
-# Add a new job with multiple tasks using a pseudo-list format, each item representing a run command
+# Add a new job with multiple tasks by passing arrays in yaml format, where each item representing a run command. 
 meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
 
 # Update an existing job with new tasks
@@ -725,7 +725,9 @@ meltano job remove <job_name>
 ### Examples
 
 ```bash
-# a new job named "simple-demo" that contains two tasks
+# Add a new job named "simple-demo" that contains two tasks
+# Task 1: tap-gitlab hide-gitlab-secrets target-mysql
+# Task 2: tap-gitlab target-csv
 meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-mysql dbt:run, tap-gitlab target-csv]"
 # list the job named "simple-demo"
 meltano job list simple-demo --format=json

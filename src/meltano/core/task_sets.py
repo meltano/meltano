@@ -4,11 +4,66 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 import structlog
+import yaml
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 
 logger = structlog.getLogger(__name__)
+
+TASKS_JSON_SCHEMA2 = {
+    "oneOf": [{"type": "string"}, {"$ref": "#/$defs/all-the-things"}],
+    "$defs": {
+        "all-the-things": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {"type": "string"},
+                    {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {"type": "string"},
+                            ]
+                        },
+                    },
+                ]
+            },
+        },
+    },
+}
+
+
+TASKS_JSON_SCHEMA = {
+    "oneOf": [
+        {"type": "string"},
+        {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"oneOf": [{"type": "string"}]}},
+                ]
+            },
+        },
+    ],
+}
+
+
+class InvalidTasksError(Exception):
+    """Raised when a yaml str cannot be parsed into a valid tasks list."""
+
+    def __init__(self, name: str, message: str):
+        """Initialize a InvalidTasksError.
+
+        Args:
+            name: Name of the TaskSet that was invalid.
+            message: The message describing the error.
+        """
+        self.name = name
+        super().__init__(f"Job '{name}' has invalid tasks. {message}")
 
 
 def _flat_split(items):
@@ -52,7 +107,7 @@ class TaskSets(NameEq, Canonical):
         flattened = []
         for task in self.tasks:
             if isinstance(task, str):
-                flattened.extend(task.split(" "))
+                flattened.append(task.split(" "))
             else:
                 flattened.append(list(_flat_split(task)))
         return flattened
@@ -82,42 +137,34 @@ class TaskSets(NameEq, Canonical):
         return self._as_args(preserve_top_level=True)
 
 
-def tasks_from_str(name: str, tasks: str) -> TaskSets:  # noqa: WPS238
-    """Create a TaskSets from a string representation of the tasks.
+def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
+    """Create a TaskSets from a yaml string.
 
-    The CLI supports both a single task representation as well as pseudo-task lists of representations. This function
-    will handle either based on the presence of wrapping '[]' characters. We check if the str is grossly malformed i.e.
-    has leading or trailing quotes, or unbalanced brackets, or comma without list convention, but make no other
-    attempts to validate the string.
-
-    Example:
-        tasks_from_str("my_job", "tap target dbt:run") # a single task
-        tasks_from_str("my_job", '[tap mapper target, dbt:run, tap2 target2]) # three tasks
+    The resulting object is validated against the TASKS_JSON_SCHEMA.
 
     Args:
-        name: The name of the TaskSet.
-        tasks: The tasks that should be associated with the TaskSet.
+        name: The name of the job.
+        yaml_str: The yaml string.
 
     Returns:
-        TaskSets obj generated from the string representation.
+        The TaskSets.
 
     Raises:
-        ValueError: If the string representation appears to be obviously malformed
+        InvalidTasksError: If the yaml string failed to parse or failed to validate against the TASKS_JSON_SCHEMA.
     """
-    if tasks.strip("\"' ") != tasks:
-        raise ValueError(f"Invalid tasks string: {tasks}")
+    tasks = []
+    try:
+        tasks = yaml.safe_load(yaml_str)
+    except yaml.parser.ParserError as yerr:
+        raise InvalidTasksError(name, f"Failed to parse yaml: {yerr}")
 
-    if tasks.endswith("]") and not tasks.startswith("["):
-        raise ValueError(f"Invalid tasks string, missing leading '[': {tasks}")
+    try:
+        validate(instance=tasks, schema=TASKS_JSON_SCHEMA)
+    except ValidationError as verr:
+        raise InvalidTasksError(name, f"Failed to validate task schema: {verr}")
 
-    if tasks.startswith("[") and not tasks.endswith("]"):
-        raise ValueError(f"Invalid tasks string, missing trailing ']': {tasks}")
+    # Handle the special case of a single task
+    if isinstance(tasks, str):
+        tasks = [tasks]
 
-    if tasks.startswith("[") and tasks.endswith("]"):
-        parsed = [task.strip(" ") for task in tasks[1:-1].split(",") if task]
-        return TaskSets(name, parsed)
-
-    if "," in tasks:
-        raise ValueError(f"Invalid tasks string, non list contains comma: {tasks}")
-
-    return TaskSets(name, [tasks])
+    return TaskSets(name=name, tasks=tasks)
