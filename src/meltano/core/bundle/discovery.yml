@@ -3604,7 +3604,7 @@ files:
     namespace: dbt_snowflake
     repo: https://gitlab.com/meltano/files-dbt-snowflake
     pip_url: git+https://gitlab.com/meltano/files-dbt-snowflake
-  - name: dbt-snowflake
+  - name: dbt-postgres
     namespace: dbt_postgres
     repo: https://gitlab.com/meltano/files-dbt-postgres
     pip_url: git+https://gitlab.com/meltano/files-dbt-postgres
