@@ -2279,6 +2279,7 @@ loaders:
             value_post_processor: stringify
             label: SSL
           - name: default_target_schema
+            aliases: [schema]
             value: $MELTANO_EXTRACT__LOAD_SCHEMA
             description: Name of the schema where the tables will be created. If `schema_mapping` is not defined then every stream sent by the tap is loaded into this schema.
             label: Default Target Schema
@@ -2359,6 +2360,7 @@ loaders:
           - name: postgres_password
             kind: password
           - name: postgres_schema
+            aliases: [schema]
             value: $MELTANO_EXTRACT__LOAD_SCHEMA
           - name: postgres_sslmode
             value: prefer
@@ -2701,6 +2703,7 @@ loaders:
             description: Whether the Target should create tables which have no records present in Remote.
           - name: snowflake_schema
             label: Snowflake Schema
+            aliases: [schema]
             value: $MELTANO_EXTRACT__LOAD_SCHEMA
             value_processor: upcase_string
           - name: state_support
