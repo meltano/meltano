@@ -19,7 +19,10 @@ from meltano.core.job import Job, Payload, State
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import (
+    LockedDefinitionService,
+    PluginDiscoveryService,
+)
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project
@@ -221,6 +224,11 @@ def discovery():  # noqa: WPS213
 @pytest.fixture(scope="class")
 def plugin_discovery_service(project, discovery):
     return PluginDiscoveryService(project, discovery=discovery)
+
+
+@pytest.fixture(scope="class")
+def locked_definition_service(project):
+    return LockedDefinitionService(project)
 
 
 @pytest.fixture(scope="class")
