@@ -11,6 +11,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.105.0 - (2022-05-19)
+---
+
+### New
+
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
@@ -23,7 +35,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3500](https://gitlab.com/meltano/meltano/-/issues/3500) Fixes bug where lock file was added but not used.
 
-### Breaks
 
 ## 1.104.0 - (2022-05-13)
 ---
