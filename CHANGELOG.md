@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
- 
+
 
 ## Unreleased
 ---
@@ -14,8 +14,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
+- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend [pipx](https://pypa.github.io/pipx/) over manually created virtual environments.  
+
+- [#3484](https://gitlab.com/meltano/meltano/-/issues/3484) Use `SettingsService.feature_flag` convention for lockfiles.
 
 ### Fixes
+
+- [#3500](https://gitlab.com/meltano/meltano/-/issues/3500) Fixes bug where lock file was added but not used.
 
 ### Breaks
 

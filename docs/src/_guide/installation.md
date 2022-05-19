@@ -39,69 +39,37 @@ Use the following command to check that you have the correct Python version inst
 python --version
 ```
 
-#### pip3
+#### Install pipx
 
-`pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
-
-```bash
-# check for current version of pip to ensure that it is using Python 3
-pip3 --version
-
-# update pip3
-pip3 install --upgrade pip
-```
-
-#### Virtual Environment
-
-<div class="notification is-danger">
-  <p><strong>IMPORTANT</strong></p>
-  <p>Unless you are building a Docker image, it is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.</p>
-</div>
-
-**Why use a virtual environment?**
-
-Your local environment may use a different version of Python or other dependencies that are difficult to manage. The virtual environment provides a "clean" space to work without these issues.
-
-#### Recommended Virtual Environment Setup
-
-We suggest you create a directory where you want your virtual environments to be saved (e.g. `.venv/`). This can be any directory in your environment, but we recommend saving it in your Meltano project to make it easier to keep track of.
-
-Then create a new virtual environment inside that directory:
+`pip` is a package installer that comes automatically with Python 3+.
+[pipx](https://pypa.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
 
 ```bash
-mkdir .venv
-python -m venv .venv/meltano
+# install pipx and ensure it is on the path
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+#Note that the below commands are not needed in most cases
+source ~/.bashrc 
 ```
-
-#### Activating Your Virtual Environment
-
-Activate the virtual environment using:
-
-```bash
-source .venv/meltano/bin/activate
-```
-
-If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
 
 <div class="notification is-info">
-  <p>Once a virtual environment is activated, it stays active until the current shell is closed. In a new shell, you must re-activate the virtual environment before interacting with the <code>meltano</code> command that will be installed in the next step.</p>
-  <p>To streamline this process, you can define a shell alias that'll be easier to remember than the entire activation invocation:</p>
-<pre>
-# add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
+    <p>For Windows, instead of source ~/.bashrc, you'll want to open up a new PowerShell instance.</p>
+</div>
 
-# use as follows, after creating a new shell:
-meltano!
-</pre>
-  <p>You can deactivate a virtual environment by typing <code>deactivate</code> in your shell.</p>
+<div class="notification is-info">
+  <p>Why use pipx and virtual environments?</p>
+  <p>Your local environment may use a different version of Python or other dependencies that are
+difficult to manage. The pipx installer automatically creates a virtual environment and provides a
+"clean" isolated space without version conflicts or other compatibility issues.</p>
 </div>
 
 ### Install Meltano
 
-Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
+Now that you have [pipx](https://pypa.github.io/pipx/) installed, run the following command to install the Meltano package into its
+own pipx-backed virtual environment:
 
 ```bash
-pip3 install meltano
+pipx install meltano
 ```
 
 Once the installation completes, you can check if it was successful by running:
