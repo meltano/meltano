@@ -1,8 +1,12 @@
 import logging
 import os
+from http import HTTPStatus
+from pathlib import Path
+from typing import Any
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
+from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436 (protected module)
+from requests import PreparedRequest
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,7 +46,7 @@ def concurrency():
     return {
         "threads": int(os.getenv("PYTEST_CONCURRENCY_THREADS", 8)),
         "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),
-        "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),
+        "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),  # noqa: WPS432
     }
 
 
@@ -54,3 +58,34 @@ def setup_env():
     yield
 
     monkeypatch.undo()
+
+
+@pytest.fixture(scope="session")
+def mock_hub_responses_dir():
+    return Path(__file__).parent.joinpath("fixtures", "hub")
+
+
+@pytest.fixture(scope="session")
+def get_hub_response(mock_hub_responses_dir: Path):
+    def _get_response(request: PreparedRequest) -> Any:
+        endpoint_mapping = {
+            "/plugins/extractors/index": "extractors.json",
+            "/plugins/loaders/index": "loaders.json",
+            "/plugins/extractors/tap-mock--meltano": "tap-mock--meltano.json",
+        }
+
+        _, endpoint = request.path_url.split("/meltano/api/v1")
+
+        try:
+            filename = endpoint_mapping[endpoint]
+        except KeyError:
+            return (HTTPStatus.NOT_FOUND, {}, '{"error": "not found"}')
+
+        file_path = mock_hub_responses_dir / filename
+        return (
+            HTTPStatus.OK,
+            {"Content-Type": "application/json"},
+            file_path.read_text(),
+        )
+
+    return _get_response
