@@ -9,10 +9,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.plugin.base import BasePlugin, PluginRef, StandalonePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import (
-    MeltanoHubService,
-    PluginDiscoveryService,
-)
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project
 
 logger = get_logger(__name__)
@@ -37,22 +34,15 @@ class LockfileAlreadyExistsError(Exception):
 class PluginLockService:
     """Plugin Lockfile Service."""
 
-    def __init__(
-        self,
-        project: Project,
-        discovery_service: PluginDiscoveryService,
-        hub_service: MeltanoHubService | None = None,
-    ):
+    def __init__(self, project: Project, discovery_service: PluginDiscoveryService):
         """Create a new Plugin Lockfile Service.
 
         Args:
             project: The Meltano project.
             discovery_service: The plugin discovery service.
-            hub_service: The Meltano Hub service.
         """
-        self.project = project
+        self.projet = project
         self.discovery_service = discovery_service
-        self.hub_service = hub_service or MeltanoHubService(project)
 
     def save(
         self,
@@ -78,22 +68,21 @@ class PluginLockService:
 
         if isinstance(plugin, BasePlugin):
             plugin_def = plugin.definition
-            path = self.project.plugin_lock_path(
+            path = self.projet.plugin_lock_path(
                 plugin_def.type,
                 plugin_def.name,
                 variant_name=variant,
             )
 
         elif plugin.inherit_from is None:
-            path = self.project.plugin_lock_path(
+            path = self.projet.plugin_lock_path(
                 plugin.type,
                 plugin.name,
                 variant_name=variant,
             )
-            plugin_def = self.hub_service.find_definition(
+            plugin_def = self.discovery_service.find_definition(
                 plugin.type,
                 plugin.name,
-                variant_name=variant,
             )
         else:
             # Recursively look for the parent plugin definition and lock that
