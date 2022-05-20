@@ -1,0 +1,23 @@
+{
+  "target-jsonl": {
+    "logo_url": "https://hub.meltano.com/assets/logos/targets/jsonl.png",
+    "default_variant": "meltano",
+    "variants": {
+      "meltano": {
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/target-jsonl--meltano"
+      }
+    }
+  },
+  "target-mock": {
+    "logo_url": "https://hub.meltano.com/assets/logos/targets/mock.png",
+    "default_variant": "meltano",
+    "variants": {
+      "meltano": {
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/target-mock--meltano"
+      },
+      "singer": {
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/target-mock--partners"
+      }
+    }
+  }
+}

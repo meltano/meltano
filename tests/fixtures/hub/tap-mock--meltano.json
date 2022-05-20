@@ -1,0 +1,20 @@
+{
+  "name": "tap-mock",
+  "namespace": "tap_mock",
+  "variant": "meltano",
+  "pip_url": "tap-mock",
+  "capabilities": [
+    "catalog",
+    "discover",
+    "state"
+  ],
+  "settings": [
+    {
+      "name": "foo"
+    },
+    {
+      "name": "bar",
+      "kind": "password"
+    }
+  ]
+}

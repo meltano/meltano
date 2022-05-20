@@ -570,6 +570,39 @@ class MeltanoHubService(PluginRepository):
         self.project = project
         self.session = requests.Session()
 
+    def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
+        """Return the list endpoint for the given plugin type.
+
+        Args:
+            plugin_type: The plugin type.
+
+        Returns:
+            The endpoint for the given plugin type.
+        """
+        return f"{self.BASE_URL}/plugins/{plugin_type.value}/index"
+
+    def plugin_endpoint(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
+    ) -> str:
+        """Return the resource endpoint for the given plugin.
+
+        Args:
+            plugin_type: The plugin type.
+            plugin_name: The plugin name.
+            variant_name: The plugin variant name.
+
+        Returns:
+            The endpoint for the given plugin type.
+        """
+        url = f"{self.BASE_URL}/plugins/{plugin_type.value}/{plugin_name}"
+        if variant_name:
+            url = f"{url}--{variant_name}"
+
+        return url
+
     def find_definition(
         self,
         plugin_type: PluginType,
@@ -589,11 +622,7 @@ class MeltanoHubService(PluginRepository):
         Raises:
             PluginNotFoundError: If the plugin definition could not be found.
         """
-        url = f"{self.BASE_URL}/plugins/{plugin_type}/{plugin_name}"
-
-        if variant_name:
-            url = f"{url}--{variant_name}"
-
+        url = self.plugin_endpoint(plugin_type, plugin_name, variant_name)
         response = self.session.get(url)
 
         try:

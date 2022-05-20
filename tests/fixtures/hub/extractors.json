@@ -1,0 +1,23 @@
+{
+  "tap-gitlab": {
+    "logo_url": "https://hub.meltano.com/assets/logos/taps/gitlab.png",
+    "default_variant": "meltano",
+    "variants": {
+      "meltano": {
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-gitlab--meltano"
+      }
+    }
+  },
+  "tap-mock": {
+    "logo_url": "https://hub.meltano.com/assets/logos/taps/mock.png",
+    "default_variant": "meltano",
+    "variants": {
+      "meltano": {
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-mock--meltanolabs"
+      },
+      "singer-io": {
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-mock--partners"
+      }
+    }
+  }
+}
