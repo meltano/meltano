@@ -13,6 +13,7 @@
     # `tap-covid-19` extractor configuration
     # TAP_COVID_19_API_TOKEN: set through https://gitlab.com/meltano/meltano/-/settings/ci_cd
 
+    # force ci rerun (TODO: remove)
     # `tap-gitlab` request caching:
     TAP_GITLAB_REQUESTS_CACHE_PATH: "$CI_PROJECT_DIR/api_caches/"
 
