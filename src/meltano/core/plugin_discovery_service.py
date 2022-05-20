@@ -569,6 +569,12 @@ class MeltanoHubService(PluginRepository):
         """
         self.project = project
         self.session = requests.Session()
+        self.session.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": f"Meltano/{meltano.__version__}",
+            }
+        )
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.

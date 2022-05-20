@@ -40,16 +40,14 @@ class TestMeltanoHubService:
 
     @responses.activate
     def test_find_definition(self, subject: MeltanoHubService):
-        responses.add_callback(
-            responses.GET,
-            subject.plugin_endpoint(PluginType.EXTRACTORS, "tap-mock", "meltano"),
-            callback=get_response,
-        )
+        url = subject.plugin_endpoint(PluginType.EXTRACTORS, "tap-mock", "meltano")
+        responses.add_callback(responses.GET, url, callback=get_response)
         definition = subject.find_definition(
             PluginType.EXTRACTORS,
             "tap-mock",
             variant_name="meltano",
         )
+        assert responses.assert_call_count(url, 1)
         assert definition.name == "tap-mock"
         assert definition.variants[0].name == "meltano"
 
