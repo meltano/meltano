@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import requests
 
 import meltano
@@ -10,6 +12,8 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_discovery_service import PluginRepository
 from meltano.core.project import Project
+
+from .schema import IndexedPlugin, VariantRef
 
 
 class MeltanoHubService(PluginRepository):
@@ -117,3 +121,28 @@ class MeltanoHubService(PluginRepository):
         )
 
         return base_plugin_factory(plugin, plugin.variants[0])
+
+    def get_plugins_of_type(self, plugin_type: PluginType) -> dict[str, IndexedPlugin]:
+        """Get all plugins of a given type.
+
+        Args:
+            plugin_type: The plugin type.
+
+        Returns:
+            The plugin definitions.
+        """
+        url = self.plugin_type_endpoint(plugin_type)
+        response = self.session.get(url)
+        plugins: dict[str, dict[str, Any]] = response.json()
+        return {
+            name: IndexedPlugin(
+                name,
+                logo_url=plugin["logo_url"],
+                default_variant=plugin["default_variant"],
+                variants={
+                    variant_name: VariantRef(variant_name, ref=variant["ref"])
+                    for variant_name, variant in plugin["variants"].items()
+                },
+            )
+            for name, plugin in plugins.items()
+        }

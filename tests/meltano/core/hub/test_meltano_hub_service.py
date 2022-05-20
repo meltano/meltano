@@ -29,10 +29,23 @@ class TestMeltanoHubService:
 
     @responses.activate
     def test_definition_not_found(self, subject: MeltanoHubService, get_hub_response):
-        responses.add_callback(
-            responses.GET,
-            subject.plugin_endpoint(PluginType.EXTRACTORS, "tap-not-found"),
-            callback=get_hub_response,
-        )
+        plugin_url = subject.plugin_endpoint(PluginType.EXTRACTORS, "tap-not-found")
+        responses.add_callback(responses.GET, plugin_url, callback=get_hub_response)
+
         with pytest.raises(PluginNotFoundError):
             subject.find_definition(PluginType.EXTRACTORS, "tap-not-found")
+
+        assert responses.assert_call_count(plugin_url, 1)
+
+    @responses.activate
+    def test_get_plugins_of_type(self, subject: MeltanoHubService, get_hub_response):
+        url = subject.plugin_type_endpoint(PluginType.EXTRACTORS)
+        responses.add_callback(responses.GET, url, callback=get_hub_response)
+        extractors = subject.get_plugins_of_type(PluginType.EXTRACTORS)
+        assert responses.assert_call_count(url, 1)
+        assert len(extractors) == 2
+        assert len(extractors["tap-mock"].variants) == 2
+        assert extractors["tap-mock"].variant_labels == [
+            "meltano (default)",
+            "singer-io",
+        ]
