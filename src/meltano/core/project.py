@@ -1,4 +1,7 @@
 """Meltano Projects."""
+
+from __future__ import annotations
+
 import errno
 import logging
 import os
@@ -6,7 +9,6 @@ import sys
 import threading
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, Union
 
 import fasteners
 from dotenv import dotenv_values
@@ -32,7 +34,7 @@ PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 class ProjectNotFound(Error):
     """Occurs when a Project is instantiated outside of a meltano project structure."""
 
-    def __init__(self, project):
+    def __init__(self, project: Project):
         """Instantiate the error.
 
         Args:
@@ -76,7 +78,7 @@ class Project(Versioned):  # noqa: WPS214
     _meltano_rw_lock = fasteners.ReaderWriterLock()
     _default = None
 
-    def __init__(self, root: Union[Path, str]):
+    def __init__(self, root: Path | str):
         """Instantiate a Project from its root directory.
 
         Args:
@@ -87,7 +89,7 @@ class Project(Versioned):  # noqa: WPS214
         self._project_files = None
         self.__meltano_ip_lock = None
 
-        self.active_environment: Optional[Environment] = None
+        self.active_environment: Environment | None = None
 
     @property
     def _meltano_ip_lock(self):
@@ -115,7 +117,7 @@ class Project(Versioned):  # noqa: WPS214
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
-    def activate(cls, project: "Project"):
+    def activate(cls, project: Project):
         """Activate the given Project.
 
         Args:
@@ -162,7 +164,7 @@ class Project(Versioned):  # noqa: WPS214
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Union[Path, str] = None, activate=True):  # noqa: WPS231
+    def find(cls, project_root: Path | str = None, activate=True):
         """Find a Project.
 
         Args:
@@ -474,6 +476,49 @@ class Project(Versioned):  # noqa: WPS214
         """
         return self.meltano_dir(
             plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
+        )
+
+    @makedirs
+    def root_plugins_dir(self, *joinpaths: str, make_dirs: bool = True):
+        """Path to the project `plugins` directory.
+
+        Args:
+            joinpaths: Paths to join with the project `plugins` directory.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the project `plugins` directory.
+        """
+        return self.root_dir("plugins", *joinpaths)
+
+    @makedirs
+    def plugin_lock_path(
+        self,
+        plugin_type: str,
+        plugin_name: str,
+        variant_name: str | None = None,
+        make_dirs: bool = True,
+    ):
+        """Path to the project lock file.
+
+        Args:
+            plugin_type: The plugin type.
+            plugin_name: The plugin name.
+            variant_name: The plugin variant name.
+            make_dirs: If True, create the directory hierarchy if it does not exist.
+
+        Returns:
+            Path to the plugin lock file.
+        """
+        filename = f"{plugin_name}"
+
+        if variant_name:
+            filename = f"{filename}--{variant_name}"
+
+        return self.root_plugins_dir(
+            plugin_type,
+            f"{filename}.lock",
+            make_dirs=make_dirs,
         )
 
     def __eq__(self, other):

@@ -6,6 +6,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
@@ -74,6 +75,7 @@ def add(
         plugin_names = [as_name]
 
     plugins_service = ProjectPluginsService(project)
+    settings_service = ProjectSettingsService(project)
 
     if flags["custom"]:
         if plugin_type in {
@@ -96,6 +98,7 @@ def add(
                 variant=variant,
                 custom=flags["custom"],
                 add_service=add_service,
+                lock=settings_service.get("ff.lock_files", False),
             )
         )
         tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)

@@ -106,6 +106,12 @@ If you would prefer to create a separate virtualenv for an inherited plugin, mod
 
 To learn how to add an inheriting plugin to your project using an [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
 
+## Lock artifacts
+
+When you add a plugin to your project using `meltano add`, the [discoverable plugin definition](project#discoverable-plugin-definitions) of the plugin will be downloaded and added to your project under `plugins/<plugin_type>/<plugin_name>--<variant_name>.lock`. This will ensure that the plugin's definition will be stable and version-controlled.
+
+Later invocations of the plugin will use this file to determine the settings, installation source, etc.
+
 ## Types
 
 Meltano supports the following types of plugins:

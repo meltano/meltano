@@ -1,28 +1,19 @@
-import copy
 import json
 from contextlib import contextmanager
 from unittest import mock
 
-import meltano.core.bundle as bundle
 import pytest
 import requests
 import requests_mock
 import yaml
-from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.plugin import (
-    PluginDefinition,
-    PluginType,
-    Variant,
-    VariantNotFoundError,
-)
+
+from meltano.core import bundle
+from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import (
-    VERSION,
-    DiscoveryFile,
-    PluginDiscoveryService,
-    PluginNotFoundError,
-)
+from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+
+HTTP_STATUS_TEAPOT = 418
 
 
 @pytest.fixture(scope="class")
@@ -39,8 +30,8 @@ def subject(plugin_discovery_service):
 
 @pytest.fixture
 def discovery_url_mock(subject):
-    with requests_mock.Mocker() as m:
-        m.get(subject.discovery_url, status_code=418)
+    with requests_mock.Mocker() as mocker:
+        mocker.get(subject.discovery_url, status_code=HTTP_STATUS_TEAPOT)
 
         yield
 
@@ -64,13 +55,13 @@ def tap_covid_19(project_add_service):
 class TestPluginDiscoveryService:
     @pytest.mark.meta
     def test_discovery_url_mock(self, subject):
-        assert requests.get(subject.discovery_url).status_code == 418
+        assert requests.get(subject.discovery_url).status_code == HTTP_STATUS_TEAPOT
 
     @pytest.fixture
     def discovery_yaml(self, subject):
-        """Disable the discovery mock"""
-        with subject.project.root_dir("discovery.yml").open("w") as d:
-            yaml.dump(subject._discovery, d)
+        """Disable the discovery mock."""
+        with subject.project.root_dir("discovery.yml").open("w") as discovery_yaml:
+            yaml.dump(subject._discovery, discovery_yaml)
 
         subject._discovery = None
 
@@ -226,8 +217,8 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     @contextmanager
     def use_remote_discovery(self, discovery_yaml, subject):
-        with requests_mock.Mocker() as m:
-            m.get(subject.discovery_url, text=yaml.dump(discovery_yaml))
+        with requests_mock.Mocker() as mocker:
+            mocker.get(subject.discovery_url, text=yaml.dump(discovery_yaml))
 
             yield discovery_yaml
 

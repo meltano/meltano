@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
@@ -56,7 +54,7 @@ class TestPluginDefinition:
         assert len(plugin_def.variants) == 1
 
         variant = plugin_def.variants[0]
-        assert variant.name == None
+        assert variant.name is None
 
     def test_init_basic(self):
         attrs = self.ATTRS["basic"]
@@ -75,7 +73,7 @@ class TestPluginDefinition:
         assert variant.repo == attrs["repo"]
 
         assert plugin_def.extras == {"foo": "bar", "baz": "qux"}
-        assert variant.extras == {}
+        assert not variant.extras
 
     def test_init_variants(self):
         attrs = self.ATTRS["variants"]
@@ -90,8 +88,8 @@ class TestPluginDefinition:
         variant = plugin_def.variants[0]
         assert variant.name == "meltano"
 
-        assert variant.original == None
-        assert variant.deprecated == None
+        assert variant.original is None
+        assert variant.deprecated is None
         assert variant.pip_url == attrs["variants"][0]["pip_url"]
         assert variant.repo == attrs["variants"][0]["repo"]
 
@@ -100,12 +98,12 @@ class TestPluginDefinition:
         variant = plugin_def.variants[1]
         assert variant.name == "singer-io"
 
-        assert variant.original == True
-        assert variant.deprecated == True
+        assert variant.original
+        assert variant.deprecated
         assert variant.pip_url == attrs["variants"][1]["pip_url"]
         assert variant.repo == attrs["variants"][1]["repo"]
 
-        assert variant.extras == {}
+        assert not variant.extras
 
     @pytest.mark.parametrize("attrs_key", ATTRS.keys())
     def test_canonical(self, attrs_key):
@@ -242,7 +240,7 @@ class TestProjectPlugin:
         assert plugin.name == "tap-example"
         assert plugin.variant is Variant.ORIGINAL_NAME
         assert plugin.pip_url is None
-        assert plugin.config == {}
+        assert not plugin.config
         assert not plugin.is_custom()
 
     def test_init_basic(self):
@@ -287,7 +285,8 @@ class TestProjectPlugin:
         assert plugin.executable == variant.executable == attrs["executable"]
         assert plugin.repo == variant.repo == attrs["repo"]
 
-        assert plugin_def.extras == variant.extras == {}
+        assert plugin_def.extras == variant.extras
+        assert not plugin_def.extras
 
     def test_init_inherited(self):
         attrs = self.ATTRS["inherited"]
@@ -434,7 +433,7 @@ class TestProjectPlugin:
         assert tap.test_commands["test"].description == "Run tests"
 
         assert "test_extra" in tap.test_commands
-        assert tap.test_commands["test_extra"].args is None
+        assert tap.test_commands["test_extra"].args == "test_extra"
         assert tap.test_commands["test_extra"].description == "Run extra tests"
         assert tap.test_commands["test_extra"].executable == "test-extra"
 
@@ -481,7 +480,7 @@ class TestProjectPlugin:
         tap.config["custom"] = "from_meltano_yml"
         tap.config["nested"] = {"custom": True}
 
-        settings_by_name = {s.name: s for s in tap.settings}
+        settings_by_name = {setting.name: setting for setting in tap.settings}
 
         # Regular settings
         assert "test" in settings_by_name
@@ -496,7 +495,7 @@ class TestProjectPlugin:
         tap.extras["custom"] = "from_meltano_yml"
         tap.extras["nested"] = {"custom": True}
 
-        settings_by_name = {s.name: s for s in tap.extra_settings}
+        settings_by_name = {setting.name: setting for setting in tap.extra_settings}
 
         # Regular extras
         assert "_select" in settings_by_name

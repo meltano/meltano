@@ -78,3 +78,37 @@ Object properties and methods are alphabetical where `Vuex` stores are the excep
   <p><strong>When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.</strong></p>
 </div>
 
+### Feature Flags
+
+Sometimes it is useful to be able to make preview features available or allow deprecated features to be used for backwards compatibility.
+To accomplish this, Meltano implements feature flags.
+For new, deprecated, or experimental features, the relevant code path can be wrapped in a feature flag context.
+
+For example:
+```python
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import EXPERIMENTAL
+
+class ExistingClass:
+
+	def __init__(self):
+		self.project = Project.find()
+		self.settings_service = ProjectSettingsService(self.project)
+
+	# If this method is called elsewhere in the code and experimental features are
+	# not allowed, it will throw an error:
+	def experimental_method(self):
+		with self.settings_service.feature_flag(EXPERIMENTAL):
+			print("Doing experimental behavior...")
+
+	# If this method is called elsewhere, its behavior will vary based on whether
+	# the feature flag is set in the project
+	# The same pattern can be used to deprecate existing behavior
+	def existing_method_with_new_behavior(self):
+		with self.settings_service.feature_flag("new_behavior") as new_behavior:
+			if new_behavior:
+				print("Doing the new behavior...")
+			else:
+				print("Doing the existing behavior...")
+
+```
