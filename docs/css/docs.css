@@ -175,3 +175,7 @@ h2 {
   border-bottom: #3438bf solid 4px;
   padding-bottom: 7px;
 }
+
+code {
+  color: #3438bf;
+}
