@@ -59,10 +59,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
 
         self.config_service = config_service or ConfigService(project)
         self.discovery_service = discovery_service or PluginDiscoveryService(project)
-        self.lock_service = lock_service or PluginLockService(
-            project,
-            self.discovery_service,
-        )
+        self.lock_service = lock_service or PluginLockService(project)
         self.locked_definition_service = (
             locked_definition_service or LockedDefinitionService(project)
         )
