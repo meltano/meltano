@@ -196,7 +196,7 @@ settings:
   value: false
 
 # Feature Flags
-- name: ff.start_uvicorn
+- name: ff.enable_uvicorn
   kind: boolean
   value: False
 
