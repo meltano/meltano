@@ -19,7 +19,10 @@ from meltano.core.job import Job, Payload, State
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import (
+    LockedDefinitionService,
+    PluginDiscoveryService,
+)
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project
@@ -33,6 +36,7 @@ from meltano.core.project_plugins_service import (
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.state_service import StateService
+from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
 PROJECT_NAME = "a_meltano_project"
@@ -224,6 +228,11 @@ def plugin_discovery_service(project, discovery):
 
 
 @pytest.fixture(scope="class")
+def locked_definition_service(project):
+    return LockedDefinitionService(project)
+
+
+@pytest.fixture(scope="class")
 def project_compiler(project):
     return ProjectCompiler(project)
 
@@ -401,6 +410,11 @@ def utility(project_add_service):
 @pytest.fixture(scope="class")
 def schedule_service(project, project_plugins_service):
     return ScheduleService(project, plugins_service=project_plugins_service)
+
+
+@pytest.fixture(scope="class")
+def task_sets_service(project):
+    return TaskSetsService(project)
 
 
 @pytest.fixture(scope="class")
@@ -737,5 +751,8 @@ def state_service(job_history_session):
 @pytest.fixture
 def project_with_environment(project: Project) -> Project:
     project.activate_environment("dev")
+    project.active_environment.env[
+        "ENVIRONMENT_ENV_VAR"
+    ] = "${MELTANO_PROJECT_ROOT}/file.txt"
     yield project
     project.active_environment = None
