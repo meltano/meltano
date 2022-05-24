@@ -170,3 +170,8 @@ h5 a:hover,
 h6 a:hover {
   color: #3438bf;
 }
+
+h2 {
+  border-bottom: #3438bf solid 4px;
+  padding-bottom: 7px;
+}
