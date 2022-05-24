@@ -1,6 +1,6 @@
 dag:
   term: DAG
-  definition: Can someone help with this? I get the graph theory concept of a DAG but it's hard to tie it into Meltano.
+  definition: DAG means Directed Acyclic Graph. Within data workflows, any sequence of tasks can be represented as a DAG when the individual tasks are linked. This is done explicitly in dbt via the "ref" function.```
   link: 
 
 dataops:
