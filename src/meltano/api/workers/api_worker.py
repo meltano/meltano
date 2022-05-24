@@ -17,7 +17,7 @@ class APIWorker(threading.Thread):
         """
         Initialize the API Worker class with the project config.
 
-        Parameters:
+        Args:
             project: Project class.
             reload: Boolean.
         """
@@ -31,26 +31,26 @@ class APIWorker(threading.Thread):
     def run(self):
         """Run the initalized API Workers with the App Server requested."""
         with self.settings_service.feature_flag(
-            FeatureFlags.STARTUVICORN, raise_error=False
+            FeatureFlags.ENABLE_UVICORN, raise_error=False
         ) as allow:
 
-            start_uvicorn = allow
+            enable_uvicorn = allow
 
             # Use Uvicorn when on Windows
             if platform.system() == "Windows":
-                if start_uvicorn:
-                    logging.info(
-                        "Thank you for setting ff.start_uvicorn. Tell your friends to give it a try."
-                    )
+                if enable_uvicorn:
+                    logging.debug("ff.enable_uvicorn enabled, starting uvicorn.")
                 else:
-                    logging.error("Windows OS detected auto setting ff.start_uvicorn")
-                    logging.error(
-                        "Add ff.start_uvicorn: True to your meltano.yml to supress this error"
+                    logging.warning(
+                        "Windows OS detected auto setting ff.enable_uvicorn"
                     )
-                    start_uvicorn = True
+                    logging.warning(
+                        "Add ff.start_uvicorn: True to your meltano.yml to supress this waring"
+                    )
+                    enable_uvicorn = True
 
             # Start uvicorn to serve API and Ui
-            if start_uvicorn:
+            if enable_uvicorn:
                 settings_for_apiworker = self.settings_service
 
                 arg_bind_host = str(settings_for_apiworker.get("ui.bind_host"))
