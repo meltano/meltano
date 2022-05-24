@@ -1,0 +1,12 @@
+{
+  "name": "target-mock",
+  "namespace": "mock",
+  "variant": "meltano",
+  "pip_url": "target-mock",
+  "settings": [
+    {
+      "name": "schema",
+      "env": "MOCKED_SCHEMA"
+    }
+  ]
+}

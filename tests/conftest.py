@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import responses
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436 (protected module)
 from requests import PreparedRequest
 
@@ -40,6 +41,18 @@ def pytest_runtest_setup(item):
     if backend_marker and backend_marker.args[0] != PYTEST_BACKEND:
         pytest.skip()
 
+    responses.start()
+
+
+def pytest_runtest_teardown(item):
+    try:
+        responses.stop()
+        responses.reset()
+    except (AttributeError, RuntimeError):
+        # patcher was already uninstalled (or not installed at all) and
+        # responses doesn't let us force maintain it
+        pass
+
 
 @pytest.fixture(scope="session")
 def concurrency():
@@ -72,6 +85,7 @@ def get_hub_response(mock_hub_responses_dir: Path):
             "/plugins/extractors/index": "extractors.json",
             "/plugins/loaders/index": "loaders.json",
             "/plugins/extractors/tap-mock--meltano": "tap-mock--meltano.json",
+            "/plugins/loaders/target-mock": "target-mock.json",
         }
 
         _, endpoint = request.path_url.split("/meltano/api/v1")
@@ -89,3 +103,9 @@ def get_hub_response(mock_hub_responses_dir: Path):
         )
 
     return _get_response
+
+
+@pytest.fixture
+def requests_mock():
+    with responses.RequestsMock() as mock:
+        yield mock

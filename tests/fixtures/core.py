@@ -7,6 +7,7 @@ from collections import namedtuple
 from pathlib import Path
 
 import pytest
+import responses
 import yaml
 
 from meltano.core import bundle
@@ -231,6 +232,32 @@ def plugin_discovery_service(project, discovery):
 @pytest.fixture(scope="class")
 def meltano_hub_service(project: Project):
     return MeltanoHubService(project)
+
+
+@pytest.fixture
+def hub_extractors_url(
+    requests_mock: responses.RequestsMock,
+    meltano_hub_service: MeltanoHubService,
+    get_hub_response,
+):
+    url = meltano_hub_service.plugin_type_endpoint(PluginType.EXTRACTORS)
+    requests_mock.add_callback(responses.GET, url, callback=get_hub_response)
+    return url
+
+
+@pytest.fixture
+def hub_tap_mock_url(
+    requests_mock: responses.RequestsMock,
+    meltano_hub_service: MeltanoHubService,
+    get_hub_response,
+):
+    url = meltano_hub_service.plugin_endpoint(
+        PluginType.EXTRACTORS,
+        "tap-mock",
+        "meltano",
+    )
+    requests_mock.add_callback(responses.GET, url, callback=get_hub_response)
+    return url
 
 
 @pytest.fixture(scope="class")

@@ -4,7 +4,7 @@
     "default_variant": "meltano",
     "variants": {
       "meltano": {
-        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/target-jsonl--meltano"
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/loaders/target-jsonl--meltano"
       }
     }
   },
@@ -13,10 +13,10 @@
     "default_variant": "meltano",
     "variants": {
       "meltano": {
-        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/target-mock--meltano"
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/loaders/target-mock--meltano"
       },
       "singer": {
-        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/extractors/target-mock--partners"
+        "ref": "https://hub.meltano.com/meltano/api/v1/plugins/loaders/target-mock--partners"
       }
     }
   }
