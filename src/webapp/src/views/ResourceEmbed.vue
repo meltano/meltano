@@ -1,16 +1,16 @@
 <script>
-import DashboardEmbed from '@/components/embeds/DashboardEmbed'
+// import DashboardEmbed from '@/components/embeds/DashboardEmbed'
 import embedsApi, { EMBED_RESOURCE_TYPES } from '@/api/embeds'
 import Logo from '@/components/navigation/Logo'
-import ReportEmbed from '@/components/embeds/ReportEmbed'
+// import ReportEmbed from '@/components/embeds/ReportEmbed'
 import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'ResourceEmbed',
   components: {
-    DashboardEmbed,
+    // DashboardEmbed,
     Logo,
-    ReportEmbed,
+    // ReportEmbed,
     RouterViewLayout
   },
   props: {
@@ -60,14 +60,14 @@ export default {
     </div>
 
     <div v-else-if="getIsResourceReport" class="box is-marginless">
-      <ReportEmbed :report="resource" />
+      <!-- <ReportEmbed :report="resource" /> -->
     </div>
 
-    <DashboardEmbed
+    <!-- <DashboardEmbed
       v-else-if="getIsResourceDashboard"
       :dashboard="resource.dashboard"
       :reports-with-query-results="resource.reportsWithQueryResults"
-    />
+    /> -->
 
     <div v-else class="box is-marginless">
       <div class="content has-text-centered">

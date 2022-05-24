@@ -4,7 +4,6 @@ import Vue from 'vue'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Dropdown from '@/components/generic/Dropdown'
-import ExploreButton from '@/components/analyze/ExploreButton'
 import { PIPELINE_INTERVAL_OPTIONS, TRANSFORM_OPTIONS } from '@/utils/constants'
 import utils from '@/utils/utils'
 import capitalize from '@/filters/capitalize'
@@ -12,8 +11,7 @@ export default {
   name: 'Pipeline',
   components: {
     ConnectorLogo,
-    Dropdown,
-    ExploreButton
+    Dropdown
   },
   filters: {
     capitalize
@@ -270,11 +268,6 @@ export default {
             </span>
           </button>
         </div>
-        <ExploreButton
-          :pipeline="pipeline"
-          is-tooltip-left
-          custom-class="is-small"
-        />
         <div v-if="pipeline.interval === '@other'" class="control">
           <button
             class="button is-small tooltip is-tooltip-top is-warning"

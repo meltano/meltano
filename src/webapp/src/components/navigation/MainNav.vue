@@ -2,7 +2,6 @@
 import { mapGetters, mapState, mapActions } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
-import ExploreList from '@/components/analyze/ExploreList'
 import Logo from '@/components/navigation/Logo'
 import utils from '@/utils/utils'
 
@@ -28,7 +27,6 @@ export default {
   name: 'MainNav',
   components: {
     Dropdown,
-    ExploreList,
     Logo
   },
   data() {

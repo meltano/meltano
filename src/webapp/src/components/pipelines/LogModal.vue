@@ -3,7 +3,6 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import DownloadButton from '@/components/generic/DownloadButton'
-import ExploreButton from '@/components/analyze/ExploreButton'
 import SubscribeButton from '@/components/generic/SubscribeButton'
 import orchestrationsApi from '@/api/orchestrations'
 import poller from '@/utils/poller'
@@ -14,7 +13,6 @@ export default {
   components: {
     ConnectorLogo,
     DownloadButton,
-    ExploreButton,
     SubscribeButton
   },
   data() {
@@ -259,11 +257,6 @@ export default {
           <button v-if="hasError" class="button is-danger" @click="getHelp">
             Get Help
           </button>
-          <ExploreButton
-            v-else-if="relatedPipeline"
-            :pipeline="relatedPipeline"
-            :is-disabled="isPolling"
-          />
           <button class="button is-info" @click="retry">
             <span>Retry</span>
             <span class="icon is-small">
