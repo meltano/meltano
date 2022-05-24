@@ -4,6 +4,7 @@ import pytest
 import responses
 
 from meltano.core.hub import MeltanoHubService
+from meltano.core.hub.client import HubPluginVariantNotFound
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project import Project
@@ -15,27 +16,84 @@ class TestMeltanoHubService:
         return MeltanoHubService(project)
 
     @responses.activate
-    def test_find_definition(self, subject: MeltanoHubService, get_hub_response):
-        url = subject.plugin_endpoint(PluginType.EXTRACTORS, "tap-mock", "meltano")
-        responses.add_callback(responses.GET, url, callback=get_hub_response)
+    def test_find_definition_specified_variant(
+        self,
+        subject: MeltanoHubService,
+        get_hub_response,
+    ):
+        index_url = subject.plugin_type_endpoint(PluginType.EXTRACTORS)
+        responses.add_callback(responses.GET, index_url, callback=get_hub_response)
+
+        plugin_url = subject.plugin_endpoint(
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            "meltano",
+        )
+        responses.add_callback(responses.GET, plugin_url, callback=get_hub_response)
+
         definition = subject.find_definition(
             PluginType.EXTRACTORS,
             "tap-mock",
             variant_name="meltano",
         )
-        assert responses.assert_call_count(url, 1)
+        assert responses.assert_call_count(index_url, 1)
+        assert responses.assert_call_count(plugin_url, 1)
+        assert definition.name == "tap-mock"
+        assert definition.variants[0].name == "meltano"
+
+    @responses.activate
+    def test_find_definition_default_variant(
+        self,
+        subject: MeltanoHubService,
+        get_hub_response,
+    ):
+        index_url = subject.plugin_type_endpoint(PluginType.EXTRACTORS)
+        responses.add_callback(responses.GET, index_url, callback=get_hub_response)
+
+        plugin_url = subject.plugin_endpoint(
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            "meltano",
+        )
+        responses.add_callback(responses.GET, plugin_url, callback=get_hub_response)
+
+        definition = subject.find_definition(PluginType.EXTRACTORS, "tap-mock")
+        assert responses.assert_call_count(index_url, 1)
+        assert responses.assert_call_count(plugin_url, 1)
         assert definition.name == "tap-mock"
         assert definition.variants[0].name == "meltano"
 
     @responses.activate
     def test_definition_not_found(self, subject: MeltanoHubService, get_hub_response):
+        index_url = subject.plugin_type_endpoint(PluginType.EXTRACTORS)
+        responses.add_callback(responses.GET, index_url, callback=get_hub_response)
+
         plugin_url = subject.plugin_endpoint(PluginType.EXTRACTORS, "tap-not-found")
         responses.add_callback(responses.GET, plugin_url, callback=get_hub_response)
 
         with pytest.raises(PluginNotFoundError):
             subject.find_definition(PluginType.EXTRACTORS, "tap-not-found")
 
-        assert responses.assert_call_count(plugin_url, 1)
+        assert responses.assert_call_count(index_url, 1)
+        assert responses.assert_call_count(plugin_url, 0)
+
+    @responses.activate
+    def test_variant_not_found(self, subject: MeltanoHubService, get_hub_response):
+        index_url = subject.plugin_type_endpoint(PluginType.EXTRACTORS)
+        responses.add_callback(responses.GET, index_url, callback=get_hub_response)
+
+        plugin_url = subject.plugin_endpoint(
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            "not-found",
+        )
+        responses.add_callback(responses.GET, plugin_url, callback=get_hub_response)
+
+        with pytest.raises(HubPluginVariantNotFound):
+            subject.find_definition(PluginType.EXTRACTORS, "tap-mock", "not-found")
+
+        assert responses.assert_call_count(index_url, 1)
+        assert responses.assert_call_count(plugin_url, 0)
 
     @responses.activate
     def test_get_plugins_of_type(self, subject: MeltanoHubService, get_hub_response):
