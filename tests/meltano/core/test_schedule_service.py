@@ -152,7 +152,7 @@ class TestScheduleService:
             schedule = add_elt("with_no_start_date", None)
             assert schedule.start_date
 
-    def test_run(self, subject, session, tap, target):
+    def test_run_elt_schedule(self, subject, session, tap, target):
         schedule = subject.add_elt(
             session,
             "tap-to-target",
@@ -187,6 +187,35 @@ class TestScheduleService:
                     "--dump=config",
                 ],
                 env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
+            )
+
+    def test_run_job_schedule(self, subject, session, tap, target):
+        schedule = subject.add(
+            "mock-job-schedule",
+            "mock-job",
+            "@daily",
+        )
+
+        # It fails because mock-job is not a valid job
+        assert subject.run(schedule).returncode == 1
+
+        process_mock = mock.Mock(returncode=0)
+        with mock.patch(
+            "meltano.core.schedule_service.MeltanoInvoker.invoke",
+            return_value=process_mock,
+        ) as invoke_mock:
+            process = subject.run(
+                schedule, "--dry-run", env={"MOCK_ENV_ENTRY": "athing"}
+            )
+            assert process.returncode == 0
+
+            invoke_mock.assert_called_once_with(
+                [
+                    "run",
+                    "--dry-run",
+                    schedule.job,
+                ],
+                env={"MOCK_ENV_ENTRY": "athing"},
             )
 
     def test_find_namespace_schedule(

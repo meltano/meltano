@@ -101,7 +101,7 @@ class ScheduleService:
         )
         return self.add_schedule(schedule)
 
-    def add(self, name: str, job: str, interval: str, **env):
+    def add(self, name: str, job: str, interval: str, **env) -> Schedule:
         """Add a scheduled job.
 
         Args:
@@ -109,9 +109,13 @@ class ScheduleService:
             job: The name of the job.
             interval: The interval of the job.
             env: The env for this scheduled job
+
+        Returns:
+            The added schedule.
         """
         schedule = Schedule(name=name, job=job, interval=interval, env=env)
         self.add_schedule(schedule)
+        return schedule
 
     def remove(self, name) -> str:
         """Remove a schedule from the project.
@@ -288,9 +292,8 @@ class ScheduleService:
             env = {}
 
         if schedule.job:
-            task_set = self.task_sets_service.get(schedule.job)
             return MeltanoInvoker(self.project).invoke(
-                ["run", *args, *task_set.squashed.split(" ")],
+                ["run", *args, schedule.job],
                 env={**schedule.env, **env},
                 **kwargs,
             )
