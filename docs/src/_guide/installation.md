@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Learn how to install Meltano locally or using Docker.
+description: Learn how to install Meltano locally with Linux, MacOS, Windows, or Docker.
 layout: doc
 weight: 1
 ---
@@ -13,9 +13,13 @@ If the installation instructions on the [homepage](/) or the [Getting Started gu
     <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
 </div>
 
-## Local Installation
+# Local Installation
 
-In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/reference/ui).
+In the section below, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/reference/ui).
+
+## Unix-like
+
+For MacOS (Including the M1), Linux Distributions, and more! 
 
 ### Requirements
 
@@ -72,7 +76,71 @@ meltano --version
 
 Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
 
-## Installing on Docker
+## Windows
+
+Please note that Windows is not fully supported yet so some features like the UI, and the ELT command may not work yet. 
+See the [Meltano on Windows](https://gitlab.com/groups/meltano/-/epics/115) Epic for more information. 
+
+If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). 
+You may also try [installing Meltano on Docker](#installing-on-docker).
+
+### Requirements
+
+Before you install Meltano, make sure you have the following requirements installed and up to date.
+
+#### Python 3.7, 3.8 or 3.9
+
+<div class="notification is-info">
+  <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
+</div>
+
+Use the following command in PowerShell to check that you have the correct Python version installed:
+
+```powershell
+python --version
+```
+
+#### Install pipx
+
+`pip` is a package installer that comes automatically with Python 3+.
+[pipx](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
+
+
+```powershell
+# install pipx and ensure it is on the path
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+#Be sure pipx is available on your path
+RefreshEnv
+```
+
+<div class="notification is-info">
+  <p>Why use pipx and virtual environments?</p>
+  <p>Your local environment may use a different version of Python or other dependencies that are
+difficult to manage. The pipx installer automatically creates a virtual environment and provides a
+"clean" isolated space without version conflicts or other compatibility issues.</p>
+</div>
+
+### Install Meltano
+
+Now that you have [pipx](https://pipxproject.github.io/pipx) installed, run the following command to install the Meltano package into its
+own pipx-backed virtual environment:
+
+```bash
+pipx install meltano
+```
+
+Once the installation completes, you can check if it was successful by running:
+
+```bash
+meltano --version
+```
+
+### Next Steps
+
+Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
+
+## Docker
 
 [Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
@@ -131,127 +199,6 @@ Now that you're successfully running Meltano, you can continue setting up your M
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
 
-## Windows
-
-Please note that Windows is not fully supported yet so some features like the UI, and the ELT command may not work yet. 
-See the [Meltano on Windows](https://gitlab.com/groups/meltano/-/epics/115) Epic for more information. 
-
-If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). 
-You may also try [installing Meltano on Docker](#installing-on-docker).
-
-### Requirements
-
-Before you install Meltano, make sure you have the following requirements installed and up to date.
-
-#### Python 3.7, 3.8 or 3.9
-
-<div class="notification is-info">
-  <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
-</div>
-
-Use the following command in PowerShell to check that you have the correct Python version installed:
-
-```powershell
-python --version
-```
-
-#### pip3 and pipx
-
-`pip` is a package installer that comes automatically with Python 3+.
-[pipx](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
-
-
-```powershell
-# install pipx and ensure it is on the path
-python3 -m pip install --user pipx
-python3 -m pipx ensurepath
-#Be sure pipx is available on your path
-RefreshEnv
-```
-
-<div class="notification is-info">
-  <p>Why use pipx and virtual environments?</p>
-  <p>Your local environment may use a different version of Python or other dependencies that are
-difficult to manage. The pipx installer automatically creates a virtual environment and provides a
-"clean" isolated space without version conflicts or other compatibility issues.</p>
-</div>
-
-### Install Meltano
-
-Now that you have [pipx](https://pipxproject.github.io/pipx) installed, run the following command to install the Meltano package into its
-own pipx-backed virtual environment:
-
-```bash
-pipx install meltano
-```
-
-Once the installation completes, you can check if it was successful by running:
-
-```bash
-meltano --version
-```
-
-### Next Steps
-
-Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
-
-## VirtualEnv-Based Install
-
-If not using [pipx](https://pipxproject.github.io/), we strongly suggest you create a directory
-where you want your virtual environments to be saved (e.g. `.venv/`). This can be any directory in
-your environment, but we recommend saving it in your Meltano project to make it easier to keep
-track of.
-
-Then create a new virtual environment inside that directory:
-
-```bash
-mkdir .venv
-python -m venv .venv/meltano
-```
-
-### Activating Your Virtual Environment
-
-Activate the virtual environment, and upgrade pip using:
-
-```bash
-source .venv/meltano/bin/activate
-pip install --upgrade pip
-```
-
-If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to
-your prompt.
-
-Once a virtual environment is activated, it stays active until the current shell is closed. In a new
-shell, you must re-activate the virtual environment before interacting with the `meltano` command
-that will be installed in the next step.
-
-To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/)
-that'll be easier to remember than the entire activation invocation:
-
-```bash
-# add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
- 
-# use as follows, after creating a new shell:
-meltano!
-```
-
-You can deactivate a virtual environment by typing `deactivate` in your shell.
-
-### Install Meltano into VirtualEnv
-
-Now that you have your virtual environment set up and running, run the following command to install
-the Meltano package:
-
-```bash
-pip3 install meltano
-```
-
-Once the installation completes, you can check if it was successful by running:
-
-```bash
-meltano --version
-```
 
 # Troubleshooting Installation
 
@@ -263,7 +210,7 @@ meltano --version
 
 We release new versions of Meltano every week. To keep tabs on the latest releases, follow along on the [Meltano blog](https://meltano.com/blog/), or have a look at our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
 
-### Using the command line
+## Using the command line
 
 You can update Meltano to the latest version by running the following command in your terminal from inside a Meltano project:
 
