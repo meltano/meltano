@@ -34,15 +34,66 @@ def schedule(project, ctx):
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
 
+def _add_elt(
+    ctx,
+    name: str,
+    extractor: str,
+    loader: str,
+    transform: str,
+    interval: str,
+    start_date: str,
+):
+    """Add a new legacy elt schedule."""
+    project = ctx.obj["project"]
+    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+
+    _, session_maker = project_engine(project)
+    session = session_maker()
+    try:
+        added_schedule = schedule_service.add_elt(
+            session, name, extractor, loader, transform, interval, start_date
+        )
+        tracker = GoogleAnalyticsTracker(schedule_service.project)
+        tracker.track_meltano_schedule("add", added_schedule)
+        click.echo(
+            f"Scheduled elt '{added_schedule.name}' at {added_schedule.interval}"
+        )
+    except ScheduleAlreadyExistsError:
+        click.secho(f"Schedule '{name}' already exists.", fg="yellow")
+    finally:
+        session.close()
+
+
+def _add_job(ctx, name: str, job: str, interval: str):
+    """Add a new scheduled job."""
+    project = ctx.obj["project"]
+    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+
+    _, session_maker = project_engine(project)
+    session = session_maker()
+    try:
+        added_schedule = schedule_service.add(name, job, interval)
+        tracker = GoogleAnalyticsTracker(schedule_service.project)
+        tracker.track_meltano_schedule("add", added_schedule)
+        click.echo(
+            f"Scheduled job '{added_schedule.name}' at {added_schedule.interval}"
+        )
+    except ScheduleAlreadyExistsError:
+        click.secho(f"Schedule '{name}' already exists.", fg="yellow")
+    finally:
+        session.close()
+
+
 @schedule.command(short_help="[default] Add a new schedule.")
 @click.argument("name")
-@click.argument("extractor")
-@click.argument("loader")
-@click.argument("interval")
+@click.option("--job", "-j", help="The name of the job to run.")
+@click.option("--extractor", required=False)
+@click.option("--loader", required=False)
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
+@click.option("--interval", required=True)
 @click.option("--start-date", type=click.DateTime(), default=None)
 @click.pass_context
-def add(ctx, name, extractor, loader, transform, interval, start_date):
+def add(ctx, name, job, extractor, loader, transform, interval, start_date):
     """
     Add a new schedule.
 
@@ -52,25 +103,18 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
     LOADER:\tWhich loader should be used
     INTERVAL:\tCron-like syntax to specify the schedule interval (@daily, @hourly, etc…)
     """
-    project = ctx.obj["project"]
-    schedule_service = ctx.obj["schedule_service"]
+    if job and (extractor or loader):
+        raise click.ClickException("Cannot specify both --job and --extractor/--loader")
 
-    _, sessionMaker = project_engine(project)  # noqa: N806
-    session = sessionMaker()
-    try:
-        added_schedule = schedule_service.add(
-            session, name, extractor, loader, transform, interval, start_date
-        )
+    if not job:
+        if not extractor:
+            raise click.ClickException("Missing --extractor")
+        if not loader:
+            raise click.ClickException("Missing --loader")
 
-        tracker = GoogleAnalyticsTracker(schedule_service.project)
-        tracker.track_meltano_schedule("add", added_schedule)
-        click.echo(f"Scheduled '{added_schedule.name}' at {added_schedule.interval}")
-    except ScheduleAlreadyExistsError as serr:
-        click.secho(
-            f"Schedule '{serr.added_schedule.name}' already exists.", fg="yellow"
-        )
-    finally:
-        session.close()
+        _add_elt(ctx, name, extractor, loader, transform, interval, start_date)
+        return
+    _add_job(ctx, name, job, interval)
 
 
 def _format_job_list_output(entry: Schedule, job: TaskSets) -> dict:
