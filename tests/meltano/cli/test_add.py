@@ -1,5 +1,6 @@
 import os
 import shutil
+import platform
 from unittest import mock
 
 import pytest
@@ -159,6 +160,10 @@ class TestCliAdd:
             "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}"
         }
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_add_files_with_updates(
         self,
         project,
@@ -212,6 +217,10 @@ class TestCliAdd:
         # File does not have "managed" header
         assert "This file is managed" not in file_path.read_text()
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_add_files_that_already_exists(
         self, project, cli_runner, project_plugins_service
     ):

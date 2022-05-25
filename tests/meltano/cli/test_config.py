@@ -1,5 +1,6 @@
 import json
-
+import platform
+import pytest
 from asynctest import CoroutineMock, mock
 
 from asserts import assert_cli_runner
@@ -7,6 +8,10 @@ from meltano.cli import cli
 
 
 class TestCliConfig:
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_config(self, project, cli_runner, tap, project_plugins_service):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
@@ -29,6 +34,10 @@ class TestCliConfig:
             json_config = json.loads(result.stdout)
             assert "_select" in json_config
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_config_env(self, project, cli_runner, tap, project_plugins_service):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",

@@ -1,10 +1,12 @@
 import asyncio
+import platform
 import signal
 import uuid
 from datetime import datetime, timedelta
 
 import psutil
 import pytest
+
 from meltano.core.job.job import (
     HEARTBEAT_VALID_MINUTES,
     HEARTBEATLESS_JOB_VALID_HOURS,
@@ -87,6 +89,10 @@ class TestJob:
         assert subject.payload["error"] == "This is a test."
 
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="This signal is not supported on Windows, tracked here https://gitlab.com/meltano/meltano/-/issues/2901",
+    )
     async def test_run_interrupted(self, session):
         subject = self.sample_job({"original_state": 1}).save(session)
 
@@ -100,6 +106,10 @@ class TestJob:
         assert subject.payload["error"] == "The process was interrupted"
 
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="This signal is not supported on Windows, tracked here https://gitlab.com/meltano/meltano/-/issues/2901",
+    )
     async def test_run_terminated(self, session):
         subject = self.sample_job({"original_state": 1}).save(session)
 

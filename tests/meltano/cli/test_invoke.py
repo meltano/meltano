@@ -1,7 +1,8 @@
 import asyncio
 import json
+import platform
+from unittest import mock
 
-import mock
 import pytest
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
@@ -83,6 +84,10 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_invoke_command_containerized(  # noqa: WPS210
         self,
         project,

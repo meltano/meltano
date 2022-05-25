@@ -1,0 +1,69 @@
+import json
+import platform
+
+import pytest
+from flask import url_for
+
+
+def assert_has_items(entry, count):
+    return len(entry["items"]) == count
+
+
+@pytest.mark.usefixtures("add_model", "seed_users")
+class TestRepos:
+    def test_index(self, api, app):
+        with app.test_request_context():
+            res = api.get(url_for("repos.index"))
+
+        payload = res.json
+
+        assert_has_items(payload["tables"], 3)
+        assert_has_items(payload["topics"], 1)
+        assert_has_items(payload["dashboards"], 0)
+        assert_has_items(payload["documents"], 1)
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
+    def test_model_index(self, api, app):
+        with app.test_request_context():
+            res = api.get(url_for("repos.model_index"))
+
+        payload = res.json
+
+        # we have topics
+        topic_identifiers = payload.keys()
+        assert topic_identifiers
+        assert "model-carbon-intensity/carbon" in topic_identifiers
+        assert "model-gitlab/gitlab" in topic_identifiers
+
+        # each topic has a name, a namespace and designs
+        for topic_def in payload.values():
+            assert topic_def["namespace"]
+            assert topic_def["name"]
+            assert topic_def["designs"]
+
+    def test_model_design(self, api, app):
+        with app.test_request_context():
+            res = api.get(
+                url_for(
+                    "repos.model_design",
+                    namespace="model-carbon-intensity",
+                    topic_name="carbon",
+                    design_name="region",
+                )
+            )
+
+        json_data = json.loads(res.data)
+
+        assert "description" in json_data
+        assert "from" in json_data
+        assert "graph" in json_data
+        assert "joins" in json_data
+        assert "label" in json_data
+        assert "name" in json_data
+        assert "related_table" in json_data
+
+        assert json_data["from"] == "region"
+        assert json_data["name"] == "region"

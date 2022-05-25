@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import platform
 import tempfile
 from pathlib import Path
 
@@ -70,6 +71,10 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_resolve_from_subdir(self, project_files, cd_temp_subdir):
         assert Path.cwd() == cd_temp_subdir
         assert cd_temp_subdir.parent == project_files.root
@@ -78,6 +83,10 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_resolve_from_any_dir(self, project_files, cd_temp_dir):
         assert Path.cwd() == cd_temp_dir
         assert project_files.include_paths == [

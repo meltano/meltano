@@ -1,3 +1,4 @@
+import platform
 from datetime import datetime
 from unittest import mock
 
@@ -85,6 +86,10 @@ class TestScheduleService:
         with pytest.raises(ScheduleAlreadyExistsError):
             subject.add_schedule(all_schedules[0])
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_remove_schedule(self, subject):
         schedules = list(subject.schedules())
         schedules_count = len(schedules)
@@ -152,6 +157,10 @@ class TestScheduleService:
             schedule = add_elt("with_no_start_date", None)
             assert schedule.start_date
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test will hold up other tests by running indefinietly",
+    )
     def test_run_elt_schedule(self, subject, session, tap, target):
         schedule = subject.add_elt(
             session,

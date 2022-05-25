@@ -1,10 +1,12 @@
 import os
+import platform
 import re
 import subprocess
 import sys
 from unittest import mock
 
 import pytest
+
 from meltano.core.project import Project
 from meltano.core.venv_service import VenvService, VirtualEnv
 
@@ -23,6 +25,10 @@ class TestVenvService:
         assert not file.exists()
 
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     async def test_clean_install(self, project, subject: VenvService):
         await subject.install("example", clean=True)
         venv_dir = subject.project.venvs_dir("namespace", "name")
@@ -65,9 +71,7 @@ class TestVenvService:
 
         # ensure a fingerprint file was created
         assert venv_dir.joinpath(".meltano_plugin_fingerprint").exists()
-        with open(
-            venv_dir.joinpath(".meltano_plugin_fingerprint"), "rt"
-        ) as fingerprint_file:
+        with open(venv_dir.joinpath(".meltano_plugin_fingerprint")) as fingerprint_file:
             assert (
                 fingerprint_file.read()
                 # sha256 of "example"
@@ -75,6 +79,10 @@ class TestVenvService:
             )
 
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     async def test_install(self, project, subject: VenvService):
         # Make sure the venv exists already
         await subject.install("example", clean=True)

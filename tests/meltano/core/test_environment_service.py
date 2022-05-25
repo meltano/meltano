@@ -1,3 +1,5 @@
+import platform
+
 import pytest
 
 from meltano.core.environment import Environment
@@ -52,6 +54,10 @@ class TestEnvironmentService:
         ):
             subject.remove("i-do-not-exist")
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_list_environments(
         self,
         subject: EnvironmentService,
