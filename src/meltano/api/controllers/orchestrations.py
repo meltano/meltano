@@ -1,4 +1,3 @@
-# noqa: WPS202
 """API Orchestation of Pipellines and Validations."""
 
 import asyncio
