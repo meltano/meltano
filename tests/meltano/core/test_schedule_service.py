@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
+
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
@@ -9,22 +10,37 @@ from meltano.core.schedule_service import (
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
-    ScheduleService,
     SettingMissingError,
 )
 
 
 @pytest.fixture(scope="session")
-def create_schedule():
+def create_elt_schedule():
     def make(name, **kwargs):
-        attrs = dict(
-            extractor="tap-mock",
-            loader="target-mock",
-            transform="run",
-            interval="@daily",
-            start_date=None,
-            env={},
-        )
+        attrs = {
+            "extractor": "tap-mock",
+            "loader": "target-mock",
+            "transform": "run",
+            "interval": "@daily",
+            "start_date": None,
+            "env": {},
+        }
+
+        attrs.update(kwargs)
+        return Schedule(name=name, **attrs)
+
+    return make
+
+
+@pytest.fixture(scope="session")
+def create_job_schedule():
+    def make(name, **kwargs):
+        attrs = {
+            "job": "job-mock",
+            "interval": "@daily",
+            "start_date": None,
+            "env": {},
+        }
 
         attrs.update(kwargs)
         return Schedule(name=name, **attrs)
@@ -48,18 +64,26 @@ class TestScheduleService:
     def subject(self, schedule_service):
         return schedule_service
 
-    def test_add_schedule(self, subject, create_schedule):
-        COUNT = 10
+    def test_add_schedules(self, subject, create_elt_schedule, create_job_schedule):
+        count = 5
 
-        schedules = [create_schedule(f"schedule_{i}") for i in range(COUNT)]
-        for schedule in schedules:
+        job_schedules = [
+            create_job_schedule(f"job_schedule_{idx}") for idx in range(count)
+        ]
+        elt_schedules = [
+            create_elt_schedule(f"elt_schedule_{idx}") for idx in range(count)
+        ]
+
+        all_schedules = job_schedules + elt_schedules
+
+        for schedule in all_schedules:
             subject.add_schedule(schedule)
 
-        assert subject.schedules() == schedules
+        assert subject.schedules() == all_schedules
 
         # but name must be unique
         with pytest.raises(ScheduleAlreadyExistsError):
-            subject.add_schedule(schedules[0])
+            subject.add_schedule(all_schedules[0])
 
     def test_remove_schedule(self, subject):
         schedules = list(subject.schedules())
@@ -67,9 +91,7 @@ class TestScheduleService:
 
         idx = 3
         target_schedule = schedules[idx]
-        target_name = f"schedule_{idx}"
-
-        assert target_schedule.name == target_name
+        target_name = target_schedule.name
 
         subject.remove_schedule(target_name)
 
@@ -89,7 +111,7 @@ class TestScheduleService:
         subject.update_schedule(schedule)
 
         # there should be only 1 element with the set interval
-        assert sum(map(lambda s: s.interval == "@pytest", subject.schedules())) == 1
+        assert sum(map(lambda sbj: sbj.interval == "@pytest", subject.schedules())) == 1
 
         # it should be the first element
         assert subject.schedules()[0].interval == "@pytest"
@@ -105,31 +127,33 @@ class TestScheduleService:
     def test_schedule_start_date(
         self, subject, session, tap, target, plugin_settings_service_factory
     ):
-        # curry the `add` method to remove some arguments
-        add = lambda name, start_date: subject.add(
+        # curry the `add_elt` method to remove some arguments
+        add_elt = lambda name, start_date: subject.add_elt(  # noqa: E731
             session, name, tap.name, target.name, "run", "@daily", start_date=start_date
         )
 
+        mock_date = datetime(2002, 1, 1)  # noqa: WPS432
+
         # when a start_date is set, the schedule should use it
-        schedule = add("with_start_date", datetime(2001, 1, 1))
-        assert schedule.start_date == datetime(2001, 1, 1)
+        schedule = add_elt("with_start_date", mock_date)
+        assert schedule.start_date == mock_date
 
         # or use the start_date in the extractor configuration
         plugin_settings_service = plugin_settings_service_factory(tap)
-        plugin_settings_service.set("start_date", datetime(2002, 1, 1), session=session)
-        schedule = add("with_default_start_date", None)
-        assert schedule.start_date == datetime(2002, 1, 1)
+        plugin_settings_service.set("start_date", mock_date, session=session)
+        schedule = add_elt("with_default_start_date", None)
+        assert schedule.start_date == mock_date
 
         # or default to `utcnow()` if the plugin exposes no config
         with mock.patch(
             "meltano.core.schedule_service.PluginSettingsService.get",
             side_effect=SettingMissingError("start_date"),
         ):
-            schedule = add("with_no_start_date", None)
+            schedule = add_elt("with_no_start_date", None)
             assert schedule.start_date
 
     def test_run(self, subject, session, tap, target):
-        schedule = subject.add(
+        schedule = subject.add_elt(
             session,
             "tap-to-target",
             tap.name,
@@ -166,9 +190,9 @@ class TestScheduleService:
             )
 
     def test_find_namespace_schedule(
-        self, subject, tap, create_schedule, project_plugins_service
+        self, subject, tap, create_elt_schedule, project_plugins_service
     ):
-        schedule = create_schedule(tap.name)
+        schedule = create_elt_schedule(tap.name)
         subject.add_schedule(schedule)
         with mock.patch(
             "meltano.core.project_plugins_service.ProjectPluginsService",
@@ -178,7 +202,7 @@ class TestScheduleService:
             assert found_schedule.extractor == tap.name
 
     def test_find_namespace_schedule_custom_extractor(
-        self, subject, create_schedule, custom_tap, project_plugins_service
+        self, subject, create_elt_schedule, custom_tap, project_plugins_service
     ):
         schedule = Schedule(name="tap-custom", extractor="tap-custom")
         subject.add_schedule(schedule)
