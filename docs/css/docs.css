@@ -217,3 +217,19 @@ code {
 li .toc-entry {
   padding-left: 1rem;
 }
+
+.announcement {
+  background-color: #031d4d;
+  text-align: center;
+}
+
+.announcement p {
+  color:  #ffffff;
+  font-weight: bold;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.announcement a {
+  color: #fbbf52;
+}

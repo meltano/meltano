@@ -78,3 +78,11 @@ algolia:
  application_id: 'ALHYNO312B'
  index_name: documentation_search
  search_only_api_key: '28f2a216e3886060fa641b7cb703de90'
+
+# Set display to true/false to toggle announcements on/off
+announcement:
+  display: true
+  text: Meltano v2.0 is almost here!
+  cta: See what's on the roadmap.
+  cta-link: https://handbook.meltano.com/product/roadmap#2022-q2
+
