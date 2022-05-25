@@ -70,7 +70,7 @@ To learn about deploying Meltano UI in production, refer to the ["Meltano UI" se
 
 ### Extractor configuration
 
-[![Extractor Configuration interface](images/ui/extractor-configuration.png)](images/ui/extractor-configuration.png)
+[![Extractor configuration interface](images/ui/extractors-configuration.png)](images/ui/extractors-configuration.png)
 
 ### Loaders
 
@@ -78,7 +78,7 @@ To learn about deploying Meltano UI in production, refer to the ["Meltano UI" se
 
 ### Loaders configuration
 
-[![Loaders Configuration interface](images/ui/loaders-configuration.png)](images/ui/loaders-configuration.png)
+[![Loaders configuration interface](images/ui/loaders-configuration.png)](images/ui/loaders-configuration.png)
 
 ### Pipelines
 
@@ -86,12 +86,12 @@ To learn about deploying Meltano UI in production, refer to the ["Meltano UI" se
 
 ### Pipeline creation
 
-[![Pipeline Creation interface](images/ui/create-pipeline.png)](images/ui/create-pipeline.png)
+[![Pipeline creation interface](images/ui/create-pipeline.png)](images/ui/create-pipeline.png)
 
 ### Pipeline run log
 
-[![Extractors Run Log interface](images/ui/pipeline-log.png)](images/ui/pipeline-log.png)
+[![Extractors run log interface](images/ui/pipeline-log.png)](images/ui/pipeline-log.png)
 
 ### Pipeline update schedule to reflect CRON settings
 
-[![Pipeline Update](images/ui/pipeline-cron.png)](images/ui/pipeline-cron.png)
+[![Pipeline update](images/ui/pipeline-cron.png)](images/ui/pipeline-cron.png)
