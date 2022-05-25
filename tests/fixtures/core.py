@@ -238,8 +238,8 @@ def locked_definition_service(project):
 
 
 @pytest.fixture(scope="class")
-def project_init_service():
-    return ProjectInitService(PROJECT_NAME)
+def project_init_service(request):
+    return ProjectInitService(f"project_{request.node.name}")
 
 
 @pytest.fixture(scope="class")
