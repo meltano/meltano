@@ -5,10 +5,14 @@ import sys
 
 import click
 from click_default_group import DefaultGroup
+from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
+from meltano.core.task_sets import TaskSets
+from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import coerce_datetime
 
@@ -27,6 +31,7 @@ def schedule(project, ctx):
     """
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
+    ctx.obj["task_sets_service"] = TaskSetsService(project)
 
 
 @schedule.command(short_help="[default] Add a new schedule.")
@@ -50,8 +55,8 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
     project = ctx.obj["project"]
     schedule_service = ctx.obj["schedule_service"]
 
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
+    _, sessionMaker = project_engine(project)  # noqa: N806
+    session = sessionMaker()
     try:
         added_schedule = schedule_service.add(
             session, name, extractor, loader, transform, interval, start_date
@@ -68,16 +73,54 @@ def add(ctx, name, extractor, loader, transform, interval, start_date):
         session.close()
 
 
+def _format_job_list_output(entry: Schedule, job: TaskSets) -> dict:
+    return {
+        "name": entry.name,
+        "interval": entry.interval,
+        "cron_interval": entry.cron_interval,
+        "env": entry.env,
+        "job": {
+            "name": job.name,
+            "tasks": job.tasks,
+        },
+    }
+
+
+def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
+    start_date = coerce_datetime(entry.start_date)
+    if start_date:
+        start_date = start_date.date().isoformat()
+
+    last_successful_run = entry.last_successful_run(session)
+    last_successful_run_ended_at = (
+        last_successful_run.ended_at.isoformat() if last_successful_run else None
+    )
+
+    return {
+        "name": entry.name,
+        "extractor": entry.extractor,
+        "loader": entry.loader,
+        "transform": entry.transform,
+        "interval": entry.interval,
+        "start_date": start_date,
+        "env": entry.env,
+        "cron_interval": entry.cron_interval,
+        "last_successful_run_ended_at": last_successful_run_ended_at,
+        "elt_args": entry.elt_args,
+    }
+
+
 @schedule.command(short_help="List available schedules.")  # noqa: WPS441
 @click.option("--format", type=click.Choice(["json", "text"]), default="text")
 @click.pass_context
 def list(ctx, format):  # noqa: WPS125
     """List available schedules."""
     project = ctx.obj["project"]
-    schedule_service = ctx.obj["schedule_service"]
+    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+    task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
+    _, sessionMaker = project_engine(project)  # noqa: N806
+    session = sessionMaker()
     try:
         StaleJobFailer().fail_stale_jobs(session)
 
@@ -89,40 +132,36 @@ def list(ctx, format):  # noqa: WPS125
             }
 
             for txt_schedule in schedule_service.schedules():
-                markers = transform_elt_markers[txt_schedule.transform]
-                click.echo(
-                    f"[{txt_schedule.interval}] {txt_schedule.name}: {txt_schedule.extractor} {markers[0]} {txt_schedule.loader} {markers[1]} transforms"
-                )
+                if txt_schedule.job:
+                    click.echo(
+                        f"[{txt_schedule.interval}] job {txt_schedule.name}: {txt_schedule.job} → {task_sets_service.get(txt_schedule.job).tasks}"
+                    )
+                else:
+                    markers = transform_elt_markers[txt_schedule.transform]
+                    click.echo(
+                        f"[{txt_schedule.interval}] elt {txt_schedule.name}: {txt_schedule.extractor} {markers[0]} {txt_schedule.loader} {markers[1]} transforms"
+                    )
+
         elif format == "json":
-            schedules = []
+            job_schedules = []
+            elt_schedules = []
             for json_schedule in schedule_service.schedules():
-                start_date = coerce_datetime(json_schedule.start_date)
-                if start_date:
-                    start_date = start_date.date().isoformat()
-
-                last_successful_run = json_schedule.last_successful_run(session)
-                last_successful_run_ended_at = (
-                    last_successful_run.ended_at.isoformat()
-                    if last_successful_run
-                    else None
+                if json_schedule.job:
+                    job_schedules.append(
+                        _format_job_list_output(
+                            json_schedule, task_sets_service.get(json_schedule.job)
+                        )
+                    )
+                else:
+                    elt_schedules.append(
+                        _format_elt_list_output(json_schedule, session)
+                    )
+            click.echo(
+                json.dumps(
+                    {"schedules": {"job": job_schedules, "elt": elt_schedules}},
+                    indent=2,
                 )
-
-                schedules.append(
-                    {
-                        "name": json_schedule.name,
-                        "extractor": json_schedule.extractor,
-                        "loader": json_schedule.loader,
-                        "transform": json_schedule.transform,
-                        "interval": json_schedule.interval,
-                        "start_date": start_date,
-                        "env": json_schedule.env,
-                        "cron_interval": json_schedule.cron_interval,
-                        "last_successful_run_ended_at": last_successful_run_ended_at,
-                        "elt_args": json_schedule.elt_args,
-                    }
-                )
-
-            click.echo(json.dumps(schedules, indent=2))
+            )
     finally:
         session.close()
 
