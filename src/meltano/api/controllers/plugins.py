@@ -86,7 +86,7 @@ def installed():
     project = Project.find()
     plugins_service = ProjectPluginsService(project)
 
-    def def_plugin_json(plugin: ProjectPlugin):
+    def _plugin_json(plugin: ProjectPlugin):
         plugin_json = {"name": plugin.name}
 
         try:
@@ -100,7 +100,7 @@ def installed():
         return plugin_json
 
     installed_plugins = {
-        plugin_type: [def_plugin_json(plugin) for plugin in plugins]
+        plugin_type: [_plugin_json(plugin) for plugin in plugins]
         for plugin_type, plugins in plugins_service.plugins_by_type().items()
     }
 
