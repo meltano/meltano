@@ -271,11 +271,15 @@ getting_started_sample_code:
 
     ### https://docs.meltano.com/getting-started#run-a-data-integration-el-pipeline
 
-    - meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
-
+    - meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-postgres --interval "@daily"
     - meltano schedule list
 
     - meltano add orchestrator airflow
+
+    ### quick job/run related sanity checks
+    - meltano job add samplejob --tasks 'tap-gitlab target-postgres'
+    - meltano run --dry-run samplejob
+    - meltano schedule add scheduled-job --job samplejob --interval "@hourly"
 
     ### ---
     - meltano invoke airflow version
