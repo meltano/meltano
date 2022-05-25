@@ -51,8 +51,8 @@ class ProjectAddService:
         # raise
 
         # TODO: Determine use Hub or discovery.yml here
-        with self.plugins_service.disallow_discovery_yaml():
-            self.plugins_service.ensure_parent(plugin)
+        # with self.plugins_service.disallow_discovery_yaml():
+        self.plugins_service.ensure_parent(plugin)
 
         # If we are inheriting from a base plugin definition,
         # repeat the variant and pip_url in meltano.yml

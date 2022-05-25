@@ -1,13 +1,21 @@
+from __future__ import annotations
+
+import json
 import logging
 import os
+from collections import Counter
+from copy import deepcopy
 from http import HTTPStatus
-from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 import pytest
+import requests
 import responses
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436 (protected module)
-from requests import PreparedRequest
+from requests.adapters import BaseAdapter
+
+from meltano.core.hub.client import MeltanoHubService
+from meltano.core.plugin.base import PluginType
 
 logging.basicConfig(level=logging.INFO)
 
@@ -73,39 +81,113 @@ def setup_env():
     monkeypatch.undo()
 
 
-@pytest.fixture(scope="session")
-def mock_hub_responses_dir():
-    return Path(__file__).parent.joinpath("fixtures", "hub")
+class MockAdapter(BaseAdapter):
+    def _process_discovery(self, base_url: str, discovery: dict) -> dict:
+        hub = {}
+        for plugin_type in PluginType:
+            index_key = f"/{plugin_type}/index"
+            hub[index_key] = {}
+            for plugin in discovery.get(plugin_type, []):
+                plugin_name = plugin["name"]
+                hub[index_key][plugin_name] = {}
+                hub[index_key][plugin_name]["variants"] = {}
+                default_variant = None
 
+                variants = plugin.get("variants", [])
 
-@pytest.fixture(scope="session")
-def get_hub_response(mock_hub_responses_dir: Path):
-    def _get_response(request: PreparedRequest) -> Any:
-        endpoint_mapping = {
-            "/plugins/extractors/index": "extractors.json",
-            "/plugins/loaders/index": "loaders.json",
-            "/plugins/extractors/tap-mock--meltano": "tap-mock--meltano.json",
-            "/plugins/loaders/target-mock": "target-mock.json",
-        }
+                for variant in variants:
+                    variant_name = variant["name"]
 
-        _, endpoint = request.path_url.split("/meltano/api/v1")
+                    if not default_variant or variant.get("default", False):
+                        default_variant = variant_name
+
+                    hub[index_key][plugin_name]["variants"][variant_name] = {
+                        "ref": f"{base_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                    }
+
+                    plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
+                    hub[plugin_key] = {
+                        **variant,
+                        "name": plugin_name,
+                        "namespace": plugin["namespace"],
+                        "variant": variant_name,
+                    }
+
+                if not variants:
+                    variant_name = "original"
+                    default_variant = variant_name
+
+                    hub[index_key][plugin_name]["variants"][variant_name] = {
+                        "ref": f"{base_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                    }
+
+                    plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
+                    hub[plugin_key] = {
+                        "name": plugin_name,
+                        "namespace": plugin["namespace"],
+                        "variant": variant_name,
+                        "settings": plugin.get("settings", []),
+                        "commands": plugin.get("commands", {}),
+                        "docs": plugin.get("docs"),
+                        "repo": plugin.get("repo"),
+                        "pip_url": plugin.get("pip_url"),
+                    }
+
+                hub[index_key][plugin_name][
+                    "logo_url"
+                ] = f"https://mock.meltano.com/{plugin_name}.png"
+                hub[index_key][plugin_name]["default_variant"] = default_variant
+
+        return hub
+
+    def __init__(self, base_url: str, discovery: dict) -> None:
+        """Create a mock HTTP adapter for the Hub.
+
+        Args:
+            base_url: The base URL of the Hub.
+            discovery: A parsed discovery.yml file.
+        """
+        super().__init__()
+        self.base_url = base_url
+        self.count = Counter()
+        self._mapping = self._process_discovery(base_url, deepcopy(discovery))
+
+    def send(
+        self,
+        request: requests.PreparedRequest,
+        stream: bool = False,
+        timeout: float | tuple[float, float] | tuple[float, None] | None = None,
+        verify: bool | str = True,
+        cert: Any | None = None,
+        proxies: Mapping[str, str] | None = None,
+    ):
+        _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
+        response = requests.Response()
 
         try:
-            filename = endpoint_mapping[endpoint]
+            data = self._mapping[endpoint]
         except KeyError:
-            return (HTTPStatus.NOT_FOUND, {}, '{"error": "not found"}')
+            response.status_code = HTTPStatus.NOT_FOUND
+            response._content = b""
+            return response
 
-        file_path = mock_hub_responses_dir / filename
-        return (
-            HTTPStatus.OK,
-            {"Content-Type": "application/json"},
-            file_path.read_text(),
-        )
-
-    return _get_response
+        self.count[endpoint] += 1
+        response.status_code = HTTPStatus.OK
+        response._content = json.dumps(data).encode()
+        return response
 
 
-@pytest.fixture
-def requests_mock():
-    with responses.RequestsMock() as mock:
-        yield mock
+@pytest.fixture(scope="class")
+def meltano_hub_service(project, discovery):
+    hub = MeltanoHubService(project)
+    hub.session.mount(hub.BASE_URL, MockAdapter(hub.BASE_URL, discovery))
+    return hub
+
+
+@pytest.fixture(scope="function")
+def hub_request_counter(meltano_hub_service: MeltanoHubService):
+    counter: Counter = meltano_hub_service.session.get_adapter(
+        meltano_hub_service.BASE_URL
+    ).count
+    counter.clear()
+    return counter
