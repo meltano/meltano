@@ -1,15 +1,10 @@
 import Router from 'vue-router'
 
-import Design from '@/components/analyze/Design'
-import Explore from '@/components/analyze/Explore'
 import CreatePipelineScheduleModal from '@/components/pipelines/CreatePipelineScheduleModal'
 import LogModal from '@/components/pipelines/LogModal'
 import PluginSettingsModal from '@/components/pipelines/PluginSettingsModal'
 import CronJobModal from '@/components/pipelines/CronJobModal'
 
-import Analyze from '@/views/Analyze'
-import Dashboard from '@/views/Dashboard'
-import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
 import Pipelines from '@/views/Pipelines'
 import Plugins from '@/views/Plugins'
@@ -113,56 +108,6 @@ const router = new Router({
           }
         }
       ]
-    },
-    {
-      path: '/analyze/',
-      name: 'analyze',
-      component: Analyze,
-      meta: {
-        title: 'Meltano: Analyze'
-      },
-      children: [
-        {
-          path: '/analyze/:extractor',
-          name: 'explore',
-          component: Explore,
-          meta: {
-            title: 'Meltano: Analyze - Explore'
-          }
-        },
-        {
-          path: '/analyze/:namespace+/:model/:design/reports/:slug',
-          name: 'report',
-          component: Design,
-          meta: {
-            title: 'Meltano: Analyze - Report'
-          }
-        },
-        {
-          path: '/analyze/:namespace+/:model/:design',
-          name: 'design',
-          component: Design,
-          meta: {
-            title: 'Meltano: Analyze - Report Builder'
-          }
-        }
-      ]
-    },
-    {
-      path: '/dashboards/',
-      name: 'dashboards',
-      component: Dashboards,
-      meta: {
-        title: 'Meltano: Dashboards'
-      }
-    },
-    {
-      path: '/dashboards/:slug',
-      name: 'dashboard',
-      component: Dashboard,
-      meta: {
-        title: 'Meltano: Dashboard'
-      }
     }
   ]
 })
