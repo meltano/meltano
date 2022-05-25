@@ -15,16 +15,24 @@
           
         </div>
 
-        <div class="column is-9">
+        <div class="column is-8">
 
             {% include breadcrumbs.html %}
 
             <section class="section content">
               <h1>{{ page.title }}</h1>
-              <div id="table-of-contents">{% toc %}</div>
               <div id="markdown-content">{% include anchor_headings.html html=content anchorBody="#" %}</div>
             </section>
             
+        </div>
+
+        <div class="column is-2">
+            <aside class="toc is-fullheight is-narrow-mobile is-hidden-mobile">
+              <h2>Table of Contents</h2>
+
+              <div id="table-of-contents">{% toc %}</div> 
+
+            </aside>
         </div>
 
       </div>
