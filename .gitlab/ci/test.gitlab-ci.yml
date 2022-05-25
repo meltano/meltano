@@ -128,6 +128,7 @@ pytest_sqlite_concurrent:
     - .pytest_sqlite
     - .pytest_concurrent
 
+# Image is ignored due to https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html#limitations-and-known-issues which is why we have to install our dependencies manually
 pytest_windows:
   extends:
     - .pytest

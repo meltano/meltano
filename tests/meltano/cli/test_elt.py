@@ -223,7 +223,7 @@ def dbt_process(process_mock_factory, dbt):
 class TestWindowsELT:
     @pytest.mark.skipif(
         platform.system() != "Windows",
-        reason="ELT doesn't work for Windows, let's be sure this fails on Windows only",
+        reason="Test is only for Windows",
     )
     @pytest.mark.backend("sqlite")
     @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)

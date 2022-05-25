@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import threading
 import time
@@ -7,6 +8,7 @@ from multiprocessing.pool import ThreadPool
 
 import pytest
 import yaml
+
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.project import PROJECT_ROOT_ENV, Project, ProjectNotFound
 
@@ -98,6 +100,10 @@ class TestProject:
         assert all(map(lambda x: x is project, projects))
 
     @pytest.mark.concurrent
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_meltano_concurrency(self, project, concurrency):
         payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]
 

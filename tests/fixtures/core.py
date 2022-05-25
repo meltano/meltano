@@ -458,7 +458,7 @@ def project(test_dir, project_init_service):
     # clean-up
     Project.deactivate()
     os.chdir(test_dir)
-    shutil.rmtree(project.root)
+    # shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")
 
 
@@ -481,7 +481,7 @@ def project_files(test_dir, compatible_copy_tree):
     # clean-up
     Project.deactivate()
     os.chdir(test_dir)
-    shutil.rmtree(project.root)
+    # shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")
 
 

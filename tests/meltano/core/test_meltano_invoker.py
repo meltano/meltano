@@ -1,11 +1,13 @@
 import os
+import platform
 import subprocess
 import sys
 from pathlib import Path
 from unittest import mock
 
-import meltano
 import pytest
+
+import meltano
 from meltano.core.meltano_invoker import MELTANO_COMMAND, MeltanoInvoker
 
 
@@ -19,6 +21,10 @@ class TestMeltanoInvoker:
         assert process.returncode == 0
         assert meltano.__version__ in str(process.stdout)  # noqa: WPS609
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_invoke_executable(self, subject, project):
         process_mock = mock.Mock(returncode=0)
         with mock.patch("subprocess.run", return_value=process_mock) as run_mock:

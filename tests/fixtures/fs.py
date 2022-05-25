@@ -46,7 +46,7 @@ def test_dir(tmp_path_factory):
         yield test_dir
     finally:
         os.chdir(cwd)
-        shutil.rmtree(test_dir)
+        # shutil.rmtree(test_dir)
 
 
 @pytest.fixture

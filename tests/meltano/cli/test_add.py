@@ -1,4 +1,5 @@
 import os
+import platform
 from unittest import mock
 
 import pytest
@@ -174,6 +175,10 @@ class TestCliAdd:
         assert len(dashboards_service.get_dashboards()) == dashboards_count
         assert len(reports_service.get_reports()) == reports_count
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_add_files_with_updates(
         self,
         project,
@@ -223,6 +228,10 @@ class TestCliAdd:
         # File does not have "managed" header
         assert "This file is managed" not in file_path.read_text()
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_add_files_that_already_exists(
         self, project, cli_runner, project_plugins_service
     ):

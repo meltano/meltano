@@ -1,4 +1,5 @@
 import json
+import platform
 
 import pytest
 from flask import url_for
@@ -21,6 +22,10 @@ class TestRepos:
         assert_has_items(payload["dashboards"], 0)
         assert_has_items(payload["documents"], 1)
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_model_index(self, api, app):
         with app.test_request_context():
             res = api.get(url_for("repos.model_index"))

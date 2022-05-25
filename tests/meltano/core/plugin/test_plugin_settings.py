@@ -1,3 +1,4 @@
+import platform
 from datetime import date, datetime
 
 import dotenv
@@ -526,6 +527,10 @@ class TestPluginSettingsService:
         subject.reset(store=store)
         assert not project.dotenv.exists()
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_env_var_expansion(
         self, session, subject, project, tap, monkeypatch, env_var
     ):

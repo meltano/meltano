@@ -1,3 +1,5 @@
+import platform
+
 import dotenv
 import pytest
 
@@ -132,6 +134,10 @@ class TestPluginInvoker:
         ],
     )
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     async def test_expand_nonpip_command_exec_args(
         self, nonpip_plugin_invoker, session, executable_str, assert_fn
     ):

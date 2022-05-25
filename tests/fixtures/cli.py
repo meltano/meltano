@@ -39,5 +39,5 @@ def project_files_cli(test_dir, compatible_copy_tree):
     # clean-up
     Project.deactivate()
     os.chdir(test_dir)
-    shutil.rmtree(project.root)
+    # shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")
