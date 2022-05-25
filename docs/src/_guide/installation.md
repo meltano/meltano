@@ -13,12 +13,9 @@ If the installation instructions on the [homepage](/) or the [Getting Started gu
     <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
 </div>
 
-# Environments
+## Local Installation
 
 In this section, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/reference/ui).
-
-## Unix Like
-Recent versions of Linux and macOS are both fully supported
 
 ### Requirements
 
@@ -36,10 +33,10 @@ Use the following command to check that you have the correct Python version inst
 python --version
 ```
 
-#### pip3 and pipx
+#### Install pipx
 
 `pip` is a package installer that comes automatically with Python 3+.
-[pipx](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
+[pipx](https://pypa.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
 
 ```bash
 # install pipx and ensure it is on the path
@@ -58,7 +55,7 @@ difficult to manage. The pipx installer automatically creates a virtual environm
 
 ### Install Meltano
 
-Now that you have [pipx](https://pipxproject.github.io/pipx) installed, run the following command to install the Meltano package into its
+Now that you have [pipx](https://pypa.github.io/pipx/) installed, run the following command to install the Meltano package into its
 own pipx-backed virtual environment:
 
 ```bash
@@ -75,7 +72,7 @@ meltano --version
 
 Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
 
-## Docker
+## Installing on Docker
 
 [Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
@@ -262,11 +259,11 @@ meltano --version
   <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/the-project/community">Getting Help</a> on the different ways to get in touch with us.</p>
 </div>
 
-# Upgrading Meltano Version
+## Upgrading Meltano Version
 
 We release new versions of Meltano every week. To keep tabs on the latest releases, follow along on the [Meltano blog](https://meltano.com/blog/), or have a look at our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
 
-## Using the command line
+### Using the command line
 
 You can update Meltano to the latest version by running the following command in your terminal from inside a Meltano project:
 

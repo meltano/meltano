@@ -1,8 +1,9 @@
 """Base class for all Meltano plugins."""
 
+from __future__ import annotations
+
 import logging
 import re
-from typing import Dict, Optional, Union
 
 import yaml
 
@@ -18,11 +19,24 @@ logger = logging.getLogger(__name__)
 
 
 class VariantNotFoundError(Exception):
-    def __init__(self, plugin: "PluginDefinition", variant_name):
+    """Raised when a variant is not found."""
+
+    def __init__(self, plugin: PluginDefinition, variant_name: str):
+        """Create a new VariantNotFoundError.
+
+        Args:
+            plugin: The plugin definition.
+            variant_name: The name of the variant that was not found.
+        """
         self.plugin = plugin
         self.variant_name = variant_name
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return a string representation of the error.
+
+        Returns:
+            The string representation of the error.
+        """
         return "{type} '{name}' variant '{variant}' is not known to Meltano. Variants: {variant_labels}".format(
             type=self.plugin.type.descriptor.capitalize(),
             name=self.plugin.name,
@@ -35,6 +49,8 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
 class PluginType(YAMLEnum):
+    """The type of a plugin."""
+
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
     TRANSFORMS = "transforms"
@@ -47,26 +63,45 @@ class PluginType(YAMLEnum):
     MAPPERS = "mappers"
     MAPPINGS = "mappings"
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return a string representation of the plugin type.
+
+        Returns:
+            The string representation of the plugin type.
+        """
         return self.value
 
     @property
-    def descriptor(self):
+    def descriptor(self) -> str:
+        """Return the descriptor of the plugin type.
+
+        Returns:
+            The descriptor of the plugin type.
+        """
         if self is self.__class__.FILES:
             return "file bundle"
 
         return self.singular
 
     @property
-    def singular(self):
-        """Makes it singular for `meltano add PLUGIN_TYPE`"""
+    def singular(self) -> str:
+        """Make singular form for `meltano add PLUGIN_TYPE`.
+
+        Returns:
+            The singular form of the plugin type.
+        """
         if self is self.__class__.UTILITIES:
             return "utility"
 
         return self.value[:-1]
 
     @property
-    def verb(self):
+    def verb(self) -> str:
+        """Make verb form.
+
+        Returns:
+            The verb form of the plugin type.
+        """
         if self is self.__class__.TRANSFORMS:
             return self.singular
         if self is self.__class__.UTILITIES:
@@ -77,17 +112,41 @@ class PluginType(YAMLEnum):
         return self.value[:-3]
 
     @classmethod
-    def value_exists(cls, value):
+    def value_exists(cls, value: str) -> bool:
+        """Check if a plugin type exists.
+
+        Args:
+            value: The plugin type to check.
+
+        Returns:
+            True if the plugin type exists, False otherwise.
+        """
         return value in cls._value2member_map_
 
     @classmethod
-    def cli_arguments(cls):
+    def cli_arguments(cls) -> list:
+        """Return the list of plugin types that can be used as CLI arguments.
+
+        Returns:
+            The list of plugin types that can be used as CLI arguments.
+        """
         args = [plugin_type.singular for plugin_type in cls]
-        args.extend([plugin_type for plugin_type in cls])
+        args.extend(list(cls))
         return args
 
     @classmethod
-    def from_cli_argument(cls, value):
+    def from_cli_argument(cls, value: str) -> PluginType:
+        """Get the plugin type from a CLI argument.
+
+        Args:
+            value: The CLI argument.
+
+        Returns:
+            The plugin type.
+
+        Raises:
+            ValueError: If the plugin type does not exist.
+        """
         for plugin_type in cls:
             if value in {plugin_type.value, plugin_type.singular}:
                 return plugin_type
@@ -96,7 +155,16 @@ class PluginType(YAMLEnum):
 
 
 class PluginRef(Canonical):
-    def __init__(self, plugin_type: Union[str, PluginType], name: str, **kwargs):
+    """A reference to a plugin."""
+
+    def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):
+        """Create a new PluginRef.
+
+        Args:
+            plugin_type: The type of the plugin.
+            name: The name of the plugin.
+            kwargs: Additional keyword arguments.
+        """
         self._type = (
             plugin_type
             if isinstance(plugin_type, PluginType)
@@ -106,16 +174,39 @@ class PluginRef(Canonical):
         super().__init__(name=name, **kwargs)
 
     @property
-    def type(self):
+    def type(self) -> PluginType:
+        """Return the type of the plugin.
+
+        Returns:
+            The type of the plugin.
+        """
         return self._type
 
-    def __eq__(self, other):
+    def __eq__(self, other: PluginRef) -> bool:
+        """Compare two plugin references.
+
+        Args:
+            other: The other plugin reference.
+
+        Returns:
+            True if the plugin references are equal, False otherwise.
+        """
         return self.name == other.name and self.type == other.type
 
-    def __hash__(self):
+    def __hash__(self) -> int:
+        """Return the hash of the plugin reference.
+
+        Returns:
+            The hash of the plugin reference.
+        """
         return hash((self.type, self.name))
 
     def set_presentation_attrs(self, extras):
+        """Set the presentation attributes of the plugin reference.
+
+        Args:
+            extras: The presentation attributes.
+        """
         self.update(
             hidden=extras.pop("hidden", None),
             label=extras.pop("label", None),
@@ -125,24 +216,42 @@ class PluginRef(Canonical):
 
 
 class Variant(NameEq, Canonical):
+    """A variant of a plugin."""
+
     ORIGINAL_NAME = "original"
     DEFAULT_NAME = "default"
 
     def __init__(
         self,
         name: str = None,
-        original: Optional[bool] = None,
-        deprecated: Optional[bool] = None,
-        docs: Optional[str] = None,
-        repo: Optional[str] = None,
-        pip_url: Optional[str] = None,
-        executable: Optional[str] = None,
-        capabilities: Optional[list] = [],
-        settings_group_validation: Optional[list] = [],
-        settings: Optional[list] = [],
-        commands: Optional[dict] = None,
+        original: bool | None = None,
+        deprecated: bool | None = None,
+        docs: str | None = None,
+        repo: str | None = None,
+        pip_url: str | None = None,
+        executable: str | None = None,
+        capabilities: list | None = None,
+        settings_group_validation: list | None = None,
+        settings: list | None = None,
+        commands: dict | None = None,
         **extras,
     ):
+        """Create a new Variant.
+
+        Args:
+            name: The name of the variant.
+            original: Whether the variant is the original one.
+            deprecated: Whether the variant is deprecated.
+            docs: The documentation URL.
+            repo: The repository URL.
+            pip_url: The pip URL.
+            executable: The executable name.
+            capabilities: The capabilities of the variant.
+            settings_group_validation: The settings group validation.
+            settings: The settings of the variant.
+            commands: The commands of the variant.
+            extras: Additional keyword arguments.
+        """
         super().__init__(
             name=name,
             original=original,
@@ -151,30 +260,46 @@ class Variant(NameEq, Canonical):
             repo=repo,
             pip_url=pip_url,
             executable=executable,
-            capabilities=list(capabilities),
-            settings_group_validation=list(settings_group_validation),
-            settings=list(map(SettingDefinition.parse, settings)),
+            capabilities=list(capabilities or []),
+            settings_group_validation=list(settings_group_validation or []),
+            settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             extras=extras,
         )
 
 
 class PluginDefinition(PluginRef):
+    """A plugin definition."""
+
     def __init__(
         self,
         plugin_type: PluginType,
         name: str,
         namespace: str,
-        variant: Optional[str] = None,
-        variants: Optional[list] = [],
+        variant: str | None = None,
+        variants: list | None = None,
         **extras,
     ):
+        """Create a new PluginDefinition.
+
+        Args:
+            plugin_type: The type of the plugin.
+            name: The name of the plugin.
+            namespace: The namespace of the plugin.
+            variant: The variant of the plugin.
+            variants: The variants of the plugin.
+            extras: Additional keyword arguments.
+        """
         super().__init__(plugin_type, name)
 
-        self._defaults["label"] = lambda p: p.name
+        self._defaults["label"] = lambda plugin: plugin.name
 
-        def default_logo_url(plugin):
-            short_name = re.sub(r"^(tap|target)-", "", plugin.name)
+        def default_logo_url(plugin_def):
+            short_name = re.sub(
+                r"^(tap|target)-",  # noqa: WPS360
+                "",
+                plugin_def.name,
+            )
             return f"/static/logos/{short_name}-logo.png"
 
         self._defaults["logo_url"] = default_logo_url
@@ -196,25 +321,49 @@ class PluginDefinition(PluginRef):
         self.variants = list(map(Variant.parse, variants))
 
     def __iter__(self):
-        for k, v in super().__iter__():
-            if k == "variants" and len(v) == 1:
+        """Iterate over the variants of the plugin definition.
+
+        Yields:
+            The variants of the plugin definition.
+        """
+        for attr, value in super().__iter__():
+            if attr == "variants" and len(value) == 1:
                 # If there is only a single variant, its properties can be
                 # nested in the plugin definition
-                for variant_k, variant_v in v[0]:
+                for variant_k, variant_v in value[0]:
                     if variant_k == "name":
-                        variant_k = "variant"
+                        variant_k = "variant"  # noqa: WPS440
 
                     yield (variant_k, variant_v)
             else:
-                yield (k, v)
+                yield (attr, value)
 
     def get_variant(self, variant_name: str) -> Variant:
+        """Get the variant with the given name.
+
+        Args:
+            variant_name: The name of the variant.
+
+        Returns:
+            The variant with the given name.
+
+        Raises:
+            VariantNotFoundError: If the variant is not found.
+        """
         try:
             return find_named(self.variants, variant_name)
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def find_variant(self, variant_or_name: Union[str, Variant] = None):
+    def find_variant(self, variant_or_name: str | Variant = None):
+        """Find the variant with the given name or variant.
+
+        Args:
+            variant_or_name: The variant or name of the variant.
+
+        Returns:
+            The variant with the given name or variant.
+        """
         if isinstance(variant_or_name, Variant):
             return variant_or_name
 
@@ -223,14 +372,21 @@ class PluginDefinition(PluginRef):
 
         if variant_or_name == Variant.ORIGINAL_NAME:
             try:
-                return next(v for v in self.variants if v.original)
+                return next(variant for variant in self.variants if variant.original)
             except StopIteration:
                 return self.variants[0]
 
         return self.get_variant(variant_or_name)
 
     def variant_label(self, variant):
-        """Return label for specified variant."""
+        """Return label for specified variant.
+
+        Args:
+            variant: The variant.
+
+        Returns:
+            The label for the variant.
+        """
         variant = self.find_variant(variant)
 
         label = variant.name or Variant.ORIGINAL_NAME
@@ -243,57 +399,148 @@ class PluginDefinition(PluginRef):
 
     @property
     def variant_labels(self):
-        """Return labels for supported variants."""
+        """Return labels for supported variants.
+
+        Returns:
+            The labels for the supported variants.
+        """
         return ", ".join([self.variant_label(variant) for variant in self.variants])
 
+    @classmethod
+    def from_standalone(
+        cls: type[PluginDefinition],
+        plugin: StandalonePlugin,
+    ) -> PluginDefinition:
+        """Create a new PluginDefinition from a StandalonePlugin.
 
-class BasePlugin(HookObject):
+        Args:
+            plugin: The plugin.
+
+        Returns:
+            The new PluginDefinition.
+        """
+        return cls(
+            plugin.plugin_type,
+            plugin.name,
+            plugin.namespace,
+            variant=plugin.variant,
+            # Extras
+            docs=plugin.docs,
+            repo=plugin.repo,
+            pip_url=plugin.pip_url,
+            executable=plugin.executable,
+            capabilities=plugin.capabilities,
+            settings_group_validation=plugin.settings_group_validation,
+            settings=plugin.settings,
+            commands=plugin.commands,
+            extras=plugin.extras,
+        )
+
+
+class BasePlugin(HookObject):  # noqa: WPS214
+    """A base plugin."""
+
     EXTRA_SETTINGS = []
 
     def __init__(self, plugin_def: PluginDefinition, variant: Variant):
+        """Create a new BasePlugin.
+
+        Args:
+            plugin_def: The plugin definition.
+            variant: The variant.
+        """
         super().__init__()
 
         self._plugin_def = plugin_def
         self._variant = variant
 
-    def __eq__(self, other):
+    def __eq__(self, other: BasePlugin):
+        """Compare two plugins.
+
+        Args:
+            other: The other plugin.
+
+        Returns:
+            True if the plugins are equal, False otherwise.
+        """
         return (
             self._plugin_def == other._plugin_def  # noqa: WPS437
             and self._variant == other._variant  # noqa: WPS437
         )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
+        """Return the hash of the plugin.
+
+        Returns:
+            The hash of the plugin.
+        """
         return hash((self._plugin_def, self._variant))
 
     def __iter__(self):
+        """Iterate over the settings of the plugin.
+
+        Yields:
+            The settings of the plugin.
+        """
         yield from self._plugin_def
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str):
+        """Get the value of the setting.
+
+        Args:
+            attr: The name of the setting.
+
+        Returns:
+            The value of the setting.
+        """
         try:
             return getattr(self._plugin_def, attr)
         except AttributeError:
             return getattr(self._variant, attr)
 
     @property
-    def variant(self):
+    def variant(self) -> str:
+        """Return the variant name.
+
+        Returns:
+            The variant name.
+        """
         return self._variant.name
 
     @property
-    def executable(self):
+    def executable(self) -> str:
+        """Return the plugin executable.
+
+        Returns:
+            The executable name.
+        """
         return self._variant.executable or self._plugin_def.name
 
     @property
     def extras(self):
+        """Return the plugin extras.
+
+        Returns:
+            The extras.
+        """
         return {**self._plugin_def.extras, **self._variant.extras}
 
     @property
     def all_commands(self):
-        """Return a dictonary of supported commands."""
+        """Return a dictonary of supported commands.
+
+        Returns:
+            A dictonary of supported commands.
+        """
         return self._variant.commands
 
     @property
-    def test_commands(self) -> Dict[str, Command]:
-        """Return a the test command for this plugin."""
+    def test_commands(self) -> dict[str, Command]:
+        """Return a the test command for this plugin.
+
+        Returns:
+            The test command for this plugin.
+        """
         return {
             name: command
             for name, command in self.all_commands.items()
@@ -302,7 +549,12 @@ class BasePlugin(HookObject):
 
     @property
     def extra_settings(self):
-        defaults = {f"_{k}": v for k, v in self.extras.items()}
+        """Return the extra settings for this plugin.
+
+        Returns:
+            The extra settings for this plugin.
+        """
+        defaults = {f"_{name}": value for name, value in self.extras.items()}
 
         existing_settings = []
         for setting in self.EXTRA_SETTINGS:
@@ -322,37 +574,187 @@ class BasePlugin(HookObject):
 
         return existing_settings
 
-    def env_prefixes(self, for_writing=False):
-        """Return environment variable prefixes to use for settings."""
+    def env_prefixes(self, for_writing=False) -> list[str]:
+        """Return environment variable prefixes to use for settings.
+
+        Args:
+            for_writing: Whether to return environment variable prefixes for writing.
+
+        Returns:
+            The environment variable prefixes.
+        """
         return [self.name, self.namespace]
 
-    def is_installable(self):
+    def is_installable(self) -> bool:
+        """Return whether the plugin is installable.
+
+        Returns:
+            True if the plugin is installable, False otherwise.
+        """
         return self.pip_url is not None
 
-    def is_invokable(self):
+    def is_invokable(self) -> bool:
+        """Return whether the plugin is invokable.
+
+        Returns:
+            True if the plugin is invokable, False otherwise.
+        """
         return self.is_installable() or self.executable is not None
 
-    def is_configurable(self):
+    def is_configurable(self) -> bool:
+        """Return whether the plugin is configurable.
+
+        Returns:
+            True if the plugin is configurable, False otherwise.
+        """
         return True
 
-    def should_add_to_file(self):
+    def should_add_to_file(self) -> bool:
+        """Return whether the plugin should be added to the config file.
+
+        Returns:
+            True if the plugin should be added to the config file, False otherwise.
+        """
         return True
 
     @property
     def runner(self):
-        return None
+        """Return the plugin runner."""
+        pass
 
-    def exec_args(self, files: Dict):
+    def exec_args(self, files: dict):
+        """Return the arguments to pass to the plugin runner.
+
+        Args:
+            files: The files to pass to the plugin runner.
+
+        Returns:
+            The arguments to pass to the plugin runner.
+        """
         return []
 
     @property
     def config_files(self):
-        """Return a list of stubbed files created for this plugin."""
-        return dict()
+        """Return a list of stubbed files created for this plugin.
+
+        Returns:
+            A list of stubbed files created for this plugin.
+        """
+        return {}
 
     @property
     def output_files(self):
-        return dict()
+        """Return a list of stubbed files created for this plugin.
+
+        Returns:
+            A list of stubbed files created for this plugin.
+        """
+        return {}
 
     def process_config(self, config):
+        """Process the config for this plugin.
+
+        Args:
+            config: The config to process.
+
+        Returns:
+            The processed config.
+        """
         return config
+
+    @property
+    def definition(self) -> PluginDefinition:
+        """Return the plugin definition.
+
+        Returns:
+            The plugin definition.
+        """
+        return self._plugin_def
+
+
+class StandalonePlugin(Canonical):
+    """A standalone plugin definition representing a single variant."""
+
+    def __init__(
+        self,
+        plugin_type: PluginType,
+        name: str,
+        namespace: str,
+        variant: str = None,
+        docs: str | None = None,
+        repo: str | None = None,
+        pip_url: str | None = None,
+        executable: str | None = None,
+        capabilities: list | None = None,
+        settings_group_validation: list | None = None,
+        settings: list | None = None,
+        commands: dict | None = None,
+        **extras,
+    ):
+        """Create a locked plugin.
+
+        Args:
+            plugin_type: The plugin type.
+            name: The name of the plugin.
+            namespace: The namespace of the plugin.
+            variant: The variant of the plugin.
+            docs: The documentation URL of the plugin.
+            repo: The repository URL of the plugin.
+            pip_url: The pip URL of the plugin.
+            executable: The executable of the plugin.
+            capabilities: The capabilities of the plugin.
+            settings_group_validation: The settings group validation of the plugin.
+            settings: The settings of the plugin.
+            commands: The commands of the plugin.
+            extras: Additional attributes to set on the plugin.
+        """
+        super().__init__(
+            plugin_type=plugin_type,
+            name=name,
+            namespace=namespace,
+            variant=variant,
+            docs=docs,
+            repo=repo,
+            pip_url=pip_url,
+            executable=executable,
+            capabilities=capabilities or [],
+            settings_group_validation=settings_group_validation or [],
+            settings=list(map(SettingDefinition.parse, settings or [])),
+            commands=Command.parse_all(commands),
+            extras=extras,
+        )
+
+    @classmethod
+    def from_variant(
+        cls: type[StandalonePlugin],
+        variant: Variant,
+        name: str,
+        namespace: str,
+        plugin_type: PluginType,
+    ):
+        """Create a locked plugin from a variant.
+
+        Args:
+            variant: The variant to create the plugin from.
+            name: The name of the plugin.
+            namespace: The namespace of the plugin.
+            plugin_type: The plugin type.
+
+        Returns:
+            A locked plugin definition.
+        """
+        return cls(
+            plugin_type=plugin_type,
+            name=name,
+            namespace=namespace,
+            variant=variant.name,
+            docs=variant.docs,
+            repo=variant.repo,
+            pip_url=variant.pip_url,
+            executable=variant.executable,
+            capabilities=variant.capabilities,
+            settings_group_validation=variant.settings_group_validation,
+            settings=variant.settings,
+            commands=variant.commands,
+            **variant.extras,
+        )

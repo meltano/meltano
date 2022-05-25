@@ -19,6 +19,44 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
+
+## 1.105.0 - (2022-05-19)
+---
+
+### New
+
+- [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
+
+- [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
+
+### Changes
+
+- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend [pipx](https://pypa.github.io/pipx/) over manually created virtual environments.
+
+- [#3484](https://gitlab.com/meltano/meltano/-/issues/3484) Use `SettingsService.feature_flag` convention for lockfiles.
+
+### Fixes
+
+- [3483](https://gitlab.com/meltano/meltano/-/issues/3483) Fixes a bug where pipx installed meltano can not find executable(.exe) meltano dependency packages. _Thanks **[Dan Norman](https://gitlab.com/BuzzCutNorman)**!_
+
+- [#3500](https://gitlab.com/meltano/meltano/-/issues/3500) Fixes bug where lock file was added but not used.
+
+
+## 1.104.0 - (2022-05-13)
+---
+
+### New
+
+- [#3031](https://gitlab.com/meltano/meltano/-/issues/3031) Add lock artifacts during `meltano add` for stability and portability of plugin definitions.
+
+### Changes
+- [#3385](https://gitlab.com/meltano/meltano/-/issues/3385) Add feature flags for experimental features
+
+### Fixes
+
+- [#3468](https://gitlab.com/meltano/meltano/-/issues/3468) Fixes bug where container spec's entrypoint was not passed along to the Docker runtime.
+
+
 ## 1.103.1 - (2022-05-05)
 ---
 

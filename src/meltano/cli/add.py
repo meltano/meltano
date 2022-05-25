@@ -6,6 +6,8 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
@@ -74,6 +76,7 @@ def add(
         plugin_names = [as_name]
 
     plugins_service = ProjectPluginsService(project)
+    settings_service = ProjectSettingsService(project)
 
     if flags["custom"]:
         if plugin_type in {
@@ -86,19 +89,24 @@ def add(
 
     plugins = []
     tracker = GoogleAnalyticsTracker(project)
-    for plugin in plugin_names:
-        plugins.append(
-            add_plugin(
-                project,
-                plugin_type,
-                plugin,
-                inherit_from=inherit_from,
-                variant=variant,
-                custom=flags["custom"],
-                add_service=add_service,
+    with settings_service.feature_flag(
+        FeatureFlags.LOCKFILES,
+        raise_error=False,
+    ) as lock:
+        for plugin in plugin_names:
+            plugins.append(
+                add_plugin(
+                    project,
+                    plugin_type,
+                    plugin,
+                    inherit_from=inherit_from,
+                    variant=variant,
+                    custom=flags["custom"],
+                    add_service=add_service,
+                    lock=lock,
+                )
             )
-        )
-        tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
+            tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
     related_plugin_types = [PluginType.FILES]
     if flags["include_related"]:
