@@ -76,18 +76,22 @@ To learn about deploying Meltano UI in production, refer to the ["Meltano UI" se
 
 [![Loaders interface](images/ui/loaders.png)](images/ui/loaders.png)
 
+### Loaders configuration
+
+[![Loaders Configuration interface](images/ui/loaders-configuration.png)](images/ui/loaders-configuration.png)
+
 ### Pipelines
 
 [![Pipelines interface](images/ui/pipelines.png)](images/ui/pipelines.png)
 
 ### Pipeline creation
 
-[![Pipeline Creation interface](images/ui/pipeline-creation.png)](images/ui/pipeline-creation.png)
+[![Pipeline Creation interface](images/ui/create-pipeline.png)](images/ui/create-pipeline.png)
 
 ### Pipeline run log
 
-[![Extractors Run Log interface](images/ui/pipeline-run-log.png)](images/ui/pipeline-run-log.png)
+[![Extractors Run Log interface](images/ui/pipeline-log.png)](images/ui/pipeline-log.png)
 
-### Explore and Dashboards
+### Pipeline update schedule to reflect CRON settings
 
-For more information on (and screenshots of) the Explore and Dashboard interfaces, refer to the [Data Analysis guide](/guide/analysis#explore-your-data).
+[![Pipeline Update](images/ui/pipeline-cron.png)](images/ui/pipeline-cron.png)
