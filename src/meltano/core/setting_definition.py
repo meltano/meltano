@@ -164,10 +164,10 @@ class SettingDefinition(NameEq, Canonical):
             value_post_processor: Used with `kind: object` to post-process the keys in a particular way.
             attrs: Keyword arguments to pass to parent class.
         """
-        env_aliases = env_aliases if env_aliases is not None else []
-        aliases = aliases if aliases is not None else []
-        options = options if options is not None else []
-        oauth = oauth if oauth is not None else {}
+        env_aliases = env_aliases or []
+        aliases = aliases or []
+        options = options or []
+        oauth = oauth or {}
 
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
