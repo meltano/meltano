@@ -6,6 +6,7 @@ from typing import Generator, List, Optional
 import structlog
 
 from meltano.core.environment import Environment, EnvironmentPluginConfig
+from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
@@ -33,7 +34,7 @@ class PluginAlreadyAddedException(Exception):
         super().__init__()
 
 
-class ProjectPluginsService:  # noqa: WPS214 (too many methods)
+class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attributes)
     """Project Plugins Service."""
 
     def __init__(
@@ -43,6 +44,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
         lock_service: PluginLockService = None,
         discovery_service: PluginDiscoveryService = None,
         locked_definition_service: LockedDefinitionService = None,
+        hub_service: MeltanoHubService = None,
         use_cache: bool = True,
     ):
         """Create a new Project Plugins Service.
@@ -53,6 +55,7 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
             lock_service: The Meltano Plugin Lock Service.
             discovery_service: The Meltano Plugin Discovery Service.
             locked_definition_service: The Meltano Locked Definition Service.
+            hub_service: The Meltano Hub Service.
             use_cache: Whether to use the plugin cache.
         """
         self.project = project
@@ -63,11 +66,28 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
         self.locked_definition_service = (
             locked_definition_service or LockedDefinitionService(project)
         )
+        self.hub_service = hub_service or MeltanoHubService(project)
 
         self._current_plugins = None
         self._use_cache = use_cache
 
         self.settings_service = ProjectSettingsService(project)
+
+        self._use_discovery_yaml: bool = True
+
+    @contextmanager
+    def disallow_discovery_yaml(self) -> Generator[None, None, None]:
+        """Disallow the discovery yaml from being used.
+
+        This is useful when you want to add a plugin to the project without
+        having to worry about the discovery yaml.
+
+        Yields:
+            None.
+        """
+        self._use_discovery_yaml = False
+        yield
+        self._use_discovery_yaml = True
 
     @property
     def current_plugins(self):
@@ -432,13 +452,16 @@ class ProjectPluginsService:  # noqa: WPS214 (too many methods)
 
             logger.debug("Lockfile is feature-flagged", status=allowed)
 
-        try:
-            return self.discovery_service.get_base_plugin(plugin)
-        except PluginNotFoundError as err:
-            if plugin.inherit_from:
-                raise PluginParentNotFoundError(plugin, err) from err
+        if self._use_discovery_yaml:
+            try:
+                return self.discovery_service.get_base_plugin(plugin)
+            except PluginNotFoundError as err:
+                if plugin.inherit_from:
+                    raise PluginParentNotFoundError(plugin, err) from err
 
-            raise
+                raise
+
+        return self.hub_service.get_base_plugin(plugin, variant_name=plugin.variant)
 
     def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Ensure that plugin has a parent set.
