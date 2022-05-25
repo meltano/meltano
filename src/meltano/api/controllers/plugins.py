@@ -24,8 +24,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 def plugin_def_json(plugin_def):
-    """
-    Convert plugin defenition to json.
+    """Convert plugin defenition to json.
 
     Args:
         plugin_def: Plugin definition
@@ -61,8 +60,7 @@ def _handle(ex):
 
 @pluginsBP.route("/all", methods=["GET"])
 def all():  # noqa: WPS125
-    """
-    Plugins found by the PluginDiscoveryService.
+    """Plugins found by the PluginDiscoveryService.
 
     Returns:
         Json containing all the discovered plugins.
@@ -80,8 +78,7 @@ def all():  # noqa: WPS125
 
 @pluginsBP.route("/installed", methods=["GET"])
 def installed():
-    """
-    All plugins installed in the project.
+    """All plugins installed in the project.
 
     Returns:
         Json of all installed plugins.
@@ -113,8 +110,7 @@ def installed():
 @pluginsBP.route("/add", methods=["POST"])
 @block_if_readonly
 def add():
-    """
-    Add Plugin the the project file.
+    """Add Plugin the the project file.
 
     Returns:
         JSON of the plugin information added.
@@ -134,8 +130,7 @@ def add():
 @pluginsBP.route("/install/batch", methods=["POST"])
 @block_if_readonly
 def install_batch():  # noqa: WPS210
-    """
-    Install multiple plugins at once.
+    """Install multiple plugins at once.
 
     Raises:
         PluginInstallError: Plugin insatllation error message.
@@ -184,8 +179,7 @@ def install_batch():  # noqa: WPS210
 @pluginsBP.route("/install", methods=["POST"])
 @block_if_readonly
 def install():
-    """
-    Install a plugin.
+    """Install a plugin.
 
     Returns:
         JSON containing the plugin installed.

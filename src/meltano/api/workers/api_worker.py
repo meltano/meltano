@@ -14,8 +14,7 @@ class APIWorker(threading.Thread):
     """The Base APIWorker Class."""
 
     def __init__(self, project: Project, reload=False):
-        """
-        Initialize the API Worker class with the project config.
+        """Initialize the API Worker class with the project config.
 
         Args:
             project: Project class.
@@ -121,8 +120,7 @@ class APIWorker(threading.Thread):
                 MeltanoInvoker(self.project).invoke(args, command="gunicorn")
 
     def pid_path(self):
-        """
-        Give the path name of the projects gunicorn.pid file location.
+        """Give the path name of the projects gunicorn.pid file location.
 
         Returns:
             Path object that gives the direct locationo of the gunicorn.pid file.
