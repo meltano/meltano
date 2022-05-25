@@ -77,6 +77,27 @@ The TOC is managed through the `jekyll-toc` gem. You can read about its configur
 
 This is added to all pages by default. It can be turned off by setting `toc: false` in the [fromt matter](https://jekyllrb.com/docs/front-matter/) of the document.
 
+### Add/Remove/Edit an Announcement
+
+You can edit the announcement and CTA under the `announcement` section in `_config.yml`. 
+
+- `display` - Set this to `true` to display an announcement or set it to `false` to hide it.
+- `text` - This is the announcement text. Keep it short and sweet (~140 characters or less) so it's not intrusive on the page.
+- `cta` - This prompts readers to do something. Make it engaging!
+- `cta-link` - This is the link folks will be directed to. It opens in a new page so readers don't lose their place in the docs.
+
+```
+announcement:
+  display: true
+  text: Meltano v2.0 is almost here!
+  cta: See what's on the roadmap.
+  cta-link: https://handbook.meltano.com/product/roadmap#2022-q2
+```
+
+#### Testing Announcements Locally
+
+If you're running docs locally, you will need to stop the Jekyll server (`^C`) and restart it with `bundle exec jekyll serve` in order to see updates to announcements. It's not ideal but it prevents folks from having to edit raw HTML to make changes to announcements.
+
 ## Check for Broken Links
 
 Builds will fail to deploy if links are broken. You can check for broken links locally with this command before pushing changes:
