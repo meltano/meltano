@@ -30,6 +30,7 @@ class FeatureFlags(Enum):
     """Available Meltano Feature Flags."""
 
     LOCKFILES = "lock_files"
+    ENABLE_UVICORN = "enable_uvicorn"
 
     def __str__(self):
         """Return feature name.
