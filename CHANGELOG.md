@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 - [#3173](https://gitlab.com/meltano/meltano/-/issues/3173) Add tests and clarify docs for environment variable resolution.
+
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
+
 ### Fixes
 
 ### Breaks
