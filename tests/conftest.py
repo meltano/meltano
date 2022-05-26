@@ -10,7 +10,6 @@ from typing import Any, Mapping
 
 import pytest
 import requests
-import responses
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436 (protected module)
 from requests.adapters import BaseAdapter
 
@@ -48,18 +47,6 @@ def pytest_runtest_setup(item):
     # both as SYSTEM and WAREHOUSE.
     if backend_marker and backend_marker.args[0] != PYTEST_BACKEND:
         pytest.skip()
-
-    responses.start()
-
-
-def pytest_runtest_teardown(item):
-    try:
-        responses.stop()
-        responses.reset()
-    except (AttributeError, RuntimeError):
-        # patcher was already uninstalled (or not installed at all) and
-        # responses doesn't let us force maintain it
-        pass
 
 
 @pytest.fixture(scope="session")
@@ -109,6 +96,7 @@ class MockAdapter(BaseAdapter):
                     hub[plugin_key] = {
                         **variant,
                         "name": plugin_name,
+                        "label": plugin.get("label"),
                         "namespace": plugin["namespace"],
                         "variant": variant_name,
                     }

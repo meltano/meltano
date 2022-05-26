@@ -82,6 +82,7 @@ class PluginLockService:
             plugin.name,
             plugin.namespace,
             plugin.type,
+            label=plugin.label,
         )
 
         with path.open("w") as lockfile:
