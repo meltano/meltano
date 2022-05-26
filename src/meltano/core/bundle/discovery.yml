@@ -3482,7 +3482,7 @@ files:
   - name: dbt
     namespace: dbt
     repo: https://gitlab.com/meltano/files-dbt
-    pip_url: git+https://gitlab.com/meltano/files-dbt.git@config-version-2
+    pip_url: git+https://gitlab.com/meltano/files-dbt.git@3120-deprecate-env-aliases-config-v2
   - name: docker
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
