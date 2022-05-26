@@ -417,6 +417,46 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
             return p_outdated
 
+    def _get_parent_from_discovery(self, plugin: ProjectPlugin) -> ProjectPlugin:
+        """Get the parent plugin from discovery.yml.
+
+        Args:
+            plugin: The plugin to get the parent of.
+
+        Returns:
+            The parent plugin.
+
+        Raises:
+            PluginParentNotFoundError: If the parent plugin is not found.
+        """
+        try:
+            return self.discovery_service.get_base_plugin(plugin)
+        except PluginNotFoundError as err:
+            if plugin.inherit_from:
+                raise PluginParentNotFoundError(plugin, err) from err
+
+            raise
+
+    def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
+        """Get the parent plugin from the hub.
+
+        Args:
+            plugin: The plugin to get the parent of.
+
+        Returns:
+            The parent plugin.
+
+        Raises:
+            PluginParentNotFoundError: If the parent plugin is not found.
+        """
+        try:
+            return self.hub_service.get_base_plugin(plugin, variant_name=plugin.variant)
+        except PluginNotFoundError as err:
+            if plugin.inherit_from:
+                raise PluginParentNotFoundError(plugin, err) from err
+
+            raise
+
     def get_parent(self, plugin: ProjectPlugin) -> Optional[ProjectPlugin]:
         """Get plugin's parent plugin.
 
@@ -425,9 +465,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         Returns:
             The parent plugin or None if the plugin has no parent.
-
-        Raises:
-            PluginParentNotFoundError: If the plugin has a parent but it can not be found.
         """
         if plugin.inherit_from and not plugin.is_variant_set:
             try:
@@ -453,15 +490,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             logger.debug("Lockfile is feature-flagged", status=allowed)
 
         if self._use_discovery_yaml:
-            try:
-                return self.discovery_service.get_base_plugin(plugin)
-            except PluginNotFoundError as err:
-                if plugin.inherit_from:
-                    raise PluginParentNotFoundError(plugin, err) from err
+            return self._get_parent_from_discovery(plugin)
 
-                raise
-
-        return self.hub_service.get_base_plugin(plugin, variant_name=plugin.variant)
+        return self._get_parent_from_hub(plugin)
 
     def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Ensure that plugin has a parent set.

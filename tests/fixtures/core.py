@@ -215,7 +215,13 @@ def discovery():  # noqa: WPS213
                     "executable": "mapper-mock-cmd",
                     "pip_url": "mapper-mock",
                     "package_name": "mapper-mock",
-                }
+                },
+                {
+                    "name": "alternative",
+                    "executable": "mapper-mock-alt",
+                    "pip_url": "mapper-mock-alt",
+                    "package_name": "mapper-mock-alt",
+                },
             ],
         }
     )
