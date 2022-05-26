@@ -22,7 +22,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local installation
 
-If you're running Linux or macOS and have [Python](https://www.python.org/) 3.7, 3.8 or 3.9 installed,
+If you're running Linux, macOS, or Windows and have [Python](https://www.python.org/) 3.7, 3.8 or 3.9 installed,
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
 inside the directory that will hold your [Meltano projects](/concepts/project).
 
@@ -33,17 +33,23 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
    cd meltano-projects
    ```
 
-1. Create and activate a virtual environment for Meltano inside the `.venv` directory:
+1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
+   python3 -m install --user pipx
+   python3 -m pipx ensurepath
+   #Note that the below commands are not needed in most cases
+   source ~/.bashrc
    ```
+
+   <div class="notification is-info">
+       <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
+   </div>
 
 1. Install the [`meltano` package from PyPI](https://pypi.org/project/meltano/):
 
    ```bash
-   pip3 install meltano
+   pipx install meltano
    ```
 
 1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:

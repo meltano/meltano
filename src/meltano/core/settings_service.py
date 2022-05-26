@@ -5,7 +5,8 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from typing import Iterable
+from enum import Enum
+from typing import Generator, Iterable
 
 from meltano.core.project import Project
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
@@ -23,6 +24,29 @@ REDACTED_VALUE = "(redacted)"
 # magic string used as feature flag setting for experimental features
 EXPERIMENTAL = "experimental"
 FEATURE_FLAG_PREFIX = "ff"
+
+
+class FeatureFlags(Enum):
+    """Available Meltano Feature Flags."""
+
+    LOCKFILES = "lock_files"
+
+    def __str__(self):
+        """Return feature name.
+
+        Returns:
+            str: Feature name.
+        """
+        return self.value
+
+    @property
+    def setting_name(self) -> str:
+        """Return the setting name for this feature flag.
+
+        Returns:
+            The setting name for this feature flag.
+        """
+        return f"{FEATURE_FLAG_PREFIX}.{self.value}"
 
 
 class FeatureNotAllowedException(Exception):
@@ -71,9 +95,6 @@ class SettingsService(ABC):  # noqa: WPS214
         self.show_hidden = show_hidden
 
         self.env_override = env_override or {}
-        if self.project.active_environment:
-            self.env_override.update(**self.project.active_environment.env)
-
         self.config_override = config_override or {}
 
         self._setting_defs = None
@@ -613,7 +634,9 @@ class SettingsService(ABC):  # noqa: WPS214
             logger.debug(message)
 
     @contextmanager
-    def feature_flag(self, feature: str, raise_error: bool = True) -> Iterable[bool]:
+    def feature_flag(
+        self, feature: str, raise_error: bool = True
+    ) -> Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 
         Args:
