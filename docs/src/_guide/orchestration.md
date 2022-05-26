@@ -76,8 +76,6 @@ Now that Airflow is installed and (automatically) configured to look at your pro
 meltano invoke airflow scheduler
 ```
 
-(Add `-D` to run the scheduler in the background)
-
 Airflow will now run your pipelines on a schedule as long as the scheduler is running!
 
 ## Using Airflow directly
@@ -87,8 +85,6 @@ You are free to interact with Airflow directly through its own UI. You can start
 ```bash
 meltano invoke airflow webserver
 ```
-
-(Add `-D` to run the webserver in the background)
 
 By default, you'll only see Meltano's pipeline DAGs here, which are created automatically using the dynamic DAG generator included with every Meltano project, located at `orchestrate/dags/meltano.py`.
 
@@ -115,13 +111,13 @@ meltano invoke airflow tasks run --raw meltano extract_load $(date -I)
 Start the Airflow UI: (will start in a separate browser)
 
 ```bash
-meltano invoke airflow webserver -D
+meltano invoke airflow webserver
 ```
 
-Start the Airflow scheduler, enabling background job processing if you're not already running Meltano UI:
+Start the Airflow scheduler, enabling job processing if you're not already running Meltano UI:
 
 ```bash
-meltano invoke airflow scheduler -D
+meltano invoke airflow scheduler
 ```
 
 Trigger a dag run:
