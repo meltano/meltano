@@ -751,7 +751,7 @@
         },
         "env": {
           "type": "string",
-          "description": "Deprecated. An environment variable name this setting can be configured with.",
+          "description": "An alternative environment variable name to populate with this settings value in the plugin environment.",
           "examples": ["GITLAB_API_TOKEN", "FACEBOOK_ADS_ACCESS_TOKEN"]
         },
         "value_processor": {
