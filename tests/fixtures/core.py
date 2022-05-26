@@ -154,9 +154,9 @@ def discovery():  # noqa: WPS213
 
     discovery[PluginType.DASHBOARDS].append(
         {
-            "name": "dashboard-google-analytics",
-            "namespace": "tap_google_analytics",
-            "pip_url": "git+https://gitlab.com/meltano/dashboard-google-analytics.git",
+            "name": "dashboard-mock",
+            "namespace": "tap_mock",
+            "pip_url": "git+https://gitlab.com/meltano/dashboard-mock.git",
         }
     )
 

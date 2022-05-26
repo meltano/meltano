@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 from unittest import mock
 
 import pytest
@@ -6,6 +7,7 @@ import yaml
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.hub.client import MeltanoHubService
 from meltano.core.m5o.dashboards_service import DashboardsService
 from meltano.core.m5o.reports_service import ReportsService
 from meltano.core.plugin import PluginRef, PluginType, Variant
@@ -48,12 +50,20 @@ class TestCliAdd:
         project,
         cli_runner,
         project_plugins_service,
+        meltano_hub_service: MeltanoHubService,
+        hub_request_counter: Counter,
     ):
+        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
+
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch(
+            "meltano.cli.add.install_plugins"
+        ) as install_plugin_mock, mock.patch(
+            "requests.adapters.HTTPAdapter.send", adapter.send
+        ):
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 

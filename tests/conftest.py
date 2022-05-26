@@ -114,7 +114,7 @@ class MockAdapter(BaseAdapter):
                     }
 
                 if not variants:
-                    variant_name = "original"
+                    variant_name = plugin.get("variant", "original")
                     default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
