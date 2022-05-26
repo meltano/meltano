@@ -1,5 +1,4 @@
 import os
-from collections import Counter
 from unittest import mock
 
 import pytest
@@ -17,6 +16,14 @@ from meltano.core.plugin_install_service import PluginInstallReason
 
 
 class TestCliAdd:
+    @pytest.fixture(autouse=True)
+    def patch_hub(self, meltano_hub_service: MeltanoHubService):
+        with mock.patch(
+            "meltano.core.project_plugins_service.MeltanoHubService",
+            return_value=meltano_hub_service,
+        ):
+            yield
+
     @pytest.mark.parametrize(
         "plugin_type,plugin_name,default_variant,related_plugin_refs",
         [
@@ -50,20 +57,12 @@ class TestCliAdd:
         project,
         cli_runner,
         project_plugins_service,
-        meltano_hub_service: MeltanoHubService,
-        hub_request_counter: Counter,
     ):
-        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
-
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
             project_plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
-        with mock.patch(
-            "meltano.cli.add.install_plugins"
-        ) as install_plugin_mock, mock.patch(
-            "requests.adapters.HTTPAdapter.send", adapter.send
-        ):
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
@@ -380,8 +379,7 @@ class TestCliAdd:
             )
             assert_cli_runner(res)
             assert (
-                "Inherit from:\ttap-mock, variant singer-io (deprecated)\n"
-                in res.stdout
+                "Inherit from:\ttap-mock, variant singer-io (default)\n" in res.stdout
             )
 
             inherited_variant = project_plugins_service.find_plugin(
