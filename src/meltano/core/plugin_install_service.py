@@ -174,21 +174,7 @@ class PluginInstallService:
             parallelism = cpu_count()
         if parallelism < 1:
             parallelism = sys.maxsize  # unbounded
-
-        # This was added to assist api_worker threads
-        try:
-            self.semaphore = asyncio.Semaphore(parallelism)
-        except RuntimeError:
-            logging.debug("Worker couldn't find an asyncio event loop")
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            self.semaphore = asyncio.Semaphore(parallelism)
-            logging.debug(
-                "Worker was given a fresh new event loop party on party people"
-            )
-        else:
-            logging.info("Worker found an events event loop")
-
+        self.semaphore = asyncio.Semaphore(parallelism)
         self.clean = clean
 
     @staticmethod
