@@ -32,6 +32,12 @@ body {
   height: auto;
 }
 
+@media screen (max-width: 1023px) {
+  .navbar a {
+    color: #485fc7;
+  }
+}
+
 .navbar a {
   color: #ffffff;
 }
