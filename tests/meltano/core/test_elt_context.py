@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from meltano.core.plugin import PluginType, Variant
@@ -18,7 +20,8 @@ def assert_loader_env(loader, env):
     assert env["MELTANO_LOADER_NAMESPACE"] == loader.namespace
     assert env["MELTANO_LOADER_VARIANT"] == loader.variant
 
-    assert env["MELTANO_LOAD_HOST"] == "localhost"
+    assert env["MELTANO_LOAD_HOST"] == os.getenv("TARGET_POSTGRES_HOST", "localhost")
+
     assert (
         env["MELTANO_LOAD_DEFAULT_TARGET_SCHEMA"]
         == env["MELTANO_EXTRACT__LOAD_SCHEMA"]

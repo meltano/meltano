@@ -173,6 +173,7 @@ class TestELBContextBuilder:
         assert target_env["MELTANO_LOAD_HOST"] == os.getenv(
             "TARGET_POSTGRES_HOST", "localhost"
         )
+
         assert (
             target_env["MELTANO_LOAD_DEFAULT_TARGET_SCHEMA"]
             == target_env["MELTANO_EXTRACT__LOAD_SCHEMA"]
