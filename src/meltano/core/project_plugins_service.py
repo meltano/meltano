@@ -7,6 +7,7 @@ import structlog
 
 from meltano.core.environment import Environment, EnvironmentPluginConfig
 from meltano.core.hub import MeltanoHubService
+from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
@@ -425,17 +426,13 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         Returns:
             The parent plugin.
-
-        Raises:
-            PluginParentNotFoundError: If the parent plugin is not found.
         """
         try:
             return self.discovery_service.get_base_plugin(plugin)
-        except PluginNotFoundError as err:
-            if plugin.inherit_from:
-                raise PluginParentNotFoundError(plugin, err) from err
-
-            raise
+        except PluginNotFoundError:
+            pass
+        except VariantNotFoundError:
+            pass
 
     def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Get the parent plugin from the hub.
