@@ -16,13 +16,13 @@ When a new pipeline schedule is created using the [UI](/reference/ui) or [CLI](/
 To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/reference/ui#pipelines), or the [`meltano schedule`  command](/reference/command-line-interface#schedule):
 
 ```bash
-meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
+meltano schedule [SCHEDULE_NAME] --extractor [EXTRACTOR_NAME] --loader [TARGET_NAME] --interval [INTERVAL]
 ```
 
 Example:
 
 ```bash
-meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
+meltano schedule carbon__sqlite --extractor tap-carbon-intensity --loader target-sqlite --interval="@daily"
 ```
 
 Now that you've scheduled your first pipeline, you can load the "Pipeline" page in the UI and see it show up.
