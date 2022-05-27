@@ -124,6 +124,7 @@ class SettingDefinition(NameEq, Canonical):
         name: str = None,
         aliases: list[str] = None,
         env: str = None,
+        env_aliases: list[str] = None,
         kind: SettingKind = None,
         value=None,
         label: str = None,
@@ -146,6 +147,7 @@ class SettingDefinition(NameEq, Canonical):
             name: Setting name.
             aliases: Setting alias names.
             env: Setting target environment variable.
+            env_aliases: Deprecated. Used to delegate alternative environment variables for overriding this setting's value.
             kind: Setting kind.
             value: Setting value.
             label: Setting label.
@@ -163,6 +165,7 @@ class SettingDefinition(NameEq, Canonical):
             attrs: Keyword arguments to pass to parent class.
         """
         aliases = aliases or []
+        env_aliases = env_aliases or []
         options = options or []
         oauth = oauth or {}
 
@@ -171,6 +174,7 @@ class SettingDefinition(NameEq, Canonical):
             name=name,
             aliases=aliases,
             env=env,
+            env_aliases=env_aliases,
             kind=SettingKind(kind) if kind else None,
             value=value,
             label=label,
@@ -303,6 +307,9 @@ class SettingDefinition(NameEq, Canonical):
             env_keys.append(self.env)
 
         env_keys.extend(utils.to_env_var(prefix, self.name) for prefix in prefixes)
+
+        if include_custom:
+            env_keys.extend(alias for alias in self.env_aliases)
 
         return [EnvVar(key) for key in utils.uniques_in(env_keys)]
 
