@@ -114,3 +114,13 @@ class TestCliSchedule:
             )
             assert res.exit_code == exit_code
             run_mock.assert_called_once_with(job_schedule, "--dry-run")
+
+    def test_schedule_remove(self, cli_runner, job_schedule):
+        process_mock = mock.Mock(returncode=0)
+
+        with mock.patch(
+            "meltano.cli.schedule.ScheduleService.remove", return_value=process_mock
+        ) as remove_mock:
+            res = cli_runner.invoke(cli, ["schedule", "remove", job_schedule.name])
+            assert res.exit_code == 0
+            remove_mock.assert_called_once_with(job_schedule.name)

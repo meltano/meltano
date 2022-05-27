@@ -86,22 +86,34 @@ def _add_job(ctx, name: str, job: str, interval: str):
 
 @schedule.command(short_help="[default] Add a new schedule.")
 @click.argument("name")
+@click.option("--interval", "-i", required=True, help="Interval of the schedule.")
 @click.option("--job", "-j", help="The name of the job to run.")
-@click.option("--extractor", required=False)
-@click.option("--loader", required=False)
-@click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
-@click.option("--interval", required=True)
-@click.option("--start-date", type=click.DateTime(), default=None)
+@click.option("--extractor", "-e", required=False, help="ELT Only")
+@click.option("--loader", "-l", required=False, help="ELT Only")
+@click.option(
+    "--transform",
+    "-t",
+    type=click.Choice(["skip", "only", "run"]),
+    default="skip",
+    help="ELT Only",
+)
+@click.option("--start-date", type=click.DateTime(), default=None, help="ELT Only")
 @click.pass_context
 def add(ctx, name, job, extractor, loader, transform, interval, start_date):
     """
-    Add a new schedule.
+    Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
+
+    Example usage:
 
     \b
-    NAME:\tThe schedule name, must be unique
-    EXTRACTOR:\tWhich extractor should be used
-    LOADER:\tWhich loader should be used
-    INTERVAL:\tCron-like syntax to specify the schedule interval (@daily, @hourly, etc…)
+    \t# Schedule a job name "my_job" to run everyday
+    \tmeltano schedule add <schedule_name> --job my_job --interval "@daily"
+    \t# Schedule an ELT task to run hourly
+    \tmeltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform run --interval "@hourly"
+
+    \b\nNote that the --job option and --extractor/--loader options are mutually exclusive.
+
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
     if job and (extractor or loader):
         raise click.ClickException("Cannot specify both --job and --extractor/--loader")
@@ -233,3 +245,19 @@ def run(ctx, name, elt_options):
     exitcode = process.returncode
     if exitcode:
         sys.exit(exitcode)
+
+
+@schedule.command(name="remove", short_help="Remove a schedule.")
+@click.argument("name", required=True)
+@click.pass_context
+def remove(ctx, name):
+    """Remove a schedule.
+
+    Usage:
+        meltano schedule remove <name>
+    """
+    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+    removed_schedule = schedule_service.find_schedule(name)
+    schedule_service.remove(name)
+    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker.track_meltano_schedule("remove", removed_schedule)
