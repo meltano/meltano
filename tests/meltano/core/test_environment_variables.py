@@ -199,12 +199,55 @@ class TestEnvVarResolution:
         args.append("test-env-var-resolution")
         result = cli_runner.invoke(cli, args)
         assert_cli_runner(result)
-        assert (
-            "\n".join(
-                [
-                    f"{env_key}={env_val}"
-                    for env_key, env_val in env_var_resolution_expectation.expected_env_values.items()
-                ]
-            )
-            == result.stdout.strip()
+        assert result.stdout.strip() == "\n".join(
+            [
+                f"{env_key}={env_val}"
+                for env_key, env_val in env_var_resolution_expectation.expected_env_values.items()
+            ]
         )
+
+    def test_environment_variable_inheritance(self, cli_runner, project, monkeypatch):
+        monkeypatch.setenv("STACKED", "1")
+        with project.meltano_update() as meltanofile:
+            meltanofile.update(
+                {
+                    "env": "${STACKED}2",
+                    "plugins": {
+                        "utilities": [
+                            {
+                                "name": "test-environment-inheritance",
+                                "namespace": "test_environment_inheritance",
+                                "executable": "pwd",
+                                "env": "${STACKED}4",
+                            }
+                        ],
+                    },
+                    "environments": [
+                        {
+                            "name": "dev",
+                            "env": {"STACKED": "${STACKED}3"},
+                            "config": {
+                                "plugins": {
+                                    "utilities": [
+                                        {
+                                            "name": "test-environment-inheritance",
+                                            "env": {"STACKED": "${STACKED}5"},
+                                        }
+                                    ]
+                                }
+                            },
+                        }
+                    ],
+                },
+            )
+        result = cli_runner.invoke(
+            cli,
+            [
+                "invoke",
+                "--print-environment-variable",
+                "STACKED",
+                "test-environment-inheritance",
+            ],
+        )
+        assert_cli_runner(result)
+        assert result.stdout.strip() == "STACKED=12345"
