@@ -1,7 +1,8 @@
 """Project Plugin Service."""
 
+import enum
 from contextlib import contextmanager
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Tuple
 
 import structlog
 
@@ -20,6 +21,16 @@ from .plugin_discovery_service import LockedDefinitionService, PluginDiscoverySe
 from .project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+class DefinitionSource(str, enum.Enum):
+    """The source of a plugin definition."""
+
+    DISCOVERY = "discovery"
+    HUB = "hub"
+    CUSTOM = "custom"
+    LOCKFILE = "lockfile"
+    INHERITED = "inherited"
 
 
 class PluginAlreadyAddedException(Exception):
@@ -426,13 +437,17 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         Returns:
             The parent plugin.
+
+        Raises:
+            PluginParentNotFoundError: If the parent plugin is not found.
         """
         try:
             return self.discovery_service.get_base_plugin(plugin)
-        except PluginNotFoundError:
-            pass
-        except VariantNotFoundError:
-            pass
+        except (PluginNotFoundError, VariantNotFoundError) as err:
+            if plugin.inherit_from:
+                raise PluginParentNotFoundError(plugin, err) from err
+
+            raise
 
     def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Get the parent plugin from the hub.
@@ -454,6 +469,69 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
             raise
 
+    def find_parent(
+        self,
+        plugin: ProjectPlugin,
+    ) -> Tuple[ProjectPlugin, DefinitionSource]:
+        """Find the parent plugin of a plugin.
+
+        Args:
+            plugin: The plugin to find the parent of.
+
+        Returns:
+            The parent plugin and the source of the parent.
+
+        Raises:
+            error: If the parent plugin is not found.
+        """
+        error = None
+
+        if plugin.inherit_from and not plugin.is_variant_set:
+            try:
+                return (
+                    self.find_plugin(
+                        plugin_type=plugin.type, plugin_name=plugin.inherit_from
+                    ),
+                    DefinitionSource.INHERITED,
+                )
+            except PluginNotFoundError as inherited_exc:
+                error = inherited_exc
+
+        with self.settings_service.feature_flag(
+            FeatureFlags.LOCKFILES,
+            raise_error=False,
+        ) as allowed:
+            if allowed:
+                try:
+                    return (
+                        self.locked_definition_service.get_base_plugin(
+                            plugin,
+                            variant_name=plugin.variant,
+                        ),
+                        DefinitionSource.LOCKFILE,
+                    )
+                except PluginNotFoundError as lockfile_exc:
+                    error = lockfile_exc
+
+            logger.debug("Lockfile is feature-flagged", status=allowed)
+
+        if self._use_discovery_yaml:
+            try:
+                return (
+                    self._get_parent_from_discovery(plugin),
+                    DefinitionSource.DISCOVERY,
+                )
+            except Exception as discovery_exc:
+                error = discovery_exc
+
+        try:
+            return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
+        except Exception as hub_exc:
+            error = hub_exc
+
+        if error:
+            raise error
+
     def get_parent(self, plugin: ProjectPlugin) -> Optional[ProjectPlugin]:
         """Get plugin's parent plugin.
 
@@ -463,33 +541,10 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Returns:
             The parent plugin or None if the plugin has no parent.
         """
-        if plugin.inherit_from and not plugin.is_variant_set:
-            try:
-                return self.find_plugin(
-                    plugin_type=plugin.type, plugin_name=plugin.inherit_from
-                )
-            except PluginNotFoundError:
-                pass
+        parent, source = self.find_parent(plugin)
 
-        with self.settings_service.feature_flag(
-            FeatureFlags.LOCKFILES,
-            raise_error=False,
-        ) as allowed:
-            if allowed:
-                try:
-                    return self.locked_definition_service.get_base_plugin(
-                        plugin,
-                        variant_name=plugin.variant,
-                    )
-                except PluginNotFoundError as exc:
-                    logger.debug("A plugin lockfile could not be found", exc_info=exc)
-
-            logger.debug("Lockfile is feature-flagged", status=allowed)
-
-        if self._use_discovery_yaml:
-            return self._get_parent_from_discovery(plugin)
-
-        return self._get_parent_from_hub(plugin)
+        logger.debug("Found plugin", plugin=plugin.name, source=source)
+        return parent
 
     def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Ensure that plugin has a parent set.

@@ -54,23 +54,23 @@ class ProjectAddService:
         with self.plugins_service.disallow_discovery_yaml():
             self.plugins_service.ensure_parent(plugin)
 
-        # If we are inheriting from a base plugin definition,
-        # repeat the variant and pip_url in meltano.yml
-        parent = plugin.parent
-        if isinstance(parent, BasePlugin):
-            # raise
-            plugin.variant = parent.variant
-            plugin.pip_url = parent.pip_url
+            # If we are inheriting from a base plugin definition,
+            # repeat the variant and pip_url in meltano.yml
+            parent = plugin.parent
+            if isinstance(parent, BasePlugin):
+                # raise
+                plugin.variant = parent.variant
+                plugin.pip_url = parent.pip_url
 
-        added = self.add_plugin(plugin)
+            added = self.add_plugin(plugin)
 
-        if lock and not added.is_custom():
-            self.plugins_service.lock_service.save(
-                added.parent,
-                exists_ok=plugin.inherit_from is not None,
-            )
+            if lock and not added.is_custom():
+                self.plugins_service.lock_service.save(
+                    added.parent,
+                    exists_ok=plugin.inherit_from is not None,
+                )
 
-        return added
+            return added
 
     def add_plugin(self, plugin: ProjectPlugin):
         """Add a plugin to the project.

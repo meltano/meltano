@@ -8,7 +8,7 @@ from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundE
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_plugins_service import DefinitionSource, ProjectPluginsService
 from meltano.core.settings_service import FeatureFlags
 
 
@@ -89,7 +89,7 @@ class TestProjectPluginsService:
 
     def test_get_parent(
         self,
-        subject,
+        subject: ProjectPluginsService,
         tap,
         alternative_tap,
         inherited_tap,
@@ -148,13 +148,15 @@ class TestProjectPluginsService:
 
         # Feature flag off means definition is not retrieved from lockfile
         subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
-        result_no_ff = subject.get_parent(tap)
+        result_no_ff, source = subject.find_parent(tap)
+        assert source == DefinitionSource.DISCOVERY
         assert result_no_ff == expected
         assert len(result_no_ff.settings) == 11  # noqa: WPS432
 
         # Feature flag on means definition is indeed retrieved from lockfile
         subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, True)
-        result = subject.get_parent(tap)
+        result, source = subject.find_parent(tap)
+        assert source == DefinitionSource.LOCKFILE
         assert result == expected
         assert result.settings == expected.settings
         assert result.settings[-1].name == "foo"

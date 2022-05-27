@@ -103,8 +103,8 @@ class TestProjectAddService:
             "inherit_from": "tap-mock-inherited",
         }
 
-        assert hub_request_counter["/extractors/index"] == 2
-        assert hub_request_counter["/extractors/tap-mock--meltano"] == 2
+        assert hub_request_counter["/extractors/index"] == 3
+        assert hub_request_counter["/extractors/tap-mock--meltano"] == 3
         assert len(hub_request_counter) == 2
 
     def test_lockfile_inherited(
