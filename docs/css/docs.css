@@ -34,7 +34,13 @@ body {
 }
 
 .navbar a {
-  color: #ffffff;
+  color: #485fc7;
+}
+
+@media screen (min-width: 1023px) {
+  .navbar a {
+    color: #ffffff;
+  }
 }
 
 .navbar-item img {
