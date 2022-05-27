@@ -1,4 +1,5 @@
 """Schedule management CLI."""
+from __future__ import annotations
 
 import json
 import sys
@@ -41,7 +42,7 @@ def _add_elt(
     loader: str,
     transform: str,
     interval: str,
-    start_date: str,
+    start_date: str | None,
 ):
     """Add a new legacy elt schedule."""
     project = ctx.obj["project"]
@@ -115,8 +116,10 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
-    if job and (extractor or loader):
-        raise click.ClickException("Cannot specify both --job and --extractor/--loader")
+    if job and (extractor or loader or transform):
+        raise click.ClickException(
+            "Cannot mix --job with --extractor/--loader/--transform"
+        )
 
     if not job:
         if not extractor:
@@ -261,3 +264,115 @@ def remove(ctx, name):
     schedule_service.remove(name)
     tracker = GoogleAnalyticsTracker(schedule_service.project)
     tracker.track_meltano_schedule("remove", removed_schedule)
+
+
+def _update_job_schedule(
+    candidate: Schedule,
+    job: str | None,
+    interval: str = None,
+) -> Schedule:
+    """Update an existing job schedule.
+
+    Args:
+        candidate: The schedule to update.
+        job: The name of the job to run.
+        interval: The interval of the schedule.
+
+    Raises:
+        click.ClickException: If the schedule is not a scheduled job.
+
+    Returns:
+        The updated schedule.
+    """
+    if not candidate.job:
+        raise click.ClickException(
+            f"Cannot update schedule {candidate.name} with job only flags as its a elt schedule"
+        )
+    if job:
+        candidate.job = job
+    if interval:
+        candidate.interval = interval
+    return candidate
+
+
+def _update_elt_schedule(
+    candidate: Schedule,
+    extractor: str | None,
+    loader: str | None,
+    transform: str | None,
+    interval: str | None,
+) -> Schedule:
+    """Update an elt schedule.
+
+    Args:
+        candidate: The schedule to update.
+        extractor: The name of the extractor to use.
+        loader: The name of the loader to use.
+        transform: The transform flag to use.
+        interval: The interval of the schedule.
+
+    Raises:
+        click.ClickException: If the schedule is not a scheduled elt task.
+
+    Returns:
+        The updated schedule.
+    """
+    if candidate.job:
+        raise click.ClickException(
+            f"Cannot update schedule {candidate.name} with elt only flags as its a scheduled job"
+        )
+
+    if extractor:
+        candidate.extractor = extractor
+    if loader:
+        candidate.loader = loader
+    if transform:
+        candidate.transform = transform
+    if interval:
+        candidate.interval = interval
+    return candidate
+
+
+@schedule.command(name="set", short_help="Update a schedule.")
+@click.argument("name", required=True)
+@click.option("--interval", "-i", help="Update the interval of the schedule.")
+@click.option("--job", "-j", help="Update the name of the job to run a scheduled job.")
+@click.option("--extractor", "-e", help="Update the extractor for an elt schedule.")
+@click.option("--loader", "-l", help="Updated the loader for an elt schedule.")
+@click.option(
+    "--transform",
+    "-t",
+    type=click.Choice(["skip", "only", "run"]),
+    default=None,
+    help="Update the transform flag for an elt schedule.",
+)
+@click.pass_context
+def set_cmd(ctx, name, interval, job, extractor, loader, transform):
+    """Update a schedule.
+
+    Usage:
+        meltano schedule set <name> [--interval <interval>] [--job <job>] [--extractor <extractor>] [--loader <loader>] [--transform <transform>]
+    """
+    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+    candidate = schedule_service.find_schedule(name)
+
+    if candidate.job:
+        if extractor or loader or transform:
+            raise click.ClickException(
+                "Cannot mix --job with --extractor/--loader/--transform"
+            )
+        updated = _update_job_schedule(candidate, job, interval)
+    else:
+        if job:
+            raise click.ClickException(
+                "Cannot mix --job with --extractor/--loader/--transform"
+            )
+        updated = _update_elt_schedule(
+            candidate, extractor, loader, transform, interval
+        )
+
+    schedule_service.update_schedule(updated)
+
+    click.echo(f"Updated schedule '{name}'")
+    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker.track_meltano_schedule("set", updated)

@@ -55,8 +55,12 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         self.job = job
         self.env = env
 
-        # Only applicable to legacy elt schedules
-        if not self.job:
+        if self.job:
+            self.extractor = None
+            self.loader = None
+            self.transform = None
+            self.start_date = None
+        else:
             self.extractor = extractor
             self.loader = loader
             self.transform = transform

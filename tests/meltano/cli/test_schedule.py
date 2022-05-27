@@ -124,3 +124,80 @@ class TestCliSchedule:
             res = cli_runner.invoke(cli, ["schedule", "remove", job_schedule.name])
             assert res.exit_code == 0
             remove_mock.assert_called_once_with(job_schedule.name)
+
+    def test_schedule_set(
+        self, cli_runner, elt_schedule, job_schedule, schedule_service
+    ):
+
+        with mock.patch(
+            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+        ):
+            res = cli_runner.invoke(
+                cli, ["schedule", "set", job_schedule.name, "--job", "mock-job-renamed"]
+            )
+            assert res.exit_code == 0
+            assert (
+                schedule_service.find_schedule(job_schedule.name).job
+                == "mock-job-renamed"
+            )
+
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "schedule",
+                    "set",
+                    elt_schedule.name,
+                    "--loader",
+                    "mock-target-renamed",
+                ],
+            )
+            assert res.exit_code == 0
+            assert (
+                schedule_service.find_schedule(elt_schedule.name).loader
+                == "mock-target-renamed"
+            )
+
+            # interval applies to both and should always work
+            res = cli_runner.invoke(
+                cli, ["schedule", "set", job_schedule.name, "--interval", "@hourly"]
+            )
+            assert res.exit_code == 0
+            assert (
+                schedule_service.find_schedule(job_schedule.name).cron_interval
+                == "0 * * * *"
+            )
+
+            res = cli_runner.invoke(
+                cli, ["schedule", "set", elt_schedule.name, "--interval", "@hourly"]
+            )
+            assert res.exit_code == 0
+            assert (
+                schedule_service.find_schedule(elt_schedule.name).cron_interval
+                == "0 * * * *"
+            )
+
+            # verify that job flags cant be set on elt tasks and vice versa
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "schedule",
+                    "set",
+                    job_schedule.name,
+                    "--loader",
+                    "mock-target-renamed",
+                ],
+            )
+            assert res.exit_code == 1
+            assert (
+                schedule_service.find_schedule(job_schedule.name).loader
+                != "mock-target-renamed"
+            )
+
+            res = cli_runner.invoke(
+                cli, ["schedule", "set", elt_schedule.name, "--job", "mock-job-renamed"]
+            )
+            assert res.exit_code == 1
+            assert (
+                schedule_service.find_schedule(elt_schedule.name).job
+                != "mock-job-renamed"
+            )
