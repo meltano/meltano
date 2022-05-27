@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+
 ---
 
 ### New
@@ -36,6 +37,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3484](https://gitlab.com/meltano/meltano/-/issues/3484) Use `SettingsService.feature_flag` convention for lockfiles.
 
+- [#3447](https://gitlab.com/meltano/meltano/-/issues/3447) Make setting-level `env:` declaration a one-way injection into the plugin execution context.
+
 ### Fixes
 
 - [#3483](https://gitlab.com/meltano/meltano/-/issues/3483) Fixes a bug where pipx installed meltano can not find executable(.exe) meltano dependency packages. _Thanks **[Dan Norman](https://gitlab.com/BuzzCutNorman)**!_
@@ -44,6 +47,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## 1.104.0 - (2022-05-13)
+
 ---
 
 ### New
@@ -51,20 +55,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3031](https://gitlab.com/meltano/meltano/-/issues/3031) Add lock artifacts during `meltano add` for stability and portability of plugin definitions.
 
 ### Changes
+
 - [#3385](https://gitlab.com/meltano/meltano/-/issues/3385) Add feature flags for experimental features
 
 ### Fixes
 
 - [#3468](https://gitlab.com/meltano/meltano/-/issues/3468) Fixes bug where container spec's entrypoint was not passed along to the Docker runtime.
 
-
 ## 1.103.1 - (2022-05-05)
+
 ---
 
 ### Fixes
 
 - [#3462](https://gitlab.com/meltano/meltano/-/issues/3462) Adds missing telemetry for `meltano state`
-
 
 ## 1.103.0 - (2022-05-05)
 
@@ -81,7 +85,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
-
 
 ## 1.102.0 - (2022-04-28)
 

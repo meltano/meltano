@@ -1,6 +1,6 @@
 import pytest
+
 from meltano.api.models import db
-from meltano.core.db import project_engine
 
 
 class TestApp:
@@ -36,13 +36,13 @@ class TestAppSMTPDefault:
 
 class TestAppSMTP:
     ENV = {
-        "MAIL_SERVER": "smtp.localdomain",
-        "MAIL_PORT": "1337",
-        "MAIL_DEFAULT_SENDER": '"Doctor Who" <dr.who@localdomain.com>',
-        "MAIL_USE_TLS": "1",
-        "MAIL_USERNAME": "username",
-        "MAIL_PASSWORD": "password",
-        "MAIL_DEBUG": "0",
+        "MELTANO_MAIL_SERVER": "smtp.localdomain",
+        "MELTANO_MAIL_PORT": "1337",
+        "MELTANO_MAIL_DEFAULT_SENDER": '"Doctor Who" <dr.who@localdomain.com>',
+        "MELTANO_MAIL_USE_TLS": "1",
+        "MELTANO_MAIL_USERNAME": "username",
+        "MELTANO_MAIL_PASSWORD": "password",
+        "MELTANO_MAIL_DEBUG": "0",
     }
 
     EXPECTED = {
