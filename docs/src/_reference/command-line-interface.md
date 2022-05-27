@@ -759,7 +759,7 @@ The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/C
 
 ```bash
 # Add a schedule
-# Schedule a job name "my_job" to run everyday
+# Schedule a job named "my_job" to run everyday
 meltano schedule add <schedule_name> --job my_job --interval "@daily"
 # Schedule an ELT task to run hourly
 meltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform run --interval "@hourly"
@@ -784,7 +784,7 @@ meltano schedule run <schedule_name>
 ### Examples
 
 ```bash
-# Add a new schedule named "gitlab-sync" to run the job named "gitlab-to-mysqlb" every day
+# Add a new schedule named "gitlab-sync" to run the job named "gitlab-to-mysql" every day
 meltano schedule add gitlab-sync --job gitlab-to-mysql --interval "@daily"
 # Or the the same, using abbreviated syntax
 meltano schedule add gitlab-sync -j gitlab-to-mysql -i "@daily"
