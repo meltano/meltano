@@ -181,6 +181,11 @@ settings:
   value: false
 
 # Feature Flags
+- name: ff.enable_uvicorn
+  kind: boolean
+  value: False
+
+# Feature Flags
 - name: experimental
   kind: boolean
   value: False

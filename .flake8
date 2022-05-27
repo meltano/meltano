@@ -240,3 +240,6 @@ per_file_ignores =
         WPS202
         # Found overused expression: allow settings store implementations to all return vars with the same names
         WPS204
+    src/meltano/api/controllers/orchestrations.py:
+        # Found too many module members: 23 > 7
+        WPS202
