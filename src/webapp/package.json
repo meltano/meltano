@@ -55,7 +55,7 @@
     "eslint-plugin-vue": "^5.0.0",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^8.1.5",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.14.1",
     "sass-loader": "^8.0.0",
     "sql-formatter": "^2.3.3",
     "ssf": "^0.10.2",
