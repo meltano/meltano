@@ -162,9 +162,9 @@ class SettingDefinition(NameEq, Canonical):
             value_post_processor: Used with `kind: object` to post-process the keys in a particular way.
             attrs: Keyword arguments to pass to parent class.
         """
-        aliases = aliases if aliases is not None else []
-        options = options if options is not None else []
-        oauth = oauth if oauth is not None else {}
+        aliases = aliases or []
+        options = options or []
+        oauth = oauth or {}
 
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
@@ -281,20 +281,25 @@ class SettingDefinition(NameEq, Canonical):
         return self.kind in {SettingKind.PASSWORD, SettingKind.OAUTH}
 
     def env_vars(
-        self, prefixes: list[str], include_custom: bool = True
+        self,
+        prefixes: list[str],
+        include_custom: bool = True,
+        for_writing: bool = False,
     ) -> list[EnvVar]:
         """Return environment variables with the provided prefixes.
 
         Args:
             prefixes: Env var prefixes to prepend.
-            include_custom: Include custom env vars from `env`.
+            include_custom: Include custom env vars from `env_aliases`.
+            for_writing: Include target env var from `env`.
 
         Returns:
             A list of EnvVar instances for this setting definition.
         """
         env_keys = []
 
-        if self.env and include_custom:
+        if self.env and for_writing:
+            # this ensures we only write to specified `env:`
             env_keys.append(self.env)
 
         env_keys.extend(utils.to_env_var(prefix, self.name) for prefix in prefixes)
