@@ -1,0 +1,29 @@
+dag:
+  term: DAG
+  definition: DAG means Directed Acyclic Graph. Within data workflows, any sequence of tasks can be represented as a DAG when the individual tasks are linked. This is done explicitly in dbt via the "ref" function.```
+  link: 
+
+dataops:
+  term: DataOps
+  definition: DataOps brings the benefits of DevOps best practices to the data lifecycle.
+  link: https://meltano.com/dataops/
+
+elt:
+  term: ELT
+  definition: ELT means Extract, Load, Transform. It is a method of data replication and transformation used to perform data integration at any scale. The purpose of ELT is to extract specific data, such as customer information or billing records, from its source, and deliver it to its end point in the fastest, most reliable way possible.
+  link: https://meltano.com/meltano-elt/
+
+orchestration:
+  term: Orchestration
+  definition: Orchestration refers to the sequencing and running of any tasks. Orchestrators are responsible for running tasks at specified times and handling advanced features like retries.
+  link: https://docs.meltano.com/guide/orchestration
+
+streams:
+  term: Streams
+  definition: In the Singer ecosystem, a stream typically represents a table, API endpoint, or discrete set of data.
+  link: https://hub.meltano.com/singer/spec
+
+streammap:
+  term: Stream Map
+  definition: In the Singer ecosystem, a stream map is an inline transformation that is applied to data on the fly before it arrives at a target.
+  link: https://sdk.meltano.com/en/latest/stream_maps.html
