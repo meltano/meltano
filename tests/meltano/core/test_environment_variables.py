@@ -192,7 +192,7 @@ class TestEnvVarResolution:
             pytest.xfail(
                 "This expected environment variable resolution behavior is currently failing."
             )
-        args = ["--log-level=debug", "invoke"]
+        args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():
             args.append("--print-environment-variable")
             args.append(key)

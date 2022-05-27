@@ -1,8 +1,9 @@
 """CLI command `meltano invoke`."""
 
+from __future__ import annotations
+
 import logging
 import sys
-from typing import Tuple
 
 import click
 from sqlalchemy.orm import sessionmaker
@@ -63,9 +64,9 @@ def invoke(
     dump: str,
     list_commands: bool,
     plugin_name: str,
-    plugin_args: Tuple[str, ...],
+    plugin_args: tuple[str, ...],
     containers: bool = False,
-    print_environment_variable: str = None,
+    print_environment_variable: str | None = None,
 ):
     """
     Invoke a plugin's executable with specified arguments.
@@ -116,7 +117,7 @@ async def _invoke(
     dump: str,
     command_name: str,
     containers: bool,
-    print_environment_variable: list,
+    print_environment_variable: list | None = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
