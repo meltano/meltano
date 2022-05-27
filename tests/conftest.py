@@ -80,7 +80,7 @@ class MockAdapter(BaseAdapter):
                 hub[index_key][plugin_name]["variants"] = {}
                 default_variant = None
 
-                variants = plugin.get("variants", [])
+                variants = plugin.pop("variants", [])
 
                 for variant in variants:
                     variant_name = variant["name"]
@@ -94,15 +94,13 @@ class MockAdapter(BaseAdapter):
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
                     hub[plugin_key] = {
+                        **plugin,
                         **variant,
                         "name": plugin_name,
                         "label": plugin.get("label"),
                         "namespace": plugin["namespace"],
                         "variant": variant_name,
                     }
-
-                    if "dialect" in plugin:
-                        hub[plugin_key]["dialect"] = plugin["dialect"]  # noqa: WPS529
 
                 if not variants:
                     variant_name = plugin.get("variant", "original")
