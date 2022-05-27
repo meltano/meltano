@@ -6,6 +6,7 @@ import sys
 from meltano.core.logging import setup_logging
 from meltano.core.project import ProjectReadonly
 
+from .interactive import InteractionStatus, InteractiveConfig  # noqa: F401
 from .utils import CliError
 
 # TODO: Importing the cli.cli module breaks other cli module imports

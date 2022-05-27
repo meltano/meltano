@@ -21,6 +21,7 @@ from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.utils import run_async
 
 from . import cli
+from .interactive import InteractiveConfig
 from .params import pass_project
 from .utils import CliError
 
@@ -237,39 +238,28 @@ def reset(ctx, store):
 @click.pass_context
 def set_(ctx, setting_name, value, store):
     """Set the configurations' setting `<name>` to `<value>`."""
-    store = SettingValueStore(store)
+    interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
+    interaction.set_value(setting_name=setting_name, value=value, store=store)
 
-    try:
-        value = json.loads(value)
-    except json.JSONDecodeError:
-        pass
 
-    settings = ctx.obj["settings"]
-    session = ctx.obj["session"]
+@config.command()
+@click.argument("setting_name", nargs=-1, required=False)
+@click.option(
+    "--store",
+    type=click.Choice(SettingValueStore.writables()),
+    default=SettingValueStore.AUTO,
+)
+@click.option("--extras", is_flag=True)
+@click.pass_context
+def interactive(ctx, setting_name, store, extras):
+    """Set configuration interactively."""
+    interaction = InteractiveConfig(ctx=ctx, store=store, extras=extras)
 
-    path = list(setting_name)
-    try:
-        value, metadata = settings.set_with_metadata(
-            path, value, store=store, session=session
-        )
-    except StoreNotSupportedError as err:
-        raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
-        ) from err
-
-    name = metadata["name"]
-    store = metadata["store"]
-    click.secho(
-        f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
-        fg="green",
-    )
-
-    current_value, source = settings.get_with_source(name, session=session)
-    if source != store:
-        click.secho(
-            f"Current value is still: {current_value!r} (from {source.label})",
-            fg="yellow",
-        )
+    if setting_name:
+        name = ".".join(list(setting_name))
+        interaction.configure(name=name)
+    else:
+        interaction.configure_all()
 
 
 @config.command("test")
@@ -305,29 +295,5 @@ def test(ctx):
 @click.pass_context
 def unset(ctx, setting_name, store):
     """Unset the configurations' setting called `<name>`."""
-    store = SettingValueStore(store)
-
-    settings = ctx.obj["settings"]
-    session = ctx.obj["session"]
-
-    path = list(setting_name)
-    try:
-        metadata = settings.unset(path, store=store, session=session)
-    except StoreNotSupportedError as err:
-        raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
-        ) from err
-
-    name = metadata["name"]
-    store = metadata["store"]
-    click.secho(
-        f"{settings.label.capitalize()} setting '{name}' in {store.label} was unset",
-        fg="green",
-    )
-
-    current_value, source = settings.get_with_source(name, session=session)
-    if source is not SettingValueStore.DEFAULT:
-        click.secho(
-            f"Current value is now: {current_value!r} (from {source.label})",
-            fg="yellow",
-        )
+    interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
+    interaction.unset_value(setting_name=setting_name, store=store)

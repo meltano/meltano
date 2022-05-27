@@ -6,9 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+
 ---
 
 ### New
+
+- [#3227](https://gitlab.com/meltano/meltano/-/issues/3227) Add interactive mode to `meltano config` command.
 
 ### Changes
 
@@ -18,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
+## 1.102.0 - (2022-04-28)
 
 ## 1.105.0 - (2022-05-19)
 ---
@@ -81,6 +85,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
 
+## 1.101.0 - (2022-04-21)
 
 ## 1.102.0 - (2022-04-28)
 
