@@ -3,7 +3,10 @@ from unittest import mock
 
 import pytest
 from flask import url_for
+
 from support.payload_builder import PayloadBuilder
+
+STATUS_OK = 200
 
 
 @pytest.fixture()
@@ -11,19 +14,22 @@ def compile_models(api):
     api.get("/repos/sync")
 
 
-def assertIsSQL(value: str) -> bool:
+def assert_is_sql(value: str) -> bool:
     assert re.match(
         r"SELECT.*FROM.*(JOIN.*)*(GROUP BY.*)?(LIMIT \d+)?", value
     ), f"{value} is not a SQL query."
 
 
-def assertListEquivalence(xs: list, ys: list):
+def assert_list_equivalence(xs: list, ys: list):
     assert len(xs) == len(ys), "Both list should have the same size."
     assert set(xs) == set(ys)
 
 
-@pytest.mark.usefixtures("project", "add_model", "schedule")
+@pytest.mark.usefixtures("project", "add_model", "elt_schedule")
 class TestSqlController:
+
+    STATUS_OK = 200
+
     @pytest.fixture
     def post(self, app, api, engine_sessionmaker):
         engine, _ = engine_sessionmaker
@@ -60,48 +66,45 @@ class TestSqlController:
         return _factory
 
     def assert_empty_query(self, post, payload_builder):
-        """with no columns, aggregates or timeframes the response is No Content"""
-
+        """With no columns, aggregates or timeframes the response is No Content."""
         res = post(payload_builder.payload)
-        assert res.status_code == 204
+        assert res.status_code == 204  # noqa: WPS432
 
     def assert_column_query(self, post, payload_builder):
-        """with columns they should be included in the query"""
-
+        """With columns they should be included in the query."""
         payload_builder.columns("name").columns("forecast", join="entry").columns(
             "perc", "fuel", join="generationmix"
         )
         res = post(payload_builder.payload)
 
-        assert res.status_code == 200
-        assertIsSQL(res.json["sql"])
+        assert res.status_code == STATUS_OK
+        assert_is_sql(res.json["sql"])
 
         # tests the label names
-        assertListEquivalence(
+        assert_list_equivalence(
             [attr["attribute_label"] for attr in res.json["query_attributes"]],
             ["Region Name", "Forecast", "Percent (%)", "Fuel Type"],
         )
 
         # tests the column names
-        assertListEquivalence(
+        assert_list_equivalence(
             [attr["attribute_name"] for attr in res.json["query_attributes"]],
             ["name", "forecast", "perc", "fuel"],
         )
 
     def assert_aggregate_query(self, post, payload_builder):
-        """with aggregates they should be included in the query"""
-
+        """With aggregates they should be included in the query."""
         payload_builder.columns("name").aggregates("count")
         res = post(payload_builder.payload)
 
-        assert res.status_code == 200
-        assertIsSQL(res.json["sql"])
+        assert res.status_code == STATUS_OK
+        assert_is_sql(res.json["sql"])
 
         assert any(
             attr["id"] == "region.count" for attr in res.json["aggregates"]
         ), res.json
 
-        assertListEquivalence(
+        assert_list_equivalence(
             [attr["attribute_name"] for attr in res.json["query_attributes"]],
             ["name", "count"],
         )
@@ -141,17 +144,17 @@ class TestSqlController:
 
         res = post(payload)
 
-        assert res.status_code == 200, res.data
-        assertIsSQL(res.json["sql"])
+        assert res.status_code == STATUS_OK, res.data
+        assert_is_sql(res.json["sql"])
 
         # tests label
-        assertListEquivalence(
+        assert_list_equivalence(
             [attr["attribute_label"] for attr in res.json["query_attributes"]],
             ["Region Name", "Forecast", "From: Week", "Percent (%)", "Fuel Type"],
         )
 
         # tests column name
-        assertListEquivalence(
+        assert_list_equivalence(
             [attr["attribute_name"] for attr in res.json["query_attributes"]],
             ["name", "forecast", "from.week", "perc", "fuel"],
         )

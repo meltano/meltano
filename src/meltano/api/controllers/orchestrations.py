@@ -523,7 +523,7 @@ def save_pipeline_schedule() -> Response:
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    schedule = schedule_service.add(
+    schedule = schedule_service.add_elt(
         db.session, slug, extractor, loader, transform, interval
     )
 
