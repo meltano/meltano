@@ -26,6 +26,7 @@ include:
   - local: .gitlab/ci/test.gitlab-ci.yml
   - local: .gitlab/ci/test_webapp.gitlab-ci.yml
   - local: .gitlab/ci/sample_code.gitlab-ci.yml
+  - local: .gitlab/ci/sample_code_windows.gitlab-ci.yml
   - local: .gitlab/ci/demo_project.gitlab-ci.yml
   - local: .gitlab/ci/sast.gitlab-ci.yml
   - local: .gitlab/ci/license_scanning.gitlab-ci.yml
