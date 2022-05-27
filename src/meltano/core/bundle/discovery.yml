@@ -2279,6 +2279,7 @@ loaders:
             value_post_processor: stringify
             label: SSL
           - name: default_target_schema
+            env: TARGET_POSTGRES_SCHEMA
             value: $MELTANO_EXTRACT__LOAD_SCHEMA
             description: Name of the schema where the tables will be created. If `schema_mapping` is not defined then every stream sent by the tap is loaded into this schema.
             label: Default Target Schema
