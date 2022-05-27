@@ -116,7 +116,7 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
-    if job and (extractor or loader or transform):
+    if job and (extractor or loader):
         raise click.ClickException(
             "Cannot mix --job with --extractor/--loader/--transform"
         )
