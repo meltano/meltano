@@ -55,14 +55,12 @@ This means that you're ready to start Meltano CLI development. For API and UI de
 
 <div class="notification is-warning">
   <p><strong>Metrics (anonymous usage data) tracking</strong></p>
-  <p>As you contribute to Meltano, you may want to disable <a href="/reference/settings#send-anonymous-usage-stats">metrics tracking</a> globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:</p>
+  <p>As you contribute to Meltano, you may want to disable <a href="/reference/settings#send-anonymous-usage-stats">metrics tracking</a> globally rather than by project. You can do this by setting the environment variable `MELTANO_SEND_ANONYMOUS_USAGE_STATS` to `False`:</p>
 <pre>
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-export MELTANO_DISABLE_TRACKING=True
+export MELTANO_SEND_ANONYMOUS_USAGE_STATS=False
 </pre>
 </div>
-
-
 
 ## System Database
 
@@ -84,8 +82,6 @@ Each migration should be isolated from the `meltano` module, so **don't import a
 </div>
 
 To run the migrations, use `meltano upgrade` inside a Meltano project.
-
-
 
 ## Testing
 
@@ -148,7 +144,5 @@ MELTANO_VENV=.venv tmuxinator local
 - [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)
 - [Managing environments with poetry](https://python-poetry.org/docs/managing-environments/)
 - [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
-
-
 
 [Accepting Merge Requests]: https://gitlab.com/groups/meltano/-/issues?label_name[]=Accepting%20Merge%20Requests

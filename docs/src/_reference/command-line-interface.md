@@ -440,7 +440,7 @@ The new project directory will contain:
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
-[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_DISABLE_TRACKING` environment variable is enabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
+[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
 ### How to use
 
@@ -472,7 +472,7 @@ meltano init demo-project --no_usage_stats
 # - OR don't share anything with the Meltano team
 #   about any project I initialize ever:
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
-echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
+echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
 meltano init demo-project # --no_usage_stats is implied
 ```
 
@@ -660,7 +660,7 @@ When an active environment is present, `run` will attempt to run incrementally a
 However, four top level flags are provided to alter behavior:
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
-(implicitly enables --log-level=debug for 'console' named handlers).
+  (implicitly enables --log-level=debug for 'console' named handlers).
 - `--no-state-update` will disable state saving for this invocation.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.

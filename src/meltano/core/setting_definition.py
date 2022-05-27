@@ -164,8 +164,8 @@ class SettingDefinition(NameEq, Canonical):
             value_post_processor: Used with `kind: object` to post-process the keys in a particular way.
             attrs: Keyword arguments to pass to parent class.
         """
-        env_aliases = env_aliases or []
         aliases = aliases or []
+        env_aliases = env_aliases or []
         options = options or []
         oauth = oauth or {}
 
