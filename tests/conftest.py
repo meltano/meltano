@@ -101,6 +101,9 @@ class MockAdapter(BaseAdapter):
                         "variant": variant_name,
                     }
 
+                    if "dialect" in plugin:
+                        hub[plugin_key]["dialect"] = plugin["dialect"]  # noqa: WPS529
+
                 if not variants:
                     variant_name = plugin.get("variant", "original")
                     default_variant = variant_name
@@ -121,6 +124,9 @@ class MockAdapter(BaseAdapter):
                         "repo": plugin.get("repo"),
                         "pip_url": plugin.get("pip_url"),
                     }
+
+                    if "dialect" in plugin:
+                        hub[plugin_key]["dialect"] = plugin["dialect"]  # noqa: WPS529
 
                 hub[index_key][plugin_name][
                     "logo_url"
