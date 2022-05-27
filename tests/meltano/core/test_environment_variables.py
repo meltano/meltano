@@ -206,6 +206,7 @@ class TestEnvVarResolution:
             ]
         )
 
+    @pytest.mark.xfail
     def test_environment_variable_inheritance(self, cli_runner, project, monkeypatch):
         monkeypatch.setenv("STACKED", "1")
         with project.meltano_update() as meltanofile:
