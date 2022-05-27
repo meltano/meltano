@@ -3,6 +3,7 @@ settings:
 - name: send_anonymous_usage_stats
   kind: boolean
   value: true
+  env_aliases: ["!MELTANO_DISABLE_TRACKING"]
 - name: project_id
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
