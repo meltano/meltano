@@ -13,9 +13,22 @@
     # `tap-covid-19` extractor configuration
     # TAP_COVID_19_API_TOKEN: set through https://gitlab.com/meltano/meltano/-/settings/ci_cd
 
+    # force ci rerun (TODO: remove)
+    # `tap-gitlab` request caching:
+    TAP_GITLAB_REQUESTS_CACHE_PATH: "$CI_PROJECT_DIR/api_caches/"
+
     MELTANO_DISABLE_TRACKING: "true"
   services:
     - postgres:11
+  cache:
+  # Reuse upstream API caches globally when running EL pipelines.
+  # This cuts down CI failures due to upstream service availability.
+  - key: "global"
+    when: always
+    paths:
+    - .cache/pip
+    - ./api_caches/
+
 
 homepage_sample_code:
   extends: .sample_code
@@ -61,9 +74,17 @@ homepage_sample_code:
     # Add GitLab extractor to your project
     - meltano add extractor tap-gitlab
 
+    # Reinstall with SDK-based variant:
+    - meltano --no-environment config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@ignore-access-denied
+    - cat meltano.yml
+    - meltano --log-level=debug install --clean extractor tap-gitlab
+    - echo "Cache dir is $TAP_GITLAB_REQUESTS_CACHE_PATH" && mkdir -p $TAP_GITLAB_REQUESTS_CACHE_PATH
+
     # Configure tap-gitlab to extract data from...
     # - the https://gitlab.com/meltano/meltano project
+    - meltano config tap-gitlab set ignore_access_denied true    
     - meltano config tap-gitlab set projects meltano/meltano
+    - meltano config tap-gitlab set groups meltano
     # - going back to May 1st, 2020
     - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
@@ -108,6 +129,8 @@ homepage_sample_code:
 
     # Select all attributes of all entities
     - meltano select tap-gitlab "*" "*"
+    - meltano select tap-gitlab --exclude "jobs" "*"
+    - meltano select tap-gitlab --exclude "pipelines_extended" "*"
 
     # Run data integration and transformation pipeline
     - meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
@@ -218,13 +241,21 @@ getting_started_sample_code:
 
     - meltano add extractor tap-gitlab
 
+    # Reinstall with SDK-based variant:
+    - meltano --no-environment config tap-gitlab set _pip_url git+https://github.com/MeltanoLabs/tap-gitlab.git@ignore-access-denied
+    - cat meltano.yml
+    - meltano --log-level=debug install --clean extractor tap-gitlab
+    - echo "Cache dir is $TAP_GITLAB_REQUESTS_CACHE_PATH" && mkdir -p $TAP_GITLAB_REQUESTS_CACHE_PATH
+
     - printf "tap_covid_19\ntap-covid-19\ntap-covid-19\ncatalog,discover,state\napi_token,user_agent,start_date\n" | meltano add --custom extractor tap-covid-19
 
     - meltano invoke tap-gitlab --help
 
     - meltano config tap-gitlab list
 
+    - meltano config tap-gitlab set ignore_access_denied true    
     - meltano config tap-gitlab set projects meltano/meltano
+    - meltano config tap-gitlab set groups meltano
     - meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
 
     - meltano config tap-gitlab
