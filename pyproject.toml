@@ -60,6 +60,7 @@ structlog = "^21.2.0"
 aiodocker = "^0.21.0"
 MarkupSafe = "<2.1.0"
 snowplow-tracker = "^0.10.0"
+uvicorn = {extras = ["standard"], version = "^0.17.6"}
 
 [tool.poetry.extras]
 infra = ["ansible"]
@@ -84,7 +85,6 @@ isort = "^5.10.1"
 pyupgrade = "^2.29.1"
 tox = "^3.24.4"
 mock = "^4.0.3"
-responses = "^0.20.0"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
