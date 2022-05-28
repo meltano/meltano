@@ -12,14 +12,14 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
 
+
 Specifically, it will:
 
-1. look for the [plugin definition](/concepts/project#plugins) in [the Meltano Hub API](https://hub.meltano.com/),
-2. add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`,
-3. store the plugin definition in the `./plugins` directory if the [lock files feature](/reference/settings#ff-lock-files) is enabled, and
-4. assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
-   1. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
-   2. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
+1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/),
+2. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`, and
+3. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
+   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
+   2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
 
