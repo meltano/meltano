@@ -343,8 +343,8 @@ class TestPluginSettingsService:
         subject.set("schema", "default", store=SettingValueStore.DOTENV)
         value, metadata = subject.get_with_metadata("schema")
 
-        # Custom `env` is the default
-        assert_env_value("default", "MOCKED_SCHEMA")
+        # Env is the default
+        assert_env_value("default", "TARGET_MOCK_SCHEMA")
 
         subject.unset("schema")
 
@@ -367,7 +367,7 @@ class TestPluginSettingsService:
 
         assert config["MOCK_SCHEMA"] == "custom_env"  # Namespace prefix
         assert (
-            config["MELTANO_LOAD_SCHEMA"] == "custom_env"
+            config["MELTANO_LOAD_SCHEMA"] == "name_prefix"
         )  # Generic prefix, read-only
 
     def test_setting_env_vars(
