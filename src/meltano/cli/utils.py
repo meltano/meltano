@@ -470,7 +470,7 @@ def propagate_stop_signals(proc):
         signal.signal(signal.SIGTERM, original_termination_handler)
 
 
-def check_dependencies_met(plugins, plugins_service: ProjectPluginsService):
+def check_dependencies_met(plugins, plugins_service: ProjectPluginsService) -> Tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
     Args:
