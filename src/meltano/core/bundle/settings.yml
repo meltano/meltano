@@ -191,16 +191,19 @@ settings:
   value: ["https://sp.meltano.com"]
 
 # Feature Flags
+# Control whether lock files are enabled or not.
 - name: ff.lock_files
   kind: boolean
   value: false
-
-# Feature Flags
+# Control whether to use Uvicorn rather than Gunicorn as the API server.
 - name: ff.enable_uvicorn
   kind: boolean
   value: False
-
-# Feature Flags
+# Control whether the API includes scheduled jobs in listings.
+- name: ff.enable_api_scheduled_job_list
+  kind: boolean
+  value: False
+# Global "experimental" flag.
 - name: experimental
   kind: boolean
   value: False

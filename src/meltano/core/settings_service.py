@@ -31,6 +31,7 @@ class FeatureFlags(Enum):
 
     LOCKFILES = "lock_files"
     ENABLE_UVICORN = "enable_uvicorn"
+    ENABLE_API_SCHEDULED_JOB_LIST = "enable_api_scheduled_job_list"
 
     def __str__(self):
         """Return feature name.
