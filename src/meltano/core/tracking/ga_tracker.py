@@ -81,9 +81,16 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             The project_id.
         """
         project_id_str = self.settings_service.get("project_id")
-        try:
-            project_id = uuid.UUID(project_id_str or "", version=4)
-        except ValueError:
+        if project_id_str:
+            try:
+                # Project ID might already be a UUID
+                project_id = uuid.UUID(project_id_str)
+            except ValueError:
+                # If the project ID is not a UUID, then we hash it, and use the hash to make a UUID
+                project_id = uuid.UUID(
+                    hashlib.sha256(project_id_str.encode()).hexdigest()[::2]
+                )
+        else:
             project_id = uuid.uuid4()
 
             if self.send_anonymous_usage_stats:
