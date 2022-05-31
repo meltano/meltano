@@ -194,7 +194,7 @@ class TestEnvVarResolution:
             )
         args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():
-            args.append("--print-environment-variable")
+            args.append("--print-var")
             args.append(key)
         args.append("test-env-var-resolution")
         result = cli_runner.invoke(cli, args)
@@ -245,7 +245,7 @@ class TestEnvVarResolution:
             cli,
             [
                 "invoke",
-                "--print-environment-variable",
+                "--print-var",
                 "STACKED",
                 "test-environment-inheritance",
             ],

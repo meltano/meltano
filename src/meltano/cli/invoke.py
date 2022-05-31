@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
     short_help="Invoke a plugin.",
 )
 @click.option(
-    "--print-environment-variable",
+    "--print-var",
     help="Print to stdout the values for the provided environment variables, as passed to the plugininvoker context. Useful for debugging.",
     multiple=True,
 )
@@ -66,7 +66,7 @@ def invoke(
     plugin_name: str,
     plugin_args: tuple[str, ...],
     containers: bool = False,
-    print_environment_variable: str | None = None,
+    print_var: str | None = None,
 ):
     """
     Invoke a plugin's executable with specified arguments.
@@ -102,7 +102,7 @@ def invoke(
             dump,
             command_name,
             containers,
-            print_environment_variable=print_environment_variable,
+            print_var=print_var,
         )
     )
     sys.exit(exit_code)
@@ -117,16 +117,16 @@ async def _invoke(
     dump: str,
     command_name: str,
     containers: bool,
-    print_environment_variable: list | None = None,
+    print_var: list | None = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
 
     try:
         async with invoker.prepared(session):
-            if print_environment_variable:
+            if print_var:
                 env = invoker.env()
-                for key in print_environment_variable:
+                for key in print_var:
                     val = env.get(key)
                     click.echo(f"{key}={val}")
             if dump:
