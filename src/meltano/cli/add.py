@@ -12,7 +12,13 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, add_plugin, add_related_plugins, install_plugins
+from .utils import (
+    CliError,
+    add_plugin,
+    add_related_plugins,
+    check_dependencies_met,
+    install_plugins,
+)
 
 
 @cli.command(short_help="Add a plugin to your project.")
@@ -42,11 +48,6 @@ from .utils import CliError, add_plugin, add_related_plugins, install_plugins
     "--custom",
     is_flag=True,
     help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
-)
-@click.option(
-    "--include-related",
-    is_flag=True,
-    help="Also add transform, dashboard, and model plugins related to the identified discoverable extractor.",
 )
 @pass_project()
 @click.pass_context
@@ -109,28 +110,17 @@ def add(
             tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
     related_plugin_types = [PluginType.FILES]
-    if flags["include_related"]:
-        related_plugin_types = list(PluginType)
 
     related_plugins = add_related_plugins(
         project, plugins, add_service=add_service, plugin_types=related_plugin_types
     )
     plugins.extend(related_plugins)
 
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `related_plugins`, but should
-    # be installed first.
-    plugins.reverse()
+    dependencies_met, err = check_dependencies_met(plugins, plugins_service)
+    if not dependencies_met:
+        raise CliError(f"Failed to install plugin(s): {err}")
 
-    # Plugin installation can be order dependent (e.g. a dbt transform package
-    # requires the dbt transformer to be installed before), so we will disable
-    # parallelism for this operation.
-    success = install_plugins(
-        project,
-        plugins,
-        reason=PluginInstallReason.ADD,
-        parallelism=1,
-    )
+    success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     if not success:
         raise CliError("Failed to install plugin(s)")

@@ -87,8 +87,6 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
-- `--include-related`: Also add transform, dashboard, and model plugins related to the identified discoverable extractor.
-
 ## `config`
 
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
@@ -660,7 +658,7 @@ When an active environment is present, `run` will attempt to run incrementally a
 However, four top level flags are provided to alter behavior:
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
-(implicitly enables --log-level=debug for 'console' named handlers).
+  (implicitly enables --log-level=debug for 'console' named handlers).
 - `--no-state-update` will disable state saving for this invocation.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.

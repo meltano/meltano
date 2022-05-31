@@ -10,6 +10,8 @@ import click
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -21,6 +23,7 @@ from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
     ProjectAddService,
 )
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
 
 setup_logging()
@@ -374,10 +377,9 @@ def add_related_plugins(
     project,
     plugins,
     add_service: ProjectAddService,
-    plugin_types: List[PluginType] = None,
+    plugin_types: List[PluginType],
 ):
     """Add any related Plugins to the given Plugin."""
-    plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
         related_plugins = add_service.add_related(
@@ -466,3 +468,34 @@ def propagate_stop_signals(proc):
         yield
     finally:
         signal.signal(signal.SIGTERM, original_termination_handler)
+
+
+def check_dependencies_met(plugins, plugins_service: ProjectPluginsService):
+    """Check dependencies of added plugins are met.
+
+    Args:
+        plugins: List of plugins to be added.
+        plugin_service: Plugin service to use when checking for dependencies.
+
+    Returns:
+        A tuple with dependency check outcome (True/False), and a string message with details of the check.
+    """
+    passed = True
+    messages = []
+    for plugin in plugins:
+        if plugin.type == PluginType.TRANSFORMS:
+            # check that the `dbt` transformer plugin is installed
+            try:
+                plugins_service.get_plugin(
+                    PluginRef(plugin_type=PluginType.TRANSFORMERS, name="dbt")
+                )
+            except PluginNotFoundError:
+                passed = False
+                messages.append(
+                    f"Plugin '{plugin.name}' missing required Transformer 'dbt'"
+                )
+    if passed:
+        message = "All dependencies met"
+    else:
+        message = "Dependencies not met: " + "; ".join(messages)
+    return passed, message
