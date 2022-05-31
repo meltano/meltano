@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import re
+import sys
 from typing import Any
 from urllib.parse import urlparse
+import uuid
 
-from snowplow_tracker import Emitter, Tracker
+from snowplow_tracker import Emitter, SelfDescribingJson, Tracker
 from structlog.stdlib import get_logger
 
+import meltano
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -59,5 +62,22 @@ class SnowplowTracker(Tracker):
                     request_timeout=request_timeout,
                 )
             )
+
+        # TODO: Should this be instantiated upstream, e.g. at the project level?
+        self.meltano_context = SelfDescribingJson(
+            "TODO",
+            {
+                "project_id": ProjectSettingsService(project).get("project_id"),
+                "meltano_version": meltano.__version__,
+                "python_version": sys.version,
+                "operating_system": sys.platform,  # TODO: check if it has all the info we want
+                "context_uuid": uuid.uuid4(),
+                "environment": (
+                    project.active_environment.name
+                    if project.active_environment
+                    else None
+                ),
+            },
+        )
 
         super().__init__(emitters=emitters, **kwargs)
