@@ -8,7 +8,7 @@ import signal
 import click
 from click_default_group import DefaultGroup
 
-from meltano.api.workers import APIWorker, MeltanoCompilerWorker, UIAvailableWorker
+from meltano.api.workers import APIWorker, UIAvailableWorker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
@@ -110,13 +110,6 @@ def start(ctx, reload, bind, bind_port):
     ensure_secure_setup(project)
 
     workers = []
-
-    try:
-        compiler_worker = MeltanoCompilerWorker(project)
-        compiler_worker.compiler.compile()
-        workers.append(compiler_worker)
-    except Exception as exn:
-        logger.error(f"Initial compilation failed: {exn}")
 
     workers.append(UIAvailableWorker(project))
     workers.append(

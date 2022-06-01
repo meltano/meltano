@@ -6,6 +6,8 @@ import os
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
+from functools import reduce
+from operator import xor
 from typing import Generator, Iterable
 
 from meltano.core.project import Project
@@ -592,6 +594,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         Raises:
             SettingMissingError: if the setting is not found
+
         """
         try:
             return next(
