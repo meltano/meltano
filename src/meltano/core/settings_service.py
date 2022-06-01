@@ -30,6 +30,7 @@ class FeatureFlags(Enum):
     """Available Meltano Feature Flags."""
 
     LOCKFILES = "lock_files"
+    ENABLE_UVICORN = "enable_uvicorn"
 
     def __str__(self):
         """Return feature name.
@@ -591,6 +592,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         Raises:
             SettingMissingError: if the setting is not found
+
         """
         try:
             return next(

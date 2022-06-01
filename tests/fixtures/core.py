@@ -11,7 +11,6 @@ import yaml
 
 from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
@@ -36,6 +35,7 @@ from meltano.core.project_plugins_service import (
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.state_service import StateService
+from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
 PROJECT_NAME = "a_meltano_project"
@@ -142,22 +142,6 @@ def discovery():  # noqa: WPS213
         }
     )
 
-    discovery[PluginType.MODELS].append(
-        {
-            "name": "model-gitlab",
-            "namespace": "tap_gitlab",
-            "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
-        }
-    )
-
-    discovery[PluginType.DASHBOARDS].append(
-        {
-            "name": "dashboard-google-analytics",
-            "namespace": "tap_google_analytics",
-            "pip_url": "git+https://gitlab.com/meltano/dashboard-google-analytics.git",
-        }
-    )
-
     discovery[PluginType.ORCHESTRATORS].append(
         {
             "name": "orchestrator-mock",
@@ -232,11 +216,6 @@ def locked_definition_service(project):
 
 
 @pytest.fixture(scope="class")
-def project_compiler(project):
-    return ProjectCompiler(project)
-
-
-@pytest.fixture(scope="class")
 def project_init_service():
     return ProjectInitService(PROJECT_NAME)
 
@@ -275,33 +254,6 @@ def plugin_invoker_factory(
         )
 
     return _factory
-
-
-@pytest.fixture(scope="class")
-def add_model(project, plugin_install_service, project_add_service):
-    models = [
-        "model-carbon-intensity",
-        "model-gitflix",
-        "model-salesforce",
-        "model-gitlab",
-    ]
-
-    for model in models:
-        plugin = project_add_service.add(PluginType.MODELS, model)
-        plugin_install_service.install_plugin(plugin)
-
-    yield
-
-    # clean-up
-    with project.meltano_update() as meltano:
-        meltano["plugins"]["models"] = [
-            model_def
-            for model_def in meltano["plugins"]["models"]
-            if model_def["name"] not in models
-        ]
-
-    for created_model in models:
-        shutil.rmtree(project.model_dir(created_model))
 
 
 @pytest.fixture(scope="class")
@@ -409,6 +361,11 @@ def utility(project_add_service):
 @pytest.fixture(scope="class")
 def schedule_service(project, project_plugins_service):
     return ScheduleService(project, plugins_service=project_plugins_service)
+
+
+@pytest.fixture(scope="class")
+def task_sets_service(project):
+    return TaskSetsService(project)
 
 
 @pytest.fixture(scope="class")

@@ -81,9 +81,16 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             The project_id.
         """
         project_id_str = self.settings_service.get("project_id")
-        try:
-            project_id = uuid.UUID(project_id_str or "", version=4)
-        except ValueError:
+        if project_id_str:
+            try:
+                # Project ID might already be a UUID
+                project_id = uuid.UUID(project_id_str)
+            except ValueError:
+                # If the project ID is not a UUID, then we hash it, and use the hash to make a UUID
+                project_id = uuid.UUID(
+                    hashlib.sha256(project_id_str.encode()).hexdigest()[::2]
+                )
+        else:
             project_id = uuid.uuid4()
 
             if self.send_anonymous_usage_stats:
@@ -417,3 +424,26 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             action=f"meltano run {blocks_string}",
             debug=debug,
         )
+
+    def track_meltano_job(
+        self, action: str, job_name: str | None = None, debug: bool = False
+    ) -> None:
+        """Track a job event.
+
+        Args:
+            action: The type of action taken on the job (e.g. add, run, list)
+            job_name: The job to track.
+            debug: Whether to send the event to the debug endpoint.
+        """
+        if job_name:
+            self.track_event(
+                category="meltano job",
+                action=(f"meltano job {job_name} {action} "),
+                debug=debug,
+            )
+        else:
+            self.track_event(
+                category="meltano job",
+                action=f"meltano job {action}",
+                debug=debug,
+            )

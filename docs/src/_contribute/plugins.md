@@ -36,6 +36,7 @@ It is recommended to add a `label`, `logo_url`, and `description` to the plugin 
 Most of the time, variant definitions should also have a `settings` array with [setting definitions](#setting-definitions).
 
 Additionally:
+
 - `capabilities` should be specified for extractor variants,
 - non-default variant executable names can be specified using `executable`, and
 - default values for [plugin extras](/guide/configuration#plugin-extras) can be specified at the plugin definition level and further overridden at the variant definition level.
@@ -61,14 +62,14 @@ Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `s
     - name: setting_name # Required (must match the connector setting name)
       aliases: [alternative_setting_name] # Optional (alternative names that can be used in `meltano.yml` and with `meltano config set`)
       label: Setting Name # Optional (human friendly text display of the setting name)
-      value: '' # Optional (Use to set a default value)
+      value: "" # Optional (Use to set a default value)
       placeholder: Ex. format_like_this # Optional (Use to set the input's placeholder default)
       kind: string # Optional (Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden`)
       description: Setting description # Optional (Use to provide inline context)
       tooltip: Here is some more info... # Optional (use to provide additional inline context)
       documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
-      env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
+      env: SOME_API_KEY # Optional (use to inject `value` into plugin context with a custom environment variable name, in addition to the default env var name)
       env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
       value_processor: nest_object # Optional (Modify value after loading it from source: env, meltano.yml, system database. Target type needs to match `kind`. Options: `nest_object`, `upcase_string`)
       value_post_processor: stringify # Optional (Modify loaded value before passing it to plugin. Target type does not need to match `kind`. Options: `stringify`)
@@ -208,36 +209,6 @@ Once you've created your transforms, you can run it with the following command:
 # Replace your extractors / targets with the appropriate ones
 meltano elt tap-gitlab target-postgres --transform only
 ```
-
-#### Models
-
-When updating the models that will appear in the UI, you can follow these steps:
-
-1. Create [`table.m5o` file](/reference/architecture#table) that defines the UI columns that will appear on the UI
-1. Update [`topic.m5o` file](/reference/architecture#topic) to include the newly created model table
-1. Compile model repo with `python3 setup.py sdist`
-1. Go to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) and replace `pip_url` with the file path to the targz file created
-1. Run `meltano install` to fetch new settings
-1. Refresh browser and you should now see your changes in the UI
-
-### Dashboard Development
-
-To create a dashboard plugin like <https://gitlab.com/meltano/dashboard-google-analytics>, follow these steps:
-
-1. Set up the extractor and model you are creating dashboard(s) and reports for in your local Meltano instance.
-1. Start Meltano UI.
-1. Use the UI to create the desired reports based on the model's designs. Name the reports appropriately, but don't include the extractor name or label.
-1. Create one or more new dashboard and add the reports to it. If you're creating just one dashboard, name it after the extractor label (e.g. "Google Analytics", not `tap-google-analytics`). If you're creating multiple dashboards, add an appropriate subtitle after a colon (e.g. "Google Analytics: My Dashboard").
-1. Create a new plugin repository named `dashboard-<data source>` (e.g. `dashboard-google-analytics`).
-1. Copy over `setup.py`, `README.md`, and `LICENSE` from <https://gitlab.com/meltano/dashboard-google-analytics> and edit these files as appropriate.
-1. Move your newly created dashboards and reports from your local Meltano project's `analyze/dashboards` and `analyze/reports` to `dashboards` and `reports` inside the new plugin repository.
-1. Push your new plugin repository to GitLab.com. Official dashboard plugins live at `https://gitlab.com/meltano/dashboard-...`.
-1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `dashboards`. Set `namespace` to the `namespace` of the extractor and model plugins the dashboard(s) and reports are related to (e.g. `tap_google_analytics`), and set `name` and `pip_url` set as appropriate.
-1. Delete the dashboard(s) and reports from your local Meltano project's `analyze` directory.
-1. Ensure that your local Meltano instance uses the recently modified `discovery.yml` by following the steps under ["Local changes to discovery.yml](#local-changes-to-discovery-yml).
-1. Run `meltano add --include-related extractor <extractor name>` to automatically install all plugins related to the extractor, including our new dashboard plugin. Related plugins are also installed automatically when installing an extractor using the UI, but we can't use that flow here because the extractor has already been installed.
-1. Verify that the dashboard(s) and reports have automatically been added to your local Meltano project's `analyze` directory and show up under "Dashboards" in the UI.
-1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
 
 ### File Bundle Development
 

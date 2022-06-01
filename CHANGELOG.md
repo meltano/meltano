@@ -6,11 +6,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
+
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
 
 ### Fixes
 
@@ -24,6 +27,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
 
+- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
@@ -31,6 +35,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend [pipx](https://pypa.github.io/pipx/) over manually created virtual environments.
 
 - [#3484](https://gitlab.com/meltano/meltano/-/issues/3484) Use `SettingsService.feature_flag` convention for lockfiles.
+
+- [#3447](https://gitlab.com/meltano/meltano/-/issues/3447) Make setting-level `env:` declaration a one-way injection into the plugin execution context.
 
 ### Fixes
 
@@ -40,6 +46,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## 1.104.0 - (2022-05-13)
+
 ---
 
 ### New
@@ -47,20 +54,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3031](https://gitlab.com/meltano/meltano/-/issues/3031) Add lock artifacts during `meltano add` for stability and portability of plugin definitions.
 
 ### Changes
+
 - [#3385](https://gitlab.com/meltano/meltano/-/issues/3385) Add feature flags for experimental features
 
 ### Fixes
 
 - [#3468](https://gitlab.com/meltano/meltano/-/issues/3468) Fixes bug where container spec's entrypoint was not passed along to the Docker runtime.
 
-
 ## 1.103.1 - (2022-05-05)
+
 ---
 
 ### Fixes
 
 - [#3462](https://gitlab.com/meltano/meltano/-/issues/3462) Adds missing telemetry for `meltano state`
-
 
 ## 1.103.0 - (2022-05-05)
 
@@ -77,7 +84,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
-
 
 ## 1.102.0 - (2022-04-28)
 

@@ -87,7 +87,7 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
-- `--include-related`: Also add transform, dashboard, and model plugins related to the identified discoverable extractor.
+- `--include-related`: Also add transform plugins related to the identified discoverable extractor.
 
 ## `config`
 
@@ -254,8 +254,6 @@ meltano discover extractors
 # Only list available loaders
 meltano discover loaders
 
-# Only list available models
-meltano discover models
 ```
 
 ## `elt`
@@ -438,7 +436,7 @@ The new project directory will contain:
 
 - a [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) that will list any [`plugins` you'll add](/guide/plugin-management#adding-a-plugin-to-your-project) and [pipeline `schedules` you'll create](/guide/orchestration),
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
-- empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
+- empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
 [Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_DISABLE_TRACKING` environment variable is enabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
@@ -483,7 +481,7 @@ Installs dependencies of your project based on the **meltano.yml** file.
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
+Use `--include-related` to automatically install transforms related to installed extractor plugins.
 
 Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
@@ -521,7 +519,6 @@ meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
 
-meltano install models
 
 meltano install --include-related
 
@@ -633,6 +630,9 @@ Note that [inline mapping names](/concepts/plugins#mappers) are _not included_ w
 
 Note that if no environment is active, `meltano run` _does not_ generate a job ID and it does not track state.
 
+In addition to explicitly specifying plugin names you can also execute one or more named
+[jobs](/reference/command-line-interface#job) alongside other commands.
+
 <div class="notification is-danger">
   <p><strong>The run command is a preview feature. Its functionality and CLI signature is still evolving.</strong></p>
   <p>During the feature preview, and similar to <code>meltano invoke dbt:[cmd]</code>, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link <a href="https://gitlab.com/meltano/meltano/-/issues/3098">#3098</a>.</p>
@@ -648,6 +648,7 @@ meltano run tap-gitlab target-postgres tap-salesforce target-mysql
 meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
 meltano run tap-gitlab one-mapping another-mapping target-postgres
+meltano run tap-gitlab target-postgres simple-job
 ```
 
 #### Parameters
@@ -686,6 +687,54 @@ meltano --environment=<ENVIRONMENT> run ...
 ```
 
 Note that if no environment is active, `meltano run` _does not_ generate a job ID and it does not track state.
+
+## `job`
+
+Use the `job` command to define one more related tasks. A job can contain a single task, or many tasks. Today all tasks
+are run sequentially. You can run a specified job by passing the job name as an argument to `meltano run`.
+
+### How to use
+
+```bash
+
+# Add a job with a single task representing a run command
+meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
+
+# Add a new job with multiple tasks by passing arrays in yaml format, where each item representing a run command.
+meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
+
+# Update an existing job with new tasks
+meltano job set <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
+meltano job set <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
+
+# List all jobs
+meltano job list
+meltano job list --format=json
+
+# List a named job
+meltano job list <job_name>
+meltano job list <job_name> --format=json
+
+# Remove a named job
+meltano job remove <job_name>
+```
+
+### Examples
+
+```bash
+# Add a new job named "simple-demo" that contains two tasks
+# Task 1: tap-gitlab hide-gitlab-secrets target-mysql
+# Task 2: tap-gitlab target-csv
+meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-mysql dbt:run, tap-gitlab target-csv]"
+# list the job named "simple-demo"
+meltano job list simple-demo --format=json
+# run the job named "simple-demo" using meltano run
+meltano run simple-demo
+# run the job named "simple-demo" AND another EL pair using meltano run
+meltano run simple-demo tap-mysql target-bigquery
+# remove the job named "simple-demo"
+meltano job remove simple-demo
+```
 
 ## `schedule`
 
@@ -1114,7 +1163,6 @@ When called without arguments, this will:
 - Upgrade the `meltano` package
 - Update files [managed by](/concepts/plugins#update-extra) [file bundles](/concepts/plugins#file-bundles)
 - Apply migrations to [system database](/concepts/project#system-database)
-- Recompile models
 
 ### How to use
 
@@ -1125,7 +1173,6 @@ meltano upgrade --skip-package # Skip upgrading the Meltano package
 meltano upgrade package # Only upgrade Meltano package
 meltano upgrade files # Only update files managed by file bundles
 meltano upgrade database # Only apply migrations to system database
-meltano upgrade models # Only recompile models
 ```
 
 ## `version`

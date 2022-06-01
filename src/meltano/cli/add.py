@@ -46,7 +46,7 @@ from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 @click.option(
     "--include-related",
     is_flag=True,
-    help="Also add transform, dashboard, and model plugins related to the identified discoverable extractor.",
+    help="Also add transform plugins related to the identified discoverable extractor.",
 )
 @pass_project()
 @click.pass_context

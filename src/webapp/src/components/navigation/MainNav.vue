@@ -2,7 +2,6 @@
 import { mapGetters, mapState, mapActions } from 'vuex'
 
 import Dropdown from '@/components/generic/Dropdown'
-import ExploreList from '@/components/analyze/ExploreList'
 import Logo from '@/components/navigation/Logo'
 import utils from '@/utils/utils'
 
@@ -28,7 +27,6 @@ export default {
   name: 'MainNav',
   components: {
     Dropdown,
-    ExploreList,
     Logo
   },
   data() {
@@ -194,70 +192,6 @@ export default {
             >
               {{ getRunningPipelines.length }}
             </span>
-          </a>
-        </router-link>
-
-        <div
-          v-if="isAnalysisEnabled"
-          class="navbar-item navbar-child has-dropdown is-hoverable"
-        >
-          <a
-            :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
-            class="navbar-link has-text-weight-semibold"
-          >
-            <a
-              class="button has-background-transparent is-borderless is-paddingless"
-              :class="{
-                'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
-              }"
-            >
-              <span class="icon is-small" :class="getIconColor('/analyze')">
-                <font-awesome-icon icon="compass"></font-awesome-icon>
-              </span>
-              <span>Explore</span>
-            </a>
-          </a>
-
-          <div class="navbar-dropdown navbar-dropdown-scrollable">
-            <template v-if="hasModels">
-              <ExploreList />
-            </template>
-            <template v-else>
-              <div class="box is-borderless is-shadowless is-marginless">
-                <div class="content explore-dropdown-shell">
-                  <h3 class="is-size-6">
-                    No Extractors
-                  </h3>
-                  <p>
-                    You must add at least one extractor to your project
-                  </p>
-                  <p>
-                    <router-link to="extractors" class="has-text-underlined"
-                      >Go to Extractors</router-link
-                    >
-                  </p>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <router-link
-          v-if="isAnalysisEnabled"
-          :to="{ name: 'dashboards' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/dashboard') }"
-          class="navbar-item navbar-child has-text-weight-semibold"
-        >
-          <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/dashboard')
-            }"
-          >
-            <span class="icon is-small" :class="getIconColor('/dashboard')">
-              <font-awesome-icon icon="th-large"></font-awesome-icon>
-            </span>
-            <span>Dashboards</span>
           </a>
         </router-link>
       </div>
