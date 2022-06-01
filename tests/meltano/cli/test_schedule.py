@@ -78,6 +78,7 @@ class TestCliSchedule:
                 cli,
                 [
                     "schedule",
+                    "add",
                     "job-schedule-mock",
                     "--job",
                     "mock-job",

@@ -799,7 +799,7 @@ meltano schedule set gitlab-sync --interval "@weekly"
 # Add a legacy ELT based schedule named "gitlab-to-jsonl" to run every minute
 # This specifies that the following command is to be run every minute:
 # meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
-meltano schedule gitlab-to-jsonl --extractor tap-gitlab --loader target-jsonl --interval="* * * * *"
+meltano schedule add gitlab-to-jsonl --extractor tap-gitlab --loader target-jsonl --interval="* * * * *"
 # Update the schedule named "gitlab-to-jsonl" to use target-csv instead of target-jsonl
 meltano schedule set gitlab-to-jsonl --loader target-csv
 ```
