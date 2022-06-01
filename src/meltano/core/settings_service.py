@@ -592,6 +592,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         Raises:
             SettingMissingError: if the setting is not found
+
         """
         try:
             return next(
