@@ -271,6 +271,9 @@
                 }
               }
             }
+          },
+          "bundle": {
+            "$ref": "#/definitions/bundle"
           }
         }
       },
@@ -344,6 +347,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "bundle": {},
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -412,6 +416,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "bundle": {},
               "dialect": {
                 "type": "string",
                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
@@ -446,7 +451,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "bundle": {}
             }
           }
         ]
@@ -473,7 +479,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "bundle": {}
             }
           }
         ]
@@ -533,7 +540,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "bundle": {}
             }
           }
         ]
@@ -561,6 +569,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "bundle": {},
               "vars": {
                 "type": "object",
                 "description": "An object containing dbt model variables"
@@ -595,7 +604,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "bundle": {}
             }
           }
         ]
@@ -622,7 +632,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "bundle": {}
             }
           }
         ]
@@ -674,6 +685,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "bundle": {},
               "mappings": {}
             }
           }
@@ -947,6 +959,34 @@
               "type": "object"
             }
           }
+        }
+      }
+    },
+    "bundle": {
+      "type": "object",
+      "description": "The bundle of the plugin",
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/bundle_file"
+          }
+        }
+      }
+    },
+    "bundle_file": {
+      "type": "object",
+      "description": "A set of files in the plugin bundle",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the file"
+        },
+        "variant": {
+          "type": "string",
+          "description": "The variant of the file"
         }
       }
     }

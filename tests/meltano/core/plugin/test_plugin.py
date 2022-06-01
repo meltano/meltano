@@ -1,6 +1,7 @@
 import pytest
 
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
+from meltano.core.plugin.bundle import PluginBundle
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import find_named
@@ -18,6 +19,14 @@ class TestPluginDefinition:
             "repo": "https://gitlab.com/meltano/tap-example",
             "foo": "bar",
             "baz": "qux",
+            "bundle": {
+                "files": [
+                    {
+                        "name": "files-example",
+                        "variant": "meltano",
+                    },
+                ],
+            },
         },
         "variants": {
             "name": "tap-example",
@@ -29,6 +38,14 @@ class TestPluginDefinition:
                     "pip_url": "meltano-tap-example",
                     "repo": "https://gitlab.com/meltano/tap-example",
                     "baz": "qux",
+                    "bundle": {
+                        "files": [
+                            {
+                                "name": "files-example",
+                                "variant": "meltano",
+                            },
+                        ],
+                    },
                 },
                 {
                     "name": "singer-io",
@@ -36,6 +53,14 @@ class TestPluginDefinition:
                     "deprecated": True,
                     "pip_url": "tap-example",
                     "repo": "https://github.com/singer-io/tap-example",
+                    "bundle": {
+                        "files": [
+                            {
+                                "name": "files-example",
+                                "variant": "singer-io",
+                            },
+                        ],
+                    },
                 },
             ],
         },
@@ -72,6 +97,10 @@ class TestPluginDefinition:
         assert variant.pip_url == attrs["pip_url"]
         assert variant.repo == attrs["repo"]
 
+        assert isinstance(variant.bundle, PluginBundle)
+        assert variant.bundle.files[0].name == "files-example"
+        assert variant.bundle.files[0].variant == "meltano"
+
         assert plugin_def.extras == {"foo": "bar", "baz": "qux"}
         assert not variant.extras
 
@@ -93,6 +122,10 @@ class TestPluginDefinition:
         assert variant.pip_url == attrs["variants"][0]["pip_url"]
         assert variant.repo == attrs["variants"][0]["repo"]
 
+        assert isinstance(variant.bundle, PluginBundle)
+        assert variant.bundle.files[0].name == "files-example"
+        assert variant.bundle.files[0].variant == "meltano"
+
         assert variant.extras == {"baz": "qux"}
 
         variant = plugin_def.variants[1]
@@ -102,6 +135,10 @@ class TestPluginDefinition:
         assert variant.deprecated
         assert variant.pip_url == attrs["variants"][1]["pip_url"]
         assert variant.repo == attrs["variants"][1]["repo"]
+
+        assert isinstance(variant.bundle, PluginBundle)
+        assert variant.bundle.files[0].name == "files-example"
+        assert variant.bundle.files[0].variant == "singer-io"
 
         assert not variant.extras
 
