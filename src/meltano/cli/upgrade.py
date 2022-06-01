@@ -30,7 +30,6 @@ def upgrade(ctx, project):
     - Upgrade the meltano package\n
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
-    - Recompile models\n
 
     Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
@@ -68,7 +67,6 @@ def all(ctx, pip_url, force, skip_package):  # noqa: WPS125
     - Upgrade the meltano package\n
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
-    - Recompile models\n
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
@@ -82,7 +80,6 @@ def all(ctx, pip_url, force, skip_package):  # noqa: WPS125
         upgrade_service.migrate_database()
 
         click.echo()
-        upgrade_service.compile_models()
 
         if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):
             click.echo()
@@ -139,10 +136,3 @@ def files(ctx):
 def database(ctx):
     """Apply migrations to system database only."""
     ctx.obj["upgrade_service"].migrate_database()
-
-
-@upgrade.command(short_help="Recompile models only.")
-@click.pass_context
-def models(ctx):
-    """Recompile models only."""
-    ctx.obj["upgrade_service"].compile_models()
