@@ -7,6 +7,8 @@ redirect_from:
 weight: 10
 ---
 
+_Note: This document is still a work in progress. Expect further changes, coming soon._
+
 ## Full list of migration tasks and breaking changes
 
 The following list includes all breaking changes in Meltano version 2.0 as well as other recommended migration tasks.
