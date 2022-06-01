@@ -14,7 +14,6 @@ output/.gitignore: |
   /venv
   /.meltano
   .env
-model/.gitkeep: ""
 extract/.gitkeep: ""
 load/.gitkeep: ""
 transform/.gitkeep: ""
