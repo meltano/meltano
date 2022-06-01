@@ -11,7 +11,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#3283](https://gitlab.com/meltano/meltano/-/issues/3283) Support `meltano add` directly from Hub.
+- [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
+
+- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX
 
 ### Changes
 

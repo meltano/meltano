@@ -382,16 +382,28 @@ def task_sets_service(project):
 
 
 @pytest.fixture(scope="class")
-def schedule(project, tap, target, schedule_service):
+def elt_schedule(project, tap, target, schedule_service):
     try:
-        return schedule_service.add(
+        return schedule_service.add_elt(
             None,
-            "schedule-mock",
+            "elt-schedule-mock",
             extractor=tap.name,
             loader=target.name,
             transform="skip",
             interval="@once",
             start_date=datetime.datetime.now(),
+        )
+    except ScheduleAlreadyExistsError as err:
+        return err.schedule
+
+
+@pytest.fixture(scope="class")
+def job_schedule(project, tap, target, schedule_service):
+    try:
+        return schedule_service.add(
+            "job-schedule-mock",
+            "mock-job",
+            interval="@once",
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule
