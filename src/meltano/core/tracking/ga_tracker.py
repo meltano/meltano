@@ -9,6 +9,7 @@ import uuid
 from typing import Any
 
 import requests
+from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -188,7 +189,13 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             logging.debug("GoogleAnalyticsTracker.track_data: RequestException")
             logging.debug(exc)
 
-    def track_event(self, category: str, action: str, debug: bool = False) -> None:
+    def track_event(
+        self,
+        category: str,
+        action: str,
+        debug: bool = False,
+        context: SelfDescribingJson | None = None,
+    ) -> None:
         """Send a GA event.
 
         Args:
@@ -205,7 +212,12 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.track_data(event, debug)
 
         # Snowplow
-        self.track_snowplow_struct_event(category=category, action=action)
+        # self.track_snowplow_struct_event(category=category, action=action)
+        self.track_snowplow_self_describing_event(
+            event=SelfDescribingJson(
+                "TODO",
+            ),
+        )
 
     def track_snowplow_struct_event(self, category: str, action: str) -> None:
         """Send a struct event to Snowplow.
@@ -222,6 +234,28 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             category=category,
             action=action,
             label=self.project_id,
+        )
+
+    def track_snowplow_self_describing_event(
+        self,
+        event: SelfDescribingJson,
+        context: list[SelfDescribingJson] | None = None,
+    ) -> None:
+        """Send a struct event to Snowplow.
+
+        Args:
+            category: The category of the event.
+            action: The action of the event.
+        """
+        if self.send_anonymous_usage_stats is False or self.snowplow_tracker is None:
+            # Only send anonymous usage stats if you have explicit permission
+            return
+
+        context = context or []
+
+        self.snowplow_tracker.track_self_describing_event(
+            event_json=event,
+            context=context + [self.snowplow_tracker.meltano_context],
         )
 
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
