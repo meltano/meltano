@@ -742,10 +742,12 @@ meltano job remove simple-demo
   <p>An <code>orchestrator</code> plugin is required to use <code>meltano schedule</code>: refer to the <a href="/guide/orchestration">Orchestration</a> documentation to get started with Meltano orchestration.</p>
 </div>
 
-Use the `schedule` command to define ELT pipelines to be run by an orchestrator at regular intervals. These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+Use the `schedule` command to define ELT or Job pipelines to be run by an orchestrator at regular intervals.
+These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+You can schedule both [jobs](#job) or legacy [`meltano elt`](#elt) tasks.
 
-You can run a specific scheduled pipeline's corresponding [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
-Any command line options (e.g. `--select=<entity>` or `--dump=config`) will be passed on to [`meltano elt`](#elt).
+You can run a specific scheduled pipeline's corresponding [`meltano run`](#run) or [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
+Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passed on to the underlying commands.
 
 ### How to use
 
@@ -754,10 +756,23 @@ The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/C
 
 ```bash
 # Add a schedule
-meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform={run,skip,only}]
+# Schedule a job named "my_job" to run everyday
+meltano schedule add <schedule_name> --job my_job --interval "@daily"
+# Schedule an ELT task to run hourly
+meltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform run --interval "@hourly"
 
 # List all schedules
 meltano schedule list [--format=json]
+
+# Remove a named schedule
+meltano schedule remove <schedule_name>
+
+# Update a named schedule changing the interval
+meltano schedule set <schedule_name> --interval <new-interval>
+# Update a named schedule changing the referenced job
+meltano schedule set <schedule_name> --job <new-job>
+# Update a named ELT scheduled changing the interval AND changing the extractor
+meltano schedule set <schedule_name> --extractor <new-tap> --interval <new-interval>
 
 # Run a schedule
 meltano schedule run <schedule_name>
@@ -766,17 +781,24 @@ meltano schedule run <schedule_name>
 ### Examples
 
 ```bash
-meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
-# This specifies that the following command is to be run once a day:
-# meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+# Add a new schedule named "gitlab-sync" to run the job named "gitlab-to-mysql" every day
+meltano schedule add gitlab-sync --job gitlab-to-mysql --interval "@daily"
 
-meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl "* * * * *"
+# Perform a dry-run of the schedule named "gitlab-sync"
+# Behind the scenes, this will execute a `meltano run --dry-run gitlab-sync`
+meltano schedule run gitlab-sync --dry-run
+
+# Update the schedule named "gitlab-sync" to run the job named "gitlab-to-postgres" instead of "gitlab-to-mysql"
+meltano schedule set gitlab-sync --job gitlab-to-postgres
+# Update the schedule named "gitlab-sync" to run weekly instead of daily
+meltano schedule set gitlab-sync --interval "@weekly"
+
+# Add a legacy ELT based schedule named "gitlab-to-jsonl" to run every minute
 # This specifies that the following command is to be run every minute:
 # meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
-
-meltano schedule run gitlab-to-jsonl --select=commits
-# This will run:
-# meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl --select=commits
+meltano schedule add gitlab-to-jsonl --extractor tap-gitlab --loader target-jsonl --interval="* * * * *"
+# Update the schedule named "gitlab-to-jsonl" to use target-csv instead of target-jsonl
+meltano schedule set gitlab-to-jsonl --loader target-csv
 ```
 
 ## `select`

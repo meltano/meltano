@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX
+
 ### Changes
 
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
