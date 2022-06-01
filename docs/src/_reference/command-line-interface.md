@@ -794,7 +794,7 @@ meltano schedule run gitlab-sync --dry-run
 # Update the schedule named "gitlab-sync" to run the job named "gitlab-to-postgres" instead of "gitlab-to-mysql"
 meltano schedule set gitlab-sync --job gitlab-to-postgres
 # Update the schedule named "gitlab-sync" to run weekly instead of daily
-meltano schedule set gitlab-sync -i "@weekly"
+meltano schedule set gitlab-sync --interval "@weekly"
 
 # Add a legacy ELT based schedule named "gitlab-to-jsonl" to run every minute
 # This specifies that the following command is to be run every minute:

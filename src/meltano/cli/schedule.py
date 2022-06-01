@@ -87,13 +87,12 @@ def _add_job(ctx, name: str, job: str, interval: str):
 
 @schedule.command(short_help="[default] Add a new schedule.")
 @click.argument("name")
-@click.option("--interval", "-i", required=True, help="Interval of the schedule.")
-@click.option("--job", "-j", help="The name of the job to run.")
-@click.option("--extractor", "-e", required=False, help="ELT Only")
-@click.option("--loader", "-l", required=False, help="ELT Only")
+@click.option("--interval", required=True, help="Interval of the schedule.")
+@click.option("--job", help="The name of the job to run.")
+@click.option("--extractor", required=False, help="ELT Only")
+@click.option("--loader", required=False, help="ELT Only")
 @click.option(
     "--transform",
-    "-t",
     type=click.Choice(["skip", "only", "run"]),
     default="skip",
     help="ELT Only",
@@ -335,13 +334,12 @@ def _update_elt_schedule(
 
 @schedule.command(name="set", short_help="Update a schedule.")
 @click.argument("name", required=True)
-@click.option("--interval", "-i", help="Update the interval of the schedule.")
-@click.option("--job", "-j", help="Update the name of the job to run a scheduled job.")
-@click.option("--extractor", "-e", help="Update the extractor for an elt schedule.")
-@click.option("--loader", "-l", help="Updated the loader for an elt schedule.")
+@click.option("--interval", help="Update the interval of the schedule.")
+@click.option("--job", help="Update the name of the job to run a scheduled job.")
+@click.option("--extractor", help="Update the extractor for an elt schedule.")
+@click.option("--loader", help="Updated the loader for an elt schedule.")
 @click.option(
     "--transform",
-    "-t",
     type=click.Choice(["skip", "only", "run"]),
     default=None,
     help="Update the transform flag for an elt schedule.",
