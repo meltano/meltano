@@ -480,11 +480,6 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
         related_plugin_refs = []
 
-        runner_ref = target_plugin.runner
-        if runner_ref:
-            if runner_ref.type in plugin_types:
-                related_plugin_refs.append(runner_ref)
-
         related_plugin_refs.extend(
             related_plugin_def
             for plugin_type in plugin_types

@@ -486,13 +486,11 @@ def check_dependencies_met(plugins, plugins_service: ProjectPluginsService):
         if plugin.type == PluginType.TRANSFORMS:
             # check that the `dbt` transformer plugin is installed
             try:
-                plugins_service.get_plugin(
-                    PluginRef(plugin_type=PluginType.TRANSFORMERS, name="dbt")
-                )
+                plugins_service.get_transformer()
             except PluginNotFoundError:
                 passed = False
                 messages.append(
-                    f"Plugin '{plugin.name}' missing required Transformer 'dbt'"
+                    f"Plugin '{plugin.name}' requires a Transformer plugin."
                 )
     if passed:
         message = "All dependencies met"

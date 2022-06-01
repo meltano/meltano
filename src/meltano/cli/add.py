@@ -86,6 +86,11 @@ def add(
         }:
             raise CliError(f"--custom is not supported for {plugin_type}")
 
+    # TODO: make this work with plugin names
+    # dependencies_met, err = check_dependencies_met(plugins, plugins_service)
+    # if not dependencies_met:
+    #     raise CliError(f"Failed to install plugin(s): {err}")
+
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins = []
@@ -115,10 +120,6 @@ def add(
         project, plugins, add_service=add_service, plugin_types=related_plugin_types
     )
     plugins.extend(related_plugins)
-
-    dependencies_met, err = check_dependencies_met(plugins, plugins_service)
-    if not dependencies_met:
-        raise CliError(f"Failed to install plugin(s): {err}")
 
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
