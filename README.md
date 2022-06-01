@@ -11,12 +11,12 @@ Welcome to your Open Source DataOps Infrastructure to manage and centralize all 
 Integrations
 ------------
 
-[MeltanoHub](https://hub.meltano.com/) is the single source of truth to find any Meltano plugins as well as [Singer](https://singer.io/) taps and targets. Users are also able to add more plugins to the Hub and have them immediately discoverable and usable within Meltano. The Hub is lovingly curated by Meltano and the wider Singer community.
+[MeltanoHub](https://hub.meltano.com/) is the single source of truth to find any Meltano plugins as well as [Singer](https://singer.io/) taps and targets. Users are also able to add more plugins to the Hub and have them immediately discoverable and usable within Meltano. The Hub is lovingly curated by Meltano and the wider Meltano community.
 
 Installation
 ------------
 
-If you're ready to run an EL(T) pipeline with a data source and destination of your choosing, start by following the [Installation guide](https://docs.meltano.com/guide/installation) to have Meltano up and running in your device.
+If you're ready to build your ideal data platform and start running data workflows across multiple tools, start by following the [Installation guide](https://docs.meltano.com/guide/installation) to have Meltano up and running in your device.
 
 Documentation
 -------------
