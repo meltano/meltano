@@ -38,7 +38,6 @@ class TestPluginInvoker:
 
         # Project settings
         assert env["MELTANO_CLI_LOG_LEVEL"] == "info"
-        import rich
 
         # Plugin info
         assert env["MELTANO_EXTRACTOR_NAME"] == tap.name
