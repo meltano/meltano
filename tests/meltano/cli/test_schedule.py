@@ -12,7 +12,7 @@ class TestCliSchedule:
     @mock.patch(
         "meltano.core.schedule_service.PluginSettingsService.get", autospec=True
     )
-    def test_elt_schedule(self, get, session, project, cli_runner, schedule_service):
+    def test_schedule_add(self, get, session, project, cli_runner, schedule_service):
         test_date = "2010-01-01"
         get.return_value = test_date
 
@@ -24,6 +24,7 @@ class TestCliSchedule:
                 cli,
                 [
                     "schedule",
+                    "add",
                     "elt-schedule-mock",
                     "--extractor",
                     "tap-mock",
@@ -47,6 +48,31 @@ class TestCliSchedule:
         assert schedule.start_date == iso8601_datetime(test_date)
 
         # test adding a scheduled job
+        with mock.patch(
+            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+        ):
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "schedule",
+                    "add",
+                    "job-schedule-mock",
+                    "--job",
+                    "mock-job",
+                    "--interval",
+                    "@eon",
+                ],
+            )
+        assert res.exit_code == 0
+
+        assert_cli_runner(res)
+        schedule = schedule_service.schedules()[1]
+
+        assert schedule.name == "job-schedule-mock"
+        assert schedule.job == "mock-job"
+        assert schedule.interval == "@eon"  # not anytime soon ;)
+
+        # test default schedule case where no argument (set, remove, add, etc) is provided
         with mock.patch(
             "meltano.cli.schedule.ScheduleService", return_value=schedule_service
         ):
