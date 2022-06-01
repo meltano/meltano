@@ -6,6 +6,7 @@ import yaml
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -13,6 +14,14 @@ from meltano.core.plugin_install_service import PluginInstallReason
 
 
 class TestCliAdd:
+    @pytest.fixture(autouse=True)
+    def patch_hub(self, meltano_hub_service: MeltanoHubService):
+        with mock.patch(
+            "meltano.core.project_plugins_service.MeltanoHubService",
+            return_value=meltano_hub_service,
+        ):
+            yield
+
     @pytest.mark.parametrize(
         "plugin_type,plugin_name,default_variant,related_plugin_refs",
         [
@@ -266,14 +275,21 @@ class TestCliAdd:
         ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
-                cli, ["add", "extractor", "tap-mock", "--variant", "singer-io"]
+                cli,
+                [
+                    "add",
+                    "mapper",
+                    "mapper-mock",
+                    "--variant",
+                    "alternative",
+                ],
             )
             assert_cli_runner(res)
 
             plugin = project_plugins_service.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock"
+                plugin_type=PluginType.MAPPERS, plugin_name="mapper-mock"
             )
-            assert plugin.variant == "singer-io"
+            assert plugin.variant == "alternative"
 
     def test_add_inherited(
         self,
@@ -332,8 +348,7 @@ class TestCliAdd:
             )
             assert_cli_runner(res)
             assert (
-                "Inherit from:\ttap-mock, variant singer-io (deprecated)\n"
-                in res.stdout
+                "Inherit from:\ttap-mock, variant singer-io (default)\n" in res.stdout
             )
 
             inherited_variant = project_plugins_service.find_plugin(
