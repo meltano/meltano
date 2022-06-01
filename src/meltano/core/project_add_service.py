@@ -48,9 +48,7 @@ class ProjectAddService:
         plugin = ProjectPlugin(
             plugin_type, plugin_name, **attrs, default_variant=Variant.DEFAULT_NAME
         )
-        # raise
 
-        # TODO: Determine use Hub or discovery.yml here
         with self.plugins_service.disallow_discovery_yaml():
             self.plugins_service.ensure_parent(plugin)
 
