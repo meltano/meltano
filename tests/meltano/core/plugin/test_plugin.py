@@ -546,6 +546,12 @@ class TestProjectPlugin:
         assert "_nested.custom" in settings_by_name
         assert settings_by_name["_nested.custom"].kind == SettingKind.BOOLEAN
 
+    def test_requires(self, transformer: ProjectPlugin):
+        """Validate the plugin requirements."""
+        assert transformer.requirements
+        assert transformer.requirements[0].name == "files-transformer-mock"
+        assert transformer.requirements[0].variant == "meltano"
+
 
 class TestPluginType:
     def test_properties(self):

@@ -1,9 +1,13 @@
 """Plugin Add CLI."""
 
+from typing import List
+
 import click
 
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -52,12 +56,12 @@ from .utils import CliError, add_plugin, add_related_plugins, install_plugins
 @click.pass_context
 def add(
     ctx,
-    project,
-    plugin_type,
-    plugin_name,
-    inherit_from=None,
-    variant=None,
-    as_name=None,
+    project: Project,
+    plugin_type: str,
+    plugin_name: str,
+    inherit_from: str = None,
+    variant: str = None,
+    as_name: str = None,
     **flags,
 ):
     """
@@ -87,7 +91,7 @@ def add(
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
-    plugins = []
+    plugins: List[ProjectPlugin] = []
     tracker = GoogleAnalyticsTracker(project)
     with settings_service.feature_flag(
         FeatureFlags.LOCKFILES,

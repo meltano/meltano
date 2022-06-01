@@ -23,7 +23,7 @@ class PluginRequirement(NameEq, Canonical):
         super().__init__(name=name, variant=variant)
 
     @classmethod
-    def parse_all(cls: type[TReq], obj: dict | None) -> dict[str, TReq]:
+    def parse_all(cls: type[TReq], obj: dict | None) -> dict[str, list[TReq]]:
         """Deserialize requirements data into a dict of PluginRequirement.
 
         Args:

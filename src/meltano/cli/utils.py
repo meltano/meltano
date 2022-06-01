@@ -10,6 +10,7 @@ import click
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -371,8 +372,8 @@ def add_plugin(
 
 
 def add_related_plugins(
-    project,
-    plugins,
+    project: Project,
+    plugins: List[ProjectPlugin],
     add_service: ProjectAddService,
     plugin_types: List[PluginType] = None,
 ):

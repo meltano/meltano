@@ -764,5 +764,6 @@ class StandalonePlugin(Canonical):
             settings_group_validation=variant.settings_group_validation,
             settings=variant.settings,
             commands=variant.commands,
+            requires=variant.requires,
             **variant.extras,
         )
