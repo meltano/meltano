@@ -183,16 +183,6 @@ class TestProjectReadonlyEnabled:
                 assert res.status_code == STATUS_READONLY
                 assert b"deployed as read-only" in res.data
 
-    def test_dashboards_save(self, app, api):
-        with app.test_request_context():
-            res = api.post(
-                url_for("dashboards.save_dashboard"),
-                json={"name": "test-dashboard", "description": ""},
-            )
-
-            assert res.status_code == STATUS_READONLY
-            assert b"deployed as read-only" in res.data
-
 
 @pytest.mark.usefixtures("seed_users")
 class TestReadonlyEnabled:
@@ -407,61 +397,6 @@ class TestAuthenticationEnabled:
 
                 assert res.status_code == HTTPStatus.OK
                 assert res.json["name"] == "tap-gitlab"
-
-    def test_get_embed_unauthenticated(self, app, api):
-        with app.test_request_context():
-            with mock.patch(
-                "meltano.api.controllers.embeds_helper.EmbedsHelper.get_embed_from_token",
-                return_value={"result": "true"},
-            ):
-                res = api.get(
-                    url_for(  # noqa: S106 (not a real password)
-                        "embeds.get_embed",
-                        token="mytoken",
-                    )
-                )
-
-                assert res.status_code == HTTPStatus.OK
-
-    def test_get_embed_authenticated(self, app, api, impersonate):
-        with app.test_request_context():
-            with mock.patch(
-                "meltano.api.controllers.embeds_helper.EmbedsHelper.get_embed_from_token",
-                return_value={"result": "true"},
-            ):
-                with impersonate(users.get_user("alice")):
-                    res = api.get(
-                        url_for(  # noqa: S106 (not a real password)
-                            "embeds.get_embed",
-                            token="mytoken",
-                        )
-                    )
-
-                    assert res.status_code == HTTPStatus.OK
-
-    def test_create_embed_unauthenticated(self, app, api):
-        with app.test_request_context():
-            with mock.patch(
-                "meltano.api.controllers.embeds",
-                return_value={"result": "embedsnippet"},
-            ):
-                res = api.post(url_for("embeds.embed"))
-
-                assert res.status_code == HTTPStatus.UNAUTHORIZED
-
-    def test_create_embed_authenticated(self, app, api, impersonate):
-        with app.test_request_context():
-            with mock.patch(
-                "meltano.api.controllers.embeds",
-                return_value={"result": "embedsnippet"},
-            ):
-                with impersonate(users.get_user("alice")):
-                    res = api.post(
-                        url_for("embeds.embed"),
-                        json={"resource_id": "test", "resource_type": "report"},
-                    )
-
-                    assert res.status_code == HTTPStatus.OK
 
 
 @pytest.mark.usefixtures("seed_users")

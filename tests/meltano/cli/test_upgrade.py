@@ -130,7 +130,3 @@ class TestCliUpgrade:
     def test_upgrade_database(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])
         assert_cli_runner(result)
-
-    def test_upgrade_models(self, project, cli_runner):
-        result = cli_runner.invoke(cli, ["upgrade", "models"])
-        assert_cli_runner(result)

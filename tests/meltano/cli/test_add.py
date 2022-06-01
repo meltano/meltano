@@ -6,9 +6,7 @@ import yaml
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.hub.client import MeltanoHubService
-from meltano.core.m5o.dashboards_service import DashboardsService
-from meltano.core.m5o.reports_service import ReportsService
+from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -38,8 +36,6 @@ class TestCliAdd:
                     PluginRef(PluginType.FILES, "dbt"),
                 ],
             ),
-            (PluginType.MODELS, "model-carbon-intensity", "meltano", []),
-            (PluginType.DASHBOARDS, "dashboard-google-analytics", "meltano", []),
             (
                 PluginType.ORCHESTRATORS,
                 "airflow",
@@ -158,31 +154,6 @@ class TestCliAdd:
             "schema": "{{ env_var('DBT_SOURCE_SCHEMA') }}"
         }
 
-    def test_add_dashboard(self, project, cli_runner):
-        def install():
-            return cli_runner.invoke(
-                cli, ["add", "dashboard", "dashboard-google-analytics"]
-            )
-
-        res = install()
-        assert res.exit_code == 0
-
-        dashboards_service = DashboardsService(project)
-        dashboards_count = len(dashboards_service.get_dashboards())
-
-        assert dashboards_count > 0
-
-        reports_service = ReportsService(project)
-        reports_count = len(reports_service.get_reports())
-        assert reports_count > 0
-
-        # Verify that reinstalling doesn't duplicate dashboards and reports
-        res = install()
-        assert res.exit_code == 0
-
-        assert len(dashboards_service.get_dashboards()) == dashboards_count
-        assert len(reports_service.get_reports()) == reports_count
-
     def test_add_files_with_updates(
         self,
         project,
@@ -267,18 +238,9 @@ class TestCliAdd:
                 "tap-gitlab", PluginType.TRANSFORMS
             )
             assert transform
-            model = project_plugins_service.find_plugin(
-                "model-gitlab", PluginType.MODELS
-            )
-            assert model
-            dashboard = project_plugins_service.find_plugin(
-                "dashboard-gitlab", PluginType.DASHBOARDS
-            )
-            assert dashboard
-
             install_plugin_mock.assert_called_once_with(
                 project,
-                [dashboard, model, transform, tap],
+                [transform, tap],
                 reason=PluginInstallReason.ADD,
                 parallelism=1,
             )

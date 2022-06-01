@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.project_settings_service import (
@@ -15,8 +16,6 @@ class TestCliUi:
         with mock.patch(
             "meltano.cli.ui.APIWorker.start"
         ) as start_api_worker, mock.patch(
-            "meltano.cli.ui.MeltanoCompilerWorker.start"
-        ) as start_compiler, mock.patch(
             "meltano.cli.ui.UIAvailableWorker.start"
         ) as start_ui_available_worker, mock.patch.object(
             GoogleAnalyticsTracker, "track_meltano_ui"
@@ -26,7 +25,6 @@ class TestCliUi:
 
             assert start_api_worker.called
             assert start_ui_available_worker.called
-            assert start_compiler.called
             assert track.called
 
     def test_ui_setup(self, project, cli_runner, monkeypatch):

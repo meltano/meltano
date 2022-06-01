@@ -90,7 +90,7 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
-- `--include-related`: Also add transform, dashboard, and model plugins related to the identified discoverable extractor.
+- `--include-related`: Also add transform plugins related to the identified discoverable extractor.
 
 ## `config`
 
@@ -257,8 +257,6 @@ meltano discover extractors
 # Only list available loaders
 meltano discover loaders
 
-# Only list available models
-meltano discover models
 ```
 
 ## `elt`
@@ -441,7 +439,7 @@ The new project directory will contain:
 
 - a [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) that will list any [`plugins` you'll add](/guide/plugin-management#adding-a-plugin-to-your-project) and [pipeline `schedules` you'll create](/guide/orchestration),
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
-- empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
+- empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
 [Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_DISABLE_TRACKING` environment variable is enabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
@@ -486,7 +484,7 @@ Installs dependencies of your project based on the **meltano.yml** file.
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
+Use `--include-related` to automatically install transforms related to installed extractor plugins.
 
 Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
@@ -524,7 +522,6 @@ meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
 
-meltano install models
 
 meltano install --include-related
 
@@ -1169,7 +1166,6 @@ When called without arguments, this will:
 - Upgrade the `meltano` package
 - Update files [managed by](/concepts/plugins#update-extra) [file bundles](/concepts/plugins#file-bundles)
 - Apply migrations to [system database](/concepts/project#system-database)
-- Recompile models
 
 ### How to use
 
@@ -1180,7 +1176,6 @@ meltano upgrade --skip-package # Skip upgrading the Meltano package
 meltano upgrade package # Only upgrade Meltano package
 meltano upgrade files # Only update files managed by file bundles
 meltano upgrade database # Only apply migrations to system database
-meltano upgrade models # Only recompile models
 ```
 
 ## `version`

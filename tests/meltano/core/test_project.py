@@ -7,6 +7,7 @@ from multiprocessing.pool import ThreadPool
 
 import pytest
 import yaml
+
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.project import PROJECT_ROOT_ENV, Project, ProjectNotFound
 
@@ -62,7 +63,7 @@ class TestProject:
 
         # or set the MELTANO_PROJECT_ROOT env var
         with monkeypatch.context() as ctx1:
-            ctx1.chdir(project.root.joinpath("model"))
+            ctx1.chdir(project.root.joinpath("extract"))
             ctx1.setenv(PROJECT_ROOT_ENV, "..")
 
             found = Project.find(activate=False)
@@ -70,7 +71,7 @@ class TestProject:
 
         # it can also recurse up from a subdirectory
         with monkeypatch.context() as ctx2:
-            ctx2.chdir(project.root.joinpath("model"))
+            ctx2.chdir(project.root.joinpath("extract"))
             found = Project.find(activate=False)
             assert found == project
 
