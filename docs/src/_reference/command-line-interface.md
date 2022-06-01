@@ -745,7 +745,7 @@ meltano job remove simple-demo
   <p>An <code>orchestrator</code> plugin is required to use <code>meltano schedule</code>: refer to the <a href="/guide/orchestration">Orchestration</a> documentation to get started with Meltano orchestration.</p>
 </div>
 
-Use the `schedule` command to define ELT pipelines to be run by an orchestrator at regular intervals. 
+Use the `schedule` command to define ELT or Job pipelines to be run by an orchestrator at regular intervals.
 These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 You can schedule both [jobs](#job) or legacy [`meltano elt`](#elt) tasks.
 
@@ -786,8 +786,6 @@ meltano schedule run <schedule_name>
 ```bash
 # Add a new schedule named "gitlab-sync" to run the job named "gitlab-to-mysql" every day
 meltano schedule add gitlab-sync --job gitlab-to-mysql --interval "@daily"
-# Or the the same, using abbreviated syntax
-meltano schedule add gitlab-sync -j gitlab-to-mysql -i "@daily"
 
 # Perform a dry-run of the schedule named "gitlab-sync"
 # Behind the scenes, this will execute a `meltano run --dry-run gitlab-sync`
