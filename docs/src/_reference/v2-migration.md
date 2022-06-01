@@ -20,5 +20,5 @@ The following list includes all breaking changes in Meltano version 2.0 as well 
    - Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`.
 1. **Removed: transforms support in Meltano schedules**
    - Meltano 2.0 continues to support extract-load (EL) operations in schedules. However, for EL+T operations which also need to transform data, please use the new `meltano job add` command to create a job definition and then specify the new job name in your schedule.
-1. **Recommended: migrating to an adapter-specific dbt plugin
+1. **Recommended: migrating to an adapter-specific dbt plugin**
    - We recommend re-adding an adapter-specific version of dbt for existing projects which may be using the legacy `dbt` plugin name.
