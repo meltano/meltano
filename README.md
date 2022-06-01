@@ -4,7 +4,7 @@
 Meltano
 -------
 
-Welcome to the open source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
+Welcome to your Open Source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
 
 ![](https://lh3.googleusercontent.com/v77ESPe2YLNxpfZNv9zYIle0vd59Oe4gr5iOMzhHamo_dwMuIxrF8zsVhodOc87xRsA6VXt-ZD5saL7MD4f0bmLzwrptUp_JtmSvKjicjBAmgmu_YtSz3PrxvJ-VvvN63mpgVGdiyLM7DPgbaw)
 
