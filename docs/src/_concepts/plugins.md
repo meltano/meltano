@@ -2,6 +2,8 @@
 title: Plugins
 description: Meltano takes a modular approach to data engineering and EL(T), where your project and pipelines are composed of plugins.
 layout: doc
+redirect_from:
+  - /guide/analysis
 weight: 2
 ---
 
@@ -120,8 +122,6 @@ Meltano supports the following types of plugins:
 - [**Mappers**](#mappers) perform stream map transforms on data between extractors and loaders.
 - [**Loaders**](#loaders) load extracted data into arbitrary data destinations.
 - [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
-- [**Models**](#models) describe the schema of the data being analyzed and the ways different tables can be joined.
-- [**Dashboards**](#dashboards) bundle curated Meltano UI dashboards and reports.
 - [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
 - [**Transformers**](#transformers) run transforms.
 - [**File bundles**](#file-bundles) bundle files you may want in your project.
@@ -689,20 +689,6 @@ meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('
 export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 {% endraw %}
 ```
-
-### Models
-
-Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/reference/ui) to aid in [data analysis](/guide/analysis).
-They describe the schema of the data being analyzed and the ways different tables can be joined,
-and are used to automatically generate SQL queries using a point-and-click interface.
-
-### Dashboards
-
-Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/reference/ui) dashboards and reports.
-
-When a dashboard is added to your project using [`meltano add`](/reference/command-line-interface#add),
-the bundled dashboards and reports will automatically be added to your project's `analyze` directory as well.
-
 ### Orchestrators
 
 Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for [orchestrating](/guide/orchestration) a project's [scheduled pipelines](/reference/command-line-interface#schedule).

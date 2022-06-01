@@ -55,8 +55,6 @@ class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
     TRANSFORMS = "transforms"
-    MODELS = "models"
-    DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
     FILES = "files"

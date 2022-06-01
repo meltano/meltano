@@ -1,14 +1,11 @@
 from contextlib import contextmanager
-from unittest import mock
 
-import meltano.api.app
 import pytest
 from flask import request_started
 from flask_security.utils import login_user, logout_user
-from meltano.api.models import db as _db
+
+from meltano.api import app as meltano_app
 from meltano.api.security.identity import create_dev_user
-from meltano.core.migration_service import MigrationService
-from sqlalchemy import MetaData
 
 
 @pytest.fixture
@@ -37,7 +34,7 @@ def create_app(request, project, vacuum_db):
     def _factory(**kwargs):
         config = {"TESTING": True, "LOGIN_DISABLED": False, "ENV": "test", **kwargs}
 
-        app = meltano.api.app.create_app(config)
+        app = meltano_app.create_app(config)
 
         # let's push an application context so the
         # `current_app` is ready in each test

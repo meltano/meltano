@@ -94,18 +94,6 @@
           "items": {
             "$ref": "#/definitions/plugins/transforms"
           }
-        },
-        "models": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/plugins/models"
-          }
-        },
-        "dashboards": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/plugins/dashboards"
-          }
         }
       }
     },
@@ -582,62 +570,6 @@
           }
         ]
       },
-      "models": {
-        "description": "https://docs.meltano.com/concepts/plugins#models",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {}
-            }
-          }
-        ]
-      },
-      "dashboards": {
-        "description": "https://docs.meltano.com/concepts/plugins#dashboards",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {}
-            }
-          }
-        ]
-      },
       "mapper_specific": {
         "type": "object",
         "properties": {
@@ -924,19 +856,6 @@
                     "additionalProperties": false,
                     "$ref": "#/definitions/environments/$defs/plugins"
                   }
-                },
-                "models": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/environments/$defs/plugins"
-                  }
-                },
-                "dashboards": {
-                  "type": "array",
-                  "items": {
-                    "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
-                  }
                 }
               }
             }
@@ -967,7 +886,7 @@
       "description": "A set of plugin requirements.",
       "additionalProperties": false,
       "patternProperties": {
-        "^(extractors|loaders|transforms|models|dashboards|orchestrators|transformers|files|utilities|mappers)$": {
+        "^(extractors|loaders|transforms|orchestrators|transformers|files|utilities|mappers)$": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/plugin_requirement"
