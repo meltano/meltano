@@ -1,9 +1,9 @@
 {
     "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
-    "description": "Schema for a Snowplow event describing a Meltano command",
+    "description": "Schema for a Snowplow context describing a Meltano command",
     "self": {
         "vendor": "com.meltano",
-        "name": "command_event",
+        "name": "command_context",
         "format": "jsonschema",
         "version": "1-0-0"
     },
@@ -15,16 +15,6 @@
             "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
             "minLength": 36,
             "maxLength": 36
-        },
-        "event": {
-            "description": "",
-            "type": "string",
-            "enum": [
-                "started",
-                "completed",
-                "failed",
-                "aborted"
-            ]
         },
         "command": {
             "description": "",
@@ -62,7 +52,6 @@
     },
     "required": [
         "event_uuid",
-        "event",
         "command",
         "command_category",
         "action",
