@@ -144,21 +144,25 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
             plugin: The plugin to remove.
             project: The Meltano project.
         """
-        path = project.plugin_lock_path(plugin.type, plugin.name, plugin.variant)
-        super().__init__(plugin, str(path))
-        self.path = path
+        lockfile_dir = project.root_plugins_dir(plugin.type)
+        glob_expr = f"{plugin.name}*.lock"
+        super().__init__(plugin, str(lockfile_dir / glob_expr))
+
+        self.paths = list(lockfile_dir.glob(glob_expr))
 
     def remove(self):
         """Remove the plugin from `plugins/`."""
-        try:
-            self.path.unlink()
-        except FileNotFoundError:
+        if not self.paths:
             self.remove_status = PluginLocationRemoveStatus.NOT_FOUND
             return
-        except OSError as err:
-            self.remove_status = PluginLocationRemoveStatus.ERROR
-            self.message = err.strerror
-            return
+
+        for path in self.paths:
+            try:
+                path.unlink()
+            except OSError as err:
+                self.remove_status = PluginLocationRemoveStatus.ERROR
+                self.message = err.strerror
+                return
 
         self.remove_status = PluginLocationRemoveStatus.REMOVED
 
