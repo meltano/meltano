@@ -11,10 +11,10 @@ publish:
     - ln -s /meltano/dist
     - poetry publish
 
-# registry.gitlab.com/meltano/meltano:<tag>-python<version> → docker.io/meltano:<tag>-python<version>
-# registry.gitlab.com/meltano/meltano:latest-python<version> → docker.io/meltano:latest-python<version>
-# registry.gitlab.com/meltano/meltano:<tag> → docker.io/meltano:<tag>
-# registry.gitlab.com/meltano/meltano:latest → docker.io/meltano:latest
+# registry.gitlab.com/meltano/meltano:<tag>-python<version> → docker.io/meltano/meltano:<tag>-python<version>
+# registry.gitlab.com/meltano/meltano:latest-python<version> → docker.io/meltano/meltano:latest-python<version>
+# registry.gitlab.com/meltano/meltano:<tag> → docker.io/meltano/meltano:<tag>
+# registry.gitlab.com/meltano/meltano:latest → docker.io/meltano/meltano:latest
 hub_meltano:
   extends:
     - .parallel:image_tag_suffix
