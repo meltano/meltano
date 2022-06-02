@@ -126,6 +126,15 @@ When Meltano invokes a plugin's executable as part of [`meltano elt`](/reference
 
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
 
+Within a [Meltano environment](/concepts/environments) environment variables can be specified using the `env` key:
+```yml
+environments:
+  - name: dev
+	env:
+	  AN_ENVIRONMENT_VARIABLE: dev
+```
+Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
+
 ## Multiple plugin configurations
 
 Every [plugin in your project](/concepts/plugins#project-plugins) has its own configuration,
