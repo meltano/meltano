@@ -16,8 +16,9 @@ from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking.project import ProjectContext
 
-from .environment import EnvironmentContext
+from .environment import environment_context
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -87,11 +88,14 @@ class MeltanoTracker:
             "send_anonymous_usage_stats", True
         )
 
-        self.contexts = (EnvironmentContext(self),)
+        self.contexts: tuple[SelfDescribingJson] = (
+            environment_context,
+            ProjectContext(project),
+        )
 
     @cached_property
     def timezone_name(self) -> str:
-        """The local timezone as an IANA TZ db name if possible, or abbreviation otherwise.
+        """The local timezone as an IANA TZ database name if possible, or abbreviation otherwise.
 
         Examples:
             The timezone name as an IANA timezone database name:
@@ -120,7 +124,7 @@ class MeltanoTracker:
             self.contexts = prev_contexts
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
-        super().track_unstruct_event(event_json, self.contexts)
+        self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:
         self.track_unstruct_event(
