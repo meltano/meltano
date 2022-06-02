@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
-import uuid
 from typing import Any
 
 import requests
@@ -14,8 +12,6 @@ from snowplow_tracker import SelfDescribingJson
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
-
-from .snowplow_tracker import SnowplowTracker
 
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
@@ -62,74 +58,6 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.project_id = self.load_project_id()
         self.client_id = self.load_client_id()
 
-        try:
-            self.snowplow_tracker = SnowplowTracker(
-                project,
-                request_timeout=self.request_timeout,
-            )
-        except ValueError:
-            logging.debug("No Snowplow collector endpoints are set")
-            self.snowplow_tracker = None
-
-    def load_project_id(self) -> uuid.UUID:
-        """
-        Fetch the project_id from the project config file.
-
-        If it is not found (e.g. first time run), generate a valid uuid4 and
-        store it in the project config file.
-
-        Returns:
-            The project_id.
-        """
-        project_id_str = self.settings_service.get("project_id")
-        if project_id_str:
-            try:
-                # Project ID might already be a UUID
-                project_id = uuid.UUID(project_id_str)
-            except ValueError:
-                # If the project ID is not a UUID, then we hash it, and use the hash to make a UUID
-                project_id = uuid.UUID(
-                    hashlib.sha256(project_id_str.encode()).hexdigest()[::2]
-                )
-        else:
-            project_id = uuid.uuid4()
-
-            if self.send_anonymous_usage_stats:
-                # If we are set to track Anonymous Usage stats, also store
-                #  the generated project_id back to the project config file
-                #  so that it persists between meltano runs.
-                self.settings_service.set("project_id", str(project_id))
-
-        return project_id
-
-    def load_client_id(self) -> uuid.UUID:
-        """
-        Fetch the client_id from the non-versioned analytics.json.
-
-        If it is not found (e.g. first time run), generate a valid uuid4 and
-        store it in analytics.json.
-
-        Returns:
-            The client_id.
-        """
-        file_path = self.project.meltano_dir().joinpath("analytics.json")
-        try:  # noqa: WPS229
-            with open(file_path) as file:
-                file_data = json.load(file)
-            client_id_str = file_data["client_id"]
-            client_id = uuid.UUID(client_id_str, version=4)
-        except FileNotFoundError:
-            client_id = uuid.uuid4()
-
-            if self.send_anonymous_usage_stats:
-                # If we are set to track Anonymous Usage stats, also store
-                #  the generated client_id in a non-versioned analytics.json file
-                #  so that it persists between meltano runs.
-                with open(file_path, "w") as file:  # noqa: WPS440
-                    data = {"client_id": str(client_id)}
-                    json.dump(data, file)
-
-        return client_id
 
     def event(self, category: str, action: str) -> dict[str, Any]:
         """Constract a GA event with all the required parameters.
@@ -241,7 +169,7 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         event: SelfDescribingJson,
         context: list[SelfDescribingJson] | None = None,
     ) -> None:
-        """Send a struct event to Snowplow.
+        """Send a self-describing event to Snowplow.
 
         Args:
             category: The category of the event.
@@ -251,11 +179,11 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             # Only send anonymous usage stats if you have explicit permission
             return
 
-        context = context or []
+        context = [] if context is None else context
 
         self.snowplow_tracker.track_self_describing_event(
             event_json=event,
-            context=context + [self.snowplow_tracker.meltano_context],
+            context=[*context, self.snowplow_tracker.meltano_context],
         )
 
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
