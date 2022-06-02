@@ -78,6 +78,9 @@ def _meltanofile_update_dict(
 
 
 _terminal_env_var = {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"}
+
+# Test cases with xfail=True should be resolved to pass
+# as part of this issue: https://github.com/meltano/meltano/issues/5982
 _env_var_resolution_expectations = {
     "Terminal environment": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"},
@@ -208,6 +211,8 @@ class TestEnvVarResolution:
 
     @pytest.mark.xfail
     def test_environment_variable_inheritance(self, cli_runner, project, monkeypatch):
+        # This test will be resolved to pass as part of
+        # this issue: https://github.com/meltano/meltano/issues/5983
         monkeypatch.setenv("STACKED", "1")
         with project.meltano_update() as meltanofile:
             meltanofile.update(
