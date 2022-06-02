@@ -597,12 +597,12 @@ When debugging plugin configuration, it is often useful to view environment vari
 This can be achieved using `--log-level=debug` but for readability and convenience, the `meltano invoke` command also supports printing individual environment variables to stdout at runtime:
 ```bash
 # Print the runtime value PLUGIN_ENVIRONMENT_VARIABLE_1:
-meltano invoke --print-environment-variable PLUGIN_ENVIRONMENT_VARIABLE_1
+meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> <PLUGIN_NAME>
 
 # The option supports printing multiple variables as well.
 
 # # Print the runtime values of both PLUGIN_ENVIRONMENT_VARIABLE_1 and PLUGIN_ENVIRONMENT_2 on separate lines:
-meltano invoke --print-environment-variable PLUGIN_ENVIRONMENT_VARIABLE_1 --print-environment-variable PLUGIN_ENVIRONMENT_VARIABLE_2
+meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_ENVIRONMENT_VARIABLE_2> <PLUGIN_NAME>
 ```
 
 ## `remove`
