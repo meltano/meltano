@@ -12,12 +12,15 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
 
+
 Specifically, it will:
 
-1. add a new [plugin definition](/concepts/project#plugins) to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`, and
-2. assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
-   1. create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
-   2. install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
+1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/),
+2. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`,
+3. Store the plugin definition in the `./plugins` directory if the [lock files feature](/reference/settings#ff-lock-files) is enabled, and
+4. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
+   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
+   2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
 
@@ -87,7 +90,7 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
-- `--include-related`: Also add transform, dashboard, and model plugins related to the identified discoverable extractor.
+- `--include-related`: Also add transform plugins related to the identified discoverable extractor.
 
 ## `config`
 
@@ -254,8 +257,6 @@ meltano discover extractors
 # Only list available loaders
 meltano discover loaders
 
-# Only list available models
-meltano discover models
 ```
 
 ## `elt`
@@ -438,7 +439,7 @@ The new project directory will contain:
 
 - a [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) that will list any [`plugins` you'll add](/guide/plugin-management#adding-a-plugin-to-your-project) and [pipeline `schedules` you'll create](/guide/orchestration),
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
-- empty `model`, `extract`, `load`, `transform`, `analyze`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
+- empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
 [Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_DISABLE_TRACKING` environment variable is enabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
@@ -483,7 +484,7 @@ Installs dependencies of your project based on the **meltano.yml** file.
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-Use `--include-related` to automatically install transform, model, and dashboard plugins related to installed extractor plugins.
+Use `--include-related` to automatically install transforms related to installed extractor plugins.
 
 Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
@@ -521,7 +522,6 @@ meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
 
-meltano install models
 
 meltano install --include-related
 
@@ -759,10 +759,12 @@ meltano job remove simple-demo
   <p>An <code>orchestrator</code> plugin is required to use <code>meltano schedule</code>: refer to the <a href="/guide/orchestration">Orchestration</a> documentation to get started with Meltano orchestration.</p>
 </div>
 
-Use the `schedule` command to define ELT pipelines to be run by an orchestrator at regular intervals. These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+Use the `schedule` command to define ELT or Job pipelines to be run by an orchestrator at regular intervals.
+These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+You can schedule both [jobs](#job) or legacy [`meltano elt`](#elt) tasks.
 
-You can run a specific scheduled pipeline's corresponding [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
-Any command line options (e.g. `--select=<entity>` or `--dump=config`) will be passed on to [`meltano elt`](#elt).
+You can run a specific scheduled pipeline's corresponding [`meltano run`](#run) or [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
+Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passed on to the underlying commands.
 
 ### How to use
 
@@ -771,10 +773,23 @@ The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/C
 
 ```bash
 # Add a schedule
-meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform={run,skip,only}]
+# Schedule a job named "my_job" to run everyday
+meltano schedule add <schedule_name> --job my_job --interval "@daily"
+# Schedule an ELT task to run hourly
+meltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform run --interval "@hourly"
 
 # List all schedules
 meltano schedule list [--format=json]
+
+# Remove a named schedule
+meltano schedule remove <schedule_name>
+
+# Update a named schedule changing the interval
+meltano schedule set <schedule_name> --interval <new-interval>
+# Update a named schedule changing the referenced job
+meltano schedule set <schedule_name> --job <new-job>
+# Update a named ELT scheduled changing the interval AND changing the extractor
+meltano schedule set <schedule_name> --extractor <new-tap> --interval <new-interval>
 
 # Run a schedule
 meltano schedule run <schedule_name>
@@ -783,17 +798,24 @@ meltano schedule run <schedule_name>
 ### Examples
 
 ```bash
-meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily --transform=run
-# This specifies that the following command is to be run once a day:
-# meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+# Add a new schedule named "gitlab-sync" to run the job named "gitlab-to-mysql" every day
+meltano schedule add gitlab-sync --job gitlab-to-mysql --interval "@daily"
 
-meltano schedule gitlab-to-jsonl tap-gitlab target-jsonl "* * * * *"
+# Perform a dry-run of the schedule named "gitlab-sync"
+# Behind the scenes, this will execute a `meltano run --dry-run gitlab-sync`
+meltano schedule run gitlab-sync --dry-run
+
+# Update the schedule named "gitlab-sync" to run the job named "gitlab-to-postgres" instead of "gitlab-to-mysql"
+meltano schedule set gitlab-sync --job gitlab-to-postgres
+# Update the schedule named "gitlab-sync" to run weekly instead of daily
+meltano schedule set gitlab-sync --interval "@weekly"
+
+# Add a legacy ELT based schedule named "gitlab-to-jsonl" to run every minute
 # This specifies that the following command is to be run every minute:
 # meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
-
-meltano schedule run gitlab-to-jsonl --select=commits
-# This will run:
-# meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl --select=commits
+meltano schedule add gitlab-to-jsonl --extractor tap-gitlab --loader target-jsonl --interval="* * * * *"
+# Update the schedule named "gitlab-to-jsonl" to use target-csv instead of target-jsonl
+meltano schedule set gitlab-to-jsonl --loader target-csv
 ```
 
 ## `select`
@@ -1180,7 +1202,6 @@ When called without arguments, this will:
 - Upgrade the `meltano` package
 - Update files [managed by](/concepts/plugins#update-extra) [file bundles](/concepts/plugins#file-bundles)
 - Apply migrations to [system database](/concepts/project#system-database)
-- Recompile models
 
 ### How to use
 
@@ -1191,7 +1212,6 @@ meltano upgrade --skip-package # Skip upgrading the Meltano package
 meltano upgrade package # Only upgrade Meltano package
 meltano upgrade files # Only update files managed by file bundles
 meltano upgrade database # Only apply migrations to system database
-meltano upgrade models # Only recompile models
 ```
 
 ## `version`

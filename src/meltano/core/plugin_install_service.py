@@ -9,7 +9,6 @@ from typing import Any, Callable, Iterable, Tuple
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
-from .compiler.project_compiler import ProjectCompiler
 from .error import AsyncSubprocessError, PluginInstallError, PluginInstallWarning
 from .plugin import PluginType
 from .project import Project
@@ -270,15 +269,8 @@ class PluginInstallService:
             Install state of installed plugins.
         """
         results = await asyncio.gather(
-            *[
-                self.install_plugin_async(plugin, reason, compile_models=False)
-                for plugin in plugins
-            ]
+            *[self.install_plugin_async(plugin, reason) for plugin in plugins]
         )
-        for plugin in plugins:
-            if plugin.type is PluginType.MODELS:
-                self.compile_models()
-                break
 
         return results
 
@@ -286,7 +278,6 @@ class PluginInstallService:
         self,
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
-        compile_models=True,
     ) -> PluginInstallState:
         """
         Install a plugin.
@@ -296,7 +287,6 @@ class PluginInstallService:
         Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
-            compile_models: (optional) Compile .m50 models flag.
 
         Returns:
             PluginInstallState state instance.
@@ -305,7 +295,6 @@ class PluginInstallService:
             self.install_plugin_async(
                 plugin,
                 reason=reason,
-                compile_models=compile_models,
             )
         )
 
@@ -314,14 +303,12 @@ class PluginInstallService:
         self,
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
-        compile_models=True,
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
         Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
-            compile_models: (optional) Compile .m50 models flag.
 
         Returns:
             PluginInstallState state instance.
@@ -352,8 +339,6 @@ class PluginInstallService:
                 state = PluginInstallState(
                     plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS
                 )
-                if compile_models and plugin.type is PluginType.MODELS:
-                    self.compile_models()
                 self.status_cb(state)
                 return state
 
@@ -390,14 +375,6 @@ class PluginInstallService:
             )
             self.status_cb(state)
             return state
-
-    def compile_models(self):
-        """Compile .m50 models."""
-        compiler = ProjectCompiler(self.project)
-        try:
-            compiler.compile()
-        except Exception as exp:  # noqa: S110
-            logger.debug("Failed to compile models: %s", exp)  # noqa: WPS323
 
     @staticmethod
     def _is_mapping(plugin: ProjectPlugin) -> bool:

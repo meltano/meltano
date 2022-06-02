@@ -8,11 +8,11 @@ import sys
 from typing import Optional
 
 import click
+import psutil
+
 import meltano
 import meltano.core.bundle as bundle
-import psutil
 from meltano.cli.utils import PluginInstallReason, install_plugins
-from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.migration_service import MigrationError, MigrationService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginType, ProjectPluginsService
@@ -122,11 +122,6 @@ class UpgradeService:
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 
-    def compile_models(self):
-        click.secho("Recompiling models...", fg="blue")
-
-        ProjectCompiler(self.project).compile()
-
     def upgrade(self, skip_package=False, **kwargs):
         package_upgraded = False
         if not skip_package:
@@ -144,7 +139,6 @@ class UpgradeService:
         click.echo()
         self.migrate_database()
         click.echo()
-        self.compile_models()
 
         click.echo()
         if package_upgraded:
