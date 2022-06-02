@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import logging
 from typing import Any
 
@@ -16,18 +15,6 @@ from meltano.core.schedule import Schedule
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
 DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect"
-
-
-def hash_sha256(value: str) -> str:
-    """Get the sha_256 hash of a string.
-
-    Args:
-        value: the string value to hash.
-
-    Returns:
-        The hashed value of the given string.
-    """
-    return hashlib.sha256(value.encode()).hexdigest()
 
 
 class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230

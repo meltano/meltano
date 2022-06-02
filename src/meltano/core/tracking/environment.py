@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import ctypes
 import ctypes.wintypes
-import hashlib
 import json
 import os
 import platform
@@ -23,6 +22,7 @@ from structlog.stdlib import get_logger
 import meltano
 from meltano.core.project import Project
 from meltano.core.settings_service import SettingsService
+from meltano.core.utils import hash_sha256
 
 logger = get_logger(__name__)
 
@@ -75,9 +75,7 @@ class EnvironmentContext(SelfDescribingJson):
                 project_id = uuid.UUID(project_id_str)
             except ValueError:
                 # If the project ID is not a UUID, then we hash it, and use the hash to make a UUID
-                project_id = uuid.UUID(
-                    hashlib.sha256(project_id_str.encode()).hexdigest()[::2]
-                )
+                project_id = uuid.UUID(hash_sha256(project_id_str)[::2])
                 self._project_uuid_source = ProjectUUIDSource.derived
             else:
                 self._project_uuid_source = ProjectUUIDSource.explicit
