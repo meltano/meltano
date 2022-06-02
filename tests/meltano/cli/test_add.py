@@ -35,7 +35,7 @@ class TestCliAdd:
                     PluginRef(PluginType.TRANSFORMERS, "dbt"),
                     PluginRef(PluginType.FILES, "dbt"),
                 ],
-                marks=[pytest.mark.xfail],
+                marks=[pytest.mark.xfail],  # Remove in: https://github.com/meltano/meltano/pull/5957
             ),
             (
                 PluginType.ORCHESTRATORS,
