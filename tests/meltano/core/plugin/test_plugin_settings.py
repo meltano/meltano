@@ -357,15 +357,9 @@ class TestPluginSettingsService:
         dotenv.set_key(project.dotenv, "TARGET_MOCK_SCHEMA", "name_prefix")
         assert_env_value("name_prefix", "TARGET_MOCK_SCHEMA")
 
-        # Custom `env`
-        dotenv.unset_key(project.dotenv, "TARGET_MOCK_SCHEMA")
-        dotenv.set_key(project.dotenv, "MOCKED_SCHEMA", "custom_env")
-        assert_env_value("custom_env", "MOCKED_SCHEMA")
-
         config = subject.as_env(session=session)
         subject.reset(store=SettingValueStore.DOTENV)
 
-        assert config["MOCK_SCHEMA"] == "custom_env"  # Namespace prefix
         assert (
             config["MELTANO_LOAD_SCHEMA"] == "name_prefix"
         )  # Generic prefix, read-only

@@ -136,7 +136,12 @@ def discovery():  # noqa: WPS213
             "name": "target-mock",
             "namespace": "mock",
             "pip_url": "target-mock",
-            "settings": [{"name": "schema", "env": "MOCKED_SCHEMA"}],
+            "settings": [
+                {
+                    "name": "schema",
+                    "env": "MOCKED_SCHEMA",
+                }
+            ],
         }
     )
 
