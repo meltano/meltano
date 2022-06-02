@@ -23,11 +23,11 @@ class TestCliAdd:
             yield
 
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name,default_variant,related_plugin_refs",
+        "plugin_type,plugin_name,default_variant,required_plugin_refs",
         [
             (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
             (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
-            (
+            pytest.param(
                 PluginType.TRANSFORMS,
                 "tap-carbon-intensity",
                 "meltano",
@@ -35,6 +35,7 @@ class TestCliAdd:
                     PluginRef(PluginType.TRANSFORMERS, "dbt"),
                     PluginRef(PluginType.FILES, "dbt"),
                 ],
+                marks=[pytest.mark.xfail],
             ),
             (
                 PluginType.ORCHESTRATORS,
@@ -43,13 +44,19 @@ class TestCliAdd:
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
         ],
+        ids=[
+            "single-extractor",
+            "single-loader",
+            "transform-and-related",
+            "orchestrator-and-required",
+        ],
     )
     def test_add(
         self,
         plugin_type,
         plugin_name,
         default_variant,
-        related_plugin_refs,
+        required_plugin_refs,
         project,
         cli_runner,
         project_plugins_service,
@@ -71,21 +78,21 @@ class TestCliAdd:
 
             plugins = [plugin]
 
-            for related_plugin_ref in related_plugin_refs:
-                if (related_plugin_ref._type) == PluginType.FILES and (
-                    related_plugin_ref.name == "dbt"
+            for required_plugin_ref in required_plugin_refs:
+                if (required_plugin_ref._type) == PluginType.FILES and (
+                    required_plugin_ref.name == "dbt"
                 ):
                     # file bundles with no managed files are added but do not appear in meltano.yml
                     assert (
-                        f"Adding related file bundle '{related_plugin_ref.name}'"
+                        f"Adding required file bundle '{required_plugin_ref.name}'"
                         in res.stdout
                     )
                 else:
-                    plugin = project_plugins_service.get_plugin(related_plugin_ref)
+                    plugin = project_plugins_service.get_plugin(required_plugin_ref)
                     assert plugin
 
                     assert (
-                        f"Added related {plugin.type.descriptor} '{plugin.name}'"
+                        f"Added required {plugin.type.descriptor} '{plugin.name}'"
                         in res.stdout
                     )
 

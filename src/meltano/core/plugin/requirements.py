@@ -13,7 +13,7 @@ TReq = TypeVar("TReq", bound="PluginRequirement")
 class PluginRequirement(NameEq, Canonical):
     """A plugin requirement."""
 
-    def __init__(self, name: str, variant: str) -> None:
+    def __init__(self, name: str, variant: str | None = None) -> None:
         """Create a new PluginBundleFile.
 
         Args:

@@ -16,7 +16,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, add_plugin, add_related_plugins, install_plugins
+from .utils import CliError, add_plugin, add_required_plugins, install_plugins
 
 
 @cli.command(short_help="Add a plugin to your project.")
@@ -116,10 +116,13 @@ def add(
     if flags["include_related"]:
         related_plugin_types = list(PluginType)
 
-    related_plugins = add_related_plugins(
-        project, plugins, add_service=add_service, plugin_types=related_plugin_types
+    required_plugins = add_required_plugins(
+        project,
+        plugins,
+        add_service=add_service,
+        plugin_types=related_plugin_types,
     )
-    plugins.extend(related_plugins)
+    plugins.extend(required_plugins)
 
     # We will install the plugins in reverse order, since dependencies
     # are listed after their dependents in `related_plugins`, but should

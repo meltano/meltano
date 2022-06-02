@@ -19,6 +19,7 @@ from meltano.core.plugin_install_service import (
 from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
+    PluginAddedReason,
     PluginAlreadyAddedException,
     ProjectAddService,
 )
@@ -49,11 +50,16 @@ class CliError(Exception):
         self.printed = True
 
 
-def print_added_plugin(plugin, related=False):
+def print_added_plugin(
+    plugin,
+    reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
+):
     """Print added plugin."""
     descriptor = plugin.type.descriptor
-    if related:
+    if reason is PluginAddedReason.RELATED:
         descriptor = f"related {descriptor}"
+    elif reason is PluginAddedReason.REQUIRED:
+        descriptor = f"required {descriptor}"
 
     if plugin.should_add_to_file():
         click.secho(
@@ -385,10 +391,32 @@ def add_related_plugins(
             plugin_install, plugin_types=plugin_types
         )
         for related_plugin in related_plugins:
-            print_added_plugin(related_plugin, related=True)
+            print_added_plugin(related_plugin, reason=PluginAddedReason.RELATED)
             click.echo()
 
         added_plugins.extend(related_plugins)
+
+    return added_plugins
+
+
+def add_required_plugins(
+    project: Project,
+    plugins: List[ProjectPlugin],
+    add_service: ProjectAddService,
+    plugin_types: List[PluginType] = None,
+):
+    """Add any Plugins required by the given Plugin."""
+    plugin_types = plugin_types or list(PluginType)
+    added_plugins = []
+    for plugin_install in plugins:
+        required_plugins = add_service.add_related(
+            plugin_install, plugin_types=plugin_types
+        )
+        for required_plugin in required_plugins:
+            print_added_plugin(required_plugin, reason=PluginAddedReason.REQUIRED)
+            click.echo()
+
+        added_plugins.extend(required_plugins)
 
     return added_plugins
 
