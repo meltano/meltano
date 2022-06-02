@@ -6,6 +6,7 @@ import datetime
 import locale
 import re
 from contextlib import contextmanager
+from typing import Any
 from urllib.parse import urlparse
 
 import tzlocal
@@ -118,9 +119,12 @@ class MeltanoTracker:
         except Exception:
             return datetime.datetime.now().astimezone().tzname()
 
-    def track_unstruct_event(
-        self,
-        event_json: SelfDescribingJson,
-        context: list[SelfDescribingJson] | None = None,
-    ) -> None:
-        super().track_unstruct_event(event_json, context)
+    def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
+        super().track_unstruct_event(event_json, self.contexts)
+
+    def track_command_event(self, event_json: dict[str, Any]) -> None:
+        self.track_unstruct_event(
+            SelfDescribingJson(
+                "iglu:com.meltano/command_event/jsonschema/1-0-0", event_json
+            )
+        )
