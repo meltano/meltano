@@ -187,7 +187,8 @@
                     "process_id",
                     "process_name",
                     "process_creation_timestamp"
-                ]
+                ],
+                "additionalProperties": false
             }
         }
     },

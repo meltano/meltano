@@ -104,7 +104,8 @@
                     "version",
                     "plugin_definition_hash",
                     "containerized"
-                ]
+                ],
+                "additionalProperties": false
             }
         }
     },
