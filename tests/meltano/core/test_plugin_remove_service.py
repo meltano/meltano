@@ -89,6 +89,14 @@ class TestPluginRemoveService:
                 subject.project.meltano_dir().joinpath(plugin.type, plugin.name)
             )
 
+            # check removed lock files
+            lock_file_paths = list(
+                subject.project.root_plugins_dir(plugin.type).glob(
+                    f"{plugin.name}*.lock"
+                )
+            )
+            assert all(not path.exists() for path in lock_file_paths)
+
     def test_remove_not_added_or_installed(self, subject: PluginRemoveService):
         plugins = list(subject.plugins_service.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
