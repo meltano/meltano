@@ -7,7 +7,18 @@ publish:
   before_script:
     - pip install poetry
   script:
-    # grab the built package
+    # Add the release marker: a file whose presence indicates that this copy of Meltano was
+    # obtained from a Python package index, rather than directly from source. This marker is used
+    # to improve Meltano's telemetry.
+    - pushd /meltano/dist
+    - ARCHIVE="$(sh -c 'echo "$1"' sh meltano*.tar.gz)"
+    - DIR="$(basename $ARCHIVE .tar.gz)"
+    - tar -xvzf "$ARCHIVE"
+    - touch "$DIR/src/meltano/core/tracking/.release_marker"
+    - tar -cvzf "$ARCHIVE" "$DIR"
+    - popd
+
+    # Publish the sdist
     - ln -s /meltano/dist
     - poetry publish
 

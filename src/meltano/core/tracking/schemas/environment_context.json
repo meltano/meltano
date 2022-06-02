@@ -21,6 +21,14 @@
             "type": "string",
             "maxLength": 256
         },
+        "is_dev_build": {
+            "description": "Whether the installed version of Meltano is a dev build",
+            "type": "boolean"
+        },
+        "is_ci_environment": {
+            "description": "Whether Meltano is running in a CI environment",
+            "type": "boolean"
+        },
         "python_version": {
             "description": "The version of Python in use",
             "type": "string",
@@ -155,6 +163,8 @@
     "required": [
         "context_uuid",
         "meltano_version",
+        "is_dev_build",
+        "is_ci_environment",
         "python_version",
         "system_name",
         "system_release",

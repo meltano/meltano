@@ -9,6 +9,7 @@ import platform
 import uuid
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 from platform import system
 from typing import Any
 
@@ -21,17 +22,23 @@ import meltano
 
 logger = get_logger(__name__)
 
+# This file is only ever created in CI when building a release
+release_marker_path = Path(__file__).parent / ".release_marker"
+
 
 class EnvironmentContext(SelfDescribingJson):
     def __init__(self):
         logger.debug(
             f"Initializing '{type(self).__module__}.{type(self).__qualname__}'"
         )
+        ci_markers = ('GITHUB_ACTIONS', 'CI')
         super().__init__(
             "iglu:com.meltano/environment_context/jsonschema/1-0-0",
             {
                 "context_uuid": uuid.uuid4(),
                 "meltano_version": meltano.__version__,
+                "is_dev_build": not release_marker_path.exists(),
+                "is_ci_environment": any(os.environ.get(x, '') == 'true' for x in ci_markers),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
             }

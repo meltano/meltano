@@ -62,6 +62,8 @@ class MeltanoTracker:
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
+
+        # TODO: do we want different endpoints when the release marker is not present?
         endpoints = self.settings_service.get("snowplow.collector_endpoints")
 
         emitters: list[Emitter] = []
