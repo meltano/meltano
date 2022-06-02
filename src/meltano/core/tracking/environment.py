@@ -73,7 +73,6 @@ class EnvironmentContext(SelfDescribingJson):
                 "num_cpu_cores": psutil.cpu_count(),
                 "num_cpu_cores_available": self.num_available_cores,
                 "process_executable_path": process.exe() or None,
-                "process_arguments": process.cmdline(),
                 "processe_hierarchy": [
                     {
                         "process_id": x.pid,
