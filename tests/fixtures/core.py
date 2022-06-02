@@ -4,6 +4,7 @@ import logging
 import os
 import shutil
 from collections import namedtuple
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -205,7 +206,13 @@ def discovery():  # noqa: WPS213
                     "executable": "mapper-mock-cmd",
                     "pip_url": "mapper-mock",
                     "package_name": "mapper-mock",
-                }
+                },
+                {
+                    "name": "alternative",
+                    "executable": "mapper-mock-alt",
+                    "pip_url": "mapper-mock-alt",
+                    "package_name": "mapper-mock-alt",
+                },
             ],
         }
     )
@@ -215,7 +222,7 @@ def discovery():  # noqa: WPS213
 
 @pytest.fixture(scope="class")
 def plugin_discovery_service(project, discovery):
-    return PluginDiscoveryService(project, discovery=discovery)
+    return PluginDiscoveryService(project, discovery=deepcopy(discovery))
 
 
 @pytest.fixture(scope="class")
@@ -270,11 +277,17 @@ def config_service(project):
 
 
 @pytest.fixture(scope="class")
-def project_plugins_service(project, config_service, plugin_discovery_service):
+def project_plugins_service(
+    project,
+    config_service,
+    plugin_discovery_service,
+    meltano_hub_service,
+):
     return ProjectPluginsService(
         project,
         config_service=config_service,
         discovery_service=plugin_discovery_service,
+        hub_service=meltano_hub_service,
         use_cache=False,
     )
 
@@ -385,16 +398,28 @@ def task_sets_service(project):
 
 
 @pytest.fixture(scope="class")
-def schedule(project, tap, target, schedule_service):
+def elt_schedule(project, tap, target, schedule_service):
     try:
-        return schedule_service.add(
+        return schedule_service.add_elt(
             None,
-            "schedule-mock",
+            "elt-schedule-mock",
             extractor=tap.name,
             loader=target.name,
             transform="skip",
             interval="@once",
             start_date=datetime.datetime.now(),
+        )
+    except ScheduleAlreadyExistsError as err:
+        return err.schedule
+
+
+@pytest.fixture(scope="class")
+def job_schedule(project, tap, target, schedule_service):
+    try:
+        return schedule_service.add(
+            "job-schedule-mock",
+            "mock-job",
+            interval="@once",
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule

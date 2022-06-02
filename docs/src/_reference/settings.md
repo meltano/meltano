@@ -1004,3 +1004,17 @@ export MELTANO_UI_TRACKING_ID=UA-123456789-2
 - Default: `["https://sp.meltano.com"]`
 
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
+
+## Feature Flags
+
+### <a name="ff-lock-files"></a>`ff.lock_files`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_LOCK_FILES`
+- Default: `False`
+
+Enables the lockfile mechanism to keep stable and version controlled plugin definitions within a Meltano project.
+
+### <a name="ff-enable-uvicron"></a>`ff.enable_uvicorn`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
+- Default: `False`

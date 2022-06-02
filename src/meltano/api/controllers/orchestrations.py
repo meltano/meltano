@@ -29,12 +29,14 @@ from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import (
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
     ScheduleService,
 )
 from meltano.core.setting_definition import SettingKind
+from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import slugify
 
 from .errors import InvalidFileNameError
@@ -473,34 +475,50 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
 def get_pipeline_schedules():
     """Endpoint for getting the pipeline schedules.
 
+    Note that unless the ff ENABLE_API_SCHEDULED_JOB_LIST is enabled this endpoint will filter out scheduled jobs.
+
     Returns:
         JSON containing the pipline schedules.
     """
     project = Project.find()
     schedule_service = ScheduleService(project)
     schedules = list(map(dict, schedule_service.schedules()))
+
+    jobs_in_list = False
+    with ProjectSettingsService(project).feature_flag(
+        FeatureFlags.ENABLE_API_SCHEDULED_JOB_LIST, raise_error=False
+    ) as allow:
+        if allow:
+            jobs_in_list = True
+
+    formatted_schedules = []
+
     for schedule in schedules:
-        finder = JobFinder(schedule["name"])
-        state_job = finder.latest(db.session)
-        schedule["has_error"] = state_job.has_error() if state_job else False
-        schedule["is_running"] = state_job.is_running() if state_job else False
-        schedule["job_id"] = schedule["name"]
-        schedule["started_at"] = state_job.started_at if state_job else None
-        schedule["ended_at"] = state_job.ended_at if state_job else None
-        schedule["trigger"] = state_job.trigger if state_job else None
+        if schedule.job and jobs_in_list:
+            formatted_schedules.append(schedule)
+        elif schedule.elt_schedule:
+            finder = JobFinder(schedule["name"])
+            state_job = finder.latest(db.session)
+            schedule["has_error"] = state_job.has_error() if state_job else False
+            schedule["is_running"] = state_job.is_running() if state_job else False
+            schedule["job_id"] = schedule["name"]
+            schedule["started_at"] = state_job.started_at if state_job else None
+            schedule["ended_at"] = state_job.ended_at if state_job else None
+            schedule["trigger"] = state_job.trigger if state_job else None
 
-        state_job_success = finder.latest_success(db.session)
-        schedule["has_ever_succeeded"] = (
-            state_job_success.is_success() if state_job_success else None
-        )
+            state_job_success = finder.latest_success(db.session)
+            schedule["has_ever_succeeded"] = (
+                state_job_success.is_success() if state_job_success else None
+            )
 
-        schedule["start_date"] = (  # noqa: WPS204
-            schedule["start_date"].date().isoformat()
-            if schedule["start_date"]
-            else None
-        )
+            schedule["start_date"] = (  # noqa: WPS204
+                schedule["start_date"].date().isoformat()
+                if schedule["start_date"]
+                else None
+            )
+            formatted_schedules.append(schedule)
 
-    return jsonify(schedules)
+    return jsonify(formatted_schedules)
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["POST"])
@@ -523,7 +541,7 @@ def save_pipeline_schedule() -> Response:
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    schedule = schedule_service.add(
+    schedule = schedule_service.add_elt(
         db.session, slug, extractor, loader, transform, interval
     )
 
