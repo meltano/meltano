@@ -450,19 +450,6 @@ class Project(Versioned):  # noqa: WPS214
         )
 
     @makedirs
-    def model_dir(self, *joinpaths, make_dirs: bool = True) -> Path:
-        """Path to the `models` directory in `.meltano`.
-
-        Args:
-            joinpaths: Paths to join to the `models` directory in `.meltano`.
-            make_dirs: Flag to make directories if not exists.
-
-        Returns:
-            Resolved path to `models` dir optionally joined to given paths.
-        """
-        return self.meltano_dir("models", *joinpaths, make_dirs=make_dirs)
-
-    @makedirs
     def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True) -> Path:
         """Path to the plugin installation directory in `.meltano`.
 

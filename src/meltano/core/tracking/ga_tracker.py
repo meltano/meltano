@@ -267,15 +267,25 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             debug: Whether to send the event to the debug endpoint.
         """
         if schedule:
-            self.track_event(
-                category="meltano schedule",
-                action=(
-                    f"meltano schedule {action} {schedule.name} "
-                    + f"{schedule.extractor} {schedule.loader} {schedule.interval} "
-                    + f"--transform={schedule.transform}"
-                ),
-                debug=debug,
-            )
+            if schedule.job:
+                self.track_event(
+                    category="meltano schedule",
+                    action=(
+                        f"meltano schedule {action} {schedule.name} "
+                        + f"--job={schedule.job} --interval={schedule.interval}"
+                    ),
+                    debug=debug,
+                )
+            else:
+                self.track_event(
+                    category="meltano schedule",
+                    action=(
+                        f"meltano schedule {action} {schedule.name} "
+                        + f"--extractor {schedule.extractor} --loader {schedule.loader} --interval {schedule.interval} "
+                        + f"--transform={schedule.transform}"
+                    ),
+                    debug=debug,
+                )
         else:
             self.track_event(
                 category="meltano schedule",

@@ -33,7 +33,6 @@ class TestCliInit:
             project.root.joinpath(meltano_dir)
             for meltano_dir in (
                 ".meltano",
-                "model",
                 "extract",
                 "load",
                 "transform",

@@ -39,7 +39,7 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
     python3 -m install --user pipx
     python3 -m pipx ensurepath
     #Note that the below commands are not needed in most cases
-    source ~/.bashrc 
+    source ~/.bashrc
     ```
     <div class="notification is-info">
         <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
@@ -837,10 +837,10 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
 1. Schedule a new [`meltano elt`](/reference/command-line-interface#elt) pipeline to be invoked on an interval using [`meltano schedule`](/reference/command-line-interface#schedule):
 
 ```bash
-meltano schedule <pipeline name> <extractor> <loader> <interval>
+meltano schedule add <pipeline name> --extractor <extractor> --loader <loader> --interval <interval>
 
 # For example:
-meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
+meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-postgres --interval @daily
 ```
 
 The `pipeline name` argument corresponds to the `--job_id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).

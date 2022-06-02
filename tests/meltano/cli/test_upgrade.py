@@ -41,13 +41,19 @@ class TestCliUpgrade:
         )
         assert "run `meltano upgrade --skip-package`" not in result.output
 
-    def test_upgrade_files(self, session, project, cli_runner, config_service):
+    def test_upgrade_files(
+        self, session, project, cli_runner, config_service, meltano_hub_service
+    ):
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
         assert "Nothing to update" in result.output
 
-        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        with mock.patch(
+            "meltano.core.project_plugins_service.MeltanoHubService",
+            return_value=meltano_hub_service,
+        ):
+            result = cli_runner.invoke(cli, ["add", "files", "airflow"])
         assert_cli_runner(result)
 
         # Don't update file if unchanged
@@ -123,8 +129,4 @@ class TestCliUpgrade:
 
     def test_upgrade_database(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])
-        assert_cli_runner(result)
-
-    def test_upgrade_models(self, project, cli_runner):
-        result = cli_runner.invoke(cli, ["upgrade", "models"])
         assert_cli_runner(result)
