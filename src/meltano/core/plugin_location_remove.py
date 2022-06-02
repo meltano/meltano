@@ -146,7 +146,10 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
         """
         lockfile_dir = project.root_plugins_dir(plugin.type)
         glob_expr = f"{plugin.name}*.lock"
-        super().__init__(plugin, str(lockfile_dir / glob_expr))
+        super().__init__(
+            plugin,
+            str(lockfile_dir.relative_to(project.root).joinpath(glob_expr)),
+        )
 
         self.paths = list(lockfile_dir.glob(glob_expr))
 
