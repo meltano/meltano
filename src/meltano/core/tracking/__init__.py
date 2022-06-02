@@ -5,7 +5,9 @@ from __future__ import annotations
 import datetime
 import locale
 import re
+import traceback
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
@@ -17,8 +19,10 @@ from structlog.stdlib import get_logger
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.project import ProjectContext
+from meltano.core.utils import hash_sha256
 
 from .environment import environment_context
+from .legacy_tracker import LegacyTracker
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -75,14 +79,17 @@ class MeltanoTracker:
                 )
             )
 
-        self.snowplow_tracker = Tracker(
-            emitters=emitters, request_timeout=request_timeout
-        )
-        self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
-        self.snowplow_tracker.subject.set_timezone(self.timezone_name)
-        # No good way to get the IP address without making a web request. We could use UPnP, but
-        # that's pretty heavyweight, both in terms of runtime, and required dependencies.
-        # self.subject.set_ip_address()
+        if emitters:
+            self.snowplow_tracker = Tracker(
+                emitters=emitters, request_timeout=request_timeout
+            )
+            self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
+            self.snowplow_tracker.subject.set_timezone(self.timezone_name)
+            # No good way to get the IP address without making a web request. We could use UPnP, but
+            # that's pretty heavyweight, both in terms of runtime, and required dependencies.
+            # self.subject.set_ip_address()
+        else:
+            self.snowplow_tracker = None
 
         self.send_anonymous_usage_stats = self.settings_service.get(
             "send_anonymous_usage_stats", True
@@ -123,8 +130,36 @@ class MeltanoTracker:
         finally:
             self.contexts = prev_contexts
 
+    def can_track(self) -> bool:
+        return self.snowplow_tracker is not None and self.send_anonymous_usage_stats
+
+    def track_struct_event(self, category: str, action: str) -> None:
+        if not self.can_track():
+            return
+
+        if self.project.active_environment is not None:
+            action = f"{action} --environment={hash_sha256(self.project.active_environment.name)}"
+
+        try:
+            self.snowplow_tracker.track_struct_event(
+                category=category,
+                action=action,
+                label=self.project_id,
+            )
+        except Exception as ex:
+            logger.warning(
+                f"Failed to submit struct event to Snowplow:\n{traceback.format_exception(ex)}"
+            )
+
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
-        self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
+        if not self.can_track():
+            return
+        try:
+            self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
+        except Exception as ex:
+            logger.warning(
+                f"Failed to submit unstruct event to Snowplow:\n{traceback.format_exception(ex)}"
+            )
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:
         self.track_unstruct_event(

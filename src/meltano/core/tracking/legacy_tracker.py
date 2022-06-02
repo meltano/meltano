@@ -1,24 +1,28 @@
-"""Google Analytics tracker for CLI commands."""
+"""Legacy tracker for Meltano.
+
+This module and its content will be removed in a future version of Meltano without a major version
+bump. It only remains here to make the transition to the new tracker as smooth as possible.
+"""
 
 from __future__ import annotations
 
-import logging
 from typing import Any
-
-import requests
-from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
+from meltano.core.tracking.project import ProjectContext
+from meltano.core.utils import hash_sha256
+
+from . import MeltanoTracker
 
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
 DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect"
 
 
-class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
-    """Event tracker for Meltano."""
+class LegacyTracker:
+    """Legacy tracker for Meltano."""
 
     def __init__(
         self,
@@ -42,9 +46,15 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.send_anonymous_usage_stats = self.settings_service.get(
             "send_anonymous_usage_stats", True
         )
-        self.project_id = self.load_project_id()
-        self.client_id = self.load_client_id()
 
+        self.tracker = MeltanoTracker(
+            project,
+            request_timeout=self.request_timeout,
+        )
+        
+        project_context = ProjectContext(project)
+        self.project_id = project_context.project_uuid
+        self.client_id = project_context.client_uuid
 
     def event(self, category: str, action: str) -> dict[str, Any]:
         """Constract a GA event with all the required parameters.
@@ -68,110 +78,16 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             "cd1": self.project_id,  # maps to the custom dimension 1 of the UI
         }
 
-    def track_data(  # noqa: WPS213
-        self, data: dict[str, Any], debug: bool = False
-    ) -> None:
-        """Send usage statistics back to Google Analytics.
-
-        Args:
-            data: The data to send.
-            debug: Whether to send the event to the debug endpoint.
-        """
-        if self.send_anonymous_usage_stats is False:
-            # Only send anonymous usage stats if you have explicit permission
-            return
-
-        if debug:
-            tracking_uri = DEBUG_MEASUREMENT_PROTOCOL_URI
-        else:
-            tracking_uri = MEASUREMENT_PROTOCOL_URI
-
-        try:  # noqa: WPS229
-            resp = requests.post(tracking_uri, data=data, timeout=self.request_timeout)
-
-            if debug:
-                logging.debug("GoogleAnalyticsTracker.track_data:")
-                logging.debug(data)
-                logging.debug("Response:")
-                logging.debug(f"status_code: {resp.status_code}")
-                logging.debug(resp.text)
-        except requests.exceptions.Timeout:
-            logging.debug("GoogleAnalyticsTracker.track_data: Request Timed Out")
-        except requests.exceptions.ConnectionError as exc:
-            logging.debug("GoogleAnalyticsTracker.track_data: ConnectionError")
-            logging.debug(exc)
-        except requests.exceptions.RequestException as exc:
-            logging.debug("GoogleAnalyticsTracker.track_data: RequestException")
-            logging.debug(exc)
-
-    def track_event(
-        self,
-        category: str,
-        action: str,
-        debug: bool = False,
-        context: SelfDescribingJson | None = None,
-    ) -> None:
-        """Send a GA event.
+    def track_event(self, category: str, action: str, debug: bool = False) -> None:
+        """Send a struct event to Snowplow.
 
         Args:
             category: GA event category.
             action: GA event action.
             debug: If True, send the event to the debug endpoint.
         """
-        if self.project.active_environment is not None:
-            environment = self.project.active_environment
-            hashed_name = hash_sha256(environment.name)
-            action = f"{action} --environment={hashed_name}"
+        self.tracker.track_struct_event(category, action)
 
-        event = self.event(category, action)
-        self.track_data(event, debug)
-
-        # Snowplow
-        # self.track_snowplow_struct_event(category=category, action=action)
-        self.track_snowplow_self_describing_event(
-            event=SelfDescribingJson(
-                "TODO",
-            ),
-        )
-
-    def track_snowplow_struct_event(self, category: str, action: str) -> None:
-        """Send a struct event to Snowplow.
-
-        Args:
-            category: The category of the event.
-            action: The action of the event.
-        """
-        if self.send_anonymous_usage_stats is False or self.snowplow_tracker is None:
-            # Only send anonymous usage stats if you have explicit permission
-            return
-
-        self.snowplow_tracker.track_struct_event(
-            category=category,
-            action=action,
-            label=self.project_id,
-        )
-
-    def track_snowplow_self_describing_event(
-        self,
-        event: SelfDescribingJson,
-        context: list[SelfDescribingJson] | None = None,
-    ) -> None:
-        """Send a self-describing event to Snowplow.
-
-        Args:
-            category: The category of the event.
-            action: The action of the event.
-        """
-        if self.send_anonymous_usage_stats is False or self.snowplow_tracker is None:
-            # Only send anonymous usage stats if you have explicit permission
-            return
-
-        context = [] if context is None else context
-
-        self.snowplow_tracker.track_self_describing_event(
-            event_json=event,
-            context=[*context, self.snowplow_tracker.meltano_context],
-        )
 
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
         """Track the initialization of a Meltano project.

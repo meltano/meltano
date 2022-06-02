@@ -11,7 +11,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 
 
 @pytest.fixture(scope="class")
@@ -29,7 +29,7 @@ class TestCliInvoke:
         process_mock.wait = CoroutineMock(return_value=0)
 
         with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
+            LegacyTracker, "track_data", return_value=None
         ), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
@@ -45,7 +45,7 @@ class TestCliInvoke:
     @pytest.fixture
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
         with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
+            LegacyTracker, "track_data", return_value=None
         ), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
@@ -165,7 +165,7 @@ class TestCliInvoke:
         process_mock.wait = CoroutineMock(return_value=2)
 
         with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
+            LegacyTracker, "track_data", return_value=None
         ), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
@@ -186,7 +186,7 @@ class TestCliInvoke:
         tap: ProjectPlugin,
     ):
         with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
+            LegacyTracker, "track_data", return_value=None
         ), patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
@@ -228,7 +228,7 @@ class TestCliInvoke:
         settings_service = plugin_settings_service_factory(tap)
 
         with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
+            LegacyTracker, "track_data", return_value=None
         ), patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,

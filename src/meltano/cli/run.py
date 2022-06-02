@@ -11,7 +11,7 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli
@@ -96,7 +96,7 @@ async def run(
         raise CliError("Some ExtractLoadBlocks set failed validation.")
     await _run_blocks(parsed_blocks, dry_run=dry_run)
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_run(blocks)
 
 

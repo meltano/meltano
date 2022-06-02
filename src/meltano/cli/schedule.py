@@ -14,7 +14,7 @@ from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.task_sets import TaskSets
 from meltano.core.task_sets_service import TaskSetsService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import coerce_datetime
 
 from . import cli
@@ -54,7 +54,7 @@ def _add_elt(
         added_schedule = schedule_service.add_elt(
             session, name, extractor, loader, transform, interval, start_date
         )
-        tracker = GoogleAnalyticsTracker(schedule_service.project)
+        tracker = LegacyTracker(schedule_service.project)
         tracker.track_meltano_schedule("add", added_schedule)
         click.echo(
             f"Scheduled elt '{added_schedule.name}' at {added_schedule.interval}"
@@ -74,7 +74,7 @@ def _add_job(ctx, name: str, job: str, interval: str):
     session = session_maker()
     try:
         added_schedule = schedule_service.add(name, job, interval)
-        tracker = GoogleAnalyticsTracker(schedule_service.project)
+        tracker = LegacyTracker(schedule_service.project)
         tracker.track_meltano_schedule("add", added_schedule)
         click.echo(
             f"Scheduled job '{added_schedule.name}' at {added_schedule.interval}"
@@ -223,7 +223,7 @@ def list(ctx, format):  # noqa: WPS125
     finally:
         session.close()
 
-    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker = LegacyTracker(schedule_service.project)
     tracker.track_meltano_schedule("list")
 
 
@@ -241,7 +241,7 @@ def run(ctx, name, elt_options):
     this_schedule = schedule_service.find_schedule(name)
     process = schedule_service.run(this_schedule, *elt_options)
 
-    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker = LegacyTracker(schedule_service.project)
     tracker.track_meltano_schedule("run", this_schedule)
 
     exitcode = process.returncode
@@ -261,7 +261,7 @@ def remove(ctx, name):
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     removed_schedule = schedule_service.find_schedule(name)
     schedule_service.remove(name)
-    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker = LegacyTracker(schedule_service.project)
     tracker.track_meltano_schedule("remove", removed_schedule)
 
 
@@ -372,5 +372,5 @@ def set_cmd(ctx, name, interval, job, extractor, loader, transform):
     schedule_service.update_schedule(updated)
 
     click.echo(f"Updated schedule '{name}'")
-    tracker = GoogleAnalyticsTracker(schedule_service.project)
+    tracker = LegacyTracker(schedule_service.project)
     tracker.track_meltano_schedule("set", updated)

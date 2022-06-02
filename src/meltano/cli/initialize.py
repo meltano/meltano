@@ -6,7 +6,7 @@ import click
 from meltano.core.error import SubprocessError
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 
 from . import cli
 from .params import database_uri_option
@@ -49,7 +49,7 @@ def init(ctx, project_name, no_usage_stats):
     try:  # noqa: WPS229
         project = init_service.init()
         init_service.echo_instructions()
-        tracker = GoogleAnalyticsTracker(project)
+        tracker = LegacyTracker(project)
         tracker.track_meltano_init(project_name=project_name)
     except SubprocessError as err:
         logger.error(err.stderr)

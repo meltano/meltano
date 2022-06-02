@@ -19,7 +19,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -136,7 +136,7 @@ async def elt(
     finally:
         session.close()
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
 
 

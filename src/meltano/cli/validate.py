@@ -11,7 +11,7 @@ from sqlalchemy.orm.session import sessionmaker
 from meltano.cli.utils import propagate_stop_signals
 from meltano.core.db import project_engine
 from meltano.core.project import Project
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
@@ -101,7 +101,7 @@ def test(
 
     exit_codes = run_async(_run_plugin_tests(session, collected.values()))
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_test(
         plugin_tests=plugin_tests,
         all_tests=all_tests,

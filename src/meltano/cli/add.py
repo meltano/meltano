@@ -8,7 +8,7 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 
 from . import cli
 from .params import pass_project
@@ -88,7 +88,7 @@ def add(
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins = []
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     with settings_service.feature_flag(
         FeatureFlags.LOCKFILES,
         raise_error=False,

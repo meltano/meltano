@@ -8,7 +8,7 @@ from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.select_service import SelectService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -88,7 +88,7 @@ async def select(
                 remove=flags["remove"],
             )
 
-        tracker = GoogleAnalyticsTracker(project)
+        tracker = LegacyTracker(project)
         tracker.track_meltano_select(
             extractor=extractor,
             entities_filter=entities_filter,

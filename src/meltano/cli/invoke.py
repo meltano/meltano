@@ -17,7 +17,7 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import run_async
 
 from . import cli
@@ -140,7 +140,7 @@ async def _invoke(
     finally:
         session.close()
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_invoke(
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )
