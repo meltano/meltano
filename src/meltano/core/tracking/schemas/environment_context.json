@@ -1,0 +1,218 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow context describing the environment in which Meltano is operating",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "environment_context",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "context_uuid": {
+            "description": "A UUID that uniquely identifies an instance of this context",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "project_uuid": {
+            "description": "A UUID that uniquely identifies the Meltano project",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "project_uuid_source": {
+            "description": "How the 'project_id' was obtained/derived - either explicitly set, derived by hashing a non-UUID project ID, or randomly generated",
+            "type": "string",
+            "enum": [
+                "explicit",
+                "derived",
+                "random"
+            ]
+        },
+        "client_uuid": {
+            "description": "A UUID that uniquely identifies the client",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "meltano_version": {
+            "description": "The version of Meltano in use",
+            "type": "string",
+            "maxLength": 256
+        },
+        "python_version": {
+            "description": "The version of Python in use",
+            "type": "string",
+            "maxLength": 256
+        },
+        "environment_name": {
+            "description": "The name of the active environment for the Meltano project",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "system_name": {
+            "description": "The system/OS name, e.g. 'Linux', 'Darwin', 'Java', 'Windows', etc.",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "system_release": {
+            "description": "The system's release, e.g. '2.2.0', 'NT', etc.",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "system_version": {
+            "description": "The system's release version, e.g. '#124-Ubuntu SMP Thu Apr 14 19:46:19 UTC 2022'",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "machine": {
+            "description": "The machine type, e.g. 'x86_64', 'i386', 'arm64', etc.",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "node": {
+            "description": "The (potentially not fully-qualified) network name of the computer",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "windows_edition": {
+            "description": "The Windows edition, e.g. 'Enterprise', 'IoTUAP', 'ServerStandard', 'nanoserver', etc.",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "freedesktop_id": {
+            "description": "The 'ID' field of the Freedesktop os-release standard, e.g. 'linuxmint'",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "freedesktop_id_like": {
+            "description": "The 'ID_LIKE' field of the Freedesktop os-release standard, e.g. 'ubuntu'",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "freedesktop_version_id": {
+            "description": "The 'VERSION_ID' field of the Freedesktop os-release standard, e.g. '20.3'",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "num_cpu_cores": {
+            "description": "The total number of logical CPU cores",
+            "type": "integer",
+            "multipleOf": 1,
+            "minimum": 1,
+            "maximum": 65535
+        },
+        "num_cpu_cores_available": {
+            "description": "The number of logical CPU cores available to the process",
+            "type": "integer",
+            "multipleOf": 1,
+            "minimum": 1,
+            "maximum": 65535
+        },
+        "process_executable_path": {
+            "description": "The path to the executable used to create the process",
+            "type": "string",
+            "maxLength": 4096
+        },
+        "process_arguments": {
+            "description": "The command line arguments used to create the process",
+            "type": "array",
+            "items": {
+                "description": "",
+                "type": "string",
+                "maxLength": 4096
+            }
+        },
+        "process_hierarchy": {
+            "description": "An array of objects detailing each process in the hierarchy from the current one to the init process",
+            "type": "array",
+            "items": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "process_id": {
+                        "description": "The PID of the process",
+                        "type": "integer",
+                        "multipleOf": 1,
+                        "minimum": 0,
+                        "maximum": 4294967295
+                    },
+                    "process_name": {
+                        "description": "The name of the process",
+                        "type": "string",
+                        "maxLength": 1024
+                    },
+                    "process_creation_timestamp": {
+                        "description": "The date and time the process was created in the ISO 8601 format",
+                        "type": "string",
+                        "pattern": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d{1,9})?(?:Z|[+-][01]\\d:[0-5]\\d)$",
+                        "maxLength": 64
+                    }
+                },
+                "required": [
+                    "process_id",
+                    "process_name",
+                    "process_creation_timestamp"
+                ]
+            }
+        }
+    },
+    "required": [
+        "context_uuid",
+        "project_uuid",
+        "project_uuid_source",
+        "client_uuid",
+        "meltano_version",
+        "python_version",
+        "environment_name",
+        "system_name",
+        "system_release",
+        "system_version",
+        "machine",
+        "node",
+        "windows_edition",
+        "freedesktop_id",
+        "freedesktop_id_like",
+        "freedesktop_version_id",
+        "num_cpu_cores",
+        "num_cpu_cores_available",
+        "process_executable_path",
+        "process_arguments",
+        "process_hierarchy"
+    ],
+    "additionalProperties": false
+}

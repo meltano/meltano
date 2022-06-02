@@ -1,0 +1,73 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow event describing a Meltano command",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "command_event",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "event_uuid": {
+            "description": "A UUID that uniquely identifies an instance of this event",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "event": {
+            "description": "",
+            "type": "string",
+            "enum": [
+                "started",
+                "completed",
+                "failed",
+                "aborted"
+            ]
+        },
+        "command": {
+            "description": "",
+            "type": "string",
+            "maxLength": 1024
+        },
+        "command_category": {
+            "description": "",
+            "type": "string",
+            "maxLength": 256
+        },
+        "action": {
+            "description": "",
+            "type": "string",
+            "maxLength": 256
+        },
+        "option_keys": {
+            "description": "",
+            "type": "array",
+            "items": {
+                "description": "",
+                "type": "string",
+                "maxLength": 256
+            }
+        },
+        "type": {
+            "description": "",
+            "type": "string",
+            "enum": [
+                "plugin",
+                "native",
+                "config"
+            ]
+        }
+    },
+    "required": [
+        "event_uuid",
+        "event",
+        "command",
+        "command_category",
+        "action",
+        "option_keys",
+        "type"
+    ],
+    "additionalProperties": false
+}

@@ -1,0 +1,116 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow context describing the plugins being used by Meltano",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "plugins_context",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "context_uuid": {
+            "description": "A UUID that uniquely identifies an instance of this context",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "plugins": {
+            "description": "An array containing information about each plugin in order",
+            "type": "array",
+            "items": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "description": "",
+                        "type": "string",
+                        "enum": [
+                            "extractor",
+                            "loader",
+                            "trasformer"
+                        ]
+                    },
+                    "type": {
+                        "description": "",
+                        "type": "string",
+                        "maxLength": 256
+                    },
+                    "name_hash": {
+                        "description": "",
+                        "type": "string",
+                        "pattern": "^[a-fA-F0-9]{64}$",
+                        "maxLength": 64,
+                        "minLength": 64
+                    },
+                    "parent_name_hash": {
+                        "description": "",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^[a-fA-F0-9]{64}$",
+                        "maxLength": 64,
+                        "minLength": 64
+                    },
+                    "command": {
+                        "description": "",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1024
+                    },
+                    "variant_name_hash": {
+                        "description": "",
+                        "type": "string",
+                        "pattern": "^[a-fA-F0-9]{64}$",
+                        "maxLength": 64,
+                        "minLength": 64
+                    },
+                    "pip_url_hash": {
+                        "description": "",
+                        "type": "string",
+                        "pattern": "^[a-fA-F0-9]{64}$",
+                        "maxLength": 64,
+                        "minLength": 64
+                    },
+                    "version": {
+                        "description": "",
+                        "type": "string",
+                        "maxLength": 256
+                    },
+                    "plugin_definition_hash": {
+                        "description": "",
+                        "type": "string",
+                        "pattern": "^[a-fA-F0-9]{64}$",
+                        "maxLength": 64,
+                        "minLength": 64
+                    },
+                    "containerized": {
+                        "description": "",
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "category",
+                    "type",
+                    "name_hash",
+                    "parent_name_hash",
+                    "command",
+                    "variant_name_hash",
+                    "pip_url_hash",
+                    "version",
+                    "plugin_definition_hash",
+                    "containerized"
+                ]
+            }
+        }
+    },
+    "required": [
+        "context_uuid",
+        "plugins"
+    ],
+    "additionalProperties": false
+}
