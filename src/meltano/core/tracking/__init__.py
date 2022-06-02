@@ -89,16 +89,6 @@ class MeltanoTracker:
 
         self.contexts = (EnvironmentContext(self),)
 
-    @contextmanager
-    def with_contexts(self, *extra_contexts) -> MeltanoTracker:
-        """Context manager within which the `MeltanoTracker` has additional Snowplow contexts."""
-        prev_contexts = self.contexts
-        self.contexts = (*prev_contexts, *extra_contexts)
-        try:
-            yield self
-        finally:
-            self.contexts = prev_contexts
-
     @cached_property
     def timezone_name(self) -> str:
         """The local timezone as an IANA TZ db name if possible, or abbreviation otherwise.
@@ -118,6 +108,16 @@ class MeltanoTracker:
             return tzlocal.get_localzone_name()
         except Exception:
             return datetime.datetime.now().astimezone().tzname()
+
+    @contextmanager
+    def with_contexts(self, *extra_contexts) -> MeltanoTracker:
+        """Context manager within which the `MeltanoTracker` has additional Snowplow contexts."""
+        prev_contexts = self.contexts
+        self.contexts = (*prev_contexts, *extra_contexts)
+        try:
+            yield self
+        finally:
+            self.contexts = prev_contexts
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
         super().track_unstruct_event(event_json, self.contexts)
