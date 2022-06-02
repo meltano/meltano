@@ -131,7 +131,7 @@ Within a [Meltano environment](/concepts/environments) environment variables can
 environments:
   - name: dev
 	env:
-	  AN_ENVIRONMENT_VARIABLE: dev
+      AN_ENVIRONMENT_VARIABLE: dev
 ```
 Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
 
