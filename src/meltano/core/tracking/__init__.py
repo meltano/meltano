@@ -135,6 +135,7 @@ class MeltanoTracker:
     def can_track(self) -> bool:
         return self.snowplow_tracker is not None and self.send_anonymous_usage_stats
 
+    # TODO: Remove `MeltanoTracker.track_struct_event` once the legacy tracker has been removed.
     def track_struct_event(self, category: str, action: str) -> None:
         if not self.can_track():
             return
