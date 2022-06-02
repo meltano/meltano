@@ -1,4 +1,4 @@
-![](https://lh6.googleusercontent.com/ZTyjEphqTxYMMfU52V6gA21HP1kHhLGFUPaO_eU7eQKfZwbqq2xsao86vlRJ_YPeTT7oJ4QOM7usLJ1q0fVYt8eDSMnqCaQpYjsS7cam5lgdQL-QQ4FxjGDSCKkp_B5LCl0cwEfOf0RjAldHYQ)
+![](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
 =========================================================================================================================================================================================
 
 Meltano
