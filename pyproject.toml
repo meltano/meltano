@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "meltano"
 version = "1.105.0"
-description = "Meltano"
-authors = ["Meltano Team and Contributors <meltano@gitlab.com>"]
+description = "Meltano: The DataOps OS"
+authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://gitlab.com/meltano/meltano"
+repository = "https://github.com/meltano/meltano"
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",

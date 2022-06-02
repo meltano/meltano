@@ -54,8 +54,6 @@ class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
     TRANSFORMS = "transforms"
-    MODELS = "models"
-    DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
     FILES = "files"
@@ -425,6 +423,7 @@ class PluginDefinition(PluginRef):
             plugin.namespace,
             variant=plugin.variant,
             # Extras
+            label=plugin.label,
             docs=plugin.docs,
             repo=plugin.repo,
             pip_url=plugin.pip_url,
@@ -681,6 +680,7 @@ class StandalonePlugin(Canonical):
         name: str,
         namespace: str,
         variant: str = None,
+        label: str = None,
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
@@ -698,6 +698,7 @@ class StandalonePlugin(Canonical):
             name: The name of the plugin.
             namespace: The namespace of the plugin.
             variant: The variant of the plugin.
+            label: The label of the plugin.
             docs: The documentation URL of the plugin.
             repo: The repository URL of the plugin.
             pip_url: The pip URL of the plugin.
@@ -713,6 +714,7 @@ class StandalonePlugin(Canonical):
             name=name,
             namespace=namespace,
             variant=variant,
+            label=label,
             docs=docs,
             repo=repo,
             pip_url=pip_url,
@@ -731,6 +733,7 @@ class StandalonePlugin(Canonical):
         name: str,
         namespace: str,
         plugin_type: PluginType,
+        label: str = None,
     ):
         """Create a locked plugin from a variant.
 
@@ -739,6 +742,7 @@ class StandalonePlugin(Canonical):
             name: The name of the plugin.
             namespace: The namespace of the plugin.
             plugin_type: The plugin type.
+            label: The label of the plugin.
 
         Returns:
             A locked plugin definition.
@@ -748,6 +752,7 @@ class StandalonePlugin(Canonical):
             name=name,
             namespace=namespace,
             variant=variant.name,
+            label=label,
             docs=variant.docs,
             repo=variant.repo,
             pip_url=variant.pip_url,

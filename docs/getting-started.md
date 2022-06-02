@@ -10,8 +10,7 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 
 <div class="notification is-warning">
     <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
-    <p>To get a sense of the Meltano experience in just a few minutes, follow the <a href="https://meltano.com">examples on the homepage</a> or watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a></p>
-    <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
+    <p>To get a sense of the Meltano experience in just a few minutes, watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a> that takes you through <a href="/guide/integration">data integration (EL)</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres loader</a>.</p>
 </div>
 
 ## Install Meltano
@@ -835,10 +834,10 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
 1. Schedule a new [`meltano elt`](/reference/command-line-interface#elt) pipeline to be invoked on an interval using [`meltano schedule`](/reference/command-line-interface#schedule):
 
 ```bash
-meltano schedule <pipeline name> <extractor> <loader> <interval>
+meltano schedule add <pipeline name> --extractor <extractor> --loader <loader> --interval <interval>
 
 # For example:
-meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
+meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-postgres --interval @daily
 ```
 
 The `pipeline name` argument corresponds to the `--job_id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).

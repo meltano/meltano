@@ -2,26 +2,27 @@
 
 import click
 
+from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
 
 
-@cli.command(short_help="List the available discoverable plugins and their variants.")
+@cli.command(short_help="List the available plugins in Meltano Hub and their variants.")
 @click.argument(
     "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )
 @pass_project()
-def discover(project, plugin_type):
+def discover(project: Project, plugin_type: str):
     """
     List the available discoverable plugins and their variants.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#discover
     """
-    discover_service = PluginDiscoveryService(project)
+    hub_service = MeltanoHubService(project)
     if plugin_type == "all":
         plugin_types = list(PluginType)
     else:
@@ -33,11 +34,21 @@ def discover(project, plugin_type):
 
         click.secho(f"{str(discovered_plugin_type).capitalize()}", fg="green")
 
-        for plugin_def in discover_service.get_plugins_of_type(discovered_plugin_type):
-            click.echo(plugin_def.name, nl=False)
+        try:
+            plugin_type_index = hub_service.get_plugins_of_type(discovered_plugin_type)
+        except Exception:
+            click.secho(
+                f"Can not retrieve {discovered_plugin_type} from the Hub",
+                fg="yellow",
+                err=True,
+            )
+            continue
 
-            if len(plugin_def.variants) > 1:
-                click.echo(f", variants: {plugin_def.variant_labels}")
+        for plugin_name, plugin in plugin_type_index.items():
+            click.echo(plugin_name, nl=False)
+
+            if len(plugin.variants) > 1:
+                click.echo(f", variants: {', '.join(plugin.variant_labels)}")
             else:
                 click.echo()
 
