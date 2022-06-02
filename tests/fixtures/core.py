@@ -79,6 +79,12 @@ def discovery():  # noqa: WPS213
                         },
                         {"name": "auth.username"},
                         {"name": "auth.password", "kind": "password"},
+                        {
+                            "name": "aliased",
+                            "kind": "string",
+                            "aliases": ["aliased_1", "aliased_2", "aliased_3"],
+                            "env_aliases": ["TAP_MOCK_ALIASED_ALIASED_1"],
+                        },
                     ],
                     "commands": {
                         "cmd": {
@@ -130,7 +136,12 @@ def discovery():  # noqa: WPS213
             "name": "target-mock",
             "namespace": "mock",
             "pip_url": "target-mock",
-            "settings": [{"name": "schema", "env": "MOCKED_SCHEMA"}],
+            "settings": [
+                {
+                    "name": "schema",
+                    "env": "MOCKED_SCHEMA",
+                }
+            ],
         }
     )
 
