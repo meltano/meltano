@@ -600,6 +600,7 @@ Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from 
 - [`meltano.yml` project file](/concepts/project)
 - Installation found in the [`.meltano` directory](/concepts/project#meltano-directory) under `.meltano/<plugin_type>/<plugin_name>`
 - `plugin_settings` table in the [system database](/concepts/project#system-database)
+- `./plugins/<plugin type>/` lock file directory
 
 ### How to Use
 
