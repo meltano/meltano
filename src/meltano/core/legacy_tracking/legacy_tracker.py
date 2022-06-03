@@ -11,10 +11,9 @@ from typing import Any
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
+from meltano.core.tracking import Tracker
 from meltano.core.tracking.project import ProjectContext
 from meltano.core.utils import hash_sha256
-
-from . import Tracker
 
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
@@ -51,7 +50,7 @@ class LegacyTracker:
             project,
             request_timeout=self.request_timeout,
         )
-        
+
         project_context = ProjectContext(project)
         self.project_id = project_context.project_uuid
         self.client_id = project_context.client_uuid
@@ -87,7 +86,6 @@ class LegacyTracker:
             debug: If True, send the event to the debug endpoint.
         """
         self.tracker.track_struct_event(category, action)
-
 
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
         """Track the initialization of a Meltano project.

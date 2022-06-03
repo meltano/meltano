@@ -5,6 +5,7 @@ import click
 import structlog
 
 from meltano.core.block.parser import BlockParser, validate_block_sets
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
@@ -12,7 +13,6 @@ from meltano.core.task_sets_service import (
     JobNotFoundError,
     TaskSetsService,
 )
-from meltano.core.tracking import LegacyTracker
 
 from . import CliError, cli
 from .params import pass_project

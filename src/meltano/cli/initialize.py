@@ -4,9 +4,9 @@ import logging
 import click
 
 from meltano.core.error import SubprocessError
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import LegacyTracker
 
 from . import cli
 from .params import database_uri_option

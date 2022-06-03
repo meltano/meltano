@@ -13,9 +13,9 @@ from meltano.cli.params import pass_project
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
-from meltano.core.tracking import LegacyTracker
 
 from . import cli
 

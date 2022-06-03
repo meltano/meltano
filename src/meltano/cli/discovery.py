@@ -3,9 +3,9 @@
 import click
 
 from meltano.core.hub import MeltanoHubService
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
-from meltano.core.tracking import LegacyTracker
 
 from . import cli
 from .params import pass_project

@@ -9,6 +9,7 @@ from asynctest import CoroutineMock, mock
 from asserts import assert_cli_runner
 from meltano.cli import CliError, cli
 from meltano.core.job import Job, State
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -16,7 +17,6 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import LegacyTracker
 
 
 class LogEntry:

@@ -114,11 +114,6 @@ class EnvironmentContext(SelfDescribingJson):
                 GetCurrentProcess(), ctypes.byref(mask), ctypes.byref(DWORD_PTR())
             ):
                 return bin(mask.value).count("1")
-            logger.debug("Call to 'GetProcessAffinityMask' failed")
-        logger.debug(
-            "Unable to determine the number of available CPU cores; "
-            "falling back to the total number of CPU cores"
-        )
         return os.cpu_count()
 
 

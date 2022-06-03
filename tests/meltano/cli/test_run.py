@@ -8,12 +8,12 @@ from asynctest import CoroutineMock, mock
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.tracking import LegacyTracker
 
 
 class MockIOBlock(IOBlock):

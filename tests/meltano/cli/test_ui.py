@@ -4,11 +4,11 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
-from meltano.core.tracking import LegacyTracker
 
 
 class TestCliUi:

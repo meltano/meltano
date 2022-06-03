@@ -7,11 +7,11 @@ import structlog
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli

@@ -10,11 +10,11 @@ from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.task_sets import TaskSets
 from meltano.core.task_sets_service import TaskSetsService
-from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import coerce_datetime
 
 from . import cli

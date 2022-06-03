@@ -9,11 +9,11 @@ import click
 from click_default_group import DefaultGroup
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
-from meltano.core.tracking import LegacyTracker
 
 from . import cli
 from .params import pass_project

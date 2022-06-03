@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import (
     PluginInvoker,
@@ -18,7 +19,6 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import LegacyTracker
 from meltano.core.utils import run_async
 
 from . import cli
