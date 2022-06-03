@@ -29,12 +29,29 @@ body {
   padding: 0.1rem 0.75rem 0.5rem;
 }
 
-.navbar-burger {
-  height: auto;
+.navbar a {
+  color: #485fc7;
 }
 
-.navbar a {
-  color: #ffffff;
+.navbar-burger{
+  height: auto;
+  color: #fff !important;
+}
+
+.navbar-end {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 1023px) {
+  .navbar a {
+    color: #ffffff;
+  }
+
+  .navbar-end {
+    justify-content: flex-end;
+    margin-left: auto;
+  }
 }
 
 .navbar-item img {
