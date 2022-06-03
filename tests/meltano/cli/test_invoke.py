@@ -28,7 +28,7 @@ class TestCliInvoke:
         process_mock.name = "utility-mock"
         process_mock.wait = CoroutineMock(return_value=0)
 
-        with patch.object(LegacyTracker, "track_data", return_value=None), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -42,7 +42,7 @@ class TestCliInvoke:
 
     @pytest.fixture
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
-        with patch.object(LegacyTracker, "track_data", return_value=None), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -160,7 +160,7 @@ class TestCliInvoke:
         process_mock.name = "utility-mock"
         process_mock.wait = CoroutineMock(return_value=2)
 
-        with patch.object(LegacyTracker, "track_data", return_value=None), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -179,7 +179,7 @@ class TestCliInvoke:
         project_plugins_service: ProjectPluginsService,
         tap: ProjectPlugin,
     ):
-        with patch.object(LegacyTracker, "track_data", return_value=None), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
         ), patch.object(
@@ -219,7 +219,7 @@ class TestCliInvoke:
     ):
         settings_service = plugin_settings_service_factory(tap)
 
-        with patch.object(LegacyTracker, "track_data", return_value=None), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
         ), patch.object(SingerTap, "discover_catalog"), patch.object(

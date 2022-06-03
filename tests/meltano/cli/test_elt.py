@@ -221,7 +221,7 @@ def dbt_process(process_mock_factory, dbt):
 
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -312,7 +312,7 @@ class TestCliEltScratchpadOne:
             assert "Exception: This is a grave danger." in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -426,7 +426,7 @@ class TestCliEltScratchpadOne:
             assert "tap-mock (out)" in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -493,7 +493,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -578,7 +578,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -645,7 +645,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -721,7 +721,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -796,7 +796,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -1014,7 +1014,7 @@ class TestCliEltScratchpadOne:
 
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -1083,7 +1083,7 @@ class TestCliEltScratchpadTwo:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -1173,7 +1173,7 @@ class TestCliEltScratchpadTwo:
 
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -1212,7 +1212,7 @@ class TestCliEltScratchpadThree:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
