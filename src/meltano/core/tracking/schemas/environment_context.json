@@ -120,11 +120,6 @@
             "minimum": 1,
             "maximum": 65535
         },
-        "process_executable_path": {
-            "description": "The path to the executable used to create the process",
-            "type": "string",
-            "maxLength": 4096
-        },
         "process_hierarchy": {
             "description": "An array of objects detailing each process in the hierarchy from the current one to the init process",
             "type": "array",
@@ -132,17 +127,12 @@
                 "description": "",
                 "type": "object",
                 "properties": {
-                    "process_id": {
-                        "description": "The PID of the process",
-                        "type": "integer",
-                        "multipleOf": 1,
-                        "minimum": 0,
-                        "maximum": 4294967295
-                    },
-                    "process_name": {
-                        "description": "The name of the process",
+                    "process_name_hash": {
+                        "description": "The hashed name of the process",
                         "type": "string",
-                        "maxLength": 1024
+                        "pattern": "^[a-fA-F0-9]{64}$",
+                        "maxLength": 64,
+                        "minLength": 64
                     },
                     "process_creation_timestamp": {
                         "description": "The date and time the process was created in the ISO 8601 format",
@@ -152,8 +142,7 @@
                     }
                 },
                 "required": [
-                    "process_id",
-                    "process_name",
+                    "process_name_hash",
                     "process_creation_timestamp"
                 ],
                 "additionalProperties": false
@@ -177,7 +166,6 @@
         "freedesktop_version_id",
         "num_cpu_cores",
         "num_cpu_cores_available",
-        "process_executable_path",
         "process_hierarchy"
     ],
     "additionalProperties": false

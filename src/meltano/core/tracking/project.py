@@ -5,9 +5,8 @@ from __future__ import annotations
 import json
 import uuid
 from enum import Enum, auto
-from functools import cached_property
-from typing import Any
 
+from cached_property import cached_property
 from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 

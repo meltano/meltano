@@ -14,11 +14,12 @@ from platform import system
 from typing import Any
 
 import psutil
-from backports.cached_property import cached_property
+from cached_property import cached_property
 from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 import meltano
+from meltano.core.utils import hash_sha256
 
 logger = get_logger(__name__)
 
@@ -31,19 +32,21 @@ class EnvironmentContext(SelfDescribingJson):
         logger.debug(
             f"Initializing '{type(self).__module__}.{type(self).__qualname__}'"
         )
-        ci_markers = ('GITHUB_ACTIONS', 'CI')
+        ci_markers = ("GITHUB_ACTIONS", "CI")
         super().__init__(
             "iglu:com.meltano/environment_context/jsonschema/1-0-0",
             {
                 "context_uuid": uuid.uuid4(),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
-                "is_ci_environment": any(os.environ.get(x, '') == 'true' for x in ci_markers),
+                "is_ci_environment": any(
+                    os.environ.get(x, "").lower()[:1] in "1t" for x in ci_markers
+                ),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
-            }
-            | self.system_info
-            | self.process_info,
+                **self.system_info,
+                **self.process_info,
+            },
         )
 
     @cached_property
@@ -82,8 +85,7 @@ class EnvironmentContext(SelfDescribingJson):
                 "process_executable_path": process.exe() or None,
                 "processe_hierarchy": [
                     {
-                        "process_id": x.pid,
-                        "process_name": x.name(),
+                        "process_name_hash": hash_sha256(x.name()),
                         "process_creation_timestamp": self.get_process_timestamp(x),
                     }
                     for x in (process, *process.parents())

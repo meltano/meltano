@@ -11,7 +11,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 import tzlocal
-from backports.cached_property import cached_property
+from cached_property import cached_property
 from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 from structlog.stdlib import get_logger

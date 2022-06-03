@@ -21,10 +21,14 @@
             "type": "string",
             "maxLength": 1024
         },
-        "command_category": {
+        "category": {
             "description": "",
             "type": "string",
-            "maxLength": 256
+            "enum": [
+                "run",
+                "invoke",
+                "elt"
+            ]
         },
         "action": {
             "description": "",
