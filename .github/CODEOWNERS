@@ -10,8 +10,8 @@
 /src/meltano/core/bundle/discovery.yml @aaronsteers
 
 # Web App and API owners
-/src/webapp/ @alex1126 @pandemicsyn
-/src/meltano/api/ @pandemicsyn @alex1126
+/src/webapp/ @alexmarple @pandemicsyn
+/src/meltano/api/ @pandemicsyn @alexmarple
 
 # Docs (General)
 /docs/ @afolson @tayloramurphy @meltano/engineering @meltano/marketing
