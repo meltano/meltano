@@ -57,7 +57,7 @@
     "required": [
         "event_uuid",
         "command",
-        "command_category",
+        "category",
         "action",
         "option_keys",
         "type"

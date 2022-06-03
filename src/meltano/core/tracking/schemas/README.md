@@ -1,4 +1,18 @@
-When a JSON file in this directory is updated, it must also be updated in our schema registry,
+To validate/lint a schema use `iguctl` rather than the Snowcat Cloud UI e.g.:
+
+```bash
+ $ $PATH_TO/igluctl lint .
+OK: com.meltano/command_context/jsonschema/1-0-0
+OK: com.meltano/environment_context/jsonschema/1-0-0
+OK: com.meltano/plugins_context/jsonschema/1-0-0
+OK: com.meltano/project_context/jsonschema/1-0-0
+TOTAL: 4 valid schemas
+TOTAL: 0 schemas didn't pass validation
+```
+
+See https://www.iglooanalytics.com/blog/understanding-snowplow-analytics-custom-contexts.html for more information.
+
+When a new version of the schema is introduced , it must also be updated in our schema registry,
 SnowcatCloud.
 
 Login to https://app.snowcatcloud.com/ using your Meltano email address. Request permissions from

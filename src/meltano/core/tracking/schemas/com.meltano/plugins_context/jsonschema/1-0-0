@@ -29,19 +29,21 @@
                         "enum": [
                             "extractor",
                             "loader",
-                            "trasformer"
+                            "transformer"
                         ]
                     },
                     "name_hash": {
                         "description": "64 character hash of the plugin name",
-                        "type": "string"
+                        "type": "string",
+                        "maxLength": 64
                     },
                     "parent_name_hash": {
                         "description": "64 character hash of the parent plugin name",
                         "type": [
                             "string",
                             "null"
-                        ]
+                        ],
+                        "maxLength": 64
                     },
                     "command": {
                         "description": "",
@@ -56,21 +58,24 @@
                         "type": [
                             "string",
                             "null"
-                        ]
+                        ],
+                        "maxLength": 64
                     },
                     "pip_url_hash": {
                         "description": "64 character hash of the pip url",
                         "type": [
                             "string",
                             "null"
-                        ]
+                        ],
+                        "maxLength": 64
                     },
                     "plugin_lock_hash": {
                         "description": "hash of the plugin lock file",
                         "type": [
                             "string",
                             "null"
-                        ]
+                        ],
+                        "maxLength": 64
                     }
                 },
                 "required": [
