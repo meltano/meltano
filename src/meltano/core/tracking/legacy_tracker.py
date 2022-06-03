@@ -14,7 +14,7 @@ from meltano.core.schedule import Schedule
 from meltano.core.tracking.project import ProjectContext
 from meltano.core.utils import hash_sha256
 
-from . import MeltanoTracker
+from . import Tracker
 
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
@@ -47,7 +47,7 @@ class LegacyTracker:
             "send_anonymous_usage_stats", True
         )
 
-        self.tracker = MeltanoTracker(
+        self.tracker = Tracker(
             project,
             request_timeout=self.request_timeout,
         )
