@@ -20,7 +20,7 @@ jobs:
     name: Pytest on py${{ matrix.python-version }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     env:
-      PYTEST_MARKERS: concurrent
+      PYTEST_MARKERS: not concurrent
 
     steps:
     - name: Check out the repository
