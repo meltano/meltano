@@ -1,9 +1,24 @@
 """Add plugins to the project."""
 
+import enum
+
 from .plugin import BasePlugin, PluginType, Variant
 from .plugin.project_plugin import ProjectPlugin
 from .project import Project
 from .project_plugins_service import PluginAlreadyAddedException, ProjectPluginsService
+
+
+class PluginAddedReason(str, enum.Enum):
+    """The reason why a plugin was added to the project."""
+
+    #: The plugin was added by the user.
+    USER_REQUEST = "user_request"
+
+    #: The plugin was added because it is related to another plugin.
+    RELATED = "related"
+
+    #: The plugin was added because it is required by another plugin.
+    REQUIRED = "required"
 
 
 class MissingPluginException(Exception):
@@ -113,3 +128,27 @@ class ProjectAddService:
             )
 
         return added_plugins_with_related
+
+    def add_required(self, plugin: ProjectPlugin):
+        """Add all required plugins to the project.
+
+        Args:
+            plugin: The plugin to get requirements from.
+
+        Returns:
+            The added plugins.
+        """
+        added_plugins = []
+        for plugin_ref in plugin.requirements:
+            try:
+                plugin = self.add(plugin_ref.type, plugin_ref.name)
+            except PluginAlreadyAddedException:
+                continue
+
+            added_plugins.append(plugin)
+
+        added_plugins_with_required = []
+        for added in added_plugins:
+            added_plugins_with_required.extend([added, *self.add_required(added)])
+
+        return added_plugins_with_required
