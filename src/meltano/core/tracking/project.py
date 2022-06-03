@@ -20,21 +20,25 @@ logger = get_logger(__name__)
 class ProjectUUIDSource(Enum):
     """The source of the `project_uuid` used for telemetry."""
 
+    # The UUID was explicitly provided in the config as the `project_id`.
     explicit = auto()
-    """The UUID was explicitly provided in the config as the `project_id`."""
 
+    # The UUID was derived by hashing the `project_id` in the config.
     derived = auto()
-    """The UUID was derived by hashing the `project_id` in the config."""
 
+    # The UUID was randomly generated (UUID v4) since no `project_id` was configured.
     random = auto()
-    """The UUID was randomly generated (UUID v4) since no `project_id` was configured."""
 
 
 class ProjectContext(SelfDescribingJson):
+    """Tracking context for the Meltano project."""
+
     def __init__(self, project: Project):
-        logger.debug(
-            f"Initializing '{type(self).__module__}.{type(self).__qualname__}' for {project!r}"
-        )
+        """Initialize a meltano tracking "project" context.
+
+        Args:
+            project: The Meltano project.
+        """
         self.project = project
         self.settings_service = SettingsService(project)
         super().__init__(
@@ -54,15 +58,24 @@ class ProjectContext(SelfDescribingJson):
 
     @property
     def project_uuid_source(self) -> ProjectUUIDSource:
-        self.project_uuid  # Ensure the `project_uuid` has been generated
+        """Obtain the source of the `project_uuid` used for telemetry.
+
+        Returns:
+            ProjectUUIDSource: The source of the `project_uuid` used for telemetry.
+        """
+        # Ensure the `project_uuid` has been generated
+        self.project_uuid  # noqa: WPS428
         return self._project_uuid_source
 
     @cached_property
     def project_uuid(self) -> uuid.UUID:
-        """The `project_id` from the project config file.
+        """Obtain the `project_id` from the project config file.
 
         If it is not found (e.g. first time run), generate a valid v4 UUID, and and store it in the
         project config file.
+
+        Returns:
+            The project UUID.
         """
         project_id_str = self.settings_service.get("project_id")
 
@@ -89,10 +102,13 @@ class ProjectContext(SelfDescribingJson):
 
     @cached_property
     def client_uuid(self) -> uuid.UUID:
-        """The `client_id` from the non-versioned `analytics.json`.
+        """Obtain the `client_id` from the non-versioned `analytics.json`.
 
         If it is not found (e.g. first time run), generate a valid v4 UUID, and store it in
         `analytics.json`.
+
+        Returns:
+            The client UUID.
         """
         analytics_json_path = self.project.meltano_dir() / "analytics.json"
         try:
@@ -105,8 +121,8 @@ class ProjectContext(SelfDescribingJson):
                 # If we are set to track Anonymous Usage stats, also store the generated
                 # `client_id` in a non-versioned `analytics.json` file so that it persists between
                 # meltano runs.
-                with open(analytics_json_path, "w") as analytics_json_file:
-                    json.dump({"client_id": str(client_id)}, analytics_json_file)
+                with open(analytics_json_path, "w") as new_analytics_json_file:
+                    json.dump({"client_id": str(client_id)}, new_analytics_json_file)
         else:
             client_id = uuid.UUID(analytics_json["client_id"], version=4)
 

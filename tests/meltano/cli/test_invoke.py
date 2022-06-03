@@ -1,7 +1,7 @@
 import asyncio
 import json
-
 from unittest import mock
+
 import pytest
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
