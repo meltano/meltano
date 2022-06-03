@@ -40,7 +40,7 @@
             "maxLength": 36
         },
         "environment_name": {
-            "description": "The name of the active environment for the Meltano project",
+            "description": "The hash of the active environment for the Meltano project",
             "type": [
                 "string",
                 "null"

@@ -41,6 +41,7 @@ class ProjectContext(SelfDescribingJson):
         """
         self.project = project
         self.settings_service = SettingsService(project)
+
         super().__init__(
             "iglu:com.meltano/project_context/jsonschema/1-0-0",
             {
@@ -49,7 +50,7 @@ class ProjectContext(SelfDescribingJson):
                 "project_uuid_source": self.project_uuid_source.name,
                 "client_uuid": self.client_uuid,
                 "environment_name": (
-                    self.project.active_environment.name
+                    hash_sha256(self.project.active_environment.name)
                     if self.project.active_environment
                     else None
                 ),
