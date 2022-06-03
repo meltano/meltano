@@ -12,6 +12,8 @@ jobs:
     name: Test on ${{ matrix.python-version }} (${{ matrix.tox-env }}${{ matrix.external && ', external' || '' }}) / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.external || false }}
+    env:
+      PYTEST_MARKERS: not concurrent
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +21,6 @@ jobs:
         - { tox-env: py, python-version: "3.7", os: "ubuntu-latest" }
         - { tox-env: py, python-version: "3.8", os: "ubuntu-latest" }
         - { tox-env: py, python-version: "3.9", os: "ubuntu-latest" }
-        - { tox-env: lint, python-version: "3.8", os: "ubuntu-latest" }
 
     steps:
     - name: Check out the repository
@@ -51,9 +52,9 @@ jobs:
         poetry env use "${{ matrix.python-version }}"
         poetry install
 
-    - name: Run tox
+    - name: Run pytest
       run: |
-        poetry run tox -e ${{ matrix.tox-env }} --${{ matrix.external && ' -m "external"' || '' }}${{ matrix.doctest && ' --doctest-modules singer_sdk' }}
+        poetry run pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
 
     - name: Upload coverage data
       if: always() && (matrix.tox-env == 'py')
