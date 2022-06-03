@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pytest
+
 from meltano.core.job import Job
 from meltano.core.job.stale_job_failer import StaleJobFailer
 
@@ -66,13 +67,13 @@ class TestStaleJobFailer:
         assert other_stale_job.has_error()
         assert not other_stale_job.is_stale()
 
-    def test_fail_stale_jobs_with_job_id(
+    def test_fail_stale_jobs_with_state_id(
         self, live_job, stale_job, other_stale_job, complete_job, session
     ):
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
 
-        failer = StaleJobFailer(job_id=stale_job.job_id)
+        failer = StaleJobFailer(state_id=stale_job.job_id)
         failer.fail_stale_jobs(session)
 
         session.refresh(live_job)
@@ -84,9 +85,9 @@ class TestStaleJobFailer:
         assert live_job.is_running()
         assert complete_job.is_complete()
 
-        # Marks stale jobs with the job ID as failed
+        # Marks stale jobs with the state ID as failed
         assert stale_job.has_error()
         assert not stale_job.is_stale()
 
-        # Leaves stale jobs with a different job ID alone
+        # Leaves stale jobs with a different state ID alone
         assert other_stale_job.is_stale()

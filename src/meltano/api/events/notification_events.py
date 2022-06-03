@@ -3,6 +3,7 @@ import logging
 from blinker import ANY
 from flask import render_template, url_for
 from flask_mail import Message
+
 from meltano.api.mail import MailService, mail
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.api.signals import PipelineSignals
@@ -72,7 +73,7 @@ class NotificationEvents:
         if success is None:
             raise ValueError("'success' must be set.")
 
-        job_id = schedule.name
+        state_id = schedule.name
         data_source = self.pipeline_data_source(schedule)
 
         status_subject_template = {
@@ -93,9 +94,11 @@ class NotificationEvents:
         subscriptions = Subscription.query.filter_by(
             event_type=SubscriptionEventType.PIPELINE_MANUAL_RUN,
             source_type="pipeline",
-            source_id=job_id,
+            source_id=state_id,
         ).all()
-        logger.debug(f"Found {len(subscriptions)} subscriptions for source '{job_id}'.")
+        logger.debug(
+            f"Found {len(subscriptions)} subscriptions for source '{state_id}'."
+        )
 
         messages = set()
         sent_recipients = set()

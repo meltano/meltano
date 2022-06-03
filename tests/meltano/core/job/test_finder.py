@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pytest
+
 from meltano.core.job.finder import JobFinder
 from meltano.core.job.job import (
     HEARTBEAT_VALID_MINUTES,
@@ -43,7 +44,7 @@ class TestJobFinder:
             )
 
         job = Job(
-            job_id="test_job_id",
+            job_id="test_state_id",
             state=state,
             started_at=started_at,
             last_heartbeat_at=last_heartbeat_at,
@@ -60,6 +61,6 @@ class TestJobFinder:
         job.last_heartbeat_at = datetime.utcnow() - timedelta(minutes=10)
         job.save(session)
 
-        assert job in JobFinder(job_id=job.job_id).stale(session)
+        assert job in JobFinder(state_id=job.job_id).stale(session)
 
-        assert job not in JobFinder(job_id="other").stale(session)
+        assert job not in JobFinder(state_id="other").stale(session)

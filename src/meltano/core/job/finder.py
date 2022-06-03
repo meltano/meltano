@@ -8,41 +8,41 @@ from .job import HEARTBEAT_VALID_MINUTES, HEARTBEATLESS_JOB_VALID_HOURS, Job, St
 class JobFinder:
     """Query builder for the `Job` model for a certain `elt_uri`."""
 
-    def __init__(self, job_id: str):
+    def __init__(self, state_id: str):
         """Initialize the JobFinder.
 
         Args:
-            job_id: the job_id to build queries for.
+            state_id: the state_id to build queries for.
         """
-        self.job_id = job_id
+        self.state_id = state_id
 
     def latest(self, session):
-        """Get the latest job for this instance's job ID.
+        """Get the latest job for this instance's state ID.
 
         Args:
             session: the session to use in querying the db
 
         Returns:
-            The latest job for this instance's job ID
+            The latest job for this instance's state ID
         """
         return (
             session.query(Job)
-            .filter(Job.job_id == self.job_id)
+            .filter(Job.job_id == self.state_id)
             .order_by(Job.started_at.desc())
             .first()
         )
 
     def successful(self, session):
-        """Get all successful jobs for this instance's job ID.
+        """Get all successful jobs for this instance's state ID.
 
         Args:
             session: the session to use in querying the db
 
         Returns:
-            All successful jobs for this instance's job ID
+            All successful jobs for this instance's state ID
         """
         return session.query(Job).filter(
-            (Job.job_id == self.job_id)  # noqa: WPS465
+            (Job.job_id == self.state_id)  # noqa: WPS465
             & (Job.state == State.SUCCESS)
             & Job.ended_at.isnot(None)
         )
@@ -54,20 +54,20 @@ class JobFinder:
             session: the session to use in querying the db
 
         Returns:
-            All runnings jobs for job_id.
+            All runnings jobs for state_id.
         """
         return session.query(Job).filter(
-            (Job.job_id == self.job_id) & (Job.state == State.RUNNING)  # noqa: WPS465
+            (Job.job_id == self.state_id) & (Job.state == State.RUNNING)  # noqa: WPS465
         )
 
     def latest_success(self, session):
-        """Get the latest successful job for this instance's job ID.
+        """Get the latest successful job for this instance's state ID.
 
         Args:
             session: the session to use in querying the db
 
         Returns:
-            The latest successful job for this instance's job ID
+            The latest successful job for this instance's state ID
         """
         return self.successful(session).order_by(Job.ended_at.desc()).first()
 
@@ -78,12 +78,12 @@ class JobFinder:
             session: the session to use in querying the db
 
         Returns:
-            The latest running job for this instance's job ID
+            The latest running job for this instance's state ID
         """
         return self.running(session).order_by(Job.started_at.desc()).first()
 
     def with_payload(self, session, flags=0, since=None, state=None):
-        """Get all jobs for this instance's job ID matching the given args.
+        """Get all jobs for this instance's state ID matching the given args.
 
         Args:
             session: the session to use in querying the db
@@ -97,7 +97,7 @@ class JobFinder:
         query = (
             session.query(Job)
             .filter(
-                (Job.job_id == self.job_id)  # noqa: WPS465
+                (Job.job_id == self.state_id)  # noqa: WPS465
                 & (Job.payload_flags != 0)
                 & (Job.payload_flags.op("&")(flags) == flags)
                 & Job.ended_at.isnot(None)
@@ -136,7 +136,7 @@ class JobFinder:
             session: the session to use to query the db
 
         Returns:
-            All stale jobs with any job ID
+            All stale jobs with any state ID
         """
         now = datetime.utcnow()
         last_valid_heartbeat_at = now - timedelta(minutes=HEARTBEAT_VALID_MINUTES)
@@ -157,29 +157,29 @@ class JobFinder:
         )
 
     def stale(self, session):
-        """Return stale jobs with the instance's job ID.
+        """Return stale jobs with the instance's state ID.
 
         Args:
             session: the session to use in querying the db
 
         Returns:
-            All stale jobs with instance's job ID
+            All stale jobs with instance's state ID
         """
-        return self.all_stale(session).filter(Job.job_id == self.job_id)
+        return self.all_stale(session).filter(Job.job_id == self.state_id)
 
     def get_all(self, session: object, since=None):
-        """Return all jobs with the instance's job ID.
+        """Return all jobs with the instance's state ID.
 
         Args:
             session: the session to use in querying the db
             since: only return jobs which ended after this datetime
 
         Returns:
-            All jobs with instance's job ID which ended after 'since'
+            All jobs with instance's state ID which ended after 'since'
         """
         query = (
             session.query(Job)
-            .filter(Job.job_id == self.job_id)
+            .filter(Job.job_id == self.state_id)
             .order_by(Job.ended_at.asc())
         )
 
