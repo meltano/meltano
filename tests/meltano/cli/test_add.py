@@ -142,8 +142,8 @@ class TestCliAdd:
             )
 
     def test_add_transform(self, project, cli_runner):
-        cli_runner.invoke(cli, ["add", "files", "dbt"])
-        cli_runner.invoke(cli, ["install", "files", "dbt"])
+        cli_runner.invoke(cli, ["add", "transformer", "dbt"])
+        cli_runner.invoke(cli, ["install", "transformer", "dbt"])
 
         res = cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics"])
         assert_cli_runner(res)
