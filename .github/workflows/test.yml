@@ -60,5 +60,5 @@ jobs:
       if: always() && (matrix.python-version == '3.9')
       uses: actions/upload-artifact@v3.1.0
       with:
-        name: coverage-data-"${{ matrix.python-version }}"
+        name: coverage-data
         path: ".coverage.*"
