@@ -89,7 +89,7 @@ class MockAdapter(BaseAdapter):
                         default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{base_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": f"{base_url}/{plugin_type}/{plugin_name}--{variant_name}"
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -107,7 +107,7 @@ class MockAdapter(BaseAdapter):
                     default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{base_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": f"{base_url}/{plugin_type}/{plugin_name}--{variant_name}"
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -143,7 +143,10 @@ class MockAdapter(BaseAdapter):
         super().__init__()
         self.base_url = base_url
         self.count = Counter()
-        self._mapping = self._process_discovery(base_url, deepcopy(discovery))
+        self._mapping = self._process_discovery(
+            f"{base_url}/meltano/api/v1/plugins",
+            deepcopy(discovery),
+        )
 
     def send(
         self,
@@ -156,6 +159,7 @@ class MockAdapter(BaseAdapter):
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
         response = requests.Response()
+        response.request = request
 
         try:
             data = self._mapping[endpoint]
@@ -173,14 +177,14 @@ class MockAdapter(BaseAdapter):
 @pytest.fixture(scope="class")
 def meltano_hub_service(project, discovery):
     hub = MeltanoHubService(project)
-    hub.session.mount(hub.BASE_URL, MockAdapter(hub.BASE_URL, discovery))
+    hub.session.mount(hub.base_url, MockAdapter(hub.base_url, discovery))
     return hub
 
 
 @pytest.fixture(scope="function")
 def hub_request_counter(meltano_hub_service: MeltanoHubService):
     counter: Counter = meltano_hub_service.session.get_adapter(
-        meltano_hub_service.BASE_URL
+        meltano_hub_service.base_url
     ).count
     counter.clear()
     return counter

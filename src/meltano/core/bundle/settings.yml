@@ -207,3 +207,8 @@ settings:
 - name: experimental
   kind: boolean
   value: False
+
+# Hub
+- name: hub.base_url
+  kind: string
+  value: https://hub.meltano.com
