@@ -81,9 +81,7 @@ class Tracker:
             )
 
         if emitters:
-            self.snowplow_tracker = SnowplowTracker(
-                emitters=emitters, request_timeout=request_timeout
-            )
+            self.snowplow_tracker = SnowplowTracker(emitters=emitters)
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
             # No good way to get the IP address without making a web request. We could use UPnP, but

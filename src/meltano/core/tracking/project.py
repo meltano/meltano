@@ -11,7 +11,7 @@ from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
-from meltano.core.settings_service import SettingsService
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import hash_sha256
 
 logger = get_logger(__name__)
@@ -40,7 +40,10 @@ class ProjectContext(SelfDescribingJson):
             project: The Meltano project.
         """
         self.project = project
-        self.settings_service = SettingsService(project)
+        self.settings_service = ProjectSettingsService(project)
+        self.send_anonymous_usage_stats = self.settings_service.get(
+            "send_anonymous_usage_stats", True
+        )
 
         super().__init__(
             "iglu:com.meltano/project_context/jsonschema/1-0-0",
