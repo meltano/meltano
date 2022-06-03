@@ -47,11 +47,6 @@ from .utils import CliError, add_plugin, add_required_plugins, install_plugins
     is_flag=True,
     help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
 )
-@click.option(
-    "--include-related",
-    is_flag=True,
-    help="Also add transform plugins related to the identified discoverable extractor.",
-)
 @pass_project()
 @click.pass_context
 def add(
@@ -112,15 +107,11 @@ def add(
             )
             tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
-    related_plugin_types = [PluginType.FILES]
-    if flags["include_related"]:
-        related_plugin_types = list(PluginType)
-
     required_plugins = add_required_plugins(
         project,
         plugins,
         add_service=add_service,
-        plugin_types=related_plugin_types,
+        plugin_types=[PluginType.FILES],
     )
     plugins.extend(required_plugins)
 

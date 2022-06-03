@@ -409,8 +409,9 @@ def add_required_plugins(
     plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
-        required_plugins = add_service.add_related(
-            plugin_install, plugin_types=plugin_types
+        required_plugins = add_service.add_required(
+            plugin_install,
+            plugin_types=plugin_types,
         )
         for required_plugin in required_plugins:
             print_added_plugin(required_plugin, reason=PluginAddedReason.REQUIRED)

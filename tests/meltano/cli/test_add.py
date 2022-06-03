@@ -228,33 +228,6 @@ class TestCliAdd:
         assert "Created transform/dbt_project (dbt).yml" in result.output
         assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
 
-    def test_add_related(self, project, cli_runner, project_plugins_service):
-        # Add dbt and transform/ files
-        cli_runner.invoke(cli, ["add", "transformer", "dbt"])
-        cli_runner.invoke(cli, ["add", "files", "dbt"])
-
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
-            install_plugin_mock.return_value = True
-            res = cli_runner.invoke(
-                cli, ["add", "--include-related", "extractor", "tap-gitlab"]
-            )
-            assert res.exit_code == 0
-
-            tap = project_plugins_service.find_plugin(
-                "tap-gitlab", PluginType.EXTRACTORS
-            )
-            assert tap
-            transform = project_plugins_service.find_plugin(
-                "tap-gitlab", PluginType.TRANSFORMS
-            )
-            assert transform
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [transform, tap],
-                reason=PluginInstallReason.ADD,
-                parallelism=1,
-            )
-
     def test_add_missing(self, project, cli_runner, project_plugins_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
 

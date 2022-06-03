@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import logging
 import sys
-from typing import Any
+from typing import Any, Iterable
 
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
@@ -370,23 +370,48 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
 
         return self.name
 
+    def get_requirements(
+        self,
+        plugin_types: Iterable[PluginType] | None = None,
+    ) -> list[ProjectPlugin]:
+        """Return the requirements for this plugin.
+
+        Args:
+            plugin_types: The plugin types to include.
+
+        Returns:
+            A list of requirements for this plugin, optionally filtered for specified
+            plugin types.
+        """
+        plugin_types = plugin_types or list(PluginType)
+        plugins: list[ProjectPlugin] = []
+
+        for plugin_type in plugin_types:
+            plugins.extend(
+                ProjectPlugin(
+                    plugin_type=plugin_type,
+                    name=dep.name,
+                    variant=dep.variant,
+                )
+                for dep in self.requires.get(plugin_type, [])
+            )
+
+            plugins.extend(
+                ProjectPlugin(
+                    plugin_type=plugin_type,
+                    name=dep.name,
+                    variant=dep.variant,
+                )
+                for dep in self._parent.requires.get(plugin_type, [])
+            )
+
+        return plugins
+
     @property
-    def requirements(self) -> list[ProjectPlugin]:
+    def all_requirements(self) -> list[ProjectPlugin]:
         """Return the requirements for this plugin.
 
         Returns:
             A list of requirements for this plugin.
         """
-        plugins = [
-            ProjectPlugin(plugin_type=plugin_type, name=dep.name, variant=dep.variant)
-            for plugin_type, deps in self.requires.items()
-            for dep in deps
-        ]
-
-        plugins.extend(
-            ProjectPlugin(plugin_type=plugin_type, name=dep.name, variant=dep.variant)
-            for plugin_type, deps in self._parent.requires.items()
-            for dep in deps
-        )
-
-        return plugins
+        return self.get_requirements(plugin_types=None)

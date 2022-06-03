@@ -546,11 +546,14 @@ class TestProjectPlugin:
         assert "_nested.custom" in settings_by_name
         assert settings_by_name["_nested.custom"].kind == SettingKind.BOOLEAN
 
-    def test_requires(self, transformer: ProjectPlugin):
+    def test_requirements(self, transformer: ProjectPlugin):
         """Validate the plugin requirements."""
-        assert transformer.requirements
-        assert transformer.requirements[0].name == "files-transformer-mock"
-        assert transformer.requirements[0].variant == "meltano"
+        assert transformer.all_requirements
+        assert transformer.all_requirements[0].name == "files-transformer-mock"
+        assert transformer.all_requirements[0].variant == "meltano"
+
+        # Plugin doesn't have any utility requirements
+        assert not transformer.get_requirements([PluginType.UTILITIES])
 
 
 class TestPluginType:
