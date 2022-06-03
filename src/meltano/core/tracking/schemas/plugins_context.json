@@ -32,27 +32,16 @@
                             "trasformer"
                         ]
                     },
-                    "type": {
-                        "description": "",
-                        "type": "string",
-                        "maxLength": 256
-                    },
                     "name_hash": {
-                        "description": "",
-                        "type": "string",
-                        "pattern": "^[a-fA-F0-9]{64}$",
-                        "maxLength": 64,
-                        "minLength": 64
+                        "description": "64 character hash of the plugin name",
+                        "type": "string"
                     },
                     "parent_name_hash": {
-                        "description": "",
+                        "description": "64 character hash of the parent plugin name",
                         "type": [
                             "string",
                             "null"
-                        ],
-                        "pattern": "^[a-fA-F0-9]{64}$",
-                        "maxLength": 64,
-                        "minLength": 64
+                        ]
                     },
                     "command": {
                         "description": "",
@@ -63,47 +52,35 @@
                         "maxLength": 1024
                     },
                     "variant_name_hash": {
-                        "description": "",
-                        "type": "string",
-                        "pattern": "^[a-fA-F0-9]{64}$",
-                        "maxLength": 64,
-                        "minLength": 64
+                        "description": "64 character hash of the plugin variant name",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
                     },
                     "pip_url_hash": {
-                        "description": "",
-                        "type": "string",
-                        "pattern": "^[a-fA-F0-9]{64}$",
-                        "maxLength": 64,
-                        "minLength": 64
+                        "description": "64 character hash of the pip url",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
                     },
-                    "version": {
-                        "description": "",
-                        "type": "string",
-                        "maxLength": 256
-                    },
-                    "plugin_definition_hash": {
-                        "description": "",
-                        "type": "string",
-                        "pattern": "^[a-fA-F0-9]{64}$",
-                        "maxLength": 64,
-                        "minLength": 64
-                    },
-                    "containerized": {
-                        "description": "",
-                        "type": "boolean"
+                    "plugin_lock_hash": {
+                        "description": "hash of the plugin lock file",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
                     }
                 },
                 "required": [
                     "category",
-                    "type",
                     "name_hash",
                     "parent_name_hash",
                     "command",
                     "variant_name_hash",
                     "pip_url_hash",
-                    "version",
-                    "plugin_definition_hash",
-                    "containerized"
+                    "plugin_lock_hash"
                 ],
                 "additionalProperties": false
             }

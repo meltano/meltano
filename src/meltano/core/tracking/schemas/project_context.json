@@ -39,7 +39,7 @@
             "minLength": 36,
             "maxLength": 36
         },
-        "environment_name": {
+        "environment_name_hash": {
             "description": "The hash of the active environment for the Meltano project",
             "type": [
                 "string",
@@ -53,7 +53,7 @@
         "project_uuid",
         "project_uuid_source",
         "client_uuid",
-        "environment_name"
+        "environment_name_hash"
     ],
     "additionalProperties": false
 }
