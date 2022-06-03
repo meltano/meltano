@@ -9,18 +9,18 @@ on:
 
 jobs:
   tests:
-    name: Pytest on py${{ matrix.python-version }} (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.external || false }}
-    env:
-      PYTEST_MARKERS: not concurrent
     strategy:
-      fail-fast: false
       matrix:
         include:
         - { python-version: "3.7", os: "ubuntu-latest" }
         - { python-version: "3.8", os: "ubuntu-latest" }
         - { python-version: "3.9", os: "ubuntu-latest" }
+      fail-fast: false
+
+    name: Pytest on py${{ matrix.python-version }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTEST_MARKERS: concurrent
 
     steps:
     - name: Check out the repository
@@ -57,7 +57,7 @@ jobs:
         poetry run pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
 
     - name: Upload coverage data
-      if: always() && (matrix.tox-env == 'py')
+      if: always() && (matrix.python-version == '3.9')
       uses: actions/upload-artifact@v3.1.0
       with:
         name: coverage-data
