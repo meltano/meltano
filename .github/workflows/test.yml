@@ -19,9 +19,6 @@ jobs:
         - { tox-env: py, python-version: "3.7", os: "ubuntu-latest" }
         - { tox-env: py, python-version: "3.8", os: "ubuntu-latest" }
         - { tox-env: py, python-version: "3.9", os: "ubuntu-latest" }
-        - { tox-env: py, python-version: "3.10", os: "ubuntu-latest" }
-        - { tox-env: py, python-version: "3.10", os: "ubuntu-latest", external: true }
-        - { tox-env: doctest, python-version: "3.10", os: "ubuntu-latest" }
         - { tox-env: lint, python-version: "3.8", os: "ubuntu-latest" }
 
     steps:
