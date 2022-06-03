@@ -61,7 +61,6 @@ class EnvironmentContext(SelfDescribingJson):
             "system_release": platform.release() or None,
             "system_version": platform.version() or None,
             "machine": platform.machine() or None,
-            "node": platform.node() or None,
             "windows_edition": platform.win32_edition()
             if hasattr(platform, "win32_edition")
             else None,

@@ -66,14 +66,6 @@
             ],
             "maxLength": 256
         },
-        "node": {
-            "description": "The (potentially not fully-qualified) network name of the computer",
-            "type": [
-                "string",
-                "null"
-            ],
-            "maxLength": 256
-        },
         "windows_edition": {
             "description": "The Windows edition, e.g. 'Enterprise', 'IoTUAP', 'ServerStandard', 'nanoserver', etc.",
             "type": [
@@ -159,7 +151,6 @@
         "system_release",
         "system_version",
         "machine",
-        "node",
         "windows_edition",
         "freedesktop_id",
         "freedesktop_id_like",
