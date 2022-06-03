@@ -23,8 +23,8 @@
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
 /.bumpversion.cfg @meltano/engineering @meltano/product
 /CHANGELOG.md @meltano/engineering @meltano/product
-/cookiecutter/tap-template/{{cookiecutter.tap_id}}/pyproject.toml @meltano/engineering @meltano/product
-/cookiecutter/target-template/{{cookiecutter.target_id}}/pyproject.toml @meltano/engineering @meltano/product
+/cookiecutter/tap-template/\{\{cookiecutter.tap_id\}\}/pyproject.toml @meltano/engineering @meltano/product
+/cookiecutter/target-template/\{\{cookiecutter.target_id\}\}/pyproject.toml @meltano/engineering @meltano/product
 /docs/package.json @meltano/engineering @meltano/product
 /package.json  @meltano/engineering @meltano/product
 /pyproject.toml  @meltano/engineering @meltano/product
