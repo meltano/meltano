@@ -3486,6 +3486,10 @@ orchestrators:
       - name: core.dags_are_paused_at_creation
         env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
         value: false
+    requires:
+      files:
+        - name: airflow
+          variant: meltnano
 files:
   - name: airflow
     namespace: airflow

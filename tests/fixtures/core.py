@@ -167,6 +167,14 @@ def discovery():  # noqa: WPS213
             "name": "transformer-mock",
             "namespace": "transformer_mock",
             "pip_url": "transformer-mock",
+            "requires": {
+                "files": [
+                    {
+                        "name": "files-transformer-mock",
+                        "variant": "meltano",
+                    },
+                ],
+            },
         }
     )
 
@@ -370,6 +378,14 @@ def alternative_target(project_add_service):
 def dbt(project_add_service):
     try:
         return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def transformer(project_add_service: ProjectAddService):
+    try:
+        return project_add_service.add(PluginType.TRANSFORMERS, "transformer-mock")
     except PluginAlreadyAddedException as err:
         return err.plugin
 

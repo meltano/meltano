@@ -14,6 +14,7 @@ from meltano.core.setting_definition import SettingDefinition, YAMLEnum
 from meltano.core.utils import NotFound, find_named
 
 from .command import Command
+from .requirements import PluginRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -232,6 +233,7 @@ class Variant(NameEq, Canonical):
         settings_group_validation: list | None = None,
         settings: list | None = None,
         commands: dict | None = None,
+        requires: dict[PluginType, list] | None = None,
         **extras,
     ):
         """Create a new Variant.
@@ -248,6 +250,7 @@ class Variant(NameEq, Canonical):
             settings_group_validation: The settings group validation.
             settings: The settings of the variant.
             commands: The commands of the variant.
+            requires: Other plugins this plugin depends on.
             extras: Additional keyword arguments.
         """
         super().__init__(
@@ -262,6 +265,7 @@ class Variant(NameEq, Canonical):
             settings_group_validation=list(settings_group_validation or []),
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
+            requires=PluginRequirement.parse_all(requires),
             extras=extras,
         )
 
@@ -432,6 +436,7 @@ class PluginDefinition(PluginRef):
             settings_group_validation=plugin.settings_group_validation,
             settings=plugin.settings,
             commands=plugin.commands,
+            requires=plugin.requires,
             extras=plugin.extras,
         )
 
@@ -689,6 +694,7 @@ class StandalonePlugin(Canonical):
         settings_group_validation: list | None = None,
         settings: list | None = None,
         commands: dict | None = None,
+        requires: dict[PluginType, list] | None = None,
         **extras,
     ):
         """Create a locked plugin.
@@ -707,6 +713,7 @@ class StandalonePlugin(Canonical):
             settings_group_validation: The settings group validation of the plugin.
             settings: The settings of the plugin.
             commands: The commands of the plugin.
+            requires: Other plugins this plugin depends on.
             extras: Additional attributes to set on the plugin.
         """
         super().__init__(
@@ -723,6 +730,7 @@ class StandalonePlugin(Canonical):
             settings_group_validation=settings_group_validation or [],
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
+            requires=PluginRequirement.parse_all(requires),
             extras=extras,
         )
 
@@ -761,5 +769,6 @@ class StandalonePlugin(Canonical):
             settings_group_validation=variant.settings_group_validation,
             settings=variant.settings,
             commands=variant.commands,
+            requires=variant.requires,
             **variant.extras,
         )
