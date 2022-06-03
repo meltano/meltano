@@ -16,10 +16,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX
 
 ### Changes
+- [#3173](https://gitlab.com/meltano/meltano/-/issues/3173) Add tests and clarify docs for environment variable resolution.
 
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
 
 ### Fixes
+
+- [#5979](https://github.com/meltano/meltano/issues/5979) Fixes `meltano remove` bug where lock files were not removed if they include a variant in the file name.
 
 ### Breaks
 
