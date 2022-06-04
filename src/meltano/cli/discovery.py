@@ -24,7 +24,9 @@ def discover(project: Project, plugin_type: str):
     """
     hub_service = MeltanoHubService(project)
     if plugin_type == "all":
-        plugin_types = list(PluginType)
+        plugin_types = [
+            plugin_type for plugin_type in list(PluginType) if plugin_type.discoverable
+        ]
     else:
         plugin_types = [PluginType.from_cli_argument(plugin_type)]
 
