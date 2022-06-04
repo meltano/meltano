@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
-import ctypes
-import ctypes.wintypes
 import os
 import platform
 import uuid
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from platform import system
 from typing import Any
 
 import psutil
@@ -27,11 +24,26 @@ logger = get_logger(__name__)
 release_marker_path = Path(__file__).parent / ".release_marker"
 
 
+def _safe_hasattr(obj: Any, name: str) -> bool:
+    """Safely checks if an object has a given attribute.
+
+    This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
+
+    Args:
+        obj: The object to check.
+        name: The name of the attribute to check.
+
+    Returns:
+        True if the object has the attribute, False otherwise.
+    """
+    return getattr(obj, name, None) is not None
+
+
 class EnvironmentContext(SelfDescribingJson):
+    """Environment context for the Snowplow tracker."""
+
     def __init__(self):
-        logger.debug(
-            f"Initializing '{type(self).__module__}.{type(self).__qualname__}'"
-        )
+        """Initialize the environment context."""
         ci_markers = ("GITHUB_ACTIONS", "CI")
         super().__init__(
             "iglu:com.meltano/environment_context/jsonschema/1-0-0",
@@ -40,7 +52,8 @@ class EnvironmentContext(SelfDescribingJson):
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(
-                    os.environ.get(x, "").lower()[:1] in "1t" for x in ci_markers
+                    os.environ.get(marker, "").lower()[:1] in "1t"
+                    for marker in ci_markers
                 ),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
@@ -51,18 +64,24 @@ class EnvironmentContext(SelfDescribingJson):
 
     @cached_property
     def system_info(self) -> dict[str, Any]:
+        """Get system information.
+
+        Returns:
+            A dictionary containing system information.
+        """
         freedesktop_data = (
             platform.freedesktop_os_release()
-            if hasattr(platform, "freedesktop_os_release")
+            if _safe_hasattr(platform, "freedesktop_os_release")
             else defaultdict(type(None))
         )
+
         return {
             "system_name": platform.system() or None,
             "system_release": platform.release() or None,
             "system_version": platform.version() or None,
             "machine": platform.machine() or None,
             "windows_edition": platform.win32_edition()
-            if hasattr(platform, "win32_edition")
+            if _safe_hasattr(platform, "win32_edition")
             else None,
             "freedesktop_id": freedesktop_data["ID"],
             "freedesktop_id_like": freedesktop_data.get("ID_LIKE", None),
@@ -71,49 +90,49 @@ class EnvironmentContext(SelfDescribingJson):
 
     @staticmethod
     def get_process_timestamp(process: psutil.Process) -> str:
-        """Obtains the creation time of a process as a ISO 8601 timestamp."""
-        return datetime.utcfromtimestamp(process.create_time()).isoformat() + "Z"
+        """Obtain the creation time of a process as a ISO 8601 timestamp.
+
+        Args:
+            process: The process to obtain the creation time from.
+
+        Returns:
+            A ISO 8601 timestamp formatted string.
+        """
+        return f"{datetime.utcfromtimestamp(process.create_time()).isoformat()}Z"
 
     @cached_property
     def process_info(self) -> dict[str, Any]:
+        """Obtain the process information for the current process.
+
+        Returns:
+            A dictionary containing the process information. Such as the hashed process name, pid, core counts, etc
+        """
         process = psutil.Process()
         with process.oneshot():
             return {
                 "num_cpu_cores": psutil.cpu_count(),
                 "num_cpu_cores_available": self.num_available_cores,
                 "process_executable_path": process.exe() or None,
-                "processe_hierarchy": [
+                "process_hierarchy": [
                     {
-                        "process_name_hash": hash_sha256(x.name()),
-                        "process_creation_timestamp": self.get_process_timestamp(x),
+                        "process_name_hash": hash_sha256(proc.name()),
+                        "process_creation_timestamp": self.get_process_timestamp(proc),
                     }
-                    for x in (process, *process.parents())
+                    for proc in (process, *process.parents())
                 ],
             }
 
     @cached_property
     def num_available_cores(self) -> int:
-        """The number of available CPU cores (obtained in a cross-platform manner)."""
-        # Based off of Will Da Silva's answer at https://stackoverflow.com/a/69200821/5946921
-        if hasattr(os, "sched_getaffinity"):
+        """Obtain the number of available CPU cores.
+
+        Uses sched_getaffinity where available, otherwise falls back to cpu_count().
+
+        Returns:
+            int: The number of available CPU cores.
+        """
+        if _safe_hasattr(os, "sched_getaffinity"):
             return len(os.sched_getaffinity(0))
-        if system() == "Windows":
-            kernel32 = ctypes.WinDLL("kernel32")
-            DWORD_PTR = ctypes.wintypes.WPARAM
-            PDWORD_PTR = ctypes.POINTER(DWORD_PTR)
-            GetCurrentProcess = kernel32.GetCurrentProcess
-            GetCurrentProcess.restype = ctypes.wintypes.HANDLE
-            GetProcessAffinityMask = kernel32.GetProcessAffinityMask
-            GetProcessAffinityMask.argtypes = (
-                ctypes.wintypes.HANDLE,
-                PDWORD_PTR,
-                PDWORD_PTR,
-            )
-            mask = DWORD_PTR()
-            if GetProcessAffinityMask(
-                GetCurrentProcess(), ctypes.byref(mask), ctypes.byref(DWORD_PTR())
-            ):
-                return bin(mask.value).count("1")
         return os.cpu_count()
 
 
