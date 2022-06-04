@@ -2,6 +2,7 @@
   extends: .parallel:python_version
   stage: test
   image: python:$PYTHON_VERSION
+  allow_failure: true  # https://github.com/meltano/meltano/issues/6006
   variables:
     # `postgres` service configuration
     POSTGRES_ADDRESS: postgres
