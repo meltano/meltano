@@ -26,3 +26,34 @@ an account admin if necessary. As of the time of writing this, the admins are:
 
 Once SnowcatCloud provides an API to update the schemas, we should add a CI job to update them
 automatically when a release pipeline is run with changes in this directory.
+
+To test/validate schemas [snowcloud-micro](https://github.com/snowplow-incubator/snowplow-micro) can be used:
+
+
+```
+docker run \
+  --mount type=bind,source=$(pwd),destination=/config \
+  -p 9090:9090 \
+  snowplow/snowplow-micro:1.2.1 \
+  --collector-config /config/micro.conf \
+  --iglu /config/iglu.json
+```
+
+Once up and running you can interact with this rest api:
+
+```
+# list a known schema
+http localhost:9090/micro/iglu/com.meltano/environment_context/jsonschema/1-0-0
+
+# list a summary
+http localhost:9090/micro/all
+
+# good events
+http localhost:9090/micro/good
+
+# bad events
+http localhost:9090/micro/bad
+
+# reset counters
+http localhost:9090/micro/reset
+```
