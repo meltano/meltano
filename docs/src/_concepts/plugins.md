@@ -51,7 +51,7 @@ and other plugins have already been collected by users and [contributed](/contri
 making them supported out of the box.
 
 Discoverable plugins are defined in the `discovery.yml` manifest,
-which can be found [in the Meltano repository](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml),
+which can be found [in the Meltano repository](https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml),
 ships inside the [`meltano` package](https://pypi.org/project/meltano/),
 and is available at <https://www.meltano.com/discovery.yml>.
 If you'd like to use a different (custom) manifest in your project,
@@ -92,7 +92,7 @@ you'll need to collect and provide this metadata yourself.
 To learn how to add a custom plugin to your project using a [custom plugin definition](project#custom-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ## Plugin Inheritance

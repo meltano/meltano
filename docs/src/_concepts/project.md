@@ -299,7 +299,7 @@ include_paths:
   - './*/**/subconfig_[0-9].yml'
 ```
 
-Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://gitlab.com/meltano/meltano/-/issues/2985)).
+Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://github.com/meltano/meltano/issues/2925)).
 
 Currently supported elements in subfiles are [plugins](/concepts/project#plugins), [schedules](/concepts/project#plugins) and [environments](/concepts/environments).
 
