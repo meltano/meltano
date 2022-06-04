@@ -56,7 +56,7 @@ class LegacyTracker:
         self.client_id = project_context.client_uuid
 
     def event(self, category: str, action: str) -> dict[str, Any]:
-        """Constract a GA event with all the required parameters.
+        """Construct a GA event with all the required parameters.
 
         Args:
             category: The category of the event.

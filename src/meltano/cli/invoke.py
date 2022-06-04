@@ -20,6 +20,7 @@ from meltano.core.plugin_invoker import (
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import cli as cli_tracking
 from meltano.core.utils import run_async
 
 from . import cli
@@ -77,7 +78,7 @@ def invoke(
     tracker = Tracker(project)
     cmd_ctx = CliContext("invoke")
     with tracker.with_contexts(cmd_ctx):
-        tracker.track_command_event({"event": "started"})
+        tracker.track_command_event(cli_tracking.STARTED)
 
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -113,9 +114,9 @@ def invoke(
     )
     with tracker.with_contexts(cmd_ctx):
         if exit_code == 0:
-            tracker.track_command_event({"event": "success"})
+            tracker.track_command_event(cli_tracking.COMPLETED)
         else:
-            tracker.track_command_event({"event": "failed"})
+            tracker.track_command_event(cli_tracking.FAILED)
     sys.exit(exit_code)
 
 

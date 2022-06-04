@@ -88,9 +88,11 @@ class Tracker:
             "send_anonymous_usage_stats", True
         )
 
+        project_ctx = ProjectContext(project)
+        self.project_id = str(project_ctx.project_uuid)
         self.contexts: tuple[SelfDescribingJson] = (
             environment_context,
-            ProjectContext(project),
+            project_ctx,
         )
 
     @cached_property
@@ -163,9 +165,7 @@ class Tracker:
                 label=self.project_id,
             )
         except Exception as err:
-            logger.debug(
-                f"Failed to submit struct event to Snowplow, error: {err}",
-            )
+            logger.debug("Failed to submit struct event to Snowplow", err=err)
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
         """Fire an unstructured tracking event.
@@ -178,9 +178,7 @@ class Tracker:
         try:
             self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
         except Exception as err:
-            logger.debug(
-                f"Failed to submit unstruct event to Snowplow, error: {err}",
-            )
+            logger.debug("Failed to submit unstruct event to Snowplow, error", err=err)
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:
         """Fire generic command tracking event.

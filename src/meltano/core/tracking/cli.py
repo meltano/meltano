@@ -5,6 +5,20 @@ import uuid
 
 from snowplow_tracker import SelfDescribingJson
 
+EVENT_RESULTS = {
+    "started": {"event": "started"},
+    "completed": {"event": "completed"},
+    "skipped": {"event": "skipped"},
+    "failed": {"event": "failed"},
+    "aborted": {"event": "aborted"},
+}
+
+STARTED = EVENT_RESULTS["started"]
+COMPLETED = EVENT_RESULTS["completed"]
+SKIPPED = EVENT_RESULTS["skipped"]
+FAILED = EVENT_RESULTS["failed"]
+ABORTED = EVENT_RESULTS["aborted"]
+
 
 class CliContext(SelfDescribingJson):
     """CLI context for the Snowplow tracker."""
