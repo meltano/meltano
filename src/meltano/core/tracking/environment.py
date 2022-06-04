@@ -48,7 +48,7 @@ class EnvironmentContext(SelfDescribingJson):
         super().__init__(
             "iglu:com.meltano/environment_context/jsonschema/1-0-0",
             {
-                "context_uuid": uuid.uuid4(),
+                "context_uuid": str(uuid.uuid4()),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(
@@ -56,7 +56,6 @@ class EnvironmentContext(SelfDescribingJson):
                     for marker in ci_markers
                 ),
                 "python_version": platform.python_version(),
-                "python_implementation": platform.python_implementation(),
                 **self.system_info,
                 **self.process_info,
             },
@@ -112,7 +111,6 @@ class EnvironmentContext(SelfDescribingJson):
             return {
                 "num_cpu_cores": psutil.cpu_count(),
                 "num_cpu_cores_available": self.num_available_cores,
-                "process_executable_path": process.exe() or None,
                 "process_hierarchy": [
                     {
                         "process_name_hash": hash_sha256(proc.name()),

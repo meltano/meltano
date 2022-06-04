@@ -48,11 +48,11 @@ class ProjectContext(SelfDescribingJson):
         super().__init__(
             "iglu:com.meltano/project_context/jsonschema/1-0-0",
             {
-                "context_uuid": uuid.uuid4(),
-                "project_uuid": self.project_uuid,
+                "context_uuid": str(uuid.uuid4()),
+                "project_uuid": str(self.project_uuid),
                 "project_uuid_source": self.project_uuid_source.name,
-                "client_uuid": self.client_uuid,
-                "environment_name": (
+                "client_uuid": str(self.client_uuid),
+                "environment_name_hash": (
                     hash_sha256(self.project.active_environment.name)
                     if self.project.active_environment
                     else None

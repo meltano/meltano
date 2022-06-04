@@ -5,7 +5,6 @@ from __future__ import annotations
 import datetime
 import locale
 import re
-import traceback
 from contextlib import contextmanager
 from typing import Any
 from urllib.parse import urlparse
@@ -163,9 +162,9 @@ class Tracker:
                 action=action,
                 label=self.project_id,
             )
-        except Exception as ex:
-            logger.warning(
-                f"Failed to submit struct event to Snowplow:\n{traceback.format_exception(ex)}"
+        except Exception as err:
+            logger.debug(
+                f"Failed to submit struct event to Snowplow, error: {err}",
             )
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
@@ -178,9 +177,9 @@ class Tracker:
             return
         try:
             self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
-        except Exception as ex:
-            logger.warning(
-                f"Failed to submit unstruct event to Snowplow:\n{traceback.format_exception(ex)}"
+        except Exception as err:
+            logger.debug(
+                f"Failed to submit unstruct event to Snowplow, error: {err}",
             )
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:

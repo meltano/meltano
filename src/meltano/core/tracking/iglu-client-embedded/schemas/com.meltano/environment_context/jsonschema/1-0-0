@@ -34,6 +34,11 @@
             "type": "string",
             "maxLength": 256
         },
+        "python_implementation": {
+            "description": "The Python implementation in use",
+            "type": "string",
+            "maxLength": 256
+        },
         "system_name": {
             "description": "The system/OS name, e.g. 'Linux', 'Darwin', 'Java', 'Windows', etc.",
             "type": [
@@ -147,6 +152,7 @@
         "is_dev_build",
         "is_ci_environment",
         "python_version",
+        "python_implementation",
         "system_name",
         "system_release",
         "system_version",
