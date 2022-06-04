@@ -104,22 +104,22 @@ class StateService:
         new_state_dict = json.loads(new_state)
         if validate:
             self.validate_state(new_state_dict)
-        job_to_add_to = self._get_or_create_job(job)
-        job_to_add_to.payload = json.loads(new_state)
-        job_to_add_to.payload_flags = payload_flags
-        job_to_add_to.save(self.session)
+        state_to_add_to = self._get_or_create_job(job)
+        state_to_add_to.payload = json.loads(new_state)
+        state_to_add_to.payload_flags = payload_flags
+        state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to job {job_to_add_to.job_id} state payload {new_state_dict}"
+            f"Added to state {state_to_add_to.job_id} state payload {new_state_dict}"
         )
 
     def get_state(self, state_id: str) -> Dict:
-        """Get state for job with the given state_id.
+        """Get state for the given state_id.
 
         Args:
             state_id: The state_id to get state for
 
         Returns:
-            Dict representing state that would be used in the next run of the given job.
+            Dict representing state that would be used in the next run.
         """
         state = {}
         incomplete_since = None
@@ -151,10 +151,10 @@ class StateService:
         return state
 
     def set_state(self, state_id: str, new_state: Optional[str], validate: bool = True):
-        """Set the state for Job state_id.
+        """Set the state for the state_id.
 
         Args:
-            state_id: the state_id of the job to set state for
+            state_id: the state_id to set state for
             new_state: the state to update to
             validate: whether or not to validate the supplied state.
         """
@@ -166,16 +166,16 @@ class StateService:
         )
 
     def clear_state(self, state_id, save: bool = True):
-        """Clear the state for Job state_id.
+        """Clear the state for the state_id.
 
         Args:
-            state_id: the state_id of the job to clear state for
-            save: whether or not to immediately save the job
+            state_id: the state_id to clear state for
+            save: whether or not to immediately save the state
         """
         self.set_state(state_id, json.dumps({}), validate=False)
 
     def merge_state(self, state_id_src: str, state_id_dst: str):
-        """Merge state from Job state_id_src into Job state_id_dst.
+        """Merge state from state_id_src into state_id_dst.
 
         Args:
             state_id_src: the state_id to get state from

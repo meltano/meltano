@@ -188,7 +188,7 @@ def merge_state(
 
 
 @meltano_state.command(name="set")
-@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
+@prompt_for_confirmation(prompt="This will overwrite the state's current value. Continue?")
 @click.option(
     "--input-file",
     type=click.Path(exists=True),

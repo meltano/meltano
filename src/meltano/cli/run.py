@@ -74,7 +74,7 @@ async def run(
 
         `meltano --environment=prod run tap-gitlab target-postgres tap-salesforce target-mysql`\n
 
-    The above command will create two jobs with the IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
+    The above command will create two jobs with state IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
 
     This a preview feature - its functionality and cli signature is still evolving.
 
