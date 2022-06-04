@@ -18,6 +18,7 @@ SnowcatCloud.
 Login to https://app.snowcatcloud.com/ using your Meltano email address. Request permissions from
 an account admin if necessary. As of the time of writing this, the admins are:
 
+- aj@meltano.com
 - pat@meltano.com
 - will@meltano.com
 - edgar@meltano.com
