@@ -71,7 +71,7 @@ docker run meltano-demo-project:dev --version
 docker run \
   --volume $(pwd)/output:/project/output \
   meltano-demo-project:dev \
-  elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+  elt tap-gitlab target-jsonl --state-id=gitlab-to-jsonl
 ```
 
 ## Docker Compose

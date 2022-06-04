@@ -29,18 +29,18 @@
             <section>
               <div class="content has-text-centered">
                 <p>
-                  <a href="{{site.github_repository}}/edit/main/docs/src/{{page.relative_path}}"><i class="fab fa-github"></i> Edit this page!</a>
+                  <a href="{{site.github_repository}}/edit/main/docs/{{page.path}}"><i class="fab fa-github"></i> Edit this page!</a>
                 </p>
               </div>
             </section>
-            
+             
         </div>
 
         <div class="column is-2">
             <aside class="toc is-fullheight is-narrow-mobile is-hidden-mobile">
               <h2>Table of Contents</h2>
 
-              <div id="table-of-contents">{% toc %}</div> 
+              <div id="table-of-contents">{{ content | toc_only }}</div> 
 
             </aside>
         </div>

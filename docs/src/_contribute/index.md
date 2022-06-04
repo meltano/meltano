@@ -17,7 +17,7 @@ Before getting started, please make sure you review our Code of Conduct. Everyon
 
 There are multiple ways to contribute to Meltano:
 
-- [The Meltano Project](https://gitlab.com/meltano/meltano/) - Suggest new features for Meltano, report bugs, or open Merge Requests to fix issues.
+- [The Meltano Project](https://github.com/meltano/meltano/) - Suggest new features for Meltano, report bugs, or open Merge Requests to fix issues.
 - [Meltano SDK](https://sdk.meltano.com/en/latest/) for Taps and Targets
 - [Plugins, taps/targets]() or adding taps/targets to [MeltanoHub](https://hub.meltano.com) - If you've made a tap, target, or other plugin, you can add it to the MeltanoHub for others to discover and use.
 - [Documentation](https://docs.meltano.com/)
@@ -35,15 +35,15 @@ There are also several community events you may be interested in:
 
 ## Where do I start?
 
-If you'd like to contribute, but you're not sure _what_, check out the list of open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/-/issues?sort=created_date&state=opened&label_name[]=Accepting+Merge+Requests). Any other improvements are welcome too, of course, so simply asking yourself "What could have been better while I was using Meltano?" is another good way to come up with ideas.
+If you'd like to contribute, but you're not sure _what_, check out the list of open issues labeled [Accepting Merge Requests](https://github.com/meltano/meltano/labels/accepting%20merge%20requests). Any other improvements are welcome too, of course, so simply asking yourself "What could have been better while I was using Meltano?" is another good way to come up with ideas.
 
-If an issue for your problem or suggested improvement doesn't exist yet on our [issue tracker](https://gitlab.com/meltano/meltano/-/issues),
-please [file a new one](https://gitlab.com/meltano/meltano/-/issues/new) before submitting a [merge request](/contribute/merge),
+If an issue for your problem or suggested improvement doesn't exist yet on our [issue tracker](https://github.com/meltano/meltano/issues),
+please [file a new one](https://github.com/meltano/meltano/issues/new) before submitting a [merge request](/contribute/merge),
 so that the team and community are aware of your plan and can help you figure out the best way to realize it.
 
 <div class="notification is-warning">
   <p><strong>Searching for something to work on?</strong></p>
-  <p>Start off by looking at our <a href="https://gitlab.com/groups/meltano/-/issues?scope=all&state=opened&label_name[]=Accepting%20Merge%20Requests">"Accepting Merge Requests"</a> label. Keep in mind that this is only a suggestion: all improvements are welcome.</p>
+  <p>Start off by looking at our <a href="https://github.com/meltano/meltano/labels/accepting%20merge%20requests">"Accepting Merge Requests"</a> label. Keep in mind that this is only a suggestion: all improvements are welcome.</p>
 </div>
 
 ## Contribution Guides

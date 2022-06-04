@@ -23,7 +23,8 @@ class TestCliDiscover:
         assert_cli_runner(result)
 
         for plugin_type in PluginType:
-            assert hub_request_counter[f"/{plugin_type}/index"] == 1
+            request_count = 1 if plugin_type.discoverable else 0
+            assert hub_request_counter[f"/{plugin_type}/index"] == request_count
 
         assert "Extractors" in result.output
         assert "tap-gitlab" in result.output

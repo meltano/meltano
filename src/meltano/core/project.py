@@ -340,7 +340,7 @@ class Project(Versioned):  # noqa: WPS214
         yield self.dotenv
 
     @makedirs
-    def meltano_dir(self, *joinpaths, make_dirs: bool = True) -> Path:
+    def meltano_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `.meltano` directory.
 
         Args:
@@ -353,7 +353,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.root.joinpath(".meltano", *joinpaths)
 
     @makedirs
-    def analyze_dir(self, *joinpaths, make_dirs: bool = True) -> Path:
+    def analyze_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `analyze` directory.
 
         Args:
@@ -366,7 +366,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.root_dir("analyze", *joinpaths)
 
     @makedirs
-    def extract_dir(self, *joinpaths, make_dirs: bool = True) -> Path:
+    def extract_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `extract` directory.
 
         Args:
@@ -379,7 +379,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.root_dir("extract", *joinpaths)
 
     @makedirs
-    def venvs_dir(self, *prefixes, make_dirs: bool = True) -> Path:
+    def venvs_dir(self, *prefixes, make_dirs: bool = True):
         """Path to a `venv` directory in `.meltano`.
 
         Args:
@@ -392,7 +392,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
 
     @makedirs
-    def run_dir(self, *joinpaths, make_dirs: bool = True) -> Path:
+    def run_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the `run` directory in `.meltano`.
 
         Args:
@@ -405,7 +405,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def logs_dir(self, *joinpaths, make_dirs: bool = True) -> Path:
+    def logs_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the `logs` directory in `.meltano`.
 
         Args:
@@ -418,11 +418,11 @@ class Project(Versioned):  # noqa: WPS214
         return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def job_dir(self, job_id, *joinpaths, make_dirs: bool = True) -> Path:
+    def job_dir(self, state_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/run`.
 
         Args:
-            job_id: Job ID of `run` dir.
+            state_id: State ID of `run` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano`.
             make_dirs: Flag to make directories if not exists.
 
@@ -430,15 +430,15 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.run_dir(
-            "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
+            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
-    def job_logs_dir(self, job_id, *joinpaths, make_dirs: bool = True) -> Path:
+    def job_logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/logs`.
 
         Args:
-            job_id: Job ID of `logs` dir.
+            state_id: State ID of `logs` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano/logs`.
             make_dirs: Flag to make directories if not exists.
 
@@ -446,11 +446,11 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.logs_dir(
-            "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
+            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
-    def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True) -> Path:
+    def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):
         """Path to the plugin installation directory in `.meltano`.
 
         Args:
@@ -466,7 +466,7 @@ class Project(Versioned):  # noqa: WPS214
         )
 
     @makedirs
-    def root_plugins_dir(self, *joinpaths: str, make_dirs: bool = True) -> Path:
+    def root_plugins_dir(self, *joinpaths: str, make_dirs: bool = True):
         """Path to the project `plugins` directory.
 
         Args:
@@ -485,7 +485,7 @@ class Project(Versioned):  # noqa: WPS214
         plugin_name: str,
         variant_name: str | None = None,
         make_dirs: bool = True,
-    ) -> Path:
+    ):
         """Path to the project lock file.
 
         Args:

@@ -183,7 +183,7 @@ class TestScheduleService:
                     tap.name,
                     target.name,
                     f"--transform={schedule.transform}",
-                    f"--job_id={schedule.name}",
+                    f"--state-id={schedule.name}",
                     "--dump=config",
                 ],
                 env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},

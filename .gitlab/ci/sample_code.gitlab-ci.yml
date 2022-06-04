@@ -2,6 +2,7 @@
   extends: .parallel:python_version
   stage: test
   image: python:$PYTHON_VERSION
+  allow_failure: true  # https://github.com/meltano/meltano/issues/6006
   variables:
     # `postgres` service configuration
     POSTGRES_ADDRESS: postgres
@@ -77,7 +78,7 @@ homepage_sample_code:
     - mkdir -p output
 
     # Run data integration pipeline
-    - meltano elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+    - meltano elt tap-gitlab target-jsonl --state-id=gitlab-to-jsonl
 
     # Read latest tag
     - head -n 1 output/tags.jsonl
@@ -110,7 +111,7 @@ homepage_sample_code:
     - meltano select tap-gitlab "*" "*"
 
     # Run data integration and transformation pipeline
-    - meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+    - meltano elt tap-gitlab target-postgres --transform=run --state-id=gitlab-to-postgres
 
     # Start `psql` shell connected to warehouse database
     - apt-get update -y
@@ -163,7 +164,7 @@ homepage_sample_code:
     # docker run \
     #   --volume $(pwd)/output:/project/output \
     #   meltano-demo-project:dev \
-    #   elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+    #   elt tap-gitlab target-jsonl --state-id=gitlab-to-jsonl
   after_script:
     - echo "If this pipeline failed due to Gitlab API returning a non-2xx status code you can try rerunning this job."
     - echo "If the failure persists or you're encountering another error feel free reach out via Gitlab or Slack."
@@ -266,7 +267,7 @@ getting_started_sample_code:
 
     ### https://docs.meltano.com/getting-started#run-a-data-integration-el-pipeline
 
-    - meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
+    - meltano elt tap-gitlab target-postgres --state-id=gitlab-to-postgres
 
 
     ### https://docs.meltano.com/getting-started#run-a-data-integration-el-pipeline

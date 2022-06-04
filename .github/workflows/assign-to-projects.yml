@@ -6,7 +6,7 @@ on:
   pull_request_target:
     types: [opened]
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MY_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   assign_one_project:
@@ -16,5 +16,6 @@ jobs:
     - name: Assign NEW issues and NEW pull requests to Product Roadmap
       uses: srggrs/assign-one-project-github-action@1.2.1
       if: github.event.action == 'opened'
+      continue-on-error: true  # https://github.com/meltano/meltano/issues/6008
       with:
         project: 'https://github.com/orgs/meltano/projects/4/'
