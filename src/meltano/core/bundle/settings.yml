@@ -20,6 +20,8 @@ settings:
   env_specific: true
 - name: discovery_url
   value: https://discovery.meltano.com/discovery.yml
+- name: hub_url
+  value: https://hub.meltano.com
 - name: discovery_url_auth
 - name: elt.buffer_size
   kind: integer
@@ -207,8 +209,3 @@ settings:
 - name: experimental
   kind: boolean
   value: False
-
-# Hub
-- name: hub.base_url
-  kind: string
-  value: https://hub.meltano.com

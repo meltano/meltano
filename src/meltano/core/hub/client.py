@@ -100,8 +100,23 @@ class MeltanoHubService(PluginRepository):
                 "User-Agent": f"Meltano/{meltano.__version__}",
             }
         )
+
         self.settings_service = ProjectSettingsService(self.project)
-        self.base_url = self.settings_service.get("hub.base_url")
+
+        if self.settings_service.get("send_anonymous_usage_stats"):
+            project_id = self.settings_service.get("project_id")
+
+            self.session.headers["X-Project-ID"] = project_id
+
+    @property
+    def hub_api_url(self):
+        """Return the URL of the Hub API.
+
+        Returns:
+            The URL of the Hub API.
+        """
+        hub_url = self.settings_service.get("hub_url")
+        return f"{hub_url}/meltano/api/v1"
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
@@ -112,7 +127,7 @@ class MeltanoHubService(PluginRepository):
         Returns:
             The endpoint for the given plugin type.
         """
-        return f"{self.base_url}/meltano/api/v1/plugins/{plugin_type.value}/index"
+        return f"{self.hub_api_url}/plugins/{plugin_type.value}/index"
 
     def plugin_endpoint(
         self,
@@ -130,9 +145,7 @@ class MeltanoHubService(PluginRepository):
         Returns:
             The endpoint for the given plugin type.
         """
-        url = (
-            f"{self.base_url}/meltano/api/v1/plugins/{plugin_type.value}/{plugin_name}"
-        )
+        url = f"{self.hub_api_url}/plugins/{plugin_type.value}/{plugin_name}"
         if variant_name:
             url = f"{url}--{variant_name}"
 

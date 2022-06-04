@@ -69,7 +69,7 @@ def setup_env():
 
 
 class MockAdapter(BaseAdapter):
-    def _process_discovery(self, base_url: str, discovery: dict) -> dict:
+    def _process_discovery(self, api_url: str, discovery: dict) -> dict:
         hub = {}
         for plugin_type in PluginType:
             index_key = f"/{plugin_type}/index"
@@ -89,7 +89,7 @@ class MockAdapter(BaseAdapter):
                         default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{base_url}/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -107,7 +107,7 @@ class MockAdapter(BaseAdapter):
                     default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{base_url}/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -133,20 +133,17 @@ class MockAdapter(BaseAdapter):
 
         return hub
 
-    def __init__(self, base_url: str, discovery: dict) -> None:
+    def __init__(self, api_url: str, discovery: dict) -> None:
         """Create a mock HTTP adapter for the Hub.
 
         Args:
-            base_url: The base URL of the Hub.
+            api_url: The base URL of the Hub.
             discovery: A parsed discovery.yml file.
         """
         super().__init__()
-        self.base_url = base_url
+        self.api_url = api_url
         self.count = Counter()
-        self._mapping = self._process_discovery(
-            f"{base_url}/meltano/api/v1/plugins",
-            deepcopy(discovery),
-        )
+        self._mapping = self._process_discovery(api_url, deepcopy(discovery))
 
     def send(
         self,
@@ -177,14 +174,14 @@ class MockAdapter(BaseAdapter):
 @pytest.fixture(scope="class")
 def meltano_hub_service(project, discovery):
     hub = MeltanoHubService(project)
-    hub.session.mount(hub.base_url, MockAdapter(hub.base_url, discovery))
+    hub.session.mount(hub.hub_api_url, MockAdapter(hub.hub_api_url, discovery))
     return hub
 
 
 @pytest.fixture(scope="function")
 def hub_request_counter(meltano_hub_service: MeltanoHubService):
     counter: Counter = meltano_hub_service.session.get_adapter(
-        meltano_hub_service.base_url
+        meltano_hub_service.hub_api_url
     ).count
     counter.clear()
     return counter
