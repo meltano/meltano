@@ -38,6 +38,7 @@ class ConflictingSettingValueException(Exception):
             setting_names: the name/aliases where conflicting values are set
 
         """
+        self.setting_names = setting_names
         super().__init__()
 
     def __str__(self) -> str:
