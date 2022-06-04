@@ -51,18 +51,6 @@
         "$ref": "#/definitions/transforms"
       }
     },
-    "models": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/models"
-      }
-    },
-    "dashboards": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/dashboards"
-      }
-    },
     "mappers": {
       "type": "array",
       "items": {
@@ -487,58 +475,6 @@
             "package_name": {
               "description": "The name of the dbt package's internal dbt project: the value of name in dbt_project.yml."
             }
-          }
-        }
-      ]
-    },
-    "models": {
-      "description": "https://docs.meltano.com/concepts/plugins#models",
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/common"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "name": {},
-            "pip_url": {},
-            "variant": {},
-            "repo": {},
-            "namespace": {},
-            "label": {},
-            "description": {},
-            "executable": {},
-            "settings": {},
-            "docs": {},
-            "settings_group_validation": {},
-            "commands": {}
-          }
-        }
-      ]
-    },
-    "dashboards": {
-      "description": "https://docs.meltano.com/concepts/plugins#dashboards",
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/common"
-        },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "name": {},
-            "pip_url": {},
-            "variant": {},
-            "namespace": {},
-            "repo": {},
-            "label": {},
-            "description": {},
-            "executable": {},
-            "settings": {},
-            "docs": {},
-            "settings_group_validation": {},
-            "commands": {}
           }
         }
       ]

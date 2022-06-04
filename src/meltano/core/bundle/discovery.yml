@@ -3365,93 +3365,6 @@ transforms:
     pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git@config-version-2'
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
-models:
-  - name: model-adwords
-    namespace: tap_adwords
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-adwords
-    pip_url: 'git+https://gitlab.com/meltano/model-adwords.git'
-  - name: model-carbon-intensity
-    namespace: tap_carbon
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-carbon-intensity
-    pip_url: 'git+https://gitlab.com/meltano/model-carbon-intensity.git'
-  - name: model-facebook
-    namespace: tap_facebook
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-facebook
-    pip_url: 'git+https://gitlab.com/meltano/model-facebook.git'
-  - name: model-gitflix
-    namespace: tap_gitflix
-    variant: meltano
-    repo: https://gitlab.com/jschatz1/model-gitflix
-    pip_url: 'git+https://gitlab.com/jschatz1/model-gitflix.git'
-  - name: model-gitlab
-    namespace: tap_gitlab
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-gitlab
-    pip_url: 'git+https://gitlab.com/meltano/model-gitlab.git'
-  - name: model-gitlab-ultimate
-    namespace: tap_gitlab_ultimate
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-gitlab-ultimate
-    pip_url: 'git+https://gitlab.com/meltano/model-gitlab-ultimate.git'
-  - name: model-google-analytics
-    namespace: tap_google_analytics
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-google-analytics
-    pip_url: 'git+https://gitlab.com/meltano/model-google-analytics.git'
-  - name: model-salesforce
-    namespace: tap_salesforce
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-salesforce
-    pip_url: 'git+https://gitlab.com/meltano/model-salesforce.git'
-  - name: model-shopify
-    namespace: tap_shopify
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-shopify
-    pip_url: 'git+https://gitlab.com/meltano/model-shopify.git'
-  - name: model-stripe
-    namespace: tap_stripe
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-stripe
-    pip_url: 'git+https://gitlab.com/meltano/model-stripe.git'
-  - name: model-zendesk
-    namespace: tap_zendesk
-    variant: meltano
-    repo: https://gitlab.com/meltano/model-zendesk
-    pip_url: 'git+https://gitlab.com/meltano/model-zendesk.git'
-dashboards:
-  - name: dashboard-adwords
-    namespace: tap_adwords
-    variant: meltano
-    repo: https://gitlab.com/meltano/dashboard-adwords
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-adwords.git'
-  - name: dashboard-facebook
-    namespace: tap_facebook
-    variant: meltano
-    repo: https://gitlab.com/meltano/dashboard-facebook
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-facebook.git'
-  - name: dashboard-gitlab
-    namespace: tap_gitlab
-    variant: meltano
-    repo: https://gitlab.com/meltano/dashboard-gitlab
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-gitlab.git'
-  - name: dashboard-google-analytics
-    namespace: tap_google_analytics
-    variant: meltano
-    repo: https://gitlab.com/meltano/dashboard-google-analytics
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-google-analytics.git'
-  - name: dashboard-shopify
-    namespace: tap_shopify
-    variant: meltano
-    repo: https://gitlab.com/meltano/dashboard-shopify
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-shopify.git'
-  - name: dashboard-stripe
-    namespace: tap_stripe
-    variant: meltano
-    repo: https://gitlab.com/meltano/dashboard-stripe
-    pip_url: 'git+https://gitlab.com/meltano/dashboard-stripe.git'
 orchestrators:
   - name: airflow
     namespace: airflow
@@ -3474,6 +3387,10 @@ orchestrators:
       - name: core.dags_are_paused_at_creation
         env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
         value: false
+    requires:
+      files:
+        - name: airflow
+          variant: meltnano
 files:
   - name: airflow
     namespace: airflow

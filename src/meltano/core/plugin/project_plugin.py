@@ -7,6 +7,7 @@ import logging
 import sys
 from typing import Any
 
+from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import expand_env_vars, flatten, uniques_in
 
@@ -64,6 +65,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         executable: str | None = None,
         config: dict | None = None,
         commands: dict | None = None,
+        requires: dict[PluginType, list] | None = None,
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
@@ -79,6 +81,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             executable: (optional) Executable name.
             config: (optional) Plugin configuration.
             commands: (optional) Plugin commands.
+            requires: (optional) Plugin requirements.
             default_variant: (optional) Default variant for this plugin.
             extras: Extra keyword arguments.
         """
@@ -103,6 +106,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 variant=variant,
                 pip_url=pip_url,
                 executable=executable,
+                requires=requires,
                 **extras,
             )
 
@@ -124,6 +128,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self.pip_url = pip_url
         self.executable = executable
         self.commands = Command.parse_all(commands)
+        self.requires = PluginRequirement.parse_all(requires)
 
         self._fallbacks.update(
             ["logo_url", "description", self.VARIANT_ATTR, "pip_url", "executable"]
@@ -364,3 +369,24 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             return self.parent.name
 
         return self.name
+
+    @property
+    def requirements(self) -> list[ProjectPlugin]:
+        """Return the requirements for this plugin.
+
+        Returns:
+            A list of requirements for this plugin.
+        """
+        plugins = [
+            ProjectPlugin(plugin_type=plugin_type, name=dep.name, variant=dep.variant)
+            for plugin_type, deps in self.requires.items()
+            for dep in deps
+        ]
+
+        plugins.extend(
+            ProjectPlugin(plugin_type=plugin_type, name=dep.name, variant=dep.variant)
+            for plugin_type, deps in self._parent.requires.items()
+            for dep in deps
+        )
+
+        return plugins

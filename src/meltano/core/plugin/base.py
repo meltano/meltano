@@ -14,6 +14,7 @@ from meltano.core.setting_definition import SettingDefinition, YAMLEnum
 from meltano.core.utils import NotFound, find_named
 
 from .command import Command
+from .requirements import PluginRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +55,6 @@ class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
     TRANSFORMS = "transforms"
-    MODELS = "models"
-    DASHBOARDS = "dashboards"
     ORCHESTRATORS = "orchestrators"
     TRANSFORMERS = "transformers"
     FILES = "files"
@@ -234,6 +233,7 @@ class Variant(NameEq, Canonical):
         settings_group_validation: list | None = None,
         settings: list | None = None,
         commands: dict | None = None,
+        requires: dict[PluginType, list] | None = None,
         **extras,
     ):
         """Create a new Variant.
@@ -250,6 +250,7 @@ class Variant(NameEq, Canonical):
             settings_group_validation: The settings group validation.
             settings: The settings of the variant.
             commands: The commands of the variant.
+            requires: Other plugins this plugin depends on.
             extras: Additional keyword arguments.
         """
         super().__init__(
@@ -264,6 +265,7 @@ class Variant(NameEq, Canonical):
             settings_group_validation=list(settings_group_validation or []),
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
+            requires=PluginRequirement.parse_all(requires),
             extras=extras,
         )
 
@@ -425,6 +427,7 @@ class PluginDefinition(PluginRef):
             plugin.namespace,
             variant=plugin.variant,
             # Extras
+            label=plugin.label,
             docs=plugin.docs,
             repo=plugin.repo,
             pip_url=plugin.pip_url,
@@ -433,6 +436,7 @@ class PluginDefinition(PluginRef):
             settings_group_validation=plugin.settings_group_validation,
             settings=plugin.settings,
             commands=plugin.commands,
+            requires=plugin.requires,
             extras=plugin.extras,
         )
 
@@ -681,6 +685,7 @@ class StandalonePlugin(Canonical):
         name: str,
         namespace: str,
         variant: str = None,
+        label: str = None,
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
@@ -689,6 +694,7 @@ class StandalonePlugin(Canonical):
         settings_group_validation: list | None = None,
         settings: list | None = None,
         commands: dict | None = None,
+        requires: dict[PluginType, list] | None = None,
         **extras,
     ):
         """Create a locked plugin.
@@ -698,6 +704,7 @@ class StandalonePlugin(Canonical):
             name: The name of the plugin.
             namespace: The namespace of the plugin.
             variant: The variant of the plugin.
+            label: The label of the plugin.
             docs: The documentation URL of the plugin.
             repo: The repository URL of the plugin.
             pip_url: The pip URL of the plugin.
@@ -706,6 +713,7 @@ class StandalonePlugin(Canonical):
             settings_group_validation: The settings group validation of the plugin.
             settings: The settings of the plugin.
             commands: The commands of the plugin.
+            requires: Other plugins this plugin depends on.
             extras: Additional attributes to set on the plugin.
         """
         super().__init__(
@@ -713,6 +721,7 @@ class StandalonePlugin(Canonical):
             name=name,
             namespace=namespace,
             variant=variant,
+            label=label,
             docs=docs,
             repo=repo,
             pip_url=pip_url,
@@ -721,6 +730,7 @@ class StandalonePlugin(Canonical):
             settings_group_validation=settings_group_validation or [],
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
+            requires=PluginRequirement.parse_all(requires),
             extras=extras,
         )
 
@@ -731,6 +741,7 @@ class StandalonePlugin(Canonical):
         name: str,
         namespace: str,
         plugin_type: PluginType,
+        label: str = None,
     ):
         """Create a locked plugin from a variant.
 
@@ -739,6 +750,7 @@ class StandalonePlugin(Canonical):
             name: The name of the plugin.
             namespace: The namespace of the plugin.
             plugin_type: The plugin type.
+            label: The label of the plugin.
 
         Returns:
             A locked plugin definition.
@@ -748,6 +760,7 @@ class StandalonePlugin(Canonical):
             name=name,
             namespace=namespace,
             variant=variant.name,
+            label=label,
             docs=variant.docs,
             repo=variant.repo,
             pip_url=variant.pip_url,
@@ -756,5 +769,6 @@ class StandalonePlugin(Canonical):
             settings_group_validation=variant.settings_group_validation,
             settings=variant.settings,
             commands=variant.commands,
+            requires=variant.requires,
             **variant.extras,
         )

@@ -4,6 +4,7 @@ import logging
 import os
 import shutil
 from collections import namedtuple
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -11,7 +12,6 @@ import yaml
 
 from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
@@ -75,6 +75,12 @@ def discovery():  # noqa: WPS213
                         {"name": "boolean", "kind": "boolean"},
                         {"name": "auth.username"},
                         {"name": "auth.password", "kind": "password"},
+                        {
+                            "name": "aliased",
+                            "kind": "string",
+                            "aliases": ["aliased_1", "aliased_2", "aliased_3"],
+                            "env_aliases": ["TAP_MOCK_ALIASED_ALIASED_1"],
+                        },
                     ],
                     "commands": {
                         "cmd": {
@@ -126,7 +132,12 @@ def discovery():  # noqa: WPS213
             "name": "target-mock",
             "namespace": "mock",
             "pip_url": "target-mock",
-            "settings": [{"name": "schema", "env": "MOCKED_SCHEMA"}],
+            "settings": [
+                {
+                    "name": "schema",
+                    "env": "MOCKED_SCHEMA",
+                }
+            ],
         }
     )
 
@@ -136,22 +147,6 @@ def discovery():  # noqa: WPS213
             "namespace": "tap_mock",
             "pip_url": "tap-mock-transform",
             "package_name": "dbt_mock",
-        }
-    )
-
-    discovery[PluginType.MODELS].append(
-        {
-            "name": "model-gitlab",
-            "namespace": "tap_gitlab",
-            "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
-        }
-    )
-
-    discovery[PluginType.DASHBOARDS].append(
-        {
-            "name": "dashboard-google-analytics",
-            "namespace": "tap_google_analytics",
-            "pip_url": "git+https://gitlab.com/meltano/dashboard-google-analytics.git",
         }
     )
 
@@ -168,6 +163,14 @@ def discovery():  # noqa: WPS213
             "name": "transformer-mock",
             "namespace": "transformer_mock",
             "pip_url": "transformer-mock",
+            "requires": {
+                "files": [
+                    {
+                        "name": "files-transformer-mock",
+                        "variant": "meltano",
+                    },
+                ],
+            },
         }
     )
 
@@ -210,7 +213,13 @@ def discovery():  # noqa: WPS213
                     "executable": "mapper-mock-cmd",
                     "pip_url": "mapper-mock",
                     "package_name": "mapper-mock",
-                }
+                },
+                {
+                    "name": "alternative",
+                    "executable": "mapper-mock-alt",
+                    "pip_url": "mapper-mock-alt",
+                    "package_name": "mapper-mock-alt",
+                },
             ],
         }
     )
@@ -220,17 +229,12 @@ def discovery():  # noqa: WPS213
 
 @pytest.fixture(scope="class")
 def plugin_discovery_service(project, discovery):
-    return PluginDiscoveryService(project, discovery=discovery)
+    return PluginDiscoveryService(project, discovery=deepcopy(discovery))
 
 
 @pytest.fixture(scope="class")
 def locked_definition_service(project):
     return LockedDefinitionService(project)
-
-
-@pytest.fixture(scope="class")
-def project_compiler(project):
-    return ProjectCompiler(project)
 
 
 @pytest.fixture(scope="class")
@@ -275,43 +279,22 @@ def plugin_invoker_factory(
 
 
 @pytest.fixture(scope="class")
-def add_model(project, plugin_install_service, project_add_service):
-    models = [
-        "model-carbon-intensity",
-        "model-gitflix",
-        "model-salesforce",
-        "model-gitlab",
-    ]
-
-    for model in models:
-        plugin = project_add_service.add(PluginType.MODELS, model)
-        plugin_install_service.install_plugin(plugin)
-
-    yield
-
-    # clean-up
-    with project.meltano_update() as meltano:
-        meltano["plugins"]["models"] = [
-            model_def
-            for model_def in meltano["plugins"]["models"]
-            if model_def["name"] not in models
-        ]
-
-    for created_model in models:
-        shutil.rmtree(project.model_dir(created_model))
-
-
-@pytest.fixture(scope="class")
 def config_service(project):
     return ConfigService(project, use_cache=False)
 
 
 @pytest.fixture(scope="class")
-def project_plugins_service(project, config_service, plugin_discovery_service):
+def project_plugins_service(
+    project,
+    config_service,
+    plugin_discovery_service,
+    meltano_hub_service,
+):
     return ProjectPluginsService(
         project,
         config_service=config_service,
         discovery_service=plugin_discovery_service,
+        hub_service=meltano_hub_service,
         use_cache=False,
     )
 
@@ -396,6 +379,14 @@ def dbt(project_add_service):
 
 
 @pytest.fixture(scope="class")
+def transformer(project_add_service: ProjectAddService):
+    try:
+        return project_add_service.add(PluginType.TRANSFORMERS, "transformer-mock")
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
 def utility(project_add_service):
     try:
         return project_add_service.add(PluginType.UTILITIES, "utility-mock")
@@ -414,16 +405,28 @@ def task_sets_service(project):
 
 
 @pytest.fixture(scope="class")
-def schedule(project, tap, target, schedule_service):
+def elt_schedule(project, tap, target, schedule_service):
     try:
-        return schedule_service.add(
+        return schedule_service.add_elt(
             None,
-            "schedule-mock",
+            "elt-schedule-mock",
             extractor=tap.name,
             loader=target.name,
             transform="skip",
             interval="@once",
             start_date=datetime.datetime.now(),
+        )
+    except ScheduleAlreadyExistsError as err:
+        return err.schedule
+
+
+@pytest.fixture(scope="class")
+def job_schedule(project, tap, target, schedule_service):
+    try:
+        return schedule_service.add(
+            "job-schedule-mock",
+            "mock-job",
+            interval="@once",
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule

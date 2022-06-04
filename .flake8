@@ -62,6 +62,8 @@ ignore =
     WPS348
     # Allow "overuse" of noqa comments.
     WPS402
+    # Allow metadta variable (__all__)
+    WPS410
     # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
     WPS420
     # Allow nested classes

@@ -6,8 +6,7 @@ import yaml
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.m5o.dashboards_service import DashboardsService
-from meltano.core.m5o.reports_service import ReportsService
+from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -15,12 +14,20 @@ from meltano.core.plugin_install_service import PluginInstallReason
 
 
 class TestCliAdd:
+    @pytest.fixture(autouse=True)
+    def patch_hub(self, meltano_hub_service: MeltanoHubService):
+        with mock.patch(
+            "meltano.core.project_plugins_service.MeltanoHubService",
+            return_value=meltano_hub_service,
+        ):
+            yield
+
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name,default_variant,related_plugin_refs",
+        "plugin_type,plugin_name,default_variant,required_plugin_refs",
         [
             (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
             (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
-            (
+            pytest.param(
                 PluginType.TRANSFORMS,
                 "tap-carbon-intensity",
                 "meltano",
@@ -28,9 +35,11 @@ class TestCliAdd:
                     PluginRef(PluginType.TRANSFORMERS, "dbt"),
                     PluginRef(PluginType.FILES, "dbt"),
                 ],
+                marks=[
+                    # Remove in: https://github.com/meltano/meltano/pull/5957
+                    pytest.mark.xfail,
+                ],
             ),
-            (PluginType.MODELS, "model-carbon-intensity", "meltano", []),
-            (PluginType.DASHBOARDS, "dashboard-google-analytics", "meltano", []),
             (
                 PluginType.ORCHESTRATORS,
                 "airflow",
@@ -38,13 +47,19 @@ class TestCliAdd:
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
         ],
+        ids=[
+            "single-extractor",
+            "single-loader",
+            "transform-and-related",
+            "orchestrator-and-required",
+        ],
     )
     def test_add(
         self,
         plugin_type,
         plugin_name,
         default_variant,
-        related_plugin_refs,
+        required_plugin_refs,
         project,
         cli_runner,
         project_plugins_service,
@@ -66,21 +81,21 @@ class TestCliAdd:
 
             plugins = [plugin]
 
-            for related_plugin_ref in related_plugin_refs:
-                if (related_plugin_ref._type) == PluginType.FILES and (
-                    related_plugin_ref.name == "dbt"
+            for required_plugin_ref in required_plugin_refs:
+                if (required_plugin_ref._type) == PluginType.FILES and (
+                    required_plugin_ref.name == "dbt"
                 ):
                     # file bundles with no managed files are added but do not appear in meltano.yml
                     assert (
-                        f"Adding related file bundle '{related_plugin_ref.name}'"
+                        f"Adding required file bundle '{required_plugin_ref.name}'"
                         in res.stdout
                     )
                 else:
-                    plugin = project_plugins_service.get_plugin(related_plugin_ref)
+                    plugin = project_plugins_service.get_plugin(required_plugin_ref)
                     assert plugin
 
                     assert (
-                        f"Added related {plugin.type.descriptor} '{plugin.name}'"
+                        f"Added required {plugin.type.descriptor} '{plugin.name}'"
                         in res.stdout
                     )
 
@@ -148,31 +163,6 @@ class TestCliAdd:
         assert project_yaml["vars"]["tap_google_analytics"] == {
             "schema": "{{ env_var('DBT_SOURCE_SCHEMA') }}"
         }
-
-    def test_add_dashboard(self, project, cli_runner):
-        def install():
-            return cli_runner.invoke(
-                cli, ["add", "dashboard", "dashboard-google-analytics"]
-            )
-
-        res = install()
-        assert res.exit_code == 0
-
-        dashboards_service = DashboardsService(project)
-        dashboards_count = len(dashboards_service.get_dashboards())
-
-        assert dashboards_count > 0
-
-        reports_service = ReportsService(project)
-        reports_count = len(reports_service.get_reports())
-        assert reports_count > 0
-
-        # Verify that reinstalling doesn't duplicate dashboards and reports
-        res = install()
-        assert res.exit_code == 0
-
-        assert len(dashboards_service.get_dashboards()) == dashboards_count
-        assert len(reports_service.get_reports()) == reports_count
 
     def test_add_files_with_updates(
         self,
@@ -258,18 +248,9 @@ class TestCliAdd:
                 "tap-gitlab", PluginType.TRANSFORMS
             )
             assert transform
-            model = project_plugins_service.find_plugin(
-                "model-gitlab", PluginType.MODELS
-            )
-            assert model
-            dashboard = project_plugins_service.find_plugin(
-                "dashboard-gitlab", PluginType.DASHBOARDS
-            )
-            assert dashboard
-
             install_plugin_mock.assert_called_once_with(
                 project,
-                [dashboard, model, transform, tap],
+                [transform, tap],
                 reason=PluginInstallReason.ADD,
                 parallelism=1,
             )
@@ -304,14 +285,21 @@ class TestCliAdd:
         ), mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
-                cli, ["add", "extractor", "tap-mock", "--variant", "singer-io"]
+                cli,
+                [
+                    "add",
+                    "mapper",
+                    "mapper-mock",
+                    "--variant",
+                    "alternative",
+                ],
             )
             assert_cli_runner(res)
 
             plugin = project_plugins_service.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock"
+                plugin_type=PluginType.MAPPERS, plugin_name="mapper-mock"
             )
-            assert plugin.variant == "singer-io"
+            assert plugin.variant == "alternative"
 
     def test_add_inherited(
         self,
@@ -370,8 +358,7 @@ class TestCliAdd:
             )
             assert_cli_runner(res)
             assert (
-                "Inherit from:\ttap-mock, variant singer-io (deprecated)\n"
-                in res.stdout
+                "Inherit from:\ttap-mock, variant singer-io (default)\n" in res.stdout
             )
 
             inherited_variant = project_plugins_service.find_plugin(

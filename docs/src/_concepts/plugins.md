@@ -2,6 +2,8 @@
 title: Plugins
 description: Meltano takes a modular approach to data engineering and EL(T), where your project and pipelines are composed of plugins.
 layout: doc
+redirect_from:
+  - /guide/analysis
 weight: 2
 ---
 
@@ -49,7 +51,7 @@ and other plugins have already been collected by users and [contributed](/contri
 making them supported out of the box.
 
 Discoverable plugins are defined in the `discovery.yml` manifest,
-which can be found [in the Meltano repository](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml),
+which can be found [in the Meltano repository](https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml),
 ships inside the [`meltano` package](https://pypi.org/project/meltano/),
 and is available at <https://www.meltano.com/discovery.yml>.
 If you'd like to use a different (custom) manifest in your project,
@@ -90,7 +92,7 @@ you'll need to collect and provide this metadata yourself.
 To learn how to add a custom plugin to your project using a [custom plugin definition](project#custom-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ## Plugin Inheritance
@@ -120,8 +122,6 @@ Meltano supports the following types of plugins:
 - [**Mappers**](#mappers) perform stream map transforms on data between extractors and loaders.
 - [**Loaders**](#loaders) load extracted data into arbitrary data destinations.
 - [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
-- [**Models**](#models) describe the schema of the data being analyzed and the ways different tables can be joined.
-- [**Dashboards**](#dashboards) bundle curated Meltano UI dashboards and reports.
 - [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
 - [**Transformers**](#transformers) run transforms.
 - [**File bundles**](#file-bundles) bundle files you may want in your project.
@@ -689,20 +689,6 @@ meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('
 export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 {% endraw %}
 ```
-
-### Models
-
-Models are [pip packages](https://pip.pypa.io/en/stable/) used by [Meltano UI](/reference/ui) to aid in [data analysis](/guide/analysis).
-They describe the schema of the data being analyzed and the ways different tables can be joined,
-and are used to automatically generate SQL queries using a point-and-click interface.
-
-### Dashboards
-
-Dashboards are [pip packages](https://pip.pypa.io/en/stable/) bundling curated [Meltano UI](/reference/ui) dashboards and reports.
-
-When a dashboard is added to your project using [`meltano add`](/reference/command-line-interface#add),
-the bundled dashboards and reports will automatically be added to your project's `analyze` directory as well.
-
 ### Orchestrators
 
 Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for [orchestrating](/guide/orchestration) a project's [scheduled pipelines](/reference/command-line-interface#schedule).
@@ -768,49 +754,7 @@ export DBT__UPDATE='{"transform/dbt_project.yml": false}'
 ### Utilities
 
 If none of the other plugin types address your needs, any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility.
-Meltano includes a selection of discoverable utilities, or you can easily add your own custom utility.
-
-#### Discoverable Utilities
-
-##### SQLFluff
-
-[SQLFluff](https://docs.sqlfluff.com/en/stable/) is a linting tool for SQL files, often used with dbt to enforce SQL code standards. From the documentation:
-
-> Bored of not having a good SQL linter that works with whichever dialect you’re working with? SQLFluff is an extensible and modular linter designed to help you write good SQL and catch errors and bad SQL before it hits your database.
-
-Install with Meltano:
-
-```bash
-meltano add utility sqlfluff
-# now try it out!
-meltano invoke sqlfluff --help
-```
-
-##### Great Expectations
-
-[Great Expectations](https://docs.greatexpectations.io/docs/) helps data teams eliminate pipeline debt, through data testing, documentation, and profiling. From the documentation:
-
-> Great Expectations is the leading tool for validating, documenting, and profiling your data to maintain quality and improve communication between teams. Head over to our [getting started](https://docs.greatexpectations.io/docs/tutorials/getting_started/intro) tutorial.
-
-Install with Meltano:
-
-```bash
-meltano add utility great_expectations
-# now try it out!
-meltano invoke great_expectations --help
-```
-
-If you are using Great Expectations to validate data in a database or warehouse, you
-might need to install the appropriate drivers. Common options are supported by Great Expectations
-as pip extras, and any additional packages you may want can be added too by configuring
-a custom `pip_url` for the `great_expectations` utility:
-
-```bash
-# set the _pip_url extra setting
-meltano config great_expectations set _pip_url "great_expectations[redshift]; awscli"
-# re-install the great_expectations plugin for changes to take effect
-meltano install utility great_expectations
-```
+Meltano has a selection of available utilities listed on [MeltanoHub](https://hub.meltano.com/utilities), or you can easily add your own custom utility.
 
 #### Custom Utilities
 

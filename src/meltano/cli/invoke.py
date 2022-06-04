@@ -1,8 +1,9 @@
 """CLI command `meltano invoke`."""
 
+from __future__ import annotations
+
 import logging
 import sys
-from typing import Tuple
 
 import click
 from sqlalchemy.orm import sessionmaker
@@ -32,6 +33,11 @@ logger = logging.getLogger(__name__)
     short_help="Invoke a plugin.",
 )
 @click.option(
+    "--print-var",
+    help="Print to stdout the values for the provided environment variables, as passed to the plugininvoker context. Useful for debugging.",
+    multiple=True,
+)
+@click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
 )
 @click.option(
@@ -58,8 +64,9 @@ def invoke(
     dump: str,
     list_commands: bool,
     plugin_name: str,
-    plugin_args: Tuple[str, ...],
+    plugin_args: tuple[str, ...],
     containers: bool = False,
+    print_var: str | None = None,
 ):
     """
     Invoke a plugin's executable with specified arguments.
@@ -95,6 +102,7 @@ def invoke(
             dump,
             command_name,
             containers,
+            print_var=print_var,
         )
     )
     sys.exit(exit_code)
@@ -109,12 +117,18 @@ async def _invoke(
     dump: str,
     command_name: str,
     containers: bool,
+    print_var: list | None = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
 
     try:
         async with invoker.prepared(session):
+            if print_var:
+                env = invoker.env()
+                for key in print_var:
+                    val = env.get(key)
+                    click.echo(f"{key}={val}")
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
