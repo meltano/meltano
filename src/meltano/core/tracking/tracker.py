@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import datetime
+import json
 import locale
 import re
 from contextlib import contextmanager
+from linecache import cache
 from typing import Any
 from urllib.parse import urlparse
 
@@ -84,14 +86,101 @@ class Tracker:
         else:
             self.snowplow_tracker = None
 
-        self.send_anonymous_usage_stats = self.settings_service.get(
-            "send_anonymous_usage_stats", True
-        )
-
         self.contexts: tuple[SelfDescribingJson] = (
             environment_context,
             ProjectContext(project),
         )
+
+    @cached_property
+    def send_anonymous_usage_stats(self) -> bool:
+        """Return whether anonymous usages stats are enabled (bool).
+
+        - Return the value from 'send_anonymous_usage_stats', if set.
+        - Otherwise the opposite of 'tracking_disabled', if set.
+        - Otherwise return 'True'
+
+        """
+        if self.settings_service.get("send_anonymous_usage_stats", None) is not None:
+            return self.settings_service.get("send_anonymous_usage_stats")
+        if self.settings_service.get("tracking_disabled", None) is not None:
+            return not self.settings_service.get("tracking_disabled")
+
+        return True
+
+    def sync_analytics_settings(self) -> None:
+        """Returns a dict with client_id, project_id, and send_anonymous_usage_stats."""
+        analytics_json_path = self.project.meltano_dir() / "analytics.json"
+        try:
+            with open(analytics_json_path, encoding="utf-8") as analytics_json_file:
+                analytics_json = json.load(analytics_json_file)
+        except FileNotFoundError:
+            if not self.send_anonymous_usage_stats:
+                # Tracking disabled and no tracking file to update.
+                return
+
+            # Tracking is enabled and no 'analytics.json' file exists.
+            # Store the generated `client_id` along with `project_id` and
+            # `send_anonymous_usage_stats=True` in a non-versioned `analytics.json` file
+            # so that it persists between meltano runs.
+            self._save_analytics_settings(
+                client_id=uuid.uuid4(),
+                project_id=self.project_uuid(),
+                send_anonymous_usage_stats=True,
+            )
+            return
+
+        # File does exist. Read existing settings.
+        client_id = analytics_json.get("client_id", uuid.uuid4())
+        project_id = analytics_json.get("project_id", self.project_uuid())
+        send_anonymous_usage_stats = analytics_json.get(
+            "send_anonymous_usage_stats", self.send_anonymous_usage_stats
+        )
+        self._telemetry_state_change_check(
+            project=project,
+            prior_project_id=project_id,
+            prior_send_anonymous_usage_stats_val=send_anonymous_usage_stats,
+        )
+        self._save_analytics_settings(
+            client_id=client_id,
+            project_id=project_id,
+            send_anonymous_usage_stats=send_anonymous_usage_stats,
+        )
+
+    def _save_analytics_settings(
+        self, client_id: str, project_id: str, send_anonymous_usage_stats: bool
+    ) -> None:
+        analytics_json_path = self.project.meltano_dir() / "analytics.json"
+        with open(
+            analytics_json_path, "w", encoding="utf-8"
+        ) as new_analytics_json_file:
+            json.dump(
+                {
+                    "client_id": str(client_id),
+                    "project_id": str(project_id),
+                    "send_anonymous_usage_stats": send_anonymous_usage_stats,
+                },
+                new_analytics_json_file,
+            )
+
+    def _telemetry_state_change_check(
+        self, project, prior_project_id, prior_send_anonymous_usage_stats_val
+    ) -> None:
+        """Check prior values against current ones and send a change event if needed."""
+        if (
+            prior_project_id == self.project_uuid()
+            and prior_send_anonymous_usage_stats_val == self.send_anonymous_usage_stats
+        ):
+            # No change. Nothing to do.
+            return
+
+        logger.debug(
+            "Telemetry state change detected. "
+            "A one time telemetry_state_change event will now be sent."
+        )
+        tracker = Tracker(project)
+        cmd_ctx = CliContext("invoke")
+        with tracker.with_contexts(cmd_ctx):
+            tracker.track_command_event({"event": "started"})
 
     @cached_property
     def timezone_name(self) -> str:

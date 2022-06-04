@@ -104,6 +104,7 @@ class ProjectContext(SelfDescribingJson):
 
         return project_id
 
+    # TODO: Move this up one level, to the Tracker class
     @cached_property
     def client_uuid(self) -> uuid.UUID:
         """Obtain the `client_id` from the non-versioned `analytics.json`.
