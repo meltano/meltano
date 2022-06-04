@@ -381,8 +381,8 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         """
         action = f"meltano state {subcommand}"
         if state_id:
-            state_id = hash_sha256(state_id)
-            action = f"{action} {state_id}"
+            hashed_state_id = hash_sha256(state_id)
+            action = f"{action} {hashed_state_id}"
         self.track_event(category="meltano state", action=action)
 
     def track_meltano_ui(self, debug: bool = False) -> None:
