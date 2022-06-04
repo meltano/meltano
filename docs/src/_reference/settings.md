@@ -42,7 +42,7 @@ By default, Meltano shares anonymous usage data with the Meltano team using Goog
 We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
 If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
-This project ID is also sent along when Meltano loads the remote `discovery.yml` manifest from the URL identified by the [`discovery_url` setting](#discovery-url).
+This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
 the Tracking IDs can be configured using the `tracking_ids.*` settings below.
@@ -237,10 +237,27 @@ meltano config meltano set project_readonly true
 export MELTANO_PROJECT_READONLY=true
 ```
 
+### <a name="hub-url"></a>`hub_url`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
+- Default: [`https://hub.meltano.com`](https://hub.meltano.com)
+
+Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
+
+This manifest is used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add), among others.
+
+#### How to use
+
+```bash
+meltano config meltano set hub_url http://localhost:4000
+
+export MELTANO_HUB_URL=http://localhost:4000
+```
+
 ### <a name="discovery-url"></a>`discovery_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DISCOVERY_URL`
-- Default: [`https://www.meltano.com/discovery.yml`](https://www.meltano.com/discovery.yml)
+- Default: [`https://discovery.meltano.com/discovery.yml`](https://discovery.meltano.com/discovery.yml)
 
 Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box.
 
