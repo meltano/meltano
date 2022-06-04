@@ -1,6 +1,6 @@
 {
     "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
-    "description": "Schema for a Snowplow context describing the environment in which Meltano is operating",
+    "description": "Schema for a Snowplow context describing the environment in which the Meltano process is executing",
     "self": {
         "vendor": "com.meltano",
         "name": "environment_context",
