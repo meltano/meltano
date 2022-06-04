@@ -1,9 +1,9 @@
 {
     "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
-    "description": "Schema for a Snowplow context describing a Meltano command",
+    "description": "Schema for a Snowplow context describing a Meltano cli command",
     "self": {
         "vendor": "com.meltano",
-        "name": "command_context",
+        "name": "cli_context",
         "format": "jsonschema",
         "version": "1-0-0"
     },
@@ -21,19 +21,13 @@
             "type": "string",
             "maxLength": 1024
         },
-        "category": {
+        "sub_command": {
             "description": "",
-            "type": "string",
-            "enum": [
-                "run",
-                "invoke",
-                "elt"
-            ]
-        },
-        "action": {
-            "description": "",
-            "type": "string",
-            "maxLength": 256
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 1024
         },
         "option_keys": {
             "description": "",
@@ -43,24 +37,13 @@
                 "type": "string",
                 "maxLength": 256
             }
-        },
-        "type": {
-            "description": "",
-            "type": "string",
-            "enum": [
-                "plugin",
-                "native",
-                "config"
-            ]
         }
     },
     "required": [
         "event_uuid",
         "command",
-        "category",
-        "action",
-        "option_keys",
-        "type"
+        "sub_command",
+        "option_keys"
     ],
     "additionalProperties": false
 }

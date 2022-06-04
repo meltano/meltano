@@ -55,9 +55,7 @@ class Tracker:
 
         Args:
             project: The Meltano project.
-            request_timeout: Timeout for the HTTP requests. Can be set either as single float value
-                which applies to both `connect` AND `read` timeout, or as tuple with two float
-                values which specify the `connect` and `read` timeouts separately.
+            request_timeout: Timeout for the HTTP requests. Can be set either as single float value which applies to both `connect` AND `read` timeout, or as tuple with two float values which specify the `connect` and `read` timeouts separately.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
@@ -84,9 +82,6 @@ class Tracker:
             self.snowplow_tracker = SnowplowTracker(emitters=emitters)
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
-            # No good way to get the IP address without making a web request. We could use UPnP, but
-            # that's pretty heavyweight, both in terms of runtime, and required dependencies.
-            # self.subject.set_ip_address()
         else:
             self.snowplow_tracker = None
 
@@ -101,7 +96,7 @@ class Tracker:
 
     @cached_property
     def timezone_name(self) -> str:
-        """The local timezone as an IANA TZ database name if possible, or abbreviation otherwise.
+        """Obtain the local timezone name.
 
         Examples:
             The timezone name as an IANA timezone database name:
@@ -113,6 +108,9 @@ class Tracker:
 
                 >>> SnowplowTracker(project).timezone_name
                 'CET'
+
+        Returns:
+            The local timezone as an IANA TZ database name if possible, or abbreviation otherwise.
         """
         try:
             return tzlocal.get_localzone_name()
@@ -121,7 +119,14 @@ class Tracker:
 
     @contextmanager
     def with_contexts(self, *extra_contexts) -> Tracker:
-        """Context manager within which the `Tracker` has additional Snowplow contexts."""
+        """Context manager within which the `Tracker` has additional Snowplow contexts.
+
+        Args:
+            extra_contexts: The additional contexts to add to the `Tracker`.
+
+        Yields:
+            A `Tracker` with additional Snowplow contexts.
+        """
         prev_contexts = self.contexts
         self.contexts = (*prev_contexts, *extra_contexts)
         try:
@@ -130,10 +135,22 @@ class Tracker:
             self.contexts = prev_contexts
 
     def can_track(self) -> bool:
+        """Check if the tracker can be used.
+
+        Returns:
+            True if the tracker can be used, False otherwise.
+        """
         return self.snowplow_tracker is not None and self.send_anonymous_usage_stats
 
-    # TODO: Remove `Tracker.track_struct_event` once the legacy tracker has been removed.
     def track_struct_event(self, category: str, action: str) -> None:
+        """Fire a structured tracking event.
+
+        Note: This is a legacy method that will be removed in a future version, once LegacyTracker is no longer used.
+
+        Args:
+            category: The category of the event.
+            action: The event actions.
+        """
         if not self.can_track():
             return
 
@@ -152,6 +169,11 @@ class Tracker:
             )
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
+        """Fire an unstructured tracking event.
+
+        Args:
+            event_json: The SelfDescribingJson event to track. See the Snowplow documentation for more information.
+        """
         if not self.can_track():
             return
         try:
@@ -162,8 +184,13 @@ class Tracker:
             )
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:
+        """Fire generic command tracking event.
+
+        Args:
+            event_json: The event JSON to track. See cli_event schema for more details.
+        """
         self.track_unstruct_event(
             SelfDescribingJson(
-                "iglu:com.meltano/command_event/jsonschema/1-0-0", event_json
+                "iglu:com.meltano/cli_event/jsonschema/1-0-0", event_json
             )
         )

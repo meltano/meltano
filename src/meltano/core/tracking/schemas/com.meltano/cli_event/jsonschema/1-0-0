@@ -1,9 +1,9 @@
 {
     "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
-    "description": "Schema for a Snowplow event describing a Meltano command",
+    "description": "Schema for a Snowplow event describing a Meltano cli command",
     "self": {
         "vendor": "com.meltano",
-        "name": "command_event",
+        "name": "cli_event",
         "format": "jsonschema",
         "version": "1-0-0"
     },

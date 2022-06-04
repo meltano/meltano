@@ -1,8 +1,8 @@
 To validate/lint a schema use `iguctl` rather than the Snowcat Cloud UI e.g.:
 
 ```bash
- $ $PATH_TO/igluctl lint .
-OK: com.meltano/command_context/jsonschema/1-0-0
+ $ $PATH_TO/igluctl lint ./src/meltano/core/tracking
+OK: com.meltano/cli_context/jsonschema/1-0-0
 OK: com.meltano/environment_context/jsonschema/1-0-0
 OK: com.meltano/plugins_context/jsonschema/1-0-0
 OK: com.meltano/project_context/jsonschema/1-0-0
