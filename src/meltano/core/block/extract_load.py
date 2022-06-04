@@ -299,8 +299,8 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             self.context.job = None
 
         elif self.context.update_state:
-            job_id = generate_job_id(self.context.project, self.head, self.tail)
-            self.context.job = Job(job_id=job_id)
+            state_id = generate_state_id(self.context.project, self.head, self.tail)
+            self.context.job = Job(job_id=state_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
                 self.context.job.job_id, self.context.job.run_id
@@ -787,8 +787,8 @@ def _check_exit_codes(  # noqa: WPS238
         raise RunnerError("Mappers failed", failed_mappers)
 
 
-def generate_job_id(project: Project, consumer: IOBlock, producer: IOBlock) -> str:
-    """Generate a job id based on a project active environment and consumer and producer names.
+def generate_state_id(project: Project, consumer: IOBlock, producer: IOBlock) -> str:
+    """Generate a state id based on a project active environment and consumer and producer names.
 
     Args:
         project: Project to retrieve active environment from.
@@ -796,11 +796,13 @@ def generate_job_id(project: Project, consumer: IOBlock, producer: IOBlock) -> s
         producer: Producer block.
 
     Returns:
-        Job id string.
+        State id string.
 
     Raises:
         RunnerError: if the project does not have an active environment.
     """
     if not project.active_environment:
-        raise RunnerError("No active environment for invocation, but requested job id")
+        raise RunnerError(
+            "No active environment for invocation, but requested state id"
+        )
     return f"{project.active_environment.name}:{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237

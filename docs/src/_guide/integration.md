@@ -12,7 +12,7 @@ which take the role of [your project](/concepts/project)'s [extractors](/concept
 Meltano [manages your tap and target configuration](#plugin-configuration) for you,
 makes it easy to [select which entities and attributes to extract](#selecting-entities-and-attributes-for-extraction),
 and keeps track of [the incremental replication state](#incremental-replication-state),
-so that subsequent pipeline runs with the same job ID will always pick up right where
+so that subsequent pipeline runs with the same state ID will always pick up right where
 the previous run left off.
 
 You can run EL(T) pipelines using [`meltano elt`](/reference/command-line-interface#elt).
@@ -217,20 +217,20 @@ To learn more about how Full-Table Replication works and its limitations, refer 
 
 ## Incremental replication state
 
-Most extractors (Singer taps) generate [state](https://hub.meltano.com/singer/spec#state) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time (made possible by the `--job_id` argument).
+Most extractors (Singer taps) generate [state](https://hub.meltano.com/singer/spec#state) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time (made possible by the `--state-id` argument).
 
 Loaders (Singer targets) take in data and state messages from extractors and are responsible for forwarding the extractor state to Meltano once the associated data has been successfully persisted in the destination.
 
-Meltano stores this pipeline state in its [system database](/concepts/project#system-database), identified by the [`meltano elt`](/reference/command-line-interface#elt) run's Job ID defined with the `--job_id` argument. The Job ID should be a unique string identifier for the pipeline and must be present in each execution in order for incremental replication to work.
+Meltano stores this pipeline state in its [system database](/concepts/project#system-database), identified by the [`meltano elt`](/reference/command-line-interface#elt) run's State ID defined with the `--state-id` argument. The State ID should be a unique string identifier for the pipeline and must be present in each execution in order for incremental replication to work.
 
 If you'd like to manually inspect a job's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
 
-If you know the `job_id` of the relevant job, you can also manually view and edit state using [the `meltano state` CLI command](/reference/command-line-interface#state).
+If you know the `state_id` of the relevant job, you can also manually view and edit state using [the `meltano state` CLI command](/reference/command-line-interface#state).
 
 ### Internal State Merge Logic
 
-When running Extract and Load jobs via [`run`](/reference/command-line-interface#run) or [`elt`](/reference/command-line-interface#elt), Meltano will pull state from the system databse from the most recently completed job where the Job ID with the same Job ID that generated a state.
-When a data replication job is executed via [`run`](/reference/command-line-interface#run) or [`elt`](/reference/command-line-interface#elt), Meltano with fetch state from the system database using the Job ID as unique key.
+When running Extract and Load jobs via [`run`](/reference/command-line-interface#run) or [`elt`](/reference/command-line-interface#elt), Meltano will pull state from the system databse from the most recently completed job where the State ID with the same State ID that generated a state.
+When a data replication job is executed via [`run`](/reference/command-line-interface#run) or [`elt`](/reference/command-line-interface#elt), Meltano with fetch state from the system database using the State ID as unique key.
 If a state record from a completed job is found, its data is then passed along to the extractor.
 If one or more partial state records are found, the partial data is merged with the last completed state, to produce an up-to-date state artifact which will be passed along to the extractor.
 The same merge behavior is performed whenever a user runs [`meltano state get`](/reference/command-line-interface#state).
@@ -283,7 +283,7 @@ Then `meltano elt` will accept the catalog file and will pass it to the tap usin
 
 ### Incremental Replication Not Running as Expected
 
-If you're trying to run a pipeline with incremental replication using `meltano elt` but it's running a full sync, ensure that you're passing a [Job ID](/getting-started#run-a-data-integration-el-pipeline) via the [`--job-id` flag](/reference/command-line-interface#how-to-use-4).
+If you're trying to run a pipeline with incremental replication using `meltano elt` but it's running a full sync, ensure that you're passing a [State ID](/getting-started#run-a-data-integration-el-pipeline) via the [`--state-id` flag](/reference/command-line-interface#how-to-use-4).
 
 ### Testing Specific Failing Streams
 
