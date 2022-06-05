@@ -55,9 +55,6 @@ class AnalyticsSettings(NamedTuple):
     """Settings which control telemetry and anonymous usage stats.
 
     These are stored within `analytics.json`.
-
-    Args:
-        NamedTuple: _description_
     """
 
     client_id: Optional[uuid.UUID]
@@ -127,7 +124,6 @@ class Tracker:
         - Return the value from 'send_anonymous_usage_stats', if set.
         - Otherwise the opposite of 'tracking_disabled', if set.
         - Otherwise return 'True'
-
         """
         if self.settings_service.get("send_anonymous_usage_stats", None) is not None:
             return self.settings_service.get("send_anonymous_usage_stats")
@@ -170,7 +166,6 @@ class Tracker:
             )
 
         self._save_analytics_settings()
-        return
 
     @cached_property
     def timezone_name(self) -> str:
@@ -308,10 +303,13 @@ class Tracker:
 
     @property
     def _analytics_json_path(self) -> Path:
+        """Return path to the 'analytics.json' file."""
         return self.project.meltano_dir() / "analytics.json"
 
     @property
     def _analytics_json_settings(self) -> AnalyticsSettings:
+        """Get settings from the 'analytics.json' file."""
+
         def _uuid_from_str(from_val: Optional[Any], warn: bool):
             if not isinstance(from_val, str):
                 if from_val is None:
@@ -352,6 +350,7 @@ class Tracker:
             return AnalyticsSettings(None, None, None)
 
     def _save_analytics_settings(self) -> None:
+        """Save settings to the 'analytics.json' file."""
         analytics_json_path = self.project.meltano_dir() / "analytics.json"
         with open(
             analytics_json_path, "w", encoding="utf-8"
