@@ -1,4 +1,10 @@
-To validate/lint a schema use `iguctl` rather than the Snowcat Cloud UI e.g.:
+# required reading
+
+See https://www.iglooanalytics.com/blog/understanding-snowplow-analytics-custom-contexts.html for more information.
+
+# iguctl usage
+
+To validate/lint a schema use [`iguctl`](https://github.com/snowplow-incubator/igluctl) rather than the Snowcat Cloud UI e.g.:
 
 ```bash
  $ $PATH_TO/igluctl lint ./src/meltano/core/tracking
@@ -10,7 +16,9 @@ TOTAL: 4 valid schemas
 TOTAL: 0 schemas didn't pass validation
 ```
 
-See https://www.iglooanalytics.com/blog/understanding-snowplow-analytics-custom-contexts.html for more information.
+Note that igluctl is Java and so will require local runtime to be installed. 
+
+# Snowcat Cloud access
 
 When a new version of the schema is introduced , it must also be updated in our schema registry,
 SnowcatCloud.
@@ -28,10 +36,13 @@ an account admin if necessary. As of the time of writing this, the admins are:
 Once SnowcatCloud provides an API to update the schemas, we should add a CI job to update them
 automatically when a release pipeline is run with changes in this directory.
 
+# Snowcloud Micro - for local development and testing
+
 To test/validate schemas [snowcloud-micro](https://github.com/snowplow-incubator/snowplow-micro) can be used:
 
 
 ```
+# from this directory
 docker run \
   --mount type=bind,source=$(pwd),destination=/config \
   -p 9090:9090 \
@@ -57,4 +68,10 @@ http localhost:9090/micro/bad
 
 # reset counters
 http localhost:9090/micro/reset
+```
+
+To redirect events to a local snowplow micro instance:
+
+```
+MELTANO_DISABLE_TRACKING=False MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS='["http://localhost:9090"]' meltano invoke something
 ```

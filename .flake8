@@ -143,6 +143,10 @@ per_file_ignores =
         WPS442
         # Allow nested functions in test methods
         WPS430
+        # Allow magic numbers
+        WPS432
+        # Allow protected module import (_pytest.monkeypatch)
+        WPS436
         # Allow protected attribute usage in test methods
         WPS437
         # Found block variables overlap (false positive)
@@ -153,6 +157,7 @@ per_file_ignores =
         WPS202
         # Found boolean non-keyword argument
         WPS425
+
 	# Found too long name
 	WPS118
 

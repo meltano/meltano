@@ -13,7 +13,7 @@ module.exports = {
       chunks: ['chunk-vendors', 'chunk-common', 'app'],
 
       // forwarded to html-webpack-plugin
-      injectFlaskContext: isProd
+      injectFlaskContext: isProd,
     },
     embed: {
       entry: 'src/main-embed.js',
@@ -22,8 +22,8 @@ module.exports = {
       chunks: ['chunk-vendors', 'chunk-common', 'embed'],
 
       // forwarded to html-webpack-plugin
-      injectFlaskContext: isProd
-    }
+      injectFlaskContext: isProd,
+    },
   },
 
   devServer: {
@@ -31,8 +31,8 @@ module.exports = {
     historyApiFallback: {
       verbose: true,
       index:
-        process.env.MELTANO_EMBED == '1' ? '/index-embed.html' : '/index.html'
-    }
+        process.env.MELTANO_EMBED == '1' ? '/index-embed.html' : '/index.html',
+    },
   },
 
   configureWebpack: {
@@ -41,9 +41,9 @@ module.exports = {
         MELTANO_APP_URL: 'http://localhost:5000',
         MELTANO_OAUTH_SERVICE_URL: 'http://localhost:5000/-/oauth',
         MELTANO_OAUTH_SERVICE_PROVIDERS: 'all',
-        MELTANO_NOTIFICATION: 'False'
-      })
-    ]
+        MELTANO_UI_NOTIFICATION: 'False',
+      }),
+    ],
   },
 
   css: {
@@ -52,8 +52,8 @@ module.exports = {
         prependData: `
           @import "node_modules/bulma/sass/utilities/initial-variables";
           @import "@/scss/bulma-preset-overrides";
-        `
-      }
-    }
-  }
+        `,
+      },
+    },
+  },
 }

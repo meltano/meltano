@@ -14,7 +14,7 @@
     # `tap-covid-19` extractor configuration
     # TAP_COVID_19_API_TOKEN: set through https://gitlab.com/meltano/meltano/-/settings/ci_cd
 
-    MELTANO_DISABLE_TRACKING: "true"
+    MELTANO_SEND_ANONYMOUS_USAGE_STATS: "false"
   services:
     - postgres:11
 

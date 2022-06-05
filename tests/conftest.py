@@ -61,7 +61,7 @@ def concurrency():
 @pytest.fixture(scope="session", autouse=True)
 def setup_env():
     monkeypatch = MonkeyPatch()
-    monkeypatch.setenv("MELTANO_DISABLE_TRACKING", "True")
+    monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
 
     yield
 
