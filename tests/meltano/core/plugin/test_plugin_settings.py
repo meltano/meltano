@@ -851,7 +851,7 @@ class TestPluginSettingsService:
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
-        monkeypatch.setenv("TAP_MOCK_ALIASED_ALIASED_1", "value_1")
+        monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_1")
         with pytest.raises(ConflictingSettingValueException):
             subject.get("aliased")
 
