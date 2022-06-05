@@ -182,7 +182,7 @@ class SettingsStoreManager(ABC):
         path: list[str],
         value: Any,
         setting_def: SettingDefinition | None = None,
-    ) -> None:
+    ) -> dict:
         """Unimplemented set method.
 
         Args:
@@ -1211,29 +1211,15 @@ class AutoStoreManager(SettingsStoreManager):
         """
         setting_def = setting_def or self.find_setting(name)
 
-        current_value, metadata = self.get(name, setting_def=setting_def)
+        _, metadata = self.get(name, setting_def=setting_def)
         source = metadata["source"]
-
-        if setting_def:
-            if value == setting_def.value:
-                # Unset everything so we fall down on default
-                self.unset(name, path, setting_def=setting_def)
-                return {"store": SettingValueStore.DEFAULT}
 
         store = self.auto_store(name, source, setting_def=setting_def)
         if store is None:
             raise StoreNotSupportedError("No storage method available")
 
-        # May raise StoreNotSupportedError, but that's good.
+        # May raise StoreNotSupportedError, which is handled upstream.
         manager = self.manager_for(store)
-
-        # Even if the global current value isn't equal,
-        # the value in this store might be
-        current_value, _ = manager.get(name, setting_def=setting_def)
-        if value == current_value:
-            # No need to do anything
-            return {"store": store}
-
         metadata = manager.set(name, path, value, setting_def=setting_def)
 
         metadata["store"] = store
