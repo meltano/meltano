@@ -10,6 +10,7 @@ import click
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import (
@@ -499,7 +500,7 @@ def propagate_stop_signals(proc):
 
 
 def check_dependencies_met(
-    plugins, plugins_service: ProjectPluginsService
+    plugin_refs: List[PluginRef], plugins_service: ProjectPluginsService
 ) -> Tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
@@ -512,7 +513,8 @@ def check_dependencies_met(
     """
     passed = True
     messages = []
-    for plugin in plugins:
+
+    for plugin in plugin_refs:
         if plugin.type == PluginType.TRANSFORMS:
             # check that the `dbt` transformer plugin is installed
             try:
