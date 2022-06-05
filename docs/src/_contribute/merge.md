@@ -8,9 +8,9 @@ weight: 3
 Meltano uses an approval workflow for all pull requests.
 
 1. Create your pull request (PR) in GitHub.
-1. Assign the merge request to any eligible approvers as shown in the GitHub Pull Request UI (or specified in [CODEOWNERS](https://github.com/meltano/meltano/blob/main/.github/CODEOWNERS)) for a review cycle.
+1. Assign the pull request to any eligible approvers as shown in the GitHub Pull Request UI (or specified in [CODEOWNERS](https://github.com/meltano/meltano/blob/main/.github/CODEOWNERS)) for a review cycle.
 1. Once the review is done the reviewer may approve the pull request or send it back for further iteration.
-1. Once approved, the merge request will be merged by any Meltano maintainer.
+1. Once approved, the pull request will be merged by any Meltano maintainer.
 
 ### Reviews
 
