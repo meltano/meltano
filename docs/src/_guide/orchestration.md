@@ -34,7 +34,7 @@ actually executing them is the orchestrator's responsibility, so let's install A
 
 Change directories so that you are inside your Meltano project,
 and then run the following command to add the
-[default DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
+[default DAG generator](https://github.com/meltano/files-airflow/blob/main/bundle/orchestrate/dags/meltano.py)
 to your project and make Airflow available to use via `meltano invoke`:
 
 ```bash
@@ -43,14 +43,14 @@ meltano add orchestrator airflow
 
 ### Using an existing Airflow installation
 
-You can also use the [Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
+You can also use the [Meltano DAG generator](https://github.com/meltano/files-airflow/blob/main/bundle/orchestrate/dags/meltano.py)
 with an existing Airflow installation, as long as the `MELTANO_PROJECT_ROOT` environment variable is set to point at your Meltano project.
 
 In fact, all `meltano invoke airflow ...` does is [populate `MELTANO_PROJECT_ROOT`](/guide/configuration#accessing-from-plugins),
 set Airflow's `core.dags_folder` setting to `$MELTANO_PROJECT_ROOT/orchestrate/dags` (where the DAG generator lives by default),
 and invoke the `airflow` executable with the provided arguments.
 
-You can add the Meltano DAG generator to your project without also installing the Airflow orchestrator plugin by adding the [`airflow` file bundle](https://gitlab.com/meltano/files-airflow):
+You can add the Meltano DAG generator to your project without also installing the Airflow orchestrator plugin by adding the [`airflow` file bundle](https://github.com/meltano/files-airflow/):
 
 ```bash
 meltano add files airflow

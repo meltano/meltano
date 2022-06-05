@@ -23,7 +23,7 @@ Additionally, you may want to [run Meltano UI and configure it for production](#
 
 If you're [containerizing your Meltano project](/guide/containerization),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
-We also provide a [Helm Chart](https://gitlab.com/meltano/infra/helm-meltano/-/tree/master/meltano) for deploying a containerized instance of the Meltano UI to [Kubernetes](https://kubernetes.io).
+We also provide a [Helm Chart](https://github.com/meltano/helm-meltano) for deploying a containerized instance of the Meltano UI to [Kubernetes](https://kubernetes.io).
 More on that [in the Kubernetes section](#kubernetes).
 
 ## SaaS Hosting Options
@@ -269,13 +269,13 @@ but there are [a couple of settings](/reference/settings#meltano-ui-server) you'
 
 If you're [containerizing your Meltano project](/guide/containerization),
 the [`project_readonly` setting](/reference/settings#project-readonly) will be
-[enabled by default](https://gitlab.com/meltano/files-docker/-/blob/master/bundle/Dockerfile#L17)
+[enabled by default](https://github.com/meltano/files-docker/blob/main/bundle/Dockerfile#L19)
 using the `MELTANO_PROJECT_READONLY` environment variable,
 since any changes to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) would not be persisted outside the container.
 
 ### Kubernetes
 
-Hosting a containerized instance of the Meltano UI on [Kubernetes](https://kubernetes.io) is made easy using the provided [Meltano Helm Chart](https://gitlab.com/meltano/infra/helm-meltano/-/tree/master/meltano).
+Hosting a containerized instance of the Meltano UI on [Kubernetes](https://kubernetes.io) is made easy using the provided [Meltano Helm Chart](https://github.com/meltano/helm-meltano).
 Try it out via the [Helm](https://helm.sh) CLI:
 
 ```bash
