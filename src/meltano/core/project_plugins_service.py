@@ -6,7 +6,7 @@ from typing import Generator, List, Optional, Tuple
 
 import structlog
 
-from meltano.core.environment import Environment, EnvironmentPluginConfig
+from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin_lock_service import PluginLockService
@@ -123,16 +123,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             yield meltano_yml.plugins
 
         self._current_plugins = None
-
-    @contextmanager
-    def update_environments(self):
-        """Update Meltano environments in `meltano.yml`.
-
-        Yields:
-            The updated environments.
-        """
-        with self.config_service.update_meltano_yml() as meltano_yml:
-            yield meltano_yml.environments
 
     def add_to_file(self, plugin: ProjectPlugin):
         """Add plugin to `meltano.yml`.
@@ -390,26 +380,16 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
             return outdated
 
-    def update_environment_plugin(self, plugin: EnvironmentPluginConfig) -> None:
+    def update_environment_plugin(self, plugin: EnvironmentPluginConfig):
         """Update a plugin configuration inside a Meltano environment.
 
         Args:
             plugin: The plugin configuration to update.
-
-        Returns:
-            None
         """
-        environments: List[Environment]
-        environment = self.project.active_environment
-
-        with self.update_environments() as environments:
-            # find the proper environment to update
-            env_idx, _ = next(
-                (idx, env) for idx, env in enumerate(environments) if env == environment
-            )
+        with self.config_service.update_active_environment() as environment:
+            environment.config.plugins.setdefault(plugin.type, [])
 
             # find the proper plugin to update
-            environment.config.plugins.setdefault(plugin.type, [])
             p_idx, p_outdated = next(
                 (
                     (idx, plg)
@@ -419,15 +399,11 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 (None, None),
             )
 
-            active_environment = environments[env_idx]
-
             if p_idx is None:
-                active_environment.config.plugins.setdefault(plugin.type, [])
-                active_environment.config.plugins[plugin.type].append(plugin)
+                environment.config.plugins.setdefault(plugin.type, [])
+                environment.config.plugins[plugin.type].append(plugin)
             else:
-                active_environment.config.plugins[plugin.type][p_idx] = plugin
-
-            return p_outdated
+                environment.config.plugins[plugin.type][p_idx] = plugin
 
     def _get_parent_from_discovery(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Get the parent plugin from discovery.yml.

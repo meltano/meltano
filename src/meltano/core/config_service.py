@@ -1,9 +1,11 @@
+"""Service to manage meltano.yml."""
 import logging
 import os
 from contextlib import contextmanager
 
-import meltano.core.bundle as bundle
 import yaml
+
+import meltano.core.bundle as bundle
 
 from .project import Project
 from .setting_definition import SettingDefinition
@@ -12,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class ConfigService:
+    """Service to manage meltano.yml."""
+
     def __init__(self, project: Project, use_cache=True):
         """Create a new project configuration service."""
         self.project = project
@@ -42,17 +46,53 @@ class ConfigService:
 
         self._current_meltano_yml = None
 
+    @contextmanager
+    def update_active_environment(self):
+        """Update active environment.
+
+        Yields:
+            active environment
+        """
+        environment = self.project.active_environment
+
+        with self.update_meltano_yml() as meltano_yml:
+            environments = meltano_yml.environments
+
+            # find the proper environment to update
+            env_idx, _ = next(
+                (idx, env) for idx, env in enumerate(environments) if env == environment
+            )
+
+            active_environment = environments[env_idx]
+            yield active_environment
+
+        self.project.active_environment = active_environment
+
     @property
     def current_config(self):
         return self.current_meltano_yml.extras
 
     def update_config(self, config):
+        """Update top-level Meltano configuration.
+
+        Parameters:
+            config: configuration dict
+        """
         with self.update_meltano_yml() as meltano_yml:
             meltano_yml.extras = config
 
+    @property
+    def current_environment_config(self):
+        return self.project.active_environment.config.extras
+
     def update_environment_config(self, config):
-        """Update configuration in an environment."""
-        self.project.active_environment.config.extras = config
+        """Update configuration in an environment.
+
+        Parameters:
+            config: configuration dict
+        """
+        with self.update_active_environment() as environment:
+            environment.config.extras = config
 
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
