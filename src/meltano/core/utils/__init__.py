@@ -189,7 +189,7 @@ def nest(d: dict, path: str, value={}, maxsplit=-1, force=False):
 
         cursor = cursor[key]
 
-    if not tail in cursor or (type(cursor[tail]) is not type(value) and force):
+    if tail not in cursor or (type(cursor[tail]) is not type(value) and force):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
         cursor[tail] = deepcopy(value)
@@ -393,7 +393,7 @@ def expand_env_vars(raw_value, env: Dict):
                 logger.debug(f"Variable '${var}' is empty.")
 
             return val
-        except KeyError as e:
+        except KeyError:
             logger.debug(f"Variable '${var}' is missing from the environment.")
             return None
 

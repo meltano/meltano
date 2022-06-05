@@ -22,7 +22,7 @@ def upgrade():
     connection = op.get_bind()
 
     connection.execute(
-        user.update().where(user.c.login_count == None).values({"login_count": 0})
+        user.update().where(user.c.login_count is None).values({"login_count": 0})
     )
 
 

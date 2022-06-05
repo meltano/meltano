@@ -415,7 +415,7 @@ class MetadataExecutor(CatalogExecutor):
         self._stream = node
         tap_stream_id = self._stream["tap_stream_id"]
 
-        if not "metadata" in node:
+        if "metadata" not in node:
             node["metadata"] = []
 
         self.ensure_metadata([])
@@ -501,7 +501,7 @@ class SchemaExecutor(CatalogExecutor):
         self._stream = node
         tap_stream_id: str = self._stream["tap_stream_id"]
 
-        if not "schema" in node:
+        if "schema" not in node:
             node["schema"] = {"type": "object"}
 
         for rule in SchemaRule.matching(self._rules, tap_stream_id):

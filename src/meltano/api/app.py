@@ -66,7 +66,7 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     from .json import setup_json
     from .mail import mail
     from .models import db
-    from .security import security, setup_security, users
+    from .security import setup_security
     from .security.oauth import setup_oauth
 
     db.init_app(app)

@@ -50,7 +50,7 @@ def test(name):
             connection for connection in connections if connection["name"] == name
         )
     # this is a really broad exception catch, this will swallow sneaky errors
-    except Exception as e:
+    except Exception:
         found_connection = {}
 
     return jsonify(found_connection)

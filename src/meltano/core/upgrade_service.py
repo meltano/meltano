@@ -51,7 +51,7 @@ class UpgradeService:
         meltano_file_path = "/src/meltano/__init__.py"
         editable = meltano.__file__.endswith(meltano_file_path)
         if editable and not force:
-            meltano_dir = meltano.__file__[0 : -len(meltano_file_path)]
+            meltano_dir = meltano.__file__[0 : -len(meltano_file_path)]  # noqa: E203
             raise AutomaticPackageUpgradeError(
                 reason="it is installed from source",
                 instructions=f"navigate to `{meltano_dir}` and run `git pull`",
@@ -72,7 +72,7 @@ class UpgradeService:
         )
 
         if run.returncode != 0:
-            raise UpgradeError(f"Failed to upgrade `meltano`.", run)
+            raise UpgradeError("Failed to upgrade `meltano`.", run)
 
         return True
 

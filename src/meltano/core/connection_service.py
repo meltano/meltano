@@ -34,7 +34,7 @@ class ConnectionService:
         # this part knows probably too much about the setting definition
         # for a plugin, but we have to do this if we want to infer connections
         # from the loader
-        db_suffix = lambda s: str(Path(s).with_suffix(".db"))
+        db_suffix = lambda s: str(Path(s).with_suffix(".db"))  # noqa: E731 # lambda
 
         dialect_templates = {
             "postgres": lambda params: "postgresql://{user}:{password}@{host}:{port}/{dbname}".format(
