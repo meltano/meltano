@@ -540,10 +540,10 @@ class BasePlugin(HookObject):  # noqa: WPS214
 
     @property
     def all_commands(self):
-        """Return a dictonary of supported commands.
+        """Return a dictionary of supported commands.
 
         Returns:
-            A dictonary of supported commands.
+            A dictionary of supported commands.
         """
         return self._variant.commands
 
@@ -559,6 +559,15 @@ class BasePlugin(HookObject):  # noqa: WPS214
             for name, command in self.all_commands.items()
             if name.startswith("test")
         }
+
+    @property
+    def all_settings(self):
+        """Return a list of settings.
+
+        Returns:
+            A list of settings.
+        """
+        return self._variant.settings
 
     @property
     def extra_settings(self):
@@ -586,6 +595,15 @@ class BasePlugin(HookObject):  # noqa: WPS214
         )
 
         return existing_settings
+
+    @property
+    def all_requires(self):
+        """Return a list of requires.
+
+        Returns:
+            A list of requires.
+        """
+        return self._variant.requires
 
     def env_prefixes(self, for_writing=False) -> list[str]:
         """Return environment variable prefixes to use for settings.
