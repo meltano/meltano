@@ -43,6 +43,7 @@ def delete():
 
 @settingsBP.route("/connections/<name>/test")
 def test(name):
+    # TODO: resolve undefined 'Settings':
     current_settings = Settings.query.first().settings
     connections = current_settings["connections"]
     try:
@@ -196,7 +197,7 @@ class RolePermissionsResource(Resource):
             ).one()
             role.permissions.remove(perm)
             db.session.commit()
-        except:
+        except Exception:
             return role, 200
 
         return role, 201

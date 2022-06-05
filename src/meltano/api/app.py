@@ -9,7 +9,7 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from meltano import __version__ as meltano_version
 from meltano.api import config as api_config
-from meltano.api.headers import *
+from meltano.api.headers import VERSION_HEADER
 from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.db import project_engine
 from meltano.core.legacy_tracking import LegacyTracker
@@ -60,8 +60,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     logger.addHandler(file_handler)
 
     # 1) Extensions
-    security_options = {}
-
     from .executor import setup_executor
     from .json import setup_json
     from .mail import mail
@@ -113,7 +111,7 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         logger.debug("Notifications are disabled.")
 
     # Google Analytics setup
-    tracker = LegacyTracker(project)
+    _ = LegacyTracker(project)  # Is this needed?
 
     @app.before_request
     def setup_js_context():

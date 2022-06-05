@@ -1,10 +1,8 @@
 import os
 
-from meltano.api.headers import *
+from meltano.api.headers import JSON_SCHEME_HEADER, VERSION_HEADER
 from meltano.core.project import Project
-from meltano.core.project_settings_service import (
-    ProjectSettingsService,
-)
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import truthy
 
 # Flask

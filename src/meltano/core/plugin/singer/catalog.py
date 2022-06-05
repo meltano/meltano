@@ -452,7 +452,7 @@ class MetadataExecutor(CatalogExecutor):
         # Unsupported fields cannot be selected
         if (
             key == "selected"
-            and value == True
+            and value is True
             and node.get("inclusion") == "unsupported"
         ):
             return
@@ -491,7 +491,7 @@ class SchemaExecutor(CatalogExecutor):
                 break
 
             # If a property node for this breadcrumb doesn't exist yet, create it.
-            if not key in next_node:
+            if key not in next_node:
                 next_node[key] = {}
 
             next_node = next_node[key]
