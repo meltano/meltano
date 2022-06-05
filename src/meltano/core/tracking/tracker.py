@@ -8,8 +8,8 @@ import locale
 import re
 import uuid
 from contextlib import contextmanager
-from linecache import cache
-from typing import Any
+from pathlib import Path
+from typing import Any, NamedTuple, Optional, Union
 from urllib.parse import urlparse
 
 import tzlocal
@@ -45,6 +45,20 @@ def check_url(url: str) -> bool:
         True if the URL is valid, False otherwise.
     """
     return bool(re.match(URL_REGEX, url))
+
+
+class AnalyticsSettings(NamedTuple):
+    """Settings which control telemetry and anonymous usage stats.
+
+    These are stored within `analytics.json`.
+
+    Args:
+        NamedTuple: _description_
+    """
+
+    client_id: Optional[str]
+    project_id: Optional[str]
+    send_anonymous_usage_stats: Optional[bool]
 
 
 # TODO: Can we store some of this info to make future invocations faster?
@@ -90,16 +104,17 @@ class Tracker:
         else:
             self.snowplow_tracker = None
 
-        self.send_anonymous_usage_stats = self.settings_service.get(
-            "send_anonymous_usage_stats", True
-        )
-
         project_ctx = ProjectContext(project)
         self.project_id = str(project_ctx.project_uuid)
         self.contexts: tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
+
+        stored_analytics_settings = self._analytics_json_settings
+        self.client_id = stored_analytics_settings.client_id or uuid.uuid4()
+
+        self.telemetry_state_change_check(stored_analytics_settings)
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
@@ -112,85 +127,44 @@ class Tracker:
         """
         if self.settings_service.get("send_anonymous_usage_stats", None) is not None:
             return self.settings_service.get("send_anonymous_usage_stats")
+
         if self.settings_service.get("tracking_disabled", None) is not None:
             return not self.settings_service.get("tracking_disabled")
 
         return True
 
-    def sync_analytics_settings(self) -> None:
-        """Returns a dict with client_id, project_id, and send_anonymous_usage_stats."""
-        analytics_json_path = self.project.meltano_dir() / "analytics.json"
-        try:
-            with open(analytics_json_path, encoding="utf-8") as analytics_json_file:
-                analytics_json = json.load(analytics_json_file)
-        except FileNotFoundError:
-            if not self.send_anonymous_usage_stats:
-                # Tracking disabled and no tracking file to update.
-                return
-
-            # Tracking is enabled and no 'analytics.json' file exists.
-            # Store the generated `client_id` along with `project_id` and
-            # `send_anonymous_usage_stats=True` in a non-versioned `analytics.json` file
-            # so that it persists between meltano runs.
-            self._save_analytics_settings(
-                client_id=uuid.uuid4(),
-                project_id=self.project_uuid(),
-                send_anonymous_usage_stats=True,
-            )
-            return
-
-        # File does exist. Read existing settings.
-        client_id = analytics_json.get("client_id", uuid.uuid4())
-        project_id = analytics_json.get("project_id", self.project_uuid())
-        send_anonymous_usage_stats = analytics_json.get(
-            "send_anonymous_usage_stats", self.send_anonymous_usage_stats
-        )
-        self._telemetry_state_change_check(
-            project=project,
-            prior_project_id=project_id,
-            prior_send_anonymous_usage_stats_val=send_anonymous_usage_stats,
-        )
-        self._save_analytics_settings(
-            client_id=client_id,
-            project_id=project_id,
-            send_anonymous_usage_stats=send_anonymous_usage_stats,
-        )
-
-    def _save_analytics_settings(
-        self, client_id: str, project_id: str, send_anonymous_usage_stats: bool
-    ) -> None:
-        analytics_json_path = self.project.meltano_dir() / "analytics.json"
-        with open(
-            analytics_json_path, "w", encoding="utf-8"
-        ) as new_analytics_json_file:
-            json.dump(
-                {
-                    "client_id": str(client_id),
-                    "project_id": str(project_id),
-                    "send_anonymous_usage_stats": send_anonymous_usage_stats,
-                },
-                new_analytics_json_file,
-            )
-
-    def _telemetry_state_change_check(
-        self, project, prior_project_id, prior_send_anonymous_usage_stats_val
+    def telemetry_state_change_check(
+        self, stored_analytics_settings: AnalyticsSettings
     ) -> None:
         """Check prior values against current ones and send a change event if needed."""
         if (
-            prior_project_id == self.project_uuid()
-            and prior_send_anonymous_usage_stats_val == self.send_anonymous_usage_stats
+            stored_analytics_settings.send_anonymous_usage_stats is None
+            and not self.send_anonymous_usage_stats
         ):
-            # No change. Nothing to do.
+            # Do nothing. Tracking is disabled and no tracking marker to update.
             return
 
-        logger.debug(
-            "Telemetry state change detected. "
-            "A one time telemetry_state_change event will now be sent."
-        )
-        tracker = Tracker(project)
-        cmd_ctx = CliContext("invoke")
-        with tracker.with_contexts(cmd_ctx):
-            tracker.track_command_event({"event": "started"})
+        if (
+            stored_analytics_settings.project_id
+            and stored_analytics_settings.project_id != self.project_id
+        ):
+            self.track_telemetry_state_change_event(
+                "project_id", stored_analytics_settings.project_id, self.project_id
+            )
+
+        if (
+            stored_analytics_settings.send_anonymous_usage_stats
+            and stored_analytics_settings.send_anonymous_usage_stats
+            != self.send_anonymous_usage_stats
+        ):
+            self.track_telemetry_state_change_event(
+                "project_id",
+                stored_analytics_settings.send_anonymous_usage_stats,
+                self.send_anonymous_usage_stats,
+            )
+
+        self._save_analytics_settings()
+        return
 
     @cached_property
     def timezone_name(self) -> str:
@@ -289,31 +263,93 @@ class Tracker:
             )
         )
 
-    # TODO: Move this up one level, to the Tracker class
-    @cached_property
-    def client_uuid(self) -> uuid.UUID:
-        """Obtain the `client_id` from the non-versioned `analytics.json`.
+    def track_telemetry_state_change_event(
+        self,
+        setting_name: str,
+        from_value: Union[str, bool],
+        to_value: Union[str, bool],
+    ) -> None:
+        """Fire a telemetry state change event.
 
-        If it is not found (e.g. first time run), generate a valid v4 UUID, and store it in
-        `analytics.json`.
-
-        Returns:
-            The client UUID.
+        Args:
+            setting_name: the name of the setting that is changing
+            from_value: the old value
+            to_value: the new value
         """
-        analytics_json_path = self.project.meltano_dir() / "analytics.json"
+        logger.debug(
+            f"Telemetry state change detected for '{setting_name}'. "
+            "A one-time 'telemetry_state_change' event will now be sent."
+        )
+        self.track_unstruct_event(
+            SelfDescribingJson(
+                (
+                    TELEMETRY_STATE_CHANGE_EVENT_SCHEMA
+                    + "/"
+                    + TELEMETRY_STATE_CHANGE_EVENT_VERSION
+                ),
+                {
+                    "setting_name": setting_name,
+                    "changed_from": from_value,
+                    "changed_to": to_value,
+                },
+            )
+        )
+
+    @property
+    def _analytics_json_path(self) -> Path:
+        return self.project.meltano_dir() / "analytics.json"
+
+    @property
+    def _analytics_json_settings(self) -> AnalyticsSettings:
+        def _uuid_from_str(from_val: Optional[Any], warn: bool):
+            if not isinstance(from_val, str):
+                if from_val is None:
+                    return None
+
+                logger.warn(
+                    f"The value '{from_val}' in 'analytics.json' was of type "
+                    "'{type(from_val).__name__}', where a string was expected. "
+                    "A new random ID will be created."
+                )
+
+            try:
+                return uuid.UUID(from_val, version=4)
+            except ValueError:
+                # Should only be reached if user manually edits 'analytics.json'.
+                log_fn = logger.debug
+                if warn:
+                    log_fn = logger.warning
+
+                log_fn(
+                    f"The string value '{from_val}' was not a valid UUID "
+                    "in 'analytics.json'. A new random ID will be created."
+                )
+                return None
+
         try:
-            with open(analytics_json_path) as analytics_json_file:
-                analytics_json = json.load(analytics_json_file)
+            with open(
+                self._analytics_json_path, encoding="utf-8"
+            ) as analytics_json_file:
+                analytics = json.load(analytics_json_file)
+                return AnalyticsSettings(
+                    _uuid_from_str(analytics.get("client_id"), warn=True),
+                    _uuid_from_str(analytics.get("project_id"), warn=True),
+                    analytics.get("send_anonymous_usage_stats"),
+                )
+
         except FileNotFoundError:
-            client_id = uuid.uuid4()
+            return AnalyticsSettings(None, None, None)
 
-            if self.send_anonymous_usage_stats:
-                # If we are set to track Anonymous Usage stats, also store the generated
-                # `client_id` in a non-versioned `analytics.json` file so that it persists between
-                # meltano runs.
-                with open(analytics_json_path, "w") as new_analytics_json_file:
-                    json.dump({"client_id": str(client_id)}, new_analytics_json_file)
-        else:
-            client_id = uuid.UUID(analytics_json["client_id"], version=4)
-
-        return client_id
+    def _save_analytics_settings(self) -> None:
+        analytics_json_path = self.project.meltano_dir() / "analytics.json"
+        with open(
+            analytics_json_path, "w", encoding="utf-8"
+        ) as new_analytics_json_file:
+            json.dump(
+                {
+                    "client_id": str(self.client_id),
+                    "project_id": str(self.project_id),
+                    "send_anonymous_usage_stats": self.send_anonymous_usage_stats,
+                },
+                new_analytics_json_file,
+            )
