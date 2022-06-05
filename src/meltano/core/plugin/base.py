@@ -630,11 +630,6 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return True
 
-    @property
-    def runner(self):
-        """Return the plugin runner."""
-        pass
-
     def exec_args(self, files: dict):
         """Return the arguments to pass to the plugin runner.
 

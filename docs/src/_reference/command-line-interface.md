@@ -12,7 +12,6 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
 
-
 Specifically, it will:
 
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/),
@@ -89,8 +88,6 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 - `--as=<new-name>`: `meltano add <type> <name> --as=<new-name>` is equivalent to `meltano add <type> <new-name> --inherit-from=<name>`, and can be used to add a [discoverable plugin](/concepts/plugins#discoverable-plugins) to your project with a different name.
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
-
-- `--include-related`: Also add transform plugins related to the identified discoverable extractor.
 
 ## `config`
 
@@ -595,6 +592,7 @@ meltano invoke --containers dbt:compile
 
 When debugging plugin configuration, it is often useful to view environment variables being provided to a plugin at runtime.
 This can be achieved using `--log-level=debug` but for readability and convenience, the `meltano invoke` command also supports printing individual environment variables to stdout at runtime:
+
 ```bash
 # Print the runtime value PLUGIN_ENVIRONMENT_VARIABLE_1:
 meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> <PLUGIN_NAME>
