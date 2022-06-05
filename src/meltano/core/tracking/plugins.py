@@ -7,7 +7,7 @@ from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.utils import hash_sha256
+from meltano.core.utils import hash_sha256, safe_hasattr
 
 logger = get_logger(__name__)
 
@@ -16,14 +16,27 @@ PLUGINS_CONTEXT_SCHEMA_VERSION = "1-0-0"
 
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
+    if not safe_hasattr(plugin, "info"):
+        logger.debug(
+            "Plugin tracker context some how encountered plugin without into attr."
+        )
+        # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?)
+        return {}
+    if safe_hasattr(plugin.parent.definition, "name"):
+        parent_name = plugin.parent.definition["name"]
+    else:
+        parent_name = None
+
     return {
         "category": str(plugin.type),
         "name_hash": hash_sha256(plugin["info"].get("name")),
-        # TODO: what if its "original" should be we hashing namespace and sending that as well?
-        "variant_name_hash": hash_sha256(plugin["info"].get("variant")),
-        "pip_url_hash": hash_sha256(plugin.formatted_pip_url),
-        # TODO: this is not the right field, but parent "name" isn't available in the plugin context
-        "parent_name_hash": hash_sha256(plugin.parent.executable),
+        "variant_name_hash": hash_sha256(plugin["info"].get("variant"))
+        if plugin["info"].get("variant")
+        else None,
+        "pip_url_hash": hash_sha256(plugin.formatted_pip_url)
+        if plugin.formatted_pip_url
+        else None,
+        "parent_name_hash": hash_sha256(parent_name) if parent_name else None,
         "command": cmd,
     }
 
