@@ -36,7 +36,7 @@ PROJECT_CONTEXT_SCHEMA_VERSION = "1-0-0"
 class ProjectContext(SelfDescribingJson):
     """Tracking context for the Meltano project."""
 
-    def __init__(self, project: Project):
+    def __init__(self, project: Project, client_id: uuid.UUID):
         """Initialize a meltano tracking "project" context.
 
         Args:
@@ -54,7 +54,7 @@ class ProjectContext(SelfDescribingJson):
                 "context_uuid": str(uuid.uuid4()),
                 "project_uuid": str(self.project_uuid),
                 "project_uuid_source": self.project_uuid_source.name,
-                "client_uuid": str(self.client_uuid),
+                "client_uuid": client_id,
                 "environment_name_hash": (
                     hash_sha256(self.project.active_environment.name)
                     if self.project.active_environment

@@ -9,7 +9,7 @@ import re
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, NamedTuple, Optional, Union
+from typing import Any, NamedTuple, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import tzlocal
@@ -27,6 +27,10 @@ from .environment import environment_context
 
 CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
 CLI_EVENT_SCHEMA_VERSION = "1-0-0"
+TELEMETRY_STATE_CHANGE_EVENT_SCHEMA = (
+    "iglu:com.meltano/telemetry_state_change_event/jsonschema"
+)
+TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION = "1-0-0"
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -56,8 +60,8 @@ class AnalyticsSettings(NamedTuple):
         NamedTuple: _description_
     """
 
-    client_id: Optional[str]
-    project_id: Optional[str]
+    client_id: Optional[uuid.UUID]
+    project_id: Optional[uuid.UUID]
     send_anonymous_usage_stats: Optional[bool]
 
 
@@ -104,15 +108,15 @@ class Tracker:
         else:
             self.snowplow_tracker = None
 
-        project_ctx = ProjectContext(project)
+        stored_analytics_settings = self._analytics_json_settings
+        self.client_id = stored_analytics_settings.client_id or uuid.uuid4()
+
+        project_ctx = ProjectContext(project, self.client_id)
         self.project_id = str(project_ctx.project_uuid)
-        self.contexts: tuple[SelfDescribingJson] = (
+        self.contexts: Tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
-
-        stored_analytics_settings = self._analytics_json_settings
-        self.client_id = stored_analytics_settings.client_id or uuid.uuid4()
 
         self.telemetry_state_change_check(stored_analytics_settings)
 
@@ -148,6 +152,7 @@ class Tracker:
             stored_analytics_settings.project_id
             and stored_analytics_settings.project_id != self.project_id
         ):
+            # Project ID has changed
             self.track_telemetry_state_change_event(
                 "project_id", stored_analytics_settings.project_id, self.project_id
             )
@@ -157,6 +162,7 @@ class Tracker:
             and stored_analytics_settings.send_anonymous_usage_stats
             != self.send_anonymous_usage_stats
         ):
+            # Telemetry state has changed
             self.track_telemetry_state_change_event(
                 "project_id",
                 stored_analytics_settings.send_anonymous_usage_stats,
@@ -266,8 +272,8 @@ class Tracker:
     def track_telemetry_state_change_event(
         self,
         setting_name: str,
-        from_value: Union[str, bool],
-        to_value: Union[str, bool],
+        from_value: Union[uuid.UUID, str, bool, None],
+        to_value: Union[uuid.UUID, str, bool, None],
     ) -> None:
         """Fire a telemetry state change event.
 
@@ -280,12 +286,17 @@ class Tracker:
             f"Telemetry state change detected for '{setting_name}'. "
             "A one-time 'telemetry_state_change' event will now be sent."
         )
+        if isinstance(from_value, uuid.UUID):
+            from_value = str(from_value)
+        if isinstance(to_value, uuid.UUID):
+            to_value = str(to_value)
+
         self.track_unstruct_event(
             SelfDescribingJson(
                 (
                     TELEMETRY_STATE_CHANGE_EVENT_SCHEMA
                     + "/"
-                    + TELEMETRY_STATE_CHANGE_EVENT_VERSION
+                    + TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION
                 ),
                 {
                     "setting_name": setting_name,
