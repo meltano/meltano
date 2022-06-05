@@ -4,6 +4,7 @@ from typing import List
 
 import click
 
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -12,7 +13,6 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
@@ -92,7 +92,8 @@ def add(
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins: List[ProjectPlugin] = []
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
+
     with settings_service.feature_flag(
         FeatureFlags.LOCKFILES,
         raise_error=False,

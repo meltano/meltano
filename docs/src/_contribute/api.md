@@ -102,7 +102,7 @@ The V2 API spec is in flux, we don't yet actually have strong ties between a lot
 As a hypothetical on how the spec might evolve, we may also end up organize around a `job` as resource or the like. Nesting under a `jobs` collection might look more like:
 
 - `envs/*/jobs/*`
-  - `envs/*/jobs/run` (potentially a custom verb - need to support ad hoc `meltano run`  like invocations, where the submitting client doesn't know what the job IDs will be)
+  - `envs/*/jobs/run` (potentially a custom verb - need to support ad hoc `meltano run`  like invocations, where the submitting client doesn't know what the state IDs will be)
   - `envs/*/jobs/*/runs/*`
   - `envs/*/jobs/*/schedule/*`
   - `envs/*/jobs/*/state/*`? (up for discussion whether state should be stand-alone or part of the jobs' collection.)
@@ -133,7 +133,7 @@ Reponse: {"The new state after update"}
 
 # meltano state copy equivalent (custom verb: copy)
 POST meltano/core/v2/envs/stage/jobs/tap-gh-to-target-sql/state/copy
-{destination: "different-job-id"}
+{destination: "different-state-id"}
 Response: {"ref to the dest")
 ```
 

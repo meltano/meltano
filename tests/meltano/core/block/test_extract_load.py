@@ -12,7 +12,7 @@ from meltano.core.block.extract_load import (
     ELBContext,
     ELBContextBuilder,
     ExtractLoadBlocks,
-    generate_job_id,
+    generate_state_id,
 )
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.singer import SingerBlock
@@ -26,7 +26,7 @@ from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
-TEST_JOB_ID = "test_job"
+TEST_STATE_ID = "test_job"
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
 MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
 
@@ -41,7 +41,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 @pytest.fixture
 def test_job(session) -> Job:
     return Job(
-        job_id=TEST_JOB_ID,
+        job_id=TEST_STATE_ID,
         state=State.SUCCESS,
         payload_flags=Payload.STATE,
         payload={"singer_state": {"bookmarks": []}},
@@ -207,7 +207,7 @@ class TestExtractLoadBlocks:
     @pytest.fixture
     def subject(self, session, elb_context):
         Job(
-            job_id=TEST_JOB_ID,
+            job_id=TEST_STATE_ID,
             state=State.SUCCESS,
             payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},
@@ -600,7 +600,7 @@ class TestExtractLoadBlocks:
 
             assert elb.context.job.job_id == "test:tap-mock-to-target-mock"
 
-            # just to be sure, we'll double-check the job_id is the same for each block
+            # just to be sure, we'll double-check the state_id is the same for each block
             for block in blocks:
                 assert block.context.job.job_id == "test:tap-mock-to-target-mock"
 
@@ -623,7 +623,7 @@ class TestExtractLoadUtils:
 
         project.active_environment = None
         with pytest.raises(RunnerError):
-            assert generate_job_id(project, block1, block2) == "block1-to-block2"
+            assert generate_state_id(project, block1, block2) == "block1-to-block2"
 
         project.active_environment = Environment(name="test")
-        assert generate_job_id(project, block1, block2) == "test:block1-to-block2"
+        assert generate_state_id(project, block1, block2) == "test:block1-to-block2"
