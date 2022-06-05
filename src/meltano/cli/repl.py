@@ -26,7 +26,6 @@ def repl():
         "session = Session()",
         "%autoreload 2",
     ]
-    # c.InteractiveShell.colors = 'LightBG'
     c.InteractiveShell.confirm_exit = False
     c.TerminalIPythonApp.display_banner = True
 

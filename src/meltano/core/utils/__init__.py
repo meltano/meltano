@@ -88,43 +88,22 @@ def compose(*fs):
 
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
-def slugify(s):
+def slugify(input_str: str):
     """
     Simplifies ugly strings into something URL-friendly.
     >>> slugify("[Some] _ Article's Title--")
     'some-articles-title'
     """
+    slugified = input_str.lower()
+    for char in [" ", "-", ".", "/"]:
+        slugified = slugified.replace(char, "_")
+    slugified = re.sub(r"\W", "", slugified)
+    slugified = slugified.replace("_", " ")
+    slugified = re.sub(r"\s+", " ", slugified)
+    slugified = slugified.strip()
+    slugified = slugified.replace(" ", "-")
 
-    # "[Some] _ Article's Title--"
-    # "[some] _ article's title--"
-    s = s.lower()
-
-    # "[some] _ article's_title--"
-    # "[some]___article's_title__"
-    for c in [" ", "-", ".", "/"]:
-        s = s.replace(c, "_")
-
-    # "[some]___article's_title__"
-    # "some___articles_title__"
-    s = re.sub(r"\W", "", s)
-
-    # "some___articles_title__"
-    # "some   articles title  "
-    s = s.replace("_", " ")
-
-    # "some   articles title  "
-    # "some articles title "
-    s = re.sub(r"\s+", " ", s)
-
-    # "some articles title "
-    # "some articles title"
-    s = s.strip()
-
-    # "some articles title"
-    # "some-articles-title"
-    s = s.replace(" ", "-")
-
-    return s
+    return slugified
 
 
 def get_basic_auth(user, token):

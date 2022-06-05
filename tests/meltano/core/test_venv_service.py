@@ -5,6 +5,7 @@ import sys
 from unittest import mock
 
 import pytest
+
 from meltano.core.project import Project
 from meltano.core.venv_service import VenvService, VirtualEnv
 
@@ -52,7 +53,7 @@ class TestVenvService:
             stderr=subprocess.PIPE,
         )
         for line in str(run.stdout).splitlines():
-            assert line.startswith("pip ") == False
+            assert line.startswith("pip ") is False
 
         assert subject.exec_path("some_exe").parts[-6:] == (
             ".meltano",
@@ -127,8 +128,7 @@ class TestVirtualEnv:
 
     def test_unknown_platform(self):
         # fmt: off
-        with mock.patch("platform.system", return_value="commodore64"), \
-          pytest.raises(Exception):
-        # fmt: on
+        with mock.patch("platform.system", return_value="commodore64"), pytest.raises(Exception):
+            # fmt: on
             subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
             assert str(ex) == "Platform commodore64 is not supported."

@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from meltano.core.plugin.singer.catalog import (
     CatalogRule,
     ListExecutor,
@@ -852,7 +853,7 @@ class TestMetadataExecutor:
         assert stream_node["replication_key"] == "created_at"
         assert stream_metadata_node["metadata"]["replication-key"] == "created_at"
         assert (
-            created_at_property_metadata_node["metadata"]["is-replication-key"] == True
+            created_at_property_metadata_node["metadata"]["is-replication-key"] is True
         )
         assert (
             hash_property_metadata_node["metadata"]["custom-metadata"] == "custom-value"
