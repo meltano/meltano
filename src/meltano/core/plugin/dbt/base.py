@@ -2,7 +2,6 @@
 import logging
 from pathlib import Path
 
-from meltano.core.behavior.hookable import hook
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import BasePlugin, PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError

@@ -1,5 +1,4 @@
 import logging
-import os
 import secrets
 
 from flask import Flask, render_template, url_for

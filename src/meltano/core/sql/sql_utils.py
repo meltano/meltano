@@ -1,4 +1,3 @@
-from .analysis_helper import AnalysisHelper
 from .base import MeltanoQuery
 
 

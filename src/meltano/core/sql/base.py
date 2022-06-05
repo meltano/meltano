@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 
 import networkx as nx
 from networkx.readwrite import json_graph
-from pypika import AliasedQuery, Criterion, Field, Interval, Order, Query, Table
+from pypika import Criterion, Field, Interval, Order, Query, Table
 from pypika import functions as fn
 
 

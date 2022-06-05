@@ -1,15 +1,10 @@
-import datetime
 import logging
-import os
 import subprocess
-from functools import partial
 
 from flask_executor import Executor
 
-from meltano.api.models import db
 from meltano.api.signals import PipelineSignals
 from meltano.core.meltano_invoker import MeltanoInvoker
-from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.project import Project
 from meltano.core.schedule_service import ScheduleService
 

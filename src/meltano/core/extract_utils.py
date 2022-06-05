@@ -1,5 +1,5 @@
 import asyncio
-from typing import Generator, Iterator
+from typing import Iterator
 
 import aiohttp
 import yaml

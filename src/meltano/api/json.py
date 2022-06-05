@@ -1,5 +1,4 @@
 import logging
-from collections.abc import Iterable, Mapping
 from enum import Enum
 
 import humps

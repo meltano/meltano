@@ -1,12 +1,9 @@
-import datetime
-import logging
 import os
 
 from meltano.api.headers import *
 from meltano.core.project import Project
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
-    SettingValueStore,
 )
 from meltano.core.utils import truthy
 

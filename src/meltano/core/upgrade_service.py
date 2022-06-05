@@ -1,7 +1,5 @@
-import importlib
 import logging
 import os
-import shutil
 import signal
 import subprocess
 import sys
@@ -11,7 +9,6 @@ import click
 import psutil
 
 import meltano
-import meltano.core.bundle as bundle
 from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.migration_service import MigrationError, MigrationService
 from meltano.core.project import Project

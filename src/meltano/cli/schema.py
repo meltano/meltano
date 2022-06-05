@@ -1,11 +1,6 @@
-import logging
-
 import click
-import psycopg2
-import psycopg2.sql
 
 from meltano.core.db import DB, project_engine
-from meltano.core.project import Project
 
 from . import cli
 from .params import pass_project

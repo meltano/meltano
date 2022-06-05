@@ -1,7 +1,5 @@
 import importlib
 import logging
-import os
-import warnings
 
 from gunicorn.glogging import CONFIG_DEFAULTS
 
