@@ -3,8 +3,9 @@ import logging
 import os
 import warnings
 
-import meltano
 from gunicorn.glogging import CONFIG_DEFAULTS
+
+import meltano
 from meltano.core.logging.utils import FORMAT
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService

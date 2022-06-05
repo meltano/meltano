@@ -5,6 +5,7 @@ from pathlib import Path
 
 import click
 import click.globals
+
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationService
 from meltano.core.project import Project
