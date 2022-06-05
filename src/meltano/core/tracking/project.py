@@ -54,7 +54,7 @@ class ProjectContext(SelfDescribingJson):
                 "context_uuid": str(uuid.uuid4()),
                 "project_uuid": str(self.project_uuid),
                 "project_uuid_source": self.project_uuid_source.name,
-                "client_uuid": client_id,
+                "client_uuid": str(client_id),
                 "environment_name_hash": (
                     hash_sha256(self.project.active_environment.name)
                     if self.project.active_environment
