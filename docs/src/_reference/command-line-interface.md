@@ -651,7 +651,7 @@ In addition to explicitly specifying plugin names you can also execute one or mo
 
 <div class="notification is-danger">
   <p><strong>The run command is a preview feature. Its functionality and CLI signature is still evolving.</strong></p>
-  <p>During the feature preview, and similar to <code>meltano invoke dbt:[cmd]</code>, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link <a href="https://gitlab.com/meltano/meltano/-/issues/3098">#3098</a>.</p>
+  <p>During the feature preview, and similar to <code>meltano invoke dbt:[cmd]</code>, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link <a href="https://github.com/meltano/meltano/issues/3026">#3026</a>.</p>
   <p>Some flags and options supported by <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a> are not yet supported in <code>meltano run</code>. For a list of these and a discussion of available workarounds, please see our issue tracker link <a href="https://gitlab.com/meltano/meltano/-/issues/3094">#3094</a>.</p>
 </div>
 
