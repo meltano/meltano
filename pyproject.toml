@@ -69,11 +69,13 @@ infra = ["ansible"]
 
 [tool.poetry.dev-dependencies]
 asynctest = "^0.12.2"
+autoflake = "^1.4"
 black = "^21.12b0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
 coverage = "^4.5.4"
+flake8 = "^4.0.1"
 freezegun = "^0.3.12"
 isort = "^5.10.1"
 mock = "^4.0.3"
@@ -86,7 +88,7 @@ pytest-cov = "^2.6.1"
 pyupgrade = "^2.29.1"
 requests-mock = "^1.6.0"
 tox = "^3.24.4"
-wemake-python-styleguide = "^0.15.3"
+wemake-python-styleguide = "^0.16.1"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
