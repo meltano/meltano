@@ -12,16 +12,16 @@ jobs:
     strategy:
       matrix:
         include:
-        - { tests-types: "E", ignore-failures: false }     # Errors
-        - { tests-types: "W", ignore-failures: false }     # Warnings
-        - { tests-types: "WPS", ignore-failures: true }    # wemake-python-styleguide
-        - { tests-types: "N", ignore-failures: true }      # Naming
-        - { tests-types: "D,DAR", ignore-failures: true }  # Docstrings
-        - { tests-types: "S", ignore-failures: true }      # Security
-        - { tests-types: "B,C4,T,D,E80,RST,P,C90,F", ignore-failures: false }  # All the rest
+        - { tests-types: "E", ignore-failure: false }     # Errors
+        - { tests-types: "W", ignore-failure: false }     # Warnings
+        - { tests-types: "WPS", ignore-failure: true }    # wemake-python-styleguide
+        - { tests-types: "N", ignore-failure: true }      # Naming
+        - { tests-types: "D,DAR", ignore-failure: true }  # Docstrings
+        - { tests-types: "S", ignore-failure: true }      # Security
+        - { tests-types: "B,C4,T,D,E80,RST,P,C90,F", ignore-failure: false }  # All the rest
       fail-fast: false
 
-    name: Pylint (${{ matrix.tests-types }}, warn-only=${{ matrix.ignore-failures }})
+    name: Pylint (${{ matrix.tests-types }}, ignore-failure=${{ matrix.ignore-failures }})
     runs-on: ubuntu-latest
 
     steps:
@@ -54,7 +54,7 @@ jobs:
         poetry env use 3.9
         poetry install
 
-    - name: Run pylint
+    - name: Run flake8 (${{ matrix.test-types }}, ignore-failure=${{ matrix.ignore-failure }})
       run: |
-        flake8 --select=${{ matrix.test-types }}
-      continue-on-error: ${{ matrix.ignore-failures }}
+        poetry run flake8 --select=${{ matrix.test-types }} src
+      continue-on-error: ${{ matrix.ignore-failure }}
