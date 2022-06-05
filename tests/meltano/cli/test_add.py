@@ -6,6 +6,7 @@ import yaml
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.utils import CliError
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
@@ -76,7 +77,7 @@ class TestCliAdd:
 
                 plugins = [plugin]
 
-                for related_plugin_ref in related_plugin_refs:
+                for related_plugin_ref in required_plugin_refs:
                     if (related_plugin_ref._type) == PluginType.FILES and (
                         related_plugin_ref.name == "dbt"
                     ):
