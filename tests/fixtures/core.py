@@ -72,18 +72,13 @@ def discovery():  # noqa: WPS213
                             "value": {"nested": "from_default"},
                         },
                         {"name": "hidden", "kind": "hidden", "value": 42},
-                        {
-                            "name": "boolean",
-                            "kind": "boolean",
-                            "env_aliases": ["TAP_MOCK_ENABLED", "!TAP_MOCK_DISABLED"],
-                        },
+                        {"name": "boolean", "kind": "boolean"},
                         {"name": "auth.username"},
                         {"name": "auth.password", "kind": "password"},
                         {
                             "name": "aliased",
                             "kind": "string",
                             "aliases": ["aliased_1", "aliased_2", "aliased_3"],
-                            "env_aliases": ["TAP_MOCK_ALIASED_ALIASED_1"],
                         },
                     ],
                     "commands": {
@@ -540,7 +535,7 @@ def mapper(project_add_service):
         return err.plugin
 
 
-def create_job_id(description: str, env: str = "dev") -> str:
+def create_state_id(description: str, env: str = "dev") -> str:
     return f"{env}:tap-{description}-to-target-{description}"
 
 
@@ -568,21 +563,21 @@ def payloads(num_params):
 
 
 @pytest.fixture
-def job_ids(num_params):
-    job_id_dict = {
-        "single_incomplete_job_id": create_job_id("single-incomplete"),
-        "single_complete_job_id": create_job_id("single-complete"),
-        "multiple_incompletes_job_id": create_job_id("multiple-incompletes"),
-        "multiple_completes_job_id": create_job_id("multiple-completes"),
-        "single_complete_then_multiple_incompletes_job_id": create_job_id(
+def state_ids(num_params):
+    state_id_dict = {
+        "single_incomplete_state_id": create_state_id("single-incomplete"),
+        "single_complete_state_id": create_state_id("single-complete"),
+        "multiple_incompletes_state_id": create_state_id("multiple-incompletes"),
+        "multiple_completes_state_id": create_state_id("multiple-completes"),
+        "single_complete_then_multiple_incompletes_state_id": create_state_id(
             "single-complete-then-multiple-incompletes"
         ),
-        "single_incomplete_then_multiple_completes_job_id": create_job_id(
+        "single_incomplete_then_multiple_completes_state_id": create_state_id(
             "single-incomplete-then-multiple-completes"
         ),
     }
-    job_ids = namedtuple("job_ids", job_id_dict)
-    return job_ids(**job_id_dict)
+    state_ids = namedtuple("state_ids", state_id_dict)
+    return state_ids(**state_id_dict)
 
 
 @pytest.fixture
@@ -608,63 +603,63 @@ def job_args():
 
 
 @pytest.fixture
-def job_ids_with_jobs(job_ids, job_args, payloads, mock_time):
+def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
-        job_ids.single_incomplete_job_id: [
+        state_ids.single_incomplete_state_id: [
             Job(
-                job_id=job_ids.single_incomplete_job_id,
+                job_id=state_ids.single_incomplete_state_id,
                 **job_args.incomplete_job_args,
                 payload=payloads.mock_state_payloads[0],
             )
         ],
-        job_ids.single_complete_job_id: [
+        state_ids.single_complete_state_id: [
             Job(
-                job_id=job_ids.single_complete_job_id,
+                job_id=state_ids.single_complete_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ],
-        job_ids.multiple_incompletes_job_id: [
+        state_ids.multiple_incompletes_state_id: [
             Job(
-                job_id=job_ids.multiple_incompletes_job_id,
+                job_id=state_ids.multiple_incompletes_state_id,
                 **job_args.incomplete_job_args,
                 payload=payload,
             )
             for payload in payloads.mock_state_payloads
         ],
-        job_ids.multiple_completes_job_id: [
+        state_ids.multiple_completes_state_id: [
             Job(
-                job_id=job_ids.multiple_completes_job_id,
+                job_id=state_ids.multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )
             for payload in payloads.mock_state_payloads
         ],
-        job_ids.single_complete_then_multiple_incompletes_job_id: [
+        state_ids.single_complete_then_multiple_incompletes_state_id: [
             Job(
-                job_id=job_ids.single_complete_then_multiple_incompletes_job_id,
+                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ]
         + [
             Job(
-                job_id=job_ids.single_complete_then_multiple_incompletes_job_id,
+                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payload,
                 **job_args.incomplete_job_args,
             )
             for payload in payloads.mock_state_payloads[1:]
         ],
-        job_ids.single_incomplete_then_multiple_completes_job_id: [
+        state_ids.single_incomplete_then_multiple_completes_state_id: [
             Job(
-                job_id=job_ids.single_incomplete_then_multiple_completes_job_id,
+                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.incomplete_job_args,
             )
         ]
         + [
             Job(
-                job_id=job_ids.single_incomplete_then_multiple_completes_job_id,
+                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )
@@ -679,22 +674,24 @@ def job_ids_with_jobs(job_ids, job_args, payloads, mock_time):
 
 
 @pytest.fixture
-def jobs(job_ids_with_jobs):
-    return [job for job_list in job_ids_with_jobs.values() for job in job_list]
+def jobs(state_ids_with_jobs):
+    return [job for job_list in state_ids_with_jobs.values() for job in job_list]
 
 
 @pytest.fixture
-def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):  # noqa: WPS210
+def state_ids_with_expected_states(  # noqa: WPS210
+    state_ids, payloads, state_ids_with_jobs
+):
     final_state = {}
     for state in payloads.mock_state_payloads:
         merge(state, final_state)
     expectations = {
-        job_ids.single_complete_job_id: payloads.mock_state_payloads[0],
-        job_ids.single_incomplete_job_id: payloads.mock_empty_payload,
+        state_ids.single_complete_state_id: payloads.mock_state_payloads[0],
+        state_ids.single_incomplete_state_id: payloads.mock_empty_payload,
     }
 
-    for job_id, job_list in job_ids_with_jobs.items():
-        expectations[job_id] = {}
+    for state_id, job_list in state_ids_with_jobs.items():
+        expectations[state_id] = {}
 
         complete_jobs = []
         incomplete_jobs = []
@@ -715,15 +712,15 @@ def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):  # noqa:
         if incomplete_jobs:
             latest_incomplete_job = max(incomplete_jobs, key=lambda _job: _job.ended_at)
         if latest_complete_job:
-            expectations[job_id] = merge(
-                expectations[job_id], latest_complete_job.payload
+            expectations[state_id] = merge(
+                expectations[state_id], latest_complete_job.payload
             )
 
         for job in incomplete_jobs:
             if (not latest_complete_job) or (
                 job.ended_at > latest_complete_job.ended_at
             ):
-                expectations[job_id] = merge(expectations[job_id], job.payload)
+                expectations[state_id] = merge(expectations[state_id], job.payload)
         # Get all dummy jobs since latest non-dummy job.
         for job in dummy_jobs:
             if (
@@ -732,10 +729,10 @@ def job_ids_with_expected_states(job_ids, payloads, job_ids_with_jobs):  # noqa:
                 (not latest_incomplete_job)
                 or (job.ended_at > latest_incomplete_job.ended_at)
             ):
-                expectations[job_id] = merge(expectations[job_id], job.payload)
+                expectations[state_id] = merge(expectations[state_id], job.payload)
     return [
-        (test_job_id, expected_state)
-        for test_job_id, expected_state in expectations.items()
+        (test_state_id, expected_state)
+        for test_state_id, expected_state in expectations.items()
     ]
 
 

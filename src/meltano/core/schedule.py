@@ -100,7 +100,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
             self.extractor,
             self.loader,
             f"--transform={self.transform}",
-            f"--job_id={self.name}",
+            f"--state-id={self.name}",
         ]
 
     def last_successful_run(self, session) -> StateJob:

@@ -1,12 +1,12 @@
 import click
+
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
-from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, add_related_plugins, install_plugins
+from .utils import CliError, install_plugins
 
 
 @cli.command(short_help="Install project dependencies.")
@@ -14,7 +14,6 @@ from .utils import CliError, add_related_plugins, install_plugins
     "plugin_type", type=click.Choice(PluginType.cli_arguments()), required=False
 )
 @click.argument("plugin_name", nargs=-1, required=False)
-@click.option("--include-related", is_flag=True)
 @click.option(
     "--clean",
     is_flag=True,
@@ -28,7 +27,7 @@ from .utils import CliError, add_related_plugins, install_plugins
     help="Limit the number of plugins to install in parallel. Defaults to the number of cores.",
 )
 @pass_project(migrate=True)
-def install(project, plugin_type, plugin_name, include_related, clean, parallelism):
+def install(project, plugin_type, plugin_name, clean, parallelism):
     """
     Install all the dependencies of your project based on the meltano.yml file.
 
@@ -44,21 +43,11 @@ def install(project, plugin_type, plugin_name, include_related, clean, paralleli
     else:
         plugins = list(plugins_service.plugins())
 
-    if include_related:
-        add_service = ProjectAddService(project, plugins_service=plugins_service)
-        related_plugins = add_related_plugins(project, plugins, add_service=add_service)
-        plugins.extend(related_plugins)
-
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `related_plugins`, but should
-    # be installed first.
-    plugins.reverse()
-
     click.echo(f"Installing {len(plugins)} plugins...")
 
     success = install_plugins(project, plugins, parallelism=parallelism, clean=clean)
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_install()
 
     if not success:

@@ -1,0 +1,49 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow context describing a Meltano cli command",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "cli_context",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "event_uuid": {
+            "description": "A UUID that uniquely identifies an instance of this event",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "command": {
+            "description": "",
+            "type": "string",
+            "maxLength": 1024
+        },
+        "sub_command": {
+            "description": "",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 1024
+        },
+        "option_keys": {
+            "description": "",
+            "type": "array",
+            "items": {
+                "description": "",
+                "type": "string",
+                "maxLength": 256
+            }
+        }
+    },
+    "required": [
+        "event_uuid",
+        "command",
+        "sub_command",
+        "option_keys"
+    ],
+    "additionalProperties": false
+}

@@ -35,7 +35,7 @@ from that registry onto any local or cloud environment on which you'd like to ru
 
 If you'd like to containerize your Meltano project, you can easily add the
 appropriate `Dockerfile` and `.dockerignore` files to your project by adding the
-[`docker` file bundle](https://gitlab.com/meltano/files-docker):
+[`docker` file bundle](https://github.com/meltano/files-docker):
 
 ```bash
 # For these examples to work, ensure that
@@ -54,7 +54,7 @@ Files added to your project include a `Dockerfile` inheriting `FROM` the public 
 
 This can be customized to use another public mirror, a private mirror (e.g. `your-company/meltano:latest`), a specific version of Meltano (e.g. `meltano/meltano:v1.55.0`), or Python 3.8 or 3.9 (e.g. `meltano/meltano:latest-python3.8` or `meltano/meltano:v1.55.0-python3.9`) by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). We currently publish images to Docker Hub and [Gitlab Registry](https://gitlab.com/groups/meltano/-/container_registries/189256?orderBy=NAME&sort=asc&search[]=latest&search[]=). Using an alternative public mirror, or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
 
-> Note: Until [#3265](https://gitlab.com/meltano/meltano/-/issues/3265) is resolved, we recommend caution in depending on the [registry.gitlab.com/meltano/meltano](https://gitlab.com/groups/meltano/-/container_registries/189256?orderBy=NAME&sort=asc&search[]=latest&search[]=) images as they are regularly rebuilt during CI/CD and may not be suitable for production use cases.
+> Note: Until [#3191](https://github.com/meltano/meltano/issues/3191) is resolved, we recommend caution in depending on the [registry.gitlab.com/meltano/meltano](https://gitlab.com/groups/meltano/-/container_registries/189256?orderBy=NAME&sort=asc&search[]=latest&search[]=) images as they are regularly rebuilt during CI/CD and may not be suitable for production use cases.
 
 The built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
 will be [the `meltano` command](/reference/command-line-interface),
@@ -71,7 +71,7 @@ docker run meltano-demo-project:dev --version
 docker run \
   --volume $(pwd)/output:/project/output \
   meltano-demo-project:dev \
-  elt tap-gitlab target-jsonl --job_id=gitlab-to-jsonl
+  elt tap-gitlab target-jsonl --state-id=gitlab-to-jsonl
 ```
 
 ## Docker Compose
@@ -79,7 +79,7 @@ docker run \
 If you'd like to use [Docker Compose](https://docs.docker.com/compose/) to experiment with
 a [production-grade](/guide/production) setup of your containerized project,
 you can add the appropriate `docker-compose.prod.yml` file to your project by adding the
-[`docker-compose` file bundle](https://gitlab.com/meltano/files-docker-compose):
+[`docker-compose` file bundle](https://github.com/meltano/files-docker-compose):
 
 ```bash
 # For these examples to work, ensure that
@@ -95,7 +95,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 Meltano UI will now be available at <http://localhost:5000>.
 
-For more details and instructions, refer to [README](https://gitlab.com/meltano/files-docker-compose/-/blob/master/bundle/README.md) contained in the file bundle.
+For more details and instructions, refer to [README](https://github.com/meltano/files-docker-compose/blob/main/bundle/README.md) contained in the file bundle.
 
 ## GitLab CI/CD
 

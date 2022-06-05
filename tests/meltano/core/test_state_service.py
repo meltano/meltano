@@ -21,22 +21,22 @@ class TestStateService:
             is None
         )
 
-    def test_get_state(self, state_service, job_ids_with_expected_states):
-        for (job_id, expected_state) in job_ids_with_expected_states:
-            assert state_service.get_state(job_id) == expected_state
+    def test_get_state(self, state_service, state_ids_with_expected_states):
+        for (state_id, expected_state) in state_ids_with_expected_states:
+            assert state_service.get_state(state_id) == expected_state
 
-    def test_list_state(self, state_service, job_ids_with_expected_states):
+    def test_list_state(self, state_service, state_ids_with_expected_states):
         assert state_service.list_state() == {
-            job_id: expected_state
-            for (job_id, expected_state) in job_ids_with_expected_states
+            state_id: expected_state
+            for (state_id, expected_state) in state_ids_with_expected_states
         }
 
     def test_add_state(self, state_service, payloads):
-        mock_job_id = "nonexistent"
+        mock_state_id = "nonexistent"
         state_service.add_state(
-            mock_job_id, json.dumps(payloads.mock_state_payloads[0])
+            mock_state_id, json.dumps(payloads.mock_state_payloads[0])
         )
-        assert state_service.get_state(mock_job_id) == payloads.mock_state_payloads[0]
+        assert state_service.get_state(mock_state_id) == payloads.mock_state_payloads[0]
 
     def test_set_state(self, job_history_session, jobs, payloads, state_service):
         for job in jobs:

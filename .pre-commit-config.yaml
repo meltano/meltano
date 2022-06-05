@@ -59,5 +59,6 @@ repos:
     args:
     - "--py3-plus"
     - "--py36-plus"
+    - "--keep-mock"
     types: [python]
     files: '.py'

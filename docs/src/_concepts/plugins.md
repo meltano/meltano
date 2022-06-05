@@ -12,7 +12,7 @@ where your [project](project) and pipelines are composed of plugins of [differen
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
 [**loaders**](#loaders) ([Singer](https://singer.io) targets),
 [**transformers**](#transformers) ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
-[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
+[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://github.com/meltano/meltano/issues/2349)).
 
 Meltano provides the glue to make these components work together smoothly and enables consistent [configuration](/guide/configuration) and [deployment](/guide/production).
 
@@ -460,7 +460,7 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](project)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/reference/command-line-interface#elt).
 
-If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's Job ID.
+If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's State ID.
 
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
 a state file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option.

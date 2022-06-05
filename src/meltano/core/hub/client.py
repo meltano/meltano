@@ -240,6 +240,9 @@ class MeltanoHubService(PluginRepository):
         Raises:
             HubPluginTypeNotFound: If the plugin type is not supported.
         """
+        if not plugin_type.discoverable:
+            return {}
+
         url = self.plugin_type_endpoint(plugin_type)
         response = self.session.get(url)
 

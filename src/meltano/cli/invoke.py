@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import (
     PluginInvoker,
@@ -18,7 +19,8 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import cli as cli_tracking
 from meltano.core.utils import run_async
 
 from . import cli
@@ -73,6 +75,11 @@ def invoke(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
+    tracker = Tracker(project)
+    cmd_ctx = CliContext("invoke")
+    with tracker.with_contexts(cmd_ctx):
+        tracker.track_command_event(cli_tracking.STARTED)
+
     try:
         plugin_name, command_name = plugin_name.split(":")
     except ValueError:
@@ -105,6 +112,11 @@ def invoke(
             print_var=print_var,
         )
     )
+    with tracker.with_contexts(cmd_ctx):
+        if exit_code == 0:
+            tracker.track_command_event(cli_tracking.COMPLETED)
+        else:
+            tracker.track_command_event(cli_tracking.FAILED)
     sys.exit(exit_code)
 
 
@@ -154,7 +166,7 @@ async def _invoke(
     finally:
         session.close()
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_invoke(
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )

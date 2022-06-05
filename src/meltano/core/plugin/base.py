@@ -110,6 +110,15 @@ class PluginType(YAMLEnum):
 
         return self.value[:-3]
 
+    @property
+    def discoverable(self) -> bool:
+        """Whether this plugin type is discoverable on the Hub.
+
+        Returns:
+            Whether this plugin type is discoverable on the Hub.
+        """
+        return self is not self.__class__.MAPPINGS
+
     @classmethod
     def value_exists(cls, value: str) -> bool:
         """Check if a plugin type exists.
@@ -620,11 +629,6 @@ class BasePlugin(HookObject):  # noqa: WPS214
             True if the plugin should be added to the config file, False otherwise.
         """
         return True
-
-    @property
-    def runner(self):
-        """Return the plugin runner."""
-        pass
 
     def exec_args(self, files: dict):
         """Return the arguments to pass to the plugin runner.
