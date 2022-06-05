@@ -9,12 +9,12 @@ weight: 10
 
 [Discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
 which can be found inside the Meltano repository at
-[`src/meltano/core/bundle/discovery.yml`](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml).
+[`src/meltano/core/bundle/discovery.yml`](https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml).
 
 ### Making a custom plugin discoverable
 
 If you've added a [custom plugin](/concepts/plugins#custom-plugins) (or [variant](/concepts/plugins#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
-The [GitLab Web IDE](https://docs.gitlab.com/ee/user/project/web_ide/) makes it very easy to contribute changes without requiring you to leave your browser.
+GitHub makes it easy to contribute changes without requiring you to leave your browser.
 
 Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/concepts/project#custom-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), so a copy-paste is usually sufficient.
 The format and further requirements are laid out in more detail below.
@@ -22,8 +22,8 @@ The format and further requirements are laid out in more detail below.
 Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
 [Extractors](https://hub.meltano.com/extractors/) or [Loaders](https://hub.meltano.com/loaders/) section of the [MeltanoHub](https://hub.meltano.com/),
 which live inside the MeltanoHub repository under
-[`/_extractors`](https://gitlab.com/meltano/hub/-/tree/main/_extractors) and
-[`/_loaders`](https://gitlab.com/meltano/hub/-/tree/main/_loaders).
+[`/_extractors`](https://github.com/meltano/hub/tree/main/extractors) and
+[`/_loaders`](https://github.com/meltano/hub/tree/main/loaders).
 However, it is _not_ required to include documentation when you contribute a new plugin definition to `discovery.yml`,
 as members of the core team are happy to any missing docs themselves as part of the review process.
 
@@ -88,7 +88,7 @@ This new variant can either be a fork of the original default variant, or an alt
 
 If you maintain or are aware of such a variant,
 please add it to your Meltano project as a [custom plugin](/concepts/plugins#custom-plugins) and [make it discoverable](#making-a-custom-plugin-discoverable),
-or [file an issue](https://gitlab.com/meltano/meltano/-/issues/new) so that the Meltano core team can assist you.
+or [file an issue](https://github.com/meltano/meltano/issues/new) so that the Meltano core team can assist you.
 
 As a plugin's primary maintainer, you do not have to spend a lot of time improving the plugin yourself.
 In fact, attracting more users and getting the community involved is likely to recude your personal maintenance burden,
@@ -175,7 +175,7 @@ This might be a configuration issue with the catalog file that is sent to the ta
 
 1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
 1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
-1. Use a separate repo (meltano/target|tap-x) in GitLab
+1. Use a separate repo (meltano/target|tap-x) in GitHub
    e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
 1. Publish PyPI packages of these package (not for now)
 1. We could mirror this repo on GitHub if we want (not for now)
@@ -212,14 +212,14 @@ meltano elt tap-gitlab target-postgres --transform only
 
 ### File Bundle Development
 
-To create a file bundle plugin like <https://gitlab.com/meltano/files-dbt>, follow these steps:
+To create a file bundle plugin like <https://github.com/meltano/files-dbt>, follow these steps:
 
 1. Create a new plugin repository named `files-<service/tool>` (e.g. `files-airflow` or `files-docker`).
-1. Copy over `setup.py`, `README.md`, and `LICENSE` from <https://gitlab.com/meltano/files.dbt> and edit these files as appropriate.
+1. Copy over `setup.py`, `README.md`, and `LICENSE` from <https://github.com/meltano/files-dbt> and edit these files as appropriate.
 1. Create a `bundle` directory with an empty `__init__.py` file.
 1. Add all desired directories and files to the `bundle` directory. All of these files will be copied over into the Meltano project directory when the file bundle is added to the project.
 1. Add all file paths under `bundle` to the `package_data["bundle"]` array in `setup.py`
-1. Push your new plugin repository to GitLab.com. Official file bundle plugins live at `https://gitlab.com/meltano/files-...`.
+1. Push your new plugin repository to GitLab.com. Official file bundle plugins live at `https://github.com/meltano/files-...`.
 1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `files`. Set `name` and `pip_url` as appropriate, and if applicable, set `namespace` to the `namespace` of the plugin the file bundle is related to (e.g. `dbt`).
 1. If any files are to be updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run, add an `update` object with `[file path]: True` entries for each file.
-1. Success! You can now submit a merge request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).
+1. Success! You can now submit a pull request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).

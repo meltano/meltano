@@ -7,7 +7,7 @@ weight: 2
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
 where your [project](/concepts/project) and pipelines are composed of [plugins](/concepts/plugins) of [different types](/concepts/plugins#types), most notably **extractors** ([Singer](https://singer.io) taps), **loaders** ([Singer](https://singer.io) targets), **transformers** ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
-**orchestrators** (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
+**orchestrators** (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://github.com/meltano/meltano/issues/2349)).
 
 Your project's plugins are defined in your [`meltano.yml` project file](/concepts/project#plugins),
 and are [installed](#installing-your-projects-plugins) inside the [`.meltano` directory](/concepts/project#meltano-directory).
