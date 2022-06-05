@@ -39,6 +39,10 @@ def _safe_hasattr(obj: Any, name: str) -> bool:
     return getattr(obj, name, None) is not None
 
 
+ENV_CONTEXT_SCHEMA = "iglu:com.meltano/environment_context/jsonschema"
+ENV_CONTEXT_SCHEMA_VERSION = "1-0-0"
+
+
 class EnvironmentContext(SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
@@ -46,7 +50,7 @@ class EnvironmentContext(SelfDescribingJson):
         """Initialize the environment context."""
         ci_markers = ("GITHUB_ACTIONS", "CI")
         super().__init__(
-            "iglu:com.meltano/environment_context/jsonschema/1-0-0",
+            f"{ENV_CONTEXT_SCHEMA}/{ENV_CONTEXT_SCHEMA_VERSION}",
             {
                 "context_uuid": str(uuid.uuid4()),
                 "meltano_version": meltano.__version__,

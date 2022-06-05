@@ -22,6 +22,9 @@ from meltano.core.utils import hash_sha256
 
 from .environment import environment_context
 
+CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
+CLI_EVENT_SCHEMA_VERSION = "1-0-0"
+
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
@@ -188,6 +191,6 @@ class Tracker:
         """
         self.track_unstruct_event(
             SelfDescribingJson(
-                "iglu:com.meltano/cli_event/jsonschema/1-0-0", event_json
+                f"{CLI_EVENT_SCHEMA}/{CLI_EVENT_SCHEMA_VERSION}", event_json
             )
         )

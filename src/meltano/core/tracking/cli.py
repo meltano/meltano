@@ -5,6 +5,9 @@ import uuid
 
 from snowplow_tracker import SelfDescribingJson
 
+CLI_CONTEXT_SCHEMA = "iglu:com.meltano/cli_context/jsonschema"
+CLI_CONTEXT_SCHEMA_VERSION = "1-0-0"
+
 EVENT_RESULTS = {
     "started": {"event": "started"},
     "completed": {"event": "completed"},
@@ -37,7 +40,7 @@ class CliContext(SelfDescribingJson):
             option_keys: The list of option keys `loader`, `job`.
         """
         super().__init__(
-            "iglu:com.meltano/cli_context/jsonschema/1-0-0",
+            f"{CLI_CONTEXT_SCHEMA}/{CLI_CONTEXT_SCHEMA_VERSION}",
             {
                 "event_uuid": str(uuid.uuid4()),
                 "command": command,
