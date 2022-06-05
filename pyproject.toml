@@ -87,6 +87,8 @@ pyupgrade = "^2.29.1"
 requests-mock = "^1.6.0"
 tox = "^3.24.4"
 wemake-python-styleguide = "^0.15.3"
+flake8-bandit = "==2.1.2"
+bandit = "==1.7.2"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"

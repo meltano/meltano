@@ -2122,7 +2122,7 @@ extractors:
   - name: tap-carbon-intensity
     label: Carbon Emissions Intensity
     description: National Grid ESO's Carbon Emissions Intensity API
-    namespace: tap_carbon
+    namespace: tap_carbon_intensity
     variants:
     - name: meltano
       hidden: true
@@ -3405,7 +3405,7 @@ transforms:
     vars:
       schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
   - name: tap-carbon-intensity
-    namespace: tap_carbon
+    namespace: tap_carbon_intensity
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-carbon-intensity
     pip_url: 'https://gitlab.com/meltano/dbt-tap-carbon-intensity.git@config-version-2'
