@@ -75,9 +75,9 @@ class Airflow(BasePlugin):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
         )
-        return_code = await handle.wait()
+        exit_code = await handle.wait()
 
-        if return_code:
+        if exit_code:
             raise AsyncSubprocessError(
                 "Command `airflow --help` failed", process=handle
             )
@@ -116,9 +116,9 @@ class Airflow(BasePlugin):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        initdb = await handle.wait()
+        exit_code = await handle.wait()
 
-        if initdb:
+        if exit_code:
             raise AsyncSubprocessError(
                 "Airflow metadata database could not be initialized: `airflow initdb` failed",
                 handle,
@@ -132,6 +132,6 @@ class Airflow(BasePlugin):
         config_file = invoker.files["config"]
         try:
             config_file.unlink()
+            logging.debug(f"Deleted configuration at {config_file}")
         except FileNotFoundError:
             pass
-        logging.debug(f"Deleted configuration at {config_file}")

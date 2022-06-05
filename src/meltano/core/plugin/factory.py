@@ -28,10 +28,11 @@ base_plugin_classes = {
     PluginType.EXTRACTORS: lazy_import(".singer", "SingerTap"),
     PluginType.LOADERS: lazy_import(".singer", "SingerTarget"),
     PluginType.TRANSFORMS: lazy_import(".dbt", "DbtTransformPlugin"),
-    PluginType.ORCHESTRATORS: lazy_import(".airflow", "Airflow"),
+    (PluginType.ORCHESTRATORS, "airflow"): lazy_import(".airflow", "Airflow"),
     PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
     PluginType.FILES: lazy_import(".file", "FilePlugin"),
     PluginType.UTILITIES: lazy_import(".utility", "UtilityPlugin"),
+    (PluginType.UTILITIES, "superset"): lazy_import(".superset", "Superset"),
     PluginType.MAPPERS: lazy_import(".singer", "SingerMapper"),
 }
 
@@ -48,6 +49,9 @@ def base_plugin_factory(
     Returns:
         The created plugin.
     """
-    plugin_cls = base_plugin_classes.get(plugin_def.type, lambda: BasePlugin)()
+    plugin_cls = base_plugin_classes.get(
+        (plugin_def.type, plugin_def.name),
+        base_plugin_classes.get(plugin_def.type, lambda: BasePlugin),
+    )()
     variant = plugin_def.find_variant(variant_or_name)
     return plugin_cls(plugin_def, variant)
