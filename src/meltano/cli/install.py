@@ -1,8 +1,9 @@
 import click
+
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
@@ -58,7 +59,7 @@ def install(project, plugin_type, plugin_name, include_related, clean, paralleli
 
     success = install_plugins(project, plugins, parallelism=parallelism, clean=clean)
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_install()
 
     if not success:

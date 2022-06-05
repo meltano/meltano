@@ -4,11 +4,11 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 class TestCliUi:
@@ -18,7 +18,7 @@ class TestCliUi:
         ) as start_api_worker, mock.patch(
             "meltano.cli.ui.UIAvailableWorker.start"
         ) as start_ui_available_worker, mock.patch.object(
-            GoogleAnalyticsTracker, "track_meltano_ui"
+            LegacyTracker, "track_meltano_ui"
         ) as track:
             result = cli_runner.invoke(cli, "ui")
             assert_cli_runner(result)

@@ -9,11 +9,11 @@ import click
 from click_default_group import DefaultGroup
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
@@ -104,7 +104,7 @@ def start(ctx, reload, bind, bind_port):
         ProjectSettingsService.config_override["ui.bind_port"] = bind_port
 
     project = ctx.obj["project"]
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_ui()
 
     ensure_secure_setup(project)
