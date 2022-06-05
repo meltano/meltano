@@ -1,4 +1,4 @@
-name: Pylint
+name: Lint Python
 
 on:
   pull_request: {}
@@ -13,14 +13,14 @@ jobs:
       matrix:
         include:
         - { test-types: "E", ignore-failure: false }     # Errors
-        - { test-types: "W,WPS", ignore-failure: false } # Warnings, wemake-python-styleguide
+        - { test-types: "W,WPS", ignore-failure: true }  # Warnings, wemake-python-styleguide
         - { test-types: "N", ignore-failure: true }      # Naming
         - { test-types: "D,DAR", ignore-failure: true }  # Docstrings
         - { test-types: "S", ignore-failure: true }      # Security
-        - { test-types: "B,C4,T,E80,RST,P,C90,F", ignore-failure: false }  # All the rest
+        - { test-types: "B,C4,T,E80,RST,P,C90,F", ignore-failure: true }  # All the rest
       fail-fast: false
 
-    name: Pylint (${{ matrix.test-types }}, ignore-failure=${{ matrix.ignore-failure }})
+    name: Flake8 (${{ matrix.test-types }}, ignore-failure=${{ matrix.ignore-failure }})
     runs-on: ubuntu-latest
 
     steps:
