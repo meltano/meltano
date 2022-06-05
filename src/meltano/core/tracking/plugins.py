@@ -22,21 +22,17 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
         )
         # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?)
         return {}
-    if safe_hasattr(plugin.parent.definition, "name"):
-        parent_name = plugin.parent.definition["name"]
-    else:
-        parent_name = None
 
     return {
         "category": str(plugin.type),
-        "name_hash": hash_sha256(plugin["info"].get("name")),
-        "variant_name_hash": hash_sha256(plugin["info"].get("variant"))
-        if plugin["info"].get("variant")
-        else None,
+        "name_hash": hash_sha256(plugin.name) if plugin.name else None,
+        "variant_name_hash": hash_sha256(plugin.variant) if plugin.variant else None,
         "pip_url_hash": hash_sha256(plugin.formatted_pip_url)
         if plugin.formatted_pip_url
         else None,
-        "parent_name_hash": hash_sha256(parent_name) if parent_name else None,
+        "parent_name_hash": hash_sha256(plugin.parent.name)
+        if plugin.parent.name
+        else None,
         "command": cmd,
     }
 
