@@ -12,16 +12,16 @@ jobs:
     strategy:
       matrix:
         include:
-        - { tests-types: "E", ignore-failure: false }     # Errors
-        - { tests-types: "W", ignore-failure: false }     # Warnings
-        - { tests-types: "WPS", ignore-failure: true }    # wemake-python-styleguide
-        - { tests-types: "N", ignore-failure: true }      # Naming
-        - { tests-types: "D,DAR", ignore-failure: true }  # Docstrings
-        - { tests-types: "S", ignore-failure: true }      # Security
-        - { tests-types: "B,C4,T,D,E80,RST,P,C90,F", ignore-failure: false }  # All the rest
+        - { test-types: "E", ignore-failure: false }     # Errors
+        - { test-types: "W", ignore-failure: false }     # Warnings
+        - { test-types: "WPS", ignore-failure: true }    # wemake-python-styleguide
+        - { test-types: "N", ignore-failure: true }      # Naming
+        - { test-types: "D,DAR", ignore-failure: true }  # Docstrings
+        - { test-types: "S", ignore-failure: true }      # Security
+        - { test-types: "B,C4,T,D,E80,RST,P,C90,F", ignore-failure: false }  # All the rest
       fail-fast: false
 
-    name: Pylint (${{ matrix.tests-types }}, ignore-failure=${{ matrix.ignore-failures }})
+    name: Pylint (${{ matrix.test-types }}, ignore-failure=${{ matrix.ignore-failure }})
     runs-on: ubuntu-latest
 
     steps:
