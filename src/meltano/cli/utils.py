@@ -4,7 +4,7 @@ import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import click
 
