@@ -30,6 +30,10 @@ class ProjectUUIDSource(Enum):
     random = auto()
 
 
+PROJECT_CONTEXT_SCHEMA = "iglu:com.meltano/project_context/jsonschema"
+PROJECT_CONTEXT_SCHEMA_VERSION = "1-0-0"
+
+
 class ProjectContext(SelfDescribingJson):
     """Tracking context for the Meltano project."""
 
@@ -46,7 +50,7 @@ class ProjectContext(SelfDescribingJson):
         )
 
         super().__init__(
-            "iglu:com.meltano/project_context/jsonschema/1-0-0",
+            f"{PROJECT_CONTEXT_SCHEMA}/{PROJECT_CONTEXT_SCHEMA_VERSION}",
             {
                 "context_uuid": str(uuid.uuid4()),
                 "project_uuid": str(self.project_uuid),

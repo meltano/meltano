@@ -15,6 +15,7 @@
             "enum": [
                 "started",
                 "completed",
+                "skipped",
                 "failed",
                 "aborted"
             ]

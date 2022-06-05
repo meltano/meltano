@@ -24,6 +24,9 @@ from meltano.core.utils import hash_sha256
 
 from .environment import environment_context
 
+CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
+CLI_EVENT_SCHEMA_VERSION = "1-0-0"
+
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
@@ -86,9 +89,15 @@ class Tracker:
         else:
             self.snowplow_tracker = None
 
+        self.send_anonymous_usage_stats = self.settings_service.get(
+            "send_anonymous_usage_stats", True
+        )
+
+        project_ctx = ProjectContext(project)
+        self.project_id = str(project_ctx.project_uuid)
         self.contexts: tuple[SelfDescribingJson] = (
             environment_context,
-            ProjectContext(project),
+            project_ctx,
         )
 
     @cached_property
@@ -252,9 +261,7 @@ class Tracker:
                 label=self.project_id,
             )
         except Exception as err:
-            logger.debug(
-                f"Failed to submit struct event to Snowplow, error: {err}",
-            )
+            logger.debug("Failed to submit struct event to Snowplow", err=err)
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
         """Fire an unstructured tracking event.
@@ -267,9 +274,7 @@ class Tracker:
         try:
             self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
         except Exception as err:
-            logger.debug(
-                f"Failed to submit unstruct event to Snowplow, error: {err}",
-            )
+            logger.debug("Failed to submit unstruct event to Snowplow, error", err=err)
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:
         """Fire generic command tracking event.
@@ -279,6 +284,6 @@ class Tracker:
         """
         self.track_unstruct_event(
             SelfDescribingJson(
-                "iglu:com.meltano/cli_event/jsonschema/1-0-0", event_json
+                f"{CLI_EVENT_SCHEMA}/{CLI_EVENT_SCHEMA_VERSION}", event_json
             )
         )
