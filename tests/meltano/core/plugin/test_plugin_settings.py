@@ -164,24 +164,7 @@ class TestPluginSettingsService:
             SettingValueStore.DEFAULT,
         )
 
-        # Negated alias
-        monkeypatch.setenv("TAP_MOCK_DISABLED", "true")
-
-        assert subject.get_with_source("boolean", session=session) == (
-            False,
-            SettingValueStore.ENV,
-        )
-
-        # Regular alias
-        monkeypatch.delenv("TAP_MOCK_DISABLED")
-        monkeypatch.setenv("TAP_MOCK_ENABLED", "on")
-        assert subject.get_with_source("boolean", session=session) == (
-            True,
-            SettingValueStore.ENV,
-        )
-
         # Preferred env var
-        monkeypatch.delenv("TAP_MOCK_ENABLED")
         monkeypatch.setenv(env_var(subject, "boolean"), "0")
 
         assert subject.get_with_source("boolean", session=session) == (
@@ -470,11 +453,9 @@ class TestPluginSettingsService:
             SettingValueStore.DOTENV,
         )
 
-        dotenv.set_key(project.dotenv, "TAP_MOCK_DISABLED", "true")
+        dotenv.set_key(project.dotenv, "TAP_MOCK_BOOLEAN", "false")
         assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
-        dotenv.unset_key(project.dotenv, "TAP_MOCK_DISABLED")
-        dotenv.set_key(project.dotenv, "TAP_MOCK_ENABLED", "false")
-        assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
+        dotenv.unset_key(project.dotenv, "TAP_MOCK_BOOLEAN")
 
         subject.set("boolean", True, store=store)
 

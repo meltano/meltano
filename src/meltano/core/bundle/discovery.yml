@@ -3057,8 +3057,7 @@ transformers:
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
       value: $MELTANO_PROJECT_ROOT/transform/profiles/postgres
-      env_aliases:
-      - DBT_PROFILES_DIR
+      env: DBT_PROFILES_DIR
       # Postgres connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: host
       kind: string
@@ -3134,8 +3133,7 @@ transformers:
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
       value: $MELTANO_PROJECT_ROOT/transform/profiles/redshift
-      env_aliases:
-      - DBT_PROFILES_DIR
+      env: DBT_PROFILES_DIR
       # Redshift connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: auth_method
       kind: string
@@ -3236,8 +3234,7 @@ transformers:
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
       value: $MELTANO_PROJECT_ROOT/transform/profiles/bigquery
-      env_aliases:
-      - DBT_PROFILES_DIR
+      env: DBT_PROFILES_DIR
       # BigQuery connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: auth_method
       kind: string
