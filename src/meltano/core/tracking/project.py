@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import uuid
 from enum import Enum, auto
 
@@ -107,32 +106,3 @@ class ProjectContext(SelfDescribingJson):
                 self.settings_service.set("project_id", str(project_id))
 
         return project_id
-
-    # TODO: Move this up one level, to the Tracker class
-    @cached_property
-    def client_uuid(self) -> uuid.UUID:
-        """Obtain the `client_id` from the non-versioned `analytics.json`.
-
-        If it is not found (e.g. first time run), generate a valid v4 UUID, and store it in
-        `analytics.json`.
-
-        Returns:
-            The client UUID.
-        """
-        analytics_json_path = self.project.meltano_dir() / "analytics.json"
-        try:
-            with open(analytics_json_path) as analytics_json_file:
-                analytics_json = json.load(analytics_json_file)
-        except FileNotFoundError:
-            client_id = uuid.uuid4()
-
-            if self.send_anonymous_usage_stats:
-                # If we are set to track Anonymous Usage stats, also store the generated
-                # `client_id` in a non-versioned `analytics.json` file so that it persists between
-                # meltano runs.
-                with open(analytics_json_path, "w") as new_analytics_json_file:
-                    json.dump({"client_id": str(client_id)}, new_analytics_json_file)
-        else:
-            client_id = uuid.UUID(analytics_json["client_id"], version=4)
-
-        return client_id
