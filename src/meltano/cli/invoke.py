@@ -1,14 +1,16 @@
 """CLI command `meltano invoke`."""
 
+from __future__ import annotations
+
 import logging
 import sys
-from typing import Tuple
 
 import click
 from sqlalchemy.orm import sessionmaker
 
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import (
     PluginInvoker,
@@ -17,7 +19,8 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import cli as cli_tracking
 from meltano.core.utils import run_async
 
 from . import cli
@@ -30,6 +33,11 @@ logger = logging.getLogger(__name__)
 @cli.command(
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",
+)
+@click.option(
+    "--print-var",
+    help="Print to stdout the values for the provided environment variables, as passed to the plugininvoker context. Useful for debugging.",
+    multiple=True,
 )
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
@@ -58,14 +66,20 @@ def invoke(
     dump: str,
     list_commands: bool,
     plugin_name: str,
-    plugin_args: Tuple[str, ...],
+    plugin_args: tuple[str, ...],
     containers: bool = False,
+    print_var: str | None = None,
 ):
     """
     Invoke a plugin's executable with specified arguments.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
+    tracker = Tracker(project)
+    cmd_ctx = CliContext("invoke")
+    with tracker.with_contexts(cmd_ctx):
+        tracker.track_command_event(cli_tracking.STARTED)
+
     try:
         plugin_name, command_name = plugin_name.split(":")
     except ValueError:
@@ -95,8 +109,14 @@ def invoke(
             dump,
             command_name,
             containers,
+            print_var=print_var,
         )
     )
+    with tracker.with_contexts(cmd_ctx):
+        if exit_code == 0:
+            tracker.track_command_event(cli_tracking.COMPLETED)
+        else:
+            tracker.track_command_event(cli_tracking.FAILED)
     sys.exit(exit_code)
 
 
@@ -109,12 +129,18 @@ async def _invoke(
     dump: str,
     command_name: str,
     containers: bool,
+    print_var: list | None = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
 
     try:
         async with invoker.prepared(session):
+            if print_var:
+                env = invoker.env()
+                for key in print_var:
+                    val = env.get(key)
+                    click.echo(f"{key}={val}")
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
@@ -140,7 +166,7 @@ async def _invoke(
     finally:
         session.close()
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_invoke(
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )

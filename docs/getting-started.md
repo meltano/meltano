@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 description: If you're ready to get started with Meltano and run an EL(T) pipeline with a data source and destination of your choosing, you've come to the right place!
-layout: doc
+layout: getting_started
 weight: 1
 ---
 
@@ -10,8 +10,7 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 
 <div class="notification is-warning">
     <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
-    <p>To get a sense of the Meltano experience in just a few minutes, follow the <a href="https://meltano.com">examples on the homepage</a> or watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a></p>
-    <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
+    <p>To get a sense of the Meltano experience in just a few minutes, watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a> that takes you through <a href="/guide/integration">data integration (EL)</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres loader</a>.</p>
 </div>
 
 ## Install Meltano
@@ -39,7 +38,7 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
     python3 -m install --user pipx
     python3 -m pipx ensurepath
     #Note that the below commands are not needed in most cases
-    source ~/.bashrc 
+    source ~/.bashrc
     ```
     <div class="notification is-info">
         <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
@@ -774,14 +773,14 @@ Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-
 There's just one step here: run your newly added extractor and loader in a pipeline using [`meltano elt`](/reference/command-line-interface#elt):
 
 ```bash
-meltano elt <extractor> <loader> --job_id=<pipeline name>
+meltano elt <extractor> <loader> --state-id=<pipeline name>
 
 # For example:
-meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres
+meltano elt tap-gitlab target-postgres --state-id=gitlab-to-postgres
 ```
 
 <div class="notification is-info">
-  <p>The <code>--job_id</code> must be included on each execution if you want to run incremental syncs. This argument should define a globally unique job identifier which is used to store and retrieve state from the system database across executions. Its a good idea to make this a unique string based on the job being run (i.e. <code>gitlab-to-postgres</code>).</p>
+  <p>The <code>--state-id</code> must be included on each execution if you want to run incremental syncs. This argument should define a globally unique identifier which is used to store and retrieve state from the system database across executions. Its a good idea to make this a unique string based on the job being run (i.e. <code>gitlab-to-postgres</code>).</p>
 </div>
 
 If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
@@ -789,17 +788,17 @@ If everything was configured correctly, you should now see your data flow from y
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/reference/command-line-interface#debugging) to get some more insight into what's going on behind the scenes.
 If that doesn't get you closer to a solution, learn how to [get help with your issue](/the-project/community).
 
-If you run `meltano elt` another time with the same Job ID, you'll see it automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/guide/integration#incremental-replication-state).
+If you run `meltano elt` another time with the same State ID, you'll see it automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/guide/integration#incremental-replication-state).
 
 <div class="notification is-info">
   <p><strong>What if I already have a state file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#state-files">state file</a> already.</p>
-  <p>If you'd like Meltano to use it instead of <a href="/guide/integration#incremental-replication-state">looking up state based on the Job ID</a>, you can either use <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a>'s <code>--state</code> option or set the <a href="/concepts/plugins#state-extra"><code>state</code> extractor extra</a>.</p>
+  <p>If you'd like Meltano to use it instead of <a href="/guide/integration#incremental-replication-state">looking up state based on the State ID</a>, you can either use <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a>'s <code>--state</code> option or set the <a href="/concepts/plugins#state-extra"><code>state</code> extractor extra</a>.</p>
   <p>If you'd like to dump the state generated by the most recent run into a file, so that you can explicitly pass it along to the next invocation, you can use <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a>'s <code>--dump=state</code> option:</p>
 
 <pre>
 # Example
-meltano elt tap-gitlab target-postgres --job_id=gitlab-to-postgres --dump=state > state.json
+meltano elt tap-gitlab target-postgres --state-id=gitlab-to-postgres --dump=state > state.json
 </pre>
 
 </div>
@@ -837,13 +836,13 @@ To help you realize this, Meltano supports scheduled pipelines that can be orche
 1. Schedule a new [`meltano elt`](/reference/command-line-interface#elt) pipeline to be invoked on an interval using [`meltano schedule`](/reference/command-line-interface#schedule):
 
 ```bash
-meltano schedule <pipeline name> <extractor> <loader> <interval>
+meltano schedule add <pipeline name> --extractor <extractor> --loader <loader> --interval <interval>
 
 # For example:
-meltano schedule gitlab-to-postgres tap-gitlab target-postgres @daily
+meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-postgres --interval @daily
 ```
 
-The `pipeline name` argument corresponds to the `--job_id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
+The `pipeline name` argument corresponds to the `--state-id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
 
 To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
 
@@ -859,7 +858,7 @@ schedules:
 ```
 
 <div class="notification is-info">
-  <p>The <code>name</code> setting in schedules acts as the <code>job_id</code> so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. <code>gitlab-to-postgres</code> or <code>gitlab-to-postgres-prod</code> if you have multiple environemnts).</p>
+  <p>The <code>name</code> setting in schedules acts as the <code>state_id</code> so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. <code>gitlab-to-postgres</code> or <code>gitlab-to-postgres-prod</code> if you have multiple environemnts).</p>
 </div>
 
 1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/reference/command-line-interface#schedule):
@@ -998,10 +997,10 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
 1. Run your dbt models either using a pipeline transform:
 
     ```bash
-    meltano elt <extractor> <loader>  --transform=run --job_id=<pipeline name>
+    meltano elt <extractor> <loader>  --transform=run --state-id=<pipeline name>
 
     # For example:
-    meltano elt tap-gitlab target-postgres --transform=run --job_id=gitlab-to-postgres
+    meltano elt tap-gitlab target-postgres --transform=run --state-id=gitlab-to-postgres
     ```
 
     Or alternatively you can run dbt directly using the `meltano invoke`, which requires more settings to be defined prior to running:

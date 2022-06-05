@@ -723,30 +723,6 @@ export MELTANO_UI_NOTIFICATION=true
 export MELTANO_NOTIFICATION=true
 ```
 
-### `ui.analysis`
-
-<div class="notification is-danger">
-  <p>The Explore and Dashboard navigation tabs in the Meltano UI are no longer enabled by default due to Meltano's new direction towards supporting analysis plugins (i.e. Lightdash, Superset, etc.). <strong>These features will be removed in <a href="https://gitlab.com/meltano/meltano/-/issues/3292">Meltano v2.0</a>.</strong></p>
-  <p>For current users of these tabs, they can be re-enabled by running `meltano config set meltano ui analysis true`.</p>
-</div>
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_ANALYSIS`
-- Default: `false`
-
-If you want to use Meltano for more than data integration (and transformation),
-you can enable this setting to show all functionality related to Analysis from the UI:
-
-- "Explore" and "Dashboards" tabs
-- "Explore" buttons in the "Pipelines" list and "Pipeline Run Log" modal
-
-#### How to use
-
-```bash
-meltano config meltano set ui analysis false
-
-export MELTANO_UI_ANALYSIS=true
-```
-
 ## Meltano UI customization
 
 These settings can be used to customize certain aspects of [Meltano UI](/reference/ui).
@@ -1020,20 +996,6 @@ export MELTANO_TRACKING_IDS_UI=UA-123456789-2
 export MELTANO_UI_TRACKING_ID=UA-123456789-2
 ```
 
-### `tracking_ids.ui_embed`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`, alias: `MELTANO_EMBED_TRACKING_ID`
-- Default: `UA-132758957-6`
-
-Tracking ID for usage of [Meltano UI](/reference/ui)'s [Embed feature](/guide/analysis#share-reports-and-dashboards).
-
-```bash
-meltano config meltano set tracking_ids ui_embed UA-123456789-3
-
-export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3
-export MELTANO_EMBED_TRACKING_ID=UA-123456789-3
-```
-
 ## Snowplow Tracking
 
 ### `snowplow.collector_endpoints`
@@ -1042,3 +1004,17 @@ export MELTANO_EMBED_TRACKING_ID=UA-123456789-3
 - Default: `["https://sp.meltano.com"]`
 
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
+
+## Feature Flags
+
+### <a name="ff-lock-files"></a>`ff.lock_files`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_LOCK_FILES`
+- Default: `False`
+
+Enables the lockfile mechanism to keep stable and version controlled plugin definitions within a Meltano project.
+
+### <a name="ff-enable-uvicron"></a>`ff.enable_uvicorn`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
+- Default: `False`

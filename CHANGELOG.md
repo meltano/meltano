@@ -11,11 +11,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
+
+- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX
+
 ### Changes
+- [#3173](https://gitlab.com/meltano/meltano/-/issues/3173) Add tests and clarify docs for environment variable resolution.
 
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
 
+- [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies replaces  implicitly "related" plugins
+
 ### Fixes
+
+- [#5979](https://github.com/meltano/meltano/issues/5979) Fixes `meltano remove` bug where lock files were not removed if they include a variant in the file name.
 
 ### Breaks
 
@@ -28,6 +37,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
 
 - [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
+
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes

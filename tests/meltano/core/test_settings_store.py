@@ -549,6 +549,7 @@ class TestMeltanoYmlStoreManager:
 
         assert get() == ("alias_value", {"expandable": True, "key": "basic"})
 
+        subject.flat_config.pop("basic")
         subject.flat_config["regular"] = "value"
 
         assert get() == ("value", {"expandable": True, "key": "regular"})

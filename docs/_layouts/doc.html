@@ -23,6 +23,16 @@
               <h1>{{ page.title }}</h1>
               <div id="markdown-content">{% include anchor_headings.html html=content anchorBody="#" %}</div>
             </section>
+
+            <hr />
+
+            <section>
+              <div class="content has-text-centered">
+                <p>
+                  <a href="{{site.github_repository}}/edit/main/docs/src/{{page.relative_path}}"><i class="fab fa-github"></i> Edit this page!</a>
+                </p>
+              </div>
+            </section>
             
         </div>
 

@@ -1,40 +1,59 @@
+from collections import Counter
 from unittest import mock
 
-import pytest
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.hub import MeltanoHubService
+from meltano.core.plugin.base import PluginType
 
 
 class TestCliDiscover:
-    def test_discover(self, project, cli_runner, plugin_discovery_service):
-        with mock.patch(
-            "meltano.cli.discovery.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ):
+    def test_discover(
+        self,
+        project,
+        cli_runner,
+        meltano_hub_service: MeltanoHubService,
+        hub_request_counter: Counter,
+    ):
+        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
+
+        with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):
             result = cli_runner.invoke(cli, ["discover"])
-            assert_cli_runner(result)
 
-            assert "Extractors" in result.output
-            assert "tap-gitlab" in result.output
-            assert (
-                "tap-mock, variants: meltano (default), singer-io (deprecated)"
-                in result.output
-            )
+        assert_cli_runner(result)
 
-            assert "Loaders" in result.output
-            assert "target-jsonl" in result.output
-            assert "target-mock" in result.output
+        for plugin_type in PluginType:
+            request_count = 1 if plugin_type.discoverable else 0
+            assert hub_request_counter[f"/{plugin_type}/index"] == request_count
 
-    def test_discover_extractors(self, project, cli_runner, plugin_discovery_service):
-        with mock.patch(
-            "meltano.cli.discovery.PluginDiscoveryService",
-            return_value=plugin_discovery_service,
-        ):
+        assert "Extractors" in result.output
+        assert "tap-gitlab" in result.output
+        assert "tap-mock" in result.output
+        assert "tap-mock, variants: meltano (default), singer-io" in result.output
+
+        assert "Loaders" in result.output
+        assert "target-jsonl" in result.output
+        assert "target-mock" in result.output
+
+    def test_discover_extractors(
+        self,
+        project,
+        cli_runner,
+        meltano_hub_service: MeltanoHubService,
+        hub_request_counter: Counter,
+    ):
+        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
+
+        with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):
             result = cli_runner.invoke(cli, ["discover", "extractors"])
-            assert_cli_runner(result)
 
-            assert "Extractors" in result.output
-            assert "tap-gitlab" in result.output
-            assert "tap-mock" in result.output
+        assert_cli_runner(result)
 
-            assert "Loaders" not in result.output
+        assert hub_request_counter["/extractors/index"] == 1
+        assert hub_request_counter["/loaders/index"] == 0
+
+        assert "Extractors" in result.output
+        assert "tap-gitlab" in result.output
+        assert "tap-mock" in result.output
+
+        assert "Loaders" not in result.output

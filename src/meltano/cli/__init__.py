@@ -23,7 +23,6 @@ from . import (  # isort:skip # noqa: F401, WPS235
     initialize,
     install,
     invoke,
-    model,
     remove,
     repl,
     schedule,

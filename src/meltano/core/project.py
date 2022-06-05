@@ -418,11 +418,11 @@ class Project(Versioned):  # noqa: WPS214
         return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def job_dir(self, job_id, *joinpaths, make_dirs: bool = True):
+    def job_dir(self, state_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/run`.
 
         Args:
-            job_id: Job ID of `run` dir.
+            state_id: State ID of `run` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano`.
             make_dirs: Flag to make directories if not exists.
 
@@ -430,15 +430,15 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.run_dir(
-            "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
+            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
-    def job_logs_dir(self, job_id, *joinpaths, make_dirs: bool = True):
+    def job_logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/logs`.
 
         Args:
-            job_id: Job ID of `logs` dir.
+            state_id: State ID of `logs` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano/logs`.
             make_dirs: Flag to make directories if not exists.
 
@@ -446,21 +446,8 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.logs_dir(
-            "elt", secure_filename(job_id), *joinpaths, make_dirs=make_dirs
+            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
         )
-
-    @makedirs
-    def model_dir(self, *joinpaths, make_dirs: bool = True):
-        """Path to the `models` directory in `.meltano`.
-
-        Args:
-            joinpaths: Paths to join to the `models` directory in `.meltano`.
-            make_dirs: Flag to make directories if not exists.
-
-        Returns:
-            Resolved path to `models` dir optionally joined to given paths.
-        """
-        return self.meltano_dir("models", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):

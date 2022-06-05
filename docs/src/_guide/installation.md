@@ -5,12 +5,11 @@ layout: doc
 weight: 1
 ---
 
-If the installation instructions on the [homepage](/) or the [Getting Started guide](/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
+If the installation instructions in the [Getting Started guide](/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
 
 <div class="notification is-warning">
     <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
-    <p>To get a sense of the Meltano experience in just a few minutes, follow the <a href="https://meltano.com">examples on the homepage</a> or watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a></p>
-    <p>They can be copy-pasted right into your terminal and will take you all the way through <a href="/guide/installation">installation</a>, <a href="/guide/integration">data integration (EL)</a>, <a href="/guide/transformation">data transformation (T)</a>, <a href="/guide/orchestration">orchestration</a>, and <a href="/guide/containerization">containerization</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/jsonl.html">target-jsonl</a> and <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres</a> loaders.</p>
+    <p>To get a sense of the Meltano experience in just a few minutes, watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a> that takes you through <a href="/guide/integration">data integration (EL)</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres loader</a>.</p>
 </div>
 
 ## Local Installation
@@ -49,7 +48,7 @@ python --version
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 #Note that the below commands are not needed in most cases
-source ~/.bashrc 
+source ~/.bashrc
 ```
 
 <div class="notification is-info">
@@ -144,7 +143,7 @@ Note that wherever you are asked to run the `meltano` command, you will want to 
 ## Troubleshooting Installation
 
 <div class="notification is-info">
-  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/the-project/community">Getting Help</a> on the different ways to get in touch with us.</p>
+  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/">Getting Help</a> on the different ways to get in touch with us.</p>
 </div>
 
 ## Upgrading Meltano Version

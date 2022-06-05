@@ -1,6 +1,7 @@
 """Defines helpers for the core codebase."""
 import asyncio
 import functools
+import hashlib
 import logging
 import math
 import os
@@ -421,3 +422,15 @@ def human_size(num, suffix="B"):
 
     prefix = ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"][magnitude]
     return f"{val:3.1f}{prefix}{suffix}"
+
+
+def hash_sha256(value: str) -> str:
+    """Get the sha256 hash of a string.
+
+    Args:
+        value: the string value to hash.
+
+    Returns:
+        The hashed value of the given string.
+    """
+    return hashlib.sha256(value.encode()).hexdigest()

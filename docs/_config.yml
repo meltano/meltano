@@ -12,6 +12,7 @@ description: > # this means to ignore newlines until "baseurl:"
   Meltano Documentation
 #baseurl: "/jekyll" # the subpath of your site, e.g. /blog
 url: "https://docs.meltano.com" # the base hostname & protocol for your site
+github_repository: https://github.com/meltano/meltano
 
 # Outputting
 permalink: /:categories/:year/:month/:day/:title

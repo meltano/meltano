@@ -1,24 +1,22 @@
 """Plugin Add CLI."""
 
+from typing import List
+
 import click
 
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
-from .utils import (
-    CliError,
-    add_plugin,
-    add_related_plugins,
-    check_dependencies_met,
-    install_plugins,
-)
+from .utils import CliError, add_plugin, add_required_plugins, install_plugins
 
 
 @cli.command(short_help="Add a plugin to your project.")
@@ -53,12 +51,12 @@ from .utils import (
 @click.pass_context
 def add(
     ctx,
-    project,
-    plugin_type,
-    plugin_name,
-    inherit_from=None,
-    variant=None,
-    as_name=None,
+    project: Project,
+    plugin_type: str,
+    plugin_name: str,
+    inherit_from: str = None,
+    variant: str = None,
+    as_name: str = None,
     **flags,
 ):
     """
@@ -93,8 +91,9 @@ def add(
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
-    plugins = []
-    tracker = GoogleAnalyticsTracker(project)
+    plugins: List[ProjectPlugin] = []
+    tracker = LegacyTracker(project)
+
     with settings_service.feature_flag(
         FeatureFlags.LOCKFILES,
         raise_error=False,
@@ -116,10 +115,13 @@ def add(
 
     related_plugin_types = [PluginType.FILES]
 
-    related_plugins = add_related_plugins(
-        project, plugins, add_service=add_service, plugin_types=related_plugin_types
+    required_plugins = add_required_plugins(
+        project,
+        plugins,
+        add_service=add_service,
+        plugin_types=related_plugin_types,
     )
-    plugins.extend(related_plugins)
+    plugins.extend(required_plugins)
 
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 

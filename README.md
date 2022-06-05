@@ -1,45 +1,50 @@
-# Meltano: Your DataOps OS
+![](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
+=========================================================================================================================================================================================
 
-[![pipeline status](https://gitlab.com/meltano/meltano/badges/master/pipeline.svg)](https://gitlab.com/meltano/meltano/commits/master)
+Meltano
+-------
 
-[Meltano](https://meltano.com) is
-[open source](https://gitlab.com/meltano/meltano),
-[self-hosted](https://docs.meltano.com/guide/production),
-[CLI-first](https://docs.meltano.com/reference/command-line-interface),
-[debuggable](https://docs.meltano.com/reference/command-line-interface#debugging), and
-[extensible](https://docs.meltano.com/concepts/plugins).
+Welcome to your Open Source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
 
-[Pipelines are code](https://docs.meltano.com/concepts/project),
-ready to be version controlled,
-[containerized](https://docs.meltano.com/guide/containerization), and
-[deployed continuously](https://docs.meltano.com/guide/production#your-meltano-project).
-Develop and test
-[locally](https://docs.meltano.com/getting-started#install-meltano),
-then
-[deploy in production](https://docs.meltano.com/guide/production)
-along with the built-in
-[Airflow integration](https://docs.meltano.com/guide/production#airflow-orchestrator),
-or inside your
-[orchestrator of choice](https://docs.meltano.com/guide/production#running-pipelines).
+![](https://lh3.googleusercontent.com/1uzR_ETj6Kj1eleSjkbCpi5ZfqxFDm4hd6jzZ7JVxi2ajI9gPyjEyg6bspvha7O8dYpO3s9Y-CN6hfwiY8rvsmh9rsZ4oACh-FhvwfRBJS8oCsE76Twkf_UCHWLSmxEdvSaYyDTIqKVrdpsvsg)
 
-Meltano [embraces](https://handbook.meltano.com/product/singer) the [Singer](https://www.singer.io/) standard and its community-maintained library of open source
-[extractors](https://hub.meltano.com/extractors/) and
-[loaders](https://hub.meltano.com/loaders/),
-and leverages [dbt](https://www.getdbt.com) for [transformation](https://docs.meltano.com/guide/transformation).
+Integrations
+------------
 
-## Documentation
+[MeltanoHub](https://hub.meltano.com/) is the single source of truth to find any Meltano plugins as well as [Singer](https://singer.io/) taps and targets. Users are also able to add more plugins to the Hub and have them immediately discoverable and usable within Meltano. The Hub is lovingly curated by Meltano and the wider Meltano community.
 
-Check out the ["Getting Started" guide](https://docs.meltano.com/getting-started)
-or find the full documentation at <https://docs.meltano.com>.
+Installation
+------------
 
-## Contributing to Meltano
+If you're ready to build your ideal data platform and start running data workflows across multiple tools, start by following the [Installation guide](https://docs.meltano.com/guide/installation) to have Meltano up and running in your device.
 
-We welcome contributions and improvements, please see the [contribution guidelines](https://docs.meltano.com/contribute/)
+Documentation
+-------------
 
-## Responsible Disclosure Policy
+Check out the ["Getting Started" guide](https://docs.meltano.com/getting-started) or find the full documentation at [https://docs.meltano.com](https://docs.meltano.com/).
+
+Contributing
+------------
+
+Meltano is a truly open-source project, built for and by its community. We happily welcome and encourage your contributions. Start by browsing through our [issue tracker](https://github.com/meltano/meltano/issues?q=is%3Aopen+is%3Aissue) to add your ideas to the roadmap. If you're still unsure on what to contribute at the moment, you can always check out the list of open issues labeled as "[Accepting Merge Requests](https://github.com/meltano/meltano/issues?q=is%3Aopen+is%3Aissue+label%3A%22accepting+merge+requests%22)".
+
+For more information on how to contribute to Meltano, refer to our [contribution guidelines](https://docs.meltano.com/contribute/).
+
+Community
+---------
+
+We host weekly online events where you can engage with us directly. Check out more information in our [Community](https://meltano.com/community/) page.
+
+If you have any questions, want sneak peeks of features or would just like to say hello and network, join our community of over +2,500 data professionals!
+
+👋 [Join us on Slack!](https://meltano.com/slack)
+
+Responsible Disclosure Policy
+-----------------------------
 
 Please refer to the [responsible disclosure policy](https://docs.meltano.com/the-project/responsible-disclosure) on our website.
 
-## License
+License
+-------
 
-This code is distributed under the MIT license, see the [LICENSE](LICENSE) file.
+This code is distributed under the MIT license, see the [LICENSE](https://github.com/meltano/meltano/blob/main/LICENSE) file.

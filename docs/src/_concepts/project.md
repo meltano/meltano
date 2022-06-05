@@ -299,7 +299,7 @@ include_paths:
   - './*/**/subconfig_[0-9].yml'
 ```
 
-Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://gitlab.com/meltano/meltano/-/issues/2985)).
+Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://github.com/meltano/meltano/issues/2925)).
 
 Currently supported elements in subfiles are [plugins](/concepts/project#plugins), [schedules](/concepts/project#plugins) and [environments](/concepts/environments).
 
@@ -335,9 +335,9 @@ In a newly initialized project, this directory will be included in [`.gitignore`
 While you would usually not want to modify files in this directory directly, knowing what's in there can aid in debugging:
 
 - `.meltano/meltano.db`: The default SQLite [system database](#system-database).
-- `.meltano/logs/elt/<job_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) output logs for the specified pipeline run.
+- `.meltano/logs/elt/<state_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) output logs for the specified pipeline run.
 - `.meltano/run/bin`: Symlink to the [`meltano` executable](/reference/command-line-interface) most recently used in this project.
-- `.meltano/run/elt/<job_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
+- `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
 

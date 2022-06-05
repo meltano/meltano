@@ -1,25 +1,22 @@
-import atexit
-import datetime
+"""Flask app for Meltano UI."""
 import importlib
 import logging
-import logging.handlers
-import os
 from urllib.parse import urlsplit
 
-import meltano.api.config
-from flask import Flask, g, jsonify, request
+from flask import Flask, g, jsonify, request  # noqa: WPS347
 from flask_cors import CORS
-from flask_login import current_user
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
+from meltano import __version__ as meltano_version
+from meltano.api import config as api_config
 from meltano.api.headers import *
 from meltano.api.security.auth import HTTP_READONLY_CODE
-from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.db import project_engine
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.utils import FORMAT, setup_logging
 from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.oauth.app import create_app as create_oauth_service
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 setup_logging()
 
@@ -27,7 +24,15 @@ setup_logging()
 logger = logging.getLogger("meltano.api")
 
 
-def create_app(config={}):
+def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
+    """Create flask app for the current project.
+
+    Args:
+        config: app configuration
+
+    Returns:
+        Flask app
+    """
     project = Project.find()
     setup_logging(project)
 
@@ -40,10 +45,10 @@ def create_app(config={}):
     )
 
     # make sure we have the latest environment loaded
-    importlib.reload(meltano.api.config)
+    importlib.reload(api_config)
 
     app.config.from_object("meltano.api.config")
-    app.config.from_mapping(**meltano.api.config.ProjectSettings(project).as_dict())
+    app.config.from_mapping(**api_config.ProjectSettings(project).as_dict())
     app.config.from_mapping(**config)
 
     # File logging
@@ -57,12 +62,12 @@ def create_app(config={}):
     # 1) Extensions
     security_options = {}
 
-    from .models import db
-    from .mail import mail
     from .executor import setup_executor
-    from .security import security, users, setup_security
-    from .security.oauth import setup_oauth
     from .json import setup_json
+    from .mail import mail
+    from .models import db
+    from .security import security, setup_security, users
+    from .security.oauth import setup_oauth
 
     db.init_app(app)
     mail.init_app(app)
@@ -82,22 +87,12 @@ def create_app(config={}):
 
     # 3) Register the controllers
 
-    from .controllers.dashboards import dashboardsBP
-    from .controllers.embeds import embedsBP
-    from .controllers.reports import reportsBP
-    from .controllers.repos import reposBP
-    from .controllers.settings import settingsBP
-    from .controllers.sql import sqlBP
     from .controllers.orchestrations import orchestrationsBP
     from .controllers.plugins import pluginsBP
-    from .controllers.root import root, api_root
+    from .controllers.root import api_root, root
+    from .controllers.settings import settingsBP
 
-    app.register_blueprint(dashboardsBP)
-    app.register_blueprint(embedsBP)
-    app.register_blueprint(reportsBP)
-    app.register_blueprint(reposBP)
     app.register_blueprint(settingsBP)
-    app.register_blueprint(sqlBP)
     app.register_blueprint(orchestrationsBP)
     app.register_blueprint(pluginsBP)
     app.register_blueprint(root)
@@ -118,13 +113,13 @@ def create_app(config={}):
         logger.debug("Notifications are disabled.")
 
     # Google Analytics setup
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
 
     @app.before_request
     def setup_js_context():
         # setup the appUrl
         appUrl = urlsplit(request.host_url)
-        g.jsContext = {"appUrl": appUrl.geturl()[:-1], "version": meltano.__version__}
+        g.jsContext = {"appUrl": appUrl.geturl()[:-1], "version": meltano_version}
 
         setting_map = {
             "isSendAnonymousUsageStats": "send_anonymous_usage_stats",
@@ -150,7 +145,7 @@ def create_app(config={}):
 
     @app.after_request
     def after_request(res):
-        res.headers[VERSION_HEADER] = meltano.__version__
+        res.headers[VERSION_HEADER] = meltano_version
         return res
 
     @app.errorhandler(500)
