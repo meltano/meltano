@@ -12,10 +12,10 @@ from meltano.api import config as api_config
 from meltano.api.headers import *
 from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.db import project_engine
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.utils import FORMAT, setup_logging
 from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.oauth.app import create_app as create_oauth_service
 
 setup_logging()
@@ -113,7 +113,7 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         logger.debug("Notifications are disabled.")
 
     # Google Analytics setup
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
 
     @app.before_request
     def setup_js_context():

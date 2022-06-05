@@ -13,9 +13,9 @@ from meltano.cli.params import pass_project
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 
@@ -123,7 +123,7 @@ def list_state(
     Optionally pass a glob-style pattern to filter state_ids by.
     """
     state_service = ctx.obj[STATE_SERVICE_KEY]
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_state("list")
     states = state_service.list_state(pattern)
     if states:
@@ -168,7 +168,7 @@ def merge_state(
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_state("merge", state_id)
     mutually_exclusive_options = ["--input-file", "STATE", "--from-state-id"]
     if not reduce(xor, map(bool, [state, input_file, from_state_id])):
@@ -212,7 +212,7 @@ def set_state(
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_state("set", state_id)
     if not reduce(xor, map(bool, [state, input_file])):
         raise MutuallyExclusiveOptionsError("--input-file", "STATE")
@@ -235,7 +235,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_state("get", state_id)
     retrieved_state = state_service.get_state(state_id)
     click.echo(json.dumps(retrieved_state))
@@ -251,6 +251,6 @@ def clear_state(ctx: click.Context, project: Project, state_id: str, force: bool
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_state("clear", state_id)
     state_service.clear_state(state_id)
