@@ -438,7 +438,7 @@ The new project directory will contain:
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
-[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_DISABLE_TRACKING` environment variable is enabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
+[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
 ### How to use
 
@@ -470,7 +470,7 @@ meltano init demo-project --no_usage_stats
 # - OR don't share anything with the Meltano team
 #   about any project I initialize ever:
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
-echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
+echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
 meltano init demo-project # --no_usage_stats is implied
 ```
 

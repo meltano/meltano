@@ -69,8 +69,7 @@ Each extractor (tap) and loader (target) variant in the `discovery.yml` has a `s
       tooltip: Here is some more info... # Optional (use to provide additional inline context)
       documentation: https://meltano.com/ # Optional (use to link to specific supplemental documentation)
       protected: true # Optional (use in combination with `value` to provide an uneditable default)
-      env: SOME_API_KEY # Optional (use to inject `value` into plugin context with a custom environment variable name, in addition to the default env var name)
-      env_aliases: [OTHER_ENV] # Optional (use to delegate alternative environment variables for overriding this setting's value)
+      env: SOME_API_KEY # Optional (use to delegate to an environment variable for overriding this setting's value)
       value_processor: nest_object # Optional (Modify value after loading it from source: env, meltano.yml, system database. Target type needs to match `kind`. Options: `nest_object`, `upcase_string`)
       value_post_processor: stringify # Optional (Modify loaded value before passing it to plugin. Target type does not need to match `kind`. Options: `stringify`)
 ```

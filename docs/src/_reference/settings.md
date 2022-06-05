@@ -31,7 +31,7 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 ### <a name="send-anonymous-usage-stats"></a>`send_anonymous_usage_stats`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`, alias: `!MELTANO_DISABLE_TRACKING` (implies value `false`)
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
 - [`meltano init`](/reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
@@ -59,7 +59,7 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 
 - When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
-- To disable tracking in all projects in one go, enable the `MELTANO_DISABLE_TRACKING` environment variable
+- To disable tracking in all projects in one go, disable the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable
 
 #### How to use
 
@@ -67,7 +67,6 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 meltano config meltano set send_anonymous_usage_stats false
 
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
-export MELTANO_DISABLE_TRACKING=true
 
 meltano init --no_usage_stats demo-project
 ```
@@ -399,7 +398,7 @@ These settings can be used to configure the [Meltano UI](/reference/ui) server.
 
 ### <a name="ui-bind-host"></a>`ui.bind_host`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_HOST`, alias: `MELTANO_API_HOSTNAME`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_HOST`
 - [`meltano ui`](/reference/command-line-interface#ui) CLI option: `--bind`
 - Default: `0.0.0.0`
 
@@ -414,14 +413,13 @@ Together with the [`ui.bind_port` setting](#ui-bind-port), this setting correspo
 meltano config meltano set ui bind_host 127.0.0.1
 
 export MELTANO_UI_BIND_HOST=127.0.0.1
-export MELTANO_API_HOSTNAME=127.0.0.1
 
 meltano ui --bind=127.0.0.1
 ```
 
 ### <a name="ui-bind-port"></a>`ui.bind_port`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_PORT`, alias: `MELTANO_API_PORT`, `PORT`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_PORT`
 - [`meltano ui`](/reference/command-line-interface#ui) CLI option: `--bind-port`
 - Default: `5000`
 
@@ -436,8 +434,6 @@ Together with the [`ui.bind_host` setting](#ui-bind-host), this setting correspo
 meltano config meltano set ui bind_port 80
 
 export MELTANO_UI_BIND_PORT=80
-export MELTANO_API_PORT=80
-export PORT=80
 
 meltano ui --bind-port=80
 ```
@@ -586,7 +582,7 @@ meltano ui setup meltano.example.com
 
 ### `ui.workers`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_WORKERS`, alias: `WORKERS`, `WEB_CONCURRENCY`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_WORKERS`
 - Default: `4`
 
 The number of worker processes `meltano ui` will use to handle requests.
@@ -599,13 +595,11 @@ This setting corresponds to [Gunicorn's `workers` setting](https://docs.gunicorn
 meltano config meltano set ui workers 1
 
 export MELTANO_UI_WORKERS=1
-export WORKERS=1
-export WEB_CONCURRENCY=1
 ```
 
 ### <a name="ui-forwarded-allow-ips"></a>`ui.forwarded_allow_ips`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_FORWARDED_ALLOW_IPS`, alias: `FORWARDED_ALLOW_IPS`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_FORWARDED_ALLOW_IPS`
 - Default: `127.0.0.1`
 
 Comma-separated front-end (reverse) proxy IPs that are allowed to set secure headers to indicate HTTPS requests.
@@ -620,7 +614,6 @@ This setting corresponds to [Gunicorn's `forwarded_allow_ips` setting](https://d
 meltano config meltano set ui forwarded_allow_ips "*"
 
 export MELTANO_UI_FORWARDED_ALLOW_IPS="*"
-export FORWARDED_ALLOW_IPS="*"
 ```
 
 ## Meltano UI features
@@ -631,7 +624,7 @@ These settings can be used to enable certain features of [Meltano UI](/reference
 
 ### <a name="ui-readonly"></a>`ui.readonly`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_READONLY`
 - Default: `false`
 
 To block all write actions in the Meltano UI, you can run it in in _read-only_ mode.
@@ -650,12 +643,11 @@ This setting differs from the [`project_readonly` setting](#project-readonly) in
 meltano config meltano set ui readonly true
 
 export MELTANO_UI_READONLY=true
-export MELTANO_READONLY=true
 ```
 
 ### <a name="ui-authentication"></a>`ui.authentication`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_AUTHENTICATION`, alias: `MELTANO_AUTHENTICATION`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_AUTHENTICATION`
 - Default: `false`
 
 Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
@@ -672,7 +664,6 @@ Additionally, you will need to:
 meltano config meltano set ui authentication true
 
 export MELTANO_UI_AUTHENTICATION=true
-export MELTANO_AUTHENTICATION=true
 ```
 
 ### <a name="ui-anonymous-readonly"></a>`ui.anonymous_readonly`
@@ -698,7 +689,7 @@ export MELTANO_UI_ANONYMOUS_READONLY=true
 
 ### <a name="ui-notification"></a>`ui.notification`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_NOTIFICATION`, alias: `MELTANO_NOTIFICATION`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_NOTIFICATION`
 - Default: `false`
 
 Meltano can send email notifications upon certain events.
@@ -720,7 +711,6 @@ docker run --rm -p 1025:1025 -p 8025:8025 --name mailhog mailhog/mailhog
 meltano config meltano set ui notification true
 
 export MELTANO_UI_NOTIFICATION=true
-export MELTANO_NOTIFICATION=true
 ```
 
 ## Meltano UI customization
@@ -970,7 +960,7 @@ Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` se
 
 ### `tracking_ids.cli`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_CLI`, alias: `MELTANO_CLI_TRACKING_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_CLI`
 - Default: `UA-132758957-3`
 
 Tracking ID for usage of the [`meltano` CLI](/reference/command-line-interface).
@@ -979,12 +969,11 @@ Tracking ID for usage of the [`meltano` CLI](/reference/command-line-interface).
 meltano config meltano set tracking_ids cli UA-123456789-1
 
 export MELTANO_TRACKING_IDS_CLI=UA-123456789-1
-export MELTANO_CLI_TRACKING_ID=UA-123456789-1
 ```
 
 ### `tracking_ids.ui`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI`, alias: `MELTANO_UI_TRACKING_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI`
 - Default: `UA-132758957-2`
 
 Tracking ID for usage of [Meltano UI](/reference/ui).
@@ -993,7 +982,19 @@ Tracking ID for usage of [Meltano UI](/reference/ui).
 meltano config meltano set tracking_ids ui UA-123456789-2
 
 export MELTANO_TRACKING_IDS_UI=UA-123456789-2
-export MELTANO_UI_TRACKING_ID=UA-123456789-2
+```
+
+### `tracking_ids.ui_embed`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`
+- Default: `UA-132758957-6`
+
+Tracking ID for usage of [Meltano UI](/reference/ui)'s [Embed feature](/guide/analysis#share-reports-and-dashboards).
+
+```bash
+meltano config meltano set tracking_ids ui_embed UA-123456789-3
+
+export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3
 ```
 
 ## Snowplow Tracking
