@@ -61,7 +61,7 @@ class TestCliAdd:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
-            if plugin_type in {PluginType.TRANSFORMS}:
+            if plugin_type is PluginType.TRANSFORMS:
                 assert res.exit_code == 1, res.stdout
                 assert isinstance(res.exception, CliError)
                 assert "Dependencies not met:" in str(res.exception)
