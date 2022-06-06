@@ -15,9 +15,9 @@ from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents, Tracker
 from meltano.core.tracking import cli as cli_tracking
 from meltano.core.tracking import cli_context_builder
+from meltano.core.tracking.plugins import plugins_tracking_context_from_block
 from meltano.core.utils import click_run_async
 
-from ..core.tracking.plugins import plugins_tracking_context_from_block
 from . import CliError, cli
 from .params import pass_project
 
@@ -112,9 +112,13 @@ async def run(
         if validate_block_sets(logger, parsed_blocks):
             logger.debug("All ExtractLoadBlocks validated, starting execution.")
         else:
-            tracker.track_command_event(cli_tracking.FAILED)
+            tracker.track_command_event(cli_tracking.ABORTED)
             raise CliError("Some ExtractLoadBlocks set failed validation.")
-        await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        try:
+            await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        except Exception as err:
+            tracker.track_command_event(cli_tracking.FAILED)
+            raise err
         tracker.track_command_event(cli_tracking.COMPLETED)
 
     legacy_tracker = LegacyTracker(project)
@@ -162,6 +166,7 @@ async def _run_blocks(
             raise CliError(
                 f"Run invocation could not be completed as block failed: {err}"
             ) from err
+
         logger.info(
             "Block run completed.",
             set_number=idx,

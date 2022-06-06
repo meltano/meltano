@@ -38,6 +38,11 @@
                         "type": "string",
                         "maxLength": 64
                     },
+                    "executable_hash": {
+                        "description": "64 character hash of the plugin executable",
+                        "type": "string",
+                        "maxLength": 64
+                    },
                     "variant_name_hash": {
                         "description": "64 character hash of the plugin variant name",
                         "type": [
@@ -83,9 +88,10 @@
                     "category",
                     "name_hash",
                     "namespace_hash",
+                    "executable_hash",
+                    "variant_name_hash",
                     "parent_name_hash",
                     "command",
-                    "variant_name_hash",
                     "pip_url_hash"
                 ],
                 "additionalProperties": false

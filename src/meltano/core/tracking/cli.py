@@ -1,8 +1,6 @@
 """Meltano telemetry contexts for the CLI events."""
 from __future__ import annotations
 
-import uuid
-
 from snowplow_tracker import SelfDescribingJson
 
 CLI_CONTEXT_SCHEMA = "iglu:com.meltano/cli_context/jsonschema"
@@ -59,7 +57,6 @@ class CliContext(SelfDescribingJson):
         super().__init__(
             f"{CLI_CONTEXT_SCHEMA}/{CLI_CONTEXT_SCHEMA_VERSION}",
             {
-                "event_uuid": str(uuid.uuid4()),
                 "command": command,
                 "sub_command": sub_command,
                 "option_keys": option_keys or [],
