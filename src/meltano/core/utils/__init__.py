@@ -366,8 +366,31 @@ def set_at_path(d, path, value):
     final[tail] = value
 
 
-def expand_env_vars(raw_value, env: Dict):
-    if not isinstance(raw_value, str):
+class EnvironmentVariableNotSetError(Exception):
+    """Occurs when a referenced environment variable is not set."""
+
+    def __init__(self, env_var: str):
+        """Initialize the error.
+
+        Args:
+            env_var: the unset environment variable name
+        """
+        super().__init__(env_var)
+        self.env_var = env_var
+
+    def __str__(self) -> str:
+        """Return the error as a string."""
+        return f"{self.env_var} referenced but not set."
+
+
+def expand_env_vars(
+    raw_value, env: Dict, recurse: bool = False, raise_error: bool = False
+):
+    if recurse and isinstance(raw_value, dict):
+        return {
+            key: expand_env_vars(val, env, recurse) for key, val in raw_value.items()
+        }
+    elif not isinstance(raw_value, str):
         return raw_value
 
     # find viable substitutions
@@ -394,8 +417,13 @@ def expand_env_vars(raw_value, env: Dict):
 
             return val
         except KeyError as e:
-            logger.debug(f"Variable '${var}' is missing from the environment.")
-            return None
+            if raise_error:
+                raise EnvironmentVariableNotSetError(
+                    next(var for var in match.groups() if var)
+                )
+            else:
+                logger.debug(f"Variable '${var}' is missing from the environment.")
+                return None
 
     fullmatch = re.fullmatch(var_matcher, raw_value)
     if fullmatch:

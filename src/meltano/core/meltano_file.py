@@ -1,5 +1,7 @@
 """Module for working with meltano.yml files."""
 import copy
+import os
+from collections import defaultdict
 from typing import Dict, Iterable, List, Optional
 
 from meltano.core.behavior.canonical import Canonical
@@ -8,6 +10,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.schedule import Schedule
 from meltano.core.task_sets import TaskSets
+from meltano.core.utils import expand_env_vars
 
 VERSION = 1
 
@@ -46,6 +49,69 @@ class MeltanoFile(Canonical):
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
         )
+
+        self.expansion_env = dict(os.environ)
+        self.base_plugin_environments = defaultdict(dict)
+
+        # Expand env vars in top level based on terminal context
+        if "env" in self.extras:
+            self.extras.update(
+                {
+                    "env": expand_env_vars(
+                        self.extras["env"], self.expansion_env, recurse=True
+                    )
+                }
+            )
+            self.expansion_env.update(self.extras["env"])
+
+        # Expand env vars in environments based on terminal context + top level
+        for environment in self.environments:
+            environment.env.update(
+                expand_env_vars(environment.env, self.expansion_env, recurse=True)
+            )
+            if environment.name == os.environ.get(
+                "MELTANO_ENVIRONMENT", self.default_environment
+            ):
+                self.expansion_env.update(environment.env)
+
+        # Expand env vars in plugins based on terminal context + top level
+        # + active environment
+        for plugin_type, plugins_of_type in self.plugins:
+            for plugin in plugins_of_type:
+                if "env" in plugin.extras:
+                    plugin.extras["env"].update(
+                        expand_env_vars(
+                            plugin.extras["env"],
+                            self.expansion_env,
+                            recurse=True,
+                        )
+                    )
+                    self.base_plugin_environments[plugin_type][plugin.name] = {
+                        **self.expansion_env,
+                        **plugin.extras.get("env", {}),
+                    }
+
+        # Expand env vars in environment-level plugins based on terminal context +
+        # top level + active environment + top-level plugin
+        for environment in self.environments:  # noqa: WPS440
+            for (  # noqa: WPS440
+                plugin_type,
+                plugins_of_type,
+            ) in environment.config.plugins.items():
+                for plugin in plugins_of_type:  # noqa: WPS440
+                    if "env" in plugin.extras:
+                        plugin.extras["env"].update(
+                            expand_env_vars(
+                                plugin.extras["env"],
+                                {
+                                    **environment.env,
+                                    **self.base_plugin_environments[plugin_type][
+                                        plugin.name
+                                    ],
+                                },
+                                recurse=True,
+                            )
+                        )
 
     def load_plugins(self, plugins: Dict[str, dict]) -> Canonical:
         """Parse the meltano.yml file and return it as `ProjectPlugin` instances.

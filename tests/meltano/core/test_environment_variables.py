@@ -1,9 +1,11 @@
 from typing import NamedTuple
 
 import pytest
+import yaml
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 class EnvVarResolutionExpectation(NamedTuple):
@@ -209,43 +211,53 @@ class TestEnvVarResolution:
             ]
         )
 
-    @pytest.mark.xfail
-    def test_environment_variable_inheritance(self, cli_runner, project, monkeypatch):
-        # This test will be resolved to pass as part of
-        # this issue: https://github.com/meltano/meltano/issues/5983
-        monkeypatch.setenv("STACKED", "1")
-        with project.meltano_update() as meltanofile:
-            meltanofile.update(
-                {
-                    "env": "${STACKED}2",
-                    "plugins": {
-                        "utilities": [
-                            {
-                                "name": "test-environment-inheritance",
-                                "namespace": "test_environment_inheritance",
-                                "executable": "pwd",
-                                "env": "${STACKED}4",
-                            }
-                        ],
-                    },
-                    "environments": [
+    @pytest.fixture
+    def stacked_env_vars_project(self, project):
+        with open(project.meltanofile) as meltano_f:
+            meltanofile = yaml.safe_load(meltano_f)
+        meltanofile.update(
+            {
+                "env": {"STACKED": "${STACKED}2"},
+                "plugins": {
+                    "utilities": [
                         {
-                            "name": "dev",
-                            "env": {"STACKED": "${STACKED}3"},
-                            "config": {
-                                "plugins": {
-                                    "utilities": [
-                                        {
-                                            "name": "test-environment-inheritance",
-                                            "env": {"STACKED": "${STACKED}5"},
-                                        }
-                                    ]
-                                }
-                            },
+                            "name": "test-environment-inheritance",
+                            "namespace": "test_environment_inheritance",
+                            "executable": "pwd",
+                            "env": {"STACKED": "${STACKED}4"},
                         }
                     ],
                 },
-            )
+                "environments": [
+                    {
+                        "name": "dev",
+                        "env": {"STACKED": "${STACKED}3"},
+                        "config": {
+                            "plugins": {
+                                "utilities": [
+                                    {
+                                        "name": "test-environment-inheritance",
+                                        "env": {"STACKED": "${STACKED}5"},
+                                    }
+                                ]
+                            }
+                        },
+                    }
+                ],
+            },
+        )
+        with open(project.meltanofile, "w") as meltano_f:
+            yaml.safe_dump(meltanofile, meltano_f)
+            meltano_f.truncate()
+        return project
+
+    def test_environment_variable_inheritance(
+        self, cli_runner, stacked_env_vars_project, monkeypatch
+    ):
+        # This test will be resolved to pass as part of
+        # this issue: https://github.com/meltano/meltano/issues/5983
+        monkeypatch.setenv("STACKED", "1")
+
         result = cli_runner.invoke(
             cli,
             [
@@ -257,3 +269,19 @@ class TestEnvVarResolution:
         )
         assert_cli_runner(result)
         assert result.stdout.strip() == "STACKED=12345"
+
+    @pytest.mark.xfail
+    def test_strict_mode_raises_error(
+        self, cli_runner, stacked_env_vars_project, monkeypatch
+    ):
+        monkeypatch.setenv("MELTANO_FF_ENV_VAR_STRICT_MODE", "true")
+        with pytest.raises(EnvironmentVariableNotSetError):
+            cli_runner.invoke(
+                cli,
+                [
+                    "invoke",
+                    "--print-var",
+                    "STACKED",
+                    "test-environment-inheritance",
+                ],
+            )
