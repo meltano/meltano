@@ -537,7 +537,14 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         return plugin
 
     def get_transformer(self) -> ProjectPlugin:
-        """Get first available Transformer plugin."""
+        """Get first available Transformer plugin.
+
+        Returns:
+            The first available Transformer plugin.
+
+        Raises:
+            PluginNotFoundError: If no Transformer plugin is found.
+        """
         transformer = next(
             iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)), None
         )
