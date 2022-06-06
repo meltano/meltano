@@ -8,7 +8,6 @@ weight: 5
 <div class="notification is-info">
   <p>Using Meltano with Snowflake? Try the new <a href="/guide/transformation#adapter-specific-dbt-transformation-preview">adapter-specific dbt plugin (preview)</a>!</p>
   <p>If you are interested in an adapter other than Snowflake, continue with <a href="/guide/transformation#dbt-installation-and-configuration-classic"> the classic installation guide </a>.</p>
-  <p>You can also check in on <a href="https://gitlab.com/meltano/meltano/-/issues/3298">#3298</a> where we are tracking progress on adapter-specific Postgres, Redshift, Bigquery and more!</p>
 </div>
 
 Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations. A transform in Meltano is simply a set of dbt models that can be installed as a package. See the [transform plugin](/concepts/plugins#transforms) docs for more details.
@@ -120,11 +119,11 @@ Installation of a new Transformer will introduce two important files to your `tr
 The new `profiles.yml` will only be used by adapter-specific `dbt` executions (e.g. `dbt-snowflake`), and can be customized to meet your requirements.
 Your existing `profiles.yml` will remain in use by your existing `dbt` Transformer plugin (via `elt` and `invoke`).
 
-It is likely that the new `dbt_project (<adapter name>).yml` will contain changes from your previous `dbt_project.yml` file, especially if you haven't already upgraded to [`dbt` v1.0](https://docs.getdbt.com/docs/guides/migration-guide/upgrading-to-v1.0).
+It is likely that the new `dbt_project (<adapter name>).yml` will contain changes from your previous `dbt_project.yml` file, especially if you haven't already upgraded to [`dbt` v1.0](https://docs.getdbt.com/guides/migration/versions/upgrading-to-v1.0).
 To complete your migration, consolidate `dbt_project.yml` and `dbt_project (<adapter name>).yml` into a single file called `dbt_project.yml`.
 As this project file will be used by both `dbt` and `dbt-<adapter>` Transformer plugins by default, you must ensure you are running an up-to-date installation of plugin `dbt` if you intend to use both adapter-specific and legacy `dbt` installs together (not recommended).
 
-If you make use of [Transform](/guide/transforms) plugins, these will continue to work as regular `dbt` packages. However adding new Transform plugins will currently (tracking at [#3382](https://gitlab.com/meltano/meltano/-/issues/3382)) re-add the legacy `dbt` Transformer plugin.
+If you make use of [Transform](/guide/transformation) plugins, these will continue to work as regular `dbt` packages. However adding new Transform plugins will currently (tracking at [#3304](https://github.com/meltano/meltano/issues/3304)) re-add the legacy `dbt` Transformer plugin.
 To avoid this we recommend adding Transforms as regular packages directly via the dbt CLI as per the [`dbt` Packages documentation](https://docs.getdbt.com/docs/building-a-dbt-project/package-management).
 
 #### Remove the `dbt` Transformer plugin and associated files

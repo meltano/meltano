@@ -17,7 +17,7 @@ In order to contribute to Meltano, you will need the following:
 
 ```bash
 # Clone the Meltano repo
-git clone git@gitlab.com:meltano/meltano.git
+git clone git@github.com:meltano/meltano.git
 
 # Change directory into the Meltano project
 cd meltano
@@ -151,4 +151,4 @@ MELTANO_VENV=.venv tmuxinator local
 
 
 
-[Accepting Merge Requests]: https://gitlab.com/groups/meltano/-/issues?label_name[]=Accepting%20Merge%20Requests
+[Accepting Pull Requests]: https://github.com/meltano/meltano/labels/accepting%20pull%20requests

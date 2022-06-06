@@ -12,6 +12,7 @@ from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -19,7 +20,6 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -68,12 +68,12 @@ logger = structlog_stdlib.get_logger(__name__)
     help="Dump content of pipeline-specific generated file.",
 )
 @click.option(
-    "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
+    "--state-id", envvar="MELTANO_STATE_ID", help="A custom string to identify the job."
 )
 @click.option(
     "--force",
     "-f",
-    help="Force a new run even when a pipeline with the same Job ID is already running.",
+    help="Force a new run even when a pipeline with the same state ID is already running.",
     is_flag=True,
 )
 @pass_project(migrate=True)
@@ -90,7 +90,7 @@ async def elt(
     catalog,
     state,
     dump,
-    job_id,
+    state_id,
     force,
 ):
     """
@@ -106,7 +106,7 @@ async def elt(
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
-        job_id=job_id
+        job_id=state_id
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
 
@@ -136,7 +136,7 @@ async def elt(
     finally:
         session.close()
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
 
 
@@ -213,7 +213,7 @@ async def _run_job(project, job, session, context_builder, force=False):
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
 
-        log = logger.bind(name="meltano", run_id=str(job.run_id), job_id=job.job_id)
+        log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_id)
 
         await _run_elt(log, context_builder, output_logger)
 
@@ -267,7 +267,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        job_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_id,
         stdio="stderr",
     )
 
@@ -283,7 +283,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(
             run_id=str(elt_context.job.run_id),
-            job_id=elt_context.job.job_id,
+            state_id=elt_context.job.job_id,
             stdio="stdout",
         )
         extractor_out = output_logger.out(
@@ -335,7 +335,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        job_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_id,
         stdio="stderr",
         cmd_type="transformer",
     )

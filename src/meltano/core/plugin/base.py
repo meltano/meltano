@@ -110,6 +110,15 @@ class PluginType(YAMLEnum):
 
         return self.value[:-3]
 
+    @property
+    def discoverable(self) -> bool:
+        """Whether this plugin type is discoverable on the Hub.
+
+        Returns:
+            Whether this plugin type is discoverable on the Hub.
+        """
+        return self is not self.__class__.MAPPINGS
+
     @classmethod
     def value_exists(cls, value: str) -> bool:
         """Check if a plugin type exists.

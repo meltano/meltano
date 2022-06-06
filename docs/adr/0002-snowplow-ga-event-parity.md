@@ -10,7 +10,7 @@ Proposed
 
 We are aiming to move away from Google Anlaytics (GA) event tracking and towards Snowplow so that we can 
 improve and increase the kind of data we're receiving from users. 
-This work is tracked in [epic 122](https://gitlab.com/groups/meltano/-/epics/122). 
+This work is tracked in [epic 122](https://gitlab.com/groups/meltano/-/epics/122). (**Please Note:** We have recently migrated our projects to GitHub but have left this epic to preserve issue history. You can find links to these issues on GitHub  at the bottom of each issue that appears in this GitLab epic.)
 
 Part of the value of Snowplow is the ability to define schemas for events therby enabling a overall
 better structure and understanding of event meaning for downstream analytics use cases.

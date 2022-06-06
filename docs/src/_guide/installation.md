@@ -5,7 +5,7 @@ layout: doc
 weight: 1
 ---
 
-If the installation instructions on the [homepage](/) or the [Getting Started guide](/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
+If the installation instructions in the [Getting Started guide](/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
 
 <div class="notification is-warning">
     <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
@@ -24,7 +24,7 @@ Before you install Meltano, make sure you have the following requirements instal
 
 Recent versions of Linux and macOS are both fully supported, but Windows is not.
 
-If you'd like to run Meltano on Windows, you can install it inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try [installing Meltano on Docker](#installing-on-docker), although Docker on Windows is known to have [some idiosyncrasies](https://gitlab.com/meltano/meltano/issues/1261#note_240256080) that might hinder Meltano's ability to function.
+If you'd like to run Meltano on Windows, you can install it inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try [installing Meltano on Docker](#installing-on-docker).
 
 #### Python 3.7, 3.8 or 3.9
 
@@ -143,12 +143,12 @@ Note that wherever you are asked to run the `meltano` command, you will want to 
 ## Troubleshooting Installation
 
 <div class="notification is-info">
-  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/the-project/community">Getting Help</a> on the different ways to get in touch with us.</p>
+  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/">Getting Help</a> on the different ways to get in touch with us.</p>
 </div>
 
 ## Upgrading Meltano Version
 
-We release new versions of Meltano every week. To keep tabs on the latest releases, follow along on the [Meltano blog](https://meltano.com/blog/), or have a look at our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
+We release new versions of Meltano every week. To keep tabs on the latest releases, follow along on the [Meltano blog](https://meltano.com/blog/), or have a look at our [CHANGELOG](https://github.com/meltano/meltano/blob/main/CHANGELOG.md).
 
 ### Using the command line
 

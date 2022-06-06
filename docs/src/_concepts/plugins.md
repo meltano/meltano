@@ -12,7 +12,7 @@ where your [project](project) and pipelines are composed of plugins of [differen
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
 [**loaders**](#loaders) ([Singer](https://singer.io) targets),
 [**transformers**](#transformers) ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
-[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
+[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://github.com/meltano/meltano/issues/2349)).
 
 Meltano provides the glue to make these components work together smoothly and enables consistent [configuration](/guide/configuration) and [deployment](/guide/production).
 
@@ -51,7 +51,7 @@ and other plugins have already been collected by users and [contributed](/contri
 making them supported out of the box.
 
 Discoverable plugins are defined in the `discovery.yml` manifest,
-which can be found [in the Meltano repository](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml),
+which can be found [in the Meltano repository](https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml),
 ships inside the [`meltano` package](https://pypi.org/project/meltano/),
 and is available at <https://www.meltano.com/discovery.yml>.
 If you'd like to use a different (custom) manifest in your project,
@@ -92,7 +92,7 @@ you'll need to collect and provide this metadata yourself.
 To learn how to add a custom plugin to your project using a [custom plugin definition](project#custom-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ## Plugin Inheritance
@@ -460,7 +460,7 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](project)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/reference/command-line-interface#elt).
 
-If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's Job ID.
+If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's State ID.
 
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
 a state file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option.
