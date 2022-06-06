@@ -3081,7 +3081,7 @@ transformers:
     executable: dbt
     namespace: dbt_postgres
     docs: https://docs.meltano.com/guide/transformation
-    repo: https://github.com/dbt-labs/dbt-postgres
+    repo: https://github.com/dbt-labs/dbt-core
     pip_url: dbt-core~=1.0.0 dbt-postgres~=1.0.0
     requires:
       files:
