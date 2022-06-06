@@ -44,6 +44,7 @@ class EnvironmentContext(SelfDescribingJson):
                     for marker in ci_markers
                 ),
                 "python_version": platform.python_version(),
+                "python_implementation": platform.python_implementation(),
                 **self.system_info,
                 **self.process_info,
             },
