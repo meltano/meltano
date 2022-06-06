@@ -27,13 +27,13 @@ def _get_opts_for_cmd_context(
 ) -> list(str):
     opts = []
     if dry_run:
-        opts.append("--dry-run")
+        opts.append("dry-run")
     if full_refresh:
-        opts.append("--full-refresh")
+        opts.append("full-refresh")
     if no_state_update:
-        opts.append("--no-state-update")
+        opts.append("no-state-update")
     if force:
-        opts.append("--force")
+        opts.append("force")
     return opts
 
 
