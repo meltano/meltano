@@ -91,6 +91,7 @@ _env_var_resolution_expectations = {
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(environment_level_env=True),
         _terminal_env_var,
+        xfail=True,
     ),
     "Top-level plugin setting (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},
@@ -98,6 +99,7 @@ _env_var_resolution_expectations = {
             environment_level_env=True, top_level_plugin_setting=True
         ),
         _terminal_env_var,
+        xfail=True,
     ),
     "Set in top-level plugin config (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_config"},
@@ -107,6 +109,7 @@ _env_var_resolution_expectations = {
             top_level_plugin_config=True,
         ),
         _terminal_env_var,
+        xfail=True,
     ),
     "Environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config"},
@@ -117,6 +120,7 @@ _env_var_resolution_expectations = {
             environment_level_plugin_config=True,
         ),
         _terminal_env_var,
+        xfail=True,
     ),
     "Set in indirected environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config_indrected"},
@@ -128,10 +132,12 @@ _env_var_resolution_expectations = {
             environment_level_plugin_config_indirected=True,
         ),
         _terminal_env_var,
+        xfail=True,
     ),
     "Environment-level env": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(environment_level_env=True),
+        xfail=True,
     ),
     "Top-level plugin setting": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},
