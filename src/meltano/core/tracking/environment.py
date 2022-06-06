@@ -58,6 +58,7 @@ class EnvironmentContext(SelfDescribingJson):
                 "is_ci_environment": any(
                     # True if 'true', 'TRUE', 'True', or '1'
                     os.environ.get(marker, "").lower()[:1] in ["1", "t"]
+                    for marker in ci_markers
                 ),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
