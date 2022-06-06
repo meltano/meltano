@@ -33,6 +33,11 @@
                         "type": "string",
                         "maxLength": 64
                     },
+                    "namespace_hash": {
+                        "description": "64 character hash of the plugin namespace",
+                        "type": "string",
+                        "maxLength": 64
+                    },
                     "variant_name_hash": {
                         "description": "64 character hash of the plugin variant name",
                         "type": [
@@ -77,6 +82,7 @@
                 "required": [
                     "category",
                     "name_hash",
+                    "namespace_hash",
                     "parent_name_hash",
                     "command",
                     "variant_name_hash",

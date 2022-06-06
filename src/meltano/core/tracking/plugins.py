@@ -18,7 +18,7 @@ PLUGINS_CONTEXT_SCHEMA_VERSION = "1-0-0"
 def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
     if not safe_hasattr(plugin, "info"):
         logger.debug(
-            "Plugin tracker context some how encountered plugin without into attr."
+            "Plugin tracker context some how encountered plugin without info attr."
         )
         # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?)
         return {}
@@ -26,6 +26,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
     return {
         "category": str(plugin.type),
         "name_hash": hash_sha256(plugin.name) if plugin.name else None,
+        "namespace_hash": hash_sha256(plugin.namespace) if plugin.namespace else None,
         "variant_name_hash": hash_sha256(plugin.variant) if plugin.variant else None,
         "pip_url_hash": hash_sha256(plugin.formatted_pip_url)
         if plugin.formatted_pip_url
