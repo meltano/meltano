@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 import yaml
 
-import meltano.core.bundle as bundle
+from meltano.core import bundle
 
 from .project import Project
 from .setting_definition import SettingDefinition
@@ -17,7 +17,12 @@ class ConfigService:
     """Service to manage meltano.yml."""
 
     def __init__(self, project: Project, use_cache=True):
-        """Create a new project configuration service."""
+        """Create a new project configuration service.
+
+        Args:
+            project: the project to configure.
+            use_cache: whether to use the cache or not.
+        """
         self.project = project
 
         self._settings = None
@@ -26,6 +31,11 @@ class ConfigService:
 
     @property
     def settings(self):
+        """Return the project settings.
+
+        Returns:
+            The project settings.
+        """
         if self._settings is None:
             with bundle.find("settings.yml").open() as settings_yaml:
                 settings = yaml.safe_load(settings_yaml)
@@ -35,12 +45,25 @@ class ConfigService:
 
     @property
     def current_meltano_yml(self):
+        """Return the current meltano.yml contents.
+
+        Returns:
+            The contents of meltano.yml.
+        """
         if self._current_meltano_yml is None or not self._use_cache:
             self._current_meltano_yml = self.project.meltano
         return self._current_meltano_yml
 
     @contextmanager
     def update_meltano_yml(self):
+        """Update meltano.yml.
+
+        This method is a context manager that will update meltano.yml with the
+        contents of the context.
+
+        Yields:
+            The contents of meltano.yml.
+        """
         with self.project.meltano_update() as meltano_yml:
             yield meltano_yml
 
@@ -70,6 +93,11 @@ class ConfigService:
 
     @property
     def current_config(self):
+        """Return the current configuration.
+
+        Returns:
+            The current configuration.
+        """
         return self.current_meltano_yml.extras
 
     def update_config(self, config):
@@ -83,6 +111,11 @@ class ConfigService:
 
     @property
     def current_environment_config(self):
+        """Return the current environment configuration.
+
+        Returns:
+            The current environment configuration.
+        """
         return self.project.active_environment.config.extras
 
     def update_environment_config(self, config):
@@ -95,4 +128,5 @@ class ConfigService:
             environment.config.extras = config
 
     def make_meltano_secret_dir(self):
+        """Create the secret directory."""
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
