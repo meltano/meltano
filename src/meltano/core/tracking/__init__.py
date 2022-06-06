@@ -2,4 +2,4 @@
 
 from .cli import CliContext
 from .plugins import PluginsTrackingContext
-from .tracker import Tracker
+from .tracker import BlockEvents, Tracker

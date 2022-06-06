@@ -1,5 +1,5 @@
 """meltano run command and supporting functions."""
-from typing import List, Union
+from __future__ import annotations
 
 import click
 import structlog
@@ -12,12 +12,29 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
+from meltano.core.tracking import BlockEvents, CliContext, Tracker
+from meltano.core.tracking import cli as cli_tracking
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli
 from .params import pass_project
 
 logger = structlog.getLogger(__name__)
+
+
+def _get_opts_for_cmd_context(
+    dry_run: bool, full_refresh: bool, no_state_update: bool, force: bool
+) -> list(str):
+    opts = []
+    if dry_run:
+        opts.append("--dry-run")
+    if full_refresh:
+        opts.append("--full-refresh")
+    if no_state_update:
+        opts.append("--no-state-update")
+    if force:
+        opts.append("--force")
+    return opts
 
 
 @cli.command(short_help="[preview] Run a set of plugins in series.")
@@ -54,7 +71,7 @@ async def run(
     full_refresh: bool,
     no_state_update: bool,
     force: bool,
-    blocks: List[str],
+    blocks: list[str],
 ):
     """
     Run a set of command blocks in series.
@@ -85,36 +102,54 @@ async def run(
             logger.info("Setting 'console' handler log level to 'debug' for dry run")
             change_console_log_level()
 
-    parser = BlockParser(logger, project, blocks, full_refresh, no_state_update, force)
-    parsed_blocks = list(parser.find_blocks(0))
-    if not parsed_blocks:
-        logger.info("No valid blocks found.")
-        return
-    if validate_block_sets(logger, parsed_blocks):
-        logger.debug("All ExtractLoadBlocks validated, starting execution.")
-    else:
-        raise CliError("Some ExtractLoadBlocks set failed validation.")
-    await _run_blocks(parsed_blocks, dry_run=dry_run)
+    tracker = Tracker(project)
+    cmd_ctx = CliContext(
+        "run",
+        None,
+        _get_opts_for_cmd_context(dry_run, full_refresh, no_state_update, force),
+    )
+    with tracker.with_contexts(cmd_ctx):
+        tracker.track_command_event(cli_tracking.STARTED)
 
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_run(blocks)
+        parser = BlockParser(
+            logger, project, blocks, full_refresh, no_state_update, force
+        )
+        parsed_blocks = list(parser.find_blocks(0))
+        if not parsed_blocks:
+            tracker.track_command_event(cli_tracking.ABORTED)
+            logger.info("No valid blocks found.")
+            return
+        if validate_block_sets(logger, parsed_blocks):
+            logger.debug("All ExtractLoadBlocks validated, starting execution.")
+        else:
+            tracker.track_command_event(cli_tracking.FAILED)
+            raise CliError("Some ExtractLoadBlocks set failed validation.")
+        await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        tracker.track_command_event(cli_tracking.COMPLETED)
+
+    legacy_tracker = LegacyTracker(project)
+    legacy_tracker.track_meltano_run(blocks)
 
 
 async def _run_blocks(
-    parsed_blocks: List[Union[BlockSet, PluginCommandBlock]], dry_run: bool
+    tracker: Tracker,
+    parsed_blocks: list[BlockSet | PluginCommandBlock],
+    dry_run: bool,
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):
+        blk_name = blk.__class__.__name__
+        tracker.track_block_event(blk_name, BlockEvents.INITIALIZED)
         if dry_run:
             if isinstance(blk, BlockSet):
                 logger.info(
                     f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}.",
-                    block_type=blk.__class__.__name__,
+                    block_type=blk_name,
                     comprised_of=[plugin.string_id for plugin in blk.blocks],
                 )
             elif isinstance(blk, PluginCommandBlock):
                 logger.info(
                     f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}.",
-                    block_type=blk.__class__.__name__,
+                    block_type=blk_name,
                     comprised_of=f"{blk.string_id}:{blk.command}",
                 )
             continue
@@ -125,11 +160,12 @@ async def _run_blocks(
             logger.error(
                 "Block run completed.",
                 set_number=idx,
-                block_type=blk.__class__.__name__,
+                block_type=blk_name,
                 success=False,
                 err=err,
                 exit_codes=err.exitcodes,
             )
+            tracker.track_block_event(blk_name, BlockEvents.FAILED)
             raise CliError(
                 f"Run invocation could not be completed as block failed: {err}"
             ) from err
@@ -140,3 +176,4 @@ async def _run_blocks(
             success=True,
             err=None,
         )
+        tracker.track_block_event(blk_name, BlockEvents.COMPLETED)

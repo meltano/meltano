@@ -24,6 +24,18 @@ from .environment import environment_context
 
 CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
 CLI_EVENT_SCHEMA_VERSION = "1-0-0"
+BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
+BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
+
+
+class BlockEvents:
+    """Events describing a block state."""
+
+    INITIALIZED: str = "initialized"
+    STARTED: str = "started"
+    COMPLETED: str = "completed"
+    FAILED: str = "failed"
+
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -192,5 +204,19 @@ class Tracker:
         self.track_unstruct_event(
             SelfDescribingJson(
                 f"{CLI_EVENT_SCHEMA}/{CLI_EVENT_SCHEMA_VERSION}", event_json
+            )
+        )
+
+    def track_block_event(self, block_type: str, event: str) -> None:
+        """Fire generic block tracking event.
+
+        Args:
+            block_type: The block type.
+            event: The event string (e.g. "initialize", "started", etc)
+        """
+        self.track_unstruct_event(
+            SelfDescribingJson(
+                f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
+                {"type": block_type, "event": event},
             )
         )
