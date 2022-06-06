@@ -15,7 +15,9 @@ class TestCliDiscover:
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,
     ):
-        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
+        adapter = meltano_hub_service.session.get_adapter(
+            meltano_hub_service.hub_api_url
+        )
 
         with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):
             result = cli_runner.invoke(cli, ["discover"])
@@ -42,7 +44,9 @@ class TestCliDiscover:
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,
     ):
-        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
+        adapter = meltano_hub_service.session.get_adapter(
+            meltano_hub_service.hub_api_url,
+        )
 
         with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):
             result = cli_runner.invoke(cli, ["discover", "extractors"])

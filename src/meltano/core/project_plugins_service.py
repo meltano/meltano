@@ -519,7 +519,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         """
         parent, source = self.find_parent(plugin)
 
-        logger.debug("Found plugin", plugin=plugin.name, source=source)
+        logger.debug(
+            "Found plugin parent", plugin=plugin.name, parent=parent.name, source=source
+        )
         return parent
 
     def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
@@ -539,11 +541,11 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def get_transformer(self) -> ProjectPlugin:
         """Get first available Transformer plugin.
 
-        Returns:
-            The first available Transformer plugin.
-
         Raises:
-            PluginNotFoundError: If no Transformer plugin is found.
+            PluginNotFoundError: If there is no transformer.
+
+        Returns:
+            First available transformer plugin.
         """
         transformer = next(
             iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)), None
