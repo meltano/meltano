@@ -47,6 +47,7 @@ class PluginSettingsService(SettingsService):
             **project_settings_service.as_env(),
             **self.env_override,
             **self.plugin.info_env,
+            **self.plugin.extra_config.get("_env", {}),
         }
 
         self._inherited_settings_service = None
@@ -55,6 +56,9 @@ class PluginSettingsService(SettingsService):
             self.environment_plugin_config = environment.get_plugin_config(
                 self.plugin.type,
                 self.plugin.name,
+            )
+            self.env_override.update(
+                self.environment_plugin_config.extra_config.get("_env", {})
             )
         else:
             self.environment_plugin_config = None

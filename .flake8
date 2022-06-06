@@ -106,6 +106,7 @@ exclude =
     src/meltano/core/logging/job_logging_service.py
     src/meltano/core/job/stale_job_failer.py
     tests/meltano/core/runner/test_runner.py
+    src/meltano/core/utils/__init__.py
 inline_quotes = double
 max_line_length = 88
 show_source = true
@@ -200,6 +201,10 @@ per_file_ignores =
     src/meltano/core/job/job.py:
         # Class attributes can be used as instance attributes in sqlalchemy.declarative model
         WPS601
+    src/meltano/core/meltano_file.py:
+	# Env var expansion involves checking existence of "env" key and then
+	# getting its value within the checking `if` block
+	WPS529
     src/meltano/core/project_files.py:
         # Dict manipulation requires lots of string constant references
         WPS226
