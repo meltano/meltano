@@ -19,9 +19,8 @@ class TransformAddService:
         self.project = project
 
         self.plugins_service = ProjectPluginsService(project)
-        dbt_plugin = self.plugins_service.find_plugin(
-            plugin_name="dbt", plugin_type=PluginType.TRANSFORMERS
-        )
+
+        dbt_plugin = self.plugins_service.get_transformer()
 
         settings_service = PluginSettingsService(
             project, dbt_plugin, plugins_service=self.plugins_service

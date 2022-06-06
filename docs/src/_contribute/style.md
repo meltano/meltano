@@ -9,7 +9,7 @@ weight: 10
 
 ### Tools
 
-Meltano uses the below tools to enforce consistent code style. Explore the [repo](https://gitlab.com/meltano/meltano/tree/master) to learn of the specific rules and settings of each.
+Meltano uses the below tools to enforce consistent code style. Explore the [repo](https://github.com/meltano/meltano) to learn of the specific rules and settings of each.
 
 Python:
 - [isort](https://pycqa.github.io/isort/)
@@ -68,11 +68,6 @@ Python imports are sorted automatically using [`isort`](https://pycqa.github.io/
 #### Definitions
 
 Object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
-
-
-<div class="notification is-warning">
-  <p><strong>We are looking to automate these rules in https://gitlab.com/meltano/meltano/issues/1609.</strong></p>
-</div>
 
 <div class="notification is-danger">
   <p><strong>When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.</strong></p>

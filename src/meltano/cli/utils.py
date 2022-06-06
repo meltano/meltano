@@ -4,12 +4,14 @@ import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import click
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
@@ -23,6 +25,7 @@ from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
     ProjectAddService,
 )
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
 
 setup_logging()
@@ -381,10 +384,9 @@ def add_related_plugins(
     project: Project,
     plugins: List[ProjectPlugin],
     add_service: ProjectAddService,
-    plugin_types: List[PluginType] = None,
+    plugin_types: List[PluginType],
 ):
     """Add any related Plugins to the given Plugin."""
-    plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
         related_plugins = add_service.add_related(
@@ -496,3 +498,36 @@ def propagate_stop_signals(proc):
         yield
     finally:
         signal.signal(signal.SIGTERM, original_termination_handler)
+
+
+def check_dependencies_met(
+    plugin_refs: List[PluginRef], plugins_service: ProjectPluginsService
+) -> Tuple[bool, str]:
+    """Check dependencies of added plugins are met.
+
+    Args:
+        plugins: List of plugins to be added.
+        plugin_service: Plugin service to use when checking for dependencies.
+
+    Returns:
+        A tuple with dependency check outcome (True/False), and a string message with details of the check.
+    """
+    passed = True
+    messages = []
+
+    for plugin in plugin_refs:
+        if plugin.type == PluginType.TRANSFORMS:
+            # check that the `dbt` transformer plugin is installed
+            try:
+                plugins_service.get_transformer()
+            except PluginNotFoundError:
+                passed = False
+                messages.append(
+                    f"Plugin '{plugin.name}' requires a transformer plugin. "
+                    "Please first add a transformer using `meltano add transformer`."
+                )
+    if passed:
+        message = "All dependencies met"
+    else:
+        message = "Dependencies not met: " + "; ".join(messages)
+    return passed, message

@@ -6,6 +6,7 @@ import yaml
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.utils import CliError
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
@@ -27,19 +28,7 @@ class TestCliAdd:
         [
             (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
             (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
-            pytest.param(
-                PluginType.TRANSFORMS,
-                "tap-carbon-intensity",
-                "meltano",
-                [
-                    PluginRef(PluginType.TRANSFORMERS, "dbt"),
-                    PluginRef(PluginType.FILES, "dbt"),
-                ],
-                marks=[
-                    # Remove in: https://github.com/meltano/meltano/pull/5957
-                    pytest.mark.xfail,
-                ],
-            ),
+            (PluginType.TRANSFORMS, "tap-carbon-intensity", "meltano", []),
             (
                 PluginType.ORCHESTRATORS,
                 "airflow",
@@ -72,36 +61,41 @@ class TestCliAdd:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
-            assert res.exit_code == 0, res.stdout
-            assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
+            if plugin_type is PluginType.TRANSFORMS:
+                assert res.exit_code == 1, res.stdout
+                assert isinstance(res.exception, CliError)
+                assert "Dependencies not met:" in str(res.exception)
+            else:
+                assert res.exit_code == 0, res.stdout
+                assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
 
-            plugin = project_plugins_service.find_plugin(plugin_name, plugin_type)
-            assert plugin
-            assert plugin.variant == default_variant
+                plugin = project_plugins_service.find_plugin(plugin_name, plugin_type)
+                assert plugin
+                assert plugin.variant == default_variant
 
-            plugins = [plugin]
+                plugins = [plugin]
 
-            for required_plugin_ref in required_plugin_refs:
-                if (required_plugin_ref._type) == PluginType.FILES and (
-                    required_plugin_ref.name == "dbt"
-                ):
-                    # file bundles with no managed files are added but do not appear in meltano.yml
-                    assert (
-                        f"Adding required file bundle '{required_plugin_ref.name}'"
-                        in res.stdout
-                    )
-                else:
-                    plugin = project_plugins_service.get_plugin(required_plugin_ref)
-                    assert plugin
+                for required_plugin_ref in required_plugin_refs:
+                    if (required_plugin_ref._type) == PluginType.FILES and (
+                        required_plugin_ref.name == "dbt"
+                    ):
+                        # file bundles with no managed files are added but do not appear in meltano.yml
+                        assert (
+                            f"Adding required file bundle '{required_plugin_ref.name}'"
+                            in res.stdout
+                        )
+                    else:
+                        plugin = project_plugins_service.get_plugin(required_plugin_ref)
+                        assert plugin
 
-                    assert (
-                        f"Added required {plugin.type.descriptor} '{plugin.name}'"
-                        in res.stdout
-                    )
+                        assert (
+                            f"Added required {plugin.type.descriptor} '{plugin.name}'"
+                            in res.stdout
+                        )
 
-                    plugins.append(plugin)
+                        plugins.append(plugin)
 
-            install_plugin_mock.assert_called()
+                install_plugin_mock.assert_called()
 
     def test_add_multiple(self, project, cli_runner, project_plugins_service):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -136,12 +130,12 @@ class TestCliAdd:
 
             install_plugin_mock.assert_called_once_with(
                 project,
-                [tap_facebook, tap_adwords, tap_gitlab],
+                [tap_gitlab, tap_adwords, tap_facebook],
                 reason=PluginInstallReason.ADD,
-                parallelism=1,
             )
 
     def test_add_transform(self, project, cli_runner):
+        # adding Transforms requires the legacy 'dbt' Transformer
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
         cli_runner.invoke(cli, ["install", "transformer", "dbt"])
 
@@ -426,10 +420,7 @@ class TestCliAdd:
             assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
-                project,
-                [plugin],
-                reason=PluginInstallReason.ADD,
-                parallelism=1,
+                project, [plugin], reason=PluginInstallReason.ADD
             )
 
     def test_add_custom_no_install(self, project, cli_runner, project_plugins_service):
@@ -478,10 +469,7 @@ class TestCliAdd:
             assert plugin.executable == plugin_variant.executable == executable
 
             install_plugin_mock.assert_called_once_with(
-                project,
-                [plugin],
-                reason=PluginInstallReason.ADD,
-                parallelism=1,
+                project, [plugin], reason=PluginInstallReason.ADD
             )
 
     def test_add_custom_variant(

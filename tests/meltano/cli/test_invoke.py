@@ -7,11 +7,11 @@ from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
 
 from meltano.cli import cli
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @pytest.fixture(scope="class")
@@ -28,9 +28,7 @@ class TestCliInvoke:
         process_mock.name = "utility-mock"
         process_mock.wait = CoroutineMock(return_value=0)
 
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -44,9 +42,7 @@ class TestCliInvoke:
 
     @pytest.fixture
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -164,9 +160,7 @@ class TestCliInvoke:
         process_mock.name = "utility-mock"
         process_mock.wait = CoroutineMock(return_value=2)
 
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -185,9 +179,7 @@ class TestCliInvoke:
         project_plugins_service: ProjectPluginsService,
         tap: ProjectPlugin,
     ):
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
         ), patch.object(
@@ -227,14 +219,10 @@ class TestCliInvoke:
     ):
         settings_service = plugin_settings_service_factory(tap)
 
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch(
+        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
-        ), patch.object(
-            SingerTap, "discover_catalog"
-        ), patch.object(
+        ), patch.object(SingerTap, "discover_catalog"), patch.object(
             SingerTap, "apply_catalog_rules"
         ):
             result = cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])

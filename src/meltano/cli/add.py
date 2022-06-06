@@ -4,7 +4,9 @@ from typing import List
 
 import click
 
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
@@ -12,11 +14,16 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, add_plugin, add_required_plugins, install_plugins
+from .utils import (
+    CliError,
+    add_plugin,
+    add_required_plugins,
+    check_dependencies_met,
+    install_plugins,
+)
 
 
 @cli.command(short_help="Add a plugin to your project.")
@@ -84,10 +91,20 @@ def add(
         }:
             raise CliError(f"--custom is not supported for {plugin_type}")
 
+    plugin_refs = [
+        PluginRef(plugin_type=plugin_type, name=name) for name in plugin_names
+    ]
+    dependencies_met, err = check_dependencies_met(
+        plugin_refs=plugin_refs, plugins_service=plugins_service
+    )
+    if not dependencies_met:
+        raise CliError(f"Failed to install plugin(s): {err}")
+
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins: List[ProjectPlugin] = []
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
+
     with settings_service.feature_flag(
         FeatureFlags.LOCKFILES,
         raise_error=False,
@@ -115,20 +132,7 @@ def add(
     )
     plugins.extend(required_plugins)
 
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `related_plugins`, but should
-    # be installed first.
-    plugins.reverse()
-
-    # Plugin installation can be order dependent (e.g. a dbt transform package
-    # requires the dbt transformer to be installed before), so we will disable
-    # parallelism for this operation.
-    success = install_plugins(
-        project,
-        plugins,
-        reason=PluginInstallReason.ADD,
-        parallelism=1,
-    )
+    success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     if not success:
         raise CliError("Failed to install plugin(s)")
