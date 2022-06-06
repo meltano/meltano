@@ -19,8 +19,9 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliContext, PluginsTrackingContext, Tracker
+from meltano.core.tracking import PluginsTrackingContext, Tracker
 from meltano.core.tracking import cli as cli_tracking
+from meltano.core.tracking import cli_context_builder
 from meltano.core.utils import run_async
 
 from . import cli
@@ -76,7 +77,15 @@ def invoke(
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
     tracker = Tracker(project)
-    cmd_ctx = CliContext("invoke")
+    cmd_ctx = cli_context_builder(
+        "invoke",
+        None,
+        plugin_type=plugin_type,
+        dump=dump,
+        list_commands=list_commands,
+        containers=containers,
+        print_var=print_var,
+    )
     with tracker.with_contexts(cmd_ctx):
         tracker.track_command_event(cli_tracking.STARTED)
 

@@ -12,29 +12,15 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, CliContext, Tracker
+from meltano.core.tracking import BlockEvents, Tracker
 from meltano.core.tracking import cli as cli_tracking
+from meltano.core.tracking import cli_context_builder
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli
 from .params import pass_project
 
 logger = structlog.getLogger(__name__)
-
-
-def _get_opts_for_cmd_context(
-    dry_run: bool, full_refresh: bool, no_state_update: bool, force: bool
-) -> list(str):
-    opts = []
-    if dry_run:
-        opts.append("dry-run")
-    if full_refresh:
-        opts.append("full-refresh")
-    if no_state_update:
-        opts.append("no-state-update")
-    if force:
-        opts.append("force")
-    return opts
 
 
 @cli.command(short_help="[preview] Run a set of plugins in series.")
@@ -103,10 +89,13 @@ async def run(
             change_console_log_level()
 
     tracker = Tracker(project)
-    cmd_ctx = CliContext(
+    cmd_ctx = cli_context_builder(
         "run",
         None,
-        _get_opts_for_cmd_context(dry_run, full_refresh, no_state_update, force),
+        dry_run=dry_run,
+        full_refresh=full_refresh,
+        no_state_update=no_state_update,
+        force=force,
     )
     with tracker.with_contexts(cmd_ctx):
         tracker.track_command_event(cli_tracking.STARTED)
