@@ -56,8 +56,7 @@ class EnvironmentContext(SelfDescribingJson):
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(
-                    os.environ.get(marker, "").lower()[:1] in "1t"
-                    for marker in ci_markers
+                    os.environ.get(marker) for marker in ci_markers
                 ),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
