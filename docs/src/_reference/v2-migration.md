@@ -111,7 +111,7 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
   <tr>
    <td>WORKERS
    </td>
-   <td>WORKERS
+   <td>MELTANO_UI_WORKERS
    </td>
   </tr>
   <tr>
