@@ -6,6 +6,8 @@ import uuid
 from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
+from meltano.core.block.blockset import BlockSet
+from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.utils import hash_sha256, safe_hasattr
 
@@ -13,6 +15,26 @@ logger = get_logger(__name__)
 
 PLUGINS_CONTEXT_SCHEMA = "iglu:com.meltano/plugins_context/jsonschema"
 PLUGINS_CONTEXT_SCHEMA_VERSION = "1-0-0"
+
+
+def plugins_tracking_context_from_block(
+    blk: BlockSet | PluginCommandBlock,
+) -> PluginsTrackingContext:
+    """Create a PluginsTrackingContext from a BlockSet or PluginCommandBlock.
+
+    Args:
+        blk: The block to create the context for.
+
+    Returns:
+        The PluginsTrackingContext for the given block.
+    """
+    if isinstance(blk, BlockSet):
+        plugins: list[(ProjectPlugin, str)] = []
+        for plugin_block in blk.blocks:
+            plugins.append((plugin_block.context.plugin, plugin_block.plugin_args))
+        return PluginsTrackingContext(plugins)
+    if isinstance(blk, PluginCommandBlock):
+        return PluginsTrackingContext([(blk.context.plugin, blk.command)])
 
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:

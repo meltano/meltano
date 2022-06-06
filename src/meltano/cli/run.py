@@ -17,6 +17,7 @@ from meltano.core.tracking import cli as cli_tracking
 from meltano.core.tracking import cli_context_builder
 from meltano.core.utils import click_run_async
 
+from ..core.tracking.plugins import plugins_tracking_context_from_block
 from . import CliError, cli
 from .params import pass_project
 
@@ -127,7 +128,9 @@ async def _run_blocks(
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):
         blk_name = blk.__class__.__name__
-        tracker.track_block_event(blk_name, BlockEvents.INITIALIZED)
+        tracking_ctx = plugins_tracking_context_from_block(blk)
+        with tracker.with_contexts(tracking_ctx):
+            tracker.track_block_event(blk_name, BlockEvents.INITIALIZED)
         if dry_run:
             if isinstance(blk, BlockSet):
                 logger.info(
@@ -154,7 +157,8 @@ async def _run_blocks(
                 err=err,
                 exit_codes=err.exitcodes,
             )
-            tracker.track_block_event(blk_name, BlockEvents.FAILED)
+            with tracker.with_contexts(tracking_ctx):
+                tracker.track_block_event(blk_name, BlockEvents.FAILED)
             raise CliError(
                 f"Run invocation could not be completed as block failed: {err}"
             ) from err
@@ -165,4 +169,5 @@ async def _run_blocks(
             success=True,
             err=None,
         )
-        tracker.track_block_event(blk_name, BlockEvents.COMPLETED)
+        with tracker.with_contexts(tracking_ctx):
+            tracker.track_block_event(blk_name, BlockEvents.COMPLETED)
