@@ -6,6 +6,7 @@ import datetime
 import locale
 import re
 from contextlib import contextmanager
+from enum import Enum, auto
 from typing import Any
 from urllib.parse import urlparse
 
