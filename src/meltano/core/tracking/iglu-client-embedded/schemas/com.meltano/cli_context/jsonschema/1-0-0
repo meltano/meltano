@@ -13,13 +13,12 @@
             "description": "A UUID that uniquely identifies an instance of this event",
             "type": "string",
             "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
-            "minLength": 36,
-            "maxLength": 36
+            "minLength": 64,
+            "maxLength": 32
         },
         "command": {
             "description": "",
-            "type": "string",
-            "maxLength": 1024
+            "type": "string"
         },
         "sub_command": {
             "description": "",

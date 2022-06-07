@@ -10,7 +10,6 @@
     "type": "object",
     "properties": {
         "event": {
-            "description": "",
             "type": "string",
             "enum": [
                 "started",
