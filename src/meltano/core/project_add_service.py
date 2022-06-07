@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Iterable
 
 from .plugin import BasePlugin, PluginType, Variant
 from .plugin.project_plugin import ProjectPlugin
@@ -101,39 +100,26 @@ class ProjectAddService:
     def add_required(
         self,
         plugin: ProjectPlugin,
-        plugin_types: Iterable[PluginType] | None = None,
+        lock: bool = True,
     ):
         """Add all required plugins to the project.
 
         Args:
             plugin: The plugin to get requirements from.
-            plugin_types: The plugin types to add.
+            lock: Whether to generate a lockfile for the plugin.
 
         Returns:
             The added plugins.
         """
         added_plugins = []
-        for plugin_ref in plugin.requirements:
-            try:
-                plugin = self.add(
-                    plugin_ref.type, plugin_ref.name, variant=plugin_ref.variant
-                )
-            except PluginAlreadyAddedException:
-                pass
-
-        try:
-            plugin_types.remove(plugin.type)
-        except ValueError:
-            pass
-
-        added_plugins = []
-        for plugin_type, plugins in plugin.get_requirements(plugin_types).items():
+        for plugin_type, plugins in plugin.all_requires.items():
             for plugin_req in plugins:
                 try:
                     plugin = self.add(
                         plugin_type,
                         plugin_req.name,
                         variant=plugin_req.variant,
+                        lock=lock,
                     )
                 except PluginAlreadyAddedException:
                     continue

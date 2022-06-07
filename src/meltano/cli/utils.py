@@ -385,15 +385,14 @@ def add_required_plugins(
     project: Project,
     plugins: List[ProjectPlugin],
     add_service: ProjectAddService,
-    plugin_types: List[PluginType] = None,
+    lock: bool = True,
 ):
     """Add any Plugins required by the given Plugin."""
-    plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
         required_plugins = add_service.add_required(
             plugin_install,
-            plugin_types=plugin_types,
+            lock=lock,
         )
         for required_plugin in required_plugins:
             print_added_plugin(required_plugin, reason=PluginAddedReason.REQUIRED)
