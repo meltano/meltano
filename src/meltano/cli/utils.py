@@ -412,8 +412,9 @@ def add_required_plugins(
     plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
-        required_plugins = add_service.add_related(
-            plugin_install, plugin_types=plugin_types
+        required_plugins = add_service.add_required(
+            plugin_install,
+            plugin_types=plugin_types,
         )
         for required_plugin in required_plugins:
             print_added_plugin(required_plugin, reason=PluginAddedReason.REQUIRED)
@@ -524,10 +525,10 @@ def check_dependencies_met(
                 passed = False
                 messages.append(
                     f"Plugin '{plugin.name}' requires a transformer plugin. "
-                    "Please first add a transformer using `meltano add transformer`."
+                    + "Please first add a transformer using `meltano add transformer`."
                 )
     if passed:
         message = "All dependencies met"
     else:
-        message = "Dependencies not met: " + "; ".join(messages)
+        message = f"Dependencies not met: {'; '.join(messages)}"
     return passed, message

@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import logging
 import sys
-from typing import Any
+from typing import Any, Iterable
 
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
@@ -398,6 +398,30 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
 
         return self.name
 
+    def get_requirements(
+        self,
+        plugin_types: Iterable[PluginType] | None = None,
+    ) -> dict[PluginType, list[PluginRequirement]]:
+        """Return the requirements for this plugin.
+
+        Args:
+            plugin_types: The plugin types to include.
+
+        Returns:
+            A list of requirements for this plugin, optionally filtered for specified
+            plugin types.
+        """
+        plugin_types = plugin_types or list(PluginType)
+        plugins: dict[PluginType, list[PluginRequirement]] = {}
+
+        for plugin_type in plugin_types:
+            plugins[plugin_type] = [
+                *self._parent.all_requires.get(plugin_type, []),
+                *self.requires.get(plugin_type, []),
+            ]
+
+        return plugins
+
     @property
     def all_requires(self) -> dict[PluginType, list]:
         """Return all requires for this plugin.
@@ -405,13 +429,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         Returns:
             List of supported requires, including those inherited from the parent plugin.
         """
-        return {
-            plugin_type: [
-                *self._parent.all_requires.get(plugin_type, []),
-                *self.requires.get(plugin_type, []),
-            ]
-            for plugin_type in list(PluginType)
-        }
+        return self.get_requirements(plugin_types=None)
 
     @property
     def requirements(self) -> list[ProjectPlugin]:

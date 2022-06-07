@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum
+from typing import Iterable
 
 from .plugin import BasePlugin, PluginType, Variant
 from .plugin.project_plugin import ProjectPlugin
@@ -98,51 +99,16 @@ class ProjectAddService:
         """
         return self.plugins_service.add_to_file(plugin)
 
-    def add_related(
+    def add_required(
         self,
-        project_plugin: ProjectPlugin,
-        plugin_types: list[PluginType] | None = None,
+        plugin: ProjectPlugin,
+        plugin_types: Iterable[PluginType] | None = None,
     ):
-        """Add all related plugins to the project.
-
-        Args:
-            args: The plugin type and name of the plugin to add.
-            kwargs: Additional attributes to add to the plugin.
-
-        Returns:
-            The added plugins.
-        """
-        if project_plugin.requirements:
-            return self.add_required(project_plugin)
-
-        related_plugin_refs = (
-            self.plugins_service.discovery_service.find_related_plugin_refs(
-                project_plugin, plugin_types
-            )
-        )
-
-        added_plugins = []
-        for plugin_ref in related_plugin_refs:
-            try:
-                plugin = self.add(plugin_ref.type, plugin_ref.name)
-            except PluginAlreadyAddedException:
-                continue
-
-            added_plugins.append(plugin)
-
-        added_plugins_with_related = []
-        for added in added_plugins:
-            added_plugins_with_related.extend(
-                [added, *self.add_related(added, plugin_types)]
-            )
-
-        return added_plugins_with_related
-
-    def add_required(self, plugin: ProjectPlugin):
         """Add all required plugins to the project.
 
         Args:
             plugin: The plugin to get requirements from.
+            plugin_types: The plugin types to add.
 
         Returns:
             The added plugins.
@@ -154,9 +120,26 @@ class ProjectAddService:
                     plugin_ref.type, plugin_ref.name, variant=plugin_ref.variant
                 )
             except PluginAlreadyAddedException:
-                continue
+                pass
 
-            added_plugins.append(plugin)
+        try:
+            plugin_types.remove(plugin.type)
+        except ValueError:
+            pass
+
+        added_plugins = []
+        for plugin_type, plugins in plugin.get_requirements(plugin_types).items():
+            for plugin_req in plugins:
+                try:
+                    plugin = self.add(
+                        plugin_type,
+                        plugin_req.name,
+                        variant=plugin_req.variant,
+                    )
+                except PluginAlreadyAddedException:
+                    continue
+
+                added_plugins.append(plugin)
 
         added_plugins_with_required = []
         for added in added_plugins:
