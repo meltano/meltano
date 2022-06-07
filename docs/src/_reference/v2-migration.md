@@ -44,7 +44,7 @@ To complete your migration, consolidate `dbt_project.yml` and `dbt_project (<ada
 As this project file will be used by both `dbt` and `dbt-<adapter>` Transformer plugins by default, you must ensure you are running an up-to-date installation of plugin `dbt` if you intend to use both adapter-specific and legacy `dbt` installs together (not recommended).
 
 If you make use of [Transform](/guide/transformation) plugins, these will continue to work as regular `dbt` packages. However adding new Transform plugins will currently (tracking at [#3304](https://github.com/meltano/meltano/issues/3304)) re-add the legacy `dbt` Transformer plugin.
-To avoid this we recommend adding Transforms as regular packages directly via the dbt CLI as per the [`dbt` Packages documentation](https://docs.getdbt.com/docs/building-a-dbt-project/package-management).
+To avoid this we recommend adding Transforms as regular packages directly via dbt as per the [`dbt` Packages documentation](https://docs.getdbt.com/docs/building-a-dbt-project/package-management).
 
 #### Remove the `dbt` Transformer plugin and associated files
 
