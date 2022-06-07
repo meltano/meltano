@@ -82,7 +82,7 @@ class ProjectAddService:
 
             if lock and not added.is_custom():
                 self.plugins_service.lock_service.save(
-                    added.parent,
+                    added,
                     exists_ok=plugin.inherit_from is not None,
                 )
 
