@@ -10,7 +10,7 @@
     "type": "object",
     "properties": {
         "setting_name": {
-            "description": "The setting name which is changing",
+            "description": "The name of the setting that is changing",
             "type": "string",
             "examples": [
                 "project_id",
@@ -19,12 +19,12 @@
             "maxLength": 256
         },
         "changed_from": {
-            "description": "The prior value",
+            "description": "The prior value of the setting that is changing",
             "type": ["string", "boolean", "null"],
             "maxLength": 256
         },
         "changed_to": {
-            "description": "The new value",
+            "description": "The new value of the setting that is changing",
             "type": ["string", "boolean", "null"],
             "maxLength": 256
         }
