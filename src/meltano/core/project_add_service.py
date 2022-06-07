@@ -154,13 +154,18 @@ class ProjectAddService:
             pass
 
         added_plugins = []
-        for plugin_ref in plugin.get_requirements(plugin_types):
-            try:
-                plugin = self.add(plugin_ref.type, plugin_ref.name)
-            except PluginAlreadyAddedException:
-                continue
+        for plugin_type, plugins in plugin.get_requirements(plugin_types).items():
+            for plugin_req in plugins:
+                try:
+                    plugin = self.add(
+                        plugin_type,
+                        plugin_req.name,
+                        variant=plugin_req.variant,
+                    )
+                except PluginAlreadyAddedException:
+                    continue
 
-            added_plugins.append(plugin)
+                added_plugins.append(plugin)
 
         added_plugins_with_required = []
         for added in added_plugins:
