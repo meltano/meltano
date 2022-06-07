@@ -381,27 +381,6 @@ def add_plugin(
     return plugin
 
 
-def add_related_plugins(
-    project: Project,
-    plugins: List[ProjectPlugin],
-    add_service: ProjectAddService,
-    plugin_types: List[PluginType],
-):
-    """Add any related Plugins to the given Plugin."""
-    added_plugins = []
-    for project_plugin in plugins:
-        related_plugins = add_service.add_related(
-            project_plugin, plugin_types=plugin_types
-        )
-        for related_plugin in related_plugins:
-            print_added_plugin(related_plugin, reason=PluginAddedReason.RELATED)
-            click.echo()
-
-        added_plugins.extend(related_plugins)
-
-    return added_plugins
-
-
 def add_required_plugins(
     project: Project,
     plugins: List[ProjectPlugin],
