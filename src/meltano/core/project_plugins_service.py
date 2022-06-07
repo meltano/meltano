@@ -491,11 +491,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
             logger.debug("Lockfile is feature-flagged", status=allowed)
 
-        try:
-            return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
-        except Exception as hub_exc:
-            error = hub_exc
-
         if self._use_discovery_yaml:
             try:
                 return (
@@ -504,6 +499,11 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 )
             except Exception as discovery_exc:
                 error = discovery_exc
+
+        try:
+            return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
+        except Exception as hub_exc:
+            error = hub_exc
 
         if error:
             raise error
