@@ -101,14 +101,20 @@ async def run(
     with tracker.with_contexts(cmd_ctx):
         tracker.track_command_event(cli_tracking.STARTED)
 
-        parser = BlockParser(
-            logger, project, blocks, full_refresh, no_state_update, force
-        )
-        parsed_blocks = list(parser.find_blocks(0))
-        if not parsed_blocks:
+        parser_blocks = []  # noqa: F841
+        try:
+            parser = BlockParser(
+                logger, project, blocks, full_refresh, no_state_update, force
+            )
+            parsed_blocks = list(parser.find_blocks(0))
+            if not parsed_blocks:
+                tracker.track_command_event(cli_tracking.ABORTED)
+                logger.info("No valid blocks found.")
+                return
+        except Exception as parser_err:
             tracker.track_command_event(cli_tracking.ABORTED)
-            logger.info("No valid blocks found.")
-            return
+            raise parser_err
+
         if validate_block_sets(logger, parsed_blocks):
             logger.debug("All ExtractLoadBlocks validated, starting execution.")
         else:
