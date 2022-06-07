@@ -208,7 +208,7 @@ class Tracker:
             )
         )
 
-    def track_block_event(self, block_type: str, event: str) -> None:
+    def track_block_event(self, block_type: str, event: BlockEvents) -> None:
         """Fire generic block tracking event.
 
         Args:
@@ -218,6 +218,6 @@ class Tracker:
         self.track_unstruct_event(
             SelfDescribingJson(
                 f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
-                {"type": block_type, "event": event},
+                {"type": block_type, "event": event.name},
             )
         )
