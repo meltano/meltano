@@ -31,6 +31,7 @@ class FeatureFlags(Enum):
 
     ENABLE_UVICORN = "enable_uvicorn"
     ENABLE_API_SCHEDULED_JOB_LIST = "enable_api_scheduled_job_list"
+    STRICT_ENV_VAR_MODE = "strict_env_var_mode"
 
     def __str__(self):
         """Return feature name.
@@ -364,10 +365,16 @@ class SettingsService(ABC):  # noqa: WPS214
         value, get_metadata = manager.get(name, setting_def=setting_def)
         metadata.update(get_metadata)
 
+        # Can't do conventional SettingsService.feature_flag call to check;
+        # it would result in circular dependency
+        env_var_strict_mode, _ = manager.get(
+            f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
+        )
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
-
-            expanded_value = do_expand_env_vars(value, env=expandable_env)
+            expanded_value = do_expand_env_vars(
+                value, env=expandable_env, raise_if_missing=env_var_strict_mode
+            )
 
             if expanded_value != value:
                 metadata["expanded"] = True

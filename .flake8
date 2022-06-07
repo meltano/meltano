@@ -105,6 +105,7 @@ exclude =
     src/meltano/api/events/notification_events.py
     src/meltano/core/logging/job_logging_service.py
     src/meltano/core/job/stale_job_failer.py
+    src/meltano/core/utils/__init__.py
     tests/meltano/core/runner/test_runner.py
 inline_quotes = double
 max_line_length = 88
