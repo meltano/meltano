@@ -13,7 +13,8 @@ classifiers = [
 ]
 include = [
   "LICENSE",
-  "*.m5o"
+  "*.m5o",
+  ".release_marker",
 ]
 
 [tool.poetry.dependencies]
