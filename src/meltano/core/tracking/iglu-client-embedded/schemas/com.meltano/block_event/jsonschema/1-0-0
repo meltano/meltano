@@ -11,7 +11,8 @@
     "properties": {
         "type": {
             "description": "The type of block firing the event.",
-            "type": "string"
+            "type": "string",
+            "maxLength": 64
         },
         "event": {
             "description": "Where in the block life cycle this event occurred.",
