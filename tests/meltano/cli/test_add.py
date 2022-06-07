@@ -165,6 +165,10 @@ class TestCliAdd:
         project_plugins_service,
         plugin_settings_service_factory,
     ):
+        # if plugin is locked, we actually wouldn't expect it to update.
+        # So we must remove lockfile
+        os.remove(project.root_dir("plugins/files/airflow--original.lock"))
+
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])
         assert_cli_runner(result)
 

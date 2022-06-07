@@ -1,4 +1,5 @@
 import json
+import shutil
 from copy import deepcopy
 
 import pytest
@@ -86,7 +87,26 @@ class TestProjectPluginsService:
         subject._use_cache = False
         assert subject.get_plugin(tap) is not plugin
 
-    def test_get_parent(
+    def test_get_parent_from_lockfile(
+        self,
+        subject: ProjectPluginsService,
+        tap: ProjectPlugin,
+        locked_definition_service: LockedDefinitionService,
+        modified_lockfile,
+    ):
+        expected = locked_definition_service.find_base_plugin(
+            plugin_type=PluginType.EXTRACTORS,
+            plugin_name="tap-mock",
+            variant="meltano",
+        )
+
+        result, source = subject.find_parent(tap)
+        assert source == DefinitionSource.LOCKFILE
+        assert result == expected
+        assert result.settings == expected.settings
+        assert result.settings[-1].name == "foo"
+
+    def test_get_parent_no_lockfiles(
         self,
         subject: ProjectPluginsService,
         tap,
@@ -95,6 +115,9 @@ class TestProjectPluginsService:
         alternative_target,
         plugin_discovery_service,
     ):
+
+        # The behavior being tested here assumes that no lockfiles exist.
+        shutil.rmtree(subject.project.root_dir("plugins"), ignore_errors=True)
         # name="tap-mock", variant="meltano"
         # Shadows base plugin with correct variant
         assert subject.get_parent(tap) == plugin_discovery_service.find_base_plugin(
@@ -131,25 +154,6 @@ class TestProjectPluginsService:
         )
         with pytest.raises(PluginParentNotFoundError):
             assert subject.get_parent(nonexistent_parent)
-
-    def test_get_parent_from_lockfile(
-        self,
-        subject: ProjectPluginsService,
-        tap: ProjectPlugin,
-        locked_definition_service: LockedDefinitionService,
-        modified_lockfile,
-    ):
-        expected = locked_definition_service.find_base_plugin(
-            plugin_type=PluginType.EXTRACTORS,
-            plugin_name="tap-mock",
-            variant="meltano",
-        )
-
-        result, source = subject.find_parent(tap)
-        assert source == DefinitionSource.LOCKFILE
-        assert result == expected
-        assert result.settings == expected.settings
-        assert result.settings[-1].name == "foo"
 
     def test_update_plugin(self, subject, tap):
         # update a tap with a random value
