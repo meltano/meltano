@@ -382,7 +382,7 @@ class EnvironmentVariableNotSetError(Exception):
         return f"{self.env_var} referenced but not set."
 
 
-def expand_env_vars(raw_value, env: Dict, raise_error: bool = False):
+def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
     if not isinstance(raw_value, str):
         return raw_value
 
@@ -410,7 +410,7 @@ def expand_env_vars(raw_value, env: Dict, raise_error: bool = False):
 
             return val
         except KeyError as e:
-            if raise_error:
+            if raise_if_missing:
                 raise EnvironmentVariableNotSetError(e.args[0])
             else:
                 logger.debug(f"Variable '${var}' is missing from the environment.")

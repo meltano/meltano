@@ -50,7 +50,7 @@ class ProjectSettingsService(SettingsService):
             ) as strict_env_var_mode:
                 environment_env = {
                     var: do_expand_env_vars(
-                        value, expandable_env, raise_error=strict_env_var_mode
+                        value, expandable_env, raise_if_missing=strict_env_var_mode
                     )
                     for var, value in self.project.active_environment.env.items()
                 }

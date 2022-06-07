@@ -374,7 +374,7 @@ class SettingsService(ABC):  # noqa: WPS214
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
             expanded_value = do_expand_env_vars(
-                value, env=expandable_env, raise_error=env_var_strict_mode
+                value, env=expandable_env, raise_if_missing=env_var_strict_mode
             )
 
             if expanded_value != value:
