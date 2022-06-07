@@ -7,7 +7,9 @@ from distutils.version import StrictVersion
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.utils import nest
+from meltano.core.setting_definition import SettingDefinition
 
 from . import BasePlugin, PluginType
 
@@ -26,6 +28,8 @@ class Airflow(BasePlugin):
     __plugin_type__ = PluginType.ORCHESTRATORS
 
     invoker_class = AirflowInvoker
+
+    EXTRA_SETTINGS = [SettingDefinition(name="_config_path")]
 
     @property
     def config_files(self):
@@ -55,6 +59,19 @@ class Airflow(BasePlugin):
         for section, cfg in config.items():
             airflow_cfg[section].update(cfg)
             logging.debug(f"\tUpdated section [{section}] with {cfg}")
+
+        custom_config_filename = invoker.plugin_config_extras["_config_path"]
+        if custom_config_filename:
+            custom_config_path = invoker.project.root.joinpath(custom_config_filename)
+
+            try:
+                with custom_config_path.open() as custom_config_file:
+                    airflow_cfg.read_file(custom_config_file)
+                logging.info(f"Merged in config from {custom_config_path}")
+            except FileNotFoundError as err:
+                raise PluginExecutionError(
+                    f"Could not find config file {custom_config_path}"
+                ) from err
 
         with airflow_cfg_path.open("w") as cfg:
             airflow_cfg.write(cfg)

@@ -3,11 +3,16 @@ import logging
 import os
 from uuid import uuid4
 
+import structlog
+
 from meltano.core.behavior.hookable import hook
 from meltano.core.db import project_engine
 from meltano.core.plugin import BasePlugin
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.project import Project
-from meltano.core.utils import nest_object
+from meltano.core.utils import nest_object, merge
+
+logger = structlog.getLogger(__name__)
 
 
 class SingerPlugin(BasePlugin):
@@ -36,9 +41,24 @@ class SingerPlugin(BasePlugin):
     @hook("before_configure")
     async def before_configure(self, invoker, session):
         """Create configuration file."""
+        config = invoker.plugin_config_processed
+
+        custom_config_filename = invoker.plugin_config_extras["_config_path"]
+        if custom_config_filename:
+            custom_config_path = invoker.project.root.joinpath(custom_config_filename)
+
+            try:
+                with custom_config_path.open() as custom_config_file:
+                    custom_config = json.load(custom_config_file)
+                merge(custom_config, config)
+                logger.info(f"Merged in config from {custom_config_path}")
+            except FileNotFoundError as err:
+                raise PluginExecutionError(
+                    f"Could not find config file {custom_config_path}"
+                ) from err
+
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
-            config = invoker.plugin_config_processed
             json.dump(config, config_file, indent=2)
 
         logging.debug(f"Created configuration at {config_path}")

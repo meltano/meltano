@@ -71,6 +71,7 @@ class SingerTarget(SingerPlugin):
     __plugin_type__ = PluginType.LOADERS
 
     EXTRA_SETTINGS = [
+        SettingDefinition(name="_config_path"),
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
         SettingDefinition(name="_target_schema", value="$MELTANO_LOAD_SCHEMA"),
     ]
