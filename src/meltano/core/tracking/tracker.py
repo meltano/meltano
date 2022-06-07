@@ -122,14 +122,13 @@ class Tracker:
         self.client_id = stored_telemetry_settings.client_id or uuid.uuid4()
 
         project_ctx = ProjectContext(project, self.client_id)
-        self.project_id = str(project_ctx.project_uuid)
+        self.project_id: uuid.UUID = project_ctx.project_uuid
         self.contexts: tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
 
         self.telemetry_state_change_check(stored_telemetry_settings)
-        self.save_telemetry_settings()
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
@@ -158,6 +157,8 @@ class Tracker:
         Args:
             stored_telemetry_settings: the prior analytics settings
         """
+        save_settings = False
+
         if (
             stored_telemetry_settings.send_anonymous_usage_stats is None
             and not self.send_anonymous_usage_stats
@@ -173,6 +174,7 @@ class Tracker:
             self.track_telemetry_state_change_event(
                 "project_id", stored_telemetry_settings.project_id, self.project_id
             )
+            save_settings = True
 
         if (
             stored_telemetry_settings.send_anonymous_usage_stats is not None
@@ -185,6 +187,10 @@ class Tracker:
                 stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
+            save_settings = True
+
+        if save_settings:
+            self.save_telemetry_settings()
 
     @cached_property
     def timezone_name(self) -> str:
@@ -253,7 +259,7 @@ class Tracker:
             self.snowplow_tracker.track_struct_event(
                 category=category,
                 action=action,
-                label=self.project_id,
+                label=str(self.project_id),
             )
         except Exception as err:
             logger.debug(
@@ -392,13 +398,10 @@ class Tracker:
             )
 
         try:
-            return uuid.UUID(from_val, version=4)
+            return uuid.UUID(from_val)
         except ValueError:
             # Should only be reached if user manually edits 'analytics.json'.
-            log_fn = logger.debug
-            if warn:
-                log_fn = logger.warning
-
+            log_fn = logger.warning if warn else logger.debug
             log_fn(
                 "Invalid UUID string in 'analytics.json'",
                 value=from_val,
