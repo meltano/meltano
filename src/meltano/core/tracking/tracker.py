@@ -9,7 +9,7 @@ import re
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, NamedTuple, Optional, Tuple, Union
+from typing import Any, NamedTuple, Optional
 from urllib.parse import urlparse
 
 import tzlocal
@@ -116,6 +116,7 @@ class Tracker:
         )
 
         self.telemetry_state_change_check(stored_telemetry_settings)
+        self.save_telemetry_settings()
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
@@ -139,7 +140,7 @@ class Tracker:
     def telemetry_state_change_check(
         self, stored_telemetry_settings: TelemetrySettings
     ) -> None:
-        """Check prior values against current ones and send a change event if needed.
+        """Check prior values against current ones, and send a change event if needed.
 
         Args:
             stored_telemetry_settings: the prior analytics settings
@@ -152,7 +153,7 @@ class Tracker:
             return
 
         if (
-            stored_telemetry_settings.project_id
+            stored_telemetry_settings.project_id is not None
             and stored_telemetry_settings.project_id != self.project_id
         ):
             # Project ID has changed
@@ -161,7 +162,7 @@ class Tracker:
             )
 
         if (
-            stored_telemetry_settings.send_anonymous_usage_stats
+            stored_telemetry_settings.send_anonymous_usage_stats is not None
             and stored_telemetry_settings.send_anonymous_usage_stats
             != self.send_anonymous_usage_stats
         ):
@@ -171,8 +172,6 @@ class Tracker:
                 stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
-
-        self.store_telemetry_settings()
 
     @cached_property
     def timezone_name(self) -> str:
@@ -274,8 +273,8 @@ class Tracker:
     def track_telemetry_state_change_event(
         self,
         setting_name: str,
-        from_value: Union[uuid.UUID, str, bool, None],
-        to_value: Union[uuid.UUID, str, bool, None],
+        from_value: uuid.UUID | str | bool | None,
+        to_value: uuid.UUID | str | bool | None,
     ) -> None:
         """Fire a telemetry state change event.
 
@@ -325,24 +324,19 @@ class Tracker:
             The saved telemetry settings.
         """
         try:
-            with open(
-                self.analytics_json_path, encoding="utf-8"
-            ) as analytics_json_file:
+            with open(self.analytics_json_path) as analytics_json_file:
                 analytics = json.load(analytics_json_file)
-                return TelemetrySettings(
-                    self._uuid_from_str(analytics.get("client_id"), warn=True),
-                    self._uuid_from_str(analytics.get("project_id"), warn=True),
-                    analytics.get("send_anonymous_usage_stats"),
-                )
-
         except FileNotFoundError:
             return TelemetrySettings(None, None, None)
+        return TelemetrySettings(
+            self._uuid_from_str(analytics.get("client_id"), warn=True),
+            self._uuid_from_str(analytics.get("project_id"), warn=True),
+            analytics.get("send_anonymous_usage_stats"),
+        )
 
-    def store_telemetry_settings(self) -> None:
+    def save_telemetry_settings(self) -> None:
         """Save settings to the 'analytics.json' file."""
-        with open(
-            self.analytics_json_path, "w", encoding="utf-8"
-        ) as new_analytics_json_file:
+        with open(self.analytics_json_path, "w") as new_analytics_json_file:
             json.dump(
                 {
                     "client_id": str(self.client_id),

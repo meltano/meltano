@@ -41,6 +41,7 @@ class ProjectContext(SelfDescribingJson):
 
         Args:
             project: The Meltano project.
+            client_id: The client ID from `analytics.json`.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
