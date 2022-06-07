@@ -257,3 +257,42 @@ class TestEnvVarResolution:
         )
         assert_cli_runner(result)
         assert result.stdout.strip() == "STACKED=12345"
+
+    @pytest.mark.xfail
+    def test_environment_variable_inheritance_meltano_env_only(
+        self, cli_runner, project, monkeypatch
+    ):
+        # This test will be resolved to pass as part of
+        # this issue: https://github.com/meltano/meltano/issues/5983
+        monkeypatch.setenv("STACKED", "1")
+        with project.meltano_update() as meltanofile:
+            meltanofile.update(
+                {
+                    "plugins": {
+                        "utilities": [
+                            {
+                                "name": "test-environment-inheritance",
+                                "namespace": "test_environment_inheritance",
+                                "executable": "pwd",
+                            }
+                        ],
+                    },
+                    "environments": [
+                        {
+                            "name": "dev",
+                            "env": {"STACKED": "${STACKED}2"},
+                        },
+                    ],
+                },
+            )
+        result = cli_runner.invoke(
+            cli,
+            [
+                "invoke",
+                "--print-var",
+                "STACKED",
+                "test-environment-inheritance",
+            ],
+        )
+        assert_cli_runner(result)
+        assert result.stdout.strip() == "STACKED=12"

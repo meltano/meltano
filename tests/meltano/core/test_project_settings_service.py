@@ -7,8 +7,10 @@ from meltano.core.project_settings_service import (
 from meltano.core.settings_service import (
     EXPERIMENTAL,
     FEATURE_FLAG_PREFIX,
+    FeatureFlags,
     FeatureNotAllowedException,
 )
+from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 @pytest.fixture
@@ -110,3 +112,20 @@ class TestProjectSettingsService:
 
         with pytest.raises(FeatureNotAllowedException):
             should_not_run()
+
+    def test_strict_env_var_mode_on_raises_error(self, subject):
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+        subject.set(
+            "stacked_env_var",
+            "${NONEXISTENT_ENV_VAR}@nonexistent",
+        )
+        with pytest.raises(EnvironmentVariableNotSetError):
+            subject.get("stacked_env_var")
+
+    def test_strict_env_var_mode_off_no_raise_error(self, subject):
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set(
+            "stacked_env_var",
+            "${NONEXISTENT_ENV_VAR}@nonexistent_1",
+        )
+        assert subject.get("stacked_env_var") == "@nonexistent_1"
