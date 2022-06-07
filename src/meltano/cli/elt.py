@@ -5,6 +5,7 @@ import logging
 from contextlib import contextmanager
 
 import click
+import structlog
 from async_generator import asynccontextmanager
 from structlog import stdlib as structlog_stdlib
 
@@ -20,6 +21,10 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
+from meltano.core.tracking import Tracker
+from meltano.core.tracking import cli as cli_tracking
+from meltano.core.tracking import cli_context_builder
+from meltano.core.tracking.plugins import plugins_tracking_context_from_elt_context
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -103,6 +108,24 @@ async def elt(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    tracker = Tracker(project)
+    cmd_ctx = cli_context_builder(
+        "run",
+        None,
+        dry=dry,
+        transform=transform,
+        full_refresh=full_refresh,
+        select=select,
+        exclude=exclude,
+        catalog=catalog,
+        state=state,
+        dump=dump,
+        state_id=state_id,
+        force=force,
+    )
+    tracker.add_contexts(cmd_ctx)
+    tracker.track_command_event(cli_tracking.STARTED)
+
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
@@ -132,12 +155,18 @@ async def elt(
         if dump:
             await dump_file(context_builder, dump)
         else:
-            await _run_job(project, job, session, context_builder, force=force)
+            await _run_job(tracker, project, job, session, context_builder, force=force)
+    except Exception as err:
+        tracker.track_command_event(cli_tracking.FAILED)
+        raise err
     finally:
         session.close()
 
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
+    tracker.track_command_event(cli_tracking.COMPLETED)
+    legacy_tracker = LegacyTracker(project)
+    legacy_tracker.track_meltano_elt(
+        extractor=extractor, loader=loader, transform=transform
+    )
 
 
 def _elt_context_builder(
@@ -195,7 +224,7 @@ async def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err
 
 
-async def _run_job(project, job, session, context_builder, force=False):
+async def _run_job(tracker, project, job, session, context_builder, force=False):
     StaleJobFailer(job.job_id).fail_stale_jobs(session)
 
     if not force:
@@ -215,7 +244,7 @@ async def _run_job(project, job, session, context_builder, force=False):
 
         log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_id)
 
-        await _run_elt(log, context_builder, output_logger)
+        await _run_elt(tracker, log, context_builder, output_logger)
 
 
 @asynccontextmanager
@@ -237,10 +266,16 @@ async def _redirect_output(log, output_logger):
                 raise
 
 
-async def _run_elt(log, context_builder, output_logger):
+async def _run_elt(
+    tracker: Tracker,
+    log: structlog.BoundLogger,
+    context_builder: ELTContextBuilder,
+    output_logger: OutputLogger,
+):
     async with _redirect_output(log, output_logger):
         try:
             elt_context = context_builder.context()
+            tracker.add_contexts(plugins_tracking_context_from_elt_context(elt_context))
 
             if elt_context.only_transform:
                 log.info("Extract & load skipped.")
