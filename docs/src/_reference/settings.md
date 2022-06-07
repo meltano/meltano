@@ -2,6 +2,7 @@
 title: Settings
 description: Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 layout: doc
+weight: 2
 ---
 
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
@@ -1036,3 +1037,10 @@ Enables the lockfile mechanism to keep stable and version controlled plugin defi
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
 - Default: `False`
+
+### <a name="ff-env-var-strict-mode"></a>`ff.env_var_strict_mode`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENV_VAR_STRICT_MODE`
+- Default: `False`
+
+Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.

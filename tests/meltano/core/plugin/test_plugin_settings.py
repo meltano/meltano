@@ -14,7 +14,9 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
+from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 from meltano.core.settings_store import ConflictingSettingValueException
+from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 def test_create(session):
@@ -859,3 +861,14 @@ class TestPluginSettingsService:
         subject = plugin_settings_service_factory(tap)
         subject.set("aliased_3", "value_3")
         assert subject.get("aliased") == "value_3"
+
+    def test_strict_env_var_mode_on_raises_error(self, subject):
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+        subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
+        with pytest.raises(EnvironmentVariableNotSetError):
+            subject.get("stacked_env_var")
+
+    def test_strict_env_var_mode_off_no_raise_error(self, subject):
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
+        assert subject.get("stacked_env_var") is None
