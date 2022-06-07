@@ -64,8 +64,6 @@ class PluginLockService:
             None if base_plugin.variant == Variant.DEFAULT_NAME else base_plugin.variant
         )
 
-        logger.info(f"Locking a {type(base_plugin)}")
-
         plugin_def = base_plugin.definition
         path = self.project.plugin_lock_path(
             plugin_def.type,
