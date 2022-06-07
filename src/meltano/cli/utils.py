@@ -365,6 +365,7 @@ def add_plugin(
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new --inherit-from {plugin.name}"
             )
     except LockfileAlreadyExistsError as exc:
+        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method should return! Results in `KeyError: venv_name`
         plugin = exc.plugin
         click.secho(
             f"Plugin definition is already locked at {exc.path}.",
@@ -388,9 +389,9 @@ def add_related_plugins(
 ):
     """Add any related Plugins to the given Plugin."""
     added_plugins = []
-    for plugin_install in plugins:
+    for project_plugin in plugins:
         related_plugins = add_service.add_related(
-            plugin_install, plugin_types=plugin_types
+            project_plugin, plugin_types=plugin_types
         )
         for related_plugin in related_plugins:
             print_added_plugin(related_plugin, reason=PluginAddedReason.RELATED)

@@ -3387,7 +3387,7 @@ orchestrators:
     requires:
       files:
         - name: airflow
-          variant: meltnano
+          variant: meltano
 files:
   - name: airflow
     namespace: airflow

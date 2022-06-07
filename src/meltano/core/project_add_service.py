@@ -1,5 +1,7 @@
 """Add plugins to the project."""
 
+from __future__ import annotations
+
 import enum
 
 from .plugin import BasePlugin, PluginType, Variant
@@ -96,7 +98,11 @@ class ProjectAddService:
         """
         return self.plugins_service.add_to_file(plugin)
 
-    def add_related(self, *args, **kwargs):
+    def add_related(
+        self,
+        project_plugin: ProjectPlugin,
+        plugin_types: list[PluginType] | None = None,
+    ):
         """Add all related plugins to the project.
 
         Args:
@@ -106,9 +112,12 @@ class ProjectAddService:
         Returns:
             The added plugins.
         """
+        if project_plugin.requirements:
+            return self.add_required(project_plugin)
+
         related_plugin_refs = (
             self.plugins_service.discovery_service.find_related_plugin_refs(
-                *args, **kwargs
+                project_plugin, plugin_types
             )
         )
 
@@ -124,7 +133,7 @@ class ProjectAddService:
         added_plugins_with_related = []
         for added in added_plugins:
             added_plugins_with_related.extend(
-                [added, *self.add_related(added, **kwargs)]
+                [added, *self.add_related(added, plugin_types)]
             )
 
         return added_plugins_with_related
@@ -141,7 +150,9 @@ class ProjectAddService:
         added_plugins = []
         for plugin_ref in plugin.requirements:
             try:
-                plugin = self.add(plugin_ref.type, plugin_ref.name)
+                plugin = self.add(
+                    plugin_ref.type, plugin_ref.name, variant=plugin_ref.variant
+                )
             except PluginAlreadyAddedException:
                 continue
 
