@@ -31,6 +31,18 @@ TELEMETRY_STATE_CHANGE_EVENT_SCHEMA = (
     "iglu:com.meltano/telemetry_state_change_event/jsonschema"
 )
 TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION = "1-0-0"
+BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
+BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
+
+
+class BlockEvents:
+    """Events describing a block state."""
+
+    INITIALIZED: str = "initialized"
+    STARTED: str = "started"
+    COMPLETED: str = "completed"
+    FAILED: str = "failed"
+
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -299,11 +311,7 @@ class Tracker:
         if isinstance(to_value, uuid.UUID):
             to_value = str(to_value)
         event_json = SelfDescribingJson(
-            (
-                TELEMETRY_STATE_CHANGE_EVENT_SCHEMA
-                + "/"
-                + TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION
-            ),
+            f"{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA}/{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION}",
             {
                 "setting_name": setting_name,
                 "changed_from": from_value,
@@ -395,3 +403,17 @@ class Tracker:
                 value=from_val,
             )
             return None
+
+    def track_block_event(self, block_type: str, event: str) -> None:
+        """Fire generic block tracking event.
+
+        Args:
+            block_type: The block type.
+            event: The event string (e.g. "initialize", "started", etc)
+        """
+        self.track_unstruct_event(
+            SelfDescribingJson(
+                f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
+                {"type": block_type, "event": event},
+            )
+        )

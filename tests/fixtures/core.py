@@ -80,6 +80,7 @@ def discovery():  # noqa: WPS213
                             "kind": "string",
                             "aliases": ["aliased_1", "aliased_2", "aliased_3"],
                         },
+                        {"name": "stacked_env_var", "kind": "string"},
                     ],
                     "commands": {
                         "cmd": {

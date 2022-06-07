@@ -16,28 +16,12 @@ from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 import meltano
-from meltano.core.utils import hash_sha256
+from meltano.core.utils import hash_sha256, safe_hasattr
 
 logger = get_logger(__name__)
 
 # This file is only ever created in CI when building a release
 release_marker_path = Path(__file__).parent / ".release_marker"
-
-
-def _safe_hasattr(obj: Any, name: str) -> bool:
-    """Safely checks if an object has a given attribute.
-
-    This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
-
-    Args:
-        obj: The object to check.
-        name: The name of the attribute to check.
-
-    Returns:
-        True if the object has the attribute, False otherwise.
-    """
-    return getattr(obj, name, None) is not None
-
 
 ENV_CONTEXT_SCHEMA = "iglu:com.meltano/environment_context/jsonschema"
 ENV_CONTEXT_SCHEMA_VERSION = "1-0-0"
@@ -76,7 +60,7 @@ class EnvironmentContext(SelfDescribingJson):
         """
         freedesktop_data = (
             platform.freedesktop_os_release()
-            if _safe_hasattr(platform, "freedesktop_os_release")
+            if safe_hasattr(platform, "freedesktop_os_release")
             else defaultdict(type(None))
         )
 
@@ -86,7 +70,7 @@ class EnvironmentContext(SelfDescribingJson):
             "system_version": platform.version() or None,
             "machine": platform.machine() or None,
             "windows_edition": platform.win32_edition()
-            if _safe_hasattr(platform, "win32_edition")
+            if safe_hasattr(platform, "win32_edition")
             else None,
             "freedesktop_id": freedesktop_data["ID"],
             "freedesktop_id_like": freedesktop_data.get("ID_LIKE", None),
@@ -135,7 +119,7 @@ class EnvironmentContext(SelfDescribingJson):
         Returns:
             int: The number of available CPU cores.
         """
-        if _safe_hasattr(os, "sched_getaffinity"):
+        if safe_hasattr(os, "sched_getaffinity"):
             return len(os.sched_getaffinity(0))
         return os.cpu_count()
 

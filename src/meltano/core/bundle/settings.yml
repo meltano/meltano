@@ -195,3 +195,7 @@ settings:
 - name: experimental
   kind: boolean
   value: False
+# Control whether references to undefined env vars causes hard fail.
+- name: ff.strict_env_var_mode
+  kind: boolean
+  value: False

@@ -367,7 +367,23 @@ def set_at_path(d, path, value):
     final[tail] = value
 
 
-def expand_env_vars(raw_value, env: Dict):
+class EnvironmentVariableNotSetError(Exception):
+    """Occurs when a referenced environment variable is not set."""
+
+    def __init__(self, env_var: str):
+        """Initialize the error.
+        Args:
+            env_var: the unset environment variable name
+        """
+        super().__init__(env_var)
+        self.env_var = env_var
+
+    def __str__(self) -> str:
+        """Return the error as a string."""
+        return f"{self.env_var} referenced but not set."
+
+
+def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
     if not isinstance(raw_value, str):
         return raw_value
 
@@ -395,8 +411,11 @@ def expand_env_vars(raw_value, env: Dict):
 
             return val
         except KeyError as e:
-            logger.debug(f"Variable '${var}' is missing from the environment.")
-            return None
+            if raise_if_missing:
+                raise EnvironmentVariableNotSetError(e.args[0])
+            else:
+                logger.debug(f"Variable '${var}' is missing from the environment.")
+                return None
 
     fullmatch = re.fullmatch(var_matcher, raw_value)
     if fullmatch:
@@ -433,7 +452,12 @@ def hash_sha256(value: str) -> str:
 
     Returns:
         The hashed value of the given string.
+
+    Raises:
+        ValueError: If we are blindly passed a value that is None.
     """
+    if value is None:
+        raise ValueError("Cannot hash None.")
     return hashlib.sha256(value.encode()).hexdigest()
 
 
@@ -450,3 +474,18 @@ def format_exception(exception: BaseException) -> str:
     return "".join(
         traceback.format_exception(type(exception), exception, exception.__traceback__)
     )
+
+
+def safe_hasattr(obj: Any, name: str) -> bool:
+    """Safely checks if an object has a given attribute.
+
+    This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
+
+    Args:
+        obj: The object to check.
+        name: The name of the attribute to check.
+
+    Returns:
+        True if the object has the attribute, False otherwise.
+    """
+    return getattr(obj, name, None) is not None
