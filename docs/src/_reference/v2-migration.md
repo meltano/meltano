@@ -9,23 +9,33 @@ weight: 10
 
 _Note: This document is still a work in progress. Expect further changes, coming soon._
 
-## Full list of migration tasks and breaking changes
-
 The following list includes all breaking changes in Meltano version 2.0 as well as other recommended migration tasks.
 
-1. **Removed: `model` plugin type**
-   - This plugin type provided very basic BI capabilities using Meltano UI. This functionality has been removed in favor of 3rd party open source BI solutions.
-1. **Removed: `dashboard` plugin type**
-   - This plugin type provided very basic BI capabilities using Meltano UI. This functionality has been removed in favor of 3rd party open source BI solutions.
-1. **Removed: `env_aliases` in plugin config**
-1. **Removed: transforms support in `meltano elt`**
-   - Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`.
-1. **Removed: transforms support in Meltano schedules**
-   - Meltano 2.0 continues to support extract-load (EL) operations in schedules. However, for EL+T operations which also need to transform data, please use the new `meltano job add` command to create a job definition and then specify the new job name in your schedule.
-1. **Recommended: migrating to an adapter-specific dbt plugin**
-   - We recommend re-adding an adapter-specific version of dbt for existing projects which may be using the legacy `dbt` plugin name.
+## Recommended
 
-## 3. Removed: `env_aliases` in Plugin Config
+### Migrate to an adapter-specific dbt plugin
+
+We recommend re-adding an adapter-specific version of dbt for existing projects which may be using the legacy `dbt` plugin name.
+
+## Removed
+
+### `model` plugin type
+
+This plugin type provided very basic BI capabilities using Meltano UI. This functionality has been removed in favor of 3rd party open source BI solutions.
+
+### `dashboard` plugin type
+
+This plugin type provided very basic BI capabilities using Meltano UI. This functionality has been removed in favor of 3rd party open source BI solutions.
+
+### `transform` support in `meltano elt`\*\*
+
+Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`.
+
+### `transform` support in Meltano schedules\*\*
+
+Meltano 2.0 continues to support extract-load (EL) operations in schedules. However, for EL+T operations which also need to transform data, please use the new `meltano job add` command to create a job definition and then specify the new job name in your schedule.
+
+### `env_aliases` in Plugin config
 
 As part of our effort to streamline the configuration experience in Meltano, we are deprecating the `env_aliases` attribute of plugin definitions.
 Previously `env_aliases` provided two functions:
@@ -33,9 +43,9 @@ Previously `env_aliases` provided two functions:
 1. Sourcing setting values from the terminal by a name other than the default environment variable (of the form `<PLUGIN_NAME>_<SETTING_NAME>`).
 1. Writing setting values into the plugins' runtime environment under an environment variable name other than the default.
 
-For sourcing setting values we encourage users going forward use the default environment variables (of the form `<PLUGIN_NAME>_<SETTING_NAME>`) for settings in most cases.
+For sourcing setting values we encourage users going forward to make use of the default environment variables (of the form `<PLUGIN_NAME>_<SETTING_NAME>`) for settings in most cases.
 These can be conveniently found for a given plugin by running `meltano config <plugin> list`.
-In cases where an environment variable of a name other than the default must be used, Meltano supports referencing in `meltano.yml`.
+In cases where an environment variable of a name other than the default must be used to source a setting value, Meltano supports referencing in `meltano.yml`.
 For example:
 
 ```yaml
@@ -46,7 +56,7 @@ plugins:
         ultimate_license: $GITLAB_API_ULTIMATE_LICENSE
 ```
 
-This will take the value from the environment variable `GITLAB_API_ULTIMATE_LICENSE` and use it configure the `tap-gitlab` setting `ultimate_license`.
+This will take the value from the environment variable `GITLAB_API_ULTIMATE_LICENSE` and use it configure the `tap-gitlab` setting named `ultimate_license`.
 
 For writing setting values into the plugins' runtime environment under an environment variable name other than the default, we support the `env:` key for setting definitions.
 These can be added or overridden in your `meltano.yml` file. For example:
@@ -62,7 +72,7 @@ plugins:
 
 This will create an environment variable called `GITLAB_API_ULTIMATE_LICENSE` in the plugins' runtime environment with the configured value of the setting `ultimate_license`.
 
-### Updating your Project
+#### Updating your Project
 
 Before v2.0 Meltano made use of `env_aliases` internally and in several common plugins.
 To ensure Meltano and those plugins continue to work as expected, references to the deprecated environment variables in your own project should be replaced.
