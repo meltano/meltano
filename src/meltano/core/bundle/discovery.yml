@@ -3453,6 +3453,41 @@ utilities:
       - name: ge_home
         value: $MELTANO_PROJECT_ROOT/utilities/great_expectations
         env: GE_HOME
+  - name: superset
+    namespace: superset
+    label: Superset
+    description: A modern, enterprise-ready business intelligence web application.
+    docs: https://docs.meltano.com/guide/analysis
+    repo: https://github.com/apache/superset
+    variant: apache
+    pip_url: apache-superset==1.5.0 markupsafe==2.0.1 # `markupsafe` is listed explicitly to resolve https://github.com/apache/superset/issues/19150
+    settings:
+    - name: ui.bind_host
+      value: "0.0.0.0"
+    - name: ui.port
+      value: 8088
+    - name: ui.timeout
+      value: 60
+    - name: ui.workers
+      value: 4
+    - name: SQLALCHEMY_DATABASE_URI
+      value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/superset/superset.db
+    - name: SECRET_KEY
+      kind: password
+      value: thisisnotapropersecretkey
+    commands:
+      ui:
+        executable: gunicorn
+        args: --bind $SUPERSET_UI_BIND_HOST:$SUPERSET_UI_PORT --timeout $SUPERSET_UI_TIMEOUT --workers $SUPERSET_UI_WORKERS superset.app:create_app()
+        description: Start the Superset UI. Will be available on the configured `ui.bind_host` and `ui.port`, which default to `http://localhost:4000`
+      create-admin:
+        args: fab create-admin
+        description: Create an admin user.
+      load_examples:
+        args: load_examples
+        description: Load examples.
+    logo_url: /assets/logos/utilities/superset.png
+
 mappers:
   - name: transform-field
     namespace: transform_field

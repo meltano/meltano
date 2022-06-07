@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## Unreleased
 
+- [#3348](https://github.com/meltano/meltano/issues/3348) Add feature flag for raising exceptions when unset environment variables are referenced in settings.
+
 ---
 
 ### New
