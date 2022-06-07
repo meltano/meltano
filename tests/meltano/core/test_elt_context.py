@@ -38,7 +38,7 @@ def assert_transform_env(transform, env):
 def assert_transformer_env(transformer, env):
     assert env["MELTANO_TRANSFORMER_NAME"] == transformer.name
     assert env["MELTANO_TRANSFORMER_NAMESPACE"] == transformer.namespace
-    assert env["MELTANO_TRANSFORMER_VARIANT"] == Variant.ORIGINAL_NAME
+    assert env["MELTANO_TRANSFORMER_VARIANT"] == "dbt-labs"
 
     assert (
         env["MELTANO_TRANSFORM_TARGET"]

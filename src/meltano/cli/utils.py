@@ -365,6 +365,7 @@ def add_plugin(
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new --inherit-from {plugin.name}"
             )
     except LockfileAlreadyExistsError as exc:
+        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method should return! Results in `KeyError: venv_name`
         plugin = exc.plugin
         click.secho(
             f"Plugin definition is already locked at {exc.path}.",
@@ -380,40 +381,18 @@ def add_plugin(
     return plugin
 
 
-def add_related_plugins(
-    project: Project,
-    plugins: List[ProjectPlugin],
-    add_service: ProjectAddService,
-    plugin_types: List[PluginType],
-):
-    """Add any related Plugins to the given Plugin."""
-    added_plugins = []
-    for plugin_install in plugins:
-        related_plugins = add_service.add_related(
-            plugin_install, plugin_types=plugin_types
-        )
-        for related_plugin in related_plugins:
-            print_added_plugin(related_plugin, reason=PluginAddedReason.RELATED)
-            click.echo()
-
-        added_plugins.extend(related_plugins)
-
-    return added_plugins
-
-
 def add_required_plugins(
     project: Project,
     plugins: List[ProjectPlugin],
     add_service: ProjectAddService,
-    plugin_types: List[PluginType] = None,
+    lock: bool = True,
 ):
     """Add any Plugins required by the given Plugin."""
-    plugin_types = plugin_types or list(PluginType)
     added_plugins = []
     for plugin_install in plugins:
         required_plugins = add_service.add_required(
             plugin_install,
-            plugin_types=plugin_types,
+            lock=lock,
         )
         for required_plugin in required_plugins:
             print_added_plugin(required_plugin, reason=PluginAddedReason.REQUIRED)

@@ -115,12 +115,12 @@ def add(
         )
         tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
-    required_plugins = add_required_plugins(
-        project,
-        plugins,
-        add_service=add_service,
-        plugin_types=[PluginType.FILES],
-    )
+        required_plugins = add_required_plugins(
+            project,
+            plugins,
+            add_service=add_service,
+            lock=lock,
+        )
     plugins.extend(required_plugins)
 
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
