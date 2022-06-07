@@ -51,15 +51,15 @@ def check_url(url: str) -> bool:
     return bool(re.match(URL_REGEX, url))
 
 
-class AnalyticsSettings(NamedTuple):
+class TelemetrySettings(NamedTuple):
     """Settings which control telemetry and anonymous usage stats.
 
     These are stored within `analytics.json`.
     """
 
-    client_id: Optional[uuid.UUID]
-    project_id: Optional[uuid.UUID]
-    send_anonymous_usage_stats: Optional[bool]
+    client_id: uuid.UUID | None
+    project_id: uuid.UUID | None
+    send_anonymous_usage_stats: bool | None
 
 
 # TODO: Can we store some of this info to make future invocations faster?
@@ -105,17 +105,17 @@ class Tracker:
         else:
             self.snowplow_tracker = None
 
-        stored_analytics_settings = self._analytics_json_settings
-        self.client_id = stored_analytics_settings.client_id or uuid.uuid4()
+        stored_telemetry_settings = self.load_saved_telemetry_settings()
+        self.client_id = stored_telemetry_settings.client_id or uuid.uuid4()
 
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id = str(project_ctx.project_uuid)
-        self.contexts: Tuple[SelfDescribingJson] = (
+        self.contexts: tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
 
-        self.telemetry_state_change_check(stored_analytics_settings)
+        self.telemetry_state_change_check(stored_telemetry_settings)
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
@@ -124,6 +124,9 @@ class Tracker:
         - Return the value from 'send_anonymous_usage_stats', if set.
         - Otherwise the opposite of 'tracking_disabled', if set.
         - Otherwise return 'True'
+
+        Returns:
+            True if anonymous usage stats are enabled.
         """
         if self.settings_service.get("send_anonymous_usage_stats", None) is not None:
             return self.settings_service.get("send_anonymous_usage_stats")
@@ -134,38 +137,42 @@ class Tracker:
         return True
 
     def telemetry_state_change_check(
-        self, stored_analytics_settings: AnalyticsSettings
+        self, stored_telemetry_settings: TelemetrySettings
     ) -> None:
-        """Check prior values against current ones and send a change event if needed."""
+        """Check prior values against current ones and send a change event if needed.
+
+        Args:
+            stored_telemetry_settings: the prior analytics settings
+        """
         if (
-            stored_analytics_settings.send_anonymous_usage_stats is None
+            stored_telemetry_settings.send_anonymous_usage_stats is None
             and not self.send_anonymous_usage_stats
         ):
             # Do nothing. Tracking is disabled and no tracking marker to update.
             return
 
         if (
-            stored_analytics_settings.project_id
-            and stored_analytics_settings.project_id != self.project_id
+            stored_telemetry_settings.project_id
+            and stored_telemetry_settings.project_id != self.project_id
         ):
             # Project ID has changed
             self.track_telemetry_state_change_event(
-                "project_id", stored_analytics_settings.project_id, self.project_id
+                "project_id", stored_telemetry_settings.project_id, self.project_id
             )
 
         if (
-            stored_analytics_settings.send_anonymous_usage_stats
-            and stored_analytics_settings.send_anonymous_usage_stats
+            stored_telemetry_settings.send_anonymous_usage_stats
+            and stored_telemetry_settings.send_anonymous_usage_stats
             != self.send_anonymous_usage_stats
         ):
             # Telemetry state has changed
             self.track_telemetry_state_change_event(
                 "project_id",
-                stored_analytics_settings.send_anonymous_usage_stats,
+                stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
 
-        self._save_analytics_settings()
+        self.store_telemetry_settings()
 
     @cached_property
     def timezone_name(self) -> str:
@@ -278,8 +285,9 @@ class Tracker:
             to_value: the new value
         """
         logger.debug(
-            f"Telemetry state change detected for '{setting_name}'. "
-            "A one-time 'telemetry_state_change' event will now be sent."
+            "Telemetry state change detected. "
+            + "A one-time 'telemetry_state_change' event will now be sent.",
+            setting_name=setting_name,
         )
         if isinstance(from_value, uuid.UUID):
             from_value = str(from_value)
@@ -302,58 +310,38 @@ class Tracker:
         )
 
     @property
-    def _analytics_json_path(self) -> Path:
-        """Return path to the 'analytics.json' file."""
+    def analytics_json_path(self) -> Path:
+        """Return path to the 'analytics.json' file.
+
+        Returns:
+            Path to 'analytics.json' file.
+        """
         return self.project.meltano_dir() / "analytics.json"
 
-    @property
-    def _analytics_json_settings(self) -> AnalyticsSettings:
-        """Get settings from the 'analytics.json' file."""
+    def load_saved_telemetry_settings(self) -> TelemetrySettings:
+        """Get settings from the 'analytics.json' file.
 
-        def _uuid_from_str(from_val: Optional[Any], warn: bool):
-            if not isinstance(from_val, str):
-                if from_val is None:
-                    return None
-
-                logger.warn(
-                    f"The value '{from_val}' in 'analytics.json' was of type "
-                    "'{type(from_val).__name__}', where a string was expected. "
-                    "A new random ID will be created."
-                )
-
-            try:
-                return uuid.UUID(from_val, version=4)
-            except ValueError:
-                # Should only be reached if user manually edits 'analytics.json'.
-                log_fn = logger.debug
-                if warn:
-                    log_fn = logger.warning
-
-                log_fn(
-                    f"The string value '{from_val}' was not a valid UUID "
-                    "in 'analytics.json'. A new random ID will be created."
-                )
-                return None
-
+        Returns:
+            The saved telemetry settings.
+        """
         try:
             with open(
-                self._analytics_json_path, encoding="utf-8"
+                self.analytics_json_path, encoding="utf-8"
             ) as analytics_json_file:
                 analytics = json.load(analytics_json_file)
-                return AnalyticsSettings(
-                    _uuid_from_str(analytics.get("client_id"), warn=True),
-                    _uuid_from_str(analytics.get("project_id"), warn=True),
+                return TelemetrySettings(
+                    self._uuid_from_str(analytics.get("client_id"), warn=True),
+                    self._uuid_from_str(analytics.get("project_id"), warn=True),
                     analytics.get("send_anonymous_usage_stats"),
                 )
 
         except FileNotFoundError:
-            return AnalyticsSettings(None, None, None)
+            return TelemetrySettings(None, None, None)
 
-    def _save_analytics_settings(self) -> None:
+    def store_telemetry_settings(self) -> None:
         """Save settings to the 'analytics.json' file."""
-        analytics_json_path = self.project.meltano_dir() / "analytics.json"
         with open(
-            analytics_json_path, "w", encoding="utf-8"
+            self.analytics_json_path, "w", encoding="utf-8"
         ) as new_analytics_json_file:
             json.dump(
                 {
@@ -363,3 +351,38 @@ class Tracker:
                 },
                 new_analytics_json_file,
             )
+
+    def _uuid_from_str(self, from_val: Optional[Any], warn: bool) -> uuid.UUID | None:
+        """Safely convert string to a UUID. Return None if invalid UUID.
+
+        Args:
+            from_val: The string.
+            warn: True to warn on conversion failure.
+
+        Returns:
+            A UUID object, or None if the string cannot be converted to UUID.
+        """
+        if not isinstance(from_val, str):
+            if from_val is None:
+                return None
+
+            logger.warning(
+                "Unexpected value type in 'analytics.json'",
+                expected_type="string",
+                value_type=type(from_val),
+                value=from_val,
+            )
+
+        try:
+            return uuid.UUID(from_val, version=4)
+        except ValueError:
+            # Should only be reached if user manually edits 'analytics.json'.
+            log_fn = logger.debug
+            if warn:
+                log_fn = logger.warning
+
+            log_fn(
+                "Invalid UUID string in 'analytics.json'",
+                value=from_val,
+            )
+            return None
