@@ -520,7 +520,7 @@ class TestProjectPlugin:
         tap.config["custom"] = "from_meltano_yml"
         tap.config["nested"] = {"custom": True}
 
-        settings_by_name = {setting.name: setting for setting in tap.settings}
+        settings_by_name = {setting.name: setting for setting in tap.all_settings}
 
         # Regular settings
         assert "test" in settings_by_name
