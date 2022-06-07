@@ -99,11 +99,11 @@ jobs:
     - name: Combine coverage data and display human readable report
       run: |
         poetry run coverage combine
-        poetry run coverage report --show-missing
+        poetry run coverage report --show-missing --ignore-errors
 
     - name: Create coverage report
       run: |
-        poetry run coverage xml
+        poetry run coverage xml --ignore-errors
 
     - name: Upload coverage report
       uses: codecov/codecov-action@v3.1.0
