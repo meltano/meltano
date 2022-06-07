@@ -74,7 +74,6 @@ class ProjectAddService:
             # repeat the variant and pip_url in meltano.yml
             parent = plugin.parent
             if isinstance(parent, BasePlugin):
-                # raise
                 plugin.variant = parent.variant
                 plugin.pip_url = parent.pip_url
 
