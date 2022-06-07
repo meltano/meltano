@@ -35,13 +35,13 @@ BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
 BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
 
 
-class BlockEvents:
+class BlockEvents(Enum):
     """Events describing a block state."""
 
-    INITIALIZED: str = "initialized"
-    STARTED: str = "started"
-    COMPLETED: str = "completed"
-    FAILED: str = "failed"
+    initialized = auto()
+    started = auto()
+    completed = auto()
+    failed = auto()
 
 
 URL_REGEX = (

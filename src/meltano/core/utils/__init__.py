@@ -488,4 +488,8 @@ def safe_hasattr(obj: Any, name: str) -> bool:
     Returns:
         True if the object has the attribute, False otherwise.
     """
-    return getattr(obj, name, None) is not None
+    try:
+        getattr(obj, name)
+    except AttributeError:
+        return False
+    return True
