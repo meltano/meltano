@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://docs.meltano.com/contribute/plugins#discoveryyml-version for more information.
-version: 20
+version: 21
 
 extractors:
   - name: tap-adwords
@@ -2992,6 +2992,9 @@ transformers:
       test:
         args: test
         description: Runs tests on data in deployed models.
+    requires:
+      files:
+        - name: dbt
   - name: dbt-snowflake
     executable: dbt
     namespace: dbt_snowflake
@@ -3387,7 +3390,6 @@ orchestrators:
     requires:
       files:
         - name: airflow
-          variant: meltnano
 files:
   - name: airflow
     namespace: airflow

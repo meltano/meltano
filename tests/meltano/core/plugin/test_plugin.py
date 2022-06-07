@@ -520,7 +520,7 @@ class TestProjectPlugin:
         tap.config["custom"] = "from_meltano_yml"
         tap.config["nested"] = {"custom": True}
 
-        settings_by_name = {setting.name: setting for setting in tap.settings}
+        settings_by_name = {setting.name: setting for setting in tap.all_settings}
 
         # Regular settings
         assert "test" in settings_by_name
@@ -546,11 +546,15 @@ class TestProjectPlugin:
         assert "_nested.custom" in settings_by_name
         assert settings_by_name["_nested.custom"].kind == SettingKind.BOOLEAN
 
-    def test_requires(self, transformer: ProjectPlugin):
+    def test_requirements(self, transformer: ProjectPlugin):
         """Validate the plugin requirements."""
-        assert transformer.requirements
-        assert transformer.requirements[0].name == "files-transformer-mock"
-        assert transformer.requirements[0].variant == "meltano"
+        assert transformer.all_requires
+        requirement = transformer.all_requires[PluginType.FILES][0]
+        assert requirement.name == "files-transformer-mock"
+        assert requirement.variant == "meltano"
+
+        # Plugin doesn't have any utility requirements
+        assert not transformer.all_requires[PluginType.UTILITIES]
 
 
 class TestPluginType:
