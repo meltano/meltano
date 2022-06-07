@@ -3304,30 +3304,30 @@ transforms:
     repo: https://gitlab.com/meltano/dbt-tap-adwords
     pip_url: 'https://gitlab.com/meltano/dbt-tap-adwords.git@config-version-2'
     vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_adwords') }}"
   - name: tap-carbon-intensity
     namespace: tap_carbon_intensity
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-carbon-intensity
     pip_url: 'https://gitlab.com/meltano/dbt-tap-carbon-intensity.git@config-version-2'
     vars:
-      entry_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.entry"
-      generationmix_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.generationmix"
-      region_table: "{{ env_var('DBT_SOURCE_SCHEMA') }}.region"
+      entry_table: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_carbon_intensity') }}.entry"
+      generationmix_table: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_carbon_intensity') }}.generationmix"
+      region_table: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_carbon_intensity') }}.region"
   - name: tap-facebook
     namespace: tap_facebook
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-facebook
     pip_url: 'https://gitlab.com/meltano/dbt-tap-facebook.git@config-version-2'
     vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_facebook') }}"
   - name: tap-gitlab
     namespace: tap_gitlab
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-gitlab
     pip_url: 'https://gitlab.com/meltano/dbt-tap-gitlab.git@config-version-2'
     vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_gitlab') }}"
       ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE', False) }}"
   - name: tap-google-analytics
     namespace: tap_google_analytics
@@ -3335,21 +3335,21 @@ transforms:
     repo: https://gitlab.com/meltano/dbt-tap-google-analytics
     pip_url: 'https://gitlab.com/meltano/dbt-tap-google-analytics.git@config-version-2'
     vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}"
   - name: tap-salesforce
     namespace: tap_salesforce
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-salesforce
     pip_url: 'https://gitlab.com/meltano/dbt-tap-salesforce.git@config-version-2'
     vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_salesforce') }}"
   - name: tap-shopify
     namespace: tap_shopify
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-shopify
     pip_url: 'https://gitlab.com/meltano/dbt-tap-shopify.git@config-version-2'
     vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_shopify') }}"
   - name: tap-stripe
     namespace: tap_stripe
     variant: meltano
@@ -3357,14 +3357,14 @@ transforms:
     pip_url: 'https://gitlab.com/meltano/dbt-tap-stripe.git@config-version-2'
     vars:
       livemode: false
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_stripe') }}"
   - name: tap-zendesk
     namespace: tap_zendesk
     variant: meltano
     repo: https://gitlab.com/meltano/dbt-tap-zendesk
     pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git@config-version-2'
     vars:
-      schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_zendesk') }}"
 orchestrators:
   - name: airflow
     namespace: airflow
