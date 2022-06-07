@@ -290,29 +290,38 @@ class Tracker:
             to_value: the new value
         """
         logger.debug(
-            "Telemetry state change detected. "
-            + "A one-time 'telemetry_state_change' event will now be sent.",
+            "Telemetry state change detected. A one-time "
+            + "'telemetry_state_change' event will now be sent.",
             setting_name=setting_name,
         )
         if isinstance(from_value, uuid.UUID):
             from_value = str(from_value)
         if isinstance(to_value, uuid.UUID):
             to_value = str(to_value)
-
-        self.track_unstruct_event(
-            SelfDescribingJson(
-                (
-                    TELEMETRY_STATE_CHANGE_EVENT_SCHEMA
-                    + "/"
-                    + TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION
-                ),
-                {
-                    "setting_name": setting_name,
-                    "changed_from": from_value,
-                    "changed_to": to_value,
-                },
-            )
+        event_json = SelfDescribingJson(
+            (
+                TELEMETRY_STATE_CHANGE_EVENT_SCHEMA
+                + "/"
+                + TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION
+            ),
+            {
+                "setting_name": setting_name,
+                "changed_from": from_value,
+                "changed_to": to_value,
+            },
         )
+        try:
+            self.snowplow_tracker.track_unstruct_event(
+                event_json,
+                # Provide no Snowplow contexts so as to avoid sending any extra information beyond
+                # the 'telemetry_state_change' event.
+                None,
+            )
+        except Exception as err:
+            logger.debug(
+                "Failed to submit 'telemetry_state_change' unstruct event to Snowplow, error",
+                err=format_exception(err),
+            )
 
     @property
     def analytics_json_path(self) -> Path:
