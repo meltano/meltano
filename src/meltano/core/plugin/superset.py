@@ -1,3 +1,4 @@
+"""Plugin glue code for Superset."""
 import logging
 import subprocess
 from typing import List
@@ -16,7 +17,14 @@ logger = structlog.getLogger(__name__)
 
 
 class SupersetInvoker(PluginInvoker):
+    """Invoker that prepares env for Superset."""
+
     def env(self):
+        """Environment variables for Superset.
+
+        Returns:
+            Dictionary of environment variables.
+        """
         env = super().env()
 
         env["SUPERSET_HOME"] = str(self.plugin_config_service.run_dir)
@@ -27,6 +35,8 @@ class SupersetInvoker(PluginInvoker):
 
 
 class Superset(BasePlugin):
+    """Plugin glue code for Superset."""
+
     __plugin_type__ = PluginType.UTILITIES
 
     invoker_class = SupersetInvoker
@@ -35,12 +45,24 @@ class Superset(BasePlugin):
 
     @property
     def config_files(self):
+        """Return the configuration files required by the plugin.
+
+        Returns:
+            Dictionary of config file identifiers and filenames
+        """
         return {"config": "superset_config.py"}
 
     @hook("before_configure")
     async def before_configure(self, invoker: SupersetInvoker, session):  # noqa: WPS217
-        """Write plugin configuration to superset_config.py."""
+        """Write plugin configuration to superset_config.py.
 
+        Args:
+            invoker: the active PluginInvoker
+            session: metadata database session
+
+        Raises:
+            PluginExecutionError: if config file couldn't be found
+        """
         config = invoker.plugin_config_processed
 
         config_script_lines = [
@@ -76,11 +98,19 @@ class Superset(BasePlugin):
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
             config_file.write("\n".join(config_script_lines))
-        logging.debug(f"Created configuration at {config_file}")
+        logging.debug(f"Created configuration at {config_path}")
 
     @hook("before_invoke")
     async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: List[str]):
-        """Create or upgrade metadata database."""
+        """Create or upgrade metadata database.
+
+        Args:
+            invoker: the active PluginInvoker
+            exec_args: the args being passed
+
+        Raises:
+            AsyncSubprocessError: if command failed to run
+        """
         handle = await invoker.invoke_async(
             "db",
             "upgrade",
@@ -99,8 +129,15 @@ class Superset(BasePlugin):
 
     @hook("before_invoke")
     async def init_hook(self, invoker: PluginInvoker, exec_args: List[str]):
-        """Create default roles and permissions."""
+        """Create default roles and permissions.
 
+        Args:
+            invoker: the active PluginInvoker
+            exec_args: the args being passed
+
+        Raises:
+            AsyncSubprocessError: if command failed to run
+        """
         handle = await invoker.invoke_async(
             "init",
             stdout=subprocess.PIPE,
@@ -118,7 +155,11 @@ class Superset(BasePlugin):
 
     @hook("before_cleanup")
     async def before_cleanup(self, invoker: PluginInvoker):
-        """Delete the config file."""
+        """Delete the config file.
+
+        Args:
+            invoker: the active PluginInvoker
+        """
         config_file = invoker.files["config"]
         try:
             config_file.unlink()

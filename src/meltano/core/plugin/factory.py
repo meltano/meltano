@@ -24,7 +24,7 @@ def lazy_import(module: str, classname: str):
     return lazy
 
 
-base_plugin_classes = {
+base_plugin_classes = {  # noqa: WPS317
     PluginType.EXTRACTORS: lazy_import(".singer", "SingerTap"),
     PluginType.LOADERS: lazy_import(".singer", "SingerTarget"),
     PluginType.TRANSFORMS: lazy_import(".dbt", "DbtTransformPlugin"),
@@ -49,7 +49,7 @@ def base_plugin_factory(
     Returns:
         The created plugin.
     """
-    plugin_cls = base_plugin_classes.get(
+    plugin_cls = base_plugin_classes.get(  # noqa: WPS317
         (plugin_def.type, plugin_def.name),
         base_plugin_classes.get(plugin_def.type, lambda: BasePlugin),
     )()
