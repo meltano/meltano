@@ -12,7 +12,6 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
 
-
 Specifically, it will:
 
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/),
@@ -89,8 +88,6 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 - `--as=<new-name>`: `meltano add <type> <name> --as=<new-name>` is equivalent to `meltano add <type> <new-name> --inherit-from=<name>`, and can be used to add a [discoverable plugin](/concepts/plugins#discoverable-plugins) to your project with a different name.
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
-
-- `--include-related`: Also add transform plugins related to the identified discoverable extractor.
 
 ## `config`
 
@@ -441,7 +438,7 @@ The new project directory will contain:
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
-[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_DISABLE_TRACKING` environment variable is enabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
+[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
 ### How to use
 
@@ -473,7 +470,7 @@ meltano init demo-project --no_usage_stats
 # - OR don't share anything with the Meltano team
 #   about any project I initialize ever:
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
-echo "export MELTANO_DISABLE_TRACKING=1" >> $SHELLRC
+echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
 meltano init demo-project # --no_usage_stats is implied
 ```
 
@@ -595,6 +592,7 @@ meltano invoke --containers dbt:compile
 
 When debugging plugin configuration, it is often useful to view environment variables being provided to a plugin at runtime.
 This can be achieved using `--log-level=debug` but for readability and convenience, the `meltano invoke` command also supports printing individual environment variables to stdout at runtime:
+
 ```bash
 # Print the runtime value PLUGIN_ENVIRONMENT_VARIABLE_1:
 meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> <PLUGIN_NAME>
@@ -653,7 +651,7 @@ In addition to explicitly specifying plugin names you can also execute one or mo
 
 <div class="notification is-danger">
   <p><strong>The run command is a preview feature. Its functionality and CLI signature is still evolving.</strong></p>
-  <p>During the feature preview, and similar to <code>meltano invoke dbt:[cmd]</code>, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link <a href="https://gitlab.com/meltano/meltano/-/issues/3098">#3098</a>.</p>
+  <p>During the feature preview, and similar to <code>meltano invoke dbt:[cmd]</code>, you may need to perform additional steps to populate `DBT_*` specific environment variables before you are able to directly invoke dbt commands. For more information and available workarounds, please see our issue tracker link <a href="https://github.com/meltano/meltano/issues/3026">#3026</a>.</p>
   <p>Some flags and options supported by <a href="/reference/command-line-interface#elt"><code>meltano elt</code></a> are not yet supported in <code>meltano run</code>. For a list of these and a discussion of available workarounds, please see our issue tracker link <a href="https://gitlab.com/meltano/meltano/-/issues/3094">#3094</a>.</p>
 </div>
 
@@ -675,7 +673,7 @@ When an active environment is present, `run` will attempt to run incrementally a
 However, four top level flags are provided to alter behavior:
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
-(implicitly enables --log-level=debug for 'console' named handlers).
+  (implicitly enables --log-level=debug for 'console' named handlers).
 - `--no-state-update` will disable state saving for this invocation.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.

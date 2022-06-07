@@ -78,9 +78,5 @@ class DbtTransformPlugin(BasePlugin):
         SettingDefinition(name="_vars", kind=SettingKind.OBJECT, value={}),
     ]
 
-    @property
-    def runner(self):
-        return PluginRef(PluginType.TRANSFORMERS, "dbt")
-
     def is_invokable(self):
         return False

@@ -63,9 +63,12 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         variant: str | None = None,
         pip_url: str | None = None,
         executable: str | None = None,
-        config: dict | None = None,
+        capabilities: list | None = None,
+        settings_group_validation: list | None = None,
+        settings: list | None = None,
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
+        config: dict | None = None,
         default_variant=Variant.ORIGINAL_NAME,
         **extras,
     ):
@@ -79,9 +82,12 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             variant: (optional) Plugin variant.
             pip_url: (optional) Plugin install pip url.
             executable: (optional) Executable name.
-            config: (optional) Plugin configuration.
+            capabilities: (optional) Capabilities.
+            settings_group_validation: (optional) Settings group validation.
+            settings: (optional) Settings.
             commands: (optional) Plugin commands.
             requires: (optional) Plugin requirements.
+            config: (optional) Plugin configuration.
             default_variant: (optional) Default variant for this plugin.
             extras: Extra keyword arguments.
         """
@@ -106,6 +112,9 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 variant=variant,
                 pip_url=pip_url,
                 executable=executable,
+                capabilities=capabilities,
+                settings_group_validation=settings_group_validation,
+                settings=settings,
                 requires=requires,
                 **extras,
             )
@@ -127,11 +136,22 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self.variant = variant
         self.pip_url = pip_url
         self.executable = executable
+        self.capabilities = capabilities
+        self.settings_group_validation = settings_group_validation
+        self.settings = list(map(SettingDefinition.parse, settings or []))
         self.commands = Command.parse_all(commands)
         self.requires = PluginRequirement.parse_all(requires)
 
         self._fallbacks.update(
-            ["logo_url", "description", self.VARIANT_ATTR, "pip_url", "executable"]
+            [
+                "logo_url",
+                "description",
+                self.VARIANT_ATTR,
+                "pip_url",
+                "executable",
+                "capabilities",
+                "settings_group_validation",
+            ]
         )
 
         # If no variant is set, we fall back on the default
@@ -259,7 +279,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return uniques_in(prefixes)
 
     @property
-    def extra_config(self) -> list[str, Any]:
+    def extra_config(self) -> dict[str, Any]:
         """Return plugin extra config.
 
         Returns:
@@ -268,7 +288,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
-    def config_with_extras(self) -> list[str, Any]:
+    def config_with_extras(self) -> dict[str, Any]:
         """Return config with extras.
 
         Returns:
@@ -288,13 +308,21 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 self.config[key] = value
 
     @property
-    def settings(self) -> list[SettingDefinition]:
-        """Return plugin settings.
+    def all_settings(self) -> list[SettingDefinition]:
+        """Return all settings for this plugin.
 
         Returns:
-            A list of Plugin settings, including those defined by the parent.
+            List of settings, including those inherited from the parent plugin.
         """
-        existing_settings = self._parent.settings
+        # New setting definitions override old ones
+        new_setting_names = {setting.name for setting in self.settings}
+        existing_settings = [
+            setting
+            for setting in self._parent.all_settings
+            if setting.name not in new_setting_names
+        ]
+        existing_settings.extend(self.settings)
+
         return [
             *existing_settings,
             *SettingDefinition.from_missing(existing_settings, self.config),
@@ -320,7 +348,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         Returns:
             A complete list of SettingDefinitions, including extras.
         """
-        return [*self.settings, *self.extra_settings]
+        return [*self.all_settings, *self.extra_settings]
 
     def is_custom(self) -> bool:
         """Return if plugin is custom.
@@ -371,22 +399,29 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return self.name
 
     @property
+    def all_requires(self) -> dict[PluginType, list]:
+        """Return all requires for this plugin.
+
+        Returns:
+            List of supported requires, including those inherited from the parent plugin.
+        """
+        return {
+            plugin_type: [
+                *self._parent.all_requires.get(plugin_type, []),
+                *self.requires.get(plugin_type, []),
+            ]
+            for plugin_type in list(PluginType)
+        }
+
+    @property
     def requirements(self) -> list[ProjectPlugin]:
         """Return the requirements for this plugin.
 
         Returns:
             A list of requirements for this plugin.
         """
-        plugins = [
+        return [
             ProjectPlugin(plugin_type=plugin_type, name=dep.name, variant=dep.variant)
-            for plugin_type, deps in self.requires.items()
+            for plugin_type, deps in self.all_requires.items()
             for dep in deps
         ]
-
-        plugins.extend(
-            ProjectPlugin(plugin_type=plugin_type, name=dep.name, variant=dep.variant)
-            for plugin_type, deps in self._parent.requires.items()
-            for dep in deps
-        )
-
-        return plugins

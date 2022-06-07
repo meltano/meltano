@@ -466,7 +466,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
         Args:
             target_plugin: The target plugin.
-            plugin_types: The plugin types.
+            plugin_types: Types of related plugins to add.
 
         Returns:
             The related plugin references.
@@ -479,10 +479,6 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             pass
 
         related_plugin_refs = []
-
-        runner_ref = target_plugin.runner
-        if runner_ref:
-            related_plugin_refs.append(runner_ref)
 
         related_plugin_refs.extend(
             related_plugin_def
