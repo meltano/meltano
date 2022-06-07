@@ -9,31 +9,73 @@ weight: 10
 
 _Note: This document is still a work in progress. Expect further changes, coming soon._
 
-The following list includes all breaking changes in Meltano version 2.0 as well as other recommended migration tasks.
+The following list includes all recommended migration tasks as well as breaking changes in Meltano version 2.0.
 
 ## Recommended
 
-### Migrate to an adapter-specific dbt plugin
+### Migrate to an Adapter-Specific `dbt` Transformer
 
-We recommend re-adding an adapter-specific version of dbt for existing projects which may be using the legacy `dbt` plugin name.
+If you previously used the `dbt` Transformer, we recommend migrating to an adapter-specific installation as per the `dbt` [available adapters documentation](https://docs.getdbt.com/docs/available-adapters).
+
+#### Install `dbt`
+
+This is easy to do! Following the instructions from above to discover and install your chosen adapter:
+
+```bash
+# list available transformer plugins
+meltano discover transformers
+
+# install adapter-specific dbt, e.g. for snowflake
+meltano add transformer dbt-snowflake
+```
+
+#### Update your `dbt_project.yml`
+
+Installation of a new Transformer will introduce two important files to your `transform/` directory:
+
+- A new `profiles.yml` file in `transform/profiles/<adapter name>/profiles.yml`
+- A new `dbt_project.yml` file in `transform/dbt_project (<adapter name>).yml`
+
+The new `profiles.yml` will only be used by adapter-specific `dbt` executions (e.g. `dbt-snowflake`), and can be customized to meet your requirements.
+Your existing `profiles.yml` will remain in use by your existing `dbt` Transformer plugin (via `elt` and `invoke`).
+
+It is likely that the new `dbt_project (<adapter name>).yml` will contain changes from your previous `dbt_project.yml` file, especially if you haven't already upgraded to [`dbt` v1.0](https://docs.getdbt.com/guides/migration/versions/upgrading-to-v1.0).
+To complete your migration, consolidate `dbt_project.yml` and `dbt_project (<adapter name>).yml` into a single file called `dbt_project.yml`.
+As this project file will be used by both `dbt` and `dbt-<adapter>` Transformer plugins by default, you must ensure you are running an up-to-date installation of plugin `dbt` if you intend to use both adapter-specific and legacy `dbt` installs together (not recommended).
+
+If you make use of [Transform](/guide/transformation) plugins, these will continue to work as regular `dbt` packages. However adding new Transform plugins will currently (tracking at [#3304](https://github.com/meltano/meltano/issues/3304)) re-add the legacy `dbt` Transformer plugin.
+To avoid this we recommend adding Transforms as regular packages directly via the dbt CLI as per the [`dbt` Packages documentation](https://docs.getdbt.com/docs/building-a-dbt-project/package-management).
+
+#### Remove the `dbt` Transformer plugin and associated files
+
+To remove the legacy `dbt` Transformer plugin, run:
+
+```bash
+# remove the transformer `dbt`
+meltano remove transformer dbt
+
+# remove the file bundle `dbt`
+meltano remove files dbt
+```
+
+Removing a file bundle _does not_ remove any files from your `transform/` directory.
+Manually remove `transform/profiles.yml` to complete clean-up (as adapter-specific installs come with their own `profiles.yml` in `transform/profiles/<adapter name>/profiles.yml`).
 
 ## Removed
 
-### `model` plugin type
+### `model` and `dashboard` plugin types
 
-This plugin type provided very basic BI capabilities using Meltano UI. This functionality has been removed in favor of 3rd party open source BI solutions.
+These plugin types provided very basic BI capabilities using Meltano UI. However there are already great 3rd party open source BI solutions in this space, such as the newly added Superset plugin.
+Meltano `model` and `dashboard` plugins have been removed in favour of existing and future 3rd party tools for the same purpose.
 
-### `dashboard` plugin type
-
-This plugin type provided very basic BI capabilities using Meltano UI. This functionality has been removed in favor of 3rd party open source BI solutions.
-
-### `transform` support in `meltano elt`\*\*
+### `transform` support in `meltano elt`
 
 Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`.
 
-### `transform` support in Meltano schedules\*\*
+### `transform` support in Meltano schedules
 
-Meltano 2.0 continues to support extract-load (EL) operations in schedules. However, for EL+T operations which also need to transform data, please use the new `meltano job add` command to create a job definition and then specify the new job name in your schedule.
+Meltano 2.0 continues to support extract-load (EL) operations in schedules.
+However, for EL+T operations which also need to transform data, please use the new `meltano job add` [command](/reference/command-line-interface#job) to create a job definition and then specify the new job name in your schedule.
 
 ### `env_aliases` in Plugin config
 
@@ -91,16 +133,10 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
    </td>
   </tr>
   <tr>
-   <td rowspan="17" >meltano
+   <td rowspan="16" >meltano
    </td>
-   <td rowspan="17" >
+   <td rowspan="16" >
    </td>
-   <td>MELTANO_DISABLE_TRACKING
-   </td>
-   <td>MELTANO_SEND_ANONYMOUS_USAGE_STATS
-   </td>
-  </tr>
-  <tr>
    <td>MELTANO_API_HOSTNAME
    </td>
    <td>MELTANO_UI_BIND_HOST
