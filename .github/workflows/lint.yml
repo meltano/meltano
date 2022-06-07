@@ -16,7 +16,7 @@ jobs:
 
       - name: Iglu Schema Lint
         uses: mrchief/iglu-lint-action@v1.1.0
-          with:
-            path_to_schemas: "src/meltano/core/tracking/iglu-client-embedded/"
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            base_branch: "main"
+        with:
+          path_to_schemas: "src/meltano/core/tracking/iglu-client-embedded/"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          base_branch: "main"
