@@ -516,7 +516,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
 
 class MeltanoYmlStoreManager(SettingsStoreManager):
-    """Meltano YAML Store Manager."""
+    """Meltano.yml Store Manager."""
 
     label = "`meltano.yml`"
     writable = True
@@ -711,7 +711,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     """Configuration stored in an environment within `meltano.yml`."""
 
-    label = "`meltano_environment`"
+    label = "the active environment in `meltano.yml`"
 
     def __init__(self, *args, **kwargs):
         """Initialise MeltanoEnvStoreManager instance.

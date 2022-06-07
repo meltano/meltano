@@ -129,12 +129,7 @@ class EnvironmentConfig(Canonical):
 class Environment(NameEq, Canonical):
     """Runtime environment for Meltano runs."""
 
-    def __init__(
-        self,
-        name: str,
-        config: dict = None,
-        env: dict = None,
-    ) -> None:
+    def __init__(self, name: str, config: dict = None, env: dict = None) -> None:
         """Create a new environment object.
 
         Args:
