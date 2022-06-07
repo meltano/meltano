@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://docs.meltano.com/contribute/plugins#discoveryyml-version for more information.
-version: 21
+version: 22
 
 extractors:
   - name: tap-adwords
@@ -2952,23 +2952,35 @@ loaders:
         description: "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages."
 transformers:
   - name: dbt
+    label: dbt
     namespace: dbt
     docs: https://docs.meltano.com/guide/transformation
     repo: https://github.com/dbt-labs/dbt-core
     pip_url: dbt-core~=1.0.0 dbt-postgres~=1.0.0 dbt-redshift~=1.0.0 dbt-snowflake~=1.0.0 dbt-bigquery~=1.0.0
+    variant: dbt-labs
+    requires:
+      files:
+      - name: files-dbt
+        variant: meltano
     settings:
       - name: project_dir
+        label: Project Directory
         value: $MELTANO_PROJECT_ROOT/transform
       - name: profiles_dir
+        label: Profiles Directory
         env: DBT_PROFILES_DIR
         value: $MELTANO_PROJECT_ROOT/transform/profile
       - name: target
+        label: Target
         value: $MELTANO_LOAD__DIALECT
       - name: source_schema
+        label: Source Schema
         value: $MELTANO_LOAD__TARGET_SCHEMA
       - name: target_schema
+        label: Target Schema
         value: analytics
       - name: models
+        label: Models
         value: $MELTANO_TRANSFORM__PACKAGE_NAME $MELTANO_EXTRACTOR_NAMESPACE my_meltano_project
     commands:
       clean:
@@ -3000,32 +3012,47 @@ transformers:
     executable: dbt
     namespace: dbt_snowflake
     docs: https://docs.meltano.com/guide/transformation
-    repo: https://github.com/dbt-labs/dbt-core
+    repo: https://github.com/dbt-labs/dbt-snowflake
     pip_url: dbt-core~=1.0.0 dbt-snowflake~=1.0.0
+    variant: dbt-labs
+    requires:
+      files:
+      - name: files-dbt-snowflake
+        variant: meltano
     settings:
     - name: project_dir
+      label: Projects Directory
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
+      label: Profiles Directory
+      env: DBT_PROFILES_DIR
       value: $MELTANO_PROJECT_ROOT/transform/profiles/snowflake
     - name: account
+      label: Account
       kind: string
       description: The snowflake account to connect to.
     - name: user
+      label: User
       kind: string
       description: The user to connect as.
     - name: password
+      label: Password
       kind: password
       description: The user password to authenticate with.
     - name: role
+      label: Role
       kind: string
       description: The user role to assume.
     - name: warehouse
+      label: Warehouse
       kind: string
       description: The compute warehouse to use when building models.
     - name: database
+      label: Database
       kind: string
       description: The database to create models in.
     - name: schema
+      label: Schema
       kind: string
       description: The schema to build models into by default.
     commands:
@@ -3051,59 +3078,77 @@ transformers:
         args: test
         description: Runs tests on data in deployed models.
   - name: dbt-postgres
+    label: dbt Postgres
     executable: dbt
     namespace: dbt_postgres
     docs: https://docs.meltano.com/guide/transformation
     repo: https://github.com/dbt-labs/dbt-core
     pip_url: dbt-core~=1.0.0 dbt-postgres~=1.0.0
+    requires:
+      files:
+      - name: files-dbt-postgres
+        variant: meltano
+    variant: dbt-labs
     settings:
     - name: project_dir
+      label: Projects Directory
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
+      label: Profiles Directory
       value: $MELTANO_PROJECT_ROOT/transform/profiles/postgres
       env: DBT_PROFILES_DIR
       # Postgres connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: host
+      label: Host
       kind: string
       description: |
         The postgres host to connect to.
     - name: user
+      label: User
       kind: string
       description: |
         The user to connect as.
     - name: password
+      label: Password
       kind: password
       description: |
         The password to connect with.
     - name: port
+      label: Port
       kind: integer
       description: |
         The port to connect to.
     - name: dbname
-      alias: database
+      label: Database
+      aliases: ["database"]
       kind: string
       description: |
         The db to connect to.
     - name: schema
+      label: Schema
       kind: string
       description: |
         The schema to use.
     - name: keepalives_idle
+      label: Keep Alives Idle
       kind: integer
       description: |
         Seconds between TCP keepalive packets.
     - name: search_path
+      label: Search Path
       kind: string
       description: |
         Overrides the default search path.
     - name: role
+      label: Role
       kind: string
       description: |
         Role for dbt to assume when executing queries.
     - name: sslmode
-      type: array
+      label: SSL Mode
+      kind: array
       description: |
-        sslmode used to connect to the database.
+        SSL Mode used to connect to the database.
     commands:
       clean:
         args: clean
@@ -3127,84 +3172,108 @@ transformers:
         args: test
         description: Runs tests on data in deployed models.
   - name: dbt-redshift
+    label: dbt Redshift
     executable: dbt
     namespace: dbt_redshift
     docs: https://docs.meltano.com/guide/transformation
-    repo: https://github.com/dbt-labs/dbt-core
+    repo: https://github.com/dbt-labs/dbt-redshift
     pip_url: dbt-core~=1.0.0 dbt-redshift~=1.0.0
+    variant: dbt-labs
+    requires:
+      files:
+      - name: files-dbt-redshift
+        variant: meltano
     settings:
     - name: project_dir
+      lable: Project Directory
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
+      label: Profiles Directory
       value: $MELTANO_PROJECT_ROOT/transform/profiles/redshift
       env: DBT_PROFILES_DIR
       # Redshift connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: auth_method
+      label: Authentication Method
       kind: string
       description: |
         The auth method to use (to use iam, set to "iam".
         Omit to use password-based auth.)
     - name: cluster_id
+      label: Cluster ID
       kind: string
       description: |
         The cluster id.
     - name: host
+      label: Host
       kind: string
       description: |
         The host for the cluster.
     - name: password
+      label: Password
       kind: password
       description: |
         The password, if using password-based auth.
     - name: user
+      label: User
       kind: string
       description: |
         The user to connect as.
     - name: port
+      label: Port
       kind: integer
       description: |
         The port to connect to.
     - name: dbname
-      alias: database
+      label: Database
+      aliases: ["database"]
       kind: string
       description: |
         The name of the db to connect to.
     - name: schema
+      label: Schema
       kind: string
       description: |
         The schema to use.
     - name: iam_profile
+      label: IAM Profile
       kind: string
       description: |
-        The iam profile to use
+        The IAM profile to use.
     - name: iam_duration_seconds
+      label: IAM Duration Seconds
       kind: integer
       description: |
-        Duration of the iam session
+        Duration of the IAM session.
     - name: autocreate
+      label: Autocreate
       kind: boolean
       description: |
         Whether or not to automatically create entities.
     - name: db_groups
+      label: Databse Groups
       kind: array
       description: |
-        DB groups to use.
+        Database groups to use.
     - name: keepalives_idle
+      label: Keep Alives Idle
       kind: integer
       description: |
         Seconds between TCP keepalive packets
     - name: search_path
+      label: Search Path
       kind: string
       description: |
         The search path to use (use of this setting is not recommended)
     - name: sslmode
+      label: SSL Mode
       kind: array
       description: |
-        sslmode used to connect to redshift
+        SSL MOde used to connect to Redshift.
     - name: ra3_node
+      label: RA3 Node
       kind: boolean
       description: |
-        Enables cross-database sources
+        Enables cross-database sources.
     commands:
       clean:
         args: clean
@@ -3228,54 +3297,68 @@ transformers:
         args: test
         description: Runs tests on data in deployed models.
   - name: dbt-bigquery
+    label: dbt BigQuery
     executable: dbt
     namespace: dbt_bigquery
     docs: https://docs.meltano.com/guide/transformation
-    repo: https://github.com/dbt-labs/dbt-core
+    repo: https://github.com/dbt-labs/dbt-bigquery
     pip_url: dbt-core~=1.0.0 dbt-bigquery~=1.0.0
+    variant: dbt-labs
+    requires:
+      files:
+      - name: files-dbt-bigquery
+        variant: meltano
     settings:
     - name: project_dir
+      label: Project Directory
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
+      label: Profiles Directory
       value: $MELTANO_PROJECT_ROOT/transform/profiles/bigquery
       env: DBT_PROFILES_DIR
       # BigQuery connection settings are set via `config:` blocks and mapped to `profiles.yml`
     - name: auth_method
+      label: Authentication Method
       kind: string
       description: |
         The auth method to use. One of: "oauth", "oauth-secrets", or "service-account"
     - name: project
-      alias: database
+      label: Project
+      aliases: ["database"]
       kind: string
       description: |
         The BigQuery project ID.
     - name: dataset
       kind: string
-      alias: schema
+      aliases: ["schema"]
       description: |
         The dataset to use.
     - name: refresh_token
+      label: Refresh Token
       kind: password
       description: |
         The refresh token, if authenticating via oauth-secrets method.
     - name: client_id
-      alias: user
+      label: Client ID
+      aliases: ["user"]
       kind: string
       description: |
         The client id to use, if authenticating via oauth-secrets method.
     - name: client_secret
-      alias: password
+      label: Client Secret
+      aliases: ["password"]
       kind: password
       description: |
         The client secret to use, if authenticating via oauth-secrets method.
     - name: token_uri
+      label: Token URI
       kind: string
       description: |
         The token redirect URI
     - name: keyfile
       kind: string
       description: |
-        The path to the keyfile.json to use, if authenticating via service-account method.
+        The path to the `keyfile.json`` to use, if authenticating via service-account method.
     commands:
       clean:
         args: clean
@@ -3394,6 +3477,7 @@ orchestrators:
           variant: meltano
 files:
   - name: airflow
+    variant: meltano
     namespace: airflow
     repo: https://gitlab.com/meltano/files-airflow
     pip_url: git+https://gitlab.com/meltano/files-airflow.git
@@ -3401,40 +3485,49 @@ files:
       orchestrate/dags/meltano.py: true
     variant: meltano
   - name: dbt
+    variant: meltano
     namespace: dbt
     repo: https://gitlab.com/meltano/files-dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git@3120-deprecate-env-aliases-config-v2
     variant: meltano
   - name: docker
+    variant: meltano
     namespace: docker
     repo: https://gitlab.com/meltano/files-docker
     pip_url: git+https://gitlab.com/meltano/files-docker.git
   - name: docker-compose
+    variant: meltano
     namespace: docker_compose
     repo: https://gitlab.com/meltano/files-docker-compose
     pip_url: git+https://gitlab.com/meltano/files-docker-compose.git
   - name: gitlab-ci
+    variant: meltano
     namespace: gitlab_ci
     repo: https://gitlab.com/meltano/files-gitlab-ci
     pip_url: git+https://gitlab.com/meltano/files-gitlab-ci.git
   - name: great_expectations
+    variant: meltano
     namespace: great_expectations
     repo: https://gitlab.com/meltano/files-great-expectations
     pip_url: git+https://gitlab.com/meltano/files-great-expectations
   - name: dbt-snowflake
-    namespace: dbt_snowflake
+    variant: meltano
+    namespace: files_dbt_snowflake
     repo: https://gitlab.com/meltano/files-dbt-snowflake
     pip_url: git+https://gitlab.com/meltano/files-dbt-snowflake
   - name: dbt-postgres
-    namespace: dbt_postgres
+    variant: meltano
+    namespace: files_dbt_postgres
     repo: https://gitlab.com/meltano/files-dbt-postgres
     pip_url: git+https://gitlab.com/meltano/files-dbt-postgres
   - name: dbt-redshift
-    namespace: dbt_redshift
+    variant: meltano
+    namespace: files_dbt_redshift
     repo: https://gitlab.com/meltano/files-dbt-redshift
     pip_url: git+https://gitlab.com/meltano/files-dbt-redshift
   - name: dbt-bigquery
-    namespace: dbt_bigquery
+    variant: meltano
+    namespace: files_dbt_bigquery
     repo: https://gitlab.com/meltano/files-dbt-bigquery
     pip_url: git+https://gitlab.com/meltano/files-dbt-bigquery
 utilities:
