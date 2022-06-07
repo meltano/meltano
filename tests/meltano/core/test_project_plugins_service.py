@@ -9,7 +9,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import DefinitionSource, ProjectPluginsService
-from meltano.core.settings_service import FeatureFlags
 
 
 @pytest.fixture
@@ -146,22 +145,11 @@ class TestProjectPluginsService:
             variant="meltano",
         )
 
-        # Feature flag off means definition is not retrieved from lockfile
-        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
-        result_no_ff, source = subject.find_parent(tap)
-        assert source == DefinitionSource.DISCOVERY
-        assert result_no_ff == expected
-        assert len(result_no_ff.settings) == 12  # noqa: WPS432
-
-        # Feature flag on means definition is indeed retrieved from lockfile
-        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, True)
         result, source = subject.find_parent(tap)
         assert source == DefinitionSource.LOCKFILE
         assert result == expected
         assert result.settings == expected.settings
         assert result.settings[-1].name == "foo"
-
-        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
 
     def test_update_plugin(self, subject, tap):
         # update a tap with a random value
