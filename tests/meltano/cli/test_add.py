@@ -210,8 +210,9 @@ class TestCliAdd:
     def test_add_files_that_already_exists(
         self, project, cli_runner, project_plugins_service
     ):
+        # dbt lockfile was created in an upstream test. Need to remove.
+        os.remove(project.root_dir("plugins/files/dbt--original.lock"))
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
-
         result = cli_runner.invoke(cli, ["add", "files", "dbt"])
         assert_cli_runner(result)
 
