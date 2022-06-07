@@ -11,6 +11,7 @@ from contextlib import suppress
 from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
+import traceback
 from typing import Any, Callable, Coroutine, Dict, Iterable, Optional, TypeVar, Union
 
 import flatten_dict
@@ -434,3 +435,18 @@ def hash_sha256(value: str) -> str:
         The hashed value of the given string.
     """
     return hashlib.sha256(value.encode()).hexdigest()
+
+
+def format_exception(exception: BaseException) -> str:
+    """Get the exception with its traceback in the standard format it would have been printed with.
+
+    Args:
+        The exception value to be turned into a string.
+
+    Returns:
+        A string that shows the exception object as it would have been printed had it been raised
+        and not caught.
+    """
+    return "".join(
+        traceback.format_exception(type(exception), exception, exception.__traceback__)
+    )

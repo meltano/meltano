@@ -21,7 +21,7 @@ from structlog.stdlib import get_logger
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.project import ProjectContext
-from meltano.core.utils import hash_sha256
+from meltano.core.utils import format_exception, hash_sha256
 
 from .environment import environment_context
 
@@ -243,7 +243,10 @@ class Tracker:
                 label=self.project_id,
             )
         except Exception as err:
-            logger.debug("Failed to submit struct event to Snowplow", err=err)
+            logger.debug(
+                "Failed to submit struct event to Snowplow",
+                err=format_exception(err),
+            )
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
         """Fire an unstructured tracking event.
@@ -256,7 +259,10 @@ class Tracker:
         try:
             self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
         except Exception as err:
-            logger.debug("Failed to submit unstruct event to Snowplow, error", err=err)
+            logger.debug(
+                "Failed to submit unstruct event to Snowplow, error",
+                err=format_exception(err),
+            )
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:
         """Fire generic command tracking event.
