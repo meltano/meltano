@@ -38,7 +38,7 @@ class PluginLockService:
         Args:
             project: The Meltano project.
         """
-        self.projet = project
+        self.project = project
 
     def save(
         self,
@@ -63,7 +63,7 @@ class PluginLockService:
         logger.info(f"Locking a {type(plugin)}")
 
         plugin_def = plugin.definition
-        path = self.projet.plugin_lock_path(
+        path = self.project.plugin_lock_path(
             plugin_def.type,
             plugin_def.name,
             variant_name=variant,
