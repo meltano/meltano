@@ -471,6 +471,15 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except PluginNotFoundError as inherited_exc:
                 error = inherited_exc
 
+        if self._use_discovery_yaml:
+            try:
+                return (
+                    self._get_parent_from_discovery(plugin),
+                    DefinitionSource.DISCOVERY,
+                )
+            except Exception as discovery_exc:
+                error = discovery_exc
+
         try:
             return (
                 self.locked_definition_service.get_base_plugin(
@@ -481,15 +490,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             )
         except PluginNotFoundError as lockfile_exc:
             error = lockfile_exc
-
-        if self._use_discovery_yaml:
-            try:
-                return (
-                    self._get_parent_from_discovery(plugin),
-                    DefinitionSource.DISCOVERY,
-                )
-            except Exception as discovery_exc:
-                error = discovery_exc
 
         try:
             return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
