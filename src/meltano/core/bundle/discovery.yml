@@ -1,6 +1,6 @@
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://docs.meltano.com/contribute/plugins#discoveryyml-version for more information.
-version: 20
+version: 21
 
 extractors:
   - name: tap-adwords
