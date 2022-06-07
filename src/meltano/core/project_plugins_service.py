@@ -460,7 +460,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             error: If the parent plugin is not found.
         """
         error = None
-
         if plugin.inherit_from and not plugin.is_variant_set:
             try:
                 return (
@@ -472,16 +471,16 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except PluginNotFoundError as inherited_exc:
                 error = inherited_exc
 
-            try:
-                return (
-                    self.locked_definition_service.get_base_plugin(
-                        plugin,
-                        variant_name=plugin.variant,
-                    ),
-                    DefinitionSource.LOCKFILE,
-                )
-            except PluginNotFoundError as lockfile_exc:
-                error = lockfile_exc
+        try:
+            return (
+                self.locked_definition_service.get_base_plugin(
+                    plugin,
+                    variant_name=plugin.variant,
+                ),
+                DefinitionSource.LOCKFILE,
+            )
+        except PluginNotFoundError as lockfile_exc:
+            error = lockfile_exc
 
         if self._use_discovery_yaml:
             try:
