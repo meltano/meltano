@@ -12,6 +12,7 @@ from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_invoker import (
     PluginInvoker,
     UnknownCommandError,
@@ -99,28 +100,39 @@ def invoke(
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.find_plugin(
-        plugin_name, plugin_type=plugin_type, invokable=True
-    )
+
+    try:
+        plugin = plugins_service.find_plugin(
+            plugin_name, plugin_type=plugin_type, invokable=True
+        )
+    except PluginNotFoundError as err:
+        with tracker.with_contexts(cmd_ctx):
+            tracker.track_command_event(cli_tracking.ABORTED)
+        raise err
 
     if list_commands:
         do_list_commands(plugin)
         return
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
-    exit_code = run_async(
-        _invoke(
-            invoker,
-            project,
-            plugin_name,
-            plugin_args,
-            session,
-            dump,
-            command_name,
-            containers,
-            print_var=print_var,
+    try:
+        exit_code = run_async(
+            _invoke(
+                invoker,
+                project,
+                plugin_name,
+                plugin_args,
+                session,
+                dump,
+                command_name,
+                containers,
+                print_var=print_var,
+            )
         )
-    )
+    except Exception as invoke_err:
+        with tracker.with_contexts(cmd_ctx):
+            tracker.track_command_event(cli_tracking.FAILED)
+        raise invoke_err
 
     with tracker.with_contexts(
         cmd_ctx, PluginsTrackingContext([(plugin, command_name)])
