@@ -2,11 +2,17 @@ import logging
 import subprocess
 from typing import List
 
+import structlog
+
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.setting_definition import SettingDefinition
 
 from . import BasePlugin, PluginType
+
+logger = structlog.getLogger(__name__)
 
 
 class SupersetInvoker(PluginInvoker):
@@ -25,31 +31,51 @@ class Superset(BasePlugin):
 
     invoker_class = SupersetInvoker
 
+    EXTRA_SETTINGS = [SettingDefinition(name="_config_path")]
+
     @property
     def config_files(self):
         return {"config": "superset_config.py"}
 
-    def process_config(self, flat_config):
-        # TODO: This means that `meltano config superset` doesn't show settings that are handled by Meltano itself, e.g. `ui.port` in the `ui` command
-        return {key: value for key, value in flat_config.items() if key.isupper()}
-
     @hook("before_configure")
     async def before_configure(self, invoker: SupersetInvoker, session):  # noqa: WPS217
         """Write plugin configuration to superset_config.py."""
-        config_path = invoker.files["config"]
-        with open(config_path, "w") as config_file:
-            config = invoker.plugin_config_processed
-            config_file.write(
-                "\n".join(
+
+        config = invoker.plugin_config_processed
+
+        config_script_lines = [
+            "import sys",
+            "module = sys.modules[__name__]",
+            f"config = {str(config)}",
+            "for key, value in config.items():",
+            "    if key.isupper():",
+            "        setattr(module, key, value)",
+        ]
+
+        custom_config_filename = invoker.plugin_config_extras["_config_path"]
+        if custom_config_filename:
+            custom_config_path = invoker.project.root.joinpath(custom_config_filename)
+
+            if custom_config_path.exists():
+                config_script_lines.extend(
                     [
-                        "import sys",
-                        "module = sys.modules[__name__]",
-                        f"config = {str(config)}",
-                        "for key, value in config.items():",
-                        "    setattr(module, key, value)",
+                        "import imp",
+                        f'custom_config = imp.load_source("superset_config", "{str(custom_config_path)}")',
+                        "for key in dir(custom_config):",
+                        "    if key.isupper():",
+                        "        setattr(module, key, getattr(custom_config, key))",
                     ]
                 )
-            )
+
+                logger.info(f"Merged in config from {custom_config_path}")
+            else:
+                raise PluginExecutionError(
+                    f"Could not find config file {custom_config_path}"
+                )
+
+        config_path = invoker.files["config"]
+        with open(config_path, "w") as config_file:
+            config_file.write("\n".join(config_script_lines))
         logging.debug(f"Created configuration at {config_file}")
 
     @hook("before_invoke")
