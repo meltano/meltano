@@ -124,13 +124,11 @@ def add(
             )
             tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
-    related_plugin_types = [PluginType.FILES]
-
     required_plugins = add_required_plugins(
         project,
         plugins,
         add_service=add_service,
-        plugin_types=related_plugin_types,
+        plugin_types=[PluginType.FILES],
     )
     plugins.extend(required_plugins)
 
