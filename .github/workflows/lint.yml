@@ -1,0 +1,22 @@
+name: Lint
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  iglulint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3.0.2
+
+      - name: Iglu Schema Lint
+        uses: mrchief/iglu-lint-action@v1.1.0
+          with:
+            path_to_schemas: "src/meltano/core/tracking/iglu-client-embedded/"
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            base_branch: "main"
