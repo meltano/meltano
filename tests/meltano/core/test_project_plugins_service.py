@@ -151,7 +151,7 @@ class TestProjectPluginsService:
         result_no_ff, source = subject.find_parent(tap)
         assert source == DefinitionSource.DISCOVERY
         assert result_no_ff == expected
-        assert len(result_no_ff.settings) == 12  # noqa: WPS432
+        assert len(result_no_ff.settings) == 13  # noqa: WPS432
 
         # Feature flag on means definition is indeed retrieved from lockfile
         subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, True)
