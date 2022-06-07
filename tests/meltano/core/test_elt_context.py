@@ -135,6 +135,7 @@ class TestELTContext:
 
         assert_extractor_env(elt_context.extractor, env)
         assert_loader_env(elt_context.loader, env)
+
         assert_transform_env(transform, env)
         assert_transformer_env(transformer, env)
 
