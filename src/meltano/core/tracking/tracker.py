@@ -8,6 +8,7 @@ import locale
 import re
 import uuid
 from contextlib import contextmanager
+from enum import Enum, auto
 from pathlib import Path
 from typing import Any, NamedTuple, Optional
 from urllib.parse import urlparse
