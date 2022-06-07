@@ -11,6 +11,7 @@ from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents, Tracker
 from meltano.core.tracking import cli as cli_tracking
 from meltano.core.tracking import cli_context_builder
@@ -151,7 +152,7 @@ async def _run_blocks(
 
         try:
             await blk.run()
-        except Exception as err:
+        except RunnerError as err:
             logger.error(
                 "Block run completed.",
                 set_number=idx,
@@ -165,6 +166,10 @@ async def _run_blocks(
             raise CliError(
                 f"Run invocation could not be completed as block failed: {err}"
             ) from err
+        except Exception as bare_err:  # make sure we also fire block failed events for all other exceptions
+            with tracker.with_contexts(tracking_ctx):
+                tracker.track_block_event(blk_name, BlockEvents.FAILED)
+            raise bare_err
 
         logger.info(
             "Block run completed.",
