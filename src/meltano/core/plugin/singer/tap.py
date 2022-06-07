@@ -135,6 +135,7 @@ class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
 
     EXTRA_SETTINGS = [
+        SettingDefinition(name="_config_path"),
         SettingDefinition(name="_catalog"),
         SettingDefinition(name="_state"),
         SettingDefinition(name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"),
