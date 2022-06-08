@@ -91,5 +91,5 @@ runs:
         CURR_VER=${{ steps.detect-versions.outputs.current-version }}
         NEW_VER=${{ inputs.version-proposed }}
         BUMP_TYPE=${{ steps.get-bump-type.outputs.bump-type }}
-        [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER'" && exit 1
+        [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type between '$CURR_VER' and '$NEW_VER'" && exit 1
         echo "Detected bump type '$BUMP_TYPE' from '$CURR_VER' to '$NEW_VER'"
