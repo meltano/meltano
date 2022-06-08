@@ -28,6 +28,7 @@ class TestLockedDefinitionService:
             "tap-locked",
             "tap_locked",
             variant="meltano",
+            foo="bar",
         )
         path = subject.project.plugin_lock_path(
             definition.plugin_type,
@@ -56,6 +57,7 @@ class TestLockedDefinitionService:
         assert plugin_def.type == PluginType.EXTRACTORS
         assert plugin_def.name == "tap-locked"
         assert plugin_def.namespace == "tap_locked"
+        assert plugin_def.extras["foo"] == "bar"
         assert len(plugin_def.variants) == 1
 
     def test_find_base_plugin(

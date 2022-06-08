@@ -5,7 +5,11 @@ from typing import List
 from dotenv import dotenv_values
 
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.settings_service import SettingsService, SettingValueStore
+from meltano.core.settings_service import (
+    FeatureFlags,
+    SettingsService,
+    SettingValueStore,
+)
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import nest_object
 
@@ -41,10 +45,15 @@ class ProjectSettingsService(SettingsService):
             # Update this with `self.project.dotenv_env`, `self.env`, etc. to expand
             # other environment variables in the Environment's `env`.
             expandable_env = {**self.project.env}
-            environment_env = {
-                var: do_expand_env_vars(value, expandable_env)
-                for var, value in self.project.active_environment.env.items()
-            }
+            with self.feature_flag(
+                FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+            ) as strict_env_var_mode:
+                environment_env = {
+                    var: do_expand_env_vars(
+                        value, expandable_env, raise_if_missing=strict_env_var_mode
+                    )
+                    for var, value in self.project.active_environment.env.items()
+                }
             self.env_override.update(environment_env)
 
         self.config_override = {  # noqa: WPS601
@@ -108,12 +117,12 @@ class ProjectSettingsService(SettingsService):
 
     @property
     def environment_config(self):
-        """Return current configuration in `meltano.yml`.
+        """Return current environment configuration in `meltano.yml`.
 
         Returns:
-            Current configuration in `meltano.yml`
+            Current environment configuration in `meltano.yml`
         """
-        return {}
+        return self.config_service.current_environment_config
 
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
@@ -162,7 +171,6 @@ class ProjectSettingsService(SettingsService):
             if ui_cfg_value is not None:
                 value = ui_cfg_value
                 metadata["source"] = SettingValueStore.ENV
-
         return value, metadata
 
     def get_from_ui_cfg(self, name: str):

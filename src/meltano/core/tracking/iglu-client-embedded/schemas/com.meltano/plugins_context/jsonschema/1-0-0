@@ -1,0 +1,106 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow context describing the plugins being used by Meltano",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "plugins_context",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "context_uuid": {
+            "description": "A UUID that uniquely identifies an instance of this context",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "plugins": {
+            "description": "An array containing information about each plugin in order",
+            "type": "array",
+            "items": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "description": "",
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "name_hash": {
+                        "description": "64 character hash of the plugin name",
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "namespace_hash": {
+                        "description": "64 character hash of the plugin namespace",
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "executable_hash": {
+                        "description": "64 character hash of the plugin executable",
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "variant_name_hash": {
+                        "description": "64 character hash of the plugin variant name",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 64
+                    },
+                    "parent_name_hash": {
+                        "description": "64 character hash of the parent plugin name",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 64
+                    },
+                    "command": {
+                        "description": "",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1024
+                    },
+                    "pip_url_hash": {
+                        "description": "64 character hash of the pip url",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 64
+                    },
+                    "plugin_lock_hash": {
+                        "description": "hash of the plugin lock file",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 64
+                    }
+                },
+                "required": [
+                    "category",
+                    "name_hash",
+                    "namespace_hash",
+                    "executable_hash",
+                    "variant_name_hash",
+                    "parent_name_hash",
+                    "command",
+                    "pip_url_hash"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": [
+        "context_uuid",
+        "plugins"
+    ],
+    "additionalProperties": false
+}

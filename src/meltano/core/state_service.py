@@ -35,34 +35,34 @@ class StateService:
         """
         self.session = session
 
-    def list_state(self, job_id_pattern: Optional[str] = None) -> Dict[str, Dict]:
+    def list_state(self, state_id_pattern: Optional[str] = None) -> Dict[str, Dict]:
         """List all state found in the db.
 
         Args:
-            job_id_pattern: An optional glob-style pattern of job_ids to search for
+            state_id_pattern: An optional glob-style pattern of state_ids to search for
 
         Returns:
-            A dict with job_ids as keys and state payloads as values.
+            A dict with state_ids as keys and state payloads as values.
         """
         states = defaultdict(dict)
         query = self.session.query(Job)
-        if job_id_pattern:
-            query = query.filter(Job.job_id.like(job_id_pattern.replace("*", "%")))
-        for job_id in {job.job_id for job in query}:  # noqa: WPS335
-            states[job_id] = self.get_state(job_id)
+        if state_id_pattern:
+            query = query.filter(Job.job_id.like(state_id_pattern.replace("*", "%")))
+        for state_id in {job.job_id for job in query}:  # noqa: WPS335
+            states[state_id] = self.get_state(state_id)
         return states
 
     def _get_or_create_job(self, job: Union[Job, str]) -> Job:
-        """If Job is passed, return it. If job_id is passed, create new and return.
+        """If Job is passed, return it. If state_id is passed, create new and return.
 
         Args:
-            job: either an existing Job to modify state for, or a job_id
+            job: either an existing Job to modify state for, or a state_id
 
         Raises:
             TypeError: if job is not of type Job or str
 
         Returns:
-            A new job with given job_id, or the given Job
+            A new job with given state_id, or the given Job
         """
         if isinstance(job, str):
             now = datetime.datetime.utcnow()
@@ -96,7 +96,7 @@ class StateService:
         """Add state for the given Job.
 
         Args:
-            job: either an existing Job or a job_id that future runs may look up state for.
+            job: either an existing Job or a state_id that future runs may look up state for.
             new_state: the state to add for the given job.
             payload_flags: the payload_flags to set for the job
             validate: whether to validate the supplied state
@@ -104,26 +104,26 @@ class StateService:
         new_state_dict = json.loads(new_state)
         if validate:
             self.validate_state(new_state_dict)
-        job_to_add_to = self._get_or_create_job(job)
-        job_to_add_to.payload = json.loads(new_state)
-        job_to_add_to.payload_flags = payload_flags
-        job_to_add_to.save(self.session)
+        state_to_add_to = self._get_or_create_job(job)
+        state_to_add_to.payload = json.loads(new_state)
+        state_to_add_to.payload_flags = payload_flags
+        state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to job {job_to_add_to.job_id} state payload {new_state_dict}"
+            f"Added to state {state_to_add_to.job_id} state payload {new_state_dict}"
         )
 
-    def get_state(self, job_id: str) -> Dict:
-        """Get state for job with the given job_id.
+    def get_state(self, state_id: str) -> Dict:
+        """Get state for the given state_id.
 
         Args:
-            job_id: The job_id to get state for
+            state_id: The state_id to get state for
 
         Returns:
-            Dict representing state that would be used in the next run of the given job.
+            Dict representing state that would be used in the next run.
         """
         state = {}
         incomplete_since = None
-        finder = JobFinder(job_id)
+        finder = JobFinder(state_id)
 
         # Get the state for the most recent completed job.
         # Do not consider dummy jobs create via add_state.
@@ -150,37 +150,37 @@ class StateService:
 
         return state
 
-    def set_state(self, job_id: str, new_state: Optional[str], validate: bool = True):
-        """Set the state for Job job_id.
+    def set_state(self, state_id: str, new_state: Optional[str], validate: bool = True):
+        """Set the state for the state_id.
 
         Args:
-            job_id: the job_id of the job to set state for
+            state_id: the state_id to set state for
             new_state: the state to update to
             validate: whether or not to validate the supplied state.
         """
         self.add_state(
-            job_id,
+            state_id,
             new_state,
             payload_flags=Payload.STATE,
             validate=validate,
         )
 
-    def clear_state(self, job_id, save: bool = True):
-        """Clear the state for Job job_id.
+    def clear_state(self, state_id, save: bool = True):
+        """Clear the state for the state_id.
 
         Args:
-            job_id: the job_id of the job to clear state for
-            save: whether or not to immediately save the job
+            state_id: the state_id to clear state for
+            save: whether or not to immediately save the state
         """
-        self.set_state(job_id, json.dumps({}), validate=False)
+        self.set_state(state_id, json.dumps({}), validate=False)
 
-    def merge_state(self, job_id_src: str, job_id_dst: str):
-        """Merge state from Job job_id_src into Job job_id_dst.
+    def merge_state(self, state_id_src: str, state_id_dst: str):
+        """Merge state from state_id_src into state_id_dst.
 
         Args:
-            job_id_src: the job_id to get state from
-            job_id_dst: the job_id_to merge state onto
+            state_id_src: the state_id to get state from
+            state_id_dst: the state_id_to merge state onto
         """
-        src_state_dict = self.get_state(job_id_src)
+        src_state_dict = self.get_state(state_id_src)
         src_state = json.dumps(src_state_dict)
-        self.add_state(job_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
+        self.add_state(state_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)

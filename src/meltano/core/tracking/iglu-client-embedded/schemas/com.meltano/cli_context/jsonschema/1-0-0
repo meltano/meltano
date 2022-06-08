@@ -1,0 +1,41 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow context describing a Meltano cli command",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "cli_context",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "command": {
+            "description": "",
+            "type": "string",
+            "maxLength": 1024
+        },
+        "sub_command": {
+            "description": "",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 1024
+        },
+        "option_keys": {
+            "description": "",
+            "type": "array",
+            "items": {
+                "description": "",
+                "type": "string",
+                "maxLength": 256
+            }
+        }
+    },
+    "required": [
+        "command",
+        "sub_command",
+        "option_keys"
+    ],
+    "additionalProperties": false
+}

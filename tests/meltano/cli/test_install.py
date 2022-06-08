@@ -30,7 +30,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [dbt, target, tap_gitlab, tap], parallelism=None, clean=False
+                project, [tap, tap_gitlab, target, dbt], parallelism=None, clean=False
             )
 
     def test_install_type(
@@ -54,7 +54,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap_gitlab, tap], parallelism=None, clean=False
+                project, [tap, tap_gitlab], parallelism=None, clean=False
             )
 
         with mock.patch(
@@ -162,7 +162,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap_gitlab, tap], parallelism=None, clean=False
+                project, [tap, tap_gitlab], parallelism=None, clean=False
             )
 
     def test_install_parallel(

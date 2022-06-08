@@ -1,0 +1,108 @@
+name: Publish release (/publish)
+
+# Responds to /publish slack commands
+#
+# The `/publish` slash command requires write admin on the repo and it takes
+# one required `VERSION` argument.
+#
+# Usage:
+# ```
+# /publish VERSION
+#
+# Some optional description here.
+# ````
+# Examples:
+# /publish X.Y.Z
+
+on:
+  repository_dispatch:
+    types:
+    - publish-command
+
+jobs:
+  publish_release:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      VERSION: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+      PR_NUMBER: ${{ github.event.client_payload.github.payload.issue.number }}
+      POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+
+    permissions:
+      contents: write  # for release-drafter/release-drafter to create a github release
+      pull-requests: write  # for release-drafter/release-drafter to add label to PR
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Find Pull Request
+      uses: juliangruber/find-pull-request-action@v1
+      id: find-pull-request
+      with:
+        # https://github.com/juliangruber/find-pull-request-action
+        branch: release/v${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+    - run: echo "Pull Request ${number} (${sha})"
+      env:
+        number: ${{ steps.find-pull-request.outputs.number }}
+        sha: ${{ steps.find-pull-request.outputs.head-sha }}
+
+    - name: Publish notification on PR
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+          [The requested publish operation is now running.](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) :rocket:
+
+    - name: Validation version input
+      id: validate-version-sequence
+      uses: ./.github/actions/validate-version-sequence
+      with:
+        version-proposed: $VERSION
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        # Version of Poetry to use
+        version: 1.1.13
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Set up Python
+      uses: actions/setup-python@v3.1.2
+      with:
+        python-version: 3.9
+        architecture: x64
+        cache: 'poetry'
+
+    - name: Poetry install
+      run: |
+        poetry install
+    - name: Add release file marker and build
+      run: |
+        touch src/meltano/core/tracking/.release_marker
+        poetry build
+
+    - name: Publish to PyPi
+      # # Only run when not on a fork:
+      # if: ${{ github.event.repository.name == 'meltano/meltano' }}
+      run: |
+        echo "Running 'poetry publish' now! 🚀"
+        poetry publish
+
+    - name: Add reaction (success)
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        reaction-type: hooray
+
+    - name: Add reaction (failure)
+      uses: peter-evans/create-or-update-comment@v2
+      if: ${{ failure() }}
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        reaction-type: confused

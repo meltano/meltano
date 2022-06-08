@@ -15,11 +15,33 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
-
 ### Fixes
 
 ### Breaks
+
+
+## 2.0.0 - (2022-06-08)
+
+- [#3348](https://github.com/meltano/meltano/issues/3348) Add feature flag for raising exceptions when unset environment variables are referenced in settings.
+
+---
+
+### New
+
+- [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
+
+- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX
+
+### Changes
+- [#3173](https://gitlab.com/meltano/meltano/-/issues/3173) Add tests and clarify docs for environment variable resolution.
+
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
+
+- [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies replaces  implicitly "related" plugins
+
+### Fixes
+
+- [#5979](https://github.com/meltano/meltano/issues/5979) Fixes `meltano remove` bug where lock files were not removed if they include a variant in the file name.
 
 ## 1.102.0 - (2022-04-28)
 
@@ -31,6 +53,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
 
 - [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
+
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
@@ -38,6 +61,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend [pipx](https://pypa.github.io/pipx/) over manually created virtual environments.
 
 - [#3484](https://gitlab.com/meltano/meltano/-/issues/3484) Use `SettingsService.feature_flag` convention for lockfiles.
+
+- [#3447](https://gitlab.com/meltano/meltano/-/issues/3447) Make setting-level `env:` declaration a one-way injection into the plugin execution context.
 
 ### Fixes
 
@@ -47,6 +72,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## 1.104.0 - (2022-05-13)
+
 ---
 
 ### New
@@ -54,20 +80,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3031](https://gitlab.com/meltano/meltano/-/issues/3031) Add lock artifacts during `meltano add` for stability and portability of plugin definitions.
 
 ### Changes
+
 - [#3385](https://gitlab.com/meltano/meltano/-/issues/3385) Add feature flags for experimental features
 
 ### Fixes
 
 - [#3468](https://gitlab.com/meltano/meltano/-/issues/3468) Fixes bug where container spec's entrypoint was not passed along to the Docker runtime.
 
-
 ## 1.103.1 - (2022-05-05)
+
 ---
 
 ### Fixes
 
 - [#3462](https://gitlab.com/meltano/meltano/-/issues/3462) Adds missing telemetry for `meltano state`
-
 
 ## 1.103.0 - (2022-05-05)
 

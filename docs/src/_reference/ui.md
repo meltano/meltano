@@ -4,7 +4,7 @@ description: Learn how to manage and monitor your plugins and pipelines using Me
 layout: doc
 redirect_from:
   - /guide/ui/
-weight: 10
+weight: 3
 ---
 
 Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
@@ -40,7 +40,7 @@ Unless [configured otherwise](/reference/settings#ui-bind-port), the UI will now
 
 If you'd like to use [Docker Compose](https://docs.docker.com/compose/) to manage the Meltano UI application lifecycle,
 you can add the appropriate `docker-compose.yml` file to your project by adding the
-[`docker-compose` file bundle](https://gitlab.com/meltano/files-docker-compose):
+[`docker-compose` file bundle](https://github.com/meltano/files-docker-compose):
 
 ```bash
 # For these examples to work, ensure that
@@ -56,7 +56,7 @@ docker-compose up -d
 
 Unless [configured otherwise](/reference/settings#ui-bind-port), the UI will now be available at <http://localhost:5000>.
 
-For more details and instructions, refer to [README](https://gitlab.com/meltano/files-docker-compose/-/blob/master/bundle/README.md) contained in the file bundle.
+For more details and instructions, refer to [README](https://github.com/meltano/files-docker-compose/blob/main/bundle/README.md) contained in the file bundle.
 
 ## Deployment in production
 

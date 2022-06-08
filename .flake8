@@ -62,6 +62,8 @@ ignore =
     WPS348
     # Allow "overuse" of noqa comments.
     WPS402
+    # Allow metadta variable (__all__)
+    WPS410
     # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
     WPS420
     # Allow nested classes
@@ -100,6 +102,11 @@ exclude =
     venv
     *.md
     src/webapp/node_modules/
+    src/meltano/api/events/notification_events.py
+    src/meltano/core/logging/job_logging_service.py
+    src/meltano/core/job/stale_job_failer.py
+    src/meltano/core/utils/__init__.py
+    tests/meltano/core/runner/test_runner.py
 inline_quotes = double
 max_line_length = 88
 show_source = true
@@ -137,6 +144,10 @@ per_file_ignores =
         WPS442
         # Allow nested functions in test methods
         WPS430
+        # Allow magic numbers
+        WPS432
+        # Allow protected module import (_pytest.monkeypatch)
+        WPS436
         # Allow protected attribute usage in test methods
         WPS437
         # Found block variables overlap (false positive)
@@ -147,6 +158,7 @@ per_file_ignores =
         WPS202
         # Found boolean non-keyword argument
         WPS425
+
 	# Found too long name
 	WPS118
 
@@ -237,3 +249,6 @@ per_file_ignores =
         WPS202
         # Found overused expression: allow settings store implementations to all return vars with the same names
         WPS204
+    src/meltano/api/controllers/orchestrations.py:
+        # Found too many module members: 23 > 7
+        WPS202

@@ -16,13 +16,13 @@ When a new pipeline schedule is created using the [UI](/reference/ui) or [CLI](/
 To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/reference/ui#pipelines), or the [`meltano schedule`  command](/reference/command-line-interface#schedule):
 
 ```bash
-meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
+meltano schedule add [SCHEDULE_NAME] --extractor [EXTRACTOR_NAME] --loader [TARGET_NAME] --interval [INTERVAL]
 ```
 
 Example:
 
 ```bash
-meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
+meltano schedule add carbon__sqlite --extractor tap-carbon-intensity --loader target-sqlite --interval="@daily"
 ```
 
 Now that you've scheduled your first pipeline, you can load the "Pipeline" page in the UI and see it show up.
@@ -34,7 +34,7 @@ actually executing them is the orchestrator's responsibility, so let's install A
 
 Change directories so that you are inside your Meltano project,
 and then run the following command to add the
-[default DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
+[default DAG generator](https://github.com/meltano/files-airflow/blob/main/bundle/orchestrate/dags/meltano.py)
 to your project and make Airflow available to use via `meltano invoke`:
 
 ```bash
@@ -43,14 +43,14 @@ meltano add orchestrator airflow
 
 ### Using an existing Airflow installation
 
-You can also use the [Meltano DAG generator](https://gitlab.com/meltano/files-airflow/-/blob/master/bundle/orchestrate/dags/meltano.py)
+You can also use the [Meltano DAG generator](https://github.com/meltano/files-airflow/blob/main/bundle/orchestrate/dags/meltano.py)
 with an existing Airflow installation, as long as the `MELTANO_PROJECT_ROOT` environment variable is set to point at your Meltano project.
 
 In fact, all `meltano invoke airflow ...` does is [populate `MELTANO_PROJECT_ROOT`](/guide/configuration#accessing-from-plugins),
 set Airflow's `core.dags_folder` setting to `$MELTANO_PROJECT_ROOT/orchestrate/dags` (where the DAG generator lives by default),
 and invoke the `airflow` executable with the provided arguments.
 
-You can add the Meltano DAG generator to your project without also installing the Airflow orchestrator plugin by adding the [`airflow` file bundle](https://gitlab.com/meltano/files-airflow):
+You can add the Meltano DAG generator to your project without also installing the Airflow orchestrator plugin by adding the [`airflow` file bundle](https://github.com/meltano/files-airflow/):
 
 ```bash
 meltano add files airflow
@@ -76,8 +76,6 @@ Now that Airflow is installed and (automatically) configured to look at your pro
 meltano invoke airflow scheduler
 ```
 
-(Add `-D` to run the scheduler in the background)
-
 Airflow will now run your pipelines on a schedule as long as the scheduler is running!
 
 ## Using Airflow directly
@@ -87,8 +85,6 @@ You are free to interact with Airflow directly through its own UI. You can start
 ```bash
 meltano invoke airflow webserver
 ```
-
-(Add `-D` to run the webserver in the background)
 
 By default, you'll only see Meltano's pipeline DAGs here, which are created automatically using the dynamic DAG generator included with every Meltano project, located at `orchestrate/dags/meltano.py`.
 
@@ -115,13 +111,13 @@ meltano invoke airflow tasks run --raw meltano extract_load $(date -I)
 Start the Airflow UI: (will start in a separate browser)
 
 ```bash
-meltano invoke airflow webserver -D
+meltano invoke airflow webserver
 ```
 
-Start the Airflow scheduler, enabling background job processing if you're not already running Meltano UI:
+Start the Airflow scheduler, enabling job processing if you're not already running Meltano UI:
 
 ```bash
-meltano invoke airflow scheduler -D
+meltano invoke airflow scheduler
 ```
 
 Trigger a dag run:

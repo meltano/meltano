@@ -30,7 +30,7 @@ To determine the values of settings, Meltano will look in 4 main places (and one
 2. **Your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
-   - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy.
+   - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
 3. **Your project's [**system database**](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
@@ -125,6 +125,15 @@ extractors:
 When Meltano invokes a plugin's executable as part of [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke), it populates the environment with the same [variables that can be referenced from settings](#available-environment-variables), as well as those describing the plugin's current configuration (including [extras](#plugin-extras)), as discoverable using [`meltano config --format=env <plugin>`](/reference/command-line-interface#config).
 
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
+
+Within a [Meltano environment](/concepts/environments) environment variables can be specified using the `env` key:
+```yml
+environments:
+  - name: dev
+    env:
+      AN_ENVIRONMENT_VARIABLE: dev
+```
+Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
 
 ## Multiple plugin configurations
 

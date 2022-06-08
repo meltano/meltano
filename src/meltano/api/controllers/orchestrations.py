@@ -1,13 +1,14 @@
-# noqa: D100,E800
+"""API Orchestation of Pipellines and Validations."""
 
 import asyncio
 import logging
 import shutil
 
 import sqlalchemy
-from flask import Response, jsonify, make_response, request, send_file, url_for
-from flask_restful import Api, Resource, fields, marshal, marshal_with
-from flask_security import roles_required
+from flask import Response, jsonify, request, send_file
+from flask_restful import Api, Resource, fields, marshal_with
+from werkzeug.exceptions import Conflict, UnprocessableEntity
+
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.executor import run_schedule
 from meltano.api.json import freeze_keys
@@ -15,33 +16,28 @@ from meltano.api.models import db
 from meltano.api.models.subscription import Subscription
 from meltano.api.security.auth import block_if_readonly
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.job import JobFinder, State
+from meltano.core.job import JobFinder
 from meltano.core.logging import (
     JobLoggingService,
     MissingJobLogException,
     SizeThresholdJobLogException,
 )
 from meltano.core.plugin import PluginRef
-from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
-from meltano.core.plugin.settings_service import (
-    PluginSettingsService,
-    SettingValueStore,
-)
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
-from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
-from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import (
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
     ScheduleService,
 )
 from meltano.core.setting_definition import SettingKind
-from meltano.core.utils import flatten, iso8601_datetime, slugify
-from werkzeug.exceptions import Conflict, UnprocessableEntity
+from meltano.core.settings_service import FeatureFlags
+from meltano.core.utils import slugify
 
 from .errors import InvalidFileNameError
 from .upload_helper import InvalidFileSizeError, InvalidFileTypeError, UploadHelper
@@ -49,6 +45,14 @@ from .utils import enforce_secure_filename
 
 
 def get_config_with_metadata(settings):
+    """Get configuration including metadata.
+
+    Args:
+        settings: List of settings to obtain metadata for.
+
+    Returns:
+        Configuration with setting metadata
+    """
     config_dict = {}
     config_metadata = {}
 
@@ -77,6 +81,18 @@ def get_config_with_metadata(settings):
 def validate_plugin_config(
     plugin: PluginRef, name, value, project: Project, settings: PluginSettingsService
 ):
+    """Check the plugin configuration.
+
+    Args:
+        plugin: PluginRef class.
+        name: Name of the plugin to validate
+        value: Name of plugin setting file
+        project: Project class.
+        settings: PluginSettingsService class.
+
+    Returns:
+        A boolean true for pass, false for fail.
+    """
     setting_def = settings.find_setting(name)
     # we want to prevent the edition of protected settings from the UI
     if setting_def.protected:
@@ -86,7 +102,7 @@ def validate_plugin_config(
     if setting_def.kind == SettingKind.FILE and value and value != "":
         uploads_directory = project.extract_dir(plugin.name)
         resolved_file_path = project.root_dir(value).resolve()
-        if not str(resolved_file_path).startswith(str(uploads_directory) + "/"):
+        if not str(resolved_file_path).startswith(f"{uploads_directory}/"):
             logging.warning(
                 "Cannot set a file configuration to a path outside the project directory"
             )
@@ -100,8 +116,8 @@ def validate_plugin_config(
     return True
 
 
-orchestrationsBP = APIBlueprint("orchestrations", __name__)
-orchestrationsAPI = Api(
+orchestrationsBP = APIBlueprint("orchestrations", __name__)  # noqa: N816
+orchestrationsAPI = Api(  # noqa: N816
     orchestrationsBP,
     errors={
         "UnprocessableEntity": {
@@ -132,7 +148,7 @@ def _handle(ex):  # noqa: F811
 
 
 @orchestrationsBP.errorhandler(ScheduleDoesNotExistError)
-def _handle(ex):  # noqa: F811
+def _handle(ex):  # noqa: F811, WPS440
     return (
         jsonify(
             {
@@ -145,12 +161,12 @@ def _handle(ex):  # noqa: F811
 
 
 @orchestrationsBP.errorhandler(InvalidFileNameError)
-def _handle(ex):  # noqa: F811
-    return (jsonify({"error": True, "code": f"The file lacks a valid name."}), 400)
+def _handle(ex):  # noqa: F811,WPS440
+    return (jsonify({"error": True, "code": "The file lacks a valid name."}), 400)
 
 
 @orchestrationsBP.errorhandler(InvalidFileTypeError)
-def _handle(ex):  # noqa: F811
+def _handle(ex):  # noqa: F811,WPS440
     return (
         jsonify(
             {
@@ -163,7 +179,7 @@ def _handle(ex):  # noqa: F811
 
 
 @orchestrationsBP.errorhandler(InvalidFileSizeError)
-def _handle(ex):  # noqa: F811
+def _handle(ex):  # noqa: F811,WPS440
     return (
         jsonify(
             {
@@ -176,22 +192,23 @@ def _handle(ex):  # noqa: F811
 
 
 @orchestrationsBP.errorhandler(MissingJobLogException)
-def _handle(ex):  # noqa: F811
+def _handle(ex):  # noqa: F811,WPS440
     return (jsonify({"error": False, "code": str(ex)}), 204)
 
 
 @orchestrationsBP.route("/jobs/state", methods=["POST"])
 def job_state() -> Response:
+    """Endpoint for getting the status of N jobs.
+
+    Returns:
+        A JSON containing all the endpoint job status for the N jobs.
     """
-    Endpoint for getting the status of N jobs
-    """
-    project = Project.find()
     poll_payload = request.get_json()
-    job_ids = poll_payload["job_ids"]
+    state_ids = poll_payload["state_ids"]
 
     jobs = []
-    for job_id in job_ids:
-        finder = JobFinder(job_id)
+    for state_id in state_ids:
+        finder = JobFinder(state_id)
         state_job = finder.latest(db.session)
         # Validate existence first as a job may not be queued yet as a result of
         # another prerequisite async process (dbt installation for example)
@@ -199,7 +216,7 @@ def job_state() -> Response:
             state_job_success = finder.latest_success(db.session)
             jobs.append(
                 {
-                    "job_id": job_id,
+                    "state_id": state_id,
                     "is_complete": state_job.is_complete(),
                     "has_error": state_job.has_error(),
                     "started_at": state_job.started_at,
@@ -213,27 +230,32 @@ def job_state() -> Response:
     return jsonify({"jobs": jobs})
 
 
-@orchestrationsBP.route("/jobs/<job_id>/log", methods=["GET"])
-def job_log(job_id) -> Response:
-    """
-    Endpoint for getting the most recent log generated by a job with job_id
+@orchestrationsBP.route("/jobs/<state_id>/log", methods=["GET"])
+def job_log(state_id) -> Response:
+    """Endpoint for getting the most recent log generated by a job with state_id.
+
+    Args:
+        state_id: id of the job you want to see logs of.
+
+    Returns:
+        JSON containing the jobs log entries
     """
     project = Project.find()
     try:
         log_service = JobLoggingService(project)
-        log = log_service.get_latest_log(job_id)
+        log = log_service.get_latest_log(state_id)
         has_log_exceeded_max_size = False
-    except SizeThresholdJobLogException as err:
+    except SizeThresholdJobLogException:
         log = None
         has_log_exceeded_max_size = True
 
-    finder = JobFinder(job_id)
+    finder = JobFinder(state_id)
     state_job = finder.latest(db.session)
     state_job_success = finder.latest_success(db.session)
 
     return jsonify(
         {
-            "job_id": job_id,
+            "state_id": state_id,
             "log": log,
             "has_log_exceeded_max_size": has_log_exceeded_max_size,
             "has_error": state_job.has_error() if state_job else False,
@@ -247,24 +269,34 @@ def job_log(job_id) -> Response:
     )
 
 
-@orchestrationsBP.route("/jobs/<job_id>/download", methods=["GET"])
-def download_job_log(job_id) -> Response:
-    """
-    Endpoint for downloading a job log with job_id
+@orchestrationsBP.route("/jobs/<state_id>/download", methods=["GET"])
+def download_job_log(state_id) -> Response:
+    """Endpoint for downloading a job log with state_id.
+
+    Args:
+        state_id: id of the job you want log info of.
+
+    Returns:
+        A plain text file of the job log.
     """
     project = Project.find()
     log_service = JobLoggingService(project)
-    return send_file(log_service.get_downloadable_log(job_id), mimetype="text/plain")
+    return send_file(log_service.get_downloadable_log(state_id), mimetype="text/plain")
 
 
 @orchestrationsBP.route("/run", methods=["POST"])
 def run():
+    """Run all scheduled payloads.
+
+    Returns:
+        JSON of all the state_ids that just ran.
+    """
     project = Project.find()
     schedule_payload = request.get_json()
     name = schedule_payload["name"]
-    job_id = run_schedule(project, name)
+    state_id = run_schedule(project, name)
 
-    return jsonify({"job_id": job_id}), 202
+    return jsonify({"state_id": state_id}), 202
 
 
 @orchestrationsBP.route(
@@ -272,10 +304,14 @@ def run():
 )
 @block_if_readonly
 def upload_plugin_configuration_file(plugin_ref) -> Response:
-    """
-    Endpoint for uploading a file for a specific plugin
-    """
+    """Endpoint for uploading a file for a specific plugin.
 
+    Args:
+        plugin_ref: Plugin being referenced.
+
+    Returns:
+        JSON contain the file path and setting name.
+    """
     file = request.files["file"]
     setting_name = enforce_secure_filename(request.form["setting_name"])
     tmp = request.form.get("tmp", False)
@@ -295,10 +331,14 @@ def upload_plugin_configuration_file(plugin_ref) -> Response:
 )
 @block_if_readonly
 def delete_plugin_configuration_file(plugin_ref) -> Response:
-    """
-    Endpoint for deleting a file for a specific plugin
-    """
+    """Endpoint for deleting a file for a specific plugin.
 
+    Args:
+        plugin_ref: Plugin being referenced.
+
+    Returns:
+        JSON contain the setting name.
+    """
     payload = request.get_json()
     setting_name = enforce_secure_filename(payload["setting_name"])
     tmp = payload.get("tmp", False)
@@ -314,10 +354,14 @@ def delete_plugin_configuration_file(plugin_ref) -> Response:
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
 def get_plugin_configuration(plugin_ref) -> Response:
-    """
-    Endpoint for getting a plugin's configuration
-    """
+    """Endpoint for getting a plugin's configuration.
 
+    Args:
+        plugin_ref: Plugin being referenced.
+
+    Returns:
+        JSON contain the plugin configuration.
+    """
     project = Project.find()
 
     plugins_service = ProjectPluginsService(project)
@@ -344,8 +388,13 @@ def get_plugin_configuration(plugin_ref) -> Response:
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
 @block_if_readonly
 def save_plugin_configuration(plugin_ref) -> Response:
-    """
-    Endpoint for persisting a plugin configuration
+    """Endpoint for persisting a plugin configuration.
+
+    Args:
+        plugin_ref: Plugin being referenced.
+
+    Returns:
+        JSON contain the saved configuration.
     """
     project = Project.find()
     payload = request.get_json()
@@ -371,9 +420,14 @@ def save_plugin_configuration(plugin_ref) -> Response:
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
 @block_if_readonly
-def test_plugin_configuration(plugin_ref) -> Response:
-    """
-    Endpoint for testing a plugin configuration's valid connection
+def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
+    """Endpoint for testing a plugin configuration's valid connection.
+
+    Args:
+        plugin_ref: Plugin being referenced.
+
+    Returns:
+        JSON with the job sucess status.
     """
     project = Project.find()
     payload = request.get_json()
@@ -404,48 +458,76 @@ def test_plugin_configuration(plugin_ref) -> Response:
             success, _detail = await plugin_test_service.validate()
             return success
 
-    loop = asyncio.get_event_loop()
+    # This was added to assist api_worker threads
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        logging.debug("../configuration/test no asyncio event loop detected")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop = asyncio.get_event_loop()
+
     success = loop.run_until_complete(test_extractor())
     return jsonify({"is_success": success}), 200
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["GET"])
 def get_pipeline_schedules():
-    """
-    Endpoint for getting the pipeline schedules
+    """Endpoint for getting the pipeline schedules.
+
+    Note that unless the ff ENABLE_API_SCHEDULED_JOB_LIST is enabled this endpoint will filter out scheduled jobs.
+
+    Returns:
+        JSON containing the pipline schedules.
     """
     project = Project.find()
     schedule_service = ScheduleService(project)
     schedules = list(map(dict, schedule_service.schedules()))
+
+    jobs_in_list = False
+    with ProjectSettingsService(project).feature_flag(
+        FeatureFlags.ENABLE_API_SCHEDULED_JOB_LIST, raise_error=False
+    ) as allow:
+        if allow:
+            jobs_in_list = True
+
+    formatted_schedules = []
+
     for schedule in schedules:
-        finder = JobFinder(schedule["name"])
-        state_job = finder.latest(db.session)
-        schedule["has_error"] = state_job.has_error() if state_job else False
-        schedule["is_running"] = state_job.is_running() if state_job else False
-        schedule["job_id"] = schedule["name"]
-        schedule["started_at"] = state_job.started_at if state_job else None
-        schedule["ended_at"] = state_job.ended_at if state_job else None
-        schedule["trigger"] = state_job.trigger if state_job else None
+        if schedule.job and jobs_in_list:
+            formatted_schedules.append(schedule)
+        elif schedule.elt_schedule:
+            finder = JobFinder(schedule["name"])
+            state_job = finder.latest(db.session)
+            schedule["has_error"] = state_job.has_error() if state_job else False
+            schedule["is_running"] = state_job.is_running() if state_job else False
+            schedule["state_id"] = schedule["name"]
+            schedule["started_at"] = state_job.started_at if state_job else None
+            schedule["ended_at"] = state_job.ended_at if state_job else None
+            schedule["trigger"] = state_job.trigger if state_job else None
 
-        state_job_success = finder.latest_success(db.session)
-        schedule["has_ever_succeeded"] = (
-            state_job_success.is_success() if state_job_success else None
-        )
+            state_job_success = finder.latest_success(db.session)
+            schedule["has_ever_succeeded"] = (
+                state_job_success.is_success() if state_job_success else None
+            )
 
-        schedule["start_date"] = (
-            schedule["start_date"].date().isoformat()
-            if schedule["start_date"]
-            else None
-        )
+            schedule["start_date"] = (  # noqa: WPS204
+                schedule["start_date"].date().isoformat()
+                if schedule["start_date"]
+                else None
+            )
+            formatted_schedules.append(schedule)
 
-    return jsonify(schedules)
+    return jsonify(formatted_schedules)
 
 
 @orchestrationsBP.route("/pipeline-schedules", methods=["POST"])
 @block_if_readonly
 def save_pipeline_schedule() -> Response:
-    """
-    Endpoint for persisting a pipeline schedule
+    """Endpoint for persisting a pipeline schedule.
+
+    Returns:
+        JSON containing the saved pipline scheudles and status.
     """
     payload = request.get_json()
     # Airflow requires alphanumeric characters, dashes, dots and underscores exclusively
@@ -459,7 +541,7 @@ def save_pipeline_schedule() -> Response:
     project = Project.find()
     schedule_service = ScheduleService(project)
 
-    schedule = schedule_service.add(
+    schedule = schedule_service.add_elt(
         db.session, slug, extractor, loader, transform, interval
     )
 
@@ -474,8 +556,10 @@ def save_pipeline_schedule() -> Response:
 @orchestrationsBP.route("/pipeline-schedules", methods=["PUT"])
 @block_if_readonly
 def update_pipeline_schedule() -> Response:
-    """
-    Endpoint for updating a pipeline schedule
+    """Endpoint for updating a pipeline schedule.
+
+    Returns:
+        JSON containing the updated pipeline schedules and status.
     """
     payload = request.get_json()
     project = Project.find()
@@ -503,8 +587,10 @@ def update_pipeline_schedule() -> Response:
 @orchestrationsBP.route("/pipeline-schedules", methods=["DELETE"])
 @block_if_readonly
 def delete_pipeline_schedule() -> Response:
-    """
-    Endpoint for deleting a pipeline schedule
+    """Endpoint for deleting a pipeline schedule.
+
+    Returns:
+        JSON containing the deleted pipelinea and status.
     """
     payload = request.get_json()
     project = Project.find()
@@ -516,6 +602,8 @@ def delete_pipeline_schedule() -> Response:
 
 
 class SubscriptionsResource(Resource):
+    """Class that assists with managing resource subscriptions."""
+
     SubscriptionDefinition = {
         "id": fields.String,
         "recipient": fields.String,
@@ -527,10 +615,24 @@ class SubscriptionsResource(Resource):
 
     @marshal_with(SubscriptionDefinition)
     def get(self):
+        """Get subscription.
+
+        Returns:
+            All subscription info.
+        """
         return Subscription.query.all()
 
     @marshal_with(SubscriptionDefinition)
     def post(self):
+        """Post subscriptions.
+
+        Raises:
+            Conflict: SQLAlchemy has detect a IntegirityError.
+            UnprocessableEntity: if the SubscriptionDefintion is unprocessable.
+
+        Returns:
+            The subscription posted and status.
+        """
         payload = request.get_json()
 
         try:
@@ -546,8 +648,18 @@ class SubscriptionsResource(Resource):
 
 
 class SubscriptionResource(Resource):
-    def delete(self, id):
-        Subscription.query.filter_by(id=id).delete()
+    """Class that assists with managing resource subscriptions."""
+
+    def delete(self, subscription_id):
+        """Post subscriptions.
+
+        Args:
+            subscription_id: Subscription ID.
+
+        Returns:
+            The subscription delted and status.
+        """
+        Subscription.query.filter_by(id=subscription_id).delete()
         db.session.commit()
 
         return "", 204

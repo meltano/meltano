@@ -1,3 +1,5 @@
+from collections import Counter
+
 import pytest
 
 from meltano.core.plugin import PluginType, Variant
@@ -13,33 +15,38 @@ class TestProjectAddService:
     def subject(self, project_add_service):
         return project_add_service
 
-    def test_missing_plugin_exception(self, subject):
+    def test_missing_plugin_exception(self, subject, hub_request_counter):
         with pytest.raises(PluginNotFoundError):
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
+        assert hub_request_counter["/extractors/index"] == 1
+        assert len(hub_request_counter) == 1
+
     @pytest.mark.parametrize(  # noqa: WPS317
-        ("plugin_type", "plugin_name", "default_variant"),
+        ("plugin_type", "plugin_name", "variant", "default_variant"),
         [
-            (PluginType.EXTRACTORS, "tap-mock", "meltano"),
-            (PluginType.LOADERS, "target-mock", None),
-            (PluginType.TRANSFORMERS, "transformer-mock", None),
-            (PluginType.TRANSFORMS, "tap-mock-transform", None),
-            (PluginType.UTILITIES, "utility-mock", None),
+            (PluginType.EXTRACTORS, "tap-mock", "meltano", "meltano"),
+            (PluginType.LOADERS, "target-mock", None, "original"),
+            (PluginType.TRANSFORMERS, "transformer-mock", None, "original"),
+            (PluginType.TRANSFORMS, "tap-mock-transform", None, "original"),
+            (PluginType.UTILITIES, "utility-mock", None, "original"),
         ],
     )
     def test_add(
         self,
-        plugin_type,
-        plugin_name,
-        default_variant,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant: str,
+        default_variant: str,
         subject: ProjectAddService,
         project: Project,
-        plugin_discovery_service,
+        hub_request_counter: Counter,
     ):
+        used_variant = variant or default_variant
         lockfile_path = project.plugin_lock_path(
             plugin_type,
             plugin_name,
-            variant_name=default_variant,
+            variant_name=used_variant,
         )
         assert not lockfile_path.exists()
 
@@ -60,7 +67,17 @@ class TestProjectAddService:
 
         assert canonical["pip_url"] == added.pip_url
 
-    def test_add_inherited(self, tap, subject, project_plugins_service):
+        assert hub_request_counter[f"/{plugin_type}/index"] == 1
+        assert hub_request_counter[f"/{plugin_type}/{plugin_name}--{used_variant}"] == 1
+        assert len(hub_request_counter) == 2
+
+    def test_add_inherited(
+        self,
+        tap,
+        subject,
+        project_plugins_service,
+        hub_request_counter,
+    ):
         # Make sure tap-mock is not in the project as a project plugin
         project_plugins_service.remove_from_file(tap)
 
@@ -86,7 +103,15 @@ class TestProjectAddService:
             "inherit_from": "tap-mock-inherited",
         }
 
-    def test_lockfile_inherited(self, subject: ProjectAddService):
+        assert hub_request_counter["/extractors/index"] == 1
+        assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
+        assert len(hub_request_counter) == 2
+
+    def test_lockfile_inherited(
+        self,
+        subject: ProjectAddService,
+        hub_request_counter: Counter,
+    ):
         child = subject.add(
             PluginType.EXTRACTORS,
             "tap-mock-inherited-new",
@@ -130,3 +155,7 @@ class TestProjectAddService:
 
         matches = list(parent_path.parent.glob("tap-mock-inherited-new*"))
         assert not matches
+
+        assert hub_request_counter["/extractors/index"] == 1
+        assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
+        assert len(hub_request_counter) == 2

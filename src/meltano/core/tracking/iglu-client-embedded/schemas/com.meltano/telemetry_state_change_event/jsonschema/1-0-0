@@ -1,0 +1,38 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow event describing a telemetry state change",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "telemetry_state_change_event",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "setting_name": {
+            "description": "The name of the setting that is changing",
+            "type": "string",
+            "examples": [
+                "project_id",
+                "send_anonymous_usage_stats"
+            ],
+            "maxLength": 256
+        },
+        "changed_from": {
+            "description": "The prior value of the setting that is changing",
+            "type": ["string", "boolean", "null"],
+            "maxLength": 256
+        },
+        "changed_to": {
+            "description": "The new value of the setting that is changing",
+            "type": ["string", "boolean", "null"],
+            "maxLength": 256
+        }
+    },
+    "required": [
+        "setting_name",
+        "changed_from",
+        "changed_to"
+    ],
+    "additionalProperties": false
+}

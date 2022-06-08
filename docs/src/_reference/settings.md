@@ -2,6 +2,7 @@
 title: Settings
 description: Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 layout: doc
+weight: 2
 ---
 
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
@@ -31,7 +32,7 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 ### <a name="send-anonymous-usage-stats"></a>`send_anonymous_usage_stats`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`, alias: `!MELTANO_DISABLE_TRACKING` (implies value `false`)
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
 - [`meltano init`](/reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
@@ -42,7 +43,7 @@ By default, Meltano shares anonymous usage data with the Meltano team using Goog
 We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
 If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
-This project ID is also sent along when Meltano loads the remote `discovery.yml` manifest from the URL identified by the [`discovery_url` setting](#discovery-url).
+This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
 the Tracking IDs can be configured using the `tracking_ids.*` settings below.
@@ -59,7 +60,7 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 
 - When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
-- To disable tracking in all projects in one go, enable the `MELTANO_DISABLE_TRACKING` environment variable
+- To disable tracking in all projects in one go, disable the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable
 
 #### How to use
 
@@ -67,7 +68,6 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 meltano config meltano set send_anonymous_usage_stats false
 
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
-export MELTANO_DISABLE_TRACKING=true
 
 meltano init --no_usage_stats demo-project
 ```
@@ -121,7 +121,7 @@ Meltano hashes any fields at all which could be used by a hacker to compromise a
 
 We hope you will choose to enable reporting, because this really does help us - and it helps the Meltano community in a very real way.
 
-If you still have any concerns about keeping anonymous reporting enabled, we hope you'll share those concerns with us. You can do so by emailing `hello@meltano.com` or by logging an issue in our [Meltano Issue Tracker](https://gitlab.com/meltano/meltano/-/issues).
+If you still have any concerns about keeping anonymous reporting enabled, we hope you'll share those concerns with us. You can do so by emailing `hello@meltano.com` or by logging an issue in our [Meltano Issue Tracker](https://github.com/meltano/meltano/issues).
 
 ### <a name="project-id"></a>`project_id`
 
@@ -172,7 +172,6 @@ If you dont target a schema then by default PostgreSQL will try to use the `publ
 ```bash
 postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
 ```
-
 
 ### `database_max_retries`
 
@@ -226,6 +225,7 @@ can still be used to store configuration in the [system database](/concepts/proj
 but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
+
 1. it does not block write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
 2. it also affects the [CLI](/reference/command-line-interface).
 
@@ -237,10 +237,27 @@ meltano config meltano set project_readonly true
 export MELTANO_PROJECT_READONLY=true
 ```
 
+### <a name="hub-url"></a>`hub_url`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
+- Default: [`https://hub.meltano.com`](https://hub.meltano.com)
+
+Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
+
+This manifest is primarily used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add). It is also used in cases where the full plugin definition is needed but no lock artifact or cached `discovery.yml` is found.
+
+#### How to use
+
+```bash
+meltano config meltano set hub_url http://localhost:4000
+
+export MELTANO_HUB_URL=http://localhost:4000
+```
+
 ### <a name="discovery-url"></a>`discovery_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DISCOVERY_URL`
-- Default: [`https://www.meltano.com/discovery.yml`](https://www.meltano.com/discovery.yml)
+- Default: [`https://discovery.meltano.com/discovery.yml`](https://discovery.meltano.com/discovery.yml)
 
 Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box.
 
@@ -267,6 +284,7 @@ export MELTANO_DISCOVERY_URL=false
 The value of the `Authorization` header sent when making a request to [`discovery_url`](#discovery-url).
 
 No `Authorization` header is applied under the following conditions:
+
 - `discovery_url_auth` is not set
 - `discovery_url_auth` is set to `false`, `null` or an empty string
 
@@ -310,7 +328,7 @@ meltano --log-level=debug ...
 - `meltano` CLI option: `--log-config`
 - Default: `logging.yaml`
 
-The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging *if present*.
+The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_.
 
 #### How to use
 
@@ -398,7 +416,7 @@ These settings can be used to configure the [Meltano UI](/reference/ui) server.
 
 ### <a name="ui-bind-host"></a>`ui.bind_host`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_HOST`, alias: `MELTANO_API_HOSTNAME`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_HOST`
 - [`meltano ui`](/reference/command-line-interface#ui) CLI option: `--bind`
 - Default: `0.0.0.0`
 
@@ -413,14 +431,13 @@ Together with the [`ui.bind_port` setting](#ui-bind-port), this setting correspo
 meltano config meltano set ui bind_host 127.0.0.1
 
 export MELTANO_UI_BIND_HOST=127.0.0.1
-export MELTANO_API_HOSTNAME=127.0.0.1
 
 meltano ui --bind=127.0.0.1
 ```
 
 ### <a name="ui-bind-port"></a>`ui.bind_port`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_PORT`, alias: `MELTANO_API_PORT`, `PORT`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_PORT`
 - [`meltano ui`](/reference/command-line-interface#ui) CLI option: `--bind-port`
 - Default: `5000`
 
@@ -435,8 +452,6 @@ Together with the [`ui.bind_host` setting](#ui-bind-host), this setting correspo
 meltano config meltano set ui bind_port 80
 
 export MELTANO_UI_BIND_PORT=80
-export MELTANO_API_PORT=80
-export PORT=80
 
 meltano ui --bind-port=80
 ```
@@ -585,7 +600,7 @@ meltano ui setup meltano.example.com
 
 ### `ui.workers`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_WORKERS`, alias: `WORKERS`, `WEB_CONCURRENCY`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_WORKERS`
 - Default: `4`
 
 The number of worker processes `meltano ui` will use to handle requests.
@@ -598,13 +613,11 @@ This setting corresponds to [Gunicorn's `workers` setting](https://docs.gunicorn
 meltano config meltano set ui workers 1
 
 export MELTANO_UI_WORKERS=1
-export WORKERS=1
-export WEB_CONCURRENCY=1
 ```
 
 ### <a name="ui-forwarded-allow-ips"></a>`ui.forwarded_allow_ips`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_FORWARDED_ALLOW_IPS`, alias: `FORWARDED_ALLOW_IPS`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_FORWARDED_ALLOW_IPS`
 - Default: `127.0.0.1`
 
 Comma-separated front-end (reverse) proxy IPs that are allowed to set secure headers to indicate HTTPS requests.
@@ -619,7 +632,6 @@ This setting corresponds to [Gunicorn's `forwarded_allow_ips` setting](https://d
 meltano config meltano set ui forwarded_allow_ips "*"
 
 export MELTANO_UI_FORWARDED_ALLOW_IPS="*"
-export FORWARDED_ALLOW_IPS="*"
 ```
 
 ## Meltano UI features
@@ -630,15 +642,16 @@ These settings can be used to enable certain features of [Meltano UI](/reference
 
 ### <a name="ui-readonly"></a>`ui.readonly`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_READONLY`, alias: `MELTANO_READONLY`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_READONLY`
 - Default: `false`
 
-To block all write actions in the Meltano UI, you can run it in in *read-only* mode.
+To block all write actions in the Meltano UI, you can run it in in _read-only_ mode.
 
 If you're enabling the [`ui.authentication` setting](#ui-authentication) and would
 like to only use read-only mode for anonymous users, enable the [`ui.anonymous_readonly` setting](#ui-anonymous-readonly) instead.
 
 This setting differs from the [`project_readonly` setting](#project-readonly) in two ways:
+
 1. it also blocks write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
 2. it does not affect the [CLI](/reference/command-line-interface).
 
@@ -648,17 +661,17 @@ This setting differs from the [`project_readonly` setting](#project-readonly) in
 meltano config meltano set ui readonly true
 
 export MELTANO_UI_READONLY=true
-export MELTANO_READONLY=true
 ```
 
 ### <a name="ui-authentication"></a>`ui.authentication`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_AUTHENTICATION`, alias: `MELTANO_AUTHENTICATION`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_AUTHENTICATION`
 - Default: `false`
 
 Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
 
 Additionally, you will need to:
+
 1. Ensure your configuration is secure by setting the [`ui.secret_key`](#ui-secret-key) and [`ui.password_salt`](#ui-password-salt) settings, as well as [`ui.server_name`](#ui-server-name) or [`ui.session_cookie_domain`](#ui-session-cookie-domain), manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup).
 
 2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
@@ -669,7 +682,6 @@ Additionally, you will need to:
 meltano config meltano set ui authentication true
 
 export MELTANO_UI_AUTHENTICATION=true
-export MELTANO_AUTHENTICATION=true
 ```
 
 ### <a name="ui-anonymous-readonly"></a>`ui.anonymous_readonly`
@@ -695,7 +707,7 @@ export MELTANO_UI_ANONYMOUS_READONLY=true
 
 ### <a name="ui-notification"></a>`ui.notification`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_NOTIFICATION`, alias: `MELTANO_NOTIFICATION`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_NOTIFICATION`
 - Default: `false`
 
 Meltano can send email notifications upon certain events.
@@ -717,30 +729,6 @@ docker run --rm -p 1025:1025 -p 8025:8025 --name mailhog mailhog/mailhog
 meltano config meltano set ui notification true
 
 export MELTANO_UI_NOTIFICATION=true
-export MELTANO_NOTIFICATION=true
-```
-
-### `ui.analysis`
-
-<div class="notification is-danger">
-  <p>The Explore and Dashboard navigation tabs in the Meltano UI are no longer enabled by default due to Meltano's new direction towards supporting analysis plugins (i.e. Lightdash, Superset, etc.). <strong>These features will be removed in <a href="https://gitlab.com/meltano/meltano/-/issues/3292">Meltano v2.0</a>.</strong></p>
-  <p>For current users of these tabs, they can be re-enabled by running `meltano config set meltano ui analysis true`.</p>
-</div>
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_ANALYSIS`
-- Default: `false`
-
-If you want to use Meltano for more than data integration (and transformation),
-you can enable this setting to show all functionality related to Analysis from the UI:
-- "Explore" and "Dashboards" tabs
-- "Explore" buttons in the "Pipelines" list and "Pipeline Run Log" modal
-
-#### How to use
-
-```bash
-meltano config meltano set ui analysis false
-
-export MELTANO_UI_ANALYSIS=true
 ```
 
 ## Meltano UI customization
@@ -770,92 +758,92 @@ Meltano uses [Flask-Mail](https://pythonhosted.org/Flask-Mail/) to send emails. 
 
 ### `mail.server`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_SERVER`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_SERVER`
 - Default: `localhost`
 
 ```bash
 meltano config meltano set mail server smtp.example.com
 
-export MAIL_SERVER=smtp.example.com
+export MELTANO_MAIL_SERVER=smtp.example.com
 ```
 
 ### `mail.port`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_PORT`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_PORT`
 - Default: `1025`
 
 ```bash
 meltano config meltano set mail port 25
 
-export MAIL_PORT=25
+export MELTANO_MAIL_PORT=25
 ```
 
 ### `mail.default_sender`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_DEFAULT_SENDER`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_DEFAULT_SENDER`
 - Default: `"Meltano" <bot@meltano.com>`
 
 ```bash
 meltano config meltano set mail default_sender '"Example Meltano" <bot@meltano.example.com>'
 
-export MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
+export MELTANO_MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
 ```
 
 ### `mail.use_tls`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_USE_TLS`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_USE_TLS`
 - Default: `false`
 
 ```bash
 meltano config meltano set mail use_tls true
 
-export MAIL_USE_TLS=true
+export MELTANO_MAIL_USE_TLS=true
 ```
 
 ### `mail.username`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_USERNAME`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_USERNAME`
 - Default: None
 
 ```bash
 meltano config meltano set mail username meltano
 
-export MAIL_USERNAME=meltano
+export MELTANO_MAIL_USERNAME=meltano
 ```
 
 ### `mail.password`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_PASSWORD`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_PASSWORD`
 - Default: None
 
 ```bash
 meltano config meltano set mail password meltano
 
-export MAIL_PASSWORD=meltano
+export MELTANO_MAIL_PASSWORD=meltano
 ```
 
 ### `mail.debug`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_DEBUG`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_DEBUG`
 - Default: `false`
 
 ```bash
 meltano config meltano set mail debug true
 
-export MAIL_DEBUG=true
+export MELTANO_MAIL_DEBUG=true
 ```
 
 ### `mail.sendgrid_unsubscribe_group_id`
 
 If you are using the SendGrid SMTP API you may optionally set the [SendGrid unsubscribe group ID](https://docs.sendgrid.com/ui/sending-email/unsubscribe-groups).
 
-- [Environment variable](/guide/configuration#configuring-settings): `MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
 - Default: `12751`
 
 ```bash
 meltano config meltano set mail sendgrid_unsubscribe_group_id 42
 
-export MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
+export MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
 ```
 
 ## OAuth Service
@@ -990,7 +978,7 @@ Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` se
 
 ### `tracking_ids.cli`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_CLI`, alias: `MELTANO_CLI_TRACKING_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_CLI`
 - Default: `UA-132758957-3`
 
 Tracking ID for usage of the [`meltano` CLI](/reference/command-line-interface).
@@ -999,12 +987,11 @@ Tracking ID for usage of the [`meltano` CLI](/reference/command-line-interface).
 meltano config meltano set tracking_ids cli UA-123456789-1
 
 export MELTANO_TRACKING_IDS_CLI=UA-123456789-1
-export MELTANO_CLI_TRACKING_ID=UA-123456789-1
 ```
 
 ### `tracking_ids.ui`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI`, alias: `MELTANO_UI_TRACKING_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI`
 - Default: `UA-132758957-2`
 
 Tracking ID for usage of [Meltano UI](/reference/ui).
@@ -1013,12 +1000,11 @@ Tracking ID for usage of [Meltano UI](/reference/ui).
 meltano config meltano set tracking_ids ui UA-123456789-2
 
 export MELTANO_TRACKING_IDS_UI=UA-123456789-2
-export MELTANO_UI_TRACKING_ID=UA-123456789-2
 ```
 
 ### `tracking_ids.ui_embed`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`, alias: `MELTANO_EMBED_TRACKING_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`
 - Default: `UA-132758957-6`
 
 Tracking ID for usage of [Meltano UI](/reference/ui)'s [Embed feature](/guide/analysis#share-reports-and-dashboards).
@@ -1027,7 +1013,6 @@ Tracking ID for usage of [Meltano UI](/reference/ui)'s [Embed feature](/guide/an
 meltano config meltano set tracking_ids ui_embed UA-123456789-3
 
 export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3
-export MELTANO_EMBED_TRACKING_ID=UA-123456789-3
 ```
 
 ## Snowplow Tracking
@@ -1038,3 +1023,18 @@ export MELTANO_EMBED_TRACKING_ID=UA-123456789-3
 - Default: `["https://sp.meltano.com"]`
 
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
+
+## Feature Flags
+
+
+### <a name="ff-enable-uvicron"></a>`ff.enable_uvicorn`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
+- Default: `False`
+
+### <a name="ff-env-var-strict-mode"></a>`ff.env_var_strict_mode`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENV_VAR_STRICT_MODE`
+- Default: `False`
+
+Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.

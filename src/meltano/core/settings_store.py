@@ -6,6 +6,8 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from copy import deepcopy
 from enum import Enum
+from functools import reduce
+from operator import eq
 from typing import TYPE_CHECKING, Any
 
 import dotenv
@@ -24,6 +26,28 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
+
+
+class ConflictingSettingValueException(Exception):
+    """Occurs when a setting has multiple conflicting values via aliases."""
+
+    def __init__(self, *setting_names):
+        """Instantiate the error.
+
+        Args:
+            setting_names: the name/aliases where conflicting values are set
+
+        """
+        self.setting_names = setting_names
+        super().__init__()
+
+    def __str__(self) -> str:
+        """Represent the error as a string.
+
+        Returns:
+            string representation of the error
+        """
+        return f"Conflicting values for setting found in: {self.setting_names}"
 
 
 class StoreNotSupportedError(Error):
@@ -264,6 +288,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
         Raises:
             StoreNotSupportedError: if setting_def not passed.
+            ConflictingSettingValueException: if multiple conflicting values for the same setting are provided.
 
         Returns:
             A tuple the got value and a dictionary containing metadata.
@@ -271,14 +296,20 @@ class BaseEnvStoreManager(SettingsStoreManager):
         if not setting_def:
             raise StoreNotSupportedError
 
+        vals_with_metadata = []
         for env_var in self.setting_env_vars(setting_def):
             try:
                 value = env_var.get(self.env)
-                return value, {"env_var": env_var.key}
+                vals_with_metadata.append((value, {"env_var": env_var.key}))
             except KeyError:
                 pass
-
-        return None, {}
+        if len(vals_with_metadata) > 1 and not reduce(
+            eq, (val for val, _ in vals_with_metadata)
+        ):
+            raise ConflictingSettingValueException(
+                metadata["env_var"] for _, metadata in vals_with_metadata
+            )
+        return vals_with_metadata[0] if vals_with_metadata else (None, {})
 
     def setting_env_vars(self, *args, **kwargs) -> dict:
         """Return setting environment variables.
@@ -485,7 +516,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
 
 class MeltanoYmlStoreManager(SettingsStoreManager):
-    """Meltano YAML Store Manager."""
+    """Meltano.yml Store Manager."""
 
     label = "`meltano.yml`"
     writable = True
@@ -523,22 +554,30 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
         Returns:
             A tuple the got value and a dictionary containing metadata.
+
+        Raises:
+            ConflictingSettingValueException: if multiple conflicting values for the same setting are provided.
         """
         keys = [name]
         if setting_def:
             keys = [setting_def.name, *setting_def.aliases]
 
         flat_config = self.flat_config
-
+        vals_with_metadata = []
         for key in keys:
             try:
                 value = flat_config[key]
                 self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
-                return value, {"key": key, "expandable": True}
+                vals_with_metadata.append((value, {"key": key, "expandable": True}))
             except KeyError:
                 pass
-
-        return None, {}
+        if len(vals_with_metadata) > 1 and not reduce(
+            eq, (val for val, _ in vals_with_metadata)
+        ):
+            raise ConflictingSettingValueException(
+                metadata["key"] for _, metadata in vals_with_metadata
+            )
+        return vals_with_metadata[0] if vals_with_metadata else (None, {})
 
     def set(
         self,
@@ -672,7 +711,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     """Configuration stored in an environment within `meltano.yml`."""
 
-    label = "`meltano_environment`"
+    label = "the active environment in `meltano.yml`"
 
     def __init__(self, *args, **kwargs):
         """Initialise MeltanoEnvStoreManager instance.
