@@ -41,7 +41,7 @@ jobs:
       run: echo "${{ steps.validate-version-sequence.outputs.bump-type }}"
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: $PYTHON_VERSION
         architecture: x64
