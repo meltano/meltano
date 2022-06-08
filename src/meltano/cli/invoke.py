@@ -78,6 +78,7 @@ def invoke(
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
     tracker = Tracker(project)
+    # the `started` event is delayed until we've had a chance to try to resolve the requested plugin
     tracker.add_contexts(
         cli_context_builder(
             "invoke",
@@ -108,6 +109,7 @@ def invoke(
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
         tracker.track_command_event(cli_tracking.STARTED)
     except PluginNotFoundError:
+        # if the plugin is not found, we fire started and aborted tracking events together to keep tracking consistent
         tracker.track_command_event(cli_tracking.STARTED)
         tracker.track_command_event(cli_tracking.ABORTED)
         raise
