@@ -1,0 +1,15 @@
+name: 'igluctl'
+description: 'Run igluctl with the provide arguments'
+inputs:
+  args:
+    description: 'Arguments to pass to igluctl'
+    required: true
+    default: 'lint ./src/meltano/core/tracking/iglu-client-embedded/'
+outputs:
+  time: # id of output
+    description: 'The time we greeted you'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.args }}
