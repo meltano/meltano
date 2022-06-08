@@ -87,10 +87,19 @@ jobs:
         echo "Simulating `poetry publish`..."
         # poetry publish  # TODO: uncomment this
 
-    - name: Add reaction
+    - name: Add reaction (success)
       uses: peter-evans/create-or-update-comment@v2
       with:
         token: ${{ secrets.ACTIONS_BOT_TOKEN }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
         reaction-type: hooray
+
+    - name: Add reaction (failure)
+      uses: peter-evans/create-or-update-comment@v2
+      if: ${{ failure() }}
+      with:
+        token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        reaction-type: confused
