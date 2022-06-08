@@ -77,7 +77,7 @@ jobs:
 
     - name: Publish to PyPi
       run: |
-        echo "`poetry publish` would run here! 🚀"
+        echo "'poetry publish' would run here! 🚀"
         # poetry publish  # TODO: uncomment this
 
     - name: Add reaction (success)
