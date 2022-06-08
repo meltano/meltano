@@ -80,15 +80,16 @@ jobs:
     #     # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
     # - uses: actions/checkout@v2
 
-    # Note: Does not appear to work from forks
-    # - name: Create release draft
-    #   uses: release-drafter/release-drafter@v5
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     # https://github.com/release-drafter/release-drafter
-    #     version: ${{ github.event.inputs.version }}
-    #     commitish: release/${{ github.event.inputs.version }}
+    - name: Create release draft
+      # Can't be run from forks:
+      if: ${{ github.event.repository.name == 'meltano/meltano' }}
+      uses: release-drafter/release-drafter@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        # https://github.com/release-drafter/release-drafter
+        version: ${{ github.event.inputs.version }}
+        commitish: release/v${{ github.event.inputs.version }}
 
     - name: Approve Pull Request
       uses: juliangruber/approve-pull-request-action@v1.1.1
