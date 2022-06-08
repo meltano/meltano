@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from meltano.core.plugin.base import BasePlugin, PluginDefinition, PluginType
@@ -44,12 +46,19 @@ class TestPluginLockService:
         variant = plugin_definition.find_variant("meltano")
         base_plugin = BasePlugin(plugin_definition, variant)
 
-        plugin = ProjectPlugin(
+        parent_plugin = ProjectPlugin(
             base_plugin.type,
             base_plugin.name,
             variant=variant,
         )
-        plugin.parent = base_plugin
+        parent_plugin.parent = base_plugin
+
+        plugin = ProjectPlugin(
+            base_plugin.type,
+            f"{base_plugin.name}--two",
+            inherit_from=parent_plugin.name,
+        )
+        plugin.parent = parent_plugin
         return plugin
 
     def test_save(
@@ -59,14 +68,19 @@ class TestPluginLockService:
         plugin: ProjectPlugin,
     ):
         lock_path = project.plugin_lock_path(
-            plugin.type,
-            plugin.name,
+            plugin.definition.type,
+            plugin.definition.name,
             plugin.variant.name,
         )
         assert not lock_path.exists()
 
         subject.save(plugin)
         assert lock_path.exists()
+
+        with lock_path.open() as lock_file:
+            lock_json = json.load(lock_file)
+            assert lock_json["foo"] == "bar"
+            assert lock_json["baz"] == "qux"
 
         with pytest.raises(LockfileAlreadyExistsError) as exc_info:
             subject.save(plugin)
