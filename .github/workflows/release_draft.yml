@@ -51,20 +51,25 @@ jobs:
       with:
         python-version: 3.9
         architecture: x64
-        cache: 'poetry'
-    - name: Poetry install
+        cache: 'pip'
+        # cache: 'poetry'
+    # - name: Poetry install
+    #   run: |
+    #     poetry install
+    - name: Pip install tools
       run: |
-        poetry install
+        pipx install --include-deps bumpversion
+        pipx install changelog-cli
 
     - name: Bump version
       run: |
         BUMP_TYPE="${{ steps.validate-version-sequence.outputs.bump-type }}"
         echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
-        poetry run changelog release --$BUMP_TYPE --yes
+        changelog release --$BUMP_TYPE --yes
         echo "Adding changelog to git..."
         git add CHANGELOG.md
         echo "Bumping version entries..."
-        poetry run bumpversion $BUMP_TYPE --new-version=$NEW_VER --allow-dirty --no-commit --no-tag
+        bumpversion $BUMP_TYPE --new-version=$NEW_VER --allow-dirty --no-commit --no-tag
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
