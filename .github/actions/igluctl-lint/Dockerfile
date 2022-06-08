@@ -9,4 +9,4 @@ RUN TMPFILE="$(mktemp)" && \
     rm "$TMPFILE" && \
     chmod u+x igluctl
 
-ENTRYPOINT ["/igluctl"]
+ENTRYPOINT ["/igluctl", "lint"]

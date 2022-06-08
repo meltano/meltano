@@ -19,4 +19,6 @@ jobs:
         uses: actions/checkout@v3.0.2
 
       - name: Iglu Schema Lint
-        uses: ./.github/actions/igluctl
+        uses: ./.github/actions/igluctl-lint
+        with:
+          path_to_schemas: './src/meltano/core/tracking/iglu-client-embedded/'
