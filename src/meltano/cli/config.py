@@ -6,6 +6,8 @@ from pathlib import Path
 
 import click
 import dotenv
+from rich.console import Console
+from rich.table import Table
 
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
@@ -124,14 +126,12 @@ def list_settings(ctx, extras):
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
 
-    printed_custom_heading = False
-    printed_extra_heading = extras
-
     # If `--extras` is not specified (`False`), we still want to load both
     # regular and extra settings, since we show custom extras.
     load_extras = True if extras else None
 
     full_config = settings.config_with_metadata(session=session, extras=load_extras)
+    table_rows = {"settings": [], "extras": [], "custom": []}
     for name, config_metadata in full_config.items():
         value = config_metadata["value"]
         source = config_metadata["source"]
@@ -141,32 +141,15 @@ def list_settings(ctx, extras):
             if not setting_def.is_extra:
                 continue
 
-            if setting_def.is_custom and not printed_custom_heading:
-                click.echo()
-                click.echo("Custom:")
-                printed_custom_heading = True
         elif setting_def.is_extra:
             if not setting_def.is_custom:
                 continue
 
-            if not printed_extra_heading:
-                click.echo()
-                click.echo("Custom extras, plugin-specific options handled by Meltano:")
-                printed_extra_heading = True
-        elif setting_def.is_custom and not printed_custom_heading:
-            click.echo()
-            click.echo("Custom, possibly unsupported by the plugin:")
-            printed_custom_heading = True
-
-        click.secho(name, fg="blue", nl=False)
-
         env_keys = [var.definition for var in settings.setting_env_vars(setting_def)]
-        click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
 
+        default_value = None
         if source is not SettingValueStore.DEFAULT:
             default_value = setting_def.value
-            if default_value is not None:
-                click.echo(f" (default: {default_value!r})", nl=False)
 
         if source is SettingValueStore.DEFAULT:
             label = "default"
@@ -175,27 +158,56 @@ def list_settings(ctx, extras):
         else:
             label = f"from {source.label}"
 
-        current_value = click.style(f"{value!r}", fg="green")
-        click.echo(f" current value: {current_value}", nl=False)
-
+        source = ""
         unexpanded_value = config_metadata.get("unexpanded_value")
         if not unexpanded_value or unexpanded_value == value:
-            click.echo(f" ({label})")
+            source = f"\n{label}"
         else:
-            click.echo(f" ({label}: {unexpanded_value!r})")
+            source = f"\n{label}: {unexpanded_value!r}"
 
-        if setting_def.description:
-            click.echo("\t", nl=False)
-            if setting_def.label:
-                click.echo(f"{setting_def.label}: ", nl=False)
-            click.echo(f"{setting_def.description}")
+        value = value if value else "''"
+        label = f"\n{setting_def.label}" if setting_def.label else ""
+        table_row = (
+            f"[blue]{name}[/blue]{label}",
+            setting_def.description or "",
+            f"[green]{value}[/green]{source}",
+            "\n".join(env_keys),
+            str(default_value) if default_value is not None else "''",
+        )
+        if setting_def.is_custom:
+            table_rows["custom"].append(table_row)
+        elif setting_def.is_extra:
+            table_rows["extras"].append(table_row)
+        else:
+            table_rows["settings"].append(table_row)
+
+    console = Console()
+    for key, rows in table_rows.items():
+        if key == "settings":
+            title = f"Settings for {settings.label}"
+        elif key == "custom":
+            title = f"Custom settings for {settings.label}\n(only defined in this project, may not be supported by plugin)"
+        elif key == "extras":
+            title = f"Extra settings for {settings.label}"
+        if rows:
+            table = Table(title=title, show_lines=True)
+            table.add_column("Name (Label)", no_wrap=True, justify="right")
+            table.add_column("Description")
+            table.add_column("Current Value (Source)")
+            table.add_column("Env(s)", no_wrap=True)
+            table.add_column("Default Value")
+            for row in rows:
+                table.add_row(*row)
+
+            click.echo()
+            console.print(table)
 
     docs_url = settings.docs_url
     if docs_url:
-        click.echo()
         click.echo(
             f"To learn more about {settings.label} and its settings, visit {docs_url}"
         )
+        click.echo()
 
 
 @config.command()
