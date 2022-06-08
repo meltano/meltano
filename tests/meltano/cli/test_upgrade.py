@@ -1,4 +1,4 @@
-import os
+import shutil
 from unittest import mock
 
 from asserts import assert_cli_runner
@@ -72,7 +72,7 @@ class TestCliUpgrade:
         file_path.write_text("Overwritten!")
 
         # The behavior being tested assumes that the file is not locked.
-        os.remove(project.root_dir("plugins/files/airflow--original.lock"))
+        shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 

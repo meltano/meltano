@@ -1,4 +1,5 @@
 import os
+import shutil
 from unittest import mock
 
 import pytest
@@ -167,7 +168,7 @@ class TestCliAdd:
     ):
         # if plugin is locked, we actually wouldn't expect it to update.
         # So we must remove lockfile
-        os.remove(project.root_dir("plugins/files/airflow--original.lock"))
+        shutil.rmtree("plugins/files", ignore_errors=True)
 
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])
         assert_cli_runner(result)
@@ -215,7 +216,7 @@ class TestCliAdd:
         self, project, cli_runner, project_plugins_service
     ):
         # dbt lockfile was created in an upstream test. Need to remove.
-        os.remove(project.root_dir("plugins/files/dbt--original.lock"))
+        shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
         result = cli_runner.invoke(cli, ["add", "files", "dbt"])
         assert_cli_runner(result)
