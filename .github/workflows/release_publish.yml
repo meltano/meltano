@@ -1,4 +1,4 @@
-name: Release publish (/publish)
+name: Publish release (/publish)
 
 # Responds to /publish slack commands
 #
