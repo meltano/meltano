@@ -70,21 +70,14 @@ jobs:
       run: |
         poetry install
         poetry build
-    - name: Add release file marker
+    - name: Add release file marker and build
       run: |
-        cd ./dist
-        ARCHIVE="$(sh -c 'echo "$1"' sh meltano*.tar.gz)"
-        DIR="$(basename $ARCHIVE .tar.gz)"
-        tar -xvzf "$ARCHIVE"
-        touch "$DIR/src/meltano/core/tracking/.release_marker"
-        tar -cvzf "$ARCHIVE" "$DIR"
-        cd -
+        touch src/meltano/core/tracking/.release_marker
+        poetry build
 
     - name: Publish to PyPi
       run: |
-        # Publish the sdist
-        ln -s dist
-        echo "Simulating `poetry publish`..."
+        echo "`poetry publish` would run here! 🚀"
         # poetry publish  # TODO: uncomment this
 
     - name: Add reaction (success)
