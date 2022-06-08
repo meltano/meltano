@@ -1,3 +1,4 @@
+import shutil
 from unittest import mock
 
 from asserts import assert_cli_runner
@@ -70,6 +71,8 @@ class TestCliUpgrade:
         # Update file if changed
         file_path.write_text("Overwritten!")
 
+        # The behavior being tested assumes that the file is not locked.
+        shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 

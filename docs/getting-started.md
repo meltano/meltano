@@ -90,10 +90,15 @@ This action will create a new directory with, among other things, your [`meltano
 
 ```yml
 version: 1
+default_environment: dev
 project_id: <random UUID>
+environments:
+- name: dev
+- name: staging
+- name: prod
 ```
 
-The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), [environments](/concepts/environments), or [pipeline schedules](/concepts/project#schedules) yet.
+The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), or [pipeline schedules](/concepts/project#schedules) yet, but does include 3 [environments](/concepts/environments) that you can use if you wish.
 
 Note that anonymous usage stats are enabled by default; if you want to learn more about how the product benefits from them or how to change the default settings, see the [settings reference](/reference/settings#send-anonymous-usage-stats) page for more details.
 
@@ -152,9 +157,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if an extractor for your data source is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-        ```bash
-        meltano discover extractors
-        ```
+    ```bash
+    meltano discover extractors
+    ```
 
 1.  Depending on the result, pick your next step:
 
@@ -773,7 +778,7 @@ meltano run <extractor> <loader> <other_plugins>
 
 # For example:
 meltano run tap-gitlab target-postgres
-meltano run tap-gitlab target-postgres dbt:test dbt:run
+meltano run tap-gitlab target-postgres dbt:test dbt:run #if you already have dbt configured
 ```
 
 Or directly using the `meltano invoke`, which requires more settings to be defined prior to running

@@ -41,7 +41,7 @@ class EnvironmentContext(SelfDescribingJson):
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(
                     # True if 'true', 'TRUE', 'True', or '1'
-                    os.environ.get(marker, "").lower()[:1] in ["1", "t"]
+                    os.environ.get(marker, "").lower()[:1] in {"1", "t"}
                     for marker in ci_markers
                 ),
                 "python_version": platform.python_version(),

@@ -7,25 +7,15 @@ weight: 10
 
 ## Discoverable plugins
 
-[Discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box are defined in the `discovery.yml` manifest,
-which can be found inside the Meltano repository at
-[`src/meltano/core/bundle/discovery.yml`](https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml).
+[Discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box are available in [Meltano Hub](https://hub.meltano.com).
 
 ### Making a custom plugin discoverable
 
-If you've added a [custom plugin](/concepts/plugins#custom-plugins) (or [variant](/concepts/plugins#variants)) to your project that could be discoverable and supported out of the box for new users, please contribute its description to this file to save the next user the hassle of setting up the custom plugin.
+If you've added a [custom plugin](/concepts/plugins#custom-plugins) (or [variant](/concepts/plugins#variants)) to your project that could be discoverable and supported out of the box for new users, please [contribute](https://github.com/meltano/hub/issues/new) its description to Meltano Hub to save the next user the hassle of setting up the custom plugin.
 GitHub makes it easy to contribute changes without requiring you to leave your browser.
 
-Discoverable plugin definitions in `discovery.yml` have the same format as [custom plugin definition](/concepts/project#custom-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), so a copy-paste is usually sufficient.
+Discoverable plugin definitions in Meltano Hub have the a very similar format as [custom plugin definition](/concepts/project#custom-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), so a copy-paste is usually sufficient.
 The format and further requirements are laid out in more detail below.
-
-Besides the new definition in `discovery.yml`, a new discoverable plugin should be documented in the
-[Extractors](https://hub.meltano.com/extractors/) or [Loaders](https://hub.meltano.com/loaders/) section of the [MeltanoHub](https://hub.meltano.com/),
-which live inside the MeltanoHub repository under
-[`/_extractors`](https://github.com/meltano/hub/tree/main/extractors) and
-[`/_loaders`](https://github.com/meltano/hub/tree/main/loaders).
-However, it is _not_ required to include documentation when you contribute a new plugin definition to `discovery.yml`,
-as members of the core team are happy to any missing docs themselves as part of the review process.
 
 #### Plugin definitions
 
