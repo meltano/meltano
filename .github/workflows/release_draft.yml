@@ -49,9 +49,9 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3.1.2
       with:
+        # https://github.com/actions/setup-python
         python-version: 3.9
         architecture: x64
-        cache: 'pip'
         # cache: 'poetry'
     # - name: Poetry install
     #   run: |
