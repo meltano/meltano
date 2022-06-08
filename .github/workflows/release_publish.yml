@@ -64,6 +64,15 @@ jobs:
         number: ${{ steps.find-pull-request.outputs.number }}
         sha: ${{ steps.find-pull-request.outputs.head-sha }}
 
+    - name: Publish notification on PR
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+          [The requested publish operation is now running.](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) :rocket:
+
     - name: Poetry install
       run: |
         poetry install
