@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import datetime
+import json
 import locale
 import re
+import uuid
 from contextlib import contextmanager
 from enum import Enum, auto
-from typing import Any
+from pathlib import Path
+from typing import Any, NamedTuple, Optional
 from urllib.parse import urlparse
 
 import tzlocal
@@ -19,12 +22,16 @@ from structlog.stdlib import get_logger
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.project import ProjectContext
-from meltano.core.utils import hash_sha256
+from meltano.core.utils import format_exception, hash_sha256
 
 from .environment import environment_context
 
 CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
 CLI_EVENT_SCHEMA_VERSION = "1-0-0"
+TELEMETRY_STATE_CHANGE_EVENT_SCHEMA = (
+    "iglu:com.meltano/telemetry_state_change_event/jsonschema"
+)
+TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION = "1-0-0"
 BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
 BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
 
@@ -55,6 +62,17 @@ def check_url(url: str) -> bool:
         True if the URL is valid, False otherwise.
     """
     return bool(re.match(URL_REGEX, url))
+
+
+class TelemetrySettings(NamedTuple):
+    """Settings which control telemetry and anonymous usage stats.
+
+    These are stored within `analytics.json`.
+    """
+
+    client_id: uuid.UUID | None
+    project_id: uuid.UUID | None
+    send_anonymous_usage_stats: bool | None
 
 
 # TODO: Can we store some of this info to make future invocations faster?
@@ -100,16 +118,79 @@ class Tracker:
         else:
             self.snowplow_tracker = None
 
-        self.send_anonymous_usage_stats = self.settings_service.get(
-            "send_anonymous_usage_stats", True
-        )
+        stored_telemetry_settings = self.load_saved_telemetry_settings()
+        self.client_id = stored_telemetry_settings.client_id or uuid.uuid4()
 
-        project_ctx = ProjectContext(project)
-        self.project_id = str(project_ctx.project_uuid)
+        project_ctx = ProjectContext(project, self.client_id)
+        self.project_id: uuid.UUID = project_ctx.project_uuid
         self.contexts: tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
+
+        self.telemetry_state_change_check(stored_telemetry_settings)
+
+    @cached_property
+    def send_anonymous_usage_stats(self) -> bool:
+        """Return whether anonymous usages stats are enabled (bool).
+
+        - Return the value from 'send_anonymous_usage_stats', if set.
+        - Otherwise the opposite of 'tracking_disabled', if set.
+        - Otherwise return 'True'
+
+        Returns:
+            True if anonymous usage stats are enabled.
+        """
+        if self.settings_service.get("send_anonymous_usage_stats", None) is not None:
+            return self.settings_service.get("send_anonymous_usage_stats")
+
+        if self.settings_service.get("tracking_disabled", None) is not None:
+            return not self.settings_service.get("tracking_disabled")
+
+        return True
+
+    def telemetry_state_change_check(
+        self, stored_telemetry_settings: TelemetrySettings
+    ) -> None:
+        """Check prior values against current ones, and send a change event if needed.
+
+        Args:
+            stored_telemetry_settings: the prior analytics settings
+        """
+        save_settings = False
+
+        if (
+            stored_telemetry_settings.send_anonymous_usage_stats is None
+            and not self.send_anonymous_usage_stats
+        ):
+            # Do nothing. Tracking is disabled and no tracking marker to update.
+            return
+
+        if (
+            stored_telemetry_settings.project_id is not None
+            and stored_telemetry_settings.project_id != self.project_id
+        ):
+            # Project ID has changed
+            self.track_telemetry_state_change_event(
+                "project_id", stored_telemetry_settings.project_id, self.project_id
+            )
+            save_settings = True
+
+        if (
+            stored_telemetry_settings.send_anonymous_usage_stats is not None
+            and stored_telemetry_settings.send_anonymous_usage_stats
+            != self.send_anonymous_usage_stats
+        ):
+            # Telemetry state has changed
+            self.track_telemetry_state_change_event(
+                "project_id",
+                stored_telemetry_settings.send_anonymous_usage_stats,
+                self.send_anonymous_usage_stats,
+            )
+            save_settings = True
+
+        if save_settings:
+            self.save_telemetry_settings()
 
     @cached_property
     def timezone_name(self) -> str:
@@ -178,10 +259,13 @@ class Tracker:
             self.snowplow_tracker.track_struct_event(
                 category=category,
                 action=action,
-                label=self.project_id,
+                label=str(self.project_id),
             )
         except Exception as err:
-            logger.debug("Failed to submit struct event to Snowplow", err=err)
+            logger.debug(
+                "Failed to submit struct event to Snowplow",
+                err=format_exception(err),
+            )
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
         """Fire an unstructured tracking event.
@@ -194,7 +278,10 @@ class Tracker:
         try:
             self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
         except Exception as err:
-            logger.debug("Failed to submit unstruct event to Snowplow, error", err=err)
+            logger.debug(
+                "Failed to submit unstruct event to Snowplow, error",
+                err=format_exception(err),
+            )
 
     def track_command_event(self, event_json: dict[str, Any]) -> None:
         """Fire generic command tracking event.
@@ -207,6 +294,119 @@ class Tracker:
                 f"{CLI_EVENT_SCHEMA}/{CLI_EVENT_SCHEMA_VERSION}", event_json
             )
         )
+
+    def track_telemetry_state_change_event(
+        self,
+        setting_name: str,
+        from_value: uuid.UUID | str | bool | None,
+        to_value: uuid.UUID | str | bool | None,
+    ) -> None:
+        """Fire a telemetry state change event.
+
+        Args:
+            setting_name: the name of the setting that is changing
+            from_value: the old value
+            to_value: the new value
+        """
+        logger.debug(
+            "Telemetry state change detected. A one-time "
+            + "'telemetry_state_change' event will now be sent.",
+            setting_name=setting_name,
+        )
+        if isinstance(from_value, uuid.UUID):
+            from_value = str(from_value)
+        if isinstance(to_value, uuid.UUID):
+            to_value = str(to_value)
+        event_json = SelfDescribingJson(
+            f"{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA}/{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION}",
+            {
+                "setting_name": setting_name,
+                "changed_from": from_value,
+                "changed_to": to_value,
+            },
+        )
+        try:
+            self.snowplow_tracker.track_unstruct_event(
+                event_json,
+                # Provide no Snowplow contexts so as to avoid sending any extra information beyond
+                # the 'telemetry_state_change' event.
+                None,
+            )
+        except Exception as err:
+            logger.debug(
+                "Failed to submit 'telemetry_state_change' unstruct event to Snowplow, error",
+                err=format_exception(err),
+            )
+
+    @property
+    def analytics_json_path(self) -> Path:
+        """Return path to the 'analytics.json' file.
+
+        Returns:
+            Path to 'analytics.json' file.
+        """
+        return self.project.meltano_dir() / "analytics.json"
+
+    def load_saved_telemetry_settings(self) -> TelemetrySettings:
+        """Get settings from the 'analytics.json' file.
+
+        Returns:
+            The saved telemetry settings.
+        """
+        try:
+            with open(self.analytics_json_path) as analytics_json_file:
+                analytics = json.load(analytics_json_file)
+        except FileNotFoundError:
+            return TelemetrySettings(None, None, None)
+        return TelemetrySettings(
+            self._uuid_from_str(analytics.get("client_id"), warn=True),
+            self._uuid_from_str(analytics.get("project_id"), warn=True),
+            analytics.get("send_anonymous_usage_stats"),
+        )
+
+    def save_telemetry_settings(self) -> None:
+        """Save settings to the 'analytics.json' file."""
+        with open(self.analytics_json_path, "w") as new_analytics_json_file:
+            json.dump(
+                {
+                    "client_id": str(self.client_id),
+                    "project_id": str(self.project_id),
+                    "send_anonymous_usage_stats": self.send_anonymous_usage_stats,
+                },
+                new_analytics_json_file,
+            )
+
+    def _uuid_from_str(self, from_val: Optional[Any], warn: bool) -> uuid.UUID | None:
+        """Safely convert string to a UUID. Return None if invalid UUID.
+
+        Args:
+            from_val: The string.
+            warn: True to warn on conversion failure.
+
+        Returns:
+            A UUID object, or None if the string cannot be converted to UUID.
+        """
+        if not isinstance(from_val, str):
+            if from_val is None:
+                return None
+
+            logger.warning(
+                "Unexpected value type in 'analytics.json'",
+                expected_type="string",
+                value_type=type(from_val),
+                value=from_val,
+            )
+
+        try:
+            return uuid.UUID(from_val)
+        except ValueError:
+            # Should only be reached if user manually edits 'analytics.json'.
+            log_fn = logger.warning if warn else logger.debug
+            log_fn(
+                "Invalid UUID string in 'analytics.json'",
+                value=from_val,
+            )
+            return None
 
     def track_block_event(self, block_type: str, event: BlockEvents) -> None:
         """Fire generic block tracking event.
