@@ -44,7 +44,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @cli.command(short_help="Run an ELT pipeline to Extract, Load, and Transform data.")
 @click.argument("extractor")
 @click.argument("loader")
-@click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
+@click.option("--transform", type=click.Choice(["skip", "only", "run"]))
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
     "--full-refresh",
@@ -125,6 +125,11 @@ async def elt(
     )
     tracker.add_contexts(cmd_ctx)
     tracker.track_command_event(cli_tracking.STARTED)
+
+    # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
+    # if transform is None we still need manually default to skip after firing the tracking event above.
+    if not transform:
+        transform = "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
