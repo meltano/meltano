@@ -451,5 +451,29 @@ def hash_sha256(value: str) -> str:
 
     Returns:
         The hashed value of the given string.
+
+    Raises:
+        ValueError: If we are blindly passed a value that is None.
     """
+    if value is None:
+        raise ValueError("Cannot hash None.")
     return hashlib.sha256(value.encode()).hexdigest()
+
+
+def safe_hasattr(obj: Any, name: str) -> bool:
+    """Safely checks if an object has a given attribute.
+
+    This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
+
+    Args:
+        obj: The object to check.
+        name: The name of the attribute to check.
+
+    Returns:
+        True if the object has the attribute, False otherwise.
+    """
+    try:
+        getattr(obj, name)
+    except AttributeError:
+        return False
+    return True

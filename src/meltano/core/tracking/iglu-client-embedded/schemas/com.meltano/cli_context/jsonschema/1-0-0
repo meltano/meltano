@@ -9,13 +9,6 @@
     },
     "type": "object",
     "properties": {
-        "event_uuid": {
-            "description": "A UUID that uniquely identifies an instance of this event",
-            "type": "string",
-            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
-            "minLength": 36,
-            "maxLength": 36
-        },
         "command": {
             "description": "",
             "type": "string",
@@ -40,7 +33,6 @@
         }
     },
     "required": [
-        "event_uuid",
         "command",
         "sub_command",
         "option_keys"

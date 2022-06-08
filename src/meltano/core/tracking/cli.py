@@ -1,8 +1,6 @@
 """Meltano telemetry contexts for the CLI events."""
 from __future__ import annotations
 
-import uuid
-
 from snowplow_tracker import SelfDescribingJson
 
 CLI_CONTEXT_SCHEMA = "iglu:com.meltano/cli_context/jsonschema"
@@ -21,6 +19,23 @@ COMPLETED = EVENT_RESULTS["completed"]
 SKIPPED = EVENT_RESULTS["skipped"]
 FAILED = EVENT_RESULTS["failed"]
 ABORTED = EVENT_RESULTS["aborted"]
+
+
+def cli_context_builder(
+    command: str, sub_command: str | None = None, **kwargs
+) -> CliContext:
+    """Initialize a CLI context.
+
+    Args:
+        command: The CLI command.
+        sub_command: The CLI sub command.
+        kwargs: Additional key-value pairs to evaluate as option_keys if they are not None/False.
+
+    Returns:
+        A CLI context.
+    """
+    option_keys = [key for key, val in kwargs.items() if val]
+    return CliContext(command=command, sub_command=sub_command, option_keys=option_keys)
 
 
 class CliContext(SelfDescribingJson):
@@ -42,7 +57,6 @@ class CliContext(SelfDescribingJson):
         super().__init__(
             f"{CLI_CONTEXT_SCHEMA}/{CLI_CONTEXT_SCHEMA_VERSION}",
             {
-                "event_uuid": str(uuid.uuid4()),
                 "command": command,
                 "sub_command": sub_command,
                 "option_keys": option_keys or [],
