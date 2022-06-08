@@ -38,8 +38,6 @@ jobs:
       uses: ./.github/actions/validate-version-sequence
       with:
         version-proposed: $VERSION
-        allow-no-change: true
-        validate-git-ref: true
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
