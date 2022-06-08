@@ -156,7 +156,7 @@ class TestCliAdd:
 
         assert "tap_google_analytics" in project_yaml["models"]
         assert project_yaml["vars"]["tap_google_analytics"] == {
-            "schema": "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+            "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}"
         }
 
     def test_add_files_with_updates(
