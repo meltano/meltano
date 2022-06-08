@@ -76,8 +76,6 @@ def add(  # noqa: WPS238
         cli_context_builder(
             "add",
             None,
-            plugin_type=plugin_type,
-            plugin_name=plugin_name,
             inherit_from=inherit_from,
             variant=variant,
             as_name=as_name,
