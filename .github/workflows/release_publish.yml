@@ -68,13 +68,13 @@ jobs:
 
     - name: Add release file marker
       run: |
-        pushd /meltano/dist
+        cd ./meltano/dist
         ARCHIVE="$(sh -c 'echo "$1"' sh meltano*.tar.gz)"
         DIR="$(basename $ARCHIVE .tar.gz)"
         tar -xvzf "$ARCHIVE"
         touch "$DIR/src/meltano/core/tracking/.release_marker"
         tar -cvzf "$ARCHIVE" "$DIR"
-        popd
+        cd -
 
     - name: Publish to PyPi
       run: |
