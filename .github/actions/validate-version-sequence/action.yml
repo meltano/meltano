@@ -81,7 +81,7 @@ runs:
         [[ $NEW_VER = $PATCH_BUMP ]] && BUMP_TYPE="patch"
         echo "::set-output name=bump-type::$(echo $BUMP_TYPE)"
     - name: Validate version bump
-      id: get-bump-type
+      id: validate-version-bump
       shell: bash
       run: |
         CURR_VER=${{ steps.detect-versions.outputs.current-version }}
