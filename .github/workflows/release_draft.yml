@@ -86,14 +86,14 @@ jobs:
         # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         labels: release
 
-    - name: Create release draft
-      uses: release-drafter/release-drafter@v5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        # https://github.com/release-drafter/release-drafter
-        version: ${{ github.event.inputs.version }}
-        commitish: release/${{ github.event.inputs.version }}
+    # - name: Create release draft
+    #   uses: release-drafter/release-drafter@v5
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     # https://github.com/release-drafter/release-drafter
+    #     version: ${{ github.event.inputs.version }}
+    #     commitish: release/${{ github.event.inputs.version }}
 
     - name: Approve Pull Request
       uses: juliangruber/approve-pull-request-action@v1.1.1
