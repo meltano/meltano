@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      PYTHON_VERSION: 3.9
     permissions:
       contents: write       # to create a github release
       pull-requests: write  # to create and update PRs
@@ -43,7 +42,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: $PYTHON_VERSION
+        python-version: 3.9
         architecture: x64
         cache: 'poetry'
     - name: Install Poetry
