@@ -28,7 +28,7 @@ inputs:
 outputs:
   bump-type:
     description: "The bump type. One of: ['major', 'minor', 'patch']"
-    value: ${{ steps.step1.outputs.random }}
+    value: ${{ steps.get-bump-type.outputs.bump-type }}
 
 runs:
   using: "composite"
