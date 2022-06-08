@@ -11,7 +11,6 @@ from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.settings_service import FeatureFlags
 
 from .config_service import ConfigService
 from .plugin import PluginRef, PluginType
@@ -461,7 +460,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             error: If the parent plugin is not found.
         """
         error = None
-
         if plugin.inherit_from and not plugin.is_variant_set:
             try:
                 return (
@@ -473,23 +471,16 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except PluginNotFoundError as inherited_exc:
                 error = inherited_exc
 
-        with self.settings_service.feature_flag(
-            FeatureFlags.LOCKFILES,
-            raise_error=False,
-        ) as allowed:
-            if allowed:
-                try:
-                    return (
-                        self.locked_definition_service.get_base_plugin(
-                            plugin,
-                            variant_name=plugin.variant,
-                        ),
-                        DefinitionSource.LOCKFILE,
-                    )
-                except PluginNotFoundError as lockfile_exc:
-                    error = lockfile_exc
-
-            logger.debug("Lockfile is feature-flagged", status=allowed)
+        try:
+            return (
+                self.locked_definition_service.get_base_plugin(
+                    plugin,
+                    variant_name=plugin.variant,
+                ),
+                DefinitionSource.LOCKFILE,
+            )
+        except PluginNotFoundError as lockfile_exc:
+            error = lockfile_exc
 
         if self._use_discovery_yaml:
             try:
