@@ -66,12 +66,13 @@ jobs:
         number: ${{ steps.find-pull-request.outputs.number }}
         sha: ${{ steps.find-pull-request.outputs.head-sha }}
 
-    - name: Poetry install
+    - name: Poetry install and build
       run: |
         poetry install
+        poetry build
     - name: Add release file marker
       run: |
-        cd ./meltano/dist
+        cd ./dist
         ARCHIVE="$(sh -c 'echo "$1"' sh meltano*.tar.gz)"
         DIR="$(basename $ARCHIVE .tar.gz)"
         tar -xvzf "$ARCHIVE"
@@ -82,7 +83,7 @@ jobs:
     - name: Publish to PyPi
       run: |
         Publish the sdist
-        ln -s /meltano/dist
+        ln -s dist
         echo "Simulating `poetry publish`..."
         # poetry publish  # TODO: uncomment this
 
