@@ -446,7 +446,7 @@ class PluginDefinition(PluginRef):
             settings=plugin.settings,
             commands=plugin.commands,
             requires=plugin.requires,
-            extras=plugin.extras,
+            **plugin.extras,
         )
 
 
@@ -760,29 +760,23 @@ class StandalonePlugin(Canonical):
     def from_variant(
         cls: type[StandalonePlugin],
         variant: Variant,
-        name: str,
-        namespace: str,
-        plugin_type: PluginType,
-        label: str = None,
+        plugin_def: PluginDefinition,
     ):
-        """Create a locked plugin from a variant.
+        """Create a locked plugin from a variant and plugin definition.
 
         Args:
             variant: The variant to create the plugin from.
-            name: The name of the plugin.
-            namespace: The namespace of the plugin.
-            plugin_type: The plugin type.
-            label: The label of the plugin.
+            plugin_def: The plugin definition to create the plugin from.
 
         Returns:
             A locked plugin definition.
         """
         return cls(
-            plugin_type=plugin_type,
-            name=name,
-            namespace=namespace,
+            plugin_type=plugin_def.type,
+            name=plugin_def.name,
+            namespace=plugin_def.namespace,
             variant=variant.name,
-            label=label,
+            label=plugin_def.label,
             docs=variant.docs,
             repo=variant.repo,
             pip_url=variant.pip_url,
@@ -792,5 +786,5 @@ class StandalonePlugin(Canonical):
             settings=variant.settings,
             commands=variant.commands,
             requires=variant.requires,
-            **variant.extras,
+            **{**plugin_def.extras, **variant.extras},
         )
