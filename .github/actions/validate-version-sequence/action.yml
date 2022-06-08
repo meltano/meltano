@@ -47,6 +47,10 @@ runs:
         echo List directory files
         ls
         echo "::set-output name=random::$(echo $RANDOM)"
+    - name: Pip installs
+      shell: bash
+      run: |
+        pipx install bumpversion
     - name: Detect current version and release version
       id: detect-versions
       shell: bash
