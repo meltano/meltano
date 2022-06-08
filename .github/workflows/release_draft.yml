@@ -27,9 +27,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Validation version input
+    - name: Validate version input
       if: ${{ github.event.inputs.force != 'true' }}
-      id: validate-version-sequence
+      id: validate-version
       uses: ./.github/actions/validate-version-sequence
       with:
         # current-version: (detected)
@@ -37,7 +37,7 @@ jobs:
         allow-no-change: false
         validate-git-ref: true
     - name: Debug version bump type
-      run: echo "${{ steps.validate-version-sequence.outputs.bump-type }}"
+      run: echo "${{ steps.validate-version.outputs.bump-type }}"
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
@@ -63,7 +63,7 @@ jobs:
 
     - name: Bump version
       run: |
-        BUMP_TYPE="${{ steps.validate-version-sequence.outputs.bump-type }}"
+        BUMP_TYPE="${{ steps.validate-version.outputs.bump-type }}"
         echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
         poetry run changelog release --$BUMP_TYPE --yes
         echo "Adding changelog to git..."
@@ -72,7 +72,7 @@ jobs:
         poetry run bumpversion "$BUMP_TYPE" --new-version="$NEW_VER" --allow-dirty --no-commit --no-tag
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3
+      uses: peter-evans/create-pull-request@v4
       id: create-pull-request
       with:
         # https://github.com/peter-evans/create-pull-request
@@ -82,9 +82,9 @@ jobs:
           Bump changelog for release v${{ github.event.inputs.version }}
         branch: release/v${{ github.event.inputs.version }}
         base: main
+        labels: release
         # committer: GitHub <noreply@github.com>
         # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-        labels: release
 
     # Note: Does not work from forks
     # - name: Create release draft

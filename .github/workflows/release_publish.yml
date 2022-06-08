@@ -12,7 +12,7 @@ name: Release publish (/publish)
 # Some optional description here.
 # ````
 # Examples:
-# /publish vX.Y.Z
+# /publish X.Y.Z
 
 on:
   repository_dispatch:
@@ -23,7 +23,7 @@ jobs:
   publish_release:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       VERSION: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
       PR_NUMBER: ${{ github.event.client_payload.github.payload.issue.number }}
     permissions:
@@ -41,10 +41,10 @@ jobs:
         allow-no-change: true
         validate-git-ref: true
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v3.1.2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.9
         architecture: x64
         cache: 'poetry'
     - name: Install Poetry
@@ -60,7 +60,7 @@ jobs:
       id: find-pull-request
       with:
         # https://github.com/juliangruber/find-pull-request-action
-        branch: my-branch-name
+        branch: release/v$VERSION
     - run: echo "Pull Request ${number} (${sha})"
       env:
         number: ${{ steps.find-pull-request.outputs.number }}
