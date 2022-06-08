@@ -7,7 +7,7 @@ on:
         description: "Version Number"
         type: string
         required: true
-        default: vX.Y.Z
+        default: 2.0.0
       force:
         description: "Force Push (ignore validation)"
         type: boolean
@@ -74,10 +74,10 @@ jobs:
       with:
         # https://github.com/peter-evans/create-pull-request
         commit-message: version bump (auto)
-        title: Release ${{ github.event.inputs.version }}
+        title: Release v${{ github.event.inputs.version }}
         body: |
-          Bump changelog for release ${{ github.event.inputs.version }}
-        branch: release/${{ github.event.inputs.version }}
+          Bump changelog for release v${{ github.event.inputs.version }}
+        branch: release/v${{ github.event.inputs.version }}
         base: main
         # committer: GitHub <noreply@github.com>
         # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
