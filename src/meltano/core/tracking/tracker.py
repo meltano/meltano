@@ -10,7 +10,7 @@ import uuid
 from contextlib import contextmanager
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, NamedTuple, Optional
+from typing import Any, NamedTuple
 from urllib.parse import urlparse
 
 import tzlocal
@@ -76,7 +76,7 @@ class TelemetrySettings(NamedTuple):
 
 
 # TODO: Can we store some of this info to make future invocations faster?
-class Tracker:
+class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     """Meltano tracker backed by Snowplow."""
 
     def __init__(
@@ -268,6 +268,7 @@ class Tracker:
                 category=category,
                 action=action,
                 label=str(self.project_id),
+                contexts=self.contexts,
             )
         except Exception as err:
             logger.debug(
@@ -384,7 +385,7 @@ class Tracker:
                 new_analytics_json_file,
             )
 
-    def _uuid_from_str(self, from_val: Optional[Any], warn: bool) -> uuid.UUID | None:
+    def _uuid_from_str(self, from_val: Any | None, warn: bool) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
 
         Args:
