@@ -69,7 +69,7 @@ jobs:
         echo "Adding changelog to git..."
         git add CHANGELOG.md
         echo "Bumping version entries..."
-        bumpversion $BUMP_TYPE --new-version=$NEW_VER --allow-dirty --no-commit --no-tag
+        bumpversion "$BUMP_TYPE" --new-version="$NEW_VER" --allow-dirty --no-commit --no-tag
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
