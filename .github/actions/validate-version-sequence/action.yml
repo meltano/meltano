@@ -50,7 +50,7 @@ runs:
     - name: Pip installs
       shell: bash
       run: |
-        pipx install bumpversion
+        pipx install --include-deps bumpversion
     - name: Detect current version and release version
       id: detect-versions
       shell: bash
