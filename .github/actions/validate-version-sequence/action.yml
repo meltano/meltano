@@ -21,8 +21,8 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Check out code
-      uses: actions/checkout@v2
+    # - name: Check out code
+    #   uses: actions/checkout@v2
     - name: Pip installs
       shell: bash
       run: |
