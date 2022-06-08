@@ -5,6 +5,7 @@ import click
 
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import PluginsTrackingContext, Tracker
 from meltano.core.tracking import cli as cli_tracking
@@ -63,7 +64,12 @@ def install(project, plugin_type, plugin_name, clean, parallelism):
         if plugin_name:
             plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
     else:
-        plugins = list(plugins_service.plugins())
+        try:
+            plugins = list(plugins_service.plugins())
+        except PluginNotFoundError:
+            tracker.track_command_event(cli_tracking.STARTED)
+            tracker.track_command_event(cli_tracking.ABORTED)
+            raise
 
     click.echo(f"Installing {len(plugins)} plugins...")
     tracker.add_contexts(
