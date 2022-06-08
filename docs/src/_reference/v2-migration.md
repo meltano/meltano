@@ -1070,6 +1070,9 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
   </tr>
 </table>
 
+
+## CLI and API Changes
+
 #### Use `--state-id` instead of `--job-id`
 In 2.0, many references to "Job ID" in our code and docs were changed to the more accurate name of "State ID".
 
