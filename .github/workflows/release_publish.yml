@@ -82,8 +82,8 @@ jobs:
         poetry build
 
     - name: Publish to PyPi
-      # Only run when not on a fork:
-      if: ${{ github.event.repository.name == 'meltano/meltano' }}
+      # # Only run when not on a fork:
+      # if: ${{ github.event.repository.name == 'meltano/meltano' }}
       run: |
         echo "Running 'poetry publish' now! 🚀"
         poetry publish

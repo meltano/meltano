@@ -78,8 +78,8 @@ jobs:
         labels: release
 
     - name: Create release draft
-      # Can't be run from forks:
-      if: ${{ github.event.repository.name == 'meltano/meltano' }}
+      # # Can't be run from forks:
+      # if: ${{ github.event.repository.name == 'meltano/meltano' }}
       uses: release-drafter/release-drafter@v5
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
