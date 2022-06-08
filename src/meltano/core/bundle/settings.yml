@@ -179,10 +179,6 @@ settings:
   value: ["https://sp.meltano.com"]
 
 # Feature Flags
-# Control whether lock files are enabled or not.
-- name: ff.lock_files
-  kind: boolean
-  value: false
 # Control whether to use Uvicorn rather than Gunicorn as the API server.
 - name: ff.enable_uvicorn
   kind: boolean
