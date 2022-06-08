@@ -110,7 +110,7 @@ async def elt(
     """
     tracker = Tracker(project)
     cmd_ctx = cli_context_builder(
-        "run",
+        "elt",
         None,
         dry=dry,
         transform=transform,

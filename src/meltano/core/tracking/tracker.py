@@ -216,7 +216,7 @@ class Tracker:
             return datetime.datetime.now().astimezone().tzname()
 
     def add_contexts(self, *extra_contexts):
-        """Add additional Snowplow contexts to the `Tracker`.
+        """Permanently add additional Snowplow contexts to the `Tracker`.
 
         Args:
             extra_contexts: The additional contexts to add to the `Tracker`.
