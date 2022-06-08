@@ -76,9 +76,6 @@ jobs:
         branch: release/v${{ github.event.inputs.version }}
         base: main
         labels: release
-        # committer: GitHub <noreply@github.com>
-        # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-    # - uses: actions/checkout@v2
 
     - name: Create release draft
       # Can't be run from forks:

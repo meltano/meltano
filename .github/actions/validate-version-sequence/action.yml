@@ -4,14 +4,6 @@ inputs:
   version-proposed:
     required: true
     description: "Version proposed"
-  # validate-git-ref:
-  #   required: false
-  #   description: "Require the new version number to match the git branch or tag name"
-  #   default: 'false'
-
-  name:
-    required: true
-    description: "Name"
 
 outputs:
   bump-type:
@@ -21,8 +13,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # - name: Check out code
-    #   uses: actions/checkout@v2
+
     - name: Pip installs
       shell: bash
       run: |
@@ -38,15 +29,6 @@ runs:
         echo "Detected current version '$CURR_VER' and release version '$RELEASE_VER'"
         echo "::set-output name=current-version::$(echo $CURR_VER)"
         echo "::set-output name=release-version::$(echo $RELEASE_VER)"
-
-    # - name: Check against release version
-    #   id: check-release-version
-    #   if: ${{ inputs.validate-git-ref }} == 'true'
-    #   shell: bash
-    #   # TODO: create validation here
-    #   run: |
-    #     CURR_VER=${{ steps.detect-versions.outputs.current-version }}
-    #     RELEASE_VER=${{ steps.detect-versions.outputs.release-version }}
 
     - name: Get bump type
       id: get-bump-type
