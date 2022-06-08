@@ -127,6 +127,7 @@ def invoke(
                 command_name,
                 containers,
                 print_var=print_var,
+                tracker=tracker,
             )
         )
     except Exception as invoke_err:
@@ -191,7 +192,7 @@ async def _invoke(
     finally:
         session.close()
 
-    tracker = LegacyTracker(project, tracker.contexts)
+    tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     tracker.track_meltano_invoke(
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )
