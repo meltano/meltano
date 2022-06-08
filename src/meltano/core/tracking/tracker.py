@@ -6,6 +6,7 @@ import datetime
 import locale
 import re
 from contextlib import contextmanager
+from enum import Enum, auto
 from typing import Any
 from urllib.parse import urlparse
 
@@ -28,13 +29,13 @@ BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
 BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
 
 
-class BlockEvents:
+class BlockEvents(Enum):
     """Events describing a block state."""
 
-    INITIALIZED: str = "initialized"
-    STARTED: str = "started"
-    COMPLETED: str = "completed"
-    FAILED: str = "failed"
+    initialized = auto()
+    started = auto()
+    completed = auto()
+    failed = auto()
 
 
 URL_REGEX = (
@@ -215,7 +216,7 @@ class Tracker:
             )
         )
 
-    def track_block_event(self, block_type: str, event: str) -> None:
+    def track_block_event(self, block_type: str, event: BlockEvents) -> None:
         """Fire generic block tracking event.
 
         Args:
@@ -225,6 +226,6 @@ class Tracker:
         self.track_unstruct_event(
             SelfDescribingJson(
                 f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
-                {"type": block_type, "event": event},
+                {"type": block_type, "event": event.name},
             )
         )

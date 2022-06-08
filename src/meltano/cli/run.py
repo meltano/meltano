@@ -140,7 +140,7 @@ async def _run_blocks(
         blk_name = blk.__class__.__name__
         tracking_ctx = plugins_tracking_context_from_block(blk)
         with tracker.with_contexts(tracking_ctx):
-            tracker.track_block_event(blk_name, BlockEvents.INITIALIZED)
+            tracker.track_block_event(blk_name, BlockEvents.initialized)
         if dry_run:
             if isinstance(blk, BlockSet):
                 logger.info(
@@ -168,13 +168,13 @@ async def _run_blocks(
                 exit_codes=err.exitcodes,
             )
             with tracker.with_contexts(tracking_ctx):
-                tracker.track_block_event(blk_name, BlockEvents.FAILED)
+                tracker.track_block_event(blk_name, BlockEvents.failed)
             raise CliError(
                 f"Run invocation could not be completed as block failed: {err}"
             ) from err
         except Exception as bare_err:  # make sure we also fire block failed events for all other exceptions
             with tracker.with_contexts(tracking_ctx):
-                tracker.track_block_event(blk_name, BlockEvents.FAILED)
+                tracker.track_block_event(blk_name, BlockEvents.failed)
             raise bare_err
 
         logger.info(
@@ -185,4 +185,4 @@ async def _run_blocks(
             err=None,
         )
         with tracker.with_contexts(tracking_ctx):
-            tracker.track_block_event(blk_name, BlockEvents.COMPLETED)
+            tracker.track_block_event(blk_name, BlockEvents.completed)
