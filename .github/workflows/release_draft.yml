@@ -87,7 +87,7 @@ jobs:
     #     # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
     # - uses: actions/checkout@v2
 
-    # Note: Does not work from forks
+    # Note: Does not appear to work from forks
     # - name: Create release draft
     #   uses: release-drafter/release-drafter@v5
     #   env:

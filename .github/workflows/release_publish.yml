@@ -41,12 +41,6 @@ jobs:
         allow-no-change: true
         validate-git-ref: true
 
-    - name: Set up Python
-      uses: actions/setup-python@v3.1.2
-      with:
-        python-version: 3.9
-        architecture: x64
-        cache: 'poetry'
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
@@ -54,6 +48,12 @@ jobs:
         version: 1.1.13
         virtualenvs-create: true
         virtualenvs-in-project: true
+    - name: Set up Python
+      uses: actions/setup-python@v3.1.2
+      with:
+        python-version: 3.9
+        architecture: x64
+        cache: 'poetry'
 
     - name: Find Pull Request
       uses: juliangruber/find-pull-request-action@v1
