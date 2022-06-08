@@ -215,6 +215,14 @@ class Tracker:
         except Exception:
             return datetime.datetime.now().astimezone().tzname()
 
+    def add_contexts(self, *extra_contexts):
+        """Permanently add additional Snowplow contexts to the `Tracker`.
+
+        Args:
+            extra_contexts: The additional contexts to add to the `Tracker`.
+        """
+        self.contexts = (*self.contexts, *extra_contexts)
+
     @contextmanager
     def with_contexts(self, *extra_contexts) -> Tracker:
         """Context manager within which the `Tracker` has additional Snowplow contexts.

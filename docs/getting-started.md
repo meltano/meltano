@@ -27,35 +27,34 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1. Create and navigate to a directory to hold your Meltano projects:
 
-```bash
-mkdir meltano-projects
-cd meltano-projects
-```
+    ```bash
+    mkdir meltano-projects
+    cd meltano-projects
+    ```
 
 1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
-```bash
-python3 -m install --user pipx
-python3 -m pipx ensurepath
-#Note that the below commands are not needed in most cases
-source ~/.bashrc
-```
-
-<div class="notification is-info">
-   <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
-</div>
+    ```bash
+    python3 -m install --user pipx
+    python3 -m pipx ensurepath
+    #Note that the below commands are not needed in most cases
+    source ~/.bashrc
+    ```
+    <div class="notification is-info">
+      <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
+    </div>
 
 1. Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
 
-```bash
-pipx install meltano
-```
+    ```bash
+    pipx install meltano
+    ```
 
 1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
 
-```bash
-meltano --version
-```
+    ```bash
+    meltano --version
+    ```
 
 If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation#local-installation) of the [Installation guide](/guide/installation) for more details.
 
@@ -69,81 +68,81 @@ _To learn more about Meltano projects, refer to the [Projects concept doc](/conc
 
 1. Navigate to the directory that you'd like to hold your Meltano projects if you haven't already done so:
 
-```bash
-mkdir meltano-projects
-cd meltano-projects
-```
+    ```bash
+    mkdir meltano-projects
+    cd meltano-projects
+    ```
 
 1. Initialize a new project in a directory of your choosing using [`meltano init`](/reference/command-line-interface#init):
 
-```bash
-meltano init <project directory name>
+    ```bash
+    meltano init <project directory name>
 
-# For example:
-meltano init my-meltano-project
+    # For example:
+    meltano init my-meltano-project
 
-# If you're using Docker, don't forget to mount the current working directory:
-docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
-```
+    # If you're using Docker, don't forget to mount the current working directory:
+    docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
+    ```
 
-This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
+    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
 
-```yml
-version: 1
-default_environment: dev
-project_id: <random UUID>
-environments:
-- name: dev
-- name: staging
-- name: prod
-```
+    ```yml
+    version: 1
+    default_environment: dev
+    project_id: <random UUID>
+    environments:
+    - name: dev
+    - name: staging
+    - name: prod
+    ```
 
-The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), or [pipeline schedules](/concepts/project#schedules) yet, but does include 3 [environments](/concepts/environments) that you can use if you wish.
+    The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), or [pipeline schedules](/concepts/project#schedules) yet, but does include 3 [environments](/concepts/environments) that you can use if you wish.
 
-Note that anonymous usage stats are enabled by default; if you want to learn more about how the product benefits from them or how to change the default settings, see the [settings reference](/reference/settings#send-anonymous-usage-stats) page for more details.
+    Note that anonymous usage stats are enabled by default; if you want to learn more about how the product benefits from them or how to change the default settings, see the [settings reference](/reference/settings#send-anonymous-usage-stats) page for more details.
 
 1. Navigate to the newly created project directory:
 
-   ```bash
-   cd <project directory>
+    ```bash
+    cd <project directory>
 
-   # For example:
-   cd my-meltano-project
-   ```
+    # For example:
+    cd my-meltano-project
+    ```
 
 1. Optionally, if you'd like to version control your changes, initialize a [Git](https://git-scm.com/) repository and create an initial commit:
 
-```bash
-git init
-git add --all
-git commit -m 'Initial Meltano project'
-```
+    ```bash
+    git init
+    git add --all
+    git commit -m 'Initial Meltano project'
+    ```
 
 This will allow you to use [`git diff`](https://git-scm.com/docs/git-diff) to easily check the impact of the [`meltano` commands](/reference/command-line-interface) you'll run below on your project files, most notably your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 ## View and Activate Your Environments
 
-As part of creating your Meltano project, we automatically added your first [environments](/concepts/environments) called `dev`, `staging` and `prod`. This allows you to define configurations specific to the environment in which you're running your project.
+As part of creating your Meltano project, we automatically added your first [environments](/concepts/environments) called `dev`, `staging` and `prod`. This allows you to define configurations specific to the environment in which you're running your project. Theres also a [`default_environment`](https://docs.meltano.com/concepts/environments#default-environments) setting in the `meltano.yml` that get automatically set to `dev`, you can list and change the active environment using:
 
 1. List your available environments:
 
-```bash
-meltano environment list
-```
+    ```bash
+    meltano environment list
+    ```
 
 1. Activate your environment for your shell session:
 
-```bash
-export MELTANO_ENVIRONMENT=dev
-```
+    ```bash
+    export MELTANO_ENVIRONMENT=dev
+    ```
 
-Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
+    Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
 
 1. [optional] Add a new environment:
 
-```bash
-meltano environment add <environment name>
-```
+    ```bash
+    meltano environment add <environment name>
+    ```
 
 ## Add an Extractor to Pull Data from a Source
 
@@ -187,6 +186,10 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
         variant: meltanolabs
         pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
     ```
+
+    Also note that if you're using Meltano version >=2.0 you will see a `plugins/extractors/tap-gitlab--meltanolabs.lock` file added to your project.
+    This pins your settings definitions for stability, they should be checked into your git repository.
+    For additional stability you can consider pinning your `pip_url` to a specific release version (e.g. tap-gitlab==1.0.0) or commit hash (e.g. git+https://github.com/MeltanoLabs/tap-gitlab.git@v1.0.0).
 
     You can now continue to step 4.
 
@@ -299,7 +302,7 @@ extractors:
 
    # For example:
    meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
-   meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
+   meltano config tap-gitlab set start_date 2022-03-01T00:00:00Z
    meltano config tap-gitlab set private_token my_private_token
    ```
 
@@ -314,7 +317,7 @@ extractors:
              - name: tap-gitlab
                config:
                  projects: meltano/meltano meltano/tap-gitlab
-                 start_date: "2021-10-01T00:00:00Z"
+                 start_date: "2022-03-01T00:00:00Z"
    ```
 
    Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
@@ -343,7 +346,7 @@ extractors:
      "ultimate_license": false,
      "fetch_merge_request_commits": false,
      "fetch_pipelines_extended": false,
-     "start_date": "2021-03-01T00:00:00Z"
+     "start_date": "2022-03-01T00:00:00Z"
    }
    ```
 
@@ -410,7 +413,7 @@ _To learn more about selecting entities and attributes for extraction, refer to 
              - name: tap-gitlab
                config:
                  projects: meltano/meltano meltano/tap-gitlab
-                 start_date: "2021-03-01T00:00:00Z"
+                 start_date: "2022-03-01T00:00:00Z"
                select:
                  - commits.id
                  - commits.project_id
@@ -498,7 +501,7 @@ Most database extractors, on the other hand, support two or more of the followin
          config:
            plugins:
              extractors:
-               - name: tap-gitlab
+               - name: tap-postgres
                  metadata:
                    some_entity_id:
                      replication-method: INCREMENTAL
@@ -531,11 +534,11 @@ which will be responsible for loading [extracted](#add-an-extractor-to-pull-data
 _To learn more about adding plugins to your project, refer to the [Plugin Management guide](/guide/plugin-management#adding-a-plugin-to-your-project)._
 
 1.  Find out if a loader for your data destination is [supported out of the box](/concepts/plugins#discoverable-plugins)
-    by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
+by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-        ```bash
-        meltano discover loaders
-        ```
+    ```bash
+    meltano discover loaders
+    ```
 
 1.  Depending on the result, pick your next step:
 
@@ -666,8 +669,6 @@ loaders:
    meltano config <plugin> set <setting> <value>
 
    # For example:
-   meltano config target-postgres set host localhost
-   meltano config target-postgres set port 5432
    meltano config target-postgres set user meltano
    meltano config target-postgres set password meltano
    meltano config target-postgres set dbname warehouse
@@ -687,8 +688,6 @@ loaders:
          variant: transferwise
          pip_url: pipelinewise-target-postgres
          config:
-           host: localhost
-           port: 5432
            user: meltano
            dbname: warehouse
            default_target_schema: public
@@ -895,16 +894,32 @@ Once your raw data has arrived in your data warehouse, its schema will likely ne
 To help you achieve this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
 
 To learn about data transformation, refer to the [Data Transformation (T) guide](/guide/transformation).
+`dbt` plugins are adapter specific so you should install the plugin that matches your warehouse (i.e. Postgres = `dbt-postgres`, Snowflow = `dbt-snowflake`, etc.).
+Refer to the [transformers page](https://hub.meltano.com/transformers/) on MeltanoHub to see all available plugins.
 
 1. Install the dbt transformer to your project:
 
    ```bash
-   meltano add transformer dbt
+   meltano add transformer dbt-postgres
    ```
 
-1. Once dbt has been installed in your Meltano project, you will see the `/transform` directory populated with dbt artifacts.
+1. Configure dbt-postgres
 
-   These artifacts are installed via the [dbt file bundle](https://gitlab.com/meltano/files-dbt/).
+    ```bash
+    meltano config dbt-postgres list
+
+    # For example:
+    meltano config dbt-postgres set host localhost
+    meltano config dbt-postgres set user meltano
+    meltano config dbt-postgres set password meltano
+    meltano config dbt-postgres set port 5432
+    meltano config dbt-postgres set dbname warehouse
+    meltano config dbt-postgres set schema analytics
+    ```
+
+1. Once dbt has been installed and configured in your Meltano project, you will see the `/transform` directory populated with dbt artifacts.
+
+   These artifacts are installed via the [dbt file bundle](https://gitlab.com/meltano/files-dbt-postgres/).
    For more about file bundles, refer to the [Plugin File bundles](/concepts/plugins#file-bundles).
 
    Now all you need to do is start writing your dbt models in the `/transform/models` directory.
@@ -961,53 +976,16 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
    {% endraw %}
    ```
 
-1. Run your dbt models either using a pipeline transform:
-
-   ```bash
-   meltano elt <extractor> <loader>  --transform=run --state-id=<pipeline name>
-
-   # For example:
-   meltano elt tap-gitlab target-postgres --transform=run --state-id=gitlab-to-postgres
-   ```
-
-   Alternatively, you can run dbt directly using the `meltano invoke`, which requires that more settings be defined prior to running:
-
-   - First, add the following configs to your dbt settings:
+1. Run your dbt models either using [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke):
 
      ```bash
-     meltano config dbt set target postgres
-     meltano config dbt set source_schema public
-     ```
-
-   - Next, add the following `env` config, which sets environment variables at runtime, to your dev environment in the meltano.yml file.
-
-     ```yaml
-     environments:
-       - name: dev
-         config: ...
-         env:
-           TARGET_POSTGRES_HOST: localhost
-           TARGET_POSTGRES_PORT: "5432"
-           TARGET_POSTGRES_USER: meltano
-           TARGET_POSTGRES_DBNAME: warehouse
-     ```
-
-   - Finally add the postgres password to your `.env` file so it doesn't get checked into git:
-
-     ```
-     PG_PASSWORD="meltano"
-     ```
-
-   - After these configurations are set, you can run the dbt models using `invoke`:
-
-     ```bash
-     meltano invoke dbt:<command>
+     meltano invoke dbt-postgres:<command>
 
      # For example:
-     meltano invoke dbt:run
+     meltano invoke dbt-postgres:run
      ```
 
-   There is also a [`meltano run`](/reference/command-line-interface#run) command that allows you to execute dbt in the same way as `invoke` but in a much more flexible fashion. This allows for inline dbt execution and more advanced reverse ETL use cases:
+    The [`meltano run`](/reference/command-line-interface#run) command allows you to execute dbt in the same way as `invoke` but in a much more flexible fashion. This allows for inline dbt execution and more advanced reverse ETL use cases:
 
    ```bash
    meltano run <extractor> <loader> <other_plugins>
@@ -1019,6 +997,10 @@ To learn about data transformation, refer to the [Data Transformation (T) guide]
    After your transform run is complete, you should see a new table named after your model `warehouse.analytics.commits_last_7d` in your target.
 
    See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) from other supported dbt commands like `dbt:test`, `dbt:seed`, `dbt:snapshot` and selection criteria like `dbt:run --models tap_gitlab.*`.
+
+### Analyze Your Data with Superset
+
+To learn how to install and use [Superset](https://superset.apache.org/) in your project, refer to the [Analyze data](/guide/analysis) docs.
 
 ### Containerize Your Project
 

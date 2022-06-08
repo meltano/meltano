@@ -8,6 +8,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
+from meltano.core.elt_context import ELTContext
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.utils import hash_sha256, safe_hasattr
 
@@ -15,6 +16,26 @@ logger = get_logger(__name__)
 
 PLUGINS_CONTEXT_SCHEMA = "iglu:com.meltano/plugins_context/jsonschema"
 PLUGINS_CONTEXT_SCHEMA_VERSION = "1-0-0"
+
+
+def plugins_tracking_context_from_elt_context(
+    elt_context: ELTContext,
+) -> PluginsTrackingContext:
+    """Create a PluginsTrackingContext from an ELTContext.
+
+    Args:
+        elt_context: The ELTContext to use.
+
+    Returns:
+        A PluginsTrackingContext.
+    """
+    plugins = []
+    if not elt_context.only_transform:
+        plugins.append((elt_context.extractor.plugin, None))
+        plugins.append((elt_context.loader.plugin, None))
+    if elt_context.transformer:
+        plugins.append((elt_context.transformer.plugin, None))
+    return PluginsTrackingContext(plugins)
 
 
 def plugins_tracking_context_from_block(
