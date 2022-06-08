@@ -178,6 +178,12 @@ def meltano_hub_service(project, discovery):
     return hub
 
 
+@pytest.fixture(scope="class")
+def hub_endpoints(meltano_hub_service):
+    adapter = meltano_hub_service.session.adapters[meltano_hub_service.hub_api_url]
+    return adapter._mapping
+
+
 @pytest.fixture(scope="function")
 def hub_request_counter(meltano_hub_service: MeltanoHubService):
     counter: Counter = meltano_hub_service.session.get_adapter(
