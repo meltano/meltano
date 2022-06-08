@@ -26,6 +26,8 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       VERSION: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
       PR_NUMBER: ${{ github.event.client_payload.github.payload.issue.number }}
+      POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+
     permissions:
       contents: write  # for release-drafter/release-drafter to create a github release
       pull-requests: write  # for release-drafter/release-drafter to add label to PR
