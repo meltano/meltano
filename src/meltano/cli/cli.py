@@ -71,7 +71,7 @@ def cli(  # noqa: WPS231
         # activate environment
         if selected_environment:
             project.activate_environment(selected_environment)
-            logger.info(
+            logger.debug(
                 "Environment '%s' is active", selected_environment  # noqa: WPS323
             )
 
