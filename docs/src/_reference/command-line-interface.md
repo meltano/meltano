@@ -701,13 +701,12 @@ Note that if no environment is active, `meltano run` _does not_ generate a state
 
 ## `job`
 
-Use the `job` command to define one more related tasks. A job can contain a single task, or many tasks. Today all tasks
-are run sequentially. You can run a specified job by passing the job name as an argument to `meltano run`.
+Use the `job` command to define one or more related tasks. A job can contain a single task, or many tasks. Today all tasks
+are run sequentially. You can run a specified job by passing the job name as an argument to `meltano run`. You can also schedule jobs using `meltano schedule`.
 
 ### How to use
 
 ```bash
-
 # Add a job with a single task representing a run command
 meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
 
@@ -730,13 +729,64 @@ meltano job list <job_name> --format=json
 meltano job remove <job_name>
 ```
 
+
 ### Examples
 
+##### Tasks and Blocks
+A task in a job consists of one or more _blocks_. A block is simply a set of related plugins that will be executed serially.
+For example, you can create a job that consists of a single tap and target:
+```bash
+meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
+```
+This would add the following to your `meltano.yml`:
+```yaml
+jobs:
+- name: tap-gitlab-to-target-postgres
+  tasks:
+  - tap-gitlab target-postgres
+```
+
+Plugins in the same block should be separated by a space and blocks should be separted by a comma.
+
+You can also provide tasks in YAML format. For example, the following is equivalent to the above:
+```bash
+meltano job add tap-gitlab-to-target-postgres --tasks "[tap-gitlab target-postgres]"
+```
+
+Note that any single block which includes a tap _must_ also include a target and vice versa.
+The tap must also precede the target.
+
+All of the following are invalid:
+```bash
+# A block with a tap must also include a target.
+meltano job add invalid-job --tasks "tap-gitlab"
+>>> Job 'invalid-job' has invalid tasks. block violates set requirements: Found no end in block set!
+
+# Within a block, a target must be preceded by a tap.
+meltano job add invalid-job --tasks target-postgres
+>>> Job 'invalid-job' has invalid tasks. block violates set requirements: Unknown command type or bad block sequence at index 1, starting block 'target-postgres'
+
+# Blocks are separated by commas, so Meltano considers this tap and target as two separate invalid blocks.
+meltano job add invalid-job --tasks "tap-gitlab, target-postgres"
+>>> Job 'invalid-job' has invalid tasks. Block tap-gitlab, not found
+```
+
+A job can consist of multiple blocks, which will be executed serially in the order they are provided:
+```bash
+# This job consists of two blocks:
+meltano add tap-gitlab-to-target-postgres-with-dbt --tasks "[tap-gitlab target-postgres, dbt:run]"
+
+# This job consists of one block, but runs the same three tasks in the same order as above. It is functionally equivalent to the comma-sparated approach.
+meltano add tap-gitlab-to-target-postgres-with-dbt-single-block --tasks "tap-gitlab target-postgres dbt:run"
+```
+
+##### Adding, listing, running, and removing:
 ```bash
 # Add a new job named "simple-demo" that contains two tasks
 # Task 1: tap-gitlab hide-gitlab-secrets target-mysql
 # Task 2: tap-gitlab target-csv
 meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-mysql dbt:run, tap-gitlab target-csv]"
+
 # list the job named "simple-demo"
 meltano job list simple-demo --format=json
 # run the job named "simple-demo" using meltano run
