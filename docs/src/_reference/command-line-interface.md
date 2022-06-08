@@ -729,26 +729,30 @@ meltano job list <job_name> --format=json
 meltano job remove <job_name>
 ```
 
-
 ### Examples
 
 ##### Tasks and Blocks
+
 A task in a job consists of one or more _blocks_. A block is simply a set of related plugins that will be executed serially.
 For example, you can create a job that consists of a single tap and target:
+
 ```bash
 meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
 ```
+
 This would add the following to your `meltano.yml`:
+
 ```yaml
 jobs:
-- name: tap-gitlab-to-target-postgres
-  tasks:
-  - tap-gitlab target-postgres
+  - name: tap-gitlab-to-target-postgres
+    tasks:
+      - tap-gitlab target-postgres
 ```
 
 Plugins in the same block should be separated by a space and blocks should be separted by a comma.
 
 You can also provide tasks in YAML format. For example, the following is equivalent to the above:
+
 ```bash
 meltano job add tap-gitlab-to-target-postgres --tasks "[tap-gitlab target-postgres]"
 ```
@@ -757,6 +761,7 @@ Note that any single block which includes a tap _must_ also include a target and
 The tap must also precede the target.
 
 All of the following are invalid:
+
 ```bash
 # A block with a tap must also include a target.
 meltano job add invalid-job --tasks "tap-gitlab"
@@ -772,6 +777,7 @@ meltano job add invalid-job --tasks "tap-gitlab, target-postgres"
 ```
 
 A job can consist of multiple blocks, which will be executed serially in the order they are provided:
+
 ```bash
 # This job consists of two blocks:
 meltano add tap-gitlab-to-target-postgres-with-dbt --tasks "[tap-gitlab target-postgres, dbt:run]"
@@ -781,6 +787,7 @@ meltano add tap-gitlab-to-target-postgres-with-dbt-single-block --tasks "tap-git
 ```
 
 ##### Adding, listing, running, and removing:
+
 ```bash
 # Add a new job named "simple-demo" that contains two tasks
 # Task 1: tap-gitlab hide-gitlab-secrets target-mysql

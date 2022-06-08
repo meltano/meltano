@@ -14,7 +14,8 @@ When a new pipeline schedule is created using the [UI](/reference/ui) or [CLI](/
 ## Create a Schedule
 
 ### Specifying extractors and loaders
-To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/reference/ui#pipelines), or the [`meltano schedule`  command](/reference/command-line-interface#schedule):
+
+To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/reference/ui#pipelines), or the [`meltano schedule` command](/reference/command-line-interface#schedule):
 
 ```bash
 meltano schedule add [SCHEDULE_NAME] --extractor [EXTRACTOR_NAME] --loader [TARGET_NAME] --interval [INTERVAL]
@@ -29,7 +30,9 @@ meltano schedule add carbon__sqlite --extractor tap-carbon-intensity --loader ta
 Now that you've scheduled your first pipeline, you can load the "Pipeline" page in the UI and see it show up.
 
 ### Scheduling predefined jobs
+
 If you've defined a [job](/reference/command-line-interface#job) within your project, you can schedule it directly without having to manually pass its plugins to the `meltano schedule add` command:
+
 ```
 # Define a job
 meltano job add tap-gitlab-to-target-postgres-with-dbt --tasks "[tap-gitlab target-postgres, dbt:run]"
