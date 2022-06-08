@@ -1,4 +1,4 @@
-name: Release publish (/publish)
+name: Slash commands dispatcher
 
 on:
   issue_comment:
