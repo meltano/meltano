@@ -7,7 +7,8 @@ from pathlib import Path
 
 from structlog.stdlib import get_logger
 
-from meltano.core.plugin.base import BasePlugin, PluginRef, StandalonePlugin, Variant
+from meltano.core.plugin.base import PluginRef, StandalonePlugin
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 
 logger = get_logger(__name__)
@@ -38,11 +39,11 @@ class PluginLockService:
         Args:
             project: The Meltano project.
         """
-        self.projet = project
+        self.project = project
 
     def save(
         self,
-        plugin: BasePlugin,
+        plugin: ProjectPlugin,
         *,
         overwrite: bool = False,
         exists_ok: bool = False,
@@ -58,15 +59,13 @@ class PluginLockService:
             LockfileAlreadyExistsError: If the lockfile already exists and is not
                 flagged for overwriting.
         """
-        variant = None if plugin.variant == Variant.DEFAULT_NAME else plugin.variant
-
-        logger.info(f"Locking a {type(plugin)}")
-
         plugin_def = plugin.definition
-        path = self.projet.plugin_lock_path(
+        variant = plugin_def.find_variant(plugin.variant)
+
+        path = self.project.plugin_lock_path(
             plugin_def.type,
             plugin_def.name,
-            variant_name=variant,
+            variant_name=variant.name,
         )
 
         if path.exists() and not overwrite and not exists_ok:
@@ -76,14 +75,7 @@ class PluginLockService:
                 plugin,
             )
 
-        variant = plugin_def.find_variant(plugin.variant)
-        locked_def = StandalonePlugin.from_variant(
-            variant,
-            plugin.name,
-            plugin.namespace,
-            plugin.type,
-            label=plugin.label,
-        )
+        locked_def = StandalonePlugin.from_variant(variant, plugin_def)
 
         with path.open("w") as lockfile:
             json.dump(locked_def.canonical(), lockfile, indent=2)

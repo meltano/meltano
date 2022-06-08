@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import uuid
 from enum import Enum, auto
 
@@ -37,11 +36,12 @@ PROJECT_CONTEXT_SCHEMA_VERSION = "1-0-0"
 class ProjectContext(SelfDescribingJson):
     """Tracking context for the Meltano project."""
 
-    def __init__(self, project: Project):
+    def __init__(self, project: Project, client_id: uuid.UUID):
         """Initialize a meltano tracking "project" context.
 
         Args:
             project: The Meltano project.
+            client_id: The client ID from `analytics.json`.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
@@ -55,7 +55,7 @@ class ProjectContext(SelfDescribingJson):
                 "context_uuid": str(uuid.uuid4()),
                 "project_uuid": str(self.project_uuid),
                 "project_uuid_source": self.project_uuid_source.name,
-                "client_uuid": str(self.client_uuid),
+                "client_uuid": str(client_id),
                 "environment_name_hash": (
                     hash_sha256(self.project.active_environment.name)
                     if self.project.active_environment
@@ -107,31 +107,3 @@ class ProjectContext(SelfDescribingJson):
                 self.settings_service.set("project_id", str(project_id))
 
         return project_id
-
-    @cached_property
-    def client_uuid(self) -> uuid.UUID:
-        """Obtain the `client_id` from the non-versioned `analytics.json`.
-
-        If it is not found (e.g. first time run), generate a valid v4 UUID, and store it in
-        `analytics.json`.
-
-        Returns:
-            The client UUID.
-        """
-        analytics_json_path = self.project.meltano_dir() / "analytics.json"
-        try:
-            with open(analytics_json_path) as analytics_json_file:
-                analytics_json = json.load(analytics_json_file)
-        except FileNotFoundError:
-            client_id = uuid.uuid4()
-
-            if self.send_anonymous_usage_stats:
-                # If we are set to track Anonymous Usage stats, also store the generated
-                # `client_id` in a non-versioned `analytics.json` file so that it persists between
-                # meltano runs.
-                with open(analytics_json_path, "w") as new_analytics_json_file:
-                    json.dump({"client_id": str(client_id)}, new_analytics_json_file)
-        else:
-            client_id = uuid.UUID(analytics_json["client_id"], version=4)
-
-        return client_id

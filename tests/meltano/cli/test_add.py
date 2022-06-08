@@ -1,4 +1,5 @@
 import os
+import shutil
 from unittest import mock
 
 import pytest
@@ -155,7 +156,7 @@ class TestCliAdd:
 
         assert "tap_google_analytics" in project_yaml["models"]
         assert project_yaml["vars"]["tap_google_analytics"] == {
-            "schema": "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+            "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}"
         }
 
     def test_add_files_with_updates(
@@ -165,6 +166,10 @@ class TestCliAdd:
         project_plugins_service,
         plugin_settings_service_factory,
     ):
+        # if plugin is locked, we actually wouldn't expect it to update.
+        # So we must remove lockfile
+        shutil.rmtree("plugins/files", ignore_errors=True)
+
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])
         assert_cli_runner(result)
 
@@ -210,8 +215,9 @@ class TestCliAdd:
     def test_add_files_that_already_exists(
         self, project, cli_runner, project_plugins_service
     ):
+        # dbt lockfile was created in an upstream test. Need to remove.
+        shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
-
         result = cli_runner.invoke(cli, ["add", "files", "dbt"])
         assert_cli_runner(result)
 

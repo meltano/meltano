@@ -12,6 +12,7 @@ from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_invoker import (
     PluginInvoker,
     UnknownCommandError,
@@ -19,8 +20,9 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import PluginsTrackingContext, Tracker
 from meltano.core.tracking import cli as cli_tracking
+from meltano.core.tracking import cli_context_builder
 from meltano.core.utils import run_async
 
 from . import cli
@@ -76,7 +78,15 @@ def invoke(
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
     tracker = Tracker(project)
-    cmd_ctx = CliContext("invoke")
+    cmd_ctx = cli_context_builder(
+        "invoke",
+        None,
+        plugin_type=plugin_type,
+        dump=dump,
+        list_commands=list_commands,
+        containers=containers,
+        print_var=print_var,
+    )
     with tracker.with_contexts(cmd_ctx):
         tracker.track_command_event(cli_tracking.STARTED)
 
@@ -90,29 +100,43 @@ def invoke(
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.find_plugin(
-        plugin_name, plugin_type=plugin_type, invokable=True
-    )
+
+    try:
+        plugin = plugins_service.find_plugin(
+            plugin_name, plugin_type=plugin_type, invokable=True
+        )
+    except PluginNotFoundError as err:
+        with tracker.with_contexts(cmd_ctx):
+            tracker.track_command_event(cli_tracking.ABORTED)
+        raise err
 
     if list_commands:
         do_list_commands(plugin)
         return
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
-    exit_code = run_async(
-        _invoke(
-            invoker,
-            project,
-            plugin_name,
-            plugin_args,
-            session,
-            dump,
-            command_name,
-            containers,
-            print_var=print_var,
+    try:
+        exit_code = run_async(
+            _invoke(
+                invoker,
+                project,
+                plugin_name,
+                plugin_args,
+                session,
+                dump,
+                command_name,
+                containers,
+                print_var=print_var,
+            )
         )
-    )
-    with tracker.with_contexts(cmd_ctx):
+    except Exception as invoke_err:
+        with tracker.with_contexts(cmd_ctx):
+            tracker.track_command_event(cli_tracking.FAILED)
+        raise invoke_err
+
+    with tracker.with_contexts(
+        cmd_ctx, PluginsTrackingContext([(plugin, command_name)])
+    ):
         if exit_code == 0:
             tracker.track_command_event(cli_tracking.COMPLETED)
         else:

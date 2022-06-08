@@ -5,6 +5,10 @@ from meltano.core.plugin import PluginType
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
+# This is dead code that likely should have been removed
+# as part of the wider m5o deprecation.
+# A later issue should remove this.
+@pytest.mark.skip
 class TestConnectionService:
     @pytest.mark.parametrize(
         "loader,analyze_params",

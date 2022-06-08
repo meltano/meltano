@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Iterable
 
 from .plugin import BasePlugin, PluginType, Variant
 from .plugin.project_plugin import ProjectPlugin
@@ -74,7 +73,6 @@ class ProjectAddService:
             # repeat the variant and pip_url in meltano.yml
             parent = plugin.parent
             if isinstance(parent, BasePlugin):
-                # raise
                 plugin.variant = parent.variant
                 plugin.pip_url = parent.pip_url
 
@@ -82,7 +80,7 @@ class ProjectAddService:
 
             if lock and not added.is_custom():
                 self.plugins_service.lock_service.save(
-                    added.parent,
+                    added,
                     exists_ok=plugin.inherit_from is not None,
                 )
 
@@ -99,68 +97,29 @@ class ProjectAddService:
         """
         return self.plugins_service.add_to_file(plugin)
 
-    def add_related(self, *args, **kwargs):
-        """Add all related plugins to the project.
-
-        Args:
-            args: The plugin type and name of the plugin to add.
-            kwargs: Additional attributes to add to the plugin.
-
-        Returns:
-            The added plugins.
-        """
-        related_plugin_refs = (
-            self.plugins_service.discovery_service.find_related_plugin_refs(
-                *args, **kwargs
-            )
-        )
-
-        added_plugins = []
-        for plugin_ref in related_plugin_refs:
-            try:
-                plugin = self.add(plugin_ref.type, plugin_ref.name)
-            except PluginAlreadyAddedException:
-                continue
-
-            added_plugins.append(plugin)
-
-        added_plugins_with_related = []
-        for added in added_plugins:
-            added_plugins_with_related.extend(
-                [added, *self.add_related(added, **kwargs)]
-            )
-
-        return added_plugins_with_related
-
     def add_required(
         self,
         plugin: ProjectPlugin,
-        plugin_types: Iterable[PluginType] | None = None,
+        lock: bool = True,
     ):
         """Add all required plugins to the project.
 
         Args:
             plugin: The plugin to get requirements from.
-            plugin_types: The plugin types to add.
+            lock: Whether to generate a lockfile for the plugin.
 
         Returns:
             The added plugins.
         """
-        plugin_types = plugin_types or list(PluginType)
-
-        try:
-            plugin_types.remove(plugin.type)
-        except ValueError:
-            pass
-
         added_plugins = []
-        for plugin_type, plugins in plugin.get_requirements(plugin_types).items():
+        for plugin_type, plugins in plugin.all_requires.items():
             for plugin_req in plugins:
                 try:
                     plugin = self.add(
                         plugin_type,
                         plugin_req.name,
                         variant=plugin_req.variant,
+                        lock=lock,
                     )
                 except PluginAlreadyAddedException:
                     continue

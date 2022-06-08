@@ -26,15 +26,29 @@
                     "category": {
                         "description": "",
                         "type": "string",
-                        "enum": [
-                            "extractor",
-                            "loader",
-                            "transformer"
-                        ]
+                        "maxLength": 64
                     },
                     "name_hash": {
                         "description": "64 character hash of the plugin name",
                         "type": "string",
+                        "maxLength": 64
+                    },
+                    "namespace_hash": {
+                        "description": "64 character hash of the plugin namespace",
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "executable_hash": {
+                        "description": "64 character hash of the plugin executable",
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "variant_name_hash": {
+                        "description": "64 character hash of the plugin variant name",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
                         "maxLength": 64
                     },
                     "parent_name_hash": {
@@ -52,14 +66,6 @@
                             "null"
                         ],
                         "maxLength": 1024
-                    },
-                    "variant_name_hash": {
-                        "description": "64 character hash of the plugin variant name",
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "maxLength": 64
                     },
                     "pip_url_hash": {
                         "description": "64 character hash of the pip url",
@@ -81,11 +87,12 @@
                 "required": [
                     "category",
                     "name_hash",
+                    "namespace_hash",
+                    "executable_hash",
+                    "variant_name_hash",
                     "parent_name_hash",
                     "command",
-                    "variant_name_hash",
-                    "pip_url_hash",
-                    "plugin_lock_hash"
+                    "pip_url_hash"
                 ],
                 "additionalProperties": false
             }

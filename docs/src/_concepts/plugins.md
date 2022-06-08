@@ -47,18 +47,10 @@ To learn how to add a plugin to your project, refer to the [Plugin Management gu
 ## Discoverable plugins
 
 [Base plugin descriptions](#project-plugins) for many popular [extractors](#extractors) (Singer taps), [loaders](#loaders) (Singer targets),
-and other plugins have already been collected by users and [contributed](/contribute/plugins#discoverable-plugins) to Meltano's index of discoverable plugins,
+and other plugins have already been collected by users and [contributed](/contribute/plugins#discoverable-plugins) to [Meltano Hub](https://hub.meltano.com),
 making them supported out of the box.
 
-Discoverable plugins are defined in the `discovery.yml` manifest,
-which can be found [in the Meltano repository](https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml),
-ships inside the [`meltano` package](https://pypi.org/project/meltano/),
-and is available at <https://www.meltano.com/discovery.yml>.
-If you'd like to use a different (custom) manifest in your project,
-put a `discovery.yml` file at the root of your project,
-or change the [`discovery_url` setting](/reference/settings#discovery-url).
-
-To find discoverable plugins, run [`meltano discover`](/reference/command-line-interface#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/).
+To find discoverable plugins, run [`meltano discover`](/reference/command-line-interface#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/), [Loaders](https://hub.meltano.com/loaders/), etc.
 
 To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](project#shadowing-plugin-definitions) or [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
 
@@ -92,7 +84,7 @@ you'll need to collect and provide this metadata yourself.
 To learn how to add a custom plugin to your project using a [custom plugin definition](project#custom-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://github.com/meltano/meltano/blob/main/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to <a href="https://github.com/meltano/hub/issues/new">Meltano Hub</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ## Plugin Inheritance
@@ -110,7 +102,7 @@ To learn how to add an inheriting plugin to your project using an [inheriting pl
 
 ## Lock artifacts
 
-When you add a plugin to your project using `meltano add`, the [discoverable plugin definition](project#discoverable-plugin-definitions) of the plugin will be downloaded and added to your project under `plugins/<plugin_type>/<plugin_name>--<variant_name>.lock`. This will ensure that the plugin's definition will be stable and version-controlled.
+When you add a plugin to your project using `meltano add`, the [discoverable plugin definition](#discoverable-plugins) of the plugin will be downloaded and added to your project under `plugins/<plugin_type>/<plugin_name>--<variant_name>.lock`. This will ensure that the plugin's definition will be stable and version-controlled.
 
 Later invocations of the plugin will use this file to determine the settings, installation source, etc.
 

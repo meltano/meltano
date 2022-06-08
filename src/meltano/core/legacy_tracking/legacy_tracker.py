@@ -51,9 +51,8 @@ class LegacyTracker:
             request_timeout=self.request_timeout,
         )
 
-        project_context = ProjectContext(project)
+        project_context = ProjectContext(project, self.tracker.client_id)
         self.project_id = project_context.project_uuid
-        self.client_id = project_context.client_uuid
 
     def event(self, category: str, action: str) -> dict[str, Any]:
         """Construct a GA event with all the required parameters.
@@ -68,7 +67,7 @@ class LegacyTracker:
         return {
             "v": "1",
             "tid": self.tracking_id,
-            "cid": self.client_id,
+            "cid": self.tracker.client_id,
             "ds": "meltano cli",
             "t": "event",
             "ec": category,
