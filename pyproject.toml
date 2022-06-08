@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "1.105.0"
+version = "2.0.0"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
