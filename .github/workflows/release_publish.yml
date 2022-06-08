@@ -33,26 +33,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Validation version input
-      id: validate-version-sequence
-      uses: ./.github/actions/validate-version-sequence
-      with:
-        version-proposed: $VERSION
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        # Version of Poetry to use
-        version: 1.1.13
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-    - name: Set up Python
-      uses: actions/setup-python@v3.1.2
-      with:
-        python-version: 3.9
-        architecture: x64
-        cache: 'poetry'
-
     - name: Find Pull Request
       uses: juliangruber/find-pull-request-action@v1
       id: find-pull-request
@@ -72,6 +52,26 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
           [The requested publish operation is now running.](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) :rocket:
+
+    - name: Validation version input
+      id: validate-version-sequence
+      uses: ./.github/actions/validate-version-sequence
+      with:
+        version-proposed: $VERSION
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        # Version of Poetry to use
+        version: 1.1.13
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Set up Python
+      uses: actions/setup-python@v3.1.2
+      with:
+        python-version: 3.9
+        architecture: x64
+        cache: 'poetry'
 
     - name: Poetry install
       run: |
