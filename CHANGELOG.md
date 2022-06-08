@@ -19,27 +19,31 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## 2.0.0 - (2022-06-08)
 
-- [#3348](https://github.com/meltano/meltano/issues/3348) Add feature flag for raising exceptions when unset environment variables are referenced in settings.
-
----
+_**Meltano 2.0** is a major update with multiple new features and some breaking changes. See our [2.0 Migration Guide](https://docs.meltano.com/reference/v2-migration) for more information._
 
 ### New
 
 - [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
-
-- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX
+- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX.
+- [#3348](https://github.com/meltano/meltano/issues/3348) Add [`env_var_strict_mode`](https://docs.meltano.com/reference/settings#ffenv_var_strict_mode) feature flag to raise an exception if unset environment variables are referenced in settings.
+- [#6060](https://github.com/meltano/meltano/pull/6060) Generate lockfiles when running `meltano add` to install new plugins (now enabled by default).
 
 ### Changes
-- [#3173](https://gitlab.com/meltano/meltano/-/issues/3173) Add tests and clarify docs for environment variable resolution.
 
-- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
-
-- [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies replaces  implicitly "related" plugins
+- [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies using `requires:` replaces implicitly "related" plugins.
+- [#5927](https://github.com/meltano/meltano/pull/5927) Remove `env_aliases` references and feature.
+- [#5957](https://github.com/meltano/meltano/pull/5957) Removed the `--include-related` CLI flag. 
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for the legacy "Dashboards" and "Explore" UX in Meltano UI.
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for legacy `model` and `dashboard` plugin types.
+- [#6043](https://github.com/meltano/meltano/pull/6034) Let Meltano settings be stored under environments.
 
 ### Fixes
 
 - [#5979](https://github.com/meltano/meltano/issues/5979) Fixes `meltano remove` bug where lock files were not removed if they include a variant in the file name.
 
+### Under the Hood
+
+- Improved [telemetry](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry) coverage across the product.
 
 ## 1.105.0 - (2022-05-19)
 ---
