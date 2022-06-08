@@ -2,6 +2,7 @@
 title: Settings
 description: Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 layout: doc
+weight: 2
 ---
 
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
@@ -1025,14 +1026,15 @@ Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` set
 
 ## Feature Flags
 
-### <a name="ff-lock-files"></a>`ff.lock_files`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_LOCK_FILES`
-- Default: `False`
-
-Enables the lockfile mechanism to keep stable and version controlled plugin definitions within a Meltano project.
 
 ### <a name="ff-enable-uvicron"></a>`ff.enable_uvicorn`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
 - Default: `False`
+
+### <a name="ff-env-var-strict-mode"></a>`ff.env_var_strict_mode`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENV_VAR_STRICT_MODE`
+- Default: `False`
+
+Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.
