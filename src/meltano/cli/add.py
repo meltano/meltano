@@ -140,13 +140,16 @@ def add(  # noqa: WPS238
             tracker.track_command_event(cli_tracking.ABORTED)
             raise
 
-        tracker.track_command_event(cli_tracking.STARTED)
         legacy_tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
         required_plugins = add_required_plugins(
             project, plugins, add_service=add_service
         )
     plugins.extend(required_plugins)
+    tracker.add_contexts(
+        PluginsTrackingContext([(candidate, None) for candidate in plugins])
+    )
+    tracker.track_command_event(cli_tracking.STARTED)
 
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
