@@ -11,7 +11,8 @@
     "properties": {
         "command": {
             "description": "",
-            "type": "string"
+            "type": "string",
+            "maxLength": 1024
         },
         "sub_command": {
             "description": "",

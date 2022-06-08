@@ -100,8 +100,7 @@
     },
     "required": [
         "context_uuid",
-        "plugins",
-        "does not exist"
+        "plugins"
     ],
     "additionalProperties": false
 }
