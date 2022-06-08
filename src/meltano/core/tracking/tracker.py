@@ -268,7 +268,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 category=category,
                 action=action,
                 label=str(self.project_id),
-                contexts=self.contexts,
+                context=self.contexts,
             )
         except Exception as err:
             logger.debug(
