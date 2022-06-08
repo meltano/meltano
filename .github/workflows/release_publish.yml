@@ -82,7 +82,7 @@ jobs:
 
     - name: Publish to PyPi
       run: |
-        Publish the sdist
+        # Publish the sdist
         ln -s dist
         echo "Simulating `poetry publish`..."
         # poetry publish  # TODO: uncomment this
