@@ -107,7 +107,7 @@ def invoke(
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
         tracker.track_command_event(cli_tracking.STARTED)
-    except PluginNotFoundError as err:
+    except PluginNotFoundError:
         tracker.track_command_event(cli_tracking.STARTED)
         tracker.track_command_event(cli_tracking.ABORTED)
         raise err
