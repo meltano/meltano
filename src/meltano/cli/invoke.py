@@ -78,17 +78,17 @@ def invoke(
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
     tracker = Tracker(project)
-    cmd_ctx = cli_context_builder(
-        "invoke",
-        None,
-        plugin_type=plugin_type,
-        dump=dump,
-        list_commands=list_commands,
-        containers=containers,
-        print_var=print_var,
+    tracker.add_contexts(
+        cli_context_builder(
+            "invoke",
+            None,
+            plugin_type=plugin_type,
+            dump=dump,
+            list_commands=list_commands,
+            containers=containers,
+            print_var=print_var,
+        )
     )
-    with tracker.with_contexts(cmd_ctx):
-        tracker.track_command_event(cli_tracking.STARTED)
 
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -105,12 +105,15 @@ def invoke(
         plugin = plugins_service.find_plugin(
             plugin_name, plugin_type=plugin_type, invokable=True
         )
+        tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
+        tracker.track_command_event(cli_tracking.STARTED)
     except PluginNotFoundError as err:
-        with tracker.with_contexts(cmd_ctx):
-            tracker.track_command_event(cli_tracking.ABORTED)
+        tracker.track_command_event(cli_tracking.STARTED)
+        tracker.track_command_event(cli_tracking.ABORTED)
         raise err
 
     if list_commands:
+        tracker.track_command_event(cli_tracking.COMPLETED)
         do_list_commands(plugin)
         return
 
@@ -130,17 +133,14 @@ def invoke(
             )
         )
     except Exception as invoke_err:
-        with tracker.with_contexts(cmd_ctx):
-            tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(cli_tracking.FAILED)
         raise invoke_err
 
-    with tracker.with_contexts(
-        cmd_ctx, PluginsTrackingContext([(plugin, command_name)])
-    ):
-        if exit_code == 0:
-            tracker.track_command_event(cli_tracking.COMPLETED)
-        else:
-            tracker.track_command_event(cli_tracking.FAILED)
+    if exit_code == 0:
+        tracker.track_command_event(cli_tracking.COMPLETED)
+    else:
+        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(cli_tracking.FAILED)
     sys.exit(exit_code)
 
 
