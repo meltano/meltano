@@ -26,7 +26,7 @@ jobs:
       pull-requests: write  # to create and update PRs
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Validation version input
       if: ${{ github.event.inputs.force != 'true' }}
