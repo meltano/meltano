@@ -95,6 +95,11 @@ def default_config(log_level: str) -> dict:
                 "handlers": ["console"],
                 "level": logging.ERROR,
             },
+            "urllib3": {
+                "handlers": ["console"],
+                "level": logging.INFO,
+                "propagate": False,
+            },
         },
     }
 
