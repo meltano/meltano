@@ -52,14 +52,14 @@ jobs:
         # https://github.com/actions/setup-python
         python-version: 3.9
         architecture: x64
-        # cache: 'poetry'
-    # - name: Poetry install
-    #   run: |
-    #     poetry install
-    - name: Pip install tools
+        cache: 'poetry'
+    - name: Poetry install
       run: |
-        pipx install --include-deps bumpversion
-        pipx install changelog-cli
+        poetry install
+    # - name: Pip install tools
+    #   run: |
+    #     pipx install --include-deps bumpversion
+    #     pipx install changelog-cli
 
     - name: Bump version
       run: |
@@ -95,9 +95,11 @@ jobs:
     #     version: ${{ github.event.inputs.version }}
     #     commitish: release/${{ github.event.inputs.version }}
 
-    - name: Approve Pull Request
-      uses: juliangruber/approve-pull-request-action@v1.1.1
-      with:
-        # https://github.com/juliangruber/approve-pull-request-action
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+    # Cannot approve own pull request.
+    # TODO: Consider approving as Melty-Bot using a token
+    # - name: Approve Pull Request
+    #   uses: juliangruber/approve-pull-request-action@v1.1.1
+    #   with:
+    #     # https://github.com/juliangruber/approve-pull-request-action
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     number: ${{ steps.create-pull-request.outputs.pull-request-number }}
