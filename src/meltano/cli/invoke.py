@@ -110,7 +110,7 @@ def invoke(
     except PluginNotFoundError:
         tracker.track_command_event(cli_tracking.STARTED)
         tracker.track_command_event(cli_tracking.ABORTED)
-        raise err
+        raise
 
     if list_commands:
         do_list_commands(plugin)
