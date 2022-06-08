@@ -64,7 +64,7 @@ jobs:
         echo "Adding changelog to git..."
         git add CHANGELOG.md
         echo "Bumping version entries..."
-        poetry run bumpversion $BUMP_TYPE --tag --allow-dirty --new-version=$NEW_VER
+        poetry run bumpversion $BUMP_TYPE --new-version=$NEW_VER --allow-dirty --no-commit --no-tag
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
