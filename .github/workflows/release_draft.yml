@@ -64,20 +64,20 @@ jobs:
         echo "Bumping version entries..."
         poetry run bumpversion "$BUMP_TYPE" --new-version="$NEW_VER" --allow-dirty --no-commit --no-tag
 
-    # - name: Create Pull Request
-    #   uses: peter-evans/create-pull-request@v4
-    #   id: create-pull-request
-    #   with:
-    #     # https://github.com/peter-evans/create-pull-request
-    #     commit-message: version bump (auto)
-    #     title: Release v${{ github.event.inputs.version }}
-    #     body: |
-    #       Bump changelog for release v${{ github.event.inputs.version }}
-    #     branch: release/v${{ github.event.inputs.version }}
-    #     base: main
-    #     labels: release
-    #     # committer: GitHub <noreply@github.com>
-    #     # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
+      id: create-pull-request
+      with:
+        # https://github.com/peter-evans/create-pull-request
+        commit-message: version bump (auto)
+        title: Release v${{ github.event.inputs.version }}
+        body: |
+          Bump changelog for release v${{ github.event.inputs.version }}
+        branch: release/v${{ github.event.inputs.version }}
+        base: main
+        labels: release
+        # committer: GitHub <noreply@github.com>
+        # author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
     # - uses: actions/checkout@v2
 
     - name: Create release draft
