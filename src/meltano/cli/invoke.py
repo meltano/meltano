@@ -154,6 +154,7 @@ async def _invoke(
     command_name: str,
     containers: bool,
     print_var: list | None = None,
+    tracker: Tracker = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
@@ -190,7 +191,7 @@ async def _invoke(
     finally:
         session.close()
 
-    tracker = LegacyTracker(project)
+    tracker = LegacyTracker(project, tracker.contexts)
     tracker.track_meltano_invoke(
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )
