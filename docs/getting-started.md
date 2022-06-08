@@ -93,9 +93,9 @@ version: 1
 default_environment: dev
 project_id: <random UUID>
 environments:
-- name: dev
-- name: staging
-- name: prod
+  - name: dev
+  - name: staging
+  - name: prod
 ```
 
 The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), or [pipeline schedules](/concepts/project#schedules) yet, but does include 3 [environments](/concepts/environments) that you can use if you wish.
@@ -157,9 +157,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if an extractor for your data source is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-    ```bash
-    meltano discover extractors
-    ```
+        ```bash
+        meltano discover extractors
+        ```
 
 1.  Depending on the result, pick your next step:
 
@@ -277,51 +277,64 @@ extractors:
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 </div>
 
-1. Find out what settings your extractor supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
+1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
    ```bash
-   meltano config <plugin> list
+   meltano config <plugin> interactive
 
    # For example:
-   meltano config tap-gitlab list
+   meltano config tap-gitlab interactive
    ```
 
-1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
+Follow the prompts to step through all available settings, or select an individual setting to configure.
 
-   <div class="notification is-info">
-     <p>
-       <strong>See <a href="https://hub.meltano.com/extractors/gitlab#private-token">MeltanoHub for details</a> on how to get a GitLab `private_token` for tap-gitlab.</strong>
-     </p>
-   </div>
+You can also optionally use the `list`, `set` and `unset` commands directly to view and change plugin configuration:
 
-   ```bash
-   meltano config <plugin> set <setting> <value>
+- Find out what settings your extractor supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
 
-   # For example:
-   meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
-   meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
-   meltano config tap-gitlab set private_token my_private_token
-   ```
+  ```bash
+  meltano config <plugin> list
 
-   This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
+  # For example:
+  meltano config tap-gitlab list
+  ```
 
-   ```yml
-   environments:
-     - name: dev
-       config:
-         plugins:
-           extractors:
-             - name: tap-gitlab
-               config:
-                 projects: meltano/meltano meltano/tap-gitlab
-                 start_date: "2021-10-01T00:00:00Z"
-   ```
+- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
 
-   Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
+    <div class="notification is-info">
+      <p>
+        <strong>See <a href="https://hub.meltano.com/extractors/gitlab#private-token">MeltanoHub for details</a> on how to get a GitLab `private_token` for tap-gitlab.</strong>
+      </p>
+    </div>
 
-   ```bash
-   export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
-   ```
+  ```bash
+  meltano config <plugin> set <setting> <value>
+
+  # For example:
+  meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
+  meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
+  meltano config tap-gitlab set private_token my_private_token
+  ```
+
+  This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
+
+  ```yml
+  environments:
+    - name: dev
+      config:
+        plugins:
+          extractors:
+            - name: tap-gitlab
+              config:
+                projects: meltano/meltano meltano/tap-gitlab
+                start_date: "2021-10-01T00:00:00Z"
+  ```
+
+  Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
+
+  ```bash
+  export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
+  ```
 
 1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/reference/command-line-interface#config):
 
