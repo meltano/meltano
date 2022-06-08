@@ -58,7 +58,7 @@ jobs:
       id: find-pull-request
       with:
         # https://github.com/juliangruber/find-pull-request-action
-        branch: release/v$VERSION
+        branch: release/v${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
     - run: echo "Pull Request ${number} (${sha})"
       env:
         number: ${{ steps.find-pull-request.outputs.number }}
