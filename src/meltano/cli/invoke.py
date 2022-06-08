@@ -113,8 +113,8 @@ def invoke(
         raise err
 
     if list_commands:
-        tracker.track_command_event(cli_tracking.COMPLETED)
         do_list_commands(plugin)
+        tracker.track_command_event(cli_tracking.COMPLETED)
         return
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
