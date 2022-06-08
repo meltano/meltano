@@ -2,7 +2,7 @@
 title: Analyze Data
 description: Learn how to analyze data using Meltano and Superset.
 layout: doc
-weight: 6
+weight: 7
 ---
 
 Once you have your data cleaned up and ready for consumption, Meltano lets you easily install and configure best in class open source business intelligence tools like [Superset](https://superset.apache.org/).
