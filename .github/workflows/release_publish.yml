@@ -66,6 +66,9 @@ jobs:
         number: ${{ steps.find-pull-request.outputs.number }}
         sha: ${{ steps.find-pull-request.outputs.head-sha }}
 
+    - name: Poetry install
+      run: |
+        poetry install
     - name: Add release file marker
       run: |
         cd ./meltano/dist
