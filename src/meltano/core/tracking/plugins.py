@@ -34,7 +34,7 @@ def plugins_tracking_context_from_elt_context(
         plugins.append((elt_context.extractor.plugin, None))
         plugins.append((elt_context.loader.plugin, None))
     if elt_context.transformer:
-        plugins.append((elt_context.transform.plugin, None))
+        plugins.append((elt_context.transformer.plugin, None))
     return PluginsTrackingContext(plugins)
 
 
