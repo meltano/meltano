@@ -1,0 +1,91 @@
+name: 'Local Action'
+description: 'Runs a composite step action'
+inputs:
+  version-proposed:
+    required: true
+    description: "Version proposed"
+  allow-no-change:
+    required: false
+    description: "Allow no change"
+    default: 'true'
+  expect-no-change:
+    required: false
+    description: "Expect no change"
+    default: 'false'
+  expect-prerelease:
+    required: false
+    description: "Expect prerelease"
+    default: 'false'
+  validate-git-ref:
+    required: false
+    description: "Require the new version number to match the git branch or tag name"
+    default: 'false'
+
+  name:
+    required: true
+    description: "Name"
+
+outputs:
+  bump-type:
+    description: "The bump type. One of: ['major', 'minor', 'patch']"
+    value: ${{ steps.step1.outputs.random }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    # - name: Show inputs
+    #   shell: bash
+    #   run: |
+    #     echo CURRENT=(TODO)
+    #     echo PROPOSED=${{ inputs.version-proposed }}
+    - id: sample-step  # TODO: remove
+      shell: bash
+      run: |
+        echo Hello ${{ inputs.name }}
+        echo List directory files
+        ls
+        echo "::set-output name=random::$(echo $RANDOM)"
+    - name: Detect current version and release version
+      id: detect-versions
+      shell: bash
+      run: |
+        echo "Detecting current version number..."
+        CURR_VER="$(bumpversion major --allow-dirty --dry-run --list | grep current_version= | cut -d'=' -f2)"
+        RELEASE_VER="${CI_COMMIT_REF_NAME#release/v}"
+        echo "Detected current version '$CURR_VER' and release version '$RELEASE_VER'"
+        echo "::set-output name=current-version::$(echo $CURR_VER)"
+        echo "::set-output name=release-version::$(echo $RELEASE_VER)"
+    - name: Check against release version
+      id: check-release-version
+      if: ${{ inputs.validate-git-ref }} == 'true'
+      shell: bash
+      run: |
+        CURR_VER=${{ steps.detect-versions.outputs.current-version }}
+        RELEASE_VER=${{ steps.detect-versions.outputs.release-version }}
+    - name: Get bump type
+      id: get-bump-type
+      shell: bash
+      run: |
+        CURR_VER=${{ steps.detect-versions.outputs.current-version }}
+        NEW_VER=${{ inputs.version-proposed }}
+        [[ "$CURR_VER" == "" ]] && echo "Could not detect current version" && exit 1
+        [[ "$NEW_VER" == "" ]] && echo "Could not detect release version" && exit 1
+        [[ "$NEW_VER" == "$CURR_VER" ]] && echo "Version is already bumped. Aborting job." && exit 0
+        MAJOR_BUMP="$(bumpversion major --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
+        MINOR_BUMP="$(bumpversion minor --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
+        PATCH_BUMP="$(bumpversion patch --allow-dirty --dry-run --list | grep new_version= | cut -d'=' -f2)"
+        [[ $NEW_VER = $MAJOR_BUMP ]] && BUMP_TYPE="major"
+        [[ $NEW_VER = $MINOR_BUMP ]] && BUMP_TYPE="minor"
+        [[ $NEW_VER = $PATCH_BUMP ]] && BUMP_TYPE="patch"
+        echo "::set-output name=bump-type::$(echo $BUMP_TYPE)"
+    - name: Validate version bump
+      id: get-bump-type
+      shell: bash
+      run: |
+        CURR_VER=${{ steps.detect-versions.outputs.current-version }}
+        NEW_VER=${{ inputs.version-proposed }}
+        BUMP_TYPE=${{ steps.get-bump-type.outputs.bump-type }}
+        [[ "$BUMP_TYPE" == "" ]] && echo "Could not detect version bump type from version text '$NEW_VER'" && exit 1
+        echo "Detected bump type '$BUMP_TYPE' from '$CURR_VER' to '$NEW_VER'"

@@ -1,0 +1,92 @@
+name: Release publish (/publish)
+
+# Responds to /publish slack commands
+#
+# The `/publish` slash command requires write admin on the repo and it takes
+# one required `VERSION` argument.
+#
+# Usage:
+# ```
+# /publish VERSION
+#
+# Some optional description here.
+# ````
+# Examples:
+# /publish vX.Y.Z
+
+on:
+  repository_dispatch:
+    types:
+    - publish-command
+
+jobs:
+  publish_release:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      VERSION: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+      PR_NUMBER: ${{ github.event.client_payload.github.payload.issue.number }}
+    permissions:
+      contents: write  # for release-drafter/release-drafter to create a github release
+      pull-requests: write  # for release-drafter/release-drafter to add label to PR
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Validation version input
+      id: validate-version-sequence
+      uses: ./.github/actions/validate-version-sequence
+      with:
+        version-proposed: $VERSION
+        allow-no-change: true
+        validate-git-ref: true
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+        cache: 'poetry'
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        # Version of Poetry to use
+        version: 1.1.13
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Find Pull Request
+      uses: juliangruber/find-pull-request-action@v1
+      id: find-pull-request
+      with:
+        # https://github.com/juliangruber/find-pull-request-action
+        branch: my-branch-name
+    - run: echo "Pull Request ${number} (${sha})"
+      env:
+        number: ${{ steps.find-pull-request.outputs.number }}
+        sha: ${{ steps.find-pull-request.outputs.head-sha }}
+
+    - name: Add release file marker
+      run: |
+        pushd /meltano/dist
+        ARCHIVE="$(sh -c 'echo "$1"' sh meltano*.tar.gz)"
+        DIR="$(basename $ARCHIVE .tar.gz)"
+        tar -xvzf "$ARCHIVE"
+        touch "$DIR/src/meltano/core/tracking/.release_marker"
+        tar -cvzf "$ARCHIVE" "$DIR"
+        popd
+
+    - name: Publish to PyPi
+      run: |
+        Publish the sdist
+        ln -s /meltano/dist
+        echo "Simulating `poetry publish`..."
+        # poetry publish  # TODO: uncomment this
+
+    - name: Add reaction
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+        comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+        reaction-type: hooray

@@ -1,0 +1,18 @@
+name: Release publish (/publish)
+
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  publish_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slash Command Dispatch
+        uses: peter-evans/slash-command-dispatch@v3
+        with:
+          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          issue-type: pull-request
+          permission:
+            write
+          commands: |
+            publish
