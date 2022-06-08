@@ -4,7 +4,7 @@ description: Learn how to manage and monitor your plugins and pipelines using Me
 layout: doc
 redirect_from:
   - /guide/ui/
-weight: 10
+weight: 3
 ---
 
 Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
