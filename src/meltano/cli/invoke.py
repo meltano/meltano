@@ -140,7 +140,6 @@ def invoke(
         tracker.track_command_event(cli_tracking.COMPLETED)
     else:
         tracker.track_command_event(cli_tracking.FAILED)
-        tracker.track_command_event(cli_tracking.FAILED)
     sys.exit(exit_code)
 
 
