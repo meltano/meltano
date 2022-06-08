@@ -58,13 +58,13 @@ jobs:
 
     - name: Bump version
       run: |
-        $BUMP_TYPE="${{ steps.validate-version-sequence.outputs.bump-type }}"
+        BUMP_TYPE="${{ steps.validate-version-sequence.outputs.bump-type }}"
         echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
-        changelog release --$BUMP_TYPE --yes
+        poetry run changelog release --$BUMP_TYPE --yes
         echo "Adding changelog to git..."
         git add CHANGELOG.md
         echo "Bumping version entries..."
-        bumpversion $BUMP_TYPE --tag --allow-dirty --new-version=$NEW_VER
+        poetry run bumpversion $BUMP_TYPE --tag --allow-dirty --new-version=$NEW_VER
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
