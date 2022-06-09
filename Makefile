@@ -113,14 +113,11 @@ sdist: freeze_db bundle
 	poetry build
 
 # sdist_public:
-# Run sdist to clean and package, add release marker
-sdist_public: sdist mark_release
-
-# mark_release:
-# Build the source distribution and include 'release marker' to properly 
-# categorize implementations 'in the wild' versus our own dev builds and tests
-mark_release:
+# Same as sdist, except add release marker before poetry build
+# The release marker differentiates installations 'in the wild' versus inernal dev builds and tests
+sdist_public: freeze_db bundle
 	touch src/meltano/core/tracking/.release_marker
+	poetry build
 
 docker_sdist: base_image
 	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
@@ -207,7 +204,6 @@ explain_makefile:
 # Note:
 # - this code is old and may be stale.
 # - process currently runs in CI
-
 release:
 	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
 	yes | poetry run changelog release --$(type)
