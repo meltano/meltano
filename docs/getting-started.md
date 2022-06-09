@@ -777,7 +777,7 @@ meltano run <extractor> <loader> <other_plugins>
 
 # For example:
 meltano run tap-gitlab target-postgres
-meltano run tap-gitlab target-postgres dbt:test dbt:run #if you already have dbt configured
+meltano run tap-gitlab target-postgres dbt-postgres:test dbt-postgres:run #if you already have dbt configured
 ```
 
 Or directly using the `meltano invoke`, which requires more settings to be defined prior to running
@@ -991,12 +991,12 @@ Refer to the [transformers page](https://hub.meltano.com/transformers/) on Melta
    meltano run <extractor> <loader> <other_plugins>
 
    # For example:
-   meltano run tap-gitlab target-postgres dbt:test dbt:run tap-postgres target-gsheet
+   meltano run tap-gitlab target-postgres dbt-postgres:test dbt-postgres:run tap-postgres target-gsheet
    ```
 
    After your transform run is complete, you should see a new table named after your model `warehouse.analytics.commits_last_7d` in your target.
 
-   See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) from other supported dbt commands like `dbt:test`, `dbt:seed`, `dbt:snapshot` and selection criteria like `dbt:run --models tap_gitlab.*`.
+   See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) from other supported dbt commands like `dbt-postgres:test`, `dbt-postgres:seed`, `dbt-postgres:snapshot` and selection criteria like `dbt-postgres:run --models tap_gitlab.*`.
 
 ### Analyze Your Data with Superset
 
