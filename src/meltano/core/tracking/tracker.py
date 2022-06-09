@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import datetime
+import atexit
 import json
 import locale
 import re
 import uuid
 from contextlib import contextmanager
+from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -15,6 +16,7 @@ from urllib.parse import urlparse
 
 import tzlocal
 from cached_property import cached_property
+from psutil import Process
 from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 from structlog.stdlib import get_logger
@@ -115,6 +117,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             self.snowplow_tracker = SnowplowTracker(emitters=emitters)
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
+            atexit.register(self.track_exit_event)
         else:
             self.snowplow_tracker = None
 
@@ -207,7 +210,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         try:
             return tzlocal.get_localzone_name()
         except Exception:
-            return datetime.datetime.now().astimezone().tzname()
+            return datetime.now().astimezone().tzname()
 
     def add_contexts(self, *extra_contexts):
         """Permanently add additional Snowplow contexts to the `Tracker`.
@@ -425,5 +428,27 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             SelfDescribingJson(
                 f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
                 {"type": block_type, "event": event.name},
+            )
+        )
+
+    def track_exit_event(self):
+        from meltano.cli import exit_code
+
+        start_time = datetime.utcfromtimestamp(Process().create_time())
+
+        # This is the reported "end time" for this process, though in reality the process will end
+        # a short time after this time as it takes time to emit the event.
+        now = datetime.utcnow()
+
+        self.track_unstruct_event(
+            SelfDescribingJson(
+                "iglu:com.meltano/exit_event/jsonschema/1-0-0",
+                {
+                    "exit_code": exit_code,
+                    "exit_timestamp": now.isoformat() + "Z",
+                    "process_duration_microseconds": int(
+                        (now - start_time).total_seconds() * 1000000
+                    ),
+                },
             )
         )
