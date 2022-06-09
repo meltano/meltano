@@ -37,6 +37,10 @@ from . import (  # isort:skip # noqa: F401, WPS235
     job,
 )
 
+# Holds the exit code for error reporting during process exiting. In particular, a function
+# registered by the `atexit` module uses this value.
+exit_code: None | int = None
+
 setup_logging()
 
 logger = logging.getLogger(__name__)
@@ -58,9 +62,6 @@ def _run_cli():
     except CliError as cli_error:
         cli_error.print()
         sys.exit(1)
-
-
-exit_code = None
 
 
 def main():
