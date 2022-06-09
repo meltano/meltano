@@ -147,7 +147,7 @@ def config(  # noqa: WPS231
     ),
 )
 @click.option("--extras", is_flag=True)
-@pass_project(migrate=True)
+@click.pass_context
 def list_settings(ctx, extras: bool):
     """List all settings for the specified plugin with their names, environment variables, and current values."""
     settings = ctx.obj["settings"]
@@ -247,7 +247,7 @@ def reset(ctx, store):
     try:
         metadata = settings.reset(store=store, session=session)
     except StoreNotSupportedError as err:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(cli_tracking.ABORTED)
         raise CliError(
             f"{settings.label.capitalize()} settings in {store.label} could not be reset: {err}"
         ) from err
@@ -272,7 +272,7 @@ def reset(ctx, store):
 def set_(ctx, setting_name, value, store):
     """Set the configurations' setting `<name>` to `<value>`."""
     store = SettingValueStore(store)
-
+    tracker = ctx.obj["tracker"]
     try:
         value = json.loads(value)
     except json.JSONDecodeError:
@@ -287,6 +287,7 @@ def set_(ctx, setting_name, value, store):
             path, value, store=store, session=session
         )
     except StoreNotSupportedError as err:
+        tracker.track_command_event(cli_tracking.ABORTED)
         raise CliError(
             f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
         ) from err
@@ -304,6 +305,7 @@ def set_(ctx, setting_name, value, store):
             f"Current value is still: {current_value!r} (from {source.label})",
             fg="yellow",
         )
+    tracker.track_command_event(cli_tracking.COMPLETED)
 
 
 @config.command("test")
@@ -357,7 +359,7 @@ def unset(ctx, setting_name, store):
     try:
         metadata = settings.unset(path, store=store, session=session)
     except StoreNotSupportedError as err:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(cli_tracking.ABORTED)
         raise CliError(
             f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
         ) from err
