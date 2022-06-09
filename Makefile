@@ -118,6 +118,7 @@ sdist: freeze_db bundle
 sdist_public: freeze_db bundle
 	touch src/meltano/core/tracking/.release_marker
 	poetry build
+	echo "Builds complete. You can now publish to PyPi using 'poetry publish'."
 
 docker_sdist: base_image
 	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
