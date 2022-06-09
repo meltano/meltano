@@ -54,8 +54,11 @@ jobs:
         poetry install
 
     - name: Run pytest
-      run: |
-        poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS" -k test_link_io -vvv
+      run: >
+        poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS"
+        tests/meltano/core/test_environment_variables.py
+        tests/meltano/core/block
+        -vvv
 
     - name: Upload coverage data
       if: always() && (matrix.python-version == '3.9')
