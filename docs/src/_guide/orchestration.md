@@ -20,7 +20,7 @@ Then you can schedule it directly using the `meltano schedule add` command:
 
 ```bash
 # Define a job
-meltano job add tap-gitlab-to-target-postgres-with-dbt --tasks "tap-gitlab target-postgres dbt:run"
+meltano job add tap-gitlab-to-target-postgres-with-dbt --tasks "tap-gitlab target-postgres dbt-postgres:run"
 
 # Schedule the job
 meltano schedule add daily-gitlab-load --job tap-gitlab-to-target-postgres-with-dbt --interval '@daily'

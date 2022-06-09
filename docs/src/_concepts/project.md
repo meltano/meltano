@@ -276,7 +276,7 @@ typically [created](/guide/orchestration#create-a-schedule)
 using [`meltano schedule`](/reference/command-line-interface#schedule),
 are defined under the `schedules` property.
 
-A schedule definition must have a `name`, `job` and `interval`:
+A scheduled job must have a `name`, `job` and `interval`:
 
 ```yaml
 schedules:

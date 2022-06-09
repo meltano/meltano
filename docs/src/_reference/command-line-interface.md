@@ -781,7 +781,7 @@ jobs:
   - name: tap-gitlab-to-target-postgres-processed-multiple-tasks
     tasks:
       - tap-gitlab hide-gitlab-secrets target-postgres
-      - dbt:run
+      - dbt-postgres:run
 ```
 
 While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting of a single task while scheduling the latter will result in a generated DAG consisting of two tasks.
@@ -792,7 +792,7 @@ While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgr
 # Add a new job named "simple-demo" that contains two tasks
 # Task 1: tap-gitlab hide-gitlab-secrets target-mysql
 # Task 2: tap-gitlab target-csv
-meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-mysql dbt:run, tap-gitlab target-csv]"
+meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run, tap-gitlab target-csv]"
 
 # list the job named "simple-demo"
 meltano job list simple-demo --format=json
