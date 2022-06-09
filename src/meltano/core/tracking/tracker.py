@@ -315,7 +315,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             to_value: the new value
         """
         if self.snowplow_tracker is None:
-            return # The Snowplow tracker is not available (e.g. because no endpoints are set)
+            return  # The Snowplow tracker is not available (e.g. because no endpoints are set)
 
         logger.debug(
             "Telemetry state change detected. A one-time "
