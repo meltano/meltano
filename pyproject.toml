@@ -12,8 +12,14 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 include = [
+  # Explicitly include non-Python files and gitignored files:
   "LICENSE",
-  "*.m5o"
+  "*.m5o",
+  "src/meltano/api/static/css/*",
+  "src/meltano/api/static/js/*",
+  "src/meltano/api/templates/webapp.html",
+  "src/meltano/api/templates/embed.html",
+  "src/meltano/core/tracking/.release_marker"
 ]
 
 [tool.poetry.dependencies]
