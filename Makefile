@@ -110,7 +110,7 @@ freeze_db:
 # Build the source distribution
 # Note: plese use `sdist-public` for the actual release build
 sdist: freeze_db bundle
-	poetry build -f sdist
+	poetry build
 
 # sdist_public:
 # Run sdist but first install release marker
