@@ -713,6 +713,11 @@ You can also schedule jobs using [`meltano schedule`](#schedule).
 meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
 
 # Add a new job with multiple tasks by passing arrays in yaml format, where each item represents a run command.
+# This will generate one task per array element:
+# task 1: <tap_name> <target_name>
+# task 2: <command>
+# task 3: <tap2_name> <target2_name>
+# etc.
 meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
 
 # Update an existing job with new tasks
