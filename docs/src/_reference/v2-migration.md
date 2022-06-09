@@ -1079,10 +1079,10 @@ In 2.0, many references to "Job ID" in our code and docs were changed to the mor
 If you are explicitly providing a `--job-id` option to any scripted or otherwise automated CLI workflows, these commands should be updated to use the `--state-id` option instead.
 
 
-#### Schedule listing json format changes
-Note that if you have custom orchestrator integrations based on the `meltano schedule list` command, you will need make adjustments to handle the new output format.
+#### Schedule list format changes
+If you have custom orchestrator integrations based on the `meltano schedule list` command, you will need to make adjustments to handle a new output format.
 
-With the addition of support for scheduled jobs to `meltano schedule`, the schema output of `meltano schedule list --format=json` has changed.
+With the addition of support for scheduled jobs in 2.0, the schema output of `meltano schedule list --format=json` has changed.
 It now includes a top level field `schedules` and two nested array fields `job` and `elt` which hold and describe their respective schedules.
 
 ex:
