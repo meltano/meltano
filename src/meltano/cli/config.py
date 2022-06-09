@@ -18,6 +18,9 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
+from meltano.core.tracking import Tracker
+from meltano.core.tracking import cli as cli_tracking
+from meltano.core.tracking import cli_context_builder
 from meltano.core.utils import run_async
 
 from . import cli
@@ -54,6 +57,18 @@ def config(  # noqa: WPS231
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
     """
+    tracker = Tracker(project)
+    tracker.add_contexts(
+        cli_context_builder(
+            "config",
+            None,
+            plugin_type=plugin_type,
+            format=format,
+            extras=extras,
+        )
+    )
+    tracker.track_command_event(cli_tracking.STARTED)
+
     plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     plugins_service = ProjectPluginsService(project)
