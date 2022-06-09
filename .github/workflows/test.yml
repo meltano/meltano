@@ -55,7 +55,7 @@ jobs:
 
     - name: Run pytest
       run: |
-        poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS"
+        poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS" -k test_link_io -vvv
 
     - name: Upload coverage data
       if: always() && (matrix.python-version == '3.9')
