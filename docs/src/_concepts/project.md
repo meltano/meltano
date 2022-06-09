@@ -43,6 +43,7 @@ using [`meltano add`](/reference/command-line-interface#add),
 are defined under the `plugins` property, inside an array named after the [plugin type](/concepts/plugins#types) (e.g. `extractors`, `loaders`).
 
 Every plugin in your project needs to have:
+
 1. a `name` that's unique among plugins of the same type,
 2. a [base plugin description](/concepts/plugins#project-plugins) describing the package in terms Meltano can understand, and
 3. [configuration](/guide/configuration) that can be defined across [various layers](/guide/configuration#configuration-layers), including the definition's [`config` property](#plugin-configuration).
@@ -251,6 +252,7 @@ Commands can specify a `container_spec` for containerized execution. To execute 
         ports:
           "8080": "8080/tcp"
 ```
+
 ### Jobs
 
 Your project's predefined pipelines, typically created using [`meltano job`](/reference/command-line-interface#job), are defined under the `jobs` property.
@@ -259,15 +261,14 @@ A job definition must have a `name` and one or more `tasks`:
 
 ```yaml
 jobs:
-- name: tap-foo-to-target-bar-dbt
-  tasks:
-    - tap-foo target-bar dbt:run
-- name: tap-foo-to-targets-bar-and-baz
-  tasks:
-    - tap-foo target-bar
-    - tap-foo target-baz
+  - name: tap-foo-to-target-bar-dbt
+    tasks:
+      - tap-foo target-bar dbt:run
+  - name: tap-foo-to-targets-bar-and-baz
+    tasks:
+      - tap-foo target-bar
+      - tap-foo target-baz
 ```
-
 
 ### Schedules
 
@@ -280,14 +281,15 @@ A scheduled job must have a `name`, `job` and `interval`:
 
 ```yaml
 schedules:
-- name: foo-to-bar
-  job: tap-foo-to-target
-  interval: '@hourly'
+  - name: foo-to-bar
+    job: tap-foo-to-target
+    interval: "@hourly"
 ```
 
 The value for `job` must be the name of an existing [job](#jobs) within the project.
 
 Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and `interval` in place of a `job`:
+
 ```yaml
 - name: foo-to-bar-elt
   extractor: tap-foo
@@ -314,13 +316,13 @@ To learn more about pipeline schedules and orchestration, refer to the [Orchestr
 
 As your project grows, and your `meltano.yml` with it, you may wish to break your config into multiple `.yml` files and to store those subfiles in various places in your Project folder hierachy.
 
-This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](https://en.wikipedia.org/wiki/Glob_(programming))) to the `include_paths` key of your `meltano.yml`:
+This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](<https://en.wikipedia.org/wiki/Glob_(programming)>)) to the `include_paths` key of your `meltano.yml`:
 
 ```yaml
 include_paths:
-  - './subconfig_[0-9].yml'
-  - './*/subconfig_[0-9].yml'
-  - './*/**/subconfig_[0-9].yml'
+  - "./subconfig_[0-9].yml"
+  - "./*/subconfig_[0-9].yml"
+  - "./*/**/subconfig_[0-9].yml"
 ```
 
 Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://github.com/meltano/meltano/issues/2925)).

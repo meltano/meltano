@@ -654,9 +654,9 @@ In addition to explicitly specifying plugin names you can also execute one or mo
 
 ```bash
 meltano run tap-gitlab target-postgres
-meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run
+meltano run tap-gitlab target-postgres dbt-postgres:clean dbt-postgres:test dbt-postgres:run
 meltano run tap-gitlab target-postgres tap-salesforce target-mysql
-meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
+meltano run tap-gitlab target-postgres dbt-postgres:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
 meltano run tap-gitlab one-mapping another-mapping target-postgres
 meltano run tap-gitlab target-postgres simple-job
@@ -738,8 +738,8 @@ Note that such a sequence is only valid if it is one of:
 
 1. An extractor followed directly by a loader. E.g. `tap-gitlab target-postgres`
 1. An extractor followed by one or more mappers and then a loader. E.g. `tap-gitlab hide-gitlab-secrets target-postgres`
-1. A plugin command invocation. E.g. `dbt:run`
-1. Any sequence of the above. E.g. `tap-gitlab hide-gitlab-secrets target-postgres dbt:run tap-zendesk target-csv`
+1. A plugin command invocation. E.g. `dbt-postgres:run`
+1. Any sequence of the above. E.g. `tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run tap-zendesk target-csv`
 
 If a job has only one task, that task can be supplied as a single quoted argument:
 
@@ -748,7 +748,7 @@ If a job has only one task, that task can be supplied as a single quoted argumen
 meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
 
 # A more complex task
-meltano job add tap-gitlab-to-target-postgres-processed --tasks "tap-gitlab hide-gitlab-secrets target-postgres dbt:run"
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run"
 ```
 
 This would add the following to your `meltano.yml`:
@@ -760,18 +760,22 @@ jobs:
       - tap-gitlab target-postgres
   - name: tap-gitlab-to-target-postgres-processed
     tasks:
-      - tap-gitlab hide-gitlab-secrets target-postgres dbt:run
+      - tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run
 ```
 
 When an Airflow DAG is generated for a job, each task in the job definition will become a single task in the generated DAG.
-So while it is certainly possible to define all your jobs using only one task each, it may sometimes be useful to split a job into multiple tasks.
+So while it is certainly possible to define all your jobs using only one task each, there are many scenarios in which it would
+be useful or even necessary to split your job into multiple tasks.
+For instance, job steps which must always run, fail, and be retried as a group should always be a part of the same task.
+And long-running job steps should likely be grouped into a separate task from shorter-running downstream steps so that those downstream steps can be rerun on their own.
+
 Each individual task must itself be a valid sequence of extractors, mappers, loaders, and plugin commands.
 When multiple tasks are defined in a job, they should be supplied to the `meltano job add` command as an array in YAML format.
 
 For instance the `tap-gitlab-to-target-postgres-processed` job in the above example could also be created as:
 
 ```bash
-meltano job add tap-gitlab-to-target-postgres-processed --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt:run]"
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt-postgres:run]"
 ```
 
 This would add the following to your `meltano.yml`:
