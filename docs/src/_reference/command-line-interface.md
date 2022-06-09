@@ -701,8 +701,10 @@ Note that if no environment is active, `meltano run` _does not_ generate a state
 
 ## `job`
 
-Use the `job` command to define one or more related tasks. A job can contain a single task, or many tasks. Today all tasks
-are run sequentially. You can run a specified job by passing the job name as an argument to `meltano run`. You can also schedule jobs using `meltano schedule`.
+Use the `job` command to define one or more sequences of tasks. A job can contain a single task, or many tasks.
+Today all tasks are run sequentially.
+You can run a specified job by passing the job name as an argument to [`meltano run`](#run).
+You can also schedule jobs using [`meltano schedule`](#schedule).
 
 ### How to use
 
@@ -710,7 +712,7 @@ are run sequentially. You can run a specified job by passing the job name as an 
 # Add a job with a single task representing a run command
 meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
 
-# Add a new job with multiple tasks by passing arrays in yaml format, where each item representing a run command.
+# Add a new job with multiple tasks by passing arrays in yaml format, where each item represents a run command.
 meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
 
 # Update an existing job with new tasks
@@ -729,15 +731,24 @@ meltano job list <job_name> --format=json
 meltano job remove <job_name>
 ```
 
-### Examples
+##### Tasks
 
-##### Tasks and Blocks
+A task should consist of the same format as arguments supplied to [the `meltano run` command](#run), which can be any valid sequence of extractors, mappers, loaders, and plugin commands.
+Note that such a sequence is only valid if it is one of:
 
-A task in a job consists of one or more _blocks_. A block is simply a set of related plugins that will be executed serially.
-For example, you can create a job that consists of a single tap and target:
+1. An extractor followed directly by a loader. E.g. `tap-gitlab target-postgres`
+1. An extractor followed by one or more mappers and then a loader. E.g. `tap-gitlab hide-gitlab-secrets target-postgres`
+1. A plugin command invocation. E.g. `dbt:run`
+1. Any sequence of the above. E.g. `tap-gitlab hide-gitlab-secrets target-postgres dbt:run tap-zendesk target-csv`
+
+If a job has only one task, that task can be supplied as a single quoted argument:
 
 ```bash
+# A task with a single extractor and loader
 meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
+
+# A more complex task
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "tap-gitlab hide-gitlab-secrets target-postgres dbt:run"
 ```
 
 This would add the following to your `meltano.yml`:
@@ -747,46 +758,35 @@ jobs:
   - name: tap-gitlab-to-target-postgres
     tasks:
       - tap-gitlab target-postgres
+  - name: tap-gitlab-to-target-postgres-processed
+    tasks:
+      - tap-gitlab hide-gitlab-secrets target-postgres dbt:run
 ```
 
-Plugins in the same block should be separated by a space and blocks should be separted by a comma.
+When an Airflow DAG is generated for a job, each task in the job definition will become a single task in the generated DAG.
+So while it is certainly possible to define all your jobs using only one task each, it may sometimes be useful to split a job into multiple tasks.
+Each individual task must itself be a valid sequence of extractors, mappers, loaders, and plugin commands.
+When multiple tasks are defined in a job, they should be supplied to the `meltano job add` command as an array in YAML format.
 
-You can also provide tasks in YAML format. For example, the following is equivalent to the above:
+For instance the `tap-gitlab-to-target-postgres-processed` job in the above example could also be created as:
 
 ```bash
-meltano job add tap-gitlab-to-target-postgres --tasks "[tap-gitlab target-postgres]"
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt:run]"
 ```
 
-Note that any single block which includes a tap _must_ also include a target and vice versa.
-The tap must also precede the target.
+This would add the following to your `meltano.yml`:
 
-All of the following are invalid:
-
-```bash
-# A block with a tap must also include a target.
-meltano job add invalid-job --tasks "tap-gitlab"
->>> Job 'invalid-job' has invalid tasks. block violates set requirements: Found no end in block set!
-
-# Within a block, a target must be preceded by a tap.
-meltano job add invalid-job --tasks target-postgres
->>> Job 'invalid-job' has invalid tasks. block violates set requirements: Unknown command type or bad block sequence at index 1, starting block 'target-postgres'
-
-# Blocks are separated by commas, so Meltano considers this tap and target as two separate invalid blocks.
-meltano job add invalid-job --tasks "tap-gitlab, target-postgres"
->>> Job 'invalid-job' has invalid tasks. Block tap-gitlab, not found
+```yaml
+jobs:
+  - name: tap-gitlab-to-target-postgres-processed-multiple-tasks
+    tasks:
+      - tap-gitlab hide-gitlab-secrets target-postgres
+      - dbt:run
 ```
 
-A job can consist of multiple blocks, which will be executed serially in the order they are provided:
+While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed` will run the same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting of a single task while scheduling the latter will result in a generated DAG consisting of two tasks.
 
-```bash
-# This job consists of two blocks:
-meltano add tap-gitlab-to-target-postgres-with-dbt --tasks "[tap-gitlab target-postgres, dbt:run]"
-
-# This job consists of one block, but runs the same three tasks in the same order as above. It is functionally equivalent to the comma-sparated approach.
-meltano add tap-gitlab-to-target-postgres-with-dbt-single-block --tasks "tap-gitlab target-postgres dbt:run"
-```
-
-##### Adding, listing, running, and removing:
+### Examples
 
 ```bash
 # Add a new job named "simple-demo" that contains two tasks

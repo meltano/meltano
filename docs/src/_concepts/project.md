@@ -251,23 +251,49 @@ Commands can specify a `container_spec` for containerized execution. To execute 
         ports:
           "8080": "8080/tcp"
 ```
+### Jobs
+
+Your project's predefined pipelines, typically created using [`meltano job`](/reference/command-line-interface#job), are defined under the `jobs` property.
+
+A job definition must have a `name` and one or more `tasks`:
+
+```yaml
+jobs:
+- name: tap-foo-to-target-bar-dbt
+  tasks:
+    - tap-foo target-bar dbt:run
+- name: tap-foo-to-targets-bar-and-baz
+  tasks:
+    - tap-foo target-bar
+	- tap-foo target-baz
+```
+
 
 ### Schedules
 
 Your project's pipeline schedules,
 typically [created](/guide/orchestration#create-a-schedule)
 using [`meltano schedule`](/reference/command-line-interface#schedule),
- are defined under the `schedules` property.
+are defined under the `schedules` property.
 
-A schedule definition must have a `name`, `extractor`, `loader`, `transform` and `interval`:
+A schedule definition must have a `name`, `job` and `interval`:
 
 ```yaml
 schedules:
 - name: foo-to-bar
+  job: tap-foo-to-target
+  interval: '@hourly'
+```
+
+The value for `job` must be the name to an existing [job](#jobs) within the project.
+
+Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and `interval`in place of a `job`:
+```yaml
+- name: foo-to-bar-elt
   extractor: tap-foo
   loader: target-bar
   transform: skip
-  interval: '@hourly'
+  interval: @hourly
 ```
 
 [Pipeline-specific configuration](/guide/integration#pipeline-specific-configuration) can be specified using [environment variables](/guide/configuration#configuring-settings) in an `env` dictionary:
@@ -275,9 +301,7 @@ schedules:
 ```yaml{7-9}
 schedules:
 - name: foo-to-bar
-  extractor: tap-foo
-  loader: target-bar
-  transform: skip
+  job: tap-foo-to-target-bat
   interval: '@hourly'
   env:
     TAP_FOO_BAR: bar
