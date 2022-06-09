@@ -17,9 +17,9 @@ include = [
   "*.m5o",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
-  "src/meltano/api/templates/webapp.html",
   "src/meltano/api/templates/embed.html",
-  "src/meltano/core/tracking/.release_marker"
+  "src/meltano/api/templates/webapp.html",
+  "src/meltano/core/tracking/.release_marker",
 ]
 
 [tool.poetry.dependencies]
@@ -112,3 +112,7 @@ skip_glob = ["*.md", "*.vue", "*.js"]
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = false

@@ -1,0 +1,65 @@
+name: Build
+
+on:
+  push: {}
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+        - { python-version: '3.7', os: 'ubuntu-latest' }
+        - { python-version: '3.8', os: 'ubuntu-latest' }
+        - { python-version: '3.9', os: 'ubuntu-latest' }
+      fail-fast: false
+
+    name: Build artifacts on py${{ matrix.python-version }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3.1.2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+        cache-dependency-path: .github/workflows/constraints.txt
+
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/constraints.txt
+      run: |
+        pipx install poetry --python=python${{ matrix.python-version }}
+        poetry --version
+
+    - name: Release Marker
+      run: |
+        touch src/meltano/core/tracking/.release_marker
+
+    - name: Build sdist
+      if: always() && (matrix.python-version == '3.9')
+      run: |
+        poetry build -f sdist
+
+    - name: Setup Node
+      uses: actions/setup-node@v3.3.0
+      with:
+        node-version: '14'
+        cache: 'yarn'
+        cache-dependency-path: src/webapp/yarn.lock
+
+    - name: Build wheel
+      run: |
+        poetry build -f wheel
+
+    # This is for temporary testing purposes only,
+    # these files should probably be added to a release
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: python-artifacts
+        path: 'dist/*'
