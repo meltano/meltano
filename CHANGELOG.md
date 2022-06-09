@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 
+
+## 2.0.1 - (2022-06-09)
+---
+
 ## 2.0.0 - (2022-06-08)
 
 _**Meltano 2.0** is a major update with multiple new features and some breaking changes. See our [2.0 Migration Guide](https://docs.meltano.com/reference/v2-migration) for more information._
