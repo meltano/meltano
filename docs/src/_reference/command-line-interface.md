@@ -701,8 +701,8 @@ Note that if no environment is active, `meltano run` _does not_ generate a state
 
 ## `job`
 
-Use the `job` command to define one or more sequences of tasks. A job can contain a single task, or many tasks.
-Today all tasks are run sequentially.
+Use the `job` command to define one or more sequences of tasks. A job can contain a single task or many tasks.
+As of today all tasks are run sequentially.
 You can run a specified job by passing the job name as an argument to [`meltano run`](#run).
 You can also schedule jobs using [`meltano schedule`](#schedule).
 
@@ -733,7 +733,7 @@ meltano job remove <job_name>
 
 ##### Tasks
 
-A task should consist of the same format as arguments supplied to [the `meltano run` command](#run), which can be any valid sequence of extractors, mappers, loaders, and plugin commands.
+A task should be of the same format as arguments supplied to [the `meltano run` command](#run), which can be any valid sequence of extractors, mappers, loaders, and plugin commands.
 Note that such a sequence is only valid if it is one of:
 
 1. An extractor followed directly by a loader. E.g. `tap-gitlab target-postgres`
@@ -784,7 +784,7 @@ jobs:
       - dbt:run
 ```
 
-While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed` will run the same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting of a single task while scheduling the latter will result in a generated DAG consisting of two tasks.
+While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting of a single task while scheduling the latter will result in a generated DAG consisting of two tasks.
 
 ### Examples
 

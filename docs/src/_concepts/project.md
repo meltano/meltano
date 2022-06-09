@@ -285,9 +285,9 @@ schedules:
   interval: '@hourly'
 ```
 
-The value for `job` must be the name to an existing [job](#jobs) within the project.
+The value for `job` must be the name of an existing [job](#jobs) within the project.
 
-Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and `interval`in place of a `job`:
+Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and `interval` in place of a `job`:
 ```yaml
 - name: foo-to-bar-elt
   extractor: tap-foo
