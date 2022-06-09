@@ -30,12 +30,17 @@ from .environment import environment_context
 
 CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
 CLI_EVENT_SCHEMA_VERSION = "1-0-0"
+
 TELEMETRY_STATE_CHANGE_EVENT_SCHEMA = (
     "iglu:com.meltano/telemetry_state_change_event/jsonschema"
 )
 TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION = "1-0-0"
+
 BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
 BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
+
+EXIT_EVENT_SCHEMA = "iglu:com.meltano/exit_event/jsonschema"
+EXIT_EVENT_VERSION = "1-0-0"
 
 
 class BlockEvents(Enum):
@@ -442,7 +447,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         self.track_unstruct_event(
             SelfDescribingJson(
-                "iglu:com.meltano/exit_event/jsonschema/1-0-0",
+                f"{EXIT_EVENT_SCHEMA}/{EXIT_EVENT_VERSION}",
                 {
                     "exit_code": exit_code,
                     "exit_timestamp": now.isoformat() + "Z",
