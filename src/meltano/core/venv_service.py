@@ -22,7 +22,11 @@ VenvSpecs = namedtuple("VenvSpecs", ("lib_dir", "bin_dir", "site_packages_dir"))
 POSIX = VenvSpecs(
     lib_dir="lib",
     bin_dir="bin",
-    site_packages_dir=os.path.join("lib", f"python{sys.version[:3]}", "site-packages"),
+    site_packages_dir=os.path.join(
+        "lib",
+        f"python{'.'.join(str(part) for part in sys.version_info[:2])}",
+        "site-packages",
+    ),
 )
 
 NT = VenvSpecs(

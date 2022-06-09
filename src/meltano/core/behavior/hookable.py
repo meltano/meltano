@@ -6,8 +6,7 @@ you to register functions to be called before or after given trigger.
 """
 import logging
 from collections import OrderedDict
-
-from async_generator import asynccontextmanager
+from contextlib import asynccontextmanager
 
 logger = logging.getLogger(__name__)
 
