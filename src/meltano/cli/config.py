@@ -172,7 +172,7 @@ def list_settings(ctx, extras):
             setting_def.description or "",
             f"[green]{value}[/green]{source}",
             "\n".join(env_keys),
-            str(default_value) if default_value is not None else "''",
+            str(default_value) if default_value is not None else "",
         )
         if setting_def.is_custom:
             table_rows["custom"].append(table_row)
