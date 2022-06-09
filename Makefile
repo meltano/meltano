@@ -113,8 +113,8 @@ sdist: freeze_db bundle
 	poetry build
 
 # sdist_public:
-# Run sdist but first install release marker
-sdist_public: mark_release sdist
+# Run sdist to clean and package, add release marker
+sdist_public: sdist mark_release
 
 # mark_release:
 # Build the source distribution and include 'release marker' to properly 
