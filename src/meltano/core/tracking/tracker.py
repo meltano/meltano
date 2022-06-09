@@ -177,7 +177,7 @@ class Tracker:
         ):
             # Telemetry state has changed
             self.track_telemetry_state_change_event(
-                "project_id",
+                "send_anonymous_usage_stats",
                 stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
