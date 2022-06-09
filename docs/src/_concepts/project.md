@@ -265,7 +265,7 @@ jobs:
 - name: tap-foo-to-targets-bar-and-baz
   tasks:
     - tap-foo target-bar
-	- tap-foo target-baz
+    - tap-foo target-baz
 ```
 
 
