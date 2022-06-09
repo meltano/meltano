@@ -201,7 +201,7 @@ class VenvService:
         """Return the fingerprint of the existing virtual environment, if any."""
         if not self.plugin_fingerprint_path.exists():
             return None
-        with open(self.plugin_fingerprint_path, "rt") as fingerprint_file:
+        with open(self.plugin_fingerprint_path) as fingerprint_file:
             return fingerprint_file.read()
 
     def write_fingerprint(self, pip_urls: List[str]):

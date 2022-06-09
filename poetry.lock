@@ -161,11 +161,11 @@ python-versions = ">=3.5.3"
 
 [[package]]
 name = "asynctest"
-version = "0.12.4"
+version = "0.13.0"
 description = "Enhance the standard unittest package with features for testing asyncio libraries"
 category = "dev"
 optional = false
-python-versions = ">=3.4"
+python-versions = ">=3.5"
 
 [[package]]
 name = "atomicwrites"
@@ -2292,7 +2292,7 @@ infra = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "752a068bb5069b57676811b4fb9316e85927e94df35ef887c30a9c8ee3751e9f"
+content-hash = "760ced7ae6f6cb924c912075b838343ea5423d2a88ebd901a0e2a6323dfcab2a"
 
 [metadata.files]
 aenum = [
@@ -2388,8 +2388,8 @@ async-timeout = [
     {file = "async_timeout-3.0.1-py3-none-any.whl", hash = "sha256:4291ca197d287d274d0b6cb5d6f8f8f82d434ed288f962539ff18cc9012f9ea3"},
 ]
 asynctest = [
-    {file = "asynctest-0.12.4-py3-none-any.whl", hash = "sha256:b29ee07019088f6f33fd7ab6826308bbd7ea8bc16ba2f0aa0f70551e70054935"},
-    {file = "asynctest-0.12.4.tar.gz", hash = "sha256:ade427a711d18016f35fb0c5d412f0ed63fb074a6084b67ff2dad48f50b0d6ca"},
+    {file = "asynctest-0.13.0-py3-none-any.whl", hash = "sha256:5da6118a7e6d6b54d83a8f7197769d046922a44d2a99c21382f0a6e4fadae676"},
+    {file = "asynctest-0.13.0.tar.gz", hash = "sha256:c27862842d15d83e6a34eb0b2866c323880eb3a75e4485b079ea11748fd77fac"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},

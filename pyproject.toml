@@ -74,7 +74,7 @@ werkzeug = "^1"
 infra = ["ansible"]
 
 [tool.poetry.dev-dependencies]
-asynctest = "^0.12.2"
+asynctest = "^0.13.0"
 black = "^21.12b0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
