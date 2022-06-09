@@ -90,6 +90,8 @@ async def run(
             change_console_log_level()
 
     tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
+
     cmd_ctx = cli_context_builder(
         "run",
         None,
@@ -127,7 +129,6 @@ async def run(
             raise err
         tracker.track_command_event(cli_tracking.COMPLETED)
 
-    legacy_tracker = LegacyTracker(project)
     legacy_tracker.track_meltano_run(blocks)
 
 

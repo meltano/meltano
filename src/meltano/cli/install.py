@@ -40,6 +40,7 @@ def install(project, plugin_type, plugin_name, clean, parallelism):
     \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#install
     """
     tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     tracker.add_contexts(
         cli_context_builder(
             "install",
@@ -72,7 +73,6 @@ def install(project, plugin_type, plugin_name, clean, parallelism):
 
     success = install_plugins(project, plugins, parallelism=parallelism, clean=clean)
 
-    legacy_tracker = LegacyTracker(project)
     legacy_tracker.track_meltano_install()
 
     if not success:
