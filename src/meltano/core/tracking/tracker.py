@@ -157,14 +157,8 @@ class Tracker:
         Args:
             stored_telemetry_settings: the prior analytics settings
         """
-        save_settings = False
-
-        if (
-            stored_telemetry_settings.send_anonymous_usage_stats is None
-            and not self.send_anonymous_usage_stats
-        ):
-            # Do nothing. Tracking is disabled and no tracking marker to update.
-            return
+        # If `stored_telemetry_settings` is all `None`, then the settings have never been saved yet
+        save_settings = all(x is None for x in stored_telemetry_settings)
 
         if (
             stored_telemetry_settings.project_id is not None
