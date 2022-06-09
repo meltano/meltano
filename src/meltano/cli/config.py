@@ -152,7 +152,7 @@ def list_settings(ctx, extras):
             default_value = setting_def.value
 
         if source is SettingValueStore.DEFAULT:
-            label = "default"
+            label = "from default"
         elif source is SettingValueStore.INHERITED:
             label = f"inherited from '{settings.plugin.parent.name}'"
         else:
