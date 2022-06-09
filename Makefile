@@ -9,6 +9,11 @@
 # - `make clean` deletes all the build artifacts
 # - `make docker_images` builds all the docker images including the production
 #   image
+#
+# To build and publish:
+#
+# > make sdist-public
+# > poetry publish --build
 
 ifdef DOCKER_REGISTRY
 base_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/base
@@ -25,6 +30,7 @@ DCRN=${DCR} --no-deps
 
 MELTANO_WEBAPP = src/webapp
 MELTANO_API = src/meltano/api
+MELTANO_RELEASE_MARKER_FILE = ./src/meltano/core/tracking/.release_marker
 
 .PHONY: build test clean docker_images release
 
@@ -39,6 +45,9 @@ TO_CLEAN  = ./build ./dist
 TO_CLEAN += ./${MELTANO_API}/static/js
 TO_CLEAN += ./${MELTANO_API}/static/css
 TO_CLEAN += ./${MELTANO_WEBAPP}/dist
+# release marker
+TO_CLEAN += ${MELTANO_RELEASE_MARKER_FILE}
+
 
 clean:
 	rm -rf ${TO_CLEAN}
@@ -97,8 +106,21 @@ bundle: clean ui
 freeze_db:
 	poetry run scripts/alembic_freeze.py
 
+# sdist:
+# Build the source distribution
+# Note: plese use `sdist-public` for the actual release build
 sdist: freeze_db bundle
 	poetry build -f sdist
+
+# sdist_public:
+# Run sdist but first install release marker
+sdist_public: mark_release sdist
+
+# mark_release:
+# Build the source distribution and include 'release marker' to properly 
+# categorize implementations 'in the wild' versus our own dev builds and tests
+mark_release:
+	touch src/meltano/core/tracking/.release_marker
 
 docker_sdist: base_image
 	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
@@ -182,6 +204,9 @@ explain_makefile:
 
 # Release
 # =====================
+# Note:
+# - this code is old and may be stale.
+# - process currently runs in CI
 
 release:
 	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
