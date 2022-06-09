@@ -157,14 +157,8 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Args:
             stored_telemetry_settings: the prior analytics settings
         """
-        save_settings = False
-
-        if (
-            stored_telemetry_settings.send_anonymous_usage_stats is None
-            and not self.send_anonymous_usage_stats
-        ):
-            # Do nothing. Tracking is disabled and no tracking marker to update.
-            return
+        # If `stored_telemetry_settings` is all `None`, then the settings have never been saved yet
+        save_settings = all(x is None for x in stored_telemetry_settings)
 
         if (
             stored_telemetry_settings.project_id is not None
@@ -183,7 +177,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         ):
             # Telemetry state has changed
             self.track_telemetry_state_change_event(
-                "project_id",
+                "send_anonymous_usage_stats",
                 stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
@@ -317,6 +311,9 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             from_value: the old value
             to_value: the new value
         """
+        if self.snowplow_tracker is None:
+            return # The Snowplow tracker is not available (e.g. because no endpoints are set)
+
         logger.debug(
             "Telemetry state change detected. A one-time "
             + "'telemetry_state_change' event will now be sent.",
