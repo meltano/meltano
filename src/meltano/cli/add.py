@@ -72,6 +72,7 @@ def add(  # noqa: WPS238
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
     tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     tracker.add_contexts(
         cli_context_builder(
             "add",
@@ -117,7 +118,6 @@ def add(  # noqa: WPS238
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins: list[ProjectPlugin] = []
-    legacy_tracker = LegacyTracker(project)
     for plugin in plugin_names:
         try:
             plugins.append(

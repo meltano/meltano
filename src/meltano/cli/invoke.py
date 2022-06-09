@@ -78,6 +78,7 @@ def invoke(
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
     tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     # the `started` event is delayed until we've had a chance to try to resolve the requested plugin
     tracker.add_contexts(
         cli_context_builder(
@@ -132,7 +133,7 @@ def invoke(
                 command_name,
                 containers,
                 print_var=print_var,
-                tracker=tracker,
+                legacy_tracker=legacy_tracker,
             )
         )
     except Exception as invoke_err:
@@ -156,7 +157,7 @@ async def _invoke(
     command_name: str,
     containers: bool,
     print_var: list | None = None,
-    tracker: Tracker = None,
+    legacy_tracker: LegacyTracker = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
@@ -193,8 +194,7 @@ async def _invoke(
     finally:
         session.close()
 
-    tracker = LegacyTracker(project, context_overrides=tracker.contexts)
-    tracker.track_meltano_invoke(
+    legacy_tracker.track_meltano_invoke(
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )
 

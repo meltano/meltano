@@ -109,6 +109,8 @@ async def elt(
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
     tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
+
     cmd_ctx = cli_context_builder(
         "elt",
         None,
@@ -168,7 +170,6 @@ async def elt(
         session.close()
 
     tracker.track_command_event(cli_tracking.COMPLETED)
-    legacy_tracker = LegacyTracker(project)
     legacy_tracker.track_meltano_elt(
         extractor=extractor, loader=loader, transform=transform
     )
