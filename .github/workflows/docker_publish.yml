@@ -40,7 +40,7 @@ jobs:
       run: |
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "PYTHON_VERSION=${{ matrix.python-version }}"
-        echo "RELEASE_VERSION=${{ steps.get-meltano-version.release-version }}""
+        echo "RELEASE_VERSION=${{ steps.get-meltano-version.release-version }}"
         echo "DRY_RUN is true?=${{ github.event.inputs.dry-run == true }}"
         echo "DRY_RUN is false?=${{ github.event.inputs.dry-run == false }}"
         echo "DRY_RUN is truthy?=${{ !(!github.event.inputs.dry-run) }}"
