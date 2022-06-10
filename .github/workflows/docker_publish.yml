@@ -43,7 +43,7 @@ jobs:
       run: |
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "PYTHON_VERSION=${{ matrix.python-version }}"
-        echo "RELEASE_VERSION=${{ steps.get-meltano-version.release-version }}"
+        echo "RELEASE_VERSION=${{ steps.get-meltano-version.outputs.release-version }}"
         echo "DEBUG INFO: DRY_RUN is truthy=${{ !(!github.event.inputs.dry-run) }}"
         echo "DEBUG INFO: DRY_RUN is falsey=${{ !github.event.inputs.dry-run }}"
 
@@ -80,11 +80,11 @@ jobs:
         context: "{{defaultContext}}:docker/publish"
         push: ${{ !github.event.inputs.dry-run }}
         tags: |
-          meltano/meltano:v${{ steps.get-meltano-version.release-version }}-${{ matrix.python-version }}
+          meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-${{ matrix.python-version }}
           meltano/meltano:latest-${{ matrix.python-version }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
-          MELTANO_VERSION=${{ steps.get-meltano-version.release-version }}
+          MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
 
     # e.g. meltano/meltano:v2.0.0
     #      meltano/meltano:latest
@@ -97,8 +97,8 @@ jobs:
         push: ${{ !github.event.inputs.dry-run }}
         tags: |
           meltano/meltano:latest
-          meltano/meltano:v${{ steps.get-meltano-version.release-version }}
+          meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}
           meltano/meltano:latest-${{ matrix.python-version }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
-          MELTANO_VERSION=${{ steps.get-meltano-version.release-version }}
+          MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
