@@ -114,17 +114,7 @@ bundle exec jekyll build && bundle exec htmlproofer --log-level :debug ./_site/ 
 
 ## Deploy
 
-This project is deployed via GitLab Pages using the steps defined in [`.gitlab-ci.yml`](.gitlab-ci.yml).
-
-### Updating Docker
-
-```
-docker build -t registry.gitlab.com/meltano/handbook .
-```
-
-```
-docker push registry.gitlab.com/meltano/handbook
-```
+This project is deployed via Netlify to https://docs.meltano.com.
 
 ## Troubleshooting
 

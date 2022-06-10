@@ -1,46 +1,36 @@
-"""Google Analytics tracker for CLI commands."""
+"""Legacy tracker for Meltano.
+
+This module and its content will be removed in a future version of Meltano without a major version
+bump. It only remains here to make the transition to the new tracker as smooth as possible.
+"""
 
 from __future__ import annotations
 
-import hashlib
-import json
-import logging
-import uuid
 from typing import Any
 
-import requests
+from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
-
-from .snowplow_tracker import SnowplowTracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.project import ProjectContext
+from meltano.core.utils import hash_sha256
 
 REQUEST_TIMEOUT = 2.0
 MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
 DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect"
 
 
-def hash_sha256(value: str) -> str:
-    """Get the sha_256 hash of a string.
-
-    Args:
-        value: the string value to hash.
-
-    Returns:
-        The hashed value of the given string.
-    """
-    return hashlib.sha256(value.encode()).hexdigest()
-
-
-class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
-    """Event tracker for Meltano."""
+class LegacyTracker:  # noqa: WPS214, WPS230
+    """Legacy tracker for Meltano."""
 
     def __init__(
         self,
         project: Project,
         tracking_id: str = None,
         request_timeout: float = None,
+        context_overrides: tuple[SelfDescribingJson] = None,
     ):
         """Create a new Google Analytics tracker.
 
@@ -48,6 +38,7 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             project: Meltano project.
             tracking_id: Unique identifier for tracking. Defaults to None.
             request_timeout: For GA requests. Defaults to None.
+            context_overrides: A list of explicit context overrides that will be set on the underlying Tracker.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(self.project)
@@ -58,80 +49,19 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         self.send_anonymous_usage_stats = self.settings_service.get(
             "send_anonymous_usage_stats", True
         )
-        self.project_id = self.load_project_id()
-        self.client_id = self.load_client_id()
 
-        try:
-            self.snowplow_tracker = SnowplowTracker(
-                project,
-                request_timeout=self.request_timeout,
-            )
-        except ValueError:
-            logging.debug("No Snowplow collector endpoints are set")
-            self.snowplow_tracker = None
+        self.tracker = Tracker(
+            project,
+            request_timeout=self.request_timeout,
+        )
+        if context_overrides:
+            self.tracker.contexts = context_overrides
 
-    def load_project_id(self) -> uuid.UUID:
-        """
-        Fetch the project_id from the project config file.
-
-        If it is not found (e.g. first time run), generate a valid uuid4 and
-        store it in the project config file.
-
-        Returns:
-            The project_id.
-        """
-        project_id_str = self.settings_service.get("project_id")
-        if project_id_str:
-            try:
-                # Project ID might already be a UUID
-                project_id = uuid.UUID(project_id_str)
-            except ValueError:
-                # If the project ID is not a UUID, then we hash it, and use the hash to make a UUID
-                project_id = uuid.UUID(
-                    hashlib.sha256(project_id_str.encode()).hexdigest()[::2]
-                )
-        else:
-            project_id = uuid.uuid4()
-
-            if self.send_anonymous_usage_stats:
-                # If we are set to track Anonymous Usage stats, also store
-                #  the generated project_id back to the project config file
-                #  so that it persists between meltano runs.
-                self.settings_service.set("project_id", str(project_id))
-
-        return project_id
-
-    def load_client_id(self) -> uuid.UUID:
-        """
-        Fetch the client_id from the non-versioned analytics.json.
-
-        If it is not found (e.g. first time run), generate a valid uuid4 and
-        store it in analytics.json.
-
-        Returns:
-            The client_id.
-        """
-        file_path = self.project.meltano_dir().joinpath("analytics.json")
-        try:  # noqa: WPS229
-            with open(file_path) as file:
-                file_data = json.load(file)
-            client_id_str = file_data["client_id"]
-            client_id = uuid.UUID(client_id_str, version=4)
-        except FileNotFoundError:
-            client_id = uuid.uuid4()
-
-            if self.send_anonymous_usage_stats:
-                # If we are set to track Anonymous Usage stats, also store
-                #  the generated client_id in a non-versioned analytics.json file
-                #  so that it persists between meltano runs.
-                with open(file_path, "w") as file:  # noqa: WPS440
-                    data = {"client_id": str(client_id)}
-                    json.dump(data, file)
-
-        return client_id
+        project_context = ProjectContext(project, self.tracker.client_id)
+        self.project_id = project_context.project_uuid
 
     def event(self, category: str, action: str) -> dict[str, Any]:
-        """Constract a GA event with all the required parameters.
+        """Construct a GA event with all the required parameters.
 
         Args:
             category: The category of the event.
@@ -143,7 +73,7 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
         return {
             "v": "1",
             "tid": self.tracking_id,
-            "cid": self.client_id,
+            "cid": self.tracker.client_id,
             "ds": "meltano cli",
             "t": "event",
             "ec": category,
@@ -152,77 +82,15 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
             "cd1": self.project_id,  # maps to the custom dimension 1 of the UI
         }
 
-    def track_data(  # noqa: WPS213
-        self, data: dict[str, Any], debug: bool = False
-    ) -> None:
-        """Send usage statistics back to Google Analytics.
-
-        Args:
-            data: The data to send.
-            debug: Whether to send the event to the debug endpoint.
-        """
-        if self.send_anonymous_usage_stats is False:
-            # Only send anonymous usage stats if you have explicit permission
-            return
-
-        if debug:
-            tracking_uri = DEBUG_MEASUREMENT_PROTOCOL_URI
-        else:
-            tracking_uri = MEASUREMENT_PROTOCOL_URI
-
-        try:  # noqa: WPS229
-            resp = requests.post(tracking_uri, data=data, timeout=self.request_timeout)
-
-            if debug:
-                logging.debug("GoogleAnalyticsTracker.track_data:")
-                logging.debug(data)
-                logging.debug("Response:")
-                logging.debug(f"status_code: {resp.status_code}")
-                logging.debug(resp.text)
-        except requests.exceptions.Timeout:
-            logging.debug("GoogleAnalyticsTracker.track_data: Request Timed Out")
-        except requests.exceptions.ConnectionError as exc:
-            logging.debug("GoogleAnalyticsTracker.track_data: ConnectionError")
-            logging.debug(exc)
-        except requests.exceptions.RequestException as exc:
-            logging.debug("GoogleAnalyticsTracker.track_data: RequestException")
-            logging.debug(exc)
-
     def track_event(self, category: str, action: str, debug: bool = False) -> None:
-        """Send a GA event.
+        """Send a struct event to Snowplow.
 
         Args:
             category: GA event category.
             action: GA event action.
             debug: If True, send the event to the debug endpoint.
         """
-        if self.project.active_environment is not None:
-            environment = self.project.active_environment
-            hashed_name = hash_sha256(environment.name)
-            action = f"{action} --environment={hashed_name}"
-
-        event = self.event(category, action)
-        self.track_data(event, debug)
-
-        # Snowplow
-        self.track_snowplow_struct_event(category=category, action=action)
-
-    def track_snowplow_struct_event(self, category: str, action: str) -> None:
-        """Send a struct event to Snowplow.
-
-        Args:
-            category: The category of the event.
-            action: The action of the event.
-        """
-        if self.send_anonymous_usage_stats is False or self.snowplow_tracker is None:
-            # Only send anonymous usage stats if you have explicit permission
-            return
-
-        self.snowplow_tracker.track_struct_event(
-            category=category,
-            action=action,
-            label=self.project_id,
-        )
+        self.tracker.track_struct_event(category, action)
 
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
         """Track the initialization of a Meltano project.
@@ -372,17 +240,17 @@ class GoogleAnalyticsTracker:  # noqa: WPS214, WPS230
 
         self.track_event(category="meltano select", action=action, debug=debug)
 
-    def track_meltano_state(self, subcommand: str, job_id: str | None = None):
+    def track_meltano_state(self, subcommand: str, state_id: str | None = None):
         """Track the management of Singer State.
 
         Args:
             subcommand: The subcommand being run (e.g. 'set' or 'clear')
-            job_id: The job_id for which state is being managed
+            state_id: The state_id for which state is being managed
         """
         action = f"meltano state {subcommand}"
-        if job_id:
-            hashed_job_id = hash_sha256(job_id)
-            action = f"{action} {hashed_job_id}"
+        if state_id:
+            hashed_state_id = hash_sha256(state_id)
+            action = f"{action} {hashed_state_id}"
         self.track_event(category="meltano state", action=action)
 
     def track_meltano_ui(self, debug: bool = False) -> None:

@@ -3,9 +3,9 @@
 import click
 
 from meltano.core.hub import MeltanoHubService
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import cli
 from .params import pass_project
@@ -24,7 +24,9 @@ def discover(project: Project, plugin_type: str):
     """
     hub_service = MeltanoHubService(project)
     if plugin_type == "all":
-        plugin_types = list(PluginType)
+        plugin_types = [
+            plugin_type for plugin_type in list(PluginType) if plugin_type.discoverable
+        ]
     else:
         plugin_types = [PluginType.from_cli_argument(plugin_type)]
 
@@ -52,5 +54,5 @@ def discover(project: Project, plugin_type: str):
             else:
                 click.echo()
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_discover(plugin_type=plugin_type)

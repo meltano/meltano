@@ -10,7 +10,9 @@ from sqlalchemy.orm import sessionmaker
 
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_invoker import (
     PluginInvoker,
     UnknownCommandError,
@@ -18,7 +20,9 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import PluginsTrackingContext, Tracker
+from meltano.core.tracking import cli as cli_tracking
+from meltano.core.tracking import cli_context_builder
 from meltano.core.utils import run_async
 
 from . import cli
@@ -73,6 +77,21 @@ def invoke(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
+    tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
+    # the `started` event is delayed until we've had a chance to try to resolve the requested plugin
+    tracker.add_contexts(
+        cli_context_builder(
+            "invoke",
+            None,
+            plugin_type=plugin_type,
+            dump=dump,
+            list_commands=list_commands,
+            containers=containers,
+            print_var=print_var,
+        )
+    )
+
     try:
         plugin_name, command_name = plugin_name.split(":")
     except ValueError:
@@ -83,28 +102,48 @@ def invoke(
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.find_plugin(
-        plugin_name, plugin_type=plugin_type, invokable=True
-    )
+
+    try:
+        plugin = plugins_service.find_plugin(
+            plugin_name, plugin_type=plugin_type, invokable=True
+        )
+        tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
+        tracker.track_command_event(cli_tracking.STARTED)
+    except PluginNotFoundError:
+        # if the plugin is not found, we fire started and aborted tracking events together to keep tracking consistent
+        tracker.track_command_event(cli_tracking.STARTED)
+        tracker.track_command_event(cli_tracking.ABORTED)
+        raise
 
     if list_commands:
         do_list_commands(plugin)
+        tracker.track_command_event(cli_tracking.COMPLETED)
         return
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
-    exit_code = run_async(
-        _invoke(
-            invoker,
-            project,
-            plugin_name,
-            plugin_args,
-            session,
-            dump,
-            command_name,
-            containers,
-            print_var=print_var,
+    try:
+        exit_code = run_async(
+            _invoke(
+                invoker,
+                project,
+                plugin_name,
+                plugin_args,
+                session,
+                dump,
+                command_name,
+                containers,
+                print_var=print_var,
+                legacy_tracker=legacy_tracker,
+            )
         )
-    )
+    except Exception as invoke_err:
+        tracker.track_command_event(cli_tracking.FAILED)
+        raise invoke_err
+
+    if exit_code == 0:
+        tracker.track_command_event(cli_tracking.COMPLETED)
+    else:
+        tracker.track_command_event(cli_tracking.FAILED)
     sys.exit(exit_code)
 
 
@@ -118,6 +157,7 @@ async def _invoke(
     command_name: str,
     containers: bool,
     print_var: list | None = None,
+    legacy_tracker: LegacyTracker = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
@@ -154,8 +194,7 @@ async def _invoke(
     finally:
         session.close()
 
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_invoke(
+    legacy_tracker.track_meltano_invoke(
         plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
     )
 

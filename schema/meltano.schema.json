@@ -259,6 +259,9 @@
                 }
               }
             }
+          },
+          "requires": {
+            "$ref": "#/definitions/requires"
           }
         }
       },
@@ -332,6 +335,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "requires": {},
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -400,6 +404,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "requires": {},
               "dialect": {
                 "type": "string",
                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
@@ -434,7 +439,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "requires": {}
             }
           }
         ]
@@ -461,7 +467,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "requires": {}
             }
           }
         ]
@@ -521,7 +528,8 @@
               "settings": {},
               "docs": {},
               "settings_group_validation": {},
-              "commands": {}
+              "commands": {},
+              "requires": {}
             }
           }
         ]
@@ -549,6 +557,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "requires": {},
               "vars": {
                 "type": "object",
                 "description": "An object containing dbt model variables"
@@ -608,6 +617,7 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
+              "requires": {},
               "mappings": {}
             }
           }
@@ -685,16 +695,8 @@
         },
         "env": {
           "type": "string",
-          "description": "An environment variable that will be initialized with the setting's value whenever the plugin is invoked. This is used to inject environment variables into the plugin's execution context.",
+          "description": "An alternative environment variable name to populate with this settings value in the plugin environment.",
           "examples": ["GITLAB_API_TOKEN", "FACEBOOK_ADS_ACCESS_TOKEN"]
-        },
-        "env_aliases": {
-          "type": "array",
-          "description": "Deprecated. Use to delegate alternative environment variables for overriding this setting's value.",
-          "examples": ["TAP_ACCOUNT_ID", "TAP_ACCOUNT_IDENTIFIER"],
-          "items": {
-            "type": "string"
-          }
         },
         "value_processor": {
           "const": "nest_object",
@@ -868,6 +870,34 @@
               "type": "object"
             }
           }
+        }
+      }
+    },
+    "requires": {
+      "type": "object",
+      "description": "A set of plugin requirements.",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(extractors|loaders|transforms|orchestrators|transformers|files|utilities|mappers)$": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/plugin_requirement"
+          }
+        }
+      }
+    },
+    "plugin_requirement": {
+      "type": "object",
+      "description": "A single plugin requirement",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the required plugin"
+        },
+        "variant": {
+          "type": "string",
+          "description": "The variant of the required plugin"
         }
       }
     }

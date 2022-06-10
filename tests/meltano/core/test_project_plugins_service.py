@@ -1,4 +1,5 @@
 import json
+import shutil
 from copy import deepcopy
 
 import pytest
@@ -9,7 +10,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import DefinitionSource, ProjectPluginsService
-from meltano.core.settings_service import FeatureFlags
 
 
 @pytest.fixture
@@ -87,7 +87,26 @@ class TestProjectPluginsService:
         subject._use_cache = False
         assert subject.get_plugin(tap) is not plugin
 
-    def test_get_parent(
+    def test_get_parent_from_lockfile(
+        self,
+        subject: ProjectPluginsService,
+        tap: ProjectPlugin,
+        locked_definition_service: LockedDefinitionService,
+        modified_lockfile,
+    ):
+        expected = locked_definition_service.find_base_plugin(
+            plugin_type=PluginType.EXTRACTORS,
+            plugin_name="tap-mock",
+            variant="meltano",
+        )
+
+        result, source = subject.find_parent(tap)
+        assert source == DefinitionSource.LOCKFILE
+        assert result == expected
+        assert result.settings == expected.settings
+        assert result.settings[-1].name == "foo"
+
+    def test_get_parent_no_lockfiles(
         self,
         subject: ProjectPluginsService,
         tap,
@@ -96,6 +115,9 @@ class TestProjectPluginsService:
         alternative_target,
         plugin_discovery_service,
     ):
+
+        # The behavior being tested here assumes that no lockfiles exist.
+        shutil.rmtree(subject.project.root_dir("plugins"), ignore_errors=True)
         # name="tap-mock", variant="meltano"
         # Shadows base plugin with correct variant
         assert subject.get_parent(tap) == plugin_discovery_service.find_base_plugin(
@@ -132,36 +154,6 @@ class TestProjectPluginsService:
         )
         with pytest.raises(PluginParentNotFoundError):
             assert subject.get_parent(nonexistent_parent)
-
-    def test_get_parent_from_lockfile(
-        self,
-        subject: ProjectPluginsService,
-        tap: ProjectPlugin,
-        locked_definition_service: LockedDefinitionService,
-        modified_lockfile,
-    ):
-        expected = locked_definition_service.find_base_plugin(
-            plugin_type=PluginType.EXTRACTORS,
-            plugin_name="tap-mock",
-            variant="meltano",
-        )
-
-        # Feature flag off means definition is not retrieved from lockfile
-        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
-        result_no_ff, source = subject.find_parent(tap)
-        assert source == DefinitionSource.DISCOVERY
-        assert result_no_ff == expected
-        assert len(result_no_ff.settings) == 12  # noqa: WPS432
-
-        # Feature flag on means definition is indeed retrieved from lockfile
-        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, True)
-        result, source = subject.find_parent(tap)
-        assert source == DefinitionSource.LOCKFILE
-        assert result == expected
-        assert result.settings == expected.settings
-        assert result.settings[-1].name == "foo"
-
-        subject.settings_service.set(FeatureFlags.LOCKFILES.setting_name, False)
 
     def test_update_plugin(self, subject, tap):
         # update a tap with a random value

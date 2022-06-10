@@ -14,6 +14,7 @@ from meltano.core.setting_definition import SettingDefinition, YAMLEnum
 from meltano.core.utils import NotFound, find_named
 
 from .command import Command
+from .requirements import PluginRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +109,15 @@ class PluginType(YAMLEnum):
             return "map"
 
         return self.value[:-3]
+
+    @property
+    def discoverable(self) -> bool:
+        """Whether this plugin type is discoverable on the Hub.
+
+        Returns:
+            Whether this plugin type is discoverable on the Hub.
+        """
+        return self is not self.__class__.MAPPINGS
 
     @classmethod
     def value_exists(cls, value: str) -> bool:
@@ -232,6 +242,7 @@ class Variant(NameEq, Canonical):
         settings_group_validation: list | None = None,
         settings: list | None = None,
         commands: dict | None = None,
+        requires: dict[PluginType, list] | None = None,
         **extras,
     ):
         """Create a new Variant.
@@ -248,6 +259,7 @@ class Variant(NameEq, Canonical):
             settings_group_validation: The settings group validation.
             settings: The settings of the variant.
             commands: The commands of the variant.
+            requires: Other plugins this plugin depends on.
             extras: Additional keyword arguments.
         """
         super().__init__(
@@ -262,6 +274,7 @@ class Variant(NameEq, Canonical):
             settings_group_validation=list(settings_group_validation or []),
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
+            requires=PluginRequirement.parse_all(requires),
             extras=extras,
         )
 
@@ -432,7 +445,8 @@ class PluginDefinition(PluginRef):
             settings_group_validation=plugin.settings_group_validation,
             settings=plugin.settings,
             commands=plugin.commands,
-            extras=plugin.extras,
+            requires=plugin.requires,
+            **plugin.extras,
         )
 
 
@@ -526,10 +540,10 @@ class BasePlugin(HookObject):  # noqa: WPS214
 
     @property
     def all_commands(self):
-        """Return a dictonary of supported commands.
+        """Return a dictionary of supported commands.
 
         Returns:
-            A dictonary of supported commands.
+            A dictionary of supported commands.
         """
         return self._variant.commands
 
@@ -545,6 +559,15 @@ class BasePlugin(HookObject):  # noqa: WPS214
             for name, command in self.all_commands.items()
             if name.startswith("test")
         }
+
+    @property
+    def all_settings(self):
+        """Return a list of settings.
+
+        Returns:
+            A list of settings.
+        """
+        return self._variant.settings
 
     @property
     def extra_settings(self):
@@ -572,6 +595,15 @@ class BasePlugin(HookObject):  # noqa: WPS214
         )
 
         return existing_settings
+
+    @property
+    def all_requires(self):
+        """Return a list of requires.
+
+        Returns:
+            A list of requires.
+        """
+        return self._variant.requires
 
     def env_prefixes(self, for_writing=False) -> list[str]:
         """Return environment variable prefixes to use for settings.
@@ -615,11 +647,6 @@ class BasePlugin(HookObject):  # noqa: WPS214
             True if the plugin should be added to the config file, False otherwise.
         """
         return True
-
-    @property
-    def runner(self):
-        """Return the plugin runner."""
-        pass
 
     def exec_args(self, files: dict):
         """Return the arguments to pass to the plugin runner.
@@ -689,6 +716,7 @@ class StandalonePlugin(Canonical):
         settings_group_validation: list | None = None,
         settings: list | None = None,
         commands: dict | None = None,
+        requires: dict[PluginType, list] | None = None,
         **extras,
     ):
         """Create a locked plugin.
@@ -707,6 +735,7 @@ class StandalonePlugin(Canonical):
             settings_group_validation: The settings group validation of the plugin.
             settings: The settings of the plugin.
             commands: The commands of the plugin.
+            requires: Other plugins this plugin depends on.
             extras: Additional attributes to set on the plugin.
         """
         super().__init__(
@@ -723,6 +752,7 @@ class StandalonePlugin(Canonical):
             settings_group_validation=settings_group_validation or [],
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
+            requires=PluginRequirement.parse_all(requires),
             extras=extras,
         )
 
@@ -730,29 +760,23 @@ class StandalonePlugin(Canonical):
     def from_variant(
         cls: type[StandalonePlugin],
         variant: Variant,
-        name: str,
-        namespace: str,
-        plugin_type: PluginType,
-        label: str = None,
+        plugin_def: PluginDefinition,
     ):
-        """Create a locked plugin from a variant.
+        """Create a locked plugin from a variant and plugin definition.
 
         Args:
             variant: The variant to create the plugin from.
-            name: The name of the plugin.
-            namespace: The namespace of the plugin.
-            plugin_type: The plugin type.
-            label: The label of the plugin.
+            plugin_def: The plugin definition to create the plugin from.
 
         Returns:
             A locked plugin definition.
         """
         return cls(
-            plugin_type=plugin_type,
-            name=name,
-            namespace=namespace,
+            plugin_type=plugin_def.type,
+            name=plugin_def.name,
+            namespace=plugin_def.namespace,
             variant=variant.name,
-            label=label,
+            label=plugin_def.label,
             docs=variant.docs,
             repo=variant.repo,
             pip_url=variant.pip_url,
@@ -761,5 +785,6 @@ class StandalonePlugin(Canonical):
             settings_group_validation=variant.settings_group_validation,
             settings=variant.settings,
             commands=variant.commands,
-            **variant.extras,
+            requires=variant.requires,
+            **{**plugin_def.extras, **variant.extras},
         )

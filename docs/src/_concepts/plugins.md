@@ -12,7 +12,7 @@ where your [project](project) and pipelines are composed of plugins of [differen
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
 [**loaders**](#loaders) ([Singer](https://singer.io) targets),
 [**transformers**](#transformers) ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
-[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://gitlab.com/meltano/meltano/-/issues/2393)).
+[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://github.com/meltano/meltano/issues/2349)).
 
 Meltano provides the glue to make these components work together smoothly and enables consistent [configuration](/guide/configuration) and [deployment](/guide/production).
 
@@ -47,18 +47,10 @@ To learn how to add a plugin to your project, refer to the [Plugin Management gu
 ## Discoverable plugins
 
 [Base plugin descriptions](#project-plugins) for many popular [extractors](#extractors) (Singer taps), [loaders](#loaders) (Singer targets),
-and other plugins have already been collected by users and [contributed](/contribute/plugins#discoverable-plugins) to Meltano's index of discoverable plugins,
+and other plugins have already been collected by users and [contributed](/contribute/plugins#discoverable-plugins) to [Meltano Hub](https://hub.meltano.com),
 making them supported out of the box.
 
-Discoverable plugins are defined in the `discovery.yml` manifest,
-which can be found [in the Meltano repository](https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml),
-ships inside the [`meltano` package](https://pypi.org/project/meltano/),
-and is available at <https://www.meltano.com/discovery.yml>.
-If you'd like to use a different (custom) manifest in your project,
-put a `discovery.yml` file at the root of your project,
-or change the [`discovery_url` setting](/reference/settings#discovery-url).
-
-To find discoverable plugins, run [`meltano discover`](/reference/command-line-interface#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/) and [Loaders](https://hub.meltano.com/loaders/).
+To find discoverable plugins, run [`meltano discover`](/reference/command-line-interface#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/), [Loaders](https://hub.meltano.com/loaders/), etc.
 
 To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](project#shadowing-plugin-definitions) or [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
 
@@ -92,7 +84,7 @@ you'll need to collect and provide this metadata yourself.
 To learn how to add a custom plugin to your project using a [custom plugin definition](project#custom-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
 <div class="notification is-warning">
-  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to <a href="https://github.com/meltano/hub/issues/new">Meltano Hub</a> to make it discoverable and supported out of the box for new users!</p>
 </div>
 
 ## Plugin Inheritance
@@ -110,7 +102,7 @@ To learn how to add an inheriting plugin to your project using an [inheriting pl
 
 ## Lock artifacts
 
-When you add a plugin to your project using `meltano add`, the [discoverable plugin definition](project#discoverable-plugin-definitions) of the plugin will be downloaded and added to your project under `plugins/<plugin_type>/<plugin_name>--<variant_name>.lock`. This will ensure that the plugin's definition will be stable and version-controlled.
+When you add a plugin to your project using `meltano add`, the [discoverable plugin definition](#discoverable-plugins) of the plugin will be downloaded and added to your project under `plugins/<plugin_type>/<plugin_name>--<variant_name>.lock`. This will ensure that the plugin's definition will be stable and version-controlled.
 
 Later invocations of the plugin will use this file to determine the settings, installation source, etc.
 
@@ -460,7 +452,7 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](project)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/reference/command-line-interface#elt).
 
-If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's Job ID.
+If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's State ID.
 
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
 a state file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option.
@@ -754,49 +746,7 @@ export DBT__UPDATE='{"transform/dbt_project.yml": false}'
 ### Utilities
 
 If none of the other plugin types address your needs, any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility.
-Meltano includes a selection of discoverable utilities, or you can easily add your own custom utility.
-
-#### Discoverable Utilities
-
-##### SQLFluff
-
-[SQLFluff](https://docs.sqlfluff.com/en/stable/) is a linting tool for SQL files, often used with dbt to enforce SQL code standards. From the documentation:
-
-> Bored of not having a good SQL linter that works with whichever dialect you’re working with? SQLFluff is an extensible and modular linter designed to help you write good SQL and catch errors and bad SQL before it hits your database.
-
-Install with Meltano:
-
-```bash
-meltano add utility sqlfluff
-# now try it out!
-meltano invoke sqlfluff --help
-```
-
-##### Great Expectations
-
-[Great Expectations](https://docs.greatexpectations.io/docs/) helps data teams eliminate pipeline debt, through data testing, documentation, and profiling. From the documentation:
-
-> Great Expectations is the leading tool for validating, documenting, and profiling your data to maintain quality and improve communication between teams. Head over to our [getting started](https://docs.greatexpectations.io/docs/tutorials/getting_started/intro) tutorial.
-
-Install with Meltano:
-
-```bash
-meltano add utility great_expectations
-# now try it out!
-meltano invoke great_expectations --help
-```
-
-If you are using Great Expectations to validate data in a database or warehouse, you
-might need to install the appropriate drivers. Common options are supported by Great Expectations
-as pip extras, and any additional packages you may want can be added too by configuring
-a custom `pip_url` for the `great_expectations` utility:
-
-```bash
-# set the _pip_url extra setting
-meltano config great_expectations set _pip_url "great_expectations[redshift]; awscli"
-# re-install the great_expectations plugin for changes to take effect
-meltano install utility great_expectations
-```
+Meltano has a selection of available utilities listed on [MeltanoHub](https://hub.meltano.com/utilities), or you can easily add your own custom utility.
 
 #### Custom Utilities
 

@@ -119,6 +119,9 @@
                   }
                 ]
               }
+            },
+            "requires": {
+              "$ref": "#/definitions/requires"
             }
           }
         }
@@ -178,7 +181,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The same of the variant.",
+          "description": "The name of the variant.",
           "examples": ["singer-io"]
         }
       }
@@ -376,6 +379,7 @@
           "additionalProperties": false,
           "properties": {
             "name": {},
+            "variant": {},
             "pip_url": {},
             "namespace": {},
             "repo": {},
@@ -385,7 +389,8 @@
             "settings": {},
             "docs": {},
             "settings_group_validation": {},
-            "commands": {}
+            "commands": {},
+            "requires": {}
           }
         }
       ]
@@ -615,16 +620,8 @@
         },
         "env": {
           "type": "string",
-          "description": "An environment variable that will be initialized with the setting's value whenever the plugin is invoked. This is used to inject environment variables into the plugin's execution context.",
+          "description": "An environment variable that will be initialized with the setting's value whenever the plugin is invoked. This is used to inject environment variables into the plugin's execution context. If the named environment variable is already defined at runtime, Meltano will use the passed value from context instead of the configured value.",
           "examples": ["DBT_PROFILES_DIR", "GE_HOME"]
-        },
-        "env_aliases": {
-          "type": "array",
-          "description": "Deprecated. Use to delegate alternative environment variables for overriding this setting's value",
-          "examples": ["TAP_ACCOUNT_ID", "TAP_ACCOUNT_IDENTIFIER"],
-          "items": {
-            "type": "string"
-          }
         },
         "value_processor": {
           "description": "Used with `kind: object` to process the keys in a particular way.",
@@ -666,6 +663,34 @@
         "docs": {
           "type": "string",
           "description": "A URL to the documentation for this plugin"
+        }
+      }
+    },
+    "requires": {
+      "type": "object",
+      "description": "A set of plugin requirements.",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(extractors|loaders|transforms|orchestrators|transformers|files|utilities|mappers)$": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/plugin_requirement"
+          }
+        }
+      }
+    },
+    "plugin_requirement": {
+      "type": "object",
+      "description": "A single plugin requirement",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the required plugin"
+        },
+        "variant": {
+          "type": "string",
+          "description": "The variant of the required plugin"
         }
       }
     }

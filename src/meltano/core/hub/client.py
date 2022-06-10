@@ -19,6 +19,7 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_discovery_service import PluginRepository
 from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 
 from .schema import IndexedPlugin, VariantRef
 
@@ -85,8 +86,6 @@ class HubPluginVariantNotFound(Exception):
 class MeltanoHubService(PluginRepository):
     """PluginRepository implementation for the Meltano Hub."""
 
-    BASE_URL = "https://hub.meltano.com/meltano/api/v1"
-
     def __init__(self, project: Project) -> None:
         """Initialize the service.
 
@@ -102,6 +101,23 @@ class MeltanoHubService(PluginRepository):
             }
         )
 
+        self.settings_service = ProjectSettingsService(self.project)
+
+        if self.settings_service.get("send_anonymous_usage_stats"):
+            project_id = self.settings_service.get("project_id")
+
+            self.session.headers["X-Project-ID"] = project_id
+
+    @property
+    def hub_api_url(self):
+        """Return the URL of the Hub API.
+
+        Returns:
+            The URL of the Hub API.
+        """
+        hub_url = self.settings_service.get("hub_url")
+        return f"{hub_url}/meltano/api/v1"
+
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
 
@@ -111,7 +127,7 @@ class MeltanoHubService(PluginRepository):
         Returns:
             The endpoint for the given plugin type.
         """
-        return f"{self.BASE_URL}/plugins/{plugin_type.value}/index"
+        return f"{self.hub_api_url}/plugins/{plugin_type.value}/index"
 
     def plugin_endpoint(
         self,
@@ -129,7 +145,7 @@ class MeltanoHubService(PluginRepository):
         Returns:
             The endpoint for the given plugin type.
         """
-        url = f"{self.BASE_URL}/plugins/{plugin_type.value}/{plugin_name}"
+        url = f"{self.hub_api_url}/plugins/{plugin_type.value}/{plugin_name}"
         if variant_name:
             url = f"{url}--{variant_name}"
 
@@ -224,6 +240,9 @@ class MeltanoHubService(PluginRepository):
         Raises:
             HubPluginTypeNotFound: If the plugin type is not supported.
         """
+        if not plugin_type.discoverable:
+            return {}
+
         url = self.plugin_type_endpoint(plugin_type)
         response = self.session.get(url)
 

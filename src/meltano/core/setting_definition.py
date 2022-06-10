@@ -164,8 +164,8 @@ class SettingDefinition(NameEq, Canonical):
             value_post_processor: Used with `kind: object` to post-process the keys in a particular way.
             attrs: Keyword arguments to pass to parent class.
         """
-        env_aliases = env_aliases or []
         aliases = aliases or []
+        env_aliases = env_aliases or []
         options = options or []
         oauth = oauth or {}
 
@@ -307,9 +307,13 @@ class SettingDefinition(NameEq, Canonical):
             env_keys.append(self.env)
 
         env_keys.extend(utils.to_env_var(prefix, self.name) for prefix in prefixes)
+        if not for_writing:
+            # read from setting name aliases
+            for alias in self.aliases:
+                env_keys.extend(utils.to_env_var(prefix, alias) for prefix in prefixes)
 
         if include_custom:
-            env_keys.extend(alias for alias in self.env_aliases)
+            env_keys.extend(env for env in self.env_aliases)
 
         return [EnvVar(key) for key in utils.uniques_in(env_keys)]
 

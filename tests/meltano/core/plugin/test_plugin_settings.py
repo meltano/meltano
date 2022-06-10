@@ -14,7 +14,9 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
+from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 from meltano.core.settings_store import ConflictingSettingValueException
+from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 def test_create(session):
@@ -164,24 +166,7 @@ class TestPluginSettingsService:
             SettingValueStore.DEFAULT,
         )
 
-        # Negated alias
-        monkeypatch.setenv("TAP_MOCK_DISABLED", "true")
-
-        assert subject.get_with_source("boolean", session=session) == (
-            False,
-            SettingValueStore.ENV,
-        )
-
-        # Regular alias
-        monkeypatch.delenv("TAP_MOCK_DISABLED")
-        monkeypatch.setenv("TAP_MOCK_ENABLED", "on")
-        assert subject.get_with_source("boolean", session=session) == (
-            True,
-            SettingValueStore.ENV,
-        )
-
         # Preferred env var
-        monkeypatch.delenv("TAP_MOCK_ENABLED")
         monkeypatch.setenv(env_var(subject, "boolean"), "0")
 
         assert subject.get_with_source("boolean", session=session) == (
@@ -308,12 +293,6 @@ class TestPluginSettingsService:
         assert env_var(subject, "start_date") not in config
         assert env_var(subject, "secure") not in config
 
-        # Env aliases are present
-        assert config["TAP_MOCK_ENABLED"] == "true"
-
-        # Negated aliases are not
-        assert "TAP_MOCK_DISABLED" not in config
-
         # Generic env vars are present
         assert config["MELTANO_EXTRACT_TEST"] == "mock"
         assert config["MELTANO_EXTRACT_LIST"] == '[1, 2, 3, "4"]'
@@ -380,15 +359,11 @@ class TestPluginSettingsService:
         # For reading setting values from environment
         assert env_vars(service, "boolean") == [
             "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
-            "TAP_MOCK_ENABLED",  # Custom alias
-            "!TAP_MOCK_DISABLED",  # Custom alias
         ]
         # For writing values into the execution environment
         assert env_vars(service, "boolean", for_writing=True) == [
             "TAP_MOCK_BOOLEAN",  # Name and namespace prefix
             "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
-            "TAP_MOCK_ENABLED",  # Custom alias
-            "!TAP_MOCK_DISABLED",  # Custom alias
         ]
 
         # Inheriting from base plugin
@@ -417,8 +392,6 @@ class TestPluginSettingsService:
             "TAP_MOCK_INHERITED_BOOLEAN",  # Name and namespace prefix
             "TAP_MOCK_BOOLEAN",  # Parent name and namespace prefix
             "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
-            "TAP_MOCK_ENABLED",  # Custom alias
-            "!TAP_MOCK_DISABLED",  # Custom alias
         ]
 
     def test_store_db(self, session, subject, tap):
@@ -482,18 +455,14 @@ class TestPluginSettingsService:
             SettingValueStore.DOTENV,
         )
 
-        dotenv.set_key(project.dotenv, "TAP_MOCK_DISABLED", "true")
+        dotenv.set_key(project.dotenv, "TAP_MOCK_BOOLEAN", "false")
         assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
-        dotenv.unset_key(project.dotenv, "TAP_MOCK_DISABLED")
-        dotenv.set_key(project.dotenv, "TAP_MOCK_ENABLED", "false")
-        assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
+        dotenv.unset_key(project.dotenv, "TAP_MOCK_BOOLEAN")
 
         subject.set("boolean", True, store=store)
 
         dotenv_contents = dotenv.dotenv_values(project.dotenv)
         assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "true"
-        assert "TAP_MOCK_DISABLED" not in dotenv_contents
-        assert "TAP_MOCK_ENABLED" not in dotenv_contents
         assert subject.get_with_source("boolean") == (True, SettingValueStore.DOTENV)
 
         subject.set("list", [1, 2, 3, "4"], store=store)
@@ -884,7 +853,7 @@ class TestPluginSettingsService:
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
-        monkeypatch.setenv("TAP_MOCK_ALIASED_ALIASED_1", "value_1")
+        monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_1")
         with pytest.raises(ConflictingSettingValueException):
             subject.get("aliased")
 
@@ -892,3 +861,14 @@ class TestPluginSettingsService:
         subject = plugin_settings_service_factory(tap)
         subject.set("aliased_3", "value_3")
         assert subject.get("aliased") == "value_3"
+
+    def test_strict_env_var_mode_on_raises_error(self, subject):
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+        subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
+        with pytest.raises(EnvironmentVariableNotSetError):
+            subject.get("stacked_env_var")
+
+    def test_strict_env_var_mode_off_no_raise_error(self, subject):
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
+        assert subject.get("stacked_env_var") is None

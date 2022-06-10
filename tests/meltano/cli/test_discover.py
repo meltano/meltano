@@ -15,7 +15,9 @@ class TestCliDiscover:
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,
     ):
-        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
+        adapter = meltano_hub_service.session.get_adapter(
+            meltano_hub_service.hub_api_url
+        )
 
         with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):
             result = cli_runner.invoke(cli, ["discover"])
@@ -23,7 +25,8 @@ class TestCliDiscover:
         assert_cli_runner(result)
 
         for plugin_type in PluginType:
-            assert hub_request_counter[f"/{plugin_type}/index"] == 1
+            request_count = 1 if plugin_type.discoverable else 0
+            assert hub_request_counter[f"/{plugin_type}/index"] == request_count
 
         assert "Extractors" in result.output
         assert "tap-gitlab" in result.output
@@ -41,7 +44,9 @@ class TestCliDiscover:
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,
     ):
-        adapter = meltano_hub_service.session.get_adapter(meltano_hub_service.BASE_URL)
+        adapter = meltano_hub_service.session.get_adapter(
+            meltano_hub_service.hub_api_url,
+        )
 
         with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):
             result = cli_runner.invoke(cli, ["discover", "extractors"])

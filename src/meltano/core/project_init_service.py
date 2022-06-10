@@ -136,7 +136,7 @@ class ProjectInitService:
         click.secho("  cd ", nl=False)
         click.secho(self.project_name, fg="magenta")
         click.echo("  Visit ", nl=False)
-        click.secho("https://meltano.com/", fg="cyan", nl=False)
+        click.secho("https://docs.meltano.com/getting-started#create-your-meltano-project", fg="cyan", nl=False)
         click.echo(" to learn where to go from here")
 
     def join_with_project_base(self, filename):

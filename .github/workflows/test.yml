@@ -1,0 +1,109 @@
+name: Test
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        include:
+        - { python-version: "3.7", os: "ubuntu-latest" }
+        - { python-version: "3.8", os: "ubuntu-latest" }
+        - { python-version: "3.9", os: "ubuntu-latest" }
+      fail-fast: false
+
+    name: Pytest on py${{ matrix.python-version }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTEST_MARKERS: not concurrent
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/constraints.txt
+      run: |
+        pipx install poetry
+        poetry --version
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3.1.2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+        cache: 'poetry'
+
+    - name: Upgrade pip
+      env:
+        PIP_CONSTRAINT: .github/workflows/constraints.txt
+      run: |
+        pip install pip
+        pip --version
+
+    - name: Install Dependencies
+      run: |
+        poetry env use "${{ matrix.python-version }}"
+        poetry install
+
+    - name: Run pytest
+      run: |
+        poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS"
+
+    - name: Upload coverage data
+      if: always() && (matrix.python-version == '3.9')
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: coverage-data
+        path: ".coverage.*"
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Install Poetry
+      run: |
+        pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+        poetry --version
+
+    - name: Set up Python
+      uses: actions/setup-python@v3.1.2
+      with:
+        python-version: '3.9'
+        cache: 'poetry'
+
+    - name: Upgrade pip
+      run: |
+        pip install --constraint=.github/workflows/constraints.txt pip
+        pip --version
+
+    - name: Download coverage data
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: coverage-data
+
+    - name: Install Dependencies
+      run: |
+        poetry env use "3.9"
+        poetry install
+
+    - name: Combine coverage data and display human readable report
+      run: |
+        poetry run coverage combine
+        poetry run coverage report --show-missing --ignore-errors
+
+    - name: Create coverage report
+      run: |
+        poetry run coverage xml --ignore-errors
+
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3.1.0

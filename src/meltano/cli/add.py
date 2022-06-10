@@ -1,18 +1,29 @@
 """Plugin Add CLI."""
+from __future__ import annotations
 
 import click
 
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.settings_service import FeatureFlags
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import PluginsTrackingContext, Tracker
+from meltano.core.tracking import cli as cli_tracking
+from meltano.core.tracking import cli_context_builder
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, add_plugin, add_related_plugins, install_plugins
+from .utils import (
+    CliError,
+    add_plugin,
+    add_required_plugins,
+    check_dependencies_met,
+    install_plugins,
+)
 
 
 @cli.command(short_help="Add a plugin to your project.")
@@ -43,21 +54,16 @@ from .utils import CliError, add_plugin, add_related_plugins, install_plugins
     is_flag=True,
     help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
 )
-@click.option(
-    "--include-related",
-    is_flag=True,
-    help="Also add transform plugins related to the identified discoverable extractor.",
-)
 @pass_project()
 @click.pass_context
-def add(
+def add(  # noqa: WPS238
     ctx,
-    project,
-    plugin_type,
-    plugin_name,
-    inherit_from=None,
-    variant=None,
-    as_name=None,
+    project: Project,
+    plugin_type: str,
+    plugin_name: str,
+    inherit_from: str = None,
+    variant: str = None,
+    as_name: str = None,
     **flags,
 ):
     """
@@ -65,6 +71,18 @@ def add(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
+    tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
+    tracker.add_contexts(
+        cli_context_builder(
+            "add",
+            None,
+            inherit_from=inherit_from,
+            variant=variant,
+            as_name=as_name,
+        )
+    )
+
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
 
@@ -76,24 +94,32 @@ def add(
         plugin_names = [as_name]
 
     plugins_service = ProjectPluginsService(project)
-    settings_service = ProjectSettingsService(project)
 
     if flags["custom"]:
         if plugin_type in {
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
         }:
+            tracker.track_command_event(cli_tracking.STARTED)
+            tracker.track_command_event(cli_tracking.ABORTED)
             raise CliError(f"--custom is not supported for {plugin_type}")
+
+    plugin_refs = [
+        PluginRef(plugin_type=plugin_type, name=name) for name in plugin_names
+    ]
+    dependencies_met, err = check_dependencies_met(
+        plugin_refs=plugin_refs, plugins_service=plugins_service
+    )
+    if not dependencies_met:
+        tracker.track_command_event(cli_tracking.STARTED)
+        tracker.track_command_event(cli_tracking.ABORTED)
+        raise CliError(f"Failed to install plugin(s): {err}")
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
-    plugins = []
-    tracker = GoogleAnalyticsTracker(project)
-    with settings_service.feature_flag(
-        FeatureFlags.LOCKFILES,
-        raise_error=False,
-    ) as lock:
-        for plugin in plugin_names:
+    plugins: list[ProjectPlugin] = []
+    for plugin in plugin_names:
+        try:
             plugins.append(
                 add_plugin(
                     project,
@@ -103,39 +129,36 @@ def add(
                     variant=variant,
                     custom=flags["custom"],
                     add_service=add_service,
-                    lock=lock,
                 )
             )
-            tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
+        except Exception:
+            # if the plugin is not known to meltano send what information we do have
+            tracker.add_contexts(
+                PluginsTrackingContext([(plugin, None) for plugin in plugins])
+            )
+            tracker.track_command_event(cli_tracking.STARTED)
+            tracker.track_command_event(cli_tracking.ABORTED)
+            raise
 
-    related_plugin_types = [PluginType.FILES]
-    if flags["include_related"]:
-        related_plugin_types = list(PluginType)
+        legacy_tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
 
-    related_plugins = add_related_plugins(
-        project, plugins, add_service=add_service, plugin_types=related_plugin_types
+        required_plugins = add_required_plugins(
+            project, plugins, add_service=add_service
+        )
+    plugins.extend(required_plugins)
+    tracker.add_contexts(
+        PluginsTrackingContext([(candidate, None) for candidate in plugins])
     )
-    plugins.extend(related_plugins)
+    tracker.track_command_event(cli_tracking.STARTED)
 
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `related_plugins`, but should
-    # be installed first.
-    plugins.reverse()
-
-    # Plugin installation can be order dependent (e.g. a dbt transform package
-    # requires the dbt transformer to be installed before), so we will disable
-    # parallelism for this operation.
-    success = install_plugins(
-        project,
-        plugins,
-        reason=PluginInstallReason.ADD,
-        parallelism=1,
-    )
+    success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     if not success:
+        tracker.track_command_event(cli_tracking.FAILED)
         raise CliError("Failed to install plugin(s)")
 
     _print_plugins(plugins)
+    tracker.track_command_event(cli_tracking.COMPLETED)
 
 
 def _print_plugins(plugins):
