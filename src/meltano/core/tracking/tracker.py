@@ -24,23 +24,10 @@ from structlog.stdlib import get_logger
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking.schemas import get_schema_url
 from meltano.core.utils import format_exception, hash_sha256
 
 from .environment import environment_context
-
-CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
-CLI_EVENT_SCHEMA_VERSION = "1-0-0"
-
-TELEMETRY_STATE_CHANGE_EVENT_SCHEMA = (
-    "iglu:com.meltano/telemetry_state_change_event/jsonschema"
-)
-TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION = "1-0-0"
-
-BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
-BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
-
-EXIT_EVENT_SCHEMA = "iglu:com.meltano/exit_event/jsonschema"
-EXIT_EVENT_VERSION = "1-0-0"
 
 
 class BlockEvents(Enum):
@@ -301,9 +288,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             event_json: The event JSON to track. See cli_event schema for more details.
         """
         self.track_unstruct_event(
-            SelfDescribingJson(
-                f"{CLI_EVENT_SCHEMA}/{CLI_EVENT_SCHEMA_VERSION}", event_json
-            )
+            SelfDescribingJson(get_schema_url("cli_event"), event_json)
         )
 
     def track_telemetry_state_change_event(
@@ -332,7 +317,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         if isinstance(to_value, uuid.UUID):
             to_value = str(to_value)
         event_json = SelfDescribingJson(
-            f"{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA}/{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION}",
+            get_schema_url("telemetry_state_change_event"),
             {
                 "setting_name": setting_name,
                 "changed_from": from_value,
@@ -431,7 +416,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         """
         self.track_unstruct_event(
             SelfDescribingJson(
-                f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
+                get_schema_url("block_event"),
                 {"type": block_type, "event": event.name},
             )
         )
@@ -447,7 +432,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         self.track_unstruct_event(
             SelfDescribingJson(
-                f"{EXIT_EVENT_SCHEMA}/{EXIT_EVENT_VERSION}",
+                get_schema_url("exit_event"),
                 {
                     "exit_code": exit_code,
                     "exit_timestamp": now.isoformat() + "Z",

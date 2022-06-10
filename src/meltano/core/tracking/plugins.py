@@ -10,12 +10,10 @@ from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.elt_context import ELTContext
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.tracking.schemas import get_schema_url
 from meltano.core.utils import hash_sha256, safe_hasattr
 
 logger = get_logger(__name__)
-
-PLUGINS_CONTEXT_SCHEMA = "iglu:com.meltano/plugins_context/jsonschema"
-PLUGINS_CONTEXT_SCHEMA_VERSION = "1-0-0"
 
 
 def plugins_tracking_context_from_elt_context(
@@ -99,7 +97,7 @@ class PluginsTrackingContext(SelfDescribingJson):
             tracking_context.append(_from_plugin(plugin, cmd))
 
         super().__init__(
-            f"{PLUGINS_CONTEXT_SCHEMA}/{PLUGINS_CONTEXT_SCHEMA_VERSION}",
+            get_schema_url("plugins_context"),
             {"context_uuid": str(uuid.uuid4()), "plugins": tracking_context},
         )
 
