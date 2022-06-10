@@ -9,6 +9,8 @@ from meltano.core.tracking.schemas import CliContextSchema
 
 
 class CliEvent(Enum):
+    """The kind of event that is occuring in the command-line interface."""
+
     started = auto()
     completed = auto()
     skipped = auto()

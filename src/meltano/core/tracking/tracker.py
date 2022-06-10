@@ -131,12 +131,12 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
-        """Return the contexts that will accompany events fired by this tracker.
+        """Get the contexts that will accompany events fired by this tracker.
 
         Returns:
             The contexts that will accompany events fired by this tracker.
         """
-        self._contexts
+        return self._contexts
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
