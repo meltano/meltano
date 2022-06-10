@@ -3,11 +3,12 @@ name: Docker Publish
 # For now, only run manually
 on:
   workflow_dispatch:
-    dry-run:
-      description: "Dry run (skip push step)"
-      type: boolean
-      required: true
-      default: true  # TOOD: revert to false when we have this tested
+    inputs:
+      dry-run:
+        description: "Dry run (skip push step)"
+        type: boolean
+        required: true
+        default: true  # TOOD: revert to false when we have this tested
 
 jobs:
   public_docker_build:
