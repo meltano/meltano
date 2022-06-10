@@ -15,6 +15,9 @@ jobs:
         - { python-version: '3.7', os: 'ubuntu-latest' }
         - { python-version: '3.8', os: 'ubuntu-latest' }
         - { python-version: '3.9', os: 'ubuntu-latest' }
+        # - { python-version: '3.7', os: 'macos-latest' }
+        # - { python-version: '3.8', os: 'macos-latest' }
+        # - { python-version: '3.9', os: 'macos-latest' }
       fail-fast: false
 
     name: Build artifacts on py${{ matrix.python-version }} (${{ matrix.os }})
@@ -44,7 +47,7 @@ jobs:
         touch src/meltano/core/tracking/.release_marker
 
     - name: Build sdist
-      if: always() && (matrix.python-version == '3.9')
+      if: always() && (matrix.python-version == '3.9') && (matrix.os == 'ubuntu-latest')
       run: |
         poetry build -f sdist
 
