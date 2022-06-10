@@ -80,6 +80,7 @@ jobs:
 
     # e.g. meltano/meltano:SHA-73d02a3b693bbf38270bf23e4cc31e69cb2837ad
     - name: Build and push images with SHA label 'meltano/meltano:SHA-${{ env.COMMIT_SHA }}'
+      if: ${{ matrix.is-default-python }}
       uses: docker/build-push-action@v3
       with:
         context: "{{defaultContext}}:docker/publish"
@@ -108,8 +109,8 @@ jobs:
     #      meltano/meltano:latest
     #      meltano/meltano:latest-python:3.8
     - name: Build and push default Python versions (if ${{ matrix.python-version }}' is default)
-      uses: docker/build-push-action@v3
       if: ${{ matrix.is-default-python }}
+      uses: docker/build-push-action@v3
       with:
         context: "{{defaultContext}}:docker/publish"
         push: ${{ !github.event.inputs.dry-run }}
