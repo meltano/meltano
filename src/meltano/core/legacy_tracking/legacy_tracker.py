@@ -54,7 +54,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
             request_timeout=self.request_timeout,
         )
         if context_overrides:
-            self.tracker.contexts = context_overrides
+            self.tracker._contexts = context_overrides
 
         project_context = ProjectContext(project, self.tracker.client_id)
         self.project_id = project_context.project_uuid
