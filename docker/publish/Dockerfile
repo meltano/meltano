@@ -9,9 +9,10 @@
 # - MELTANO_VERSION: the version of Meltano to use, e.g. '1.105.0', '2.0.1', etc.
 
 ARG PYTHON_VERSION
-ARG MELTANO_VERSION
 
 FROM python:$PYTHON_VERSION
+
+ARG MELTANO_VERSION
 
 # Probably not needed, but some devs may want these libraries
 RUN echo "Installing system deps" \
@@ -21,7 +22,7 @@ RUN echo "Installing system deps" \
 
 # installing the application the same way our users
 # do when using PyPI
-RUN pip install meltano==$MELTANO_VERSION
+RUN pip install meltano==${MELTANO_VERSION}
 
 # meltano project directory, this is where you should
 # mount your Meltano project
