@@ -70,8 +70,7 @@ def get_traceback_json(tb: TracebackType) -> TracebackLevelsJSON:
     while tb:
         levels.append(
             {
-                "path": get_relative_traceback_path(tb),
-                "path_hash": get_hashed_traceback_path(tb),
+                "file": get_relative_traceback_path(tb),
                 "line_number": tb.tb_lineno,
             }
         )
@@ -88,8 +87,11 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
         tb: The traceback from which to extract the path info.
 
     Returns:
-        `'<stdin>'` if the path was `'<stdin>'`, else the path made relative to a path in
-        `BASE_PATHS`, or if that is not possible, `None`.
+        The first valid option of the following is returned:
+        - If the path is `'<stdin>'`: `'<stdin>'`
+        - If possible: the path made relative to a path in `BASE_PATHS`
+        - If the file name is `__init__.py` or `__main__.py`: `'.../<module name>/<file name>.py'`.
+        - Otherwise: `'.../<filename>.py'`.
     """
     try:
         str_path = tb.tb_frame.f_code.co_filename
@@ -107,20 +109,7 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
         except ValueError:  # Path could not be made relative to `base_path`
             pass  # Try making it relative to the next base path
 
-    return None
-
-
-def get_hashed_traceback_path(tb: TracebackType) -> str | None:
-    """Get the hashed absolute path from a traceback.
-
-    Parameters:
-        tb: The traceback from which to extract the path info.
-
-    Returns:
-        The hashed absolute path from the traceback, or `None` if the traceback is missing that
-        info.
-    """
-    try:
-        return hash_sha256(tb.tb_frame.f_code.co_filename)
-    except Exception:
-        return None
+    if path.parts[-1] in {"__init__.py", "__main__.py"}:
+        # Include the module directory if the file is `__init__.py` or `__main__.py`
+        return f".../{path.parts[-2]}/{path.parts[-1]}"
+    return f".../{path.parts[-1]}"

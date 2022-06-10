@@ -46,21 +46,13 @@
                     "items": {
                         "type": "object",
                         "properties": {
-                            "path": {
-                                "description": "The path of the Python source file for this level of the traceback, relative to the location Python was installed; null if the path could not be made relative",
+                            "file": {
+                                "description": "The path of the Python source file for this level of the traceback, relative to the location Python was installed. `'<stdin>'` if the input was from stdin. `'.../<module name>/__(init|main)__.py'` if the file name was `__init__.py` or `__main__.py`, and a relative path could not be created. '.../<module name>.py otherwise.",
                                 "type": [
                                     "string",
                                     "null"
                                 ],
                                 "maxLength": 1024
-                            },
-                            "path_hash": {
-                                "description": "64 character hash of the absolute path of the Python source file for this level of traceback",
-                                "type": [
-                                    "string",
-                                    "null"
-                                ],
-                                "maxLength": 64
                             },
                             "line_number": {
                                 "description": "The line number in the Python source code associated with this traceback",
@@ -70,8 +62,7 @@
                             }
                         },
                         "required": [
-                            "path",
-                            "path_hash",
+                            "file",
                             "line_number"
                         ],
                         "additionalProperties": false

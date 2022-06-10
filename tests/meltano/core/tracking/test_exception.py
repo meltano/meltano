@@ -2,17 +2,19 @@ from __future__ import annotations
 
 import inspect
 import json
-import pathlib
 import uuid
-from pathlib import Path
-from typing import Any
 import warnings
+from pathlib import Path
+from platform import python_version_tuple
+from typing import Any
 
 from jsonschema import ValidationError, validate
 
 from meltano.core.tracking import ExceptionContext
 from meltano.core.tracking import __file__ as tracking_module_path
 from meltano.core.utils import hash_sha256
+
+THIS_FILE_BASENAME = Path(__file__).name
 
 with open(
     Path(tracking_module_path).parent
@@ -35,10 +37,6 @@ class AnyInt:
 
     def __eq__(self, other):
         return isinstance(other, int)
-
-
-def is_hash(hashed: str) -> bool:
-    return len(hashed) == 64 and not set(hashed) - set("abcdefABCDEF0123456789")
 
 
 def is_valid_exception_context(instance: dict[str, Any]) -> bool:
@@ -95,10 +93,8 @@ def test_simple_exception_context():
 
     tb_data = ex_data["traceback"]
     assert len(tb_data) == 1
-    for key in ("path", "path_hash", "line_number"):
+    for key in ("file", "line_number"):
         assert key in tb_data[0]
-
-    assert is_hash(tb_data[0]["path_hash"])
 
 
 def test_complex_exception_context():
@@ -124,37 +120,32 @@ def test_complex_exception_context():
 
     assert is_valid_exception_context(ctx.data)
 
-    pathlib_hash = hash_sha256(pathlib.__file__)
-    this_filepath_hash = hash_sha256(__file__)
-
+    pathlib_relative_path = "lib/python{}.{}/pathlib.py".format(
+        *python_version_tuple()[:2]
+    )
     path_resolve_exception_context = {
         "type": "FileNotFoundError",
         "str_hash": "8604732e6dd06fbcccf2f97979f6ec308a21b6b253fd42de5cf79a0b758155d0",
         "repr_hash": "b4f0f46612e4904b5c3861b2596331b62edf2b82ba33aba8d8a3bc19741e587e",
         "traceback": [
             {
-                "path": None,
-                "path_hash": this_filepath_hash,
+                "file": f".../{THIS_FILE_BASENAME}",
                 "line_number": line_nums[1],
             },
             {
-                "path": "lib/python3.7/pathlib.py",
-                "path_hash": pathlib_hash,
+                "file": pathlib_relative_path,
                 "line_number": AnyInt(),
             },
             {
-                "path": "lib/python3.7/pathlib.py",
-                "path_hash": pathlib_hash,
+                "file": pathlib_relative_path,
                 "line_number": AnyInt(),
             },
             {
-                "path": "lib/python3.7/pathlib.py",
-                "path_hash": pathlib_hash,
+                "file": pathlib_relative_path,
                 "line_number": AnyInt(),
             },
             {
-                "path": "lib/python3.7/pathlib.py",
-                "path_hash": pathlib_hash,
+                "file": pathlib_relative_path,
                 "line_number": AnyInt(),
             },
         ],
@@ -170,8 +161,7 @@ def test_complex_exception_context():
             "repr_hash": "ad9443d77d731da456747bd47282a51afe86be7058533f44dcc979320ad62c73",
             "traceback": [
                 {
-                    "path": None,
-                    "path_hash": this_filepath_hash,
+                    "file": f".../{THIS_FILE_BASENAME}",
                     "line_number": line_nums[3],
                 }
             ],
@@ -182,13 +172,11 @@ def test_complex_exception_context():
                 "repr_hash": "0015450e35aed13f4802973752ee45d02c8f8eaa5d57417962986f4b8ef1bf88",
                 "traceback": [
                     {
-                        "path": None,
-                        "path_hash": this_filepath_hash,
+                        "file": f".../{THIS_FILE_BASENAME}",
                         "line_number": line_nums[0],
                     },
                     {
-                        "path": None,
-                        "path_hash": this_filepath_hash,
+                        "file": f".../{THIS_FILE_BASENAME}",
                         "line_number": line_nums[2],
                     },
                 ],
