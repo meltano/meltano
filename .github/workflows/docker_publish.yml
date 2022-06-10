@@ -1,14 +1,19 @@
 name: Docker Publish
 
+# This workflow will publish all public docker images to DockerHub
+# Use the `dry-run=FALSE` input variable to debug the workflow without pushing
+# images.
+
 # For now, only run manually
 on:
   workflow_dispatch:
     inputs:
       dry-run:
+        # True to only push SHA label
         description: "Dry run (skip push step)"
         type: boolean
         required: true
-        default: true  # TOOD: revert to false when we have this tested
+        default: true
 
 jobs:
   public_docker_build:
@@ -44,6 +49,7 @@ jobs:
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "PYTHON_VERSION=${{ matrix.python-version }}"
         echo "RELEASE_VERSION=${{ steps.get-meltano-version.outputs.release-version }}"
+        echo "COMMIT_SHA=${{ env.COMMIT_SHA }}"
         echo "DEBUG INFO: DRY_RUN is truthy=${{ !(!github.event.inputs.dry-run) }}"
         echo "DEBUG INFO: DRY_RUN is falsey=${{ !github.event.inputs.dry-run }}"
 
@@ -72,6 +78,18 @@ jobs:
     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
     #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    # e.g. meltano/meltano:SHA-<COMMIT_SHA>
+    - name: Build and push images with SHA label 'meltano/meltano:SHA-${{ env.COMMIT_SHA }}'
+      uses: docker/build-push-action@v3
+      with:
+        context: "{{defaultContext}}:docker/publish"
+        push: true
+        tags: |
+          meltano/meltano:SHA-${{ env.COMMIT_SHA }}
+        build-args: |
+          PYTHON_VERSION=${{ matrix.python-version }}
+          MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+
     # e.g. meltano/meltano:v2.0.0-python:3.8
     # e.g. meltano/meltano:latest-python:3.8
     - name: Build and push images with suffix '-${{ matrix.python-version }}'
@@ -89,7 +107,7 @@ jobs:
     # e.g. meltano/meltano:v2.0.0
     #      meltano/meltano:latest
     #      meltano/meltano:latest-python:3.8
-    - name: Build and push default Python versions (if default='${{ matrix.python-version }}')
+    - name: Build and push default Python versions (if ${{ matrix.python-version }}' is default)
       uses: docker/build-push-action@v3
       if: ${{ matrix.is-default-python }}
       with:
