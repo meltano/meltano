@@ -39,6 +39,7 @@ jobs:
         poetry --version
 
     - name: Release Marker
+      if: ${{ github.event.release }}
       run: |
         touch src/meltano/core/tracking/.release_marker
 
