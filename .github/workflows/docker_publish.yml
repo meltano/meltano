@@ -35,6 +35,7 @@ jobs:
     - name: Get Meltano Version
       id: get-meltano-version
       run: |
+        pipx install poetry
         echo "::set-output name=release-version::$(poetry version --short)"
     - name: Print job inputs summary
       run: |
