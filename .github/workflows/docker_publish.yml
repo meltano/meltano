@@ -27,10 +27,10 @@ jobs:
       matrix:
         include:
         # TODO: uncomment when basic functionality is working
-        # - python-version: "3.7"
-        #   is-default-python: true
-        # - python-version: "3.8"
-        #   is-default-python: true  # will be used in 'latest' images
+        - python-version: "3.7"
+          is-default-python: false
+        - python-version: "3.8"
+          is-default-python: true  # will be used in 'latest' images
         - python-version: "3.9"
           is-default-python: false
 
