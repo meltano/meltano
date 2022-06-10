@@ -29,6 +29,14 @@ from meltano.core.utils import format_exception, hash_sha256
 
 from .environment import environment_context
 
+URL_REGEX = (
+    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+)
+
+MICROSECONDS_PER_SECOND = 1000000
+
+logger = get_logger(__name__)
+
 
 class BlockEvents(Enum):
     """Events describing a block state."""
@@ -37,13 +45,6 @@ class BlockEvents(Enum):
     started = auto()
     completed = auto()
     failed = auto()
-
-
-URL_REGEX = (
-    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
-)
-
-logger = get_logger(__name__)
 
 
 def check_url(url: str) -> bool:
@@ -153,7 +154,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             stored_telemetry_settings: the prior analytics settings
         """
         # If `stored_telemetry_settings` is all `None`, then the settings have never been saved yet
-        save_settings = all(x is None for x in stored_telemetry_settings)
+        save_settings = all(setting is None for setting in stored_telemetry_settings)
 
         if (
             stored_telemetry_settings.project_id is not None
@@ -422,6 +423,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         )
 
     def track_exit_event(self):
+        """Fire exit event."""
         from meltano.cli import exit_code
 
         start_time = datetime.utcfromtimestamp(Process().create_time())
@@ -435,9 +437,9 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 get_schema_url("exit_event"),
                 {
                     "exit_code": exit_code,
-                    "exit_timestamp": now.isoformat() + "Z",
+                    "exit_timestamp": f"{now.isoformat()}Z",
                     "process_duration_microseconds": int(
-                        (now - start_time).total_seconds() * 1000000
+                        (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND
                     ),
                 },
             )
