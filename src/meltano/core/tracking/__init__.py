@@ -3,6 +3,7 @@
 from .contexts import (
     CliContext,
     CliEvent,
+    ExceptionContext,
     PluginsTrackingContext,
     ProjectContext,
     cli_context_builder,
