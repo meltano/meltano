@@ -3,8 +3,7 @@ from __future__ import annotations
 
 from snowplow_tracker import SelfDescribingJson
 
-CLI_CONTEXT_SCHEMA = "iglu:com.meltano/cli_context/jsonschema"
-CLI_CONTEXT_SCHEMA_VERSION = "1-0-0"
+from meltano.core.tracking.schemas import CliContextSchema
 
 EVENT_RESULTS = {
     "started": {"event": "started"},
@@ -55,7 +54,7 @@ class CliContext(SelfDescribingJson):
             option_keys: The list of option keys `loader`, `job`.
         """
         super().__init__(
-            f"{CLI_CONTEXT_SCHEMA}/{CLI_CONTEXT_SCHEMA_VERSION}",
+            CliContextSchema.url,
             {
                 "command": command,
                 "sub_command": sub_command,

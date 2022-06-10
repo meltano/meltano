@@ -24,23 +24,23 @@ from structlog.stdlib import get_logger
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking.schemas import (
+    BlockEventSchema,
+    CliEventSchema,
+    ExitEventSchema,
+    TelemetryStateChangeEventSchema,
+)
 from meltano.core.utils import format_exception, hash_sha256
 
 from .environment import environment_context
 
-CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
-CLI_EVENT_SCHEMA_VERSION = "1-0-0"
-
-TELEMETRY_STATE_CHANGE_EVENT_SCHEMA = (
-    "iglu:com.meltano/telemetry_state_change_event/jsonschema"
+URL_REGEX = (
+    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
-TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION = "1-0-0"
 
-BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
-BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
+MICROSECONDS_PER_SECOND = 1000000
 
-EXIT_EVENT_SCHEMA = "iglu:com.meltano/exit_event/jsonschema"
-EXIT_EVENT_VERSION = "1-0-0"
+logger = get_logger(__name__)
 
 
 class BlockEvents(Enum):
@@ -50,13 +50,6 @@ class BlockEvents(Enum):
     started = auto()
     completed = auto()
     failed = auto()
-
-
-URL_REGEX = (
-    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
-)
-
-logger = get_logger(__name__)
 
 
 def check_url(url: str) -> bool:
@@ -166,7 +159,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             stored_telemetry_settings: the prior analytics settings
         """
         # If `stored_telemetry_settings` is all `None`, then the settings have never been saved yet
-        save_settings = all(x is None for x in stored_telemetry_settings)
+        save_settings = all(setting is None for setting in stored_telemetry_settings)
 
         if (
             stored_telemetry_settings.project_id is not None
@@ -300,11 +293,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Args:
             event_json: The event JSON to track. See cli_event schema for more details.
         """
-        self.track_unstruct_event(
-            SelfDescribingJson(
-                f"{CLI_EVENT_SCHEMA}/{CLI_EVENT_SCHEMA_VERSION}", event_json
-            )
-        )
+        self.track_unstruct_event(SelfDescribingJson(CliEventSchema.url, event_json))
 
     def track_telemetry_state_change_event(
         self,
@@ -332,7 +321,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         if isinstance(to_value, uuid.UUID):
             to_value = str(to_value)
         event_json = SelfDescribingJson(
-            f"{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA}/{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION}",
+            TelemetryStateChangeEventSchema.url,
             {
                 "setting_name": setting_name,
                 "changed_from": from_value,
@@ -431,12 +420,13 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         """
         self.track_unstruct_event(
             SelfDescribingJson(
-                f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
+                BlockEventSchema.url,
                 {"type": block_type, "event": event.name},
             )
         )
 
     def track_exit_event(self):
+        """Fire exit event."""
         from meltano.cli import exit_code
 
         start_time = datetime.utcfromtimestamp(Process().create_time())
@@ -447,12 +437,12 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         self.track_unstruct_event(
             SelfDescribingJson(
-                f"{EXIT_EVENT_SCHEMA}/{EXIT_EVENT_VERSION}",
+                ExitEventSchema.url,
                 {
                     "exit_code": exit_code,
-                    "exit_timestamp": now.isoformat() + "Z",
+                    "exit_timestamp": f"{now.isoformat()}Z",
                     "process_duration_microseconds": int(
-                        (now - start_time).total_seconds() * 1000000
+                        (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND
                     ),
                 },
             )
