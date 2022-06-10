@@ -16,46 +16,6 @@ from meltano.core.utils import hash_sha256, safe_hasattr
 logger = get_logger(__name__)
 
 
-def plugins_tracking_context_from_elt_context(
-    elt_context: ELTContext,
-) -> PluginsTrackingContext:
-    """Create a PluginsTrackingContext from an ELTContext.
-
-    Args:
-        elt_context: The ELTContext to use.
-
-    Returns:
-        A PluginsTrackingContext.
-    """
-    plugins = []
-    if not elt_context.only_transform:
-        plugins.append((elt_context.extractor.plugin, None))
-        plugins.append((elt_context.loader.plugin, None))
-    if elt_context.transformer:
-        plugins.append((elt_context.transformer.plugin, None))
-    return PluginsTrackingContext(plugins)
-
-
-def plugins_tracking_context_from_block(
-    blk: BlockSet | PluginCommandBlock,
-) -> PluginsTrackingContext:
-    """Create a PluginsTrackingContext from a BlockSet or PluginCommandBlock.
-
-    Args:
-        blk: The block to create the context for.
-
-    Returns:
-        The PluginsTrackingContext for the given block.
-    """
-    if isinstance(blk, BlockSet):
-        plugins: list[(ProjectPlugin, str)] = []
-        for plugin_block in blk.blocks:
-            plugins.append((plugin_block.context.plugin, plugin_block.plugin_args))
-        return PluginsTrackingContext(plugins)
-    if isinstance(blk, PluginCommandBlock):
-        return PluginsTrackingContext([(blk.context.plugin, blk.command)])
-
-
 def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
     if not safe_hasattr(plugin, "info"):
         logger.debug(
@@ -109,3 +69,46 @@ class PluginsTrackingContext(SelfDescribingJson):
             cmd: The command that was executed.
         """
         self["plugins"].append({_from_plugin(plugin, cmd)})
+
+    @classmethod
+    def from_elt_context(cls, elt_context: ELTContext) -> PluginsTrackingContext:
+        """Create a PluginsTrackingContext from an ELTContext.
+
+        Parameters:
+            elt_context: The ELTContext to use.
+
+        Returns:
+            A PluginsTrackingContext.
+        """
+        plugins = []
+        if not elt_context.only_transform:
+            plugins.append((elt_context.extractor.plugin, None))
+            plugins.append((elt_context.loader.plugin, None))
+        if elt_context.transformer:
+            plugins.append((elt_context.transformer.plugin, None))
+        return cls(plugins)
+
+    @classmethod
+    def from_block(cls, blk: BlockSet | PluginCommandBlock) -> PluginsTrackingContext:
+        """Create a PluginsTrackingContext from a BlockSet or PluginCommandBlock.
+
+        Parameters:
+            blk: The block to create the context for.
+
+        Raises:
+            TypeError: `blk` is not a `BlockSet` or `PluginCommandBlock`.
+
+        Returns:
+            The PluginsTrackingContext for the given block.
+        """
+        if isinstance(blk, BlockSet):
+            plugins: list[(ProjectPlugin, str)] = []
+            for plugin_block in blk.blocks:
+                plugins.append((plugin_block.context.plugin, plugin_block.plugin_args))
+            return cls(plugins)
+        if isinstance(blk, PluginCommandBlock):
+            return cls([(blk.context.plugin, blk.command)])
+        raise TypeError(
+            "Parameter 'blk' must be an instance of 'BlockSet' or 'PluginCommandBlock', "
+            + f"not {type(blk)!r}"
+        )

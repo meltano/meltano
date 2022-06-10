@@ -21,12 +21,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import (
-    CliEvent,
-    Tracker,
-    cli_context_builder,
-    plugins_tracking_context_from_elt_context,
-)
+from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -113,7 +108,7 @@ async def elt(
     tracker = Tracker(project)
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
 
-    cmd_ctx = cli_context_builder(
+    cmd_ctx = CliContext.from_command_and_kwargs(
         "elt",
         None,
         dry=dry,
@@ -283,7 +278,7 @@ async def _run_elt(
     async with _redirect_output(log, output_logger):
         try:
             elt_context = context_builder.context()
-            tracker.add_contexts(plugins_tracking_context_from_elt_context(elt_context))
+            tracker.add_contexts(PluginsTrackingContext.from_elt_context(elt_context))
 
             if elt_context.only_transform:
                 log.info("Extract & load skipped.")
