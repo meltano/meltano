@@ -93,14 +93,14 @@ jobs:
 
     # e.g. meltano/meltano:v2.0.0-python:3.8
     # e.g. meltano/meltano:latest-python:3.8
-    - name: Build and push images with suffix '-${{ matrix.python-version }}'
+    - name: Build and push images with suffix '-python${{ matrix.python-version }}'
       uses: docker/build-push-action@v3
       with:
         context: "{{defaultContext}}:docker/publish"
         push: ${{ !github.event.inputs.dry-run }}
         tags: |
-          meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-${{ matrix.python-version }}
-          meltano/meltano:latest-${{ matrix.python-version }}
+          meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}
+          meltano/meltano:latest-python${{ matrix.python-version }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
@@ -117,7 +117,7 @@ jobs:
         tags: |
           meltano/meltano:latest
           meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}
-          meltano/meltano:latest-${{ matrix.python-version }}
+          meltano/meltano:latest-python${{ matrix.python-version }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
