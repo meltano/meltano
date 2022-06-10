@@ -20,9 +20,12 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import PluginsTrackingContext, Tracker
-from meltano.core.tracking import cli as cli_tracking
-from meltano.core.tracking import cli_context_builder
+from meltano.core.tracking import (
+    CliEvent,
+    PluginsTrackingContext,
+    Tracker,
+    cli_context_builder,
+)
 from meltano.core.utils import run_async
 
 from . import cli
@@ -108,16 +111,16 @@ def invoke(
             plugin_name, plugin_type=plugin_type, invokable=True
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
-        tracker.track_command_event(cli_tracking.STARTED)
+        tracker.track_command_event(CliEvent.started)
     except PluginNotFoundError:
         # if the plugin is not found, we fire started and aborted tracking events together to keep tracking consistent
-        tracker.track_command_event(cli_tracking.STARTED)
-        tracker.track_command_event(cli_tracking.ABORTED)
+        tracker.track_command_event(CliEvent.started)
+        tracker.track_command_event(CliEvent.aborted)
         raise
 
     if list_commands:
         do_list_commands(plugin)
-        tracker.track_command_event(cli_tracking.COMPLETED)
+        tracker.track_command_event(CliEvent.completed)
         return
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
@@ -137,13 +140,13 @@ def invoke(
             )
         )
     except Exception as invoke_err:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(CliEvent.failed)
         raise invoke_err
 
     if exit_code == 0:
-        tracker.track_command_event(cli_tracking.COMPLETED)
+        tracker.track_command_event(CliEvent.completed)
     else:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(CliEvent.failed)
     sys.exit(exit_code)
 
 

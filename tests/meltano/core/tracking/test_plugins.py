@@ -1,6 +1,6 @@
 from meltano.core.block.plugin_command import plugin_command_invoker
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.tracking.plugins import (
+from meltano.core.tracking import (
     PluginsTrackingContext,
     plugins_tracking_context_from_block,
 )

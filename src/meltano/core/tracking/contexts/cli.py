@@ -1,23 +1,19 @@
 """Meltano telemetry contexts for the CLI events."""
 from __future__ import annotations
 
+from enum import Enum, auto
+
 from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.tracking.schemas import CliContextSchema
 
-EVENT_RESULTS = {
-    "started": {"event": "started"},
-    "completed": {"event": "completed"},
-    "skipped": {"event": "skipped"},
-    "failed": {"event": "failed"},
-    "aborted": {"event": "aborted"},
-}
 
-STARTED = EVENT_RESULTS["started"]
-COMPLETED = EVENT_RESULTS["completed"]
-SKIPPED = EVENT_RESULTS["skipped"]
-FAILED = EVENT_RESULTS["failed"]
-ABORTED = EVENT_RESULTS["aborted"]
+class CliEvent(Enum):
+    started = auto()
+    completed = auto()
+    skipped = auto()
+    failed = auto()
+    aborted = auto()
 
 
 def cli_context_builder(

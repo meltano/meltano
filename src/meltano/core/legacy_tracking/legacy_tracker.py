@@ -13,8 +13,7 @@ from snowplow_tracker import SelfDescribingJson
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
-from meltano.core.tracking import Tracker
-from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking import ProjectContext, Tracker
 from meltano.core.utils import hash_sha256
 
 REQUEST_TIMEOUT = 2.0

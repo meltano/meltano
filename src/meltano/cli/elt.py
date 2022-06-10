@@ -21,10 +21,12 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import Tracker
-from meltano.core.tracking import cli as cli_tracking
-from meltano.core.tracking import cli_context_builder
-from meltano.core.tracking.plugins import plugins_tracking_context_from_elt_context
+from meltano.core.tracking import (
+    CliEvent,
+    Tracker,
+    cli_context_builder,
+    plugins_tracking_context_from_elt_context,
+)
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -126,7 +128,7 @@ async def elt(
         force=force,
     )
     tracker.add_contexts(cmd_ctx)
-    tracker.track_command_event(cli_tracking.STARTED)
+    tracker.track_command_event(CliEvent.started)
 
     # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
     # if transform is None we still need manually default to skip after firing the tracking event above.
@@ -164,12 +166,12 @@ async def elt(
         else:
             await _run_job(tracker, project, job, session, context_builder, force=force)
     except Exception as err:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(CliEvent.failed)
         raise err
     finally:
         session.close()
 
-    tracker.track_command_event(cli_tracking.COMPLETED)
+    tracker.track_command_event(CliEvent.completed)
     legacy_tracker.track_meltano_elt(
         extractor=extractor, loader=loader, transform=transform
     )
