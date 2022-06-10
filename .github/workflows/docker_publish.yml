@@ -2,6 +2,7 @@ name: Docker Publish
 
 # For now, only run manually
 on:
+  pull_request: # TODO: remove this line after first run
   workflow_dispatch:
     inputs:
       dry-run:
