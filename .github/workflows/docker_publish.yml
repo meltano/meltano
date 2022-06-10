@@ -4,13 +4,18 @@ name: Docker Publish
 on:
   workflow_dispatch:
     dry-run:
-      description: "Force Push (ignore validation)"
+      description: "Dry run (skip push step)"
       type: boolean
       required: true
-      default: false
+      default: true  # TOOD: revert to false when we have this tested
 
 jobs:
   public_docker_build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: meltano/meltano
+      COMMIT_SHA: ${{ github.sha }}
+
     strategy:
       fail-fast: true
       matrix:
@@ -22,17 +27,23 @@ jobs:
         - python-version: "3.9"
           is-default-python: false
 
-    runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: meltano/meltano
-      COMMIT_SHA: ${{ github.sha }}
     steps:
     - uses: actions/checkout@v2
-
     - name: Get Meltano Version
       id: get-meltano-version
       run: |
         echo "::set-output name=release-version::$(poetry version --short)"
+
+    # These exist to show if 'dry-run' flag is set as intended and correctly parsed from inputs
+    - name: Print dry-run message (if applicable)
+      if: ${{ github.event.inputs.dry-run }}
+      run: |
+        echo "NOTE: This job is a dry run and will not publish any images."
+    - name: Print publish message (if applicable)
+      if: ${{ github.event.inputs.dry-run != true }}
+      run: |
+        echo "NOTE: This job is planning to publish the docker images."
+        echo "⚠️ If this is not intended, please cancel this job."
 
     # - name: Login to DockerHub
     #   uses: docker/login-action@v2
