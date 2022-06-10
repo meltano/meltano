@@ -1,0 +1,37 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow event detailing a Meltano process exiting",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "exit_event",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "exit_code": {
+            "description": "The exit code of the process",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+        },
+        "exit_timestamp": {
+            "description": "The time the process exited at",
+            "type": "string",
+            "pattern": "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d{1,9})?(?:Z|[+-][01]\\d:[0-5]\\d)$",
+            "maxLength": 64
+        },
+        "process_duration_microseconds": {
+            "description": "The duration the process ran for in microseconds",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 18446744073709551615
+        }
+    },
+    "required": [
+        "exit_code",
+        "exit_timestamp",
+        "process_duration_microseconds"
+    ],
+    "additionalProperties": false
+}
