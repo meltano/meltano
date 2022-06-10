@@ -4,6 +4,8 @@ on:
   push: {}
   workflow_dispatch:
     inputs: {}
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -63,3 +65,31 @@ jobs:
       with:
         name: python-artifacts
         path: 'dist/*'
+
+  pypi_release:
+    name: Publish to PyPI
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Download coverage data
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: python-artifacts
+        path: dist/
+
+    - name: Verify artifacts
+      run: |
+        ls dist/
+
+    # - name: Publish
+    #   if: ${{ github.event.release }}
+    #   uses: pypa/gh-action-pypi-publish@release/v1.5.0
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.PYPI_TOKEN }}
+    #     ## Test PyPI can be used here
+    #     # password: ${{ secrets.TEST_PYPI_TOKEN }}
+    #     # repository_url: https://test.pypi.org/legacy/
