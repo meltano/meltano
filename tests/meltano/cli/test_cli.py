@@ -19,7 +19,7 @@ class TestCli:
         yield project
 
         Project.deactivate()
-        # shutil.rmtree(project.root)
+        shutil.rmtree(project.root)
 
     @pytest.fixture()
     def deactivate_project(self):
