@@ -41,21 +41,19 @@ jobs:
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "PYTHON_VERSION=${{ matrix.python-version }}"
         echo "RELEASE_VERSION=${{ steps.get-meltano-version.release-version }}"
-        echo "DRY_RUN is true?=${{ github.event.inputs.dry-run == true }}"
-        echo "DRY_RUN is false?=${{ github.event.inputs.dry-run == false }}"
-        echo "DRY_RUN is truthy?=${{ !(!github.event.inputs.dry-run) }}"
-        echo "DRY_RUN is falsey?=${{ !github.event.inputs.dry-run }}"
+        echo "DEBUG INFO: DRY_RUN is truthy=${{ !(!github.event.inputs.dry-run) }}"
+        echo "DEBUG INFO: DRY_RUN is falsey=${{ !github.event.inputs.dry-run }}"
 
     # These exist to show if 'dry-run' flag is set as intended and correctly parsed from inputs
     - name: Print dry-run message (if applicable)
       if: ${{ github.event.inputs.dry-run }}
       run: |
-        echo "DRY_RUN=${{ !github.event.inputs.dry-run }}"
+        echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "NOTE: This job is a dry run and will not publish any images."
     - name: Print publish message (if applicable)
       if: ${{ !github.event.inputs.dry-run }}
       run: |
-        echo "DRY_RUN=${{ !github.event.inputs.dry-run }}"
+        echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "NOTE: This job is planning to publish the docker images."
         echo "⚠️ If this is not intended, please cancel this job."
 
@@ -77,7 +75,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: "{{defaultContext}}:docker/publish"
-        push: ${{ github.event.inputs.dry-run != true }}
+        push: ${{ !github.event.inputs.dry-run }}
         tags: |
           meltano/meltano:v${{ steps.get-meltano-version.release-version }}-${{ matrix.python-version }}
           meltano/meltano:latest-${{ matrix.python-version }}
@@ -93,7 +91,7 @@ jobs:
       if: ${{ matrix.is-default-python }}
       with:
         context: "{{defaultContext}}:docker/publish"
-        push: ${{ github.event.inputs.dry-run != true }}
+        push: ${{ !github.event.inputs.dry-run }}
         tags: |
           meltano/meltano:latest
           meltano/meltano:v${{ steps.get-meltano-version.release-version }}
