@@ -12,13 +12,8 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import (
-    BlockEvents,
-    CliEvent,
-    Tracker,
-    cli_context_builder,
-    plugins_tracking_context_from_block,
-)
+from meltano.core.tracking import BlockEvents, CliContext, CliEvent, Tracker
+from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli
@@ -95,7 +90,7 @@ async def run(
     tracker = Tracker(project)
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
 
-    cmd_ctx = cli_context_builder(
+    cmd_ctx = CliContext.from_command_and_kwargs(
         "run",
         None,
         dry_run=dry_run,
@@ -142,7 +137,7 @@ async def _run_blocks(
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):
         blk_name = blk.__class__.__name__
-        tracking_ctx = plugins_tracking_context_from_block(blk)
+        tracking_ctx = PluginsTrackingContext.from_block(blk)
         with tracker.with_contexts(tracking_ctx):
             tracker.track_block_event(blk_name, BlockEvents.initialized)
         if dry_run:

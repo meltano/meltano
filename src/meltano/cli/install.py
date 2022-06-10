@@ -6,12 +6,7 @@ import click
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import (
-    CliEvent,
-    PluginsTrackingContext,
-    Tracker,
-    cli_context_builder,
-)
+from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
 from . import cli
 from .params import pass_project
@@ -45,7 +40,7 @@ def install(project, plugin_type, plugin_name, clean, parallelism):
     tracker = Tracker(project)
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     tracker.add_contexts(
-        cli_context_builder(
+        CliContext.from_command_and_kwargs(
             "install",
             None,
             clean=clean,
