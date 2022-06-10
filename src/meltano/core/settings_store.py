@@ -594,10 +594,12 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         for key in keys:
             try:
                 value = flat_config[key]
-                self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
-                vals_with_metadata.append((value, {"key": key, "expandable": True}))
             except KeyError:
-                pass
+                continue
+
+            self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
+            vals_with_metadata.append((value, {"key": key, "expandable": True}))
+
         if len(vals_with_metadata) > 1 and not reduce(
             eq, (val for val, _ in vals_with_metadata)
         ):
@@ -1205,10 +1207,15 @@ class AutoStoreManager(SettingsStoreManager):
         for source in self.sources:
             try:
                 manager = self.manager_for(source)
-                value, metadata = manager.get(name, setting_def=setting_def, **kwargs)
-                found_source = source
             except StoreNotSupportedError:
                 continue
+
+            try:
+                value, metadata = manager.get(name, setting_def=setting_def, **kwargs)
+            except StoreNotSupportedError:
+                continue
+
+            found_source = source
 
             if value is not None:
                 break
