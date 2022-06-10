@@ -1,0 +1,72 @@
+name: Docker Publish
+
+# For now, only run manually
+on:
+  workflow_dispatch:
+    dry-run:
+      description: "Force Push (ignore validation)"
+      type: boolean
+      required: true
+      default: false
+
+jobs:
+  public_docker_build:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+        - python-version: "3.7"
+          is-default-python: true
+        - python-version: "3.8"
+          is-default-python: true  # will be used in 'latest' images
+        - python-version: "3.9"
+          is-default-python: false
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: meltano/meltano
+      COMMIT_SHA: ${{ github.sha }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Get Meltano Version
+      id: get-meltano-version
+      run: |
+        echo "::set-output name=release-version::$(poetry version --short)"
+
+    # - name: Login to DockerHub
+    #   uses: docker/login-action@v2
+    #   with:
+    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # e.g. meltano/meltano:v2.0.0-python:3.8
+    # e.g. meltano/meltano:latest-python:3.8
+    - name: Build and push images with suffix '-${{ matrix.python-version }}'
+      uses: docker/build-push-action@v3
+      with:
+        context: "{{defaultContext}}:docker/publish"
+        push: ${{ github.event.inputs.dry-run != true }}
+        tags: |
+          meltano/meltano:v${{ steps.get-meltano-version.release-version }}-${{ matrix.python-version }}
+          meltano/meltano:latest-${{ matrix.python-version }}
+        build-args: |
+          PYTHON_VERSION=${{ matrix.python-version }}
+          MELTANO_VERSION=${{ steps.get-meltano-version.release-version }}
+
+    # e.g. meltano/meltano:v2.0.0
+    #      meltano/meltano:latest
+    #      meltano/meltano:latest-python:3.8
+    - name: Build and push default Python versions (if default='${{ matrix.python-version }}')
+      uses: docker/build-push-action@v3
+      if: ${{ matrix.is-default-python }}
+      with:
+        context: "{{defaultContext}}:docker/publish"
+        push: ${{ github.event.inputs.dry-run != true }}
+        tags: |
+          meltano/meltano:latest
+          meltano/meltano:v${{ steps.get-meltano-version.release-version }}
+          meltano/meltano:latest-${{ matrix.python-version }}
+        build-args: |
+          PYTHON_VERSION=${{ matrix.python-version }}
+          MELTANO_VERSION=${{ steps.get-meltano-version.release-version }}
