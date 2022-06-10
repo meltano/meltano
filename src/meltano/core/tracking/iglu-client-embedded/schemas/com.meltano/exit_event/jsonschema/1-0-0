@@ -25,7 +25,7 @@
             "description": "The duration the process ran for in microseconds",
             "type": "integer",
             "minimum": 0,
-            "maximum": 18446744073709551616
+            "maximum": 18446744073709551615
         }
     },
     "required": [
