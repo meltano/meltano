@@ -47,7 +47,7 @@ class ProjectContext(SelfDescribingJson):
         )
 
         super().__init__(
-            get_schema_url('project_context'),
+            get_schema_url("project_context"),
             {
                 "context_uuid": str(uuid.uuid4()),
                 "project_uuid": str(self.project_uuid),

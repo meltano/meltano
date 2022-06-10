@@ -54,7 +54,7 @@ class CliContext(SelfDescribingJson):
             option_keys: The list of option keys `loader`, `job`.
         """
         super().__init__(
-            get_schema_url('cli_context'),
+            get_schema_url("cli_context"),
             {
                 "command": command,
                 "sub_command": sub_command,
