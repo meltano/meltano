@@ -86,7 +86,7 @@ class TestCliInvoke:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     def test_invoke_command_containerized(  # noqa: WPS210
         self,

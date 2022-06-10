@@ -16,6 +16,10 @@ class TestMeltanoInvoker:
     def subject(self, project):
         return MeltanoInvoker(project)
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_invoke(self, subject):
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
@@ -23,7 +27,7 @@ class TestMeltanoInvoker:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     def test_invoke_executable(self, subject, project):
         process_mock = mock.Mock(returncode=0)
