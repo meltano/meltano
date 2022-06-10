@@ -21,6 +21,9 @@ jobs:
     env:
       IMAGE_NAME: meltano/meltano
       COMMIT_SHA: ${{ github.sha }}
+      # Boolean values don't actually work so cast to 'true' and 'false'
+      # https://github.com/actions/runner/issues/1483
+      DRY_RUN_STR: ${{format('{0}', github.event.inputs.dry-run)}}
 
     strategy:
       fail-fast: true
@@ -46,21 +49,21 @@ jobs:
         echo "::set-output name=release-version::$(poetry version --short)"
     - name: Print job inputs summary
       run: |
-        echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
+        echo "DRY_RUN=${{ env.DRY_RUN_STR }}"
         echo "PYTHON_VERSION=${{ matrix.python-version }}"
         echo "RELEASE_VERSION=${{ steps.get-meltano-version.outputs.release-version }}"
         echo "COMMIT_SHA=${{ env.COMMIT_SHA }}"
-        echo "DEBUG INFO: DRY_RUN is truthy=${{ !(!github.event.inputs.dry-run) }}"
-        echo "DEBUG INFO: DRY_RUN is falsey=${{ !github.event.inputs.dry-run }}"
+        echo "DEBUG INFO: DRY_RUN is truthy=${{ env.DRY_RUN_STR == 'true' }}"
+        echo "DEBUG INFO: DRY_RUN is falsey=${{ env.DRY_RUN_STR == 'false' }}"
 
     # These exist to show if 'dry-run' flag is set as intended and correctly parsed from inputs
     - name: Print dry-run message (if applicable)
-      if: ${{ github.event.inputs.dry-run }}
+      if: ${{ env.DRY_RUN_STR == 'true' }}
       run: |
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "NOTE: This job is a dry run and will not publish any images."
     - name: Print publish message (if applicable)
-      if: ${{ !github.event.inputs.dry-run }}
+      if: ${{ env.DRY_RUN_STR == 'false' }}
       run: |
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "NOTE: This job is planning to publish the docker images."
@@ -97,7 +100,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: "{{defaultContext}}:docker/publish"
-        push: ${{ !github.event.inputs.dry-run }}
+        push: ${{ env.DRY_RUN_STR == 'false' }}
         tags: |
           meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}
           meltano/meltano:latest-python${{ matrix.python-version }}
@@ -113,7 +116,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: "{{defaultContext}}:docker/publish"
-        push: ${{ !github.event.inputs.dry-run }}
+        push: ${{ env.DRY_RUN_STR == 'false' }}
         tags: |
           meltano/meltano:latest
           meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}
