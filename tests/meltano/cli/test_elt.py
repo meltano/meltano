@@ -226,7 +226,7 @@ class TestWindowsELT:
         reason="Test is only for Windows",
     )
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
