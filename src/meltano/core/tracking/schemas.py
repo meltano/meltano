@@ -2,27 +2,34 @@
 
 from __future__ import annotations
 
-VENDOR = "com.meltano"
+from dataclasses import dataclass
 
-SCHEMAS: dict[str, str] = {
-    "cli_context": "1-0-0",
-    "cli_event": "1-0-0",
-    "block_event": "1-0-0",
-    "environment_context": "1-0-0",
-    "exit_event": "1-0-0",
-    "plugins_context": "1-0-0",
-    "project_context": "1-0-0",
-    "telemetry_state_change_event": "1-0-0",
-}
+DEFAULT_VENDOR = "com.meltano"
 
 
-def get_schema_url(schema_name: str) -> str:
-    """Construct an iglu schema URL using the provided name and the stored version.
+@dataclass
+class IgluSchema:
+    """Dataclass to store the name, version, vendor, and URL for an Iglu schema."""
 
-    Parameters:
-        schema_name: The name of the schema the URL should be for.
+    name: str
+    version: str
+    vendor: str = DEFAULT_VENDOR
 
-    Returns:
-        The URL to the schema.
-    """
-    return f"iglu:{VENDOR}/{schema_name}/jsonschema/{SCHEMAS[schema_name]}"
+    @property
+    def url(self) -> str:
+        """Construct an iglu schema URL.
+
+        Returns:
+            The URL to the schema.
+        """
+        return f"iglu:{self.vendor}/{self.name}/jsonschema/{self.version}"
+
+
+CliContextSchema = IgluSchema("cli_context", "1-0-0")
+CliEventSchema = IgluSchema("cli_event", "1-0-0")
+BlockEventSchema = IgluSchema("block_event", "1-0-0")
+EnvironmentContextSchema = IgluSchema("environment_context", "1-0-0")
+ExitEventSchema = IgluSchema("exit_event", "1-0-0")
+PluginsContextSchema = IgluSchema("plugins_context", "1-0-0")
+ProjectContextSchema = IgluSchema("project_context", "1-0-0")
+TelemetryStateChangeEventSchema = IgluSchema("telemetry_state_change_event", "1-0-0")

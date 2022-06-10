@@ -24,7 +24,12 @@ from structlog.stdlib import get_logger
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.project import ProjectContext
-from meltano.core.tracking.schemas import get_schema_url
+from meltano.core.tracking.schemas import (
+    BlockEventSchema,
+    CliEventSchema,
+    ExitEventSchema,
+    TelemetryStateChangeEventSchema,
+)
 from meltano.core.utils import format_exception, hash_sha256
 
 from .environment import environment_context
@@ -288,9 +293,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Args:
             event_json: The event JSON to track. See cli_event schema for more details.
         """
-        self.track_unstruct_event(
-            SelfDescribingJson(get_schema_url("cli_event"), event_json)
-        )
+        self.track_unstruct_event(SelfDescribingJson(CliEventSchema.url, event_json))
 
     def track_telemetry_state_change_event(
         self,
@@ -318,7 +321,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         if isinstance(to_value, uuid.UUID):
             to_value = str(to_value)
         event_json = SelfDescribingJson(
-            get_schema_url("telemetry_state_change_event"),
+            TelemetryStateChangeEventSchema.url,
             {
                 "setting_name": setting_name,
                 "changed_from": from_value,
@@ -417,7 +420,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         """
         self.track_unstruct_event(
             SelfDescribingJson(
-                get_schema_url("block_event"),
+                BlockEventSchema.url,
                 {"type": block_type, "event": event.name},
             )
         )
@@ -434,7 +437,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         self.track_unstruct_event(
             SelfDescribingJson(
-                get_schema_url("exit_event"),
+                ExitEventSchema.url,
                 {
                     "exit_code": exit_code,
                     "exit_timestamp": f"{now.isoformat()}Z",

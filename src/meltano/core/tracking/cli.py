@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from snowplow_tracker import SelfDescribingJson
 
-from meltano.core.tracking.schemas import get_schema_url
+from meltano.core.tracking.schemas import CliContextSchema
 
 EVENT_RESULTS = {
     "started": {"event": "started"},
@@ -54,7 +54,7 @@ class CliContext(SelfDescribingJson):
             option_keys: The list of option keys `loader`, `job`.
         """
         super().__init__(
-            get_schema_url("cli_context"),
+            CliContextSchema.url,
             {
                 "command": command,
                 "sub_command": sub_command,

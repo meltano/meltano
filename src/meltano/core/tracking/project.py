@@ -11,7 +11,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking.schemas import get_schema_url
+from meltano.core.tracking.schemas import ProjectContextSchema
 from meltano.core.utils import hash_sha256
 
 logger = get_logger(__name__)
@@ -47,7 +47,7 @@ class ProjectContext(SelfDescribingJson):
         )
 
         super().__init__(
-            get_schema_url("project_context"),
+            ProjectContextSchema.url,
             {
                 "context_uuid": str(uuid.uuid4()),
                 "project_uuid": str(self.project_uuid),

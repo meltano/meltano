@@ -4,7 +4,7 @@ from meltano.core.tracking.plugins import (
     PluginsTrackingContext,
     plugins_tracking_context_from_block,
 )
-from meltano.core.tracking.schemas import get_schema_url
+from meltano.core.tracking.schemas import PluginsContextSchema
 from meltano.core.utils import hash_sha256
 
 
@@ -20,7 +20,7 @@ class TestPluginsTrackingContext:
             command="test",
         )
         plugin_ctx = plugins_tracking_context_from_block(cmd)
-        assert plugin_ctx.schema == get_schema_url("plugins_context")
+        assert plugin_ctx.schema == PluginsContextSchema.url
         assert len(plugin_ctx.data.get("plugins")) == 1
         plugin = plugin_ctx.data.get("plugins")[0]
         assert plugin.get("name_hash") == hash_sha256(dbt.name)
@@ -34,7 +34,7 @@ class TestPluginsTrackingContext:
     def test_plugins_tracking_context(self, tap: ProjectPlugin, dbt: ProjectPlugin):
 
         plugin_ctx = PluginsTrackingContext([(tap, None), (dbt, "test")])
-        assert plugin_ctx.schema == get_schema_url("plugins_context")
+        assert plugin_ctx.schema == PluginsContextSchema.url
         assert len(plugin_ctx.data.get("plugins")) == 2
         for plugin in plugin_ctx.data.get("plugins"):
             if plugin.get("category") == "extractors":

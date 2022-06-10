@@ -16,7 +16,7 @@ from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 import meltano
-from meltano.core.tracking.schemas import get_schema_url
+from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import hash_sha256, safe_hasattr
 
 logger = get_logger(__name__)
@@ -32,7 +32,7 @@ class EnvironmentContext(SelfDescribingJson):
         """Initialize the environment context."""
         ci_markers = ("GITHUB_ACTIONS", "CI")
         super().__init__(
-            get_schema_url("environment_context"),
+            EnvironmentContextSchema.url,
             {
                 "context_uuid": str(uuid.uuid4()),
                 "meltano_version": meltano.__version__,

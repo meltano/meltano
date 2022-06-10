@@ -10,7 +10,7 @@ from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.elt_context import ELTContext
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.tracking.schemas import get_schema_url
+from meltano.core.tracking.schemas import PluginsContextSchema
 from meltano.core.utils import hash_sha256, safe_hasattr
 
 logger = get_logger(__name__)
@@ -97,7 +97,7 @@ class PluginsTrackingContext(SelfDescribingJson):
             tracking_context.append(_from_plugin(plugin, cmd))
 
         super().__init__(
-            get_schema_url("plugins_context"),
+            PluginsContextSchema.url,
             {"context_uuid": str(uuid.uuid4()), "plugins": tracking_context},
         )
 
