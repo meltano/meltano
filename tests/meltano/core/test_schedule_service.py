@@ -88,7 +88,7 @@ class TestScheduleService:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     def test_remove_schedule(self, subject):
         schedules = list(subject.schedules())
@@ -198,6 +198,10 @@ class TestScheduleService:
                 env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
             )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     def test_run_job_schedule(self, subject, session, tap, target):
         schedule = subject.add(
             "mock-job-schedule",

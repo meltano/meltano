@@ -27,7 +27,7 @@ class TestVenvService:
     @pytest.mark.asyncio
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     async def test_clean_install(self, project, subject: VenvService):
         await subject.install("example", clean=True)
@@ -81,7 +81,7 @@ class TestVenvService:
     @pytest.mark.asyncio
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     async def test_install(self, project, subject: VenvService):
         # Make sure the venv exists already

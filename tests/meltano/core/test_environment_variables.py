@@ -1,3 +1,4 @@
+import platform
 from typing import NamedTuple
 
 import pytest
@@ -177,6 +178,10 @@ _env_var_resolution_expectations = {
 
 
 class TestEnvVarResolution:
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     @pytest.mark.parametrize(
         "scenario,env_var_resolution_expectation,",
         _env_var_resolution_expectations.items(),

@@ -1,5 +1,5 @@
-import shutil
 import platform
+import shutil
 from unittest import mock
 
 import pytest
@@ -11,7 +11,7 @@ from meltano.cli import cli
 class TestCliUpgrade:
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     def test_upgrade(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade"])
@@ -42,7 +42,7 @@ class TestCliUpgrade:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     def test_upgrade_package(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "package"])
@@ -55,7 +55,7 @@ class TestCliUpgrade:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currenttly being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
     )
     def test_upgrade_files(
         self, session, project, cli_runner, config_service, meltano_hub_service

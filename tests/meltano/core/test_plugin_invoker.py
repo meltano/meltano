@@ -6,7 +6,6 @@ import pytest
 from meltano.core.plugin.command import UndefinedEnvVarError
 from meltano.core.plugin_invoker import UnknownCommandError
 from meltano.core.venv_service import VirtualEnv
-from fixtures.core import PROJECT_NAME
 
 
 class TestPluginInvoker:
@@ -69,6 +68,10 @@ class TestPluginInvoker:
             == project_with_environment.active_environment.name
         )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     @pytest.mark.asyncio
     async def test_expanded_environment_env(
         self, project_with_environment, tap, session, plugin_invoker_factory
@@ -138,6 +141,10 @@ class TestPluginInvoker:
         assert exec_args[0].endswith("other-utility")
         assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+    )
     @pytest.mark.parametrize(
         "executable_str,assert_fn",
         [

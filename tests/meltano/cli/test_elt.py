@@ -239,7 +239,7 @@ class TestWindowsELT:
         target,
     ):
         job_id = "pytest_test_elt_windows"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        args = ["elt", tap.name, target.name]
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
         assert (
