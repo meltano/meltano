@@ -1,7 +1,7 @@
 import asyncio
 import json
 import platform
-from unittest import mock
+import mock
 
 import pytest
 from asynctest import CoroutineMock, Mock, patch
