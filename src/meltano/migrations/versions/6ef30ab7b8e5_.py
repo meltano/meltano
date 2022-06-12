@@ -19,9 +19,9 @@ def upgrade():
     op.create_table(
         "user",
         sa.Column("id", sa.Integer, nullable=False),
-        sa.Column("username", sa.String),
-        sa.Column("email", sa.String),
-        sa.Column("password", sa.String),
+        sa.Column("username", sa.String(128)),
+        sa.Column("email", sa.String(128)),
+        sa.Column("password", sa.String(128)),
         sa.Column("active", sa.Boolean),
         sa.Column("confirmed_at", sa.DateTime, nullable=True),
         sa.PrimaryKeyConstraint("id"),
@@ -33,7 +33,7 @@ def upgrade():
         "role",
         sa.Column("id", sa.Integer, nullable=False),
         sa.Column("name", sa.String(80)),
-        sa.Column("description", sa.String, nullable=True),
+        sa.Column("description", sa.String(128), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
@@ -52,8 +52,8 @@ def upgrade():
         "role_permissions",
         sa.Column("id", sa.Integer, nullable=False),
         sa.Column("role_id", sa.Integer),
-        sa.Column("type", sa.String),
-        sa.Column("context", sa.String, nullable=True),
+        sa.Column("type", sa.String(128)),
+        sa.Column("context", sa.String(128), nullable=True),
         sa.ForeignKeyConstraint(["role_id"], ["role.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -66,7 +66,7 @@ def upgrade():
         sa.Column("provider_user_id", sa.Integer, nullable=True),
         sa.Column("access_token", sa.String(255)),
         sa.Column("created_at", sa.DateTime, nullable=True),
-        sa.Column("id_token", sa.String),
+        sa.Column("id_token", sa.String(128)),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.PrimaryKeyConstraint("id"),
     )

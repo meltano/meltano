@@ -7,6 +7,7 @@ Create Date: 2020-02-17 16:03:27.765240
 """
 import sqlalchemy as sa
 from alembic import op
+
 from meltano.migrations import GUID
 
 # revision identifiers, used by Alembic.
@@ -20,10 +21,10 @@ def upgrade():
     op.create_table(
         "subscriptions",
         sa.Column("id", GUID, primary_key=True),
-        sa.Column("recipient", sa.String(), nullable=False),
-        sa.Column("event_type", sa.String(), nullable=False),
-        sa.Column("source_type", sa.String(), nullable=True),
-        sa.Column("source_id", sa.String(), nullable=True),
+        sa.Column("recipient", sa.String(128), nullable=False),
+        sa.Column("event_type", sa.String(128), nullable=False),
+        sa.Column("source_type", sa.String(128), nullable=True),
+        sa.Column("source_id", sa.String(128), nullable=True),
         sa.Column("created_at", sa.DateTime),
         sa.UniqueConstraint("recipient", "event_type", "source_type", "source_id"),
     )

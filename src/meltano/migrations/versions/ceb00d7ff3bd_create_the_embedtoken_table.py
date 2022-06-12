@@ -20,7 +20,7 @@ def upgrade():
         "embed_tokens",
         sa.Column("id", sa.Integer, primary_key=True),
         sa.Column("token", sa.String(64), unique=True),
-        sa.Column("resource_id", sa.String(), nullable=False),
+        sa.Column("resource_id", sa.String(128), nullable=False),
         sa.Column("created_at", sa.DateTime),
     )
 

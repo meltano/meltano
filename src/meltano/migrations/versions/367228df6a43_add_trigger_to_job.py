@@ -16,7 +16,7 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column("job", sa.Column("trigger", sa.String()))
+    op.add_column("job", sa.Column("trigger", sa.String(128)))
 
 
 def downgrade():

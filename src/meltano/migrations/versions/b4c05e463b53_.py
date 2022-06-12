@@ -9,8 +9,9 @@ from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
-from meltano.migrations import IntFlag, JSONEncodedDict
 from sqlalchemy.ext.mutable import MutableDict
+
+from meltano.migrations import IntFlag, JSONEncodedDict
 
 # revision identifiers, used by Alembic.
 revision = "b4c05e463b53"
@@ -32,7 +33,7 @@ def upgrade():
     op.create_table(
         "job",
         sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("job_id", sa.String),
+        sa.Column("job_id", sa.String(128)),
         sa.Column("state", sa.Enum(State, name="job_state")),
         sa.Column("started_at", sa.DateTime),
         sa.Column("ended_at", sa.DateTime),
@@ -42,10 +43,10 @@ def upgrade():
 
     op.create_table(
         "plugin_settings",
-        sa.Column("label", sa.String(), nullable=True),
+        sa.Column("label", sa.String(128), nullable=True),
         sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column("namespace", sa.String(), nullable=True),
+        sa.Column("name", sa.String(128), nullable=False),
+        sa.Column("namespace", sa.String(128), nullable=True),
         sa.Column("value", sa.PickleType(), nullable=True),
         sa.Column("enabled", sa.Boolean(), nullable=True),
         sa.PrimaryKeyConstraint("name", "namespace"),
