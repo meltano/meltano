@@ -738,7 +738,7 @@ meltano job remove <job_name>
 
 ##### Tasks
 
-A task should be of the same format as arguments supplied to [the `meltano run` command](#run), which can be any valid sequence of extractors, mappers, loaders, and plugin commands.
+A task should be of the same format as arguments supplied to [the `meltano run` command](#run), which can be any valid sequence of plugins (e.g. extractors, mappers, loaders, utilities, etc.) and [plugin commands](/concepts/project#plugin-commands).
 Note that such a sequence is only valid if it is one of:
 
 1. An extractor followed directly by a loader. E.g. `tap-gitlab target-postgres`
