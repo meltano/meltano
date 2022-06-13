@@ -1,4 +1,3 @@
-from typing import Dict
 
 from meltano.core.plugin import PluginType
 

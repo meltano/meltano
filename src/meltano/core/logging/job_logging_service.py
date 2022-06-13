@@ -1,11 +1,6 @@
-import datetime
-import glob
 import logging
 import os
-import shutil
 from contextlib import contextmanager
-from pathlib import Path
-from typing import Optional, Union
 
 from meltano.core.project import Project
 from meltano.core.utils import makedirs, slugify
@@ -16,13 +11,11 @@ MAX_FILE_SIZE = 2_097_152  # 2MB max
 class MissingJobLogException(Exception):
     """Occurs when JobLoggingService can not find a requested log."""
 
-    pass
 
 
 class SizeThresholdJobLogException(Exception):
     """Occurs when a Job log exceeds the MAX_FILE_SIZE."""
 
-    pass
 
 
 class JobLoggingService:

@@ -1,5 +1,4 @@
 import json
-import logging
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef

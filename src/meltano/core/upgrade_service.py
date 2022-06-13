@@ -1,7 +1,5 @@
-import importlib
 import logging
 import os
-import shutil
 import signal
 import subprocess
 import sys
@@ -21,7 +19,6 @@ from meltano.core.project_plugins_service import PluginType, ProjectPluginsServi
 class UpgradeError(Exception):
     """Occurs when the Meltano upgrade fails"""
 
-    pass
 
 
 class AutomaticPackageUpgradeError(Exception):

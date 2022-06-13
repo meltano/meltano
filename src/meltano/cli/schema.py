@@ -1,4 +1,3 @@
-import logging
 
 import click
 import psycopg2
@@ -13,7 +12,6 @@ from .params import pass_project
 @cli.group(short_help="Manage system DB schema.")
 def schema():
     """Manage system DB schema."""
-    pass
 
 
 @schema.command(short_help="Create system DB schema, if not exists.")

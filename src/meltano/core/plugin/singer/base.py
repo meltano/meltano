@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 from uuid import uuid4
 
 from meltano.core.behavior.hookable import hook

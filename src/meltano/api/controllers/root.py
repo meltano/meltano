@@ -1,7 +1,5 @@
 import logging
-import subprocess
 from functools import wraps
-from urllib.parse import urlsplit
 
 import meltano
 import requests

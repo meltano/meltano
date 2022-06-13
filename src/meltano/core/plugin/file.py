@@ -1,5 +1,3 @@
-import logging
-from pathlib import Path
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.db import project_engine

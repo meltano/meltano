@@ -1,5 +1,3 @@
-import datetime
-import logging
 import os
 
 from meltano.api.headers import *

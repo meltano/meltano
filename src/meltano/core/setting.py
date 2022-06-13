@@ -1,5 +1,3 @@
-import logging
-import os
 
 import sqlalchemy.types as types
 from sqlalchemy import Column, UniqueConstraint

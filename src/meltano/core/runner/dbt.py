@@ -1,8 +1,5 @@
 import asyncio
-import logging
-import os
 import sys
-from io import StringIO
 
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContext

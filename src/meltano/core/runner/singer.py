@@ -1,12 +1,8 @@
 import asyncio
 import logging
-import os
-import shutil
 import subprocess
 import sys
 from contextlib import suppress
-from enum import IntFlag
-from pathlib import Path
 
 from meltano.core.elt_context import ELTContext
 from meltano.core.job import Job, Payload

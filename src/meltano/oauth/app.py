@@ -1,5 +1,4 @@
 import logging
-import os
 import secrets
 
 import meltano.oauth.config
