@@ -2,6 +2,7 @@ import logging
 import subprocess
 
 from flask_executor import Executor
+
 from meltano.api.models import db
 from meltano.api.signals import PipelineSignals
 from meltano.core.meltano_invoker import MeltanoInvoker

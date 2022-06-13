@@ -3,6 +3,7 @@ from datetime import datetime
 
 from flask import Blueprint
 from flask_login import current_user
+
 from meltano.api.security import block_if_api_auth_required, users
 
 VERSION = 1

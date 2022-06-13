@@ -1,5 +1,6 @@
-from meltano.core.plugin import PluginRef
 from werkzeug.routing import PathConverter
+
+from meltano.core.plugin import PluginRef
 
 
 class PluginRefConverter(PathConverter):

@@ -1,4 +1,5 @@
 import click
+
 from meltano.core.db import DB, project_engine
 
 from . import cli

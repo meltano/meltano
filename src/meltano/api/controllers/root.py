@@ -1,20 +1,13 @@
 import logging
 from functools import wraps
 
-import meltano
 import requests
-from flask import (
-    Blueprint,
-    current_app,
-    g,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-)
+from flask import Blueprint, current_app, g, jsonify, redirect, render_template, request
 from flask_login import current_user
 from flask_security import roles_required
 from jinja2 import TemplateNotFound
+
+import meltano
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import block_if_readonly, passes_authentication_checks
 from meltano.core.project import Project
