@@ -4,8 +4,6 @@ from typing import Optional
 
 import yaml
 
-from .db import project_engine
-from .plugin import PluginType
 from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project

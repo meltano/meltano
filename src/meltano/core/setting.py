@@ -1,9 +1,7 @@
-
 import sqlalchemy.types as types
-from sqlalchemy import Column, UniqueConstraint
+from sqlalchemy import Column
 
 from .models import SystemModel
-from .utils import nest
 
 
 class Setting(SystemModel):

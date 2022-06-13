@@ -1,4 +1,3 @@
-
 from meltano.core.plugin import PluginType
 
 from .base import *

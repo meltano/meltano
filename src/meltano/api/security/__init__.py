@@ -1,4 +1,3 @@
-
 from flask import current_app, jsonify, make_response, redirect, request
 from flask_login import current_user, user_logged_in
 from flask_principal import Identity, identity_loaded

@@ -9,7 +9,6 @@ import click
 import psutil
 
 import meltano
-import meltano.core.bundle as bundle
 from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.migration_service import MigrationError, MigrationService
 from meltano.core.project import Project
@@ -18,7 +17,6 @@ from meltano.core.project_plugins_service import PluginType, ProjectPluginsServi
 
 class UpgradeError(Exception):
     """Occurs when the Meltano upgrade fails"""
-
 
 
 class AutomaticPackageUpgradeError(Exception):

@@ -12,10 +12,8 @@ class MissingJobLogException(Exception):
     """Occurs when JobLoggingService can not find a requested log."""
 
 
-
 class SizeThresholdJobLogException(Exception):
     """Occurs when a Job log exceeds the MAX_FILE_SIZE."""
-
 
 
 class JobLoggingService:

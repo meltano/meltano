@@ -86,10 +86,8 @@ class PluginInstallError(Exception):
     """Happens when a plugin fails to install."""
 
 
-
 class PluginInstallWarning(Exception):
     """Happens when a plugin optional optional step fails to install."""
-
 
 
 class PluginNotInstallable(Exception):

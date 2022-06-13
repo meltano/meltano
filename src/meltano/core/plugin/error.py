@@ -47,7 +47,5 @@ class PluginExecutionError(Exception):
     """Base exception for problems that stem from the execution of a plugin (sub-process)."""
 
 
-
 class PluginLacksCapabilityError(Exception):
     """Base exception when a plugin lacks a requested capability."""
-

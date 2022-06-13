@@ -5,11 +5,10 @@ import sys
 from contextlib import suppress
 
 from meltano.core.elt_context import ELTContext
-from meltano.core.job import Job, Payload
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.singer import PluginType, SingerTap, SingerTarget
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin.singer import PluginType
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import human_size
 
