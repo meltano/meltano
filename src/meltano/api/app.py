@@ -113,7 +113,7 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         logger.debug("Notifications are disabled.")
 
     # Google Analytics setup
-    tracker = LegacyTracker(project)
+    LegacyTracker(project)
 
     @app.before_request
     def setup_js_context():

@@ -43,7 +43,7 @@ class JobLoggingService:
 
         try:
             log_file = open(log_file_name, "w")
-        except OSError as err:
+        except OSError:
             # Don't stop the Job running if you can not open the log file
             # for writting: just return /dev/null
             logging.error(
