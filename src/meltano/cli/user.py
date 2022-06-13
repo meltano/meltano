@@ -1,7 +1,6 @@
 """User account management CLI."""
 
 import click
-from flask_security.utils import hash_password
 
 from meltano.api.app import create_app
 
@@ -49,7 +48,9 @@ def add(ctx, username, password, role, **flags):
     """
     app = create_app()
 
-    from meltano.api.security import users
+    from flask_security.utils import hash_password
+
+    from meltano.api.security.identity import users
 
     try:
         with app.app_context():
@@ -71,6 +72,7 @@ def add(ctx, username, password, role, **flags):
             current_user = users.get_user(username) or users.create_user(
                 username=username
             )
+
             current_user.password = hash_password(password)
             current_user.roles = roles
 

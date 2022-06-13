@@ -5,8 +5,8 @@ from sqlalchemy.orm import joinedload
 
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.models.security import Role, RolePermissions, User, db
-from meltano.api.security import users
 from meltano.api.security.auth import block_if_readonly
+from meltano.api.security.identity import users
 
 from .settings_helper import SettingsHelper
 

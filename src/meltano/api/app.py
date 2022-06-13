@@ -60,8 +60,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     logger.addHandler(file_handler)
 
     # 1) Extensions
-    security_options = {}
-
     from .executor import setup_executor
     from .json import setup_json
     from .mail import mail
