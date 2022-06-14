@@ -27,7 +27,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.session = self.ctx.obj["session"]
         self.plugin = self.ctx.obj["settings"].plugin
         self.environment_service = EnvironmentService(self.project)
-        self.max_width = max_width or 80  # noqa: WPS432
+        self.max_width = max_width or 75  # noqa: WPS432
         self.indentation = "  "
 
     @property
@@ -142,7 +142,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             click.echo(f"{self.indentation}{index}) ", nl=False)
             click.secho(f"{name}", nl=False, fg="blue")
             if description:
-                click.secho(f": {self.truncate(description)}")
+                pretty_description = description.replace("\n", " ")
+                click.secho(f": {self.truncate(pretty_description)}")
             else:
                 click.echo()
 
