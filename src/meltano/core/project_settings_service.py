@@ -1,7 +1,9 @@
 """Project Settings Service."""
 
+import json
 from typing import List
 
+import structlog
 from dotenv import dotenv_values
 
 from meltano.core.setting_definition import SettingDefinition
@@ -14,6 +16,8 @@ from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import nest_object
 
 from .config_service import ConfigService
+
+logger = structlog.get_logger(__name__)
 
 UI_CFG_SETTINGS = {
     "ui.server_name": "SERVER_NAME",
@@ -60,6 +64,23 @@ class ProjectSettingsService(SettingsService):
             **self.__class__.config_override,
             **self.config_override,
         }
+
+        if self.get("project_id") is None:
+            try:
+                with open(
+                    self.project.meltano_dir() / "analytics.json"
+                ) as analytics_json_file:
+                    project_id = json.load(analytics_json_file)["project_id"]
+            except (OSError, KeyError, json.JSONDecodeError) as err:
+                logger.debug(
+                    "Unable to restore 'project_id' from 'analytics.json'", err=err
+                )
+            else:
+                self.update_meltano_yml_config(
+                    {"project_id": project_id, **self.meltano_yml_config}
+                )
+                self.set("project_id", project_id)
+                logger.debug("Restored 'project_id' from 'analytics.json'")
 
     @property
     def label(self) -> str:
