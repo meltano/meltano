@@ -1215,12 +1215,6 @@ class AutoStoreManager(SettingsStoreManager):
         current_value, metadata = self.get(name, setting_def=setting_def)
         source = metadata["source"]
 
-        if setting_def:
-            if value == setting_def.value:
-                # Unset everything so we fall down on default
-                self.unset(name, path, setting_def=setting_def)
-                return {"store": SettingValueStore.DEFAULT}
-
         store = self.auto_store(name, source, setting_def=setting_def)
         if store is None:
             raise StoreNotSupportedError("No storage method available")
