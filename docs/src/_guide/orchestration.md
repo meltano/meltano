@@ -16,7 +16,7 @@ When a new pipeline schedule is created using the [CLI](/reference/command-line-
 ### Scheduling predefined jobs
 
 To regularly schedule your pipeline to run first define it as a [job](/reference/command-line-interface#job) within your project.
-Then you can schedule it using the `meltano schedule add` command:
+Then you can schedule it using the [`meltano schedule add`](/reference/command-line-interface#schedule) command:
 
 ```bash
 # Define a job
