@@ -5,6 +5,7 @@ import click
 from meltano.cli.params import pass_project
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.project import Project
+from meltano.core.tracking import Tracker
 
 from . import cli
 
@@ -21,6 +22,7 @@ def meltano_environment(project: Project, ctx: click.Context):
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#environment
     """
     ctx.obj[ENVIRONMENT_SERVICE_KEY] = EnvironmentService(project)
+    ctx.obj["tracker"] = Tracker(project)
 
 
 @meltano_environment.command()
