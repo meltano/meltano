@@ -44,7 +44,7 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Set up Python
-      uses: actions/setup-python@v3.1.2
+      uses: actions/setup-python@v4.0.0
       with:
         # https://github.com/actions/setup-python
         python-version: 3.9
