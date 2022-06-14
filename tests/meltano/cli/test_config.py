@@ -86,3 +86,36 @@ class TestCliConfig:
             str(result.exception)
             == "Testing of the Meltano project configuration is not supported"
         )
+
+
+class TestCliConfigSet:
+    def test_set_environment_default(
+        self, project, cli_runner, tap, project_plugins_service
+    ):
+        with mock.patch(
+            "meltano.cli.config.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(
+                cli,
+                ["--no-environment", "config", "tap-mock", "set", "test", "not-mock"],
+            )
+            assert_cli_runner(result)
+
+            # value 'mock' is the default
+            result = cli_runner.invoke(
+                cli, ["--environment=dev", "config", "tap-mock", "set", "test", "mock"]
+            )
+            assert_cli_runner(result)
+
+            # test if default was set for environment
+            result = cli_runner.invoke(cli, ["--environment=dev", "config", "tap-mock"])
+            assert_cli_runner(result)
+            json_config = json.loads(result.stdout)
+            assert json_config["test"] == "mock"
+
+            # test if base config was left unchanged
+            result = cli_runner.invoke(cli, ["--no-environment", "config", "tap-mock"])
+            assert_cli_runner(result)
+            json_config = json.loads(result.stdout)
+            assert json_config["test"] == "not-mock"
