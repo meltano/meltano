@@ -14,12 +14,12 @@ from pathlib import Path
 from typing import Any, NamedTuple
 from urllib.parse import urlparse
 
+import structlog
 import tzlocal
 from cached_property import cached_property
 from psutil import Process
 from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
-from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -38,7 +38,7 @@ URL_REGEX = (
 
 MICROSECONDS_PER_SECOND = 1000000
 
-logger = get_logger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BlockEvents(Enum):
@@ -127,7 +127,10 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             project_ctx,
         )
 
-        self.telemetry_state_change_check(stored_telemetry_settings)
+        if all(setting is None for setting in stored_telemetry_settings):
+            self.save_telemetry_settings()
+        else:
+            self.telemetry_state_change_check(stored_telemetry_settings)
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
@@ -368,7 +371,20 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         try:
             with open(self.analytics_json_path) as analytics_json_file:
                 analytics = json.load(analytics_json_file)
-        except FileNotFoundError:
+        except (OSError, json.JSONDecodeError):
+            return TelemetrySettings(None, None, None)
+
+        missing_keys = {
+            "client_id",
+            "project_id",
+            "send_anonymous_usage_stats",
+        } - set(analytics)
+
+        if missing_keys:
+            logger.debug(
+                "'analytics.json' has missing keys, and will be overwritten with new 'analytics.json'",
+                missing_keys=missing_keys,
+            )
             return TelemetrySettings(None, None, None)
         return TelemetrySettings(
             self._uuid_from_str(analytics.get("client_id"), warn=True),
@@ -377,16 +393,19 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         )
 
     def save_telemetry_settings(self) -> None:
-        """Save settings to the 'analytics.json' file."""
-        with open(self.analytics_json_path, "w") as new_analytics_json_file:
-            json.dump(
-                {
-                    "client_id": str(self.client_id),
-                    "project_id": str(self.project_id),
-                    "send_anonymous_usage_stats": self.send_anonymous_usage_stats,
-                },
-                new_analytics_json_file,
-            )
+        """Attempt to save settings to the 'analytics.json' file."""
+        try:
+            with open(self.analytics_json_path, "w") as new_analytics_json_file:
+                json.dump(
+                    {
+                        "client_id": str(self.client_id),
+                        "project_id": str(self.project_id),
+                        "send_anonymous_usage_stats": self.send_anonymous_usage_stats,
+                    },
+                    new_analytics_json_file,
+                )
+        except OSError as err:
+            logger.debug("Unable to save 'analytics.json'", err=err)
 
     def _uuid_from_str(self, from_val: Any | None, warn: bool) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
@@ -411,7 +430,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         try:
             return uuid.UUID(from_val)
-        except ValueError:
+        except (ValueError, TypeError):
             # Should only be reached if user manually edits 'analytics.json'.
             log_fn = logger.warning if warn else logger.debug
             log_fn(
