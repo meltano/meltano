@@ -317,7 +317,7 @@ To learn more about pipeline schedules and orchestration, refer to the [Orchestr
 
 As your project grows, and your `meltano.yml` with it, you may wish to break your config into multiple `.yml` files and to store those subfiles in various places in your Project folder hierachy.
 
-This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](<https://en.wikipedia.org/wiki/Glob_(programming)>)) to the `include_paths` key of your `meltano.yml`:
+This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](https://en.wikipedia.org/wiki/Glob_(programming))) to the `include_paths` key of your `meltano.yml`:
 
 ```yaml
 include_paths:
