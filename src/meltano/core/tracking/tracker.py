@@ -23,7 +23,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking import CliEvent, ProjectContext, environment_context
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -31,8 +31,6 @@ from meltano.core.tracking.schemas import (
     TelemetryStateChangeEventSchema,
 )
 from meltano.core.utils import format_exception, hash_sha256
-
-from .environment import environment_context
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -124,12 +122,21 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id: uuid.UUID = project_ctx.project_uuid
-        self.contexts: tuple[SelfDescribingJson] = (
+        self._contexts: tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
 
         self.telemetry_state_change_check(stored_telemetry_settings)
+
+    @property
+    def contexts(self) -> tuple[SelfDescribingJson]:
+        """Get the contexts that will accompany events fired by this tracker.
+
+        Returns:
+            The contexts that will accompany events fired by this tracker.
+        """
+        return self._contexts
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
@@ -216,7 +223,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Args:
             extra_contexts: The additional contexts to add to the `Tracker`.
         """
-        self.contexts = (*self.contexts, *extra_contexts)
+        self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
     def with_contexts(self, *extra_contexts) -> Tracker:
@@ -228,12 +235,12 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Yields:
             A `Tracker` with additional Snowplow contexts.
         """
-        prev_contexts = self.contexts
-        self.contexts = (*prev_contexts, *extra_contexts)
+        prev_contexts = self._contexts
+        self._contexts = (*prev_contexts, *extra_contexts)
         try:
             yield self
         finally:
-            self.contexts = prev_contexts
+            self._contexts = prev_contexts
 
     def can_track(self) -> bool:
         """Check if the tracker can be used.
@@ -287,13 +294,15 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 err=format_exception(err),
             )
 
-    def track_command_event(self, event_json: dict[str, Any]) -> None:
+    def track_command_event(self, event: CliEvent) -> None:
         """Fire generic command tracking event.
 
         Args:
-            event_json: The event JSON to track. See cli_event schema for more details.
+            event: An member from `meltano.core.tracking.CliEvent`
         """
-        self.track_unstruct_event(SelfDescribingJson(CliEventSchema.url, event_json))
+        self.track_unstruct_event(
+            SelfDescribingJson(CliEventSchema.url, {"event": event.name})
+        )
 
     def track_telemetry_state_change_event(
         self,

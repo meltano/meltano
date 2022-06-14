@@ -1,5 +1,10 @@
 """Meltano telemetry."""
 
-from .cli import CliContext, cli_context_builder
-from .plugins import PluginsTrackingContext
+from .contexts import (
+    CliContext,
+    CliEvent,
+    PluginsTrackingContext,
+    ProjectContext,
+    environment_context,
+)
 from .tracker import BlockEvents, Tracker
