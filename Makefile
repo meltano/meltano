@@ -9,6 +9,11 @@
 # - `make clean` deletes all the build artifacts
 # - `make docker_images` builds all the docker images including the production
 #   image
+#
+# To build and publish:
+#
+# > make sdist-public
+# > poetry publish --build
 
 ifdef DOCKER_REGISTRY
 base_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/base
@@ -25,6 +30,7 @@ DCRN=${DCR} --no-deps
 
 MELTANO_WEBAPP = src/webapp
 MELTANO_API = src/meltano/api
+MELTANO_RELEASE_MARKER_FILE = ./src/meltano/core/tracking/.release_marker
 
 .PHONY: build test clean docker_images release
 
@@ -39,6 +45,9 @@ TO_CLEAN  = ./build ./dist
 TO_CLEAN += ./${MELTANO_API}/static/js
 TO_CLEAN += ./${MELTANO_API}/static/css
 TO_CLEAN += ./${MELTANO_WEBAPP}/dist
+# release marker
+TO_CLEAN += ${MELTANO_RELEASE_MARKER_FILE}
+
 
 clean:
 	rm -rf ${TO_CLEAN}
@@ -62,7 +71,7 @@ base_image:
 
 prod_image: base_image ui
 	docker build \
-		--file docker/prod/Dockerfile \
+		--file docker/main/Dockerfile \
 		-t $(prod_image_tag) \
 		--build-arg BASE_IMAGE=$(base_image_tag) \
 		.
@@ -97,8 +106,19 @@ bundle: clean ui
 freeze_db:
 	poetry run scripts/alembic_freeze.py
 
+# sdist:
+# Build the source distribution
+# Note: plese use `sdist-public` for the actual release build
 sdist: freeze_db bundle
-	poetry build -f sdist
+	poetry build
+
+# sdist_public:
+# Same as sdist, except add release marker before poetry build
+# The release marker differentiates installations 'in the wild' versus inernal dev builds and tests
+sdist_public: freeze_db bundle
+	touch src/meltano/core/tracking/.release_marker
+	poetry build
+	echo "Builds complete. You can now publish to PyPi using 'poetry publish'."
 
 docker_sdist: base_image
 	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
@@ -182,7 +202,9 @@ explain_makefile:
 
 # Release
 # =====================
-
+# Note:
+# - this code is old and may be stale.
+# - process currently runs in CI
 release:
 	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
 	yes | poetry run changelog release --$(type)

@@ -494,9 +494,11 @@ def get_pipeline_schedules():
     formatted_schedules = []
 
     for schedule in schedules:
-        if schedule.job and jobs_in_list:
+        if schedule.get("job") and jobs_in_list:
+            # we only return API results for scheduled jobs if the feature flag is explicitly enabled
+            # as the UI is not job aware yet.
             formatted_schedules.append(schedule)
-        elif schedule.elt_schedule:
+        elif not schedule.get("job"):  # a legacy elt task
             finder = JobFinder(schedule["name"])
             state_job = finder.latest(db.session)
             schedule["has_error"] = state_job.has_error() if state_job else False

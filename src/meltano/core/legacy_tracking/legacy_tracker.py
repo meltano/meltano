@@ -8,11 +8,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from snowplow_tracker import SelfDescribingJson
+
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
-from meltano.core.tracking import Tracker
-from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking import ProjectContext, Tracker
 from meltano.core.utils import hash_sha256
 
 REQUEST_TIMEOUT = 2.0
@@ -20,7 +21,7 @@ MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
 DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect"
 
 
-class LegacyTracker:
+class LegacyTracker:  # noqa: WPS214, WPS230
     """Legacy tracker for Meltano."""
 
     def __init__(
@@ -28,6 +29,7 @@ class LegacyTracker:
         project: Project,
         tracking_id: str = None,
         request_timeout: float = None,
+        context_overrides: tuple[SelfDescribingJson] = None,
     ):
         """Create a new Google Analytics tracker.
 
@@ -35,6 +37,7 @@ class LegacyTracker:
             project: Meltano project.
             tracking_id: Unique identifier for tracking. Defaults to None.
             request_timeout: For GA requests. Defaults to None.
+            context_overrides: A list of explicit context overrides that will be set on the underlying Tracker.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(self.project)
@@ -50,6 +53,8 @@ class LegacyTracker:
             project,
             request_timeout=self.request_timeout,
         )
+        if context_overrides:
+            self.tracker._contexts = context_overrides
 
         project_context = ProjectContext(project, self.tracker.client_id)
         self.project_id = project_context.project_uuid

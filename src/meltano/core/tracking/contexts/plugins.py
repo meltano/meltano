@@ -10,52 +10,10 @@ from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.elt_context import ELTContext
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.tracking.schemas import PluginsContextSchema
 from meltano.core.utils import hash_sha256, safe_hasattr
 
 logger = get_logger(__name__)
-
-PLUGINS_CONTEXT_SCHEMA = "iglu:com.meltano/plugins_context/jsonschema"
-PLUGINS_CONTEXT_SCHEMA_VERSION = "1-0-0"
-
-
-def plugins_tracking_context_from_elt_context(
-    elt_context: ELTContext,
-) -> PluginsTrackingContext:
-    """Create a PluginsTrackingContext from an ELTContext.
-
-    Args:
-        elt_context: The ELTContext to use.
-
-    Returns:
-        A PluginsTrackingContext.
-    """
-    plugins = []
-    if not elt_context.only_transform:
-        plugins.append((elt_context.extractor.plugin, None))
-        plugins.append((elt_context.loader.plugin, None))
-    if elt_context.transformer:
-        plugins.append((elt_context.transformer.plugin, None))
-    return PluginsTrackingContext(plugins)
-
-
-def plugins_tracking_context_from_block(
-    blk: BlockSet | PluginCommandBlock,
-) -> PluginsTrackingContext:
-    """Create a PluginsTrackingContext from a BlockSet or PluginCommandBlock.
-
-    Args:
-        blk: The block to create the context for.
-
-    Returns:
-        The PluginsTrackingContext for the given block.
-    """
-    if isinstance(blk, BlockSet):
-        plugins: list[(ProjectPlugin, str)] = []
-        for plugin_block in blk.blocks:
-            plugins.append((plugin_block.context.plugin, plugin_block.plugin_args))
-        return PluginsTrackingContext(plugins)
-    if isinstance(blk, PluginCommandBlock):
-        return PluginsTrackingContext([(blk.context.plugin, blk.command)])
 
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
@@ -99,7 +57,7 @@ class PluginsTrackingContext(SelfDescribingJson):
             tracking_context.append(_from_plugin(plugin, cmd))
 
         super().__init__(
-            f"{PLUGINS_CONTEXT_SCHEMA}/{PLUGINS_CONTEXT_SCHEMA_VERSION}",
+            PluginsContextSchema.url,
             {"context_uuid": str(uuid.uuid4()), "plugins": tracking_context},
         )
 
@@ -111,3 +69,46 @@ class PluginsTrackingContext(SelfDescribingJson):
             cmd: The command that was executed.
         """
         self["plugins"].append({_from_plugin(plugin, cmd)})
+
+    @classmethod
+    def from_elt_context(cls, elt_context: ELTContext) -> PluginsTrackingContext:
+        """Create a PluginsTrackingContext from an ELTContext.
+
+        Parameters:
+            elt_context: The ELTContext to use.
+
+        Returns:
+            A PluginsTrackingContext.
+        """
+        plugins = []
+        if not elt_context.only_transform:
+            plugins.append((elt_context.extractor.plugin, None))
+            plugins.append((elt_context.loader.plugin, None))
+        if elt_context.transformer:
+            plugins.append((elt_context.transformer.plugin, None))
+        return cls(plugins)
+
+    @classmethod
+    def from_block(cls, blk: BlockSet | PluginCommandBlock) -> PluginsTrackingContext:
+        """Create a PluginsTrackingContext from a BlockSet or PluginCommandBlock.
+
+        Parameters:
+            blk: The block to create the context for.
+
+        Raises:
+            TypeError: `blk` is not a `BlockSet` or `PluginCommandBlock`.
+
+        Returns:
+            The PluginsTrackingContext for the given block.
+        """
+        if isinstance(blk, BlockSet):
+            plugins: list[(ProjectPlugin, str)] = []
+            for plugin_block in blk.blocks:
+                plugins.append((plugin_block.context.plugin, plugin_block.plugin_args))
+            return cls(plugins)
+        if isinstance(blk, PluginCommandBlock):
+            return cls([(blk.context.plugin, blk.command)])
+        raise TypeError(
+            "Parameter 'blk' must be an instance of 'BlockSet' or 'PluginCommandBlock', "
+            + f"not {type(blk)!r}"
+        )

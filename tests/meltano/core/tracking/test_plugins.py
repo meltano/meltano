@@ -1,11 +1,7 @@
 from meltano.core.block.plugin_command import plugin_command_invoker
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.tracking.plugins import (
-    PLUGINS_CONTEXT_SCHEMA,
-    PLUGINS_CONTEXT_SCHEMA_VERSION,
-    PluginsTrackingContext,
-    plugins_tracking_context_from_block,
-)
+from meltano.core.tracking import PluginsTrackingContext
+from meltano.core.tracking.schemas import PluginsContextSchema
 from meltano.core.utils import hash_sha256
 
 
@@ -20,11 +16,8 @@ class TestPluginsTrackingContext:
             project,
             command="test",
         )
-        plugin_ctx = plugins_tracking_context_from_block(cmd)
-        assert (
-            plugin_ctx.schema
-            == f"{PLUGINS_CONTEXT_SCHEMA}/{PLUGINS_CONTEXT_SCHEMA_VERSION}"
-        )
+        plugin_ctx = PluginsTrackingContext.from_block(cmd)
+        assert plugin_ctx.schema == PluginsContextSchema.url
         assert len(plugin_ctx.data.get("plugins")) == 1
         plugin = plugin_ctx.data.get("plugins")[0]
         assert plugin.get("name_hash") == hash_sha256(dbt.name)
@@ -38,10 +31,7 @@ class TestPluginsTrackingContext:
     def test_plugins_tracking_context(self, tap: ProjectPlugin, dbt: ProjectPlugin):
 
         plugin_ctx = PluginsTrackingContext([(tap, None), (dbt, "test")])
-        assert (
-            plugin_ctx.schema
-            == f"{PLUGINS_CONTEXT_SCHEMA}/{PLUGINS_CONTEXT_SCHEMA_VERSION}"
-        )
+        assert plugin_ctx.schema == PluginsContextSchema.url
         assert len(plugin_ctx.data.get("plugins")) == 2
         for plugin in plugin_ctx.data.get("plugins"):
             if plugin.get("category") == "extractors":

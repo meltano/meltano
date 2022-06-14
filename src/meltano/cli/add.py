@@ -11,9 +11,7 @@ from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import PluginsTrackingContext, Tracker
-from meltano.core.tracking import cli as cli_tracking
-from meltano.core.tracking import cli_context_builder
+from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
 from . import cli
 from .params import pass_project
@@ -72,8 +70,9 @@ def add(  # noqa: WPS238
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
     tracker = Tracker(project)
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     tracker.add_contexts(
-        cli_context_builder(
+        CliContext.from_command_and_kwargs(
             "add",
             None,
             inherit_from=inherit_from,
@@ -99,8 +98,8 @@ def add(  # noqa: WPS238
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
         }:
-            tracker.track_command_event(cli_tracking.STARTED)
-            tracker.track_command_event(cli_tracking.ABORTED)
+            tracker.track_command_event(CliEvent.started)
+            tracker.track_command_event(CliEvent.aborted)
             raise CliError(f"--custom is not supported for {plugin_type}")
 
     plugin_refs = [
@@ -110,14 +109,13 @@ def add(  # noqa: WPS238
         plugin_refs=plugin_refs, plugins_service=plugins_service
     )
     if not dependencies_met:
-        tracker.track_command_event(cli_tracking.STARTED)
-        tracker.track_command_event(cli_tracking.ABORTED)
+        tracker.track_command_event(CliEvent.started)
+        tracker.track_command_event(CliEvent.aborted)
         raise CliError(f"Failed to install plugin(s): {err}")
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
 
     plugins: list[ProjectPlugin] = []
-    legacy_tracker = LegacyTracker(project)
     for plugin in plugin_names:
         try:
             plugins.append(
@@ -136,8 +134,8 @@ def add(  # noqa: WPS238
             tracker.add_contexts(
                 PluginsTrackingContext([(plugin, None) for plugin in plugins])
             )
-            tracker.track_command_event(cli_tracking.STARTED)
-            tracker.track_command_event(cli_tracking.ABORTED)
+            tracker.track_command_event(CliEvent.started)
+            tracker.track_command_event(CliEvent.aborted)
             raise
 
         legacy_tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
@@ -149,16 +147,16 @@ def add(  # noqa: WPS238
     tracker.add_contexts(
         PluginsTrackingContext([(candidate, None) for candidate in plugins])
     )
-    tracker.track_command_event(cli_tracking.STARTED)
+    tracker.track_command_event(CliEvent.started)
 
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     if not success:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(CliEvent.failed)
         raise CliError("Failed to install plugin(s)")
 
     _print_plugins(plugins)
-    tracker.track_command_event(cli_tracking.COMPLETED)
+    tracker.track_command_event(CliEvent.completed)
 
 
 def _print_plugins(plugins):

@@ -2,38 +2,43 @@
 
 from __future__ import annotations
 
-import datetime
+import atexit
 import json
 import locale
 import re
 import uuid
 from contextlib import contextmanager
+from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, NamedTuple, Optional
+from typing import Any, NamedTuple
 from urllib.parse import urlparse
 
 import tzlocal
 from cached_property import cached_property
+from psutil import Process
 from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking import CliEvent, ProjectContext, environment_context
+from meltano.core.tracking.schemas import (
+    BlockEventSchema,
+    CliEventSchema,
+    ExitEventSchema,
+    TelemetryStateChangeEventSchema,
+)
 from meltano.core.utils import format_exception, hash_sha256
 
-from .environment import environment_context
-
-CLI_EVENT_SCHEMA = "iglu:com.meltano/cli_event/jsonschema"
-CLI_EVENT_SCHEMA_VERSION = "1-0-0"
-TELEMETRY_STATE_CHANGE_EVENT_SCHEMA = (
-    "iglu:com.meltano/telemetry_state_change_event/jsonschema"
+URL_REGEX = (
+    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
-TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION = "1-0-0"
-BLOCK_EVENT_SCHEMA = "iglu:com.meltano/block_event/jsonschema"
-BLOCK_EVENT_SCHEMA_VERSION = "1-0-0"
+
+MICROSECONDS_PER_SECOND = 1000000
+
+logger = get_logger(__name__)
 
 
 class BlockEvents(Enum):
@@ -43,13 +48,6 @@ class BlockEvents(Enum):
     started = auto()
     completed = auto()
     failed = auto()
-
-
-URL_REGEX = (
-    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
-)
-
-logger = get_logger(__name__)
 
 
 def check_url(url: str) -> bool:
@@ -76,7 +74,7 @@ class TelemetrySettings(NamedTuple):
 
 
 # TODO: Can we store some of this info to make future invocations faster?
-class Tracker:
+class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     """Meltano tracker backed by Snowplow."""
 
     def __init__(
@@ -115,6 +113,7 @@ class Tracker:
             self.snowplow_tracker = SnowplowTracker(emitters=emitters)
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
+            atexit.register(self.track_exit_event)
         else:
             self.snowplow_tracker = None
 
@@ -123,12 +122,21 @@ class Tracker:
 
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id: uuid.UUID = project_ctx.project_uuid
-        self.contexts: tuple[SelfDescribingJson] = (
+        self._contexts: tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
 
         self.telemetry_state_change_check(stored_telemetry_settings)
+
+    @property
+    def contexts(self) -> tuple[SelfDescribingJson]:
+        """Get the contexts that will accompany events fired by this tracker.
+
+        Returns:
+            The contexts that will accompany events fired by this tracker.
+        """
+        return self._contexts
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
@@ -157,14 +165,8 @@ class Tracker:
         Args:
             stored_telemetry_settings: the prior analytics settings
         """
-        save_settings = False
-
-        if (
-            stored_telemetry_settings.send_anonymous_usage_stats is None
-            and not self.send_anonymous_usage_stats
-        ):
-            # Do nothing. Tracking is disabled and no tracking marker to update.
-            return
+        # If `stored_telemetry_settings` is all `None`, then the settings have never been saved yet
+        save_settings = all(setting is None for setting in stored_telemetry_settings)
 
         if (
             stored_telemetry_settings.project_id is not None
@@ -183,7 +185,7 @@ class Tracker:
         ):
             # Telemetry state has changed
             self.track_telemetry_state_change_event(
-                "project_id",
+                "send_anonymous_usage_stats",
                 stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
@@ -213,7 +215,7 @@ class Tracker:
         try:
             return tzlocal.get_localzone_name()
         except Exception:
-            return datetime.datetime.now().astimezone().tzname()
+            return datetime.now().astimezone().tzname()
 
     def add_contexts(self, *extra_contexts):
         """Permanently add additional Snowplow contexts to the `Tracker`.
@@ -221,7 +223,7 @@ class Tracker:
         Args:
             extra_contexts: The additional contexts to add to the `Tracker`.
         """
-        self.contexts = (*self.contexts, *extra_contexts)
+        self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
     def with_contexts(self, *extra_contexts) -> Tracker:
@@ -233,12 +235,12 @@ class Tracker:
         Yields:
             A `Tracker` with additional Snowplow contexts.
         """
-        prev_contexts = self.contexts
-        self.contexts = (*prev_contexts, *extra_contexts)
+        prev_contexts = self._contexts
+        self._contexts = (*prev_contexts, *extra_contexts)
         try:
             yield self
         finally:
-            self.contexts = prev_contexts
+            self._contexts = prev_contexts
 
     def can_track(self) -> bool:
         """Check if the tracker can be used.
@@ -268,6 +270,7 @@ class Tracker:
                 category=category,
                 action=action,
                 label=str(self.project_id),
+                context=self.contexts,
             )
         except Exception as err:
             logger.debug(
@@ -291,16 +294,14 @@ class Tracker:
                 err=format_exception(err),
             )
 
-    def track_command_event(self, event_json: dict[str, Any]) -> None:
+    def track_command_event(self, event: CliEvent) -> None:
         """Fire generic command tracking event.
 
         Args:
-            event_json: The event JSON to track. See cli_event schema for more details.
+            event: An member from `meltano.core.tracking.CliEvent`
         """
         self.track_unstruct_event(
-            SelfDescribingJson(
-                f"{CLI_EVENT_SCHEMA}/{CLI_EVENT_SCHEMA_VERSION}", event_json
-            )
+            SelfDescribingJson(CliEventSchema.url, {"event": event.name})
         )
 
     def track_telemetry_state_change_event(
@@ -316,6 +317,9 @@ class Tracker:
             from_value: the old value
             to_value: the new value
         """
+        if self.snowplow_tracker is None:
+            return  # The Snowplow tracker is not available (e.g. because no endpoints are set)
+
         logger.debug(
             "Telemetry state change detected. A one-time "
             + "'telemetry_state_change' event will now be sent.",
@@ -326,7 +330,7 @@ class Tracker:
         if isinstance(to_value, uuid.UUID):
             to_value = str(to_value)
         event_json = SelfDescribingJson(
-            f"{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA}/{TELEMETRY_STATE_CHANGE_EVENT_SCHEMA_VERSION}",
+            TelemetryStateChangeEventSchema.url,
             {
                 "setting_name": setting_name,
                 "changed_from": from_value,
@@ -384,7 +388,7 @@ class Tracker:
                 new_analytics_json_file,
             )
 
-    def _uuid_from_str(self, from_val: Optional[Any], warn: bool) -> uuid.UUID | None:
+    def _uuid_from_str(self, from_val: Any | None, warn: bool) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
 
         Args:
@@ -425,7 +429,30 @@ class Tracker:
         """
         self.track_unstruct_event(
             SelfDescribingJson(
-                f"{BLOCK_EVENT_SCHEMA}/{BLOCK_EVENT_SCHEMA_VERSION}",
+                BlockEventSchema.url,
                 {"type": block_type, "event": event.name},
+            )
+        )
+
+    def track_exit_event(self):
+        """Fire exit event."""
+        from meltano.cli import exit_code
+
+        start_time = datetime.utcfromtimestamp(Process().create_time())
+
+        # This is the reported "end time" for this process, though in reality the process will end
+        # a short time after this time as it takes time to emit the event.
+        now = datetime.utcnow()
+
+        self.track_unstruct_event(
+            SelfDescribingJson(
+                ExitEventSchema.url,
+                {
+                    "exit_code": exit_code,
+                    "exit_timestamp": f"{now.isoformat()}Z",
+                    "process_duration_microseconds": int(
+                        (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND
+                    ),
+                },
             )
         )
