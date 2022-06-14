@@ -270,6 +270,7 @@ jobs:
       - tap-foo target-baz
 ```
 
+You can learn more about how tasks are defined and run in the [`meltano job` documentation](/reference/command-line-interface#job).
 ### Schedules
 
 Your project's pipeline schedules,
