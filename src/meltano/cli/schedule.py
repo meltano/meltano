@@ -12,10 +12,15 @@ from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.schedule import Schedule
-from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
+from meltano.core.schedule_service import (
+    ScheduleAlreadyExistsError,
+    ScheduleNotFoundError,
+    ScheduleService,
+)
 from meltano.core.task_sets import TaskSets
 from meltano.core.task_sets_service import TaskSetsService
-from meltano.core.utils import coerce_datetime
+from meltano.core.tracking import CliContext, CliEvent, Tracker
+from meltano.core.utils import NotFound, coerce_datetime
 
 from . import cli
 from .params import pass_project
@@ -33,6 +38,10 @@ def schedule(project, ctx):
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
     ctx.obj["task_sets_service"] = TaskSetsService(project)
+    ctx.obj["tracker"] = Tracker(project)
+    ctx.obj["legacy_tracker"] = LegacyTracker(
+        project, context_overrides=ctx.obj["tracker"].contexts
+    )
 
 
 def _add_elt(
@@ -46,6 +55,8 @@ def _add_elt(
 ):
     """Add a new legacy elt schedule."""
     project = ctx.obj["project"]
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
 
     _, session_maker = project_engine(project)
@@ -54,13 +65,17 @@ def _add_elt(
         added_schedule = schedule_service.add_elt(
             session, name, extractor, loader, transform, interval, start_date
         )
-        tracker = LegacyTracker(schedule_service.project)
-        tracker.track_meltano_schedule("add", added_schedule)
+        legacy_tracker.track_meltano_schedule("add", added_schedule)
         click.echo(
             f"Scheduled elt '{added_schedule.name}' at {added_schedule.interval}"
         )
+        tracker.track_command_event(CliEvent.completed)
     except ScheduleAlreadyExistsError:
+        tracker.track_command_event(CliEvent.aborted)
         click.secho(f"Schedule '{name}' already exists.", fg="yellow")
+    except Exception:
+        tracker.track_command_event(CliEvent.failed)
+        raise
     finally:
         session.close()
 
@@ -68,19 +83,26 @@ def _add_elt(
 def _add_job(ctx, name: str, job: str, interval: str):
     """Add a new scheduled job."""
     project = ctx.obj["project"]
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
+
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
 
     _, session_maker = project_engine(project)
     session = session_maker()
     try:
         added_schedule = schedule_service.add(name, job, interval)
-        tracker = LegacyTracker(schedule_service.project)
-        tracker.track_meltano_schedule("add", added_schedule)
+        legacy_tracker.track_meltano_schedule("add", added_schedule)
         click.echo(
             f"Scheduled job '{added_schedule.name}' at {added_schedule.interval}"
         )
+        tracker.track_command_event(CliEvent.completed)
     except ScheduleAlreadyExistsError:
+        tracker.track_command_event(CliEvent.aborted)
         click.secho(f"Schedule '{name}' already exists.", fg="yellow")
+    except Exception:
+        tracker.track_command_event(CliEvent.failed)
+        raise
     finally:
         session.close()
 
@@ -99,7 +121,9 @@ def _add_job(ctx, name: str, job: str, interval: str):
 )
 @click.option("--start-date", type=click.DateTime(), default=None, help="ELT Only")
 @click.pass_context
-def add(ctx, name, job, extractor, loader, transform, interval, start_date):
+def add(
+    ctx, name, job, extractor, loader, transform, interval, start_date
+):  # noqa: WPS238 - too many raises
     """
     Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
 
@@ -115,15 +139,33 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
+    tracker = ctx.obj["tracker"]
+    tracker.add_contexts(
+        CliContext.from_command_and_kwargs(
+            "schedule",
+            "add",
+            job=job,
+            extract=extractor,
+            loader=loader,
+            transform=transform,
+            interval=interval,
+            start_date=start_date,
+        )
+    )
+    tracker.track_command_event(CliEvent.started)
+
     if job and (extractor or loader):
+        tracker.track_command_event(CliEvent.aborted)
         raise click.ClickException(
             "Cannot mix --job with --extractor/--loader/--transform"
         )
 
     if not job:
         if not extractor:
+            tracker.track_command_event(CliEvent.aborted)
             raise click.ClickException("Missing --extractor")
         if not loader:
+            tracker.track_command_event(CliEvent.aborted)
             raise click.ClickException("Missing --loader")
 
         _add_elt(ctx, name, extractor, loader, transform, interval, start_date)
@@ -174,6 +216,17 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
 def list(ctx, format):  # noqa: WPS125
     """List available schedules."""
     project = ctx.obj["project"]
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker.add_contexts(
+        CliContext.from_command_and_kwargs(
+            "schedule",
+            "list",
+            format=format,
+        )
+    )
+    tracker.track_command_event(CliEvent.started)
+
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
@@ -220,11 +273,13 @@ def list(ctx, format):  # noqa: WPS125
                     indent=2,
                 )
             )
+    except Exception:
+        tracker.track_command_event(CliEvent.failed)
+        raise
     finally:
         session.close()
-
-    tracker = LegacyTracker(schedule_service.project)
-    tracker.track_meltano_schedule("list")
+    tracker.track_command_event(CliEvent.completed)
+    legacy_tracker.track_meltano_schedule("list")
 
 
 @schedule.command(
@@ -236,13 +291,34 @@ def list(ctx, format):  # noqa: WPS125
 @click.pass_context
 def run(ctx, name, elt_options):
     """Run a schedule."""
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker.add_contexts(
+        CliContext.from_command_and_kwargs(
+            "schedule",
+            "run",
+            name=name,
+            elt_options=elt_options,
+        )
+    )
+    tracker.track_command_event(CliEvent.started)
+
     schedule_service = ctx.obj["schedule_service"]
 
-    this_schedule = schedule_service.find_schedule(name)
-    process = schedule_service.run(this_schedule, *elt_options)
+    try:
+        this_schedule = schedule_service.find_schedule(name)
+    except (ScheduleNotFoundError, NotFound):
+        tracker.track_command_event(CliEvent.aborted)
+        raise
 
-    tracker = LegacyTracker(schedule_service.project)
-    tracker.track_meltano_schedule("run", this_schedule)
+    try:
+        process = schedule_service.run(this_schedule, *elt_options)
+    except Exception:
+        tracker.track_command_event(CliEvent.failed)
+        raise
+
+    legacy_tracker.track_meltano_schedule("run", this_schedule)
+    tracker.track_command_event(CliEvent.completed)
 
     exitcode = process.returncode
     if exitcode:
@@ -258,11 +334,33 @@ def remove(ctx, name):
     Usage:
         meltano schedule remove <name>
     """
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker.add_contexts(
+        CliContext.from_command_and_kwargs(
+            "schedule",
+            "remove",
+            name=name,
+        )
+    )
+    tracker.track_command_event(CliEvent.started)
+
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
-    removed_schedule = schedule_service.find_schedule(name)
-    schedule_service.remove(name)
-    tracker = LegacyTracker(schedule_service.project)
-    tracker.track_meltano_schedule("remove", removed_schedule)
+
+    try:
+        removed_schedule = schedule_service.find_schedule(name)
+    except (ScheduleNotFoundError, NotFound):
+        tracker.track_command_event(CliEvent.aborted)
+        raise
+
+    try:
+        schedule_service.remove(name)
+    except Exception:
+        tracker.track_command_event(CliEvent.failed)
+        raise
+
+    legacy_tracker.track_meltano_schedule("remove", removed_schedule)
+    tracker.track_command_event(CliEvent.completed)
 
 
 def _update_job_schedule(
@@ -345,32 +443,58 @@ def _update_elt_schedule(
     help="Update the transform flag for an elt schedule.",
 )
 @click.pass_context
-def set_cmd(ctx, name, interval, job, extractor, loader, transform):
+def set_cmd(  # noqa: WPS238 - too many raises (4)
+    ctx, name, interval, job, extractor, loader, transform
+):
     """Update a schedule.
 
     Usage:
         meltano schedule set <name> [--interval <interval>] [--job <job>] [--extractor <extractor>] [--loader <loader>] [--transform <transform>]
     """
-    schedule_service: ScheduleService = ctx.obj["schedule_service"]
-    candidate = schedule_service.find_schedule(name)
-
-    if candidate.job:
-        if extractor or loader or transform:
-            raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform"
-            )
-        updated = _update_job_schedule(candidate, job, interval)
-    else:
-        if job:
-            raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform"
-            )
-        updated = _update_elt_schedule(
-            candidate, extractor, loader, transform, interval
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker.add_contexts(
+        CliContext.from_command_and_kwargs(
+            "schedule",
+            "set",
+            name=name,
+            interval=interval,
+            job=job,
+            extractor=extractor,
+            loader=loader,
+            transform=transform,
         )
+    )
+    tracker.track_command_event(CliEvent.started)
 
-    schedule_service.update_schedule(updated)
+    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+
+    try:
+        candidate = schedule_service.find_schedule(name)
+        if candidate.job:
+            if extractor or loader or transform:
+                raise click.ClickException(
+                    "Cannot mix --job with --extractor/--loader/--transform"
+                )
+            updated = _update_job_schedule(candidate, job, interval)
+        else:
+            if job:
+                raise click.ClickException(
+                    "Cannot mix --job with --extractor/--loader/--transform"
+                )
+            updated = _update_elt_schedule(
+                candidate, extractor, loader, transform, interval
+            )
+    except (click.ClickException, ScheduleNotFoundError, NotFound):
+        tracker.track_command_event(CliEvent.aborted)
+        raise
+
+    try:
+        schedule_service.update_schedule(updated)
+    except Exception:
+        tracker.track_command_event(CliEvent.failed)
+        raise
 
     click.echo(f"Updated schedule '{name}'")
-    tracker = LegacyTracker(schedule_service.project)
-    tracker.track_meltano_schedule("set", updated)
+    legacy_tracker.track_meltano_schedule("set", updated)
+    tracker.track_command_event(CliEvent.completed)

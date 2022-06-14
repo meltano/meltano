@@ -184,6 +184,8 @@ per_file_ignores =
         WPS216
         # Allow many module members
         WPS202
+        # Found overused expression (due to repeated tracking calls)
+        WPS204
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
