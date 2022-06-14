@@ -35,7 +35,7 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
 1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
     ```bash
-    python3 -m install --user pipx
+    python3 -m pip install --user pipx
     python3 -m pipx ensurepath
     #Note that the below commands are not needed in most cases
     source ~/.bashrc
