@@ -43,6 +43,7 @@ using [`meltano add`](/reference/command-line-interface#add),
 are defined under the `plugins` property, inside an array named after the [plugin type](/concepts/plugins#types) (e.g. `extractors`, `loaders`).
 
 Every plugin in your project needs to have:
+
 1. a `name` that's unique among plugins of the same type,
 2. a [base plugin description](/concepts/plugins#project-plugins) describing the package in terms Meltano can understand, and
 3. [configuration](/guide/configuration) that can be defined across [various layers](/guide/configuration#configuration-layers), including the definition's [`config` property](#plugin-configuration).
@@ -252,22 +253,50 @@ Commands can specify a `container_spec` for containerized execution. To execute 
           "8080": "8080/tcp"
 ```
 
+### Jobs
+
+Your project's predefined pipelines, typically created using [`meltano job`](/reference/command-line-interface#job), are defined under the `jobs` property.
+
+A job definition must have a `name` and one or more `tasks`:
+
+```yaml
+jobs:
+  - name: tap-foo-to-target-bar-dbt
+    tasks:
+      - tap-foo target-bar dbt:run
+  - name: tap-foo-to-targets-bar-and-baz
+    tasks:
+      - tap-foo target-bar
+      - tap-foo target-baz
+```
+
+You can learn more about how tasks are defined and run in the [`meltano job` documentation](/reference/command-line-interface#job).
 ### Schedules
 
 Your project's pipeline schedules,
 typically [created](/guide/orchestration#create-a-schedule)
 using [`meltano schedule`](/reference/command-line-interface#schedule),
- are defined under the `schedules` property.
+are defined under the `schedules` property.
 
-A schedule definition must have a `name`, `extractor`, `loader`, `transform` and `interval`:
+A scheduled job must have a `name`, `job` and `interval`:
 
 ```yaml
 schedules:
-- name: foo-to-bar
+  - name: foo-to-bar
+    job: tap-foo-to-target
+    interval: "@hourly"
+```
+
+The value for `job` must be the name of an existing [job](#jobs) within the project.
+
+Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and `interval` in place of a `job`:
+
+```yaml
+- name: foo-to-bar-elt
   extractor: tap-foo
   loader: target-bar
   transform: skip
-  interval: '@hourly'
+  interval: @hourly
 ```
 
 [Pipeline-specific configuration](/guide/integration#pipeline-specific-configuration) can be specified using [environment variables](/guide/configuration#configuring-settings) in an `env` dictionary:
@@ -275,9 +304,7 @@ schedules:
 ```yaml{7-9}
 schedules:
 - name: foo-to-bar
-  extractor: tap-foo
-  loader: target-bar
-  transform: skip
+  job: tap-foo-to-target-bat
   interval: '@hourly'
   env:
     TAP_FOO_BAR: bar
@@ -294,9 +321,9 @@ This can be done by creating new `.yml` files and adding them (directly or via a
 
 ```yaml
 include_paths:
-  - './subconfig_[0-9].yml'
-  - './*/subconfig_[0-9].yml'
-  - './*/**/subconfig_[0-9].yml'
+  - "./subconfig_[0-9].yml"
+  - "./*/subconfig_[0-9].yml"
+  - "./*/**/subconfig_[0-9].yml"
 ```
 
 Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://github.com/meltano/meltano/issues/2925)).
