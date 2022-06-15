@@ -5,6 +5,7 @@ import click
 import structlog
 
 from meltano.core.block.parser import BlockParser, validate_block_sets
+from meltano.core.elt_context import PluginContext
 from meltano.core.legacy_tracking import LegacyTracker, legacy_tracker
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
@@ -302,6 +303,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
         try:
             block_parser = BlockParser(logger, project, blocks)
             parsed_blocks = list(block_parser.find_blocks(0))
+            tracker.add_contexts(PluginsTrackingContext.from_blocks(parsed_blocks))
         except Exception as err:
             tracker.track_command_event(CliEvent.failed)
             raise InvalidTasksError(task_set.name, err)
