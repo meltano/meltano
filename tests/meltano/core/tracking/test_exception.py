@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import inspect
 import json
+import platform
 import uuid
 import warnings
 from pathlib import Path
 from platform import python_version_tuple
 from typing import Any
 
+import pytest
 from jsonschema import ValidationError, validate
 
 from meltano.core.tracking import ExceptionContext
@@ -97,6 +99,10 @@ def test_simple_exception_context():
         assert key in tb_data[0]
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+)
 def test_complex_exception_context():
     line_nums: list[int] = []
 
