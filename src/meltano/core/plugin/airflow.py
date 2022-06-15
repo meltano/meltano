@@ -1,3 +1,4 @@
+"""Plugin glue code for Airflow."""
 import configparser
 import logging
 import os
@@ -13,7 +14,14 @@ from . import BasePlugin, PluginType
 
 
 class AirflowInvoker(PluginInvoker):
+    """Invoker that prepares env for Airflow."""
+
     def env(self):
+        """Environment variables for Airflow.
+
+        Returns:
+            Dictionary of environment variables.
+        """
         env = super().env()
 
         env["AIRFLOW_HOME"] = str(self.plugin_config_service.run_dir)
@@ -23,15 +31,30 @@ class AirflowInvoker(PluginInvoker):
 
 
 class Airflow(BasePlugin):
+    """Plugin glue code for Airflow."""
+
     __plugin_type__ = PluginType.ORCHESTRATORS
 
     invoker_class = AirflowInvoker
 
     @property
     def config_files(self):
+        """Return the configuration files required by the plugin.
+
+        Returns:
+            Dictionary of config file identifiers and filenames
+        """
         return {"config": "airflow.cfg"}
 
     def process_config(self, flat_config):
+        """Unflatten the config.
+
+        Args:
+            flat_config: the flat config
+
+        Returns:
+            unflattened config
+        """
         config = {}
         for key, value in flat_config.items():
             nest(config, key, str(value))
@@ -39,7 +62,11 @@ class Airflow(BasePlugin):
 
     @staticmethod
     def update_config_file(invoker: AirflowInvoker) -> None:
-        """Update airflow.cfg with plugin configuration."""
+        """Update airflow.cfg with plugin configuration.
+
+        Args:
+            invoker: the active PluginInvoker
+        """
         airflow_cfg_path = invoker.files["config"]
         logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
 
@@ -47,27 +74,40 @@ class Airflow(BasePlugin):
         # now we let's update the config to use our stubs
         airflow_cfg = configparser.ConfigParser()
 
-        with airflow_cfg_path.open() as cfg:
-            airflow_cfg.read_file(cfg)
+        with airflow_cfg_path.open() as airflow_cfg_file_to_read:
+            airflow_cfg.read_file(airflow_cfg_file_to_read)
             logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
         config = invoker.plugin_config_processed
-        for section, cfg in config.items():
-            airflow_cfg[section].update(cfg)
-            logging.debug(f"\tUpdated section [{section}] with {cfg}")
+        for section, section_config in config.items():
+            airflow_cfg[section].update(section_config)
+            logging.debug(f"\tUpdated section [{section}] with {section_config}")
 
-        with airflow_cfg_path.open("w") as cfg:
-            airflow_cfg.write(cfg)
+        with airflow_cfg_path.open("w") as airflow_cfg_file_to_write:
+            airflow_cfg.write(airflow_cfg_file_to_write)
             logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
     @hook("before_install")
     async def setup_env(self, *args, **kwargs):
-        """Configure the env to make airflow installable without GPL deps."""
+        """Configure the env to make airflow installable without GPL deps.
+
+        Args:
+            args: Arbitrary args
+            kwargs: Arbitrary kwargs
+        """
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
     @hook("before_configure")
     async def before_configure(self, invoker: AirflowInvoker, session):  # noqa: WPS217
-        """Keep the Airflow metadata database up-to-date."""
+        """Generate config file and keep metadata database up-to-date.
+
+        Args:
+            invoker: the active PluginInvoker
+            session: metadata database session
+
+        Raises:
+            AsyncSubprocessError: if command failed to run
+        """
         # generate the default `airflow.cfg`
         handle = await invoker.invoke_async(
             "--help",
@@ -75,9 +115,9 @@ class Airflow(BasePlugin):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
         )
-        return_code = await handle.wait()
+        exit_code = await handle.wait()
 
-        if return_code:
+        if exit_code:
             raise AsyncSubprocessError(
                 "Command `airflow --help` failed", process=handle
             )
@@ -116,9 +156,9 @@ class Airflow(BasePlugin):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        initdb = await handle.wait()
+        exit_code = await handle.wait()
 
-        if initdb:
+        if exit_code:
             raise AsyncSubprocessError(
                 "Airflow metadata database could not be initialized: `airflow initdb` failed",
                 handle,
@@ -128,10 +168,14 @@ class Airflow(BasePlugin):
 
     @hook("before_cleanup")
     async def before_cleanup(self, invoker: PluginInvoker):
-        """Delete the config file."""
+        """Delete the config file.
+
+        Args:
+            invoker: the active PluginInvoker
+        """
         config_file = invoker.files["config"]
         try:
             config_file.unlink()
+            logging.debug(f"Deleted configuration at {config_file}")
         except FileNotFoundError:
             pass
-        logging.debug(f"Deleted configuration at {config_file}")

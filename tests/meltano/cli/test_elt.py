@@ -9,6 +9,7 @@ from asynctest import CoroutineMock, mock
 from asserts import assert_cli_runner
 from meltano.cli import CliError, cli
 from meltano.core.job import Job, State
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -16,7 +17,6 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 class LogEntry:
@@ -221,7 +221,7 @@ def dbt_process(process_mock_factory, dbt):
 
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -241,8 +241,8 @@ class TestCliEltScratchpadOne:
         result = cli_runner.invoke(cli, ["elt"])
         assert result.exit_code == 2
 
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         # exit cleanly when everything is fine
         create_subprocess_exec = CoroutineMock(
@@ -288,7 +288,7 @@ class TestCliEltScratchpadOne:
                 ],
             )
 
-        job_logging_service.delete_all_logs(job_id)
+        job_logging_service.delete_all_logs(state_id)
 
         exc = Exception("This is a grave danger.")
         with mock.patch.object(SingerRunner, "run", side_effect=exc), mock.patch(
@@ -307,12 +307,12 @@ class TestCliEltScratchpadOne:
             assert exception_logged(result.stderr, exc)
 
             # ensure there is a log of this exception
-            log = job_logging_service.get_latest_log(job_id).splitlines()
+            log = job_logging_service.get_latest_log(state_id).splitlines()
             assert "Traceback (most recent call last):" in log
             assert "Exception: This is a grave danger." in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -330,10 +330,10 @@ class TestCliEltScratchpadOne:
         job_logging_service,
         monkeypatch,
     ):
-        job_id = "pytest_test_elt_debug"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt_debug"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
-        job_logging_service.delete_all_logs(job_id)
+        job_logging_service.delete_all_logs(state_id)
 
         create_subprocess_exec = CoroutineMock(
             side_effect=(tap_process, target_process)
@@ -412,7 +412,7 @@ class TestCliEltScratchpadOne:
 
             assert_log_lines(result.stdout + result.stderr, lines)
 
-            log = job_logging_service.get_latest_log(job_id)
+            log = job_logging_service.get_latest_log(state_id)
 
             full_result = result.stdout + result.stderr
 
@@ -426,7 +426,7 @@ class TestCliEltScratchpadOne:
             assert "tap-mock (out)" in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -443,8 +443,8 @@ class TestCliEltScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         tap_process.wait.return_value = 1
         tap_process.stderr.readline.side_effect = (
@@ -463,7 +463,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Extractor failed" in str(result.exception)
-            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
+            job_logs_file = job_logging_service.get_all_logs(state_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -493,7 +493,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -510,8 +510,8 @@ class TestCliEltScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
         async def tap_wait_mock():
@@ -549,7 +549,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
-            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
+            job_logs_file = job_logging_service.get_all_logs(state_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -578,7 +578,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -595,8 +595,8 @@ class TestCliEltScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         target_process.wait.return_value = 1
         target_process.stderr.readline.side_effect = (
@@ -615,7 +615,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
-            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
+            job_logs_file = job_logging_service.get_all_logs(state_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -645,7 +645,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -662,8 +662,8 @@ class TestCliEltScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         tap_process.wait.return_value = 1
         tap_process.stderr.readline.side_effect = (
@@ -689,7 +689,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Extractor and loader failed" in str(result.exception)
-            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
+            job_logs_file = job_logging_service.get_all_logs(state_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -721,7 +721,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -738,8 +738,8 @@ class TestCliEltScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         # Raise a ValueError wrapping a LimitOverrunError, like StreamReader.readline does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
@@ -772,7 +772,7 @@ class TestCliEltScratchpadOne:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Output line length limit exceeded" in str(result.exception)
-            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
+            job_logs_file = job_logging_service.get_all_logs(state_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -796,7 +796,7 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -812,8 +812,8 @@ class TestCliEltScratchpadOne:
         target_process,
         project_plugins_service,
     ):
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "pytest_test_elt"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         exc = Exception("Failed to read from target stderr.")
         target_process.stderr.readline.side_effect = exc
@@ -850,10 +850,10 @@ class TestCliEltScratchpadOne:
     def test_elt_already_running(
         self, cli_runner, tap, target, project_plugins_service, session
     ):
-        job_id = "already_running"
-        args = ["elt", "--job_id", job_id, tap.name, target.name]
+        state_id = "already_running"
+        args = ["elt", "--state-id", state_id, tap.name, target.name]
 
-        existing_job = Job(job_id=job_id, state=State.RUNNING)
+        existing_job = Job(job_id=state_id, state=State.RUNNING)
         existing_job.save(session)
 
         with mock.patch(
@@ -864,7 +864,7 @@ class TestCliEltScratchpadOne:
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert f"Another '{job_id}' pipeline is already running" in str(
+            assert f"Another '{state_id}' pipeline is already running" in str(
                 result.exception
             )
 
@@ -881,11 +881,11 @@ class TestCliEltScratchpadOne:
         with project.root.joinpath("catalog.json").open("w") as catalog_file:
             json.dump(catalog, catalog_file)
 
-        job_id = "pytest_test_elt"
+        state_id = "pytest_test_elt"
         args = [
             "elt",
-            "--job_id",
-            job_id,
+            "--state-id",
+            state_id,
             tap.name,
             target.name,
             "--catalog",
@@ -917,11 +917,11 @@ class TestCliEltScratchpadOne:
         with project.root.joinpath("state.json").open("w") as state_file:
             json.dump(state, state_file)
 
-        job_id = "pytest_test_elt"
+        state_id = "pytest_test_elt"
         args = [
             "elt",
-            "--job_id",
-            job_id,
+            "--state-id",
+            state_id,
             tap.name,
             target.name,
             "--state",
@@ -950,11 +950,11 @@ class TestCliEltScratchpadOne:
         project_plugins_service,
         plugin_settings_service_factory,
     ):
-        job_id = "pytest_test_elt"
+        state_id = "pytest_test_elt"
         args = [
             "elt",
-            "--job_id",
-            job_id,
+            "--state-id",
+            state_id,
             tap.name,
             target.name,
             "--dump",
@@ -985,11 +985,11 @@ class TestCliEltScratchpadOne:
         project_plugins_service,
         plugin_settings_service_factory,
     ):
-        job_id = "pytest_test_elt"
+        state_id = "pytest_test_elt"
         args = [
             "elt",
-            "--job_id",
-            job_id,
+            "--state-id",
+            state_id,
             tap.name,
             target.name,
             "--dump",
@@ -1014,7 +1014,7 @@ class TestCliEltScratchpadOne:
 
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -1083,7 +1083,7 @@ class TestCliEltScratchpadTwo:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -1104,8 +1104,16 @@ class TestCliEltScratchpadTwo:
         project_plugins_service,
         job_logging_service,
     ):
-        job_id = "pytest_test_elt"
-        args = ["elt", "--job_id", job_id, tap.name, target.name, "--transform", "run"]
+        state_id = "pytest_test_elt"
+        args = [
+            "elt",
+            "--state-id",
+            state_id,
+            tap.name,
+            target.name,
+            "--transform",
+            "run",
+        ]
 
         dbt_process.wait.return_value = 1
         dbt_process.returncode = 1
@@ -1136,7 +1144,7 @@ class TestCliEltScratchpadTwo:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "`dbt run` failed" in str(result.exception)
-            job_logs_file = job_logging_service.get_all_logs(job_id)[0]
+            job_logs_file = job_logging_service.get_all_logs(state_id)[0]
 
             assert_log_lines(
                 result.stdout + result.stderr,
@@ -1173,7 +1181,7 @@ class TestCliEltScratchpadTwo:
 
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
@@ -1212,7 +1220,7 @@ class TestCliEltScratchpadThree:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(GoogleAnalyticsTracker, "track_data", return_value=None)
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )

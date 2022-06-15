@@ -1,0 +1,33 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow event describing a Meltano block event",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "block_event",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "type": {
+            "description": "The type of block firing the event.",
+            "type": "string",
+            "maxLength": 64
+        },
+        "event": {
+            "description": "Where in the block life cycle this event occurred.",
+            "type": "string",
+            "enum": [
+                "initialized",
+                "started",
+                "completed",
+                "failed"
+            ]
+        }
+    },
+    "required": [
+        "type",
+        "event"
+    ],
+    "additionalProperties": false
+}

@@ -5,6 +5,7 @@ import click
 import structlog
 
 from meltano.core.block.parser import BlockParser, validate_block_sets
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
@@ -12,7 +13,6 @@ from meltano.core.task_sets_service import (
     JobNotFoundError,
     TaskSetsService,
 )
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from . import CliError, cli
 from .params import pass_project
@@ -46,7 +46,7 @@ def _list_single_job(
         click.echo(
             json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2)
         )
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_job("list", job_name)
 
 
@@ -75,7 +75,7 @@ def _list_all_jobs(
                 indent=2,
             )
         )
-        tracker = GoogleAnalyticsTracker(project)
+        tracker = LegacyTracker(project)
         tracker.track_meltano_job("list")
 
 
@@ -181,7 +181,7 @@ def add(ctx, job_name: str, raw_tasks: str):
 
     click.echo(f"Added job {task_sets.name}: {task_sets.tasks}")
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_job("add", job_name)
 
 
@@ -231,7 +231,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
 
     click.echo(f"Updated job {task_sets.name}: {task_sets.tasks}")
 
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_job("set", job_name)
 
 
@@ -248,7 +248,7 @@ def remove(ctx, job_name: str):  # noqa: WPS442
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     task_sets = task_sets_service.remove(job_name)
     click.echo(f"Removed job '{task_sets.name}'.")
-    tracker = GoogleAnalyticsTracker(project)
+    tracker = LegacyTracker(project)
     tracker.track_meltano_job("remove", job_name)
 
 

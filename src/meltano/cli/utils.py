@@ -4,12 +4,15 @@ import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import click
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import PluginRef
+from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -18,9 +21,11 @@ from meltano.core.plugin_install_service import (
 from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
 from meltano.core.project import Project
 from meltano.core.project_add_service import (
+    PluginAddedReason,
     PluginAlreadyAddedException,
     ProjectAddService,
 )
+from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
 
 setup_logging()
@@ -48,11 +53,16 @@ class CliError(Exception):
         self.printed = True
 
 
-def print_added_plugin(plugin, related=False):
+def print_added_plugin(
+    plugin,
+    reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
+):
     """Print added plugin."""
     descriptor = plugin.type.descriptor
-    if related:
+    if reason is PluginAddedReason.RELATED:
         descriptor = f"related {descriptor}"
+    elif reason is PluginAddedReason.REQUIRED:
+        descriptor = f"required {descriptor}"
 
     if plugin.should_add_to_file():
         click.secho(
@@ -355,6 +365,7 @@ def add_plugin(
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new --inherit-from {plugin.name}"
             )
     except LockfileAlreadyExistsError as exc:
+        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method should return! Results in `KeyError: venv_name`
         plugin = exc.plugin
         click.secho(
             f"Plugin definition is already locked at {exc.path}.",
@@ -370,24 +381,24 @@ def add_plugin(
     return plugin
 
 
-def add_related_plugins(
-    project,
-    plugins,
+def add_required_plugins(
+    project: Project,
+    plugins: List[ProjectPlugin],
     add_service: ProjectAddService,
-    plugin_types: List[PluginType] = None,
+    lock: bool = True,
 ):
-    """Add any related Plugins to the given Plugin."""
-    plugin_types = plugin_types or list(PluginType)
+    """Add any Plugins required by the given Plugin."""
     added_plugins = []
     for plugin_install in plugins:
-        related_plugins = add_service.add_related(
-            plugin_install, plugin_types=plugin_types
+        required_plugins = add_service.add_required(
+            plugin_install,
+            lock=lock,
         )
-        for related_plugin in related_plugins:
-            print_added_plugin(related_plugin, related=True)
+        for required_plugin in required_plugins:
+            print_added_plugin(required_plugin, reason=PluginAddedReason.REQUIRED)
             click.echo()
 
-        added_plugins.extend(related_plugins)
+        added_plugins.extend(required_plugins)
 
     return added_plugins
 
@@ -466,3 +477,36 @@ def propagate_stop_signals(proc):
         yield
     finally:
         signal.signal(signal.SIGTERM, original_termination_handler)
+
+
+def check_dependencies_met(
+    plugin_refs: List[PluginRef], plugins_service: ProjectPluginsService
+) -> Tuple[bool, str]:
+    """Check dependencies of added plugins are met.
+
+    Args:
+        plugins: List of plugins to be added.
+        plugin_service: Plugin service to use when checking for dependencies.
+
+    Returns:
+        A tuple with dependency check outcome (True/False), and a string message with details of the check.
+    """
+    passed = True
+    messages = []
+
+    for plugin in plugin_refs:
+        if plugin.type == PluginType.TRANSFORMS:
+            # check that the `dbt` transformer plugin is installed
+            try:
+                plugins_service.get_transformer()
+            except PluginNotFoundError:
+                passed = False
+                messages.append(
+                    f"Plugin '{plugin.name}' requires a transformer plugin. "
+                    + "Please first add a transformer using `meltano add transformer`."
+                )
+    if passed:
+        message = "All dependencies met"
+    else:
+        message = f"Dependencies not met: {'; '.join(messages)}"
+    return passed, message

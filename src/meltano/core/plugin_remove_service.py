@@ -5,8 +5,9 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
     DbRemoveManager,
     InstallationRemoveManager,
+    LockedDefinitionRemoveManager,
     MeltanoYmlRemoveManager,
-    PluginLocationRemoveStatus,
+    PluginLocationRemoveManager,
 )
 from meltano.core.project_plugins_service import ProjectPluginsService
 
@@ -68,7 +69,9 @@ class PluginRemoveService:
 
         return removed_plugins, num_plugins
 
-    def remove_plugin(self, plugin: ProjectPlugin) -> Tuple[PluginLocationRemoveStatus]:
+    def remove_plugin(
+        self, plugin: ProjectPlugin
+    ) -> Tuple[PluginLocationRemoveManager]:
         """Remove a plugin.
 
         Removes from `meltano.yml`, its installation in `.meltano`, and its settings in
@@ -84,6 +87,7 @@ class PluginRemoveService:
             DbRemoveManager(plugin, self.project),
             MeltanoYmlRemoveManager(plugin, self.project),
             InstallationRemoveManager(plugin, self.project),
+            LockedDefinitionRemoveManager(plugin, self.project),
         )
 
         for manager in remove_managers:

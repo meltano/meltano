@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock
+
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output
@@ -12,7 +13,7 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner.singer import SingerRunner
 
-TEST_JOB_ID = "test_job"
+TEST_STATE_ID = "test_job"
 
 
 class AnyInstanceOf:
@@ -61,7 +62,7 @@ class TestSingerRunner:
     @pytest.fixture()
     def subject(self, session, elt_context):
         Job(
-            job_id=TEST_JOB_ID,
+            job_id=TEST_STATE_ID,
             state=State.SUCCESS,
             payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},

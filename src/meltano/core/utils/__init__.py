@@ -1,6 +1,7 @@
 """Defines helpers for the core codebase."""
 import asyncio
 import functools
+import hashlib
 import logging
 import math
 import os
@@ -10,6 +11,7 @@ from contextlib import suppress
 from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
+import traceback
 from typing import Any, Callable, Coroutine, Dict, Iterable, Optional, TypeVar, Union
 
 import flatten_dict
@@ -365,7 +367,23 @@ def set_at_path(d, path, value):
     final[tail] = value
 
 
-def expand_env_vars(raw_value, env: Dict):
+class EnvironmentVariableNotSetError(Exception):
+    """Occurs when a referenced environment variable is not set."""
+
+    def __init__(self, env_var: str):
+        """Initialize the error.
+        Args:
+            env_var: the unset environment variable name
+        """
+        super().__init__(env_var)
+        self.env_var = env_var
+
+    def __str__(self) -> str:
+        """Return the error as a string."""
+        return f"{self.env_var} referenced but not set."
+
+
+def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
     if not isinstance(raw_value, str):
         return raw_value
 
@@ -393,8 +411,11 @@ def expand_env_vars(raw_value, env: Dict):
 
             return val
         except KeyError as e:
-            logger.debug(f"Variable '${var}' is missing from the environment.")
-            return None
+            if raise_if_missing:
+                raise EnvironmentVariableNotSetError(e.args[0])
+            else:
+                logger.debug(f"Variable '${var}' is missing from the environment.")
+                return None
 
     fullmatch = re.fullmatch(var_matcher, raw_value)
     if fullmatch:
@@ -421,3 +442,54 @@ def human_size(num, suffix="B"):
 
     prefix = ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"][magnitude]
     return f"{val:3.1f}{prefix}{suffix}"
+
+
+def hash_sha256(value: str) -> str:
+    """Get the sha256 hash of a string.
+
+    Args:
+        value: the string value to hash.
+
+    Returns:
+        The hashed value of the given string.
+
+    Raises:
+        ValueError: If we are blindly passed a value that is None.
+    """
+    if value is None:
+        raise ValueError("Cannot hash None.")
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
+def format_exception(exception: BaseException) -> str:
+    """Get the exception with its traceback in the standard format it would have been printed with.
+
+    Args:
+        The exception value to be turned into a string.
+
+    Returns:
+        A string that shows the exception object as it would have been printed had it been raised
+        and not caught.
+    """
+    return "".join(
+        traceback.format_exception(type(exception), exception, exception.__traceback__)
+    )
+
+
+def safe_hasattr(obj: Any, name: str) -> bool:
+    """Safely checks if an object has a given attribute.
+
+    This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
+
+    Args:
+        obj: The object to check.
+        name: The name of the attribute to check.
+
+    Returns:
+        True if the object has the attribute, False otherwise.
+    """
+    try:
+        getattr(obj, name)
+    except AttributeError:
+        return False
+    return True

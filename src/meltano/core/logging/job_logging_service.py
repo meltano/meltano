@@ -30,23 +30,23 @@ class JobLoggingService:
         self.project = project
 
     @makedirs
-    def logs_dir(self, job_id, *joinpaths):
-        return self.project.job_logs_dir(job_id, *joinpaths)
+    def logs_dir(self, state_id, *joinpaths):
+        return self.project.job_logs_dir(state_id, *joinpaths)
 
     def generate_log_name(
-        self, job_id: str, run_id: str, file_name: str = "elt.log"
+        self, state_id: str, run_id: str, file_name: str = "elt.log"
     ) -> str:
         """Generate an internal etl log path and name."""
-        return self.logs_dir(job_id, str(run_id), file_name)
+        return self.logs_dir(state_id, str(run_id), file_name)
 
     @contextmanager
-    def create_log(self, job_id, run_id, file_name="elt.log"):
+    def create_log(self, state_id, run_id, file_name="elt.log"):
         """
         Open a new log file for logging and yield it.
 
-        Log will be created inside the logs_dir, which is .meltano/logs/elt/:job_id/:run_id
+        Log will be created inside the logs_dir, which is .meltano/logs/elt/:state_id/:run_id
         """
-        log_file_name = self.generate_log_name(job_id, run_id, file_name)
+        log_file_name = self.generate_log_name(state_id, run_id, file_name)
 
         try:
             log_file = open(log_file_name, "w")
@@ -63,13 +63,13 @@ class JobLoggingService:
         finally:
             log_file.close()
 
-    def get_latest_log(self, job_id):
+    def get_latest_log(self, state_id):
         """
         Get the contents of the most recent log for any ELT job
-         that ran with the provided job_id
+         that ran with the provided state_id
         """
         try:
-            latest_log = next(iter(self.get_all_logs(job_id)))
+            latest_log = next(iter(self.get_all_logs(state_id)))
 
             if latest_log.stat().st_size > MAX_FILE_SIZE:
                 raise SizeThresholdJobLogException(
@@ -80,59 +80,59 @@ class JobLoggingService:
                 return f.read()
         except StopIteration:
             raise MissingJobLogException(
-                f"Could not find any log for job with id '{job_id}'"
+                f"Could not find any log for job with id '{state_id}'"
             )
         except FileNotFoundError:
             raise MissingJobLogException(
-                f"Cannot log for job with id '{job_id}': '{latest_log}' is missing."
+                f"Cannot log for job with id '{state_id}': '{latest_log}' is missing."
             )
 
-    def get_downloadable_log(self, job_id):
+    def get_downloadable_log(self, state_id):
         """
         Get the `*.log` file of the most recent log for any ELT job
-         that ran with the provided job_id
+         that ran with the provided state_id
         """
         try:
-            latest_log = next(iter(self.get_all_logs(job_id)))
+            latest_log = next(iter(self.get_all_logs(state_id)))
             return str(latest_log.resolve())
         except StopIteration:
             raise MissingJobLogException(
-                f"Could not find any log for job with id '{job_id}'"
+                f"Could not find any log for job with id '{state_id}'"
             )
         except FileNotFoundError:
             raise MissingJobLogException(
-                f"Cannot log for job with id '{job_id}': '{latest_log}' is missing."
+                f"Cannot log for job with id '{state_id}': '{latest_log}' is missing."
             )
 
-    def get_all_logs(self, job_id):
+    def get_all_logs(self, state_id):
         """
-        Get all the log files for any ELT job that ran with the provided job_id
+        Get all the log files for any ELT job that ran with the provided state_id
 
         The result is ordered so that the most recent is first on the list
         """
         log_files = []
-        for logs_dir in self.logs_dirs(job_id):
+        for logs_dir in self.logs_dirs(state_id):
             log_files.extend(list(logs_dir.glob("**/*.log")))
 
         log_files.sort(key=lambda path: os.stat(path).st_ctime_ns, reverse=True)
 
         return log_files
 
-    def delete_all_logs(self, job_id):
+    def delete_all_logs(self, state_id):
         """
-        Delete all the log files for any ELT job that ran with the provided job_id
+        Delete all the log files for any ELT job that ran with the provided state_id
         """
 
-        for log_path in self.get_all_logs(job_id):
+        for log_path in self.get_all_logs(state_id):
             log_path.unlink()
 
-    def legacy_logs_dir(self, job_id, *joinpaths):
-        job_dir = self.project.run_dir("elt").joinpath(slugify(job_id), *joinpaths)
+    def legacy_logs_dir(self, state_id, *joinpaths):
+        job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)
         return job_dir if job_dir.exists() else None
 
-    def logs_dirs(self, job_id, *joinpaths):
-        logs_dir = self.logs_dir(job_id, *joinpaths)
-        legacy_logs_dir = self.legacy_logs_dir(job_id, *joinpaths)
+    def logs_dirs(self, state_id, *joinpaths):
+        logs_dir = self.logs_dir(state_id, *joinpaths)
+        legacy_logs_dir = self.legacy_logs_dir(state_id, *joinpaths)
 
         dirs = [logs_dir]
         if legacy_logs_dir:

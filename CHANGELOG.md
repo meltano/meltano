@@ -6,7 +6,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
-
 ---
 
 ### New
@@ -14,11 +13,66 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 - [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions
 
-- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
-
 ### Fixes
 
 ### Breaks
+
+
+## 2.0.2 - (2022-06-14)
+---
+
+### Fixes
+
+- [#6174](https://github.com/meltano/meltano/issues/6174) Fix issue where loading schedules could cause Meltano UI to crash.
+
+### Docs
+
+- [#6184](https://github.com/meltano/meltano/pull/6184) Bugfix in getting-started guide installation instructions - _Thanks, **[Martin Morset (@dingobar)](https://github.com/dingobar)**!_
+
+### Misc
+
+- [#6149](https://github.com/meltano/meltano/pull/6149),[#6142](https://github.com/meltano/meltano/pull/6142) Add anonymized telemetry handling for exceptions.
+
+## 2.0.1 - (2022-06-09)
+---
+
+### Fixes
+
+- [#6143](https://github.com/meltano/meltano/issues/6143) Resolve issue where Meltano UI would not start.
+
+## 2.0.0 - (2022-06-08)
+---
+
+_**Meltano 2.0** is a major update with multiple new features and some breaking changes. See our [2.0 Migration Guide](https://docs.meltano.com/reference/v2-migration) for more information._
+
+### New
+
+- [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
+- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX.
+- [#3348](https://github.com/meltano/meltano/issues/3348) Add [`env_var_strict_mode`](https://docs.meltano.com/reference/settings#ffenv_var_strict_mode) feature flag to raise an exception if unset environment variables are referenced in settings.
+- [#6060](https://github.com/meltano/meltano/pull/6060) Generate lockfiles when running `meltano add` to install new plugins (now enabled by default).
+- [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies using `requires:`, replaces implicitly "related" plugins.
+
+### Changes
+
+- [#5957](https://github.com/meltano/meltano/pull/5957) Remove the auto-add functionality that applied to transform plugins and plugins with matching `namespace`.
+- [#6043](https://github.com/meltano/meltano/pull/6034) Let Meltano settings be stored under environments.
+
+### Breaks
+
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for the legacy "Dashboards" and "Explore" UX in Meltano UI.
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for legacy `model` and `dashboard` plugin types.
+- [#3048](https://github.com/meltano/meltano/issues/3048) Drop support for `env_aliases` feature and remove its references in `discovery.yml`.
+- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag. 
+
+### Fixes
+
+- [#5979](https://github.com/meltano/meltano/issues/5979) Fixes `meltano remove` bug where lock files were not removed if they include a variant in the file name.
+- [#6015](https://github.com/meltano/meltano/issues/6015) Fixes a bug where `meltano config meltano set` would not always set a value.
+
+### Under the Hood
+
+- Improved [telemetry](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry) coverage across the product.
 
 
 ## 1.105.0 - (2022-05-19)
@@ -27,22 +81,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
-
 - [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
 
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend [pipx](https://pypa.github.io/pipx/) over manually created virtual environments.
-
 - [#3484](https://gitlab.com/meltano/meltano/-/issues/3484) Use `SettingsService.feature_flag` convention for lockfiles.
-
 - [#3447](https://gitlab.com/meltano/meltano/-/issues/3447) Make setting-level `env:` declaration a one-way injection into the plugin execution context.
 
 ### Fixes
 
 - [#3483](https://gitlab.com/meltano/meltano/-/issues/3483) Fixes a bug where pipx installed meltano can not find executable(.exe) meltano dependency packages. _Thanks **[Dan Norman](https://gitlab.com/BuzzCutNorman)**!_
-
 - [#3500](https://gitlab.com/meltano/meltano/-/issues/3500) Fixes bug where lock file was added but not used.
 
 
