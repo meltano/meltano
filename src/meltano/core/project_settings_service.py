@@ -5,8 +5,8 @@ from typing import List
 
 import structlog
 from dotenv import dotenv_values
-from meltano.core.project import ProjectReadonly
 
+from meltano.core.project import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import (
     FeatureFlags,

@@ -23,10 +23,11 @@ def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
             "https://other.endpoint/path/to/collector"
         ]
     """
-    ProjectSettingsService(project).set("snowplow.collector_endpoints", endpoints)
+    with caplog.at_level(logging.INFO, logger='meltano.core.project_settings_service'):
+        ProjectSettingsService(project).set("snowplow.collector_endpoints", endpoints)
 
-    with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
-        tracker = Tracker(project)
+        with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
+            tracker = Tracker(project)
 
     assert len(caplog.records) == 2
     assert caplog.records[0].levelname == "WARNING"
