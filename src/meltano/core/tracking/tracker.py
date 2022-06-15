@@ -118,7 +118,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             self.snowplow_tracker = SnowplowTracker(emitters=emitters)
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
-            atexit.register(self.track_exit_event)
+            self.setup_exit_event()
         else:
             self.snowplow_tracker = None
 
@@ -441,9 +441,25 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             )
         )
 
+    def setup_exit_event(self):
+        from meltano import cli
+
+        if not cli.atexit_handler_registered:
+            cli.atexit_handler_registered = True
+
+            # Provide `meltano.cli` with this tracker to track the exit event with more context.
+            cli.exit_event_tracker = self
+
+            # As a fallback, use atexit to help ensure the exit event is sent.
+            atexit.register(self.track_exit_event)
+
     def track_exit_event(self):
         """Fire exit event."""
-        from meltano.cli import exit_code
+        from meltano import cli
+
+        if cli.exit_code_reported:
+            return
+        cli.exit_code_reported = True
 
         start_time = datetime.utcfromtimestamp(Process().create_time())
 
@@ -455,7 +471,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             SelfDescribingJson(
                 ExitEventSchema.url,
                 {
-                    "exit_code": exit_code,
+                    "exit_code": cli.exit_code,
                     "exit_timestamp": f"{now.isoformat()}Z",
                     "process_duration_microseconds": int(
                         (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND
@@ -463,3 +479,4 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 },
             )
         )
+        print(f'{self!r}.track_exit_event() -> exit_code: {cli.exit_code!r}')
