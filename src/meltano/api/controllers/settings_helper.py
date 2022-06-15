@@ -1,7 +1,4 @@
 import json
-import os
-from os.path import join
-from pathlib import Path
 
 from meltano.core.project import Project
 

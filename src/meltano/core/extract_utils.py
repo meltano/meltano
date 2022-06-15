@@ -1,5 +1,5 @@
 import asyncio
-from typing import Generator, Iterator
+from typing import Iterator
 
 import aiohttp
 import yaml
@@ -55,7 +55,7 @@ def fetch_urls(
     """
     try:
         loop = asyncio.get_event_loop()
-    except RuntimeError as e:
+    except RuntimeError:
         # Fix for when asyncio runs inside a sub-thread so there is no
         #  event_loop available
         asyncio.set_event_loop(asyncio.new_event_loop())
