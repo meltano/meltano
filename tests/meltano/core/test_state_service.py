@@ -1,4 +1,5 @@
 import json
+import platform
 
 import pytest
 
@@ -38,6 +39,10 @@ class TestStateService:
         )
         assert state_service.get_state(mock_state_id) == payloads.mock_state_payloads[0]
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_set_state(self, job_history_session, jobs, payloads, state_service):
         for job in jobs:
             for state in payloads.mock_state_payloads:
