@@ -61,14 +61,20 @@ def lock(
     plugins_service = ProjectPluginsService(project)
 
     with plugins_service.use_preferred_source(DefinitionSource.HUB):
-        if plugin_type:
-            plugin_type = PluginType.from_cli_argument(plugin_type)
-            plugins = plugins_service.get_plugins_of_type(plugin_type)
-            if plugin_name:
-                plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
-        else:
-            # Make it a list so source preference is not lazily evaluated.
-            plugins = list(plugins_service.plugins())
+        try:
+            if plugin_type:
+                plugin_type = PluginType.from_cli_argument(plugin_type)
+                plugins = plugins_service.get_plugins_of_type(plugin_type)
+                if plugin_name:
+                    plugins = [
+                        plugin for plugin in plugins if plugin.name in plugin_name
+                    ]
+            else:
+                # Make it a list so source preference is not lazily evaluated.
+                plugins = list(plugins_service.plugins())
+        except Exception:
+            tracker.track_command_event(CliEvent.aborted)
+            raise
 
     tracked_plugins = []
 
