@@ -5,6 +5,7 @@ from typing import List
 
 import structlog
 from dotenv import dotenv_values
+from meltano.core.project import ProjectReadonly
 
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import (
@@ -65,6 +66,21 @@ class ProjectSettingsService(SettingsService):
             **self.config_override,
         }
 
+        try:
+            self.ensure_project_id()
+        except ProjectReadonly:
+            logger.debug(
+                "Cannot update `project_id` in `meltano.yml`: project is read-only."
+            )
+
+    def ensure_project_id(self) -> None:
+        """Ensure `project_id` is configured properly.
+
+        Every `meltano.yml` file should contain the `project_id` key-value pair. It should be
+        present in the top-level config, rather than in any environment-level configs.
+
+        If it is not present, it will be restored from `analytics.json` if possible.
+        """
         if self.project.active_environment and "project_id" in self.environment_config:
             # `project_id` is only valid at the top-level of the config, so we move it up there.
             env_config = self.environment_config.copy()
