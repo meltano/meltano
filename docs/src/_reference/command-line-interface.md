@@ -608,7 +608,7 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 
 `meltano lock` creates lock files for all [non-custom](/concepts/plugins#custom-plugins) plugins in the project.
 
-To update your lock artifacts with the latest plugin definitions in Meltano Hub, use the `--update` option.
+To update your lock artifacts with the latest plugin definitions in MeltanoHub, use the `--update` option.
 
 ## `remove`
 
