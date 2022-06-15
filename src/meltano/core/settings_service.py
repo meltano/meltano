@@ -109,7 +109,6 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             Label for the settings service.
         """
-        pass
 
     @property
     @abstractmethod
@@ -119,7 +118,6 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             URL for Meltano doc site.
         """
-        pass
 
     @property
     def env_prefixes(self) -> list[str]:
@@ -134,30 +132,25 @@ class SettingsService(ABC):  # noqa: WPS214
     @abstractmethod
     def db_namespace(self) -> str:
         """Return namespace for setting value records in system database."""
-        pass
 
     @property
     @abstractmethod
     def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings."""
-        pass
 
     @property
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
-        pass
 
     @property
     @abstractmethod
     def meltano_yml_config(self) -> dict:
         """Return current configuration in `meltano.yml`."""
-        pass
 
     @property
     @abstractmethod
     def environment_config(self) -> dict:
         """Return current configuration in `meltano.yml`."""
-        pass
 
     @abstractmethod
     def update_meltano_yml_config(self, config):
@@ -166,7 +159,6 @@ class SettingsService(ABC):  # noqa: WPS214
         Args:
             config: updated config
         """
-        pass
 
     @abstractmethod
     def update_meltano_environment_config(self, config: dict):
@@ -175,12 +167,10 @@ class SettingsService(ABC):  # noqa: WPS214
         Args:
             config: updated config
         """
-        pass
 
     @abstractmethod
     def process_config(self):
         """Process configuration dictionary to be used downstream."""
-        pass
 
     @property
     def flat_meltano_yml_config(self):
