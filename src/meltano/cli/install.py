@@ -6,9 +6,7 @@ import click
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import PluginsTrackingContext, Tracker
-from meltano.core.tracking import cli as cli_tracking
-from meltano.core.tracking import cli_context_builder
+from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
 from . import cli
 from .params import pass_project
@@ -42,7 +40,7 @@ def install(project, plugin_type, plugin_name, clean, parallelism):
     tracker = Tracker(project)
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     tracker.add_contexts(
-        cli_context_builder(
+        CliContext.from_command_and_kwargs(
             "install",
             None,
             clean=clean,
@@ -61,21 +59,21 @@ def install(project, plugin_type, plugin_name, clean, parallelism):
         else:
             plugins = list(plugins_service.plugins())
     except Exception:
-        tracker.track_command_event(cli_tracking.STARTED)
-        tracker.track_command_event(cli_tracking.ABORTED)
+        tracker.track_command_event(CliEvent.started)
+        tracker.track_command_event(CliEvent.aborted)
         raise
 
     click.echo(f"Installing {len(plugins)} plugins...")
     tracker.add_contexts(
         PluginsTrackingContext([(candidate, None) for candidate in plugins])
     )
-    tracker.track_command_event(cli_tracking.STARTED)
+    tracker.track_command_event(CliEvent.started)
 
     success = install_plugins(project, plugins, parallelism=parallelism, clean=clean)
 
     legacy_tracker.track_meltano_install()
 
     if not success:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(CliEvent.failed)
         raise CliError("Failed to install plugin(s)")
-    tracker.track_command_event(cli_tracking.COMPLETED)
+    tracker.track_command_event(CliEvent.completed)
