@@ -50,6 +50,7 @@ def lock(
             plugin_name=plugin_name,
         )
     )
+    tracker.track_command_event(CliEvent.started)
 
     lock_service = PluginLockService(project)
     plugins_service = ProjectPluginsService(project)
@@ -65,7 +66,6 @@ def lock(
             plugins = list(plugins_service.plugins())
 
     tracked_plugins = []
-    tracker.track_command_event(CliEvent.started)
 
     for plugin in plugins:
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
