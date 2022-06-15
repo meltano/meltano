@@ -168,9 +168,6 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Args:
             stored_telemetry_settings: the prior analytics settings
         """
-        # If `stored_telemetry_settings` is all `None`, then the settings have never been saved yet
-        save_settings = all(setting is None for setting in stored_telemetry_settings)
-
         if (
             stored_telemetry_settings.project_id is not None
             and stored_telemetry_settings.project_id != self.project_id
@@ -179,7 +176,6 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             self.track_telemetry_state_change_event(
                 "project_id", stored_telemetry_settings.project_id, self.project_id
             )
-            save_settings = True
 
         if (
             stored_telemetry_settings.send_anonymous_usage_stats is not None
@@ -192,10 +188,6 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
-            save_settings = True
-
-        if save_settings:
-            self.save_telemetry_settings()
 
     @cached_property
     def timezone_name(self) -> str:
@@ -320,6 +312,10 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             from_value: the old value
             to_value: the new value
         """
+        # Save the telemetry settings to ensure this is the only telemetry
+        # state change event fired for this particular setting change.
+        self.save_telemetry_settings()
+
         if self.snowplow_tracker is None:
             return  # The Snowplow tracker is not available (e.g. because no endpoints are set)
 
