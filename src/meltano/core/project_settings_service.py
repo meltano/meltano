@@ -74,7 +74,12 @@ class ProjectSettingsService(SettingsService):
             )
             self.update_meltano_environment_config(env_config)
 
-        if self.get("project_id") is None:
+        try:
+            project_id = self.get("project_id")
+        except OSError:
+            project_id = None
+
+        if project_id is None:
             try:
                 with open(
                     self.project.meltano_dir() / "analytics.json"
