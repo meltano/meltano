@@ -1,0 +1,110 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow context describing the exceptions currently being handled",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "exception_context",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "definitions": {
+        "exception": {
+            "description": "An exception currently being handled",
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "type": {
+                    "description": "The name of the type of exception",
+                    "type": "string",
+                    "maxLength": 64,
+                    "examples": [
+                        "ValueError",
+                        "TypeError",
+                        "KeyboardInterrupt",
+                        "SystemExit",
+                        "OSError"
+                    ]
+                },
+                "str_hash": {
+                    "description": "64 character hash of the string representation of the exception given by `str`",
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "repr_hash": {
+                    "description": "64 character hash of the string representation of the exception given by `repr`",
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "traceback": {
+                    "description": "Traceback info from the exception",
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "file": {
+                                "description": "The path of the Python source file for this level of the traceback, relative to the location Python was installed. `'<stdin>'` if the input was from stdin. `'.../<module name>/__(init|main)__.py'` if the file name was `__init__.py` or `__main__.py`, and a relative path could not be created. '.../<module name>.py otherwise.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "maxLength": 1024
+                            },
+                            "line_number": {
+                                "description": "The line number in the Python source code associated with this traceback",
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 4294967295
+                            }
+                        },
+                        "required": [
+                            "file",
+                            "line_number"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "cause": {
+                    "description": "The explicit cause of this exception, typically created with a `raise from` statement",
+                    "$ref": "#/definitions/exception"
+                },
+                "context": {
+                    "description": "The exception that was being handled when this exception was raised",
+                    "$ref": "#/definitions/exception"
+                }
+            },
+            "required": [
+                "type",
+                "str_hash",
+                "repr_hash",
+                "traceback",
+                "cause",
+                "context"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "type": "object",
+    "properties": {
+        "context_uuid": {
+            "description": "A UUID that uniquely identifies an instance of this context",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "exception": {
+            "description": "The top-level exception currently being handled",
+            "$ref": "#/definitions/exception"
+        }
+    },
+    "required": [
+        "context_uuid",
+        "exception"
+    ],
+    "additionalProperties": false
+}
