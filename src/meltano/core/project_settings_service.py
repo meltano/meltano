@@ -65,6 +65,15 @@ class ProjectSettingsService(SettingsService):
             **self.config_override,
         }
 
+        if self.project.active_environment and "project_id" in self.environment_config:
+            # `project_id` is only valid at the top-level of the config, so we move it up there.
+            env_config = self.environment_config.copy()
+            self.update_meltano_yml_config(
+                # Potentially overwrite it with the existing top-level `project_id`
+                {"project_id": env_config.pop("project_id"), **self.meltano_yml_config}
+            )
+            self.update_meltano_environment_config(env_config)
+
         if self.get("project_id") is None:
             try:
                 with open(
