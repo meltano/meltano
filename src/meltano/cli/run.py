@@ -12,10 +12,8 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, Tracker
-from meltano.core.tracking import cli as cli_tracking
-from meltano.core.tracking import cli_context_builder
-from meltano.core.tracking.plugins import plugins_tracking_context_from_block
+from meltano.core.tracking import BlockEvents, CliContext, CliEvent, Tracker
+from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli
@@ -92,7 +90,7 @@ async def run(
     tracker = Tracker(project)
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
 
-    cmd_ctx = cli_context_builder(
+    cmd_ctx = CliContext.from_command_and_kwargs(
         "run",
         None,
         dry_run=dry_run,
@@ -101,7 +99,7 @@ async def run(
         force=force,
     )
     with tracker.with_contexts(cmd_ctx):
-        tracker.track_command_event(cli_tracking.STARTED)
+        tracker.track_command_event(CliEvent.started)
 
         parser_blocks = []  # noqa: F841
         try:
@@ -110,24 +108,24 @@ async def run(
             )
             parsed_blocks = list(parser.find_blocks(0))
             if not parsed_blocks:
-                tracker.track_command_event(cli_tracking.ABORTED)
+                tracker.track_command_event(CliEvent.aborted)
                 logger.info("No valid blocks found.")
                 return
         except Exception as parser_err:
-            tracker.track_command_event(cli_tracking.ABORTED)
+            tracker.track_command_event(CliEvent.aborted)
             raise parser_err
 
         if validate_block_sets(logger, parsed_blocks):
             logger.debug("All ExtractLoadBlocks validated, starting execution.")
         else:
-            tracker.track_command_event(cli_tracking.ABORTED)
+            tracker.track_command_event(CliEvent.aborted)
             raise CliError("Some ExtractLoadBlocks set failed validation.")
         try:
             await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
         except Exception as err:
-            tracker.track_command_event(cli_tracking.FAILED)
+            tracker.track_command_event(CliEvent.failed)
             raise err
-        tracker.track_command_event(cli_tracking.COMPLETED)
+        tracker.track_command_event(CliEvent.completed)
 
     legacy_tracker.track_meltano_run(blocks)
 
@@ -139,7 +137,7 @@ async def _run_blocks(
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):
         blk_name = blk.__class__.__name__
-        tracking_ctx = plugins_tracking_context_from_block(blk)
+        tracking_ctx = PluginsTrackingContext.from_block(blk)
         with tracker.with_contexts(tracking_ctx):
             tracker.track_block_event(blk_name, BlockEvents.initialized)
         if dry_run:
