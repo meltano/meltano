@@ -93,4 +93,5 @@ def main():
             exit_code = 1
         # Track the exit event now to provide more details via the exception context.
         # We assume the process will exit practically immediately after `main` returns.
-        exit_event_tracker.track_exit_event()
+        if exit_event_tracker is not None:
+            exit_event_tracker.track_exit_event()
