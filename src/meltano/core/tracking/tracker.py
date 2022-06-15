@@ -442,6 +442,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         )
 
     def setup_exit_event(self):
+        """If not already done, register the atexit handler to fire the exit event."""
         from meltano import cli
 
         if not cli.atexit_handler_registered:
