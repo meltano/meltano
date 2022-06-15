@@ -479,4 +479,4 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 },
             )
         )
-        print(f'{self!r}.track_exit_event() -> exit_code: {cli.exit_code!r}')
+        atexit.unregister(self.track_exit_event)
