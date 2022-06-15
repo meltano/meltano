@@ -442,17 +442,24 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         )
 
     def setup_exit_event(self):
-        """If not already done, register the atexit handler to fire the exit event."""
+        """If not already done, register the atexit handler to fire the exit event.
+
+        This method also provides this tracker instance to the CLI module for
+        it to fire an exit event immediately before the CLI exits. The atexit
+        handler is used only as a fallback.
+        """
         from meltano import cli
 
-        if not cli.atexit_handler_registered:
-            cli.atexit_handler_registered = True
+        if cli.atexit_handler_registered:
+            return
 
-            # Provide `meltano.cli` with this tracker to track the exit event with more context.
-            cli.exit_event_tracker = self
+        cli.atexit_handler_registered = True
 
-            # As a fallback, use atexit to help ensure the exit event is sent.
-            atexit.register(self.track_exit_event)
+        # Provide `meltano.cli` with this tracker to track the exit event with more context.
+        cli.exit_event_tracker = self
+
+        # As a fallback, use atexit to help ensure the exit event is sent.
+        atexit.register(self.track_exit_event)
 
     def track_exit_event(self):
         """Fire exit event."""
