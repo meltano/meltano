@@ -33,4 +33,3 @@
 .windows:defaults:
   variables:
     PYTHONIOENCODING: utf-8
-    MELTANO_DISABLE_TRACKING: "true"
