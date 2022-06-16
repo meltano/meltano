@@ -308,7 +308,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
             tracker.track_command_event(CliEvent.failed)
             raise InvalidTasksError(task_set.name, err)
         if not validate_block_sets(logger, parsed_blocks):
-            tracker.track_command_event(CliEvent.failed)
+            tracker.track_command_event(CliEvent.aborted)
             raise InvalidTasksError(
                 task_set.name,
                 "BlockSet validation failed.",
