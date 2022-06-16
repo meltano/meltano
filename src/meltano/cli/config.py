@@ -88,7 +88,8 @@ def config(  # noqa: WPS231
             tracker.track_command_event(CliEvent.aborted)
             raise
 
-    tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
+    if plugin:
+        tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
     tracker.track_command_event(CliEvent.started)
 
     _, Session = project_engine(project)  # noqa: N806
