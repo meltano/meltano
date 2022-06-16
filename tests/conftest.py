@@ -58,16 +58,6 @@ def concurrency():
     }
 
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_env():
-    monkeypatch = MonkeyPatch()
-    monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
-
-    yield
-
-    monkeypatch.undo()
-
-
 class MockAdapter(BaseAdapter):
     def _process_discovery(self, api_url: str, discovery: dict) -> dict:
         hub = {}

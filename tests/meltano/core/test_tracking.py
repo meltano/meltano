@@ -10,8 +10,7 @@ from meltano.core.tracking import Tracker
 
 @pytest.mark.meta
 def test_tracking_disabled(project):
-    assert os.getenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS") == "False"
-    assert ProjectSettingsService(project).get("send_anonymous_usage_stats") is False
+    assert ProjectSettingsService(project).get("snowplow.collector_endpoints") == []
 
 
 def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
