@@ -22,7 +22,7 @@ def load_analytics_json(project: Project) -> dict[str, Any]:
 def check_analytics_json(project: Project) -> None:
     analytics_json = load_analytics_json(project)
 
-    for key in {"client_id", "project_id"}:
+    for key in ("client_id", "project_id"):
         value = analytics_json[key]
         assert isinstance(value, str)
         uuid.UUID(value)

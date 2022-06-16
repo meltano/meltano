@@ -10,7 +10,6 @@ from typing import Any, Mapping
 
 import pytest
 import requests
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436 (protected module)
 from requests.adapters import BaseAdapter
 
 from meltano.core.hub.client import MeltanoHubService
