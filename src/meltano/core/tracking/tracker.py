@@ -148,22 +148,12 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
-        """Return whether anonymous usages stats are enabled (bool).
-
-        - Return the value from 'send_anonymous_usage_stats', if set.
-        - Otherwise the opposite of 'tracking_disabled', if set.
-        - Otherwise return 'True'
+        """Return whether anonymous usages stats are enabled.
 
         Returns:
             True if anonymous usage stats are enabled.
         """
-        if self.settings_service.get("send_anonymous_usage_stats") is not None:
-            return self.settings_service.get("send_anonymous_usage_stats")
-
-        if self.settings_service.get("tracking_disabled") is not None:
-            return not self.settings_service.get("tracking_disabled")
-
-        return True
+        return self.settings_service.get("send_anonymous_usage_stats", True)
 
     def telemetry_state_change_check(
         self, stored_telemetry_settings: TelemetrySettings
@@ -176,6 +166,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         if (
             stored_telemetry_settings.project_id is not None
             and stored_telemetry_settings.project_id != self.project_id
+            and self.send_anonymous_usage_stats
         ):
             # Project ID has changed
             self.track_telemetry_state_change_event(

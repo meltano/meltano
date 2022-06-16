@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import uuid
 from contextlib import contextmanager
 from typing import Any
@@ -39,6 +40,14 @@ def delete_analytics_json(project: Project) -> None:
         # Recreate `analytics.json`, to avoid causing issues for other tests within the same class
         # that expect it. Note that `project` is class-scoped.
         Tracker(project)
+
+
+def clear_telemetry_settings(project):
+    os.environ.pop("MELTANO_SEND_ANONYMOUS_USAGE_STATS", None)
+    setting_service = ProjectSettingsService(project)
+    config = setting_service.meltano_yml_config
+    config.pop("send_anonymous_usage_stats", None)
+    setting_service.update_meltano_yml_config(config)
 
 
 class TestTracker:
@@ -93,20 +102,37 @@ class TestTracker:
 
         assert original_project_id == restored_project_id
 
+    def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
+        setting_service = ProjectSettingsService(project)
+        method_name = "track_telemetry_state_change_event"
+
+        setting_service.set("send_anonymous_usage_stats", True)
+        setting_service.set("project_id", str(uuid.uuid4()))
+        Tracker(project).save_telemetry_settings()
+
+        setting_service.set("send_anonymous_usage_stats", False)
+        with mock.patch.object(Tracker, method_name) as mocked:
+            Tracker(project).save_telemetry_settings()
+            assert mocked.call_count == 1
+
+        setting_service.set("project_id", str(uuid.uuid4()))
+        with mock.patch.object(Tracker, method_name) as mocked:
+            Tracker(project).save_telemetry_settings()
+            assert mocked.call_count == 0
+
     def test_no_state_change_event_without_analytics_json(self, project: Project):
         setting_service = ProjectSettingsService(project)
         method_name = "track_telemetry_state_change_event"
 
+        setting_service.set("send_anonymous_usage_stats", True)
         setting_service.set("project_id", str(uuid.uuid4()))
-        with mock.patch.object(Tracker, method_name) as mocked_1:
-            Tracker(project)
-            assert mocked_1.call_count == 1
+        Tracker(project).save_telemetry_settings()
 
         with delete_analytics_json(project):
             setting_service.set("project_id", str(uuid.uuid4()))
-            with mock.patch.object(Tracker, method_name) as mocked_2:
+            with mock.patch.object(Tracker, method_name) as mocked:
                 Tracker(project)
-                assert mocked_2.call_count == 0
+                assert mocked.call_count == 0
 
     def test_analytics_json_is_created(self, project: Project):
         check_analytics_json(project)
@@ -176,3 +202,53 @@ class TestTracker:
                 assert mocked.call_count == 1
             finally:
                 ProjectSettingsService.config_override = original_config_override
+
+    @pytest.mark.parametrize(
+        "snowplow_endpoints,send_stats,expected",
+        (
+            (["https://example.com"], True, True),
+            (["https://example.com"], False, False),
+            ([], True, False),
+            ([], False, False),
+        ),
+    )
+    def test_can_track(
+        self,
+        project: Project,
+        snowplow_endpoints: list[str],
+        send_stats: bool,
+        expected: bool,
+    ):
+        setting_service = ProjectSettingsService(project)
+        setting_service.set("snowplow.collector_endpoints", snowplow_endpoints)
+        setting_service.set("send_anonymous_usage_stats", send_stats)
+        assert Tracker(project).can_track() is expected
+
+    def test_send_anonymous_usage_stats(self, project: Project):
+        clear_telemetry_settings(project)
+
+        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "True"
+        assert Tracker(project).send_anonymous_usage_stats is True
+
+        # Ensure the env var takes priority
+        ProjectSettingsService(project).set("send_anonymous_usage_stats", False)
+        assert Tracker(project).send_anonymous_usage_stats is True
+
+        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "False"
+        assert Tracker(project).send_anonymous_usage_stats is False
+
+        # Ensure the env var takes priority
+        ProjectSettingsService(project).set("send_anonymous_usage_stats", True)
+        assert Tracker(project).send_anonymous_usage_stats is False
+
+        clear_telemetry_settings(project)
+        ProjectSettingsService(project).set("send_anonymous_usage_stats", False)
+        assert Tracker(project).send_anonymous_usage_stats is False
+
+        clear_telemetry_settings(project)
+        ProjectSettingsService(project).set("send_anonymous_usage_stats", True)
+        assert Tracker(project).send_anonymous_usage_stats is True
+
+    def test_default_send_anonymous_usage_stats(self, project: Project):
+        clear_telemetry_settings(project)
+        assert Tracker(project).send_anonymous_usage_stats
