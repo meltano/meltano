@@ -130,14 +130,11 @@ class IOBlock(metaclass=ABCMeta):
         Args:
             context: invocation context to use for this execution.
         """
-        pass
 
     @abstractmethod
     async def post(self) -> None:
         """Execute post-stop tasks."""
-        pass
 
     @abstractmethod
     async def close_stdin(self) -> None:
         """Close the underlying stdin if the block is a consumer."""
-        pass

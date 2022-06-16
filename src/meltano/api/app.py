@@ -60,13 +60,11 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     logger.addHandler(file_handler)
 
     # 1) Extensions
-    security_options = {}
-
     from .executor import setup_executor
     from .json import setup_json
     from .mail import mail
     from .models import db
-    from .security import security, setup_security, users
+    from .security import setup_security
     from .security.oauth import setup_oauth
 
     db.init_app(app)
@@ -113,7 +111,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         logger.debug("Notifications are disabled.")
 
     # Google Analytics setup
-    tracker = LegacyTracker(project)
 
     @app.before_request
     def setup_js_context():

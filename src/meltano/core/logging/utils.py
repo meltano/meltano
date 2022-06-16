@@ -170,7 +170,6 @@ class SubprocessOutputWriter(Protocol):
         Args:
             lines: string to write
         """
-        pass
 
 
 async def _write_line_writer(writer, line):

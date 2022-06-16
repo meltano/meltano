@@ -18,6 +18,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 2.0.3 - (2022-06-15)
+---
+
+### Changes
+
+- [#6186](https://github.com/meltano/meltano/pull/6186) Improve CLI startup performance
+
 ## 2.0.2 - (2022-06-14)
 ---
 
