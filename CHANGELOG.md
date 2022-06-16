@@ -17,6 +17,28 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 2.0.3 - (2022-06-15)
+---
+
+### Changes
+
+- [#6186](https://github.com/meltano/meltano/pull/6186) Improve CLI startup performance
+
+## 2.0.2 - (2022-06-14)
+---
+
+### Fixes
+
+- [#6174](https://github.com/meltano/meltano/issues/6174) Fix issue where loading schedules could cause Meltano UI to crash.
+
+### Docs
+
+- [#6184](https://github.com/meltano/meltano/pull/6184) Bugfix in getting-started guide installation instructions - _Thanks, **[Martin Morset (@dingobar)](https://github.com/dingobar)**!_
+
+### Misc
+
+- [#6149](https://github.com/meltano/meltano/pull/6149),[#6142](https://github.com/meltano/meltano/pull/6142) Add anonymized telemetry handling for exceptions.
+
 ## 2.0.1 - (2022-06-09)
 ---
 

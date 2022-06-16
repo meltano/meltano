@@ -1,4 +1,4 @@
-name: Create release draft
+name: Version bump
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ on:
         default: false
 
 jobs:
-  draft_release:
+  version_bump:
 
     runs-on: ubuntu-latest
     env:
@@ -76,17 +76,6 @@ jobs:
         branch: release/v${{ github.event.inputs.version }}
         base: main
         labels: release
-
-    - name: Create release draft
-      # # Can't be run from forks:
-      # if: ${{ github.event.repository.name == 'meltano/meltano' }}
-      uses: release-drafter/release-drafter@v5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        # https://github.com/release-drafter/release-drafter
-        version: ${{ github.event.inputs.version }}
-        commitish: release/v${{ github.event.inputs.version }}
 
     - name: Approve Pull Request
       if: ${{ steps.create-pull-request.outputs.pull-request-number != 0 }}
