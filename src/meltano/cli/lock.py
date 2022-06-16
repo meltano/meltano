@@ -33,10 +33,10 @@ logger = structlog.get_logger(__name__)
     is_flag=True,
     help="Lock all the plugins of the project.",
 )
-@click.argument(
-    "plugin-type",
+@click.option(
+    "--plugin-type",
     type=click.Choice(PluginType.cli_arguments()),
-    required=False,
+    help="Lock only the plugins of the given type.",
 )
 @click.argument("plugin_name", nargs=-1, required=False)
 @click.option("--update", "-u", is_flag=True, help="Update the lock file.")
@@ -67,25 +67,25 @@ def lock(
     lock_service = PluginLockService(project)
     plugins_service = ProjectPluginsService(project)
 
-    if (all_plugins and plugin_type) or not (all_plugins or plugin_type):
+    if (all_plugins and plugin_name) or not (all_plugins or plugin_name):
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Exactly one of --all or plugin type must be specified.")
+        raise CliError("Exactly one of --all or plugin name must be specified.")
 
     with plugins_service.use_preferred_source(DefinitionSource.HUB):
         try:
-            if all_plugins:
-                # Make it a list so source preference is not lazily evaluated.
-                plugins = list(plugins_service.plugins())
-            elif plugin_type:
-                plugin_type = PluginType.from_cli_argument(plugin_type)
-                plugins = plugins_service.get_plugins_of_type(plugin_type)
-                if plugin_name:
-                    plugins = [
-                        plugin for plugin in plugins if plugin.name in plugin_name
-                    ]
+            # Make it a list so source preference is not lazily evaluated.
+            plugins = list(plugins_service.plugins())
+
         except Exception:
             tracker.track_command_event(CliEvent.aborted)
             raise
+
+    if plugin_name:
+        plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
+
+    if plugin_type:
+        plugin_type = PluginType.from_cli_argument(plugin_type)
+        plugins = [plugin for plugin in plugins if plugin.type == plugin_type]
 
     tracked_plugins = []
 

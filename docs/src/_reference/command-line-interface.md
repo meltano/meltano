@@ -615,14 +615,17 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 meltano lock --all
 
 # Lock all plugins of a certain type
-meltano lock <type>
+meltano lock --all --plugin-type=<type>
 
 # Lock specific plugins
-meltano lock <type> <name> <name_two>
+meltano lock <name> <name_two>
+
+# Lock specific plugins and disambiguate by type
+meltano lock <name> <name_two> --plugin-type=<type>
 
 # Use --update in combination with any of the above to update the lock file
 # with the latest definition from MeltanoHub
-meltano lock --update
+meltano lock --all --update
 ```
 
 ## `remove`

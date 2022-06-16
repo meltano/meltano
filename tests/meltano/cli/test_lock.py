@@ -27,15 +27,15 @@ class TestLock:
         "args",
         [
             ["lock"],
-            ["lock", "--all", "extractors"],
+            ["lock", "--all", "tap-mock"],
         ],
-        ids=["noop", "all-and-plugin-type"],
+        ids=["noop", "all-and-plugin-name"],
     )
     def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]):
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
 
-        exception_message = "Exactly one of --all or plugin type must be specified."
+        exception_message = "Exactly one of --all or plugin name must be specified."
         assert exception_message == str(result.exception)
 
     def test_lockfile_exists(
@@ -101,7 +101,10 @@ class TestLock:
         # 2 taps, 1 target
         assert len(lockfiles) == 3
 
-        result = cli_runner.invoke(cli, ["lock", "--update", "extractors"])
+        result = cli_runner.invoke(
+            cli,
+            ["lock", "--all", "--update", "--plugin-type", "extractor"],
+        )
         assert result.exit_code == 0
         assert "Lockfile exists" not in result.output
         assert "Locked definition for extractor tap-mock" in result.output
