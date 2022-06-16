@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#5961](https://github.com/meltano/meltano/issues/5961) Add `meltano lock` command to create or update plugin lock artifacts.
+
 ### Changes
 
 ### Fixes
