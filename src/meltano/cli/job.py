@@ -183,7 +183,7 @@ def add(ctx, job_name: str, raw_tasks: str):
     try:
         task_sets = tasks_from_yaml_str(job_name, raw_tasks)
     except InvalidTasksError as yerr:
-        tracker.track_command_event(CliEvent.failed)
+        tracker.track_command_event(CliEvent.aborted)
         raise CliError(yerr)
 
     try:
