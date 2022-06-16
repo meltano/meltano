@@ -612,7 +612,7 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 
 ```bash
 # Lock all plugins
-meltano lock
+meltano lock --all
 
 # Lock all plugins of a certain type
 meltano lock <type>

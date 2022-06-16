@@ -15,7 +15,7 @@ from meltano.core.plugin_lock_service import (
 from meltano.core.project_plugins_service import DefinitionSource, ProjectPluginsService
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
-from . import cli
+from . import CliError, cli
 from .params import pass_project
 
 if TYPE_CHECKING:
@@ -27,6 +27,12 @@ logger = structlog.get_logger(__name__)
 
 
 @cli.command(short_help="Lock plugin definitions.")
+@click.option(
+    "--all",
+    "all_plugins",
+    is_flag=True,
+    help="Lock all the plugins of the project.",
+)
 @click.argument(
     "plugin-type",
     type=click.Choice(PluginType.cli_arguments()),
@@ -37,6 +43,7 @@ logger = structlog.get_logger(__name__)
 @pass_project()
 def lock(
     project: Project,
+    all_plugins: bool,
     plugin_type: str | None,
     plugin_name: tuple[str, ...],
     update: bool,
@@ -60,18 +67,22 @@ def lock(
     lock_service = PluginLockService(project)
     plugins_service = ProjectPluginsService(project)
 
+    if (all_plugins and plugin_type) or not (all_plugins or plugin_type):
+        tracker.track_command_event(CliEvent.aborted)
+        raise CliError("Exactly one of --all or plugin type must be specified.")
+
     with plugins_service.use_preferred_source(DefinitionSource.HUB):
         try:
-            if plugin_type:
+            if all_plugins:
+                # Make it a list so source preference is not lazily evaluated.
+                plugins = list(plugins_service.plugins())
+            elif plugin_type:
                 plugin_type = PluginType.from_cli_argument(plugin_type)
                 plugins = plugins_service.get_plugins_of_type(plugin_type)
                 if plugin_name:
                     plugins = [
                         plugin for plugin in plugins if plugin.name in plugin_name
                     ]
-            else:
-                # Make it a list so source preference is not lazily evaluated.
-                plugins = list(plugins_service.plugins())
         except Exception:
             tracker.track_command_event(CliEvent.aborted)
             raise

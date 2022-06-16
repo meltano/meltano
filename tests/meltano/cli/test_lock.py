@@ -23,6 +23,21 @@ class TestLock:
         ):
             yield
 
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["lock"],
+            ["lock", "--all", "extractors"],
+        ],
+        ids=["noop", "all-and-plugin-type"],
+    )
+    def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]):
+        result = cli_runner.invoke(cli, args)
+        assert result.exit_code == 1
+
+        exception_message = "Exactly one of --all or plugin type must be specified."
+        assert exception_message == str(result.exception)
+
     def test_lockfile_exists(
         self,
         cli_runner: CliRunner,
@@ -33,7 +48,7 @@ class TestLock:
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         assert len(lockfiles) == 2
 
-        result = cli_runner.invoke(cli, ["lock"])
+        result = cli_runner.invoke(cli, ["lock", "--all"])
         assert result.exit_code == 0
         assert "Lockfile exists for extractor tap-mock" in result.output
         assert "Lockfile exists for loader target-mock" in result.output
@@ -60,7 +75,7 @@ class TestLock:
             }
         )
 
-        result = cli_runner.invoke(cli, ["lock", "--update"])
+        result = cli_runner.invoke(cli, ["lock", "--all", "--update"])
         assert result.exit_code == 0
         assert result.output.count("Lockfile exists") == 0
         assert result.output.count("Locked definition") == 2
