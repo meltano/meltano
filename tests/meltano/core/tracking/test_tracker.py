@@ -154,9 +154,9 @@ class TestTracker:
         # Delete the project ID from `meltano.yml`, but leave it unchanged in `analytics.json`
         config = setting_service.meltano_yml_config.copy()
         del config["project_id"]
-        config["send_anonymous_usage_stats"] = not config.get(
-            "send_anonymous_usage_stats", True
-        )
+        config["send_anonymous_usage_stats"] = not load_analytics_json(project)[
+            "send_anonymous_usage_stats"
+        ]
         setting_service.update_meltano_yml_config(config)
 
         assert setting_service.get("project_id") is None
@@ -167,5 +167,12 @@ class TestTracker:
         assert original_project_id == restored_project_id
 
         with mock.patch.object(Tracker, "track_telemetry_state_change_event") as mocked:
-            Tracker(project)
-            assert mocked.call_count == 1
+            original_config_override = ProjectSettingsService.config_override
+            try:
+                ProjectSettingsService.config_override.pop(
+                    "send_anonymous_usage_stats", None
+                )
+                Tracker(project)
+                assert mocked.call_count == 1
+            finally:
+                ProjectSettingsService.config_override = original_config_override
