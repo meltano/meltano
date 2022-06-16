@@ -84,7 +84,7 @@ const router = new Router({
           }
         },
         {
-          path: ':jobId',
+          path: ':stateId',
           name: 'runLog',
           components: {
             default: Pipelines,
@@ -96,7 +96,7 @@ const router = new Router({
           }
         },
         {
-          path: '/cron-job-settings/:jobId',
+          path: '/cron-job-settings/:stateId',
           name: 'cronJobSettings',
           components: {
             default: Pipelines,
