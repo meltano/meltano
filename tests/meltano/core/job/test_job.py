@@ -93,10 +93,7 @@ class TestJob:
         subject = self.sample_job({"original_state": 1}).save(session)
         with pytest.raises(KeyboardInterrupt):
             async with subject.run(session):
-                if platform.system() == "Windows":
-                    windows_signal_process(signal.SIGINT)
-                else:
-                    psutil.Process().send_signal(signal.SIGINT)
+                send_signal(signal.SIGINT)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -109,10 +106,7 @@ class TestJob:
 
         with pytest.raises(SystemExit):
             async with subject.run(session):
-                if platform.system() == "Windows":
-                    windows_signal_process(signal.SIGTERM)
-                else:
-                    psutil.Process().send_signal(signal.SIGTERM)
+                send_signal(signal.SIGTERM)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -185,11 +179,13 @@ class TestJob:
         assert "5 minutes" in job.payload["error"]
 
 
-def windows_signal_process(signal: int):
-    # Replace with signal.raise_signal once Python 3.7 has been dropped
-    # https://stackoverflow.com/questions/35772001/how-to-handle-a-signal-sigint-on-a-windows-os-machine
-    import ctypes
+def send_signal(signal: int):
+    if platform.system() == "Windows":
+        # Replace once Python 3.7 has been dropped see https://github.com/meltano/meltano/issues/6223
+        import ctypes
 
-    ucrtbase = ctypes.CDLL("ucrtbase")
-    c_raise = ucrtbase["raise"]
-    c_raise(signal)
+        ucrtbase = ctypes.CDLL("ucrtbase")
+        c_raise = ucrtbase["raise"]
+        c_raise(signal)
+    else:
+        psutil.Process().send_signal(signal)
