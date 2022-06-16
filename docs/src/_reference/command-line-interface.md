@@ -604,6 +604,30 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> <PLUGIN_NAME>
 meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_ENVIRONMENT_VARIABLE_2> <PLUGIN_NAME>
 ```
 
+## `lock`
+
+`meltano lock` creates lock files for [non-custom](/concepts/plugins#custom-plugins) plugins in the project.
+
+### How to use
+
+```bash
+# Lock all plugins
+meltano lock --all
+
+# Lock all plugins of a certain type
+meltano lock --all --plugin-type=<type>
+
+# Lock specific plugins
+meltano lock <name> <name_two>
+
+# Lock specific plugins and disambiguate by type
+meltano lock <name> <name_two> --plugin-type=<type>
+
+# Use --update in combination with any of the above to update the lock file
+# with the latest definition from MeltanoHub
+meltano lock --all --update
+```
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
