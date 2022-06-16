@@ -35,14 +35,7 @@ The development build of the Meltano API and a production build of the UI will n
 
 ## Debugging Your Code
 
-Here is the recommended way to validate / debug your code:
-
-```
-# Purpose: Start a debugger
-# Usage: Use as a one-line import / invocation for easier cleanup
-import pdb;
-pdb.set_trace()
-```
+To debug your code, we recommend using [the Python debugger](https://docs.python.org/3/library/pdb.html). It can be invoked by adding [`breakpoint()`](https://docs.python.org/3/library/functions.html#breakpoint) in your Python code at the location you want to drop into the debugger.
 
 ## API V2 Design Guidelines
 

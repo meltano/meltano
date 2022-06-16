@@ -43,7 +43,6 @@ class PluginLocationRemoveManager(ABC):
     @abstractmethod
     def remove(self):
         """Abstract remove method."""
-        pass
 
     @property
     def plugin_removed(self) -> bool:

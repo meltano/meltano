@@ -46,10 +46,6 @@ class PluginNotSupportedError(Exception):
 class PluginExecutionError(Exception):
     """Base exception for problems that stem from the execution of a plugin (sub-process)."""
 
-    pass
-
 
 class PluginLacksCapabilityError(Exception):
     """Base exception when a plugin lacks a requested capability."""
-
-    pass

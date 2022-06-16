@@ -2,13 +2,11 @@ import logging
 
 from blinker import ANY
 from flask import render_template, url_for
-from flask_mail import Message
 
 from meltano.api.mail import MailService, mail
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.api.signals import PipelineSignals
-from meltano.core.plugin import PluginDefinition, PluginType
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 

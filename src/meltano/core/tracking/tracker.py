@@ -23,7 +23,12 @@ from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import CliEvent, ProjectContext, environment_context
+from meltano.core.tracking import (
+    CliEvent,
+    ExceptionContext,
+    ProjectContext,
+    environment_context,
+)
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -136,7 +141,9 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Returns:
             The contexts that will accompany events fired by this tracker.
         """
-        return self._contexts
+        # The `ExceptionContext` is re-created every time this is accessed because it details the
+        # exceptions that are being processed when it is created.
+        return (*self._contexts, ExceptionContext())
 
     @cached_property
     def send_anonymous_usage_stats(self) -> bool:
