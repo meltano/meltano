@@ -43,6 +43,7 @@ def delete_analytics_json(project: Project) -> None:
 
 
 def clear_telemetry_settings(project):
+    ProjectSettingsService.config_override.pop("send_anonymous_usage_stats", None)
     os.environ.pop("MELTANO_SEND_ANONYMOUS_USAGE_STATS", None)
     setting_service = ProjectSettingsService(project)
     config = setting_service.meltano_yml_config
@@ -103,6 +104,7 @@ class TestTracker:
         assert original_project_id == restored_project_id
 
     def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
+        clear_telemetry_settings(project)
         setting_service = ProjectSettingsService(project)
         method_name = "track_telemetry_state_change_event"
 
