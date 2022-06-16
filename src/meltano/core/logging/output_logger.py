@@ -1,3 +1,4 @@
+"""Output Logger."""
 import asyncio
 import logging
 import os
@@ -7,13 +8,21 @@ from typing import Optional
 
 import structlog
 from async_generator import asynccontextmanager
+from structlog.dev import plain_traceback
 
 from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from .utils import capture_subprocess_output
 
 
 class OutputLogger:
-    def __init__(self, file):
+    """Output Logger."""
+
+    def __init__(self, file: str):
+        """Log to file using Out class instance.
+
+        Args:
+            file: File to log to.
+        """
         self.file = file
         self.stdout = sys.stdout
         self.stderr = sys.stderr
@@ -49,25 +58,66 @@ class OutputLogger:
 
 
 class LineWriter:
+    """Simple line writer."""
+
     def __init__(self, out):
+        """Write lines using out instance.
+
+        Args:
+            out: Out class instance to use when writing lines.
+        """
         self.__out = out
 
     def __getattr__(self, name):
+        """Get attribute of Out class instance.
+
+        Args:
+            name: Attribute name.
+
+        Returns:
+            Got attribute.
+        """
         return getattr(self.__out, name)
 
     def write(self, line):
+        """Write a line.
+
+        Args:
+            line: The line to write.
+        """
         self.__out.writeline(line.rstrip())
 
 
 class FileDescriptorWriter:
+    """File descriptor writer."""
+
     def __init__(self, out, fd):
+        """Create an open file object connected to the file descriptor fd.
+
+        Args:
+            out: Out class instance.
+            fd: File descriptor.
+        """
         self.__out = out
         self.__writer = os.fdopen(fd, "w")
 
     def __getattr__(self, name):
+        """Get attribute of writer.
+
+        Args:
+            name: Attribute name.
+
+        Returns:
+            Got attribute.
+        """
         return getattr(self.__writer, name)
 
     def isatty(self):
+        """Is a TTY.
+
+        Returns:
+            Returns True if the out stream is interactive.
+        """
         return self.__out.isatty()
 
 
@@ -107,7 +157,9 @@ class Out:  # noqa: WPS230
             logging.FileHandler using an uncolorized console formatter
         """
         formatter = structlog.stdlib.ProcessorFormatter(
-            processor=structlog.dev.ConsoleRenderer(colors=False),
+            processor=structlog.dev.ConsoleRenderer(
+                colors=False, exception_formatter=plain_traceback
+            ),
             foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
         )
         handler = logging.FileHandler(self.file)
@@ -116,16 +168,32 @@ class Out:  # noqa: WPS230
 
     @contextmanager
     def line_writer(self):
+        """Context manager yielding a LineWriter instance.
+
+        Yields:
+            A LineWriter.
+        """
         yield LineWriter(self)
 
     @contextmanager
     def redirect_logging(self, ignore_errors=()):
-        """Redirect log entries to a temporarily added file handler."""
+        """Temporarily redirect log entries via an added file handler.
+
+        Args:
+            ignore_errors: Error classes to ignore.
+
+        Yields:
+            Context with redirected logging configured.
+        """  # noqa: DAR401
         logger = logging.getLogger()
         logger.addHandler(self.redirect_log_handler)
         try:
             yield
-        except (KeyboardInterrupt, asyncio.CancelledError, *ignore_errors):
+        except (  # noqa: WPS455, WPS329
+            KeyboardInterrupt,
+            asyncio.CancelledError,
+            *ignore_errors,
+        ):
             raise
         except Exception as err:
             logger.error(str(err), exc_info=True)
@@ -135,6 +203,11 @@ class Out:  # noqa: WPS230
 
     @asynccontextmanager
     async def writer(self):
+        """Context manager for output log writer.
+
+        Yields:
+            A log writer.
+        """
         read_fd, write_fd = os.pipe()
 
         reader = asyncio.ensure_future(self._read_from_fd(read_fd))
@@ -150,18 +223,32 @@ class Out:  # noqa: WPS230
 
     @asynccontextmanager
     async def redirect_stdout(self):
+        """Temporarily redirecting STDOUT to this output logger.
+
+        Yields:
+            Context manager with redirected STDOUT.
+        """
         async with self.writer() as stdout:
             with redirect_stdout(stdout):
                 yield
 
     @asynccontextmanager
     async def redirect_stderr(self):
+        """Temporarily redirect STDERR to this output logger.
+
+        Yields:
+            Context with redirected STDERR.
+        """
         async with self.writer() as stderr:
             with redirect_stderr(stderr):
                 yield
 
     def writeline(self, line: str) -> None:
-        """Write a line to the underlying structured logger, cleaning up any dangling control chars."""
+        """Write a line to the underlying structured logger, cleaning up any dangling control chars.
+
+        Args:
+            line: The line to write.
+        """
         self.last_line = line
         self.logger.log(self.write_level, line.rstrip(), name=self.name)
 

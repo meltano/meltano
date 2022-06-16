@@ -8,6 +8,7 @@ from typing import Dict, Optional
 
 import structlog
 import yaml
+from structlog.dev import plain_traceback
 
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
 from meltano.core.project import Project
@@ -73,7 +74,9 @@ def default_config(log_level: str) -> dict:
         "formatters": {
             "colored": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(colors=True),
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=True, exception_formatter=plain_traceback
+                ),
                 "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
             },
         },
