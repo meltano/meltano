@@ -141,7 +141,6 @@ class VenvService:
             shutil.rmtree(self.project.run_dir(self.name, make_dirs=False))
         except FileNotFoundError:
             logger.debug("No cached configuration files to remove")
-            pass
 
     def clean(self):
         """Destroy the virtual environment, if it exists."""
@@ -155,7 +154,6 @@ class VenvService:
         except FileNotFoundError:
             # If the VirtualEnv has never been created before do nothing
             logger.debug("No old virtual environment to remove")
-            pass
 
         return
 

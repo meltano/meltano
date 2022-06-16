@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import List
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.db import project_engine
 from meltano.core.job import Job, Payload
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
