@@ -38,7 +38,6 @@ class PluginTestService(ABC):
     @abstractmethod
     def validate(self) -> Union[bool, str]:
         """Abstract method to validate plugin configuration."""
-        pass
 
 
 class ExtractorTestService(PluginTestService):

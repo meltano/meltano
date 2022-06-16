@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import asyncio
 import signal
+from typing import TYPE_CHECKING
 
-import aiodocker
-from aiodocker.containers import DockerContainer
 from structlog.stdlib import get_logger
 
 from .container_spec import ContainerSpec
+
+if TYPE_CHECKING:
+    from aiodocker.containers import DockerContainer
+
 
 logger = get_logger(__name__)
 
@@ -46,6 +49,8 @@ class ContainerService:
         Returns:
             Docker container information after execution.
         """
+        import aiodocker
+
         async with aiodocker.Docker() as docker:
             if pull:
                 await docker.images.pull(spec.image)

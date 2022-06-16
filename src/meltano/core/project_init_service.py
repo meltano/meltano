@@ -5,7 +5,6 @@ import click
 
 from .cli_messages import GREETING
 from .db import project_engine
-from .migration_service import MigrationError, MigrationService
 from .plugin.meltano_file import MeltanoFilePlugin
 from .project import Project
 from .project_settings_service import ProjectSettingsService, SettingValueStore
@@ -103,6 +102,8 @@ class ProjectInitService:
 
         # register the system database connection
         engine, _ = project_engine(self.project, default=True)
+
+        from meltano.core.migration_service import MigrationError, MigrationService
 
         try:
             migration_service = MigrationService(engine)
