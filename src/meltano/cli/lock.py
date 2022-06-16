@@ -80,7 +80,6 @@ def lock(
 
     for plugin in plugins:
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
-        tracked_plugins.append((plugin, None))
         if plugin.is_custom():
             click.secho(f"{descriptor.capitalize()} is a custom plugin", fg="yellow")
         else:
@@ -94,6 +93,7 @@ def lock(
                 )
                 continue
 
+            tracked_plugins.append((plugin, None))
             click.secho(f"Locked definition for {descriptor}", fg="green")
 
     tracker.add_contexts(PluginsTrackingContext(tracked_plugins))
