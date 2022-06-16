@@ -242,7 +242,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     try:
         _validate_tasks(project, task_sets, ctx)
     except InvalidTasksError as err:
-        tracker.track_command_event(CliEvent.failed)
+        tracker.track_command_event(CliEvent.aborted)
         raise CliError(err)
 
     try:
