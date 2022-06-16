@@ -6,25 +6,26 @@ weight: 12
 ---
 # What are Python Virtual Environments
 
-Python Virtual Environments also known as a venv, are a way to allow a
-Python application access to specefic versions of the libraries that it needs. In the singer ecosystem
-you may need to install multiple Taps and Targets, which all of different dependencies. If any of those
-dependecies conflict with eachother you'd have a bad time without Virtual Envrionments.
+Python Virtual Environments, also known as a venv, are a way to allow a
+Python application access to specific versions of the libraries it needs to run properly. In the Singer ecosystem
+you may need to install multiple Taps and Targets, which all have different dependencies. 
+If any of those dependecies wer in conflict with each other you would have a difficult development experience without Virtual Envrionments.
 
 Python has a great technical write up at [Virtual Environments and Packages](https://docs.python.org/3/tutorial/venv.html).
 
-We're going to focus on the Meltano use case for Virtual Environments which is use for a two main purposes
-1. Installing Meltano in an isolated environment
-1. Installing Plugins (Taps, Targets, Transformers, etc) in isolated environments
+We're going to focus on the Meltano use case for Virtual Environments which is use for a two main purposes:
+1. Installing Meltano
+1. Installing Plugins (Taps, Targets, Transformers, etc)
 
 # Why should I care about Virtual Environments?
 
-Ideally you don't have to to worry about Virtual Environments while using Meltano,
-we recommend using pipx to install meltano which manages creating venvs for you, see our [Installation Guide](../_guide/installation.md).
+Ideally, you don't have to to worry about Virtual Environments while using Meltano,
+we recommend using pipx to install Meltano which manages the creation of venvs for you.
+See our [Installation Guide](../_guide/installation.md) for more details.
 
 However, if you ever need to customize or build your own production pipeline (or do anything else) you may need to understand
-how to install Meltano in an isolated way so that you don't conflict dependecies with your own Operating System
-or other Python applications running on the same box
+how to install Meltano in an isolated way so that you don't have a conflict with dependecies within your own Operating System
+or other Python applications running on the same machine.
 
 # How do I use Virtual Environments?
 
@@ -38,20 +39,24 @@ Then create a new virtual environment inside that directory:
 python -m venv .venv/meltano
 ```
 
-That's it! You've created a virtual environment. Feel free to explore the directory and compare it to your global python directory!
+This `python` command is calling the `venv` package and it is creating a virtual environment in `.venv/meltano/`.
+
+And that's it! You've created a virtual environment. 
+Feel free to explore the directory and compare it to your global python directory!
+You can navigate to the directory by running `cd .venv/meltano/`.
 
 ## Activating Your Virtual Environment
 
 Activate the virtual environment, and upgrade pip using:
 
-<div class="notification is-info">
-  <p>Note that pip needs to be upgraded every time you make a new venv. Doing this helps avoid hard to troubleshoot issues with dependencies later.</p>
-</div>
-
 ```bash
 source .venv/meltano/bin/activate
 pip install --upgrade pip
 ```
+
+<div class="notification is-info">
+  <p>Note that pip needs to be upgraded every time you make a new venv. Doing this helps avoid hard to troubleshoot issues with dependencies later.</p>
+</div>
 
 If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to
 your prompt.
@@ -71,14 +76,20 @@ the Meltano package:
 pip install meltano
 ```
 
+<div class="notification is-info">
+  <p>As a reminder, we do generally recommend using `pipx` for installing python packages.
+Ensure you have `pipx` installed by reviewing the [Install pipx](/guide/installation#install-pipx) instructions.</p>
+</div>
+
 # How does meltano use Virtual Environments internally?
 
 Whenever you run `meltano install`, Meltano creates a `.meltano/` directory in your project.
 This directory has a number of sub-directories (subject to change at any point, as this is an
-internal directory). In `.meltano/` you may see an `extractors/` directory that was created (if you
-have an extractor). Go into that directory, you'll see the name of a your tap, inside of that
+internal directory). 
+In `.meltano/` you may see an `extractors/` directory that was created (if you
+have an extractor). 
+In that directory you'll see the name of a your tap and inside of that
 directory is a virtual environment!
 
-Each plugin is an application, so each of the steps we ran above to install Meltano is ran for each of your plugins when you run `meltano install`.
+Each plugin is an application, so each of the steps we ran above to install Meltano is ran for you for each plugin when you run `meltano install`.
 Meltano manages all of your plugins virtual environments for you!
-Pretty neat, no need to worry about any of that stuff yourself.
