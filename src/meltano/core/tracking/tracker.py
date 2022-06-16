@@ -73,7 +73,6 @@ class TelemetrySettings(NamedTuple):
     send_anonymous_usage_stats: bool | None
 
 
-# TODO: Can we store some of this info to make future invocations faster?
 class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     """Meltano tracker backed by Snowplow."""
 
@@ -91,7 +90,6 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         self.project = project
         self.settings_service = ProjectSettingsService(project)
 
-        # TODO: do we want different endpoints when the release marker is not present?
         endpoints = self.settings_service.get("snowplow.collector_endpoints")
 
         emitters: list[Emitter] = []
@@ -152,10 +150,10 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Returns:
             True if anonymous usage stats are enabled.
         """
-        if self.settings_service.get("send_anonymous_usage_stats", None) is not None:
+        if self.settings_service.get("send_anonymous_usage_stats") is not None:
             return self.settings_service.get("send_anonymous_usage_stats")
 
-        if self.settings_service.get("tracking_disabled", None) is not None:
+        if self.settings_service.get("tracking_disabled") is not None:
             return not self.settings_service.get("tracking_disabled")
 
         return True
