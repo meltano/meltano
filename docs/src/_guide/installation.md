@@ -45,8 +45,8 @@ python --version
 # install pipx and ensure it is on the path
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
-#Be sure pipx is available on your path
-source ~/.bashrc 
+# Be sure pipx is available on your path
+source ~/.bashrc
 ```
 
 <div class="notification is-info">
