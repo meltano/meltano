@@ -19,16 +19,16 @@ export default {
     return axios.delete(utils.apiUrl('orchestrations', `subscriptions/${id}`))
   },
 
-  downloadJobLog({ jobId }) {
-    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/download`))
+  downloadJobLog({ stateId }) {
+    return axios.get(utils.apiUrl('orchestrations', `jobs/${stateId}/download`))
   },
 
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },
 
-  getJobLog({ jobId }) {
-    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/log`))
+  getJobLog({ stateId }) {
+    return axios.get(utils.apiUrl('orchestrations', `jobs/${stateId}/log`))
   },
 
   getPipelineSchedules() {
