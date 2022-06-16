@@ -21,11 +21,11 @@ export default {
     ...mapState('orchestration', ['pipelines']),
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
     relatedPipeline() {
-      return this.pipelines.find(pipeline => pipeline.name === this.jobId)
+      return this.pipelines.find(pipeline => pipeline.name === this.stateId)
     }
   },
   created() {
-    this.jobId = this.$route.params.jobId
+    this.stateId = this.$route.params.stateId
     if (
       this.$route.params.cronInterval &&
       this.$route.params.cronInterval.includes('*')
