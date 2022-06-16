@@ -305,7 +305,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
             parsed_blocks = list(block_parser.find_blocks(0))
             tracker.add_contexts(PluginsTrackingContext.from_blocks(parsed_blocks))
         except Exception as err:
-            tracker.track_command_event(CliEvent.failed)
+            tracker.track_command_event(CliEvent.aborted)
             raise InvalidTasksError(task_set.name, err)
         if not validate_block_sets(logger, parsed_blocks):
             tracker.track_command_event(CliEvent.aborted)
