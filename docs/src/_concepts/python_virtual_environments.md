@@ -22,7 +22,7 @@ We're going to focus on the Meltano use case for Virtual Environments which is u
 Ideally you don't have to to worry about Virtual Environments while using Meltano, 
 we recommend using pipx to install meltano which manages creating venvs for you, see our [Installation Guide](../_guide/installation.md).
 
-However, if you ever need to customize or build your own production pipeline (Or do anything else) you may need to understand
+However, if you ever need to customize or build your own production pipeline (or do anything else) you may need to understand
 how to install Meltano in an isolated way so that you don't conflict dependecies with your own Operating System
 or other Python applications running on the same box
 
@@ -46,7 +46,7 @@ That's it! You've created a virtual environment. Feel free to explore the direct
 Activate the virtual environment, and upgrade pip using:
 
 <div class="notification is-info">
-  <p>Note that pip needs to be upgraded everytime you make a new venv, you want to do this to avoid hard to troubleshoot issues with dependencies later.</p>
+  <p>Note that pip needs to be upgraded every time you make a new venv. Doing this helps avoid hard to troubleshoot issues with dependencies later.</p>
 </div>
 
 ```bash
@@ -61,16 +61,6 @@ Once a virtual environment is activated, it stays active until the current shell
 shell, you must re-activate the virtual environment before interacting with the `meltano` command
 that will be installed in the next step.
 
-To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/)
-that'll be easier to remember than the entire activation invocation:
-
-```bash
-# add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-alias meltano!="source $MELTANO_PROJECT_PATH/.venv/meltano/bin/activate"
- 
-# use as follows, after creating a new shell:
-meltano!
-```
 
 You can deactivate a virtual environment by typing `deactivate` in your shell.
 
@@ -80,15 +70,16 @@ Now that you have your virtual environment set up and running, run the following
 the Meltano package:
 
 ```bash
-pip3 install meltano
+pip install meltano
 ```
 
 # How does meltano use Virtual Environments internally?
 
 Whenever you run `meltano install`, Meltano creates a `.meltano/` directory in your project.
-This folder has a number of sub folders (these folders are subject to change at any point as this is an internal folder).
-In `.meltano/` you may see an `extractors/` folder that was created (if you have an extractor). 
-Go into that folder, you'll see the name of a your tap, inside of that folder is a virtual environment! 
+This directory has a number of sub-directories (subject to change at any point, as this is an
+internal directory). In `.meltano/` you may see an `extractors/` directory that was created (if you
+have an extractor). Go into that directory, you'll see the name of a your tap, inside of that
+directory is a virtual environment!
 
 Each plugin is an application, so each of the steps we ran above to install Meltano is ran for each of your plugins when you run `meltano install`.
 Meltano manages all of your plugins virtual environments for you! 
