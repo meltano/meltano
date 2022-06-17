@@ -1073,10 +1073,10 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
 
 ## CLI and API Changes
 
-#### Use `--state-id` instead of `--job-id`
+#### Use `--state-id` instead of `--job_id`
 In 2.0, many references to "Job ID" in our code and docs were changed to the more accurate name of "State ID".
 
-If you are explicitly providing a `--job-id` option to any scripted or otherwise automated CLI workflows, these commands should be updated to use the `--state-id` option instead.
+If you are explicitly providing a `--job_id` option to any scripted or otherwise automated CLI workflows, these commands should be updated to use the `--state-id` option instead.
 
 
 #### Schedule list format changes

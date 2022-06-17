@@ -10,12 +10,37 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#5961](https://github.com/meltano/meltano/issues/5961) Add `meltano lock` command to create or update plugin lock artifacts.
+
 ### Changes
+- [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions
 
 ### Fixes
 
 ### Breaks
 
+
+## 2.0.3 - (2022-06-15)
+---
+
+### Changes
+
+- [#6186](https://github.com/meltano/meltano/pull/6186) Improve CLI startup performance
+
+## 2.0.2 - (2022-06-14)
+---
+
+### Fixes
+
+- [#6174](https://github.com/meltano/meltano/issues/6174) Fix issue where loading schedules could cause Meltano UI to crash.
+
+### Docs
+
+- [#6184](https://github.com/meltano/meltano/pull/6184) Bugfix in getting-started guide installation instructions - _Thanks, **[Martin Morset (@dingobar)](https://github.com/dingobar)**!_
+
+### Misc
+
+- [#6149](https://github.com/meltano/meltano/pull/6149),[#6142](https://github.com/meltano/meltano/pull/6142) Add anonymized telemetry handling for exceptions.
 
 ## 2.0.1 - (2022-06-09)
 ---

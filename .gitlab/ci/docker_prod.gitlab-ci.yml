@@ -9,7 +9,7 @@
     - job: meltano_base_forks
       optional: true
   variables:
-    DOCKERFILE: docker/prod/Dockerfile
+    DOCKERFILE: docker/main/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE
   before_script:
     - source .gitlab/ci/scripts/docker_build_before_script.sh

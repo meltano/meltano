@@ -27,7 +27,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('orchestration', ['getRunningPipelineJobIds']),
+    ...mapGetters('orchestration', ['getRunningPipelinestateIds']),
     ...mapState('orchestration', ['pipelines']),
     ...mapGetters('plugins', ['getPluginLabel']),
     getDownloadPromise() {
@@ -71,7 +71,7 @@ export default {
       return !!this.$flask['isAnalysisEnabled']
     },
     relatedPipeline() {
-      return this.pipelines.find(pipeline => pipeline.name === this.jobId)
+      return this.pipelines.find(pipeline => pipeline.name === this.stateId)
     },
     dataSourceLabel() {
       return this.relatedPipeline
@@ -80,7 +80,7 @@ export default {
     }
   },
   created() {
-    this.jobId = this.$route.params.jobId
+    this.stateId = this.$route.params.stateId
     this.initJobPoller()
   },
   beforeDestroy() {
@@ -96,7 +96,7 @@ export default {
     },
     initJobPoller() {
       const pollFn = () => {
-        this.getJobLog(this.jobId)
+        this.getJobLog(this.stateId)
           .then(response => {
             this.jobStatus = response.data
             this.hasError = this.jobStatus.hasError
@@ -107,7 +107,7 @@ export default {
             this.jobLog = error.response.data.code
           })
           .finally(() => {
-            if (this.getRunningPipelineJobIds.indexOf(this.jobId) === -1) {
+            if (this.getRunningPipelinestateIds.indexOf(this.stateId) === -1) {
               this.isPolling = false
               this.jobPoller.dispose()
             }
@@ -177,7 +177,7 @@ export default {
               <SubscribeButton
                 event-type="pipeline_manual_run"
                 source-type="pipeline"
-                :source-id="jobId"
+                :source-id="stateId"
               >
                 <label
                   slot="label"
@@ -213,9 +213,9 @@ export default {
         <DownloadButton
           v-if="hasLogExceededMaxSize || !isPolling"
           label="Download Log"
-          :file-name="`${jobId}-job-log.txt`"
+          :file-name="`${stateId}-job-log.txt`"
           :trigger-promise="getDownloadPromise"
-          :trigger-payload="{ jobId }"
+          :trigger-payload="{ stateId }"
         ></DownloadButton>
         <label v-else class="checkbox is-unselectable">
           <input v-model="shouldAutoScroll" type="checkbox" />

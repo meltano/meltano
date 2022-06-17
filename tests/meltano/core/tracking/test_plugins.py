@@ -1,9 +1,6 @@
 from meltano.core.block.plugin_command import plugin_command_invoker
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.tracking.plugins import (
-    PluginsTrackingContext,
-    plugins_tracking_context_from_block,
-)
+from meltano.core.tracking import PluginsTrackingContext
 from meltano.core.tracking.schemas import PluginsContextSchema
 from meltano.core.utils import hash_sha256
 
@@ -19,7 +16,7 @@ class TestPluginsTrackingContext:
             project,
             command="test",
         )
-        plugin_ctx = plugins_tracking_context_from_block(cmd)
+        plugin_ctx = PluginsTrackingContext.from_block(cmd)
         assert plugin_ctx.schema == PluginsContextSchema.url
         assert len(plugin_ctx.data.get("plugins")) == 1
         plugin = plugin_ctx.data.get("plugins")[0]
@@ -53,3 +50,7 @@ class TestPluginsTrackingContext:
                 assert plugin.get("pip_url_hash") == hash_sha256(dbt.formatted_pip_url)
                 assert plugin.get("parent_name_hash") == hash_sha256(dbt.parent.name)
                 assert plugin.get("command") == "test"
+
+        # verify that passing a None object results in an empty plugin context.
+        plugin_ctx = PluginsTrackingContext([(None, None)])
+        assert plugin_ctx.data.get("plugins") == [{}]
