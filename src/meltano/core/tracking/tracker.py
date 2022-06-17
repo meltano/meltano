@@ -94,6 +94,10 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
+        self.send_anonymous_usage_stats = self.settings_service.get(
+            "send_anonymous_usage_stats",
+            not self.settings_service.get("disable_tracking", False),
+        )
 
         endpoints = self.settings_service.get("snowplow.collector_endpoints")
 
@@ -145,15 +149,6 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         # The `ExceptionContext` is re-created every time this is accessed because it details the
         # exceptions that are being processed when it is created.
         return (*self._contexts, ExceptionContext())
-
-    @cached_property
-    def send_anonymous_usage_stats(self) -> bool:
-        """Return whether anonymous usages stats are enabled.
-
-        Returns:
-            True if anonymous usage stats are enabled.
-        """
-        return self.settings_service.get("send_anonymous_usage_stats", True)
 
     def telemetry_state_change_check(
         self, stored_telemetry_settings: TelemetrySettings
