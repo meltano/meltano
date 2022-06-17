@@ -10,14 +10,22 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#5961](https://github.com/meltano/meltano/issues/5961) Add `meltano lock` command to create or update plugin lock artifacts.
-
 ### Changes
-- [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions
 
 ### Fixes
 
 ### Breaks
+
+
+## 2.1.0 - (2022-06-17)
+---
+
+### New
+
+- [#5961](https://github.com/meltano/meltano/issues/5961) Add `meltano lock` command to create or update plugin lock artifacts.
+
+### Changes
+- [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions
 
 
 ## 2.0.3 - (2022-06-15)
