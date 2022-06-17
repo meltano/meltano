@@ -124,7 +124,6 @@ def job(project, ctx):
     tracker.add_contexts(CliContext("job", ctx.invoked_subcommand or None))
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
     tracker.track_command_event(CliEvent.started)
-    legacy_tracker.track_meltano_job(ctx.invoked_subcommand or None)
     ctx.obj["tracker"] = tracker
     ctx.obj["legacy_tracker"] = legacy_tracker
 
