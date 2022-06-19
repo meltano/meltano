@@ -14,8 +14,6 @@ select =
     D
     # flake8-eradicate
     E80
-    # flake8-rst-docstrings
-    RST
     # flake8-string-format
     P
     # mccabe
