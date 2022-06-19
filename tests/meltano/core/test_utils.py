@@ -1,6 +1,7 @@
 import pytest  # noqa: F401
 
 from meltano.core.utils import flatten, nest, pop_at_path, set_at_path
+from meltano.core.utils.singleton import SingletonMeta
 
 
 def test_nest():
@@ -77,3 +78,10 @@ def test_flatten():
     expected_flat = {"_update.orchestrate/dags/meltano.py": False}
     result = flatten(example_config, "dot")
     assert result == expected_flat
+
+
+def test_singleton():
+    class SingletonTestClass(metaclass=SingletonMeta):
+        pass
+
+    assert SingletonTestClass() is SingletonTestClass()
