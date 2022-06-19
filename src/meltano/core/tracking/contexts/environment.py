@@ -17,7 +17,7 @@ from structlog.stdlib import get_logger
 
 import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
-from meltano.core.utils import hash_sha256, safe_hasattr
+from meltano.core.utils import hash_sha256
 
 logger = get_logger(__name__)
 
@@ -56,20 +56,16 @@ class EnvironmentContext(SelfDescribingJson):
         Returns:
             A dictionary containing system information.
         """
-        freedesktop_data = (
-            platform.freedesktop_os_release()
-            if safe_hasattr(platform, "freedesktop_os_release")
-            else defaultdict(type(None))
-        )
+        freedesktop_data = getattr(
+            platform, "freedesktop_os_release", lambda: defaultdict(type(None))
+        )()
 
         return {
             "system_name": platform.system() or None,
             "system_release": platform.release() or None,
             "system_version": platform.version() or None,
             "machine": platform.machine() or None,
-            "windows_edition": platform.win32_edition()
-            if safe_hasattr(platform, "win32_edition")
-            else None,
+            "windows_edition": getattr(platform, 'win32_edition', lambda: None)(),
             "freedesktop_id": freedesktop_data["ID"],
             "freedesktop_id_like": freedesktop_data.get("ID_LIKE", None),
             "freedesktop_version_id": freedesktop_data.get("VERSION_ID", None),
@@ -117,9 +113,10 @@ class EnvironmentContext(SelfDescribingJson):
         Returns:
             int: The number of available CPU cores.
         """
-        if safe_hasattr(os, "sched_getaffinity"):
+        try:
             return len(os.sched_getaffinity(0))
-        return os.cpu_count()
+        except AttributeError:
+            return os.cpu_count()
 
 
 environment_context = EnvironmentContext()

@@ -475,22 +475,3 @@ def format_exception(exception: BaseException) -> str:
     return "".join(
         traceback.format_exception(type(exception), exception, exception.__traceback__)
     )
-
-
-def safe_hasattr(obj: Any, name: str) -> bool:
-    """Safely checks if an object has a given attribute.
-
-    This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
-
-    Args:
-        obj: The object to check.
-        name: The name of the attribute to check.
-
-    Returns:
-        True if the object has the attribute, False otherwise.
-    """
-    try:
-        getattr(obj, name)
-    except AttributeError:
-        return False
-    return True

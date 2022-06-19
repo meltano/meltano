@@ -11,13 +11,13 @@ from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.elt_context import ELTContext
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.tracking.schemas import PluginsContextSchema
-from meltano.core.utils import hash_sha256, safe_hasattr
+from meltano.core.utils import hash_sha256
 
 logger = get_logger(__name__)
 
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
-    if not plugin or not safe_hasattr(plugin, "info"):
+    if not plugin or not hasattr(plugin, "info"):  # noqa: WPS421
         # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?), or where passed None.
         # this event will be routed to the "bad" bucket on the snowplow side. That makes it detectable on our end,
         # unlike if we had just filtered it out completely.
