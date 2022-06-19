@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import click
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
@@ -13,8 +15,6 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
-from . import cli
-from .params import pass_project
 from .utils import (
     CliError,
     add_plugin,
@@ -24,7 +24,7 @@ from .utils import (
 )
 
 
-@cli.command(short_help="Add a plugin to your project.")
+@cli.commands.add
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
 @click.option(

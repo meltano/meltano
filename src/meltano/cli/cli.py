@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging  # noqa: D100
 import sys
-import warnings  # noqa: F401
+from collections import UserDict
 
 import click
 
@@ -87,3 +89,9 @@ def cli(  # noqa: WPS231
             "For more details, visit http://meltano.com/docs/installation.html#upgrading-meltano-version"
         )
         sys.exit(3)
+
+
+# Decorators couldn't be arbitrary expressions prior to Python 3.9 (PEP-0614), so we cannot access
+# the lazy command activators as `cli.commands["name"]`. Using `DotDict` we can work around this
+# limitation by writing it as `cli.commands.name`.
+cli.commands = type("DotDict", (UserDict,), {"__getattr__": UserDict.get})(cli.commands)

@@ -9,6 +9,7 @@ from typing import Optional
 import click
 import structlog
 
+from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
@@ -16,8 +17,6 @@ from meltano.core.job import Payload
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
-
-from . import cli
 
 STATE_SERVICE_KEY = "state_service"
 
@@ -97,7 +96,7 @@ def state_service_from_state_id(
     return None
 
 
-@cli.group(name="state", short_help="Manage Singer state.")
+@cli.commands.state
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_state(project: Project, ctx: click.Context):

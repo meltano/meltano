@@ -2,17 +2,16 @@
 
 import click
 
+from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.project import Project
 from meltano.core.tracking import CliContext, CliEvent, Tracker
 
-from . import cli
-
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 
 
-@cli.group(name="environment", short_help="Manage environments.")
+@cli.commands.environment
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_environment(project: Project, ctx: click.Context):

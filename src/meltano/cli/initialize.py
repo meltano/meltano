@@ -3,13 +3,13 @@ import logging
 
 import click
 
+from meltano.cli.cli import cli
+from meltano.cli.params import database_uri_option
 from meltano.core.error import SubprocessError
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
 
-from . import cli
-from .params import database_uri_option
 from .utils import CliError
 
 EXTRACTORS = "extractors"
@@ -19,7 +19,7 @@ ALL = "all"
 logger = logging.getLogger(__name__)
 
 
-@cli.command(short_help="Create a new Meltano project.")
+@cli.commands.init
 @click.pass_context
 @click.argument("project_name", required=False)
 @click.option(
@@ -30,7 +30,7 @@ def init(ctx, project_name, no_usage_stats):
     """
     Create a new Meltano project.
 
-    Read more at https://docs.meltano.com/reference/command-line-interface#init
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#init
 
     """
     if not project_name:

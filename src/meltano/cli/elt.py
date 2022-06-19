@@ -9,6 +9,8 @@ import structlog
 from async_generator import asynccontextmanager
 from structlog import stdlib as structlog_stdlib
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -24,8 +26,6 @@ from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import click_run_async
 
-from . import cli
-from .params import pass_project
 from .utils import CliError
 
 DUMPABLES = {
@@ -38,7 +38,7 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.command(short_help="Run an ELT pipeline to Extract, Load, and Transform data.")
+@cli.commands.elt
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]))

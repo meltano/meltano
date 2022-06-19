@@ -6,17 +6,16 @@ import secrets
 import signal
 
 import click
-from click_default_group import DefaultGroup
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
 
-from . import cli
-from .params import pass_project
 from .utils import CliError
 
 logger = logging.getLogger(__name__)
@@ -74,12 +73,7 @@ def start_workers(workers):
     return stop_all
 
 
-@cli.group(
-    cls=DefaultGroup,
-    default="start",
-    default_if_no_args=True,
-    short_help="Start the Meltano UI webserver.",
-)
+@cli.commands.ui
 @pass_project(migrate=True)
 @click.pass_context
 def ui(ctx, project):

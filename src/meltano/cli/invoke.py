@@ -8,6 +8,8 @@ import sys
 import click
 from sqlalchemy.orm import sessionmaker
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.legacy_tracking import LegacyTracker
@@ -23,17 +25,12 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import run_async
 
-from . import cli
-from .params import pass_project
 from .utils import CliError, propagate_stop_signals
 
 logger = logging.getLogger(__name__)
 
 
-@cli.command(
-    context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
-    short_help="Invoke a plugin.",
-)
+@cli.commands.invoke
 @click.option(
     "--print-var",
     help="Print to stdout the values for the provided environment variables, as passed to the plugininvoker context. Useful for debugging.",

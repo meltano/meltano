@@ -4,6 +4,7 @@ from __future__ import annotations
 import click
 import structlog
 
+from meltano.cli.params import pass_project
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -17,12 +18,11 @@ from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli
-from .params import pass_project
 
 logger = structlog.getLogger(__name__)
 
 
-@cli.command(short_help="[preview] Run a set of plugins in series.")
+@cli.commands.run
 @click.option(
     "--dry-run",
     help="Do not run, just parse the invocation, validate it, and explain what would be executed.",
@@ -78,7 +78,7 @@ async def run(
 
     The above command will create two jobs with state IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
 
-    This a preview feature - its functionality and cli signature is still evolving.
+    This a preview feature - its functionality and CLI signature is still evolving.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
     """

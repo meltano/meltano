@@ -4,6 +4,7 @@ import json
 import click
 import structlog
 
+from meltano.cli.params import pass_project
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
@@ -15,7 +16,6 @@ from meltano.core.task_sets_service import (
 )
 
 from . import CliError, cli
-from .params import pass_project
 
 logger = structlog.getLogger(__name__)
 
@@ -79,7 +79,7 @@ def _list_all_jobs(
         tracker.track_meltano_job("list")
 
 
-@cli.group(short_help="Manage jobs.")
+@cli.commands.job
 @click.pass_context
 @pass_project(migrate=True)
 def job(project, ctx):
@@ -91,8 +91,10 @@ def job(project, ctx):
     \b
     \t# This help
     \tmeltano job --help
+    \b
     \t# List all jobs in JSON format
     \tmeltano job list --format json
+    \b
     \t# List a named job
     \tmeltano job list <job_name>
     \b
@@ -107,7 +109,7 @@ def job(project, ctx):
     \t# Remove a named job
     \tmeltano job remove <job_name>
 
-    \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#jobs
     """
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)

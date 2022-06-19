@@ -3,17 +3,17 @@ from __future__ import annotations
 
 import click
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
-from . import cli
-from .params import pass_project
 from .utils import CliError, install_plugins
 
 
-@cli.command(short_help="Install project dependencies.")
+@cli.commands.install
 @click.argument(
     "plugin_type", type=click.Choice(PluginType.cli_arguments()), required=False
 )

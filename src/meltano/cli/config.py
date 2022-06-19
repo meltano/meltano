@@ -8,6 +8,8 @@ from pathlib import Path
 import click
 import dotenv
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -22,14 +24,10 @@ from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import run_async
 
-from . import cli
-from .params import pass_project
 from .utils import CliError
 
 
-@cli.group(
-    invoke_without_command=True, short_help="Display Meltano or plugin configuration."
-)
+@cli.commands.config
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
 )

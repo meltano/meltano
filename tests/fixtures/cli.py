@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
+from meltano.cli import cli
 from meltano.core.project import Project
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
@@ -13,9 +14,15 @@ from meltano.core.project_init_service import ProjectInitService
 
 @pytest.fixture()
 def cli_runner(pushd):
-    # this will make sure we are back at `cwd`
-    # after this test is finished
+    # Ensures we return to `cwd` after this test
     pushd(os.getcwd())
+
+    # Commands must be activated manually for direct invocation via `CliRunner`
+    for command in cli.commands.values():
+        try:
+            command._activate()
+        except AttributeError:
+            pass
 
     yield CliRunner(mix_stderr=False)
 

@@ -3,6 +3,7 @@ import random
 
 import click
 
+from meltano.cli.cli import cli
 from meltano.core.cli_messages import (
     DRAGON_0,
     DRAGON_1,
@@ -12,10 +13,8 @@ from meltano.core.cli_messages import (
     MELTY,
 )
 
-from . import cli
 
-
-@cli.command(short_help="Summon a dragon!")
+@cli.commands.dragon
 @click.pass_context
 def dragon(ctx):
     """Summon a dragon."""

@@ -3,12 +3,11 @@
 import click
 
 from meltano.api.app import create_app
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 
-from . import cli
-from .params import pass_project
 
-
-@cli.group(invoke_without_command=True, short_help="Manage Meltano user accounts.")
+@cli.commands.user
 @pass_project(migrate=True)
 @click.pass_context
 def user(ctx, project):

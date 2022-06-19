@@ -1,6 +1,8 @@
 """Defines `meltano remove` command."""
 import click
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
@@ -9,11 +11,8 @@ from meltano.core.plugin_location_remove import (
 )
 from meltano.core.plugin_remove_service import PluginRemoveService
 
-from . import cli
-from .params import pass_project
 
-
-@cli.command(short_help="Remove plugins from your project.")
+@cli.commands.remove
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()

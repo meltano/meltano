@@ -1,8 +1,8 @@
-from . import cli
-from .params import database_uri_option
+from meltano.cli.cli import cli
+from meltano.cli.params import database_uri_option
 
 
-@cli.command(hidden=True)
+@cli.commands.repl
 @database_uri_option
 def repl():
     # dynamic includes

@@ -2,16 +2,15 @@
 
 import click
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.hub import MeltanoHubService
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 
-from . import cli
-from .params import pass_project
 
-
-@cli.command(short_help="List the available plugins in Meltano Hub and their variants.")
+@cli.commands.discover
 @click.argument(
     "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )

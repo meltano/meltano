@@ -3,22 +3,15 @@
 import os
 
 import click
-from click_default_group import DefaultGroup
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
 
-from . import cli
-from .params import pass_project
 
-
-@cli.group(
-    cls=DefaultGroup,
-    default="all",
-    default_if_no_args=True,
-    short_help="Upgrade Meltano and your entire project to the latest version.",
-)
+@cli.commands.upgrade
 @pass_project()
 @click.pass_context
 def upgrade(ctx, project):

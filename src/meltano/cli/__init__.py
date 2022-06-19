@@ -8,39 +8,10 @@ from typing import TYPE_CHECKING
 
 from meltano.core.logging import setup_logging
 from meltano.core.project import ProjectReadonly
-from meltano.core.tracking.contexts.exception import ExceptionContext  # noqa: F401
 
+from . import commands  # noqa: F401
+from .cli import cli
 from .utils import CliError
-
-# TODO: Importing the cli.cli module breaks other cli module imports
-# This suggests a cyclic dependency or a poorly structured interface.
-# This should be investigated and resolved to avoid implicit behavior
-# based solely on import order.
-from .cli import cli  # isort:skip
-from . import (  # isort:skip # noqa: F401, WPS235
-    add,
-    config,
-    discovery,
-    dragon,
-    elt,
-    environment,
-    initialize,
-    install,
-    invoke,
-    lock,
-    remove,
-    repl,
-    schedule,
-    schema,
-    select,
-    state,
-    ui,
-    upgrade,
-    user,
-    run,
-    validate,
-    job,
-)
 
 if TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
@@ -68,8 +39,6 @@ def _run_cli():
             raise CliError(
                 f"The requested action could not be completed: {err}"
             ) from err
-        except KeyboardInterrupt:  # noqa: WPS329
-            raise
         except Exception as err:
             raise CliError(str(err)) from err
     except CliError as cli_error:

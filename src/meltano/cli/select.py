@@ -4,6 +4,8 @@ from typing import Dict
 
 import click
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.db import project_engine
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin.error import PluginExecutionError
@@ -11,8 +13,6 @@ from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.select_service import SelectService
 from meltano.core.utils import click_run_async
 
-from . import cli
-from .params import pass_project
 from .utils import CliError
 
 
@@ -39,7 +39,7 @@ def selection_mark(selection):
     return f"[{selection:<{colwidth}}]"
 
 
-@cli.command(short_help="Manage extractor selection patterns.")
+@cli.commands.select
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")

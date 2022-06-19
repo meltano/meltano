@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import click
 import structlog
 
+from meltano.cli.params import pass_project
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
@@ -16,7 +17,6 @@ from meltano.core.project_plugins_service import DefinitionSource, ProjectPlugin
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
 from . import CliError, cli
-from .params import pass_project
 
 if TYPE_CHECKING:
     from meltano.core.project import Project
@@ -26,7 +26,7 @@ __all__ = ["lock"]
 logger = structlog.get_logger(__name__)
 
 
-@cli.command(short_help="Lock plugin definitions.")
+@cli.commands.lock
 @click.option(
     "--all",
     "all_plugins",
@@ -48,7 +48,8 @@ def lock(
     plugin_name: tuple[str, ...],
     update: bool,
 ):
-    """Lock plugin definitions.
+    """
+    Lock plugin definitions.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#lock
     """

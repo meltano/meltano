@@ -1,12 +1,11 @@
 import click
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.db import DB, project_engine
 
-from . import cli
-from .params import pass_project
 
-
-@cli.group(short_help="Manage system DB schema.")
+@cli.commands.schema
 def schema():
     """Manage system DB schema."""
 

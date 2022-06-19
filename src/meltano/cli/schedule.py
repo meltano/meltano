@@ -5,9 +5,10 @@ import json
 import sys
 
 import click
-from click_default_group import DefaultGroup
 from sqlalchemy.orm import Session
 
+from meltano.cli.cli import cli
+from meltano.cli.params import pass_project
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.legacy_tracking import LegacyTracker
@@ -17,11 +18,8 @@ from meltano.core.task_sets import TaskSets
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
 
-from . import cli
-from .params import pass_project
 
-
-@cli.group(cls=DefaultGroup, default="add", short_help="Manage pipeline schedules.")
+@cli.commands.schedule
 @click.pass_context
 @pass_project(migrate=True)
 def schedule(project, ctx):
