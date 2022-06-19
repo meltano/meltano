@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 
 import fasteners
 from dotenv import dotenv_values
-from werkzeug.utils import secure_filename
 
 from meltano.core.environment import Environment
 from meltano.core.plugin.base import PluginRef
@@ -437,8 +436,13 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
+        import werkzeug.utils
+
         return self.run_dir(
-            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt",
+            werkzeug.utils.secure_filename(state_id),
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs
@@ -453,8 +457,13 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
+        import werkzeug.utils
+
         return self.logs_dir(
-            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt",
+            werkzeug.utils.secure_filename(state_id),
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs

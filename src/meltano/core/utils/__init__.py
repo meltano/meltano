@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import Any, Callable, Coroutine, Dict, Iterable, Optional, TypeVar, Union
 
 import flatten_dict
-from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -129,6 +128,8 @@ def slugify(s):
 
 
 def get_basic_auth(user, token):
+    from requests.auth import HTTPBasicAuth
+
     return HTTPBasicAuth(user, token)
 
 
