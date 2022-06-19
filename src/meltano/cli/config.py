@@ -100,7 +100,6 @@ def config(  # noqa: WPS231
                 plugins_service=plugins_service,
             )
             invoker = PluginInvoker(project, plugin)
-            run_async(invoker.prepare(session))
         else:
             settings = ProjectSettingsService(
                 project, config_service=plugins_service.config_service
@@ -318,8 +317,8 @@ def test(ctx):
     session = ctx.obj["session"]
 
     async def _validate():  # noqa: WPS430
-        async with invoker.prepared(session):
-            plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
+        plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
+        async with plugin_test_service.plugin_invoker.prepared(session):
             return await plugin_test_service.validate()
 
     try:

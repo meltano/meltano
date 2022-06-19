@@ -114,3 +114,18 @@ class PluginsTrackingContext(SelfDescribingJson):
             "Parameter 'blk' must be an instance of 'BlockSet' or 'PluginCommandBlock', "
             + f"not {type(blk)!r}"
         )
+
+    @classmethod
+    def from_blocks(
+        cls, parsed_blocks: list[BlockSet | PluginCommandBlock]
+    ) -> PluginsTrackingContext:
+        plugins: list[tuple[ProjectPlugin, str]] = []
+        for blk in parsed_blocks:
+            if isinstance(blk, BlockSet):
+                for plugin_block in blk.blocks:
+                    plugins.append(
+                        (plugin_block.context.plugin, plugin_block.plugin_args)
+                    )
+            elif isinstance(blk, PluginCommandBlock):
+                plugins.append((blk.context.plugin, blk.command))
+        return PluginsTrackingContext(plugins)
