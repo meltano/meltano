@@ -1,6 +1,15 @@
-import pytest  # noqa: F401
+import hashlib
+from traceback import print_exc
+from uuid import uuid4
 
-from meltano.core.utils import flatten, nest, pop_at_path, set_at_path
+from meltano.core.utils import (
+    flatten,
+    format_exception,
+    hash_sha256,
+    nest,
+    pop_at_path,
+    set_at_path,
+)
 from meltano.core.utils.singleton import SingletonMeta
 
 
@@ -80,8 +89,34 @@ def test_flatten():
     assert result == expected_flat
 
 
+def test_hash_sha256():
+    for _ in range(10):
+        random_string = str(uuid4())
+        assert (
+            hash_sha256(random_string)
+            == hashlib.sha256(random_string.encode()).hexdigest()
+        )
+
+
+def test_format_exception(capsys):
+    def inner_function():
+        try:
+            assert 2 + 2 == 5
+        except AssertionError as ex_1:
+            raise ValueError("bad value") from ex_1
+
+    try:
+        inner_function()
+    except ValueError as ex_2:
+        print_exc()
+        formatted_exception = format_exception(ex_2)
+
+    _, err = capsys.readouterr()
+    assert formatted_exception == err
+
+
 def test_singleton():
     class SingletonTestClass(metaclass=SingletonMeta):
-        pass
+        """A class whose metaclass is `SingletonMeta`."""
 
     assert SingletonTestClass() is SingletonTestClass()
