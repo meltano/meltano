@@ -25,9 +25,9 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import (
     CliEvent,
+    EnvironmentContext,
     ExceptionContext,
     ProjectContext,
-    environment_context,
 )
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
@@ -130,7 +130,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id: uuid.UUID = project_ctx.project_uuid
         self._contexts: tuple[SelfDescribingJson] = (
-            environment_context,
+            EnvironmentContext(),
             project_ctx,
         )
 

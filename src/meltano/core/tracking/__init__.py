@@ -3,9 +3,9 @@
 from .contexts import (
     CliContext,
     CliEvent,
+    EnvironmentContext,
     ExceptionContext,
     PluginsTrackingContext,
     ProjectContext,
-    environment_context,
 )
 from .tracker import BlockEvents, Tracker

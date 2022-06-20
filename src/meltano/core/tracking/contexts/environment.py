@@ -18,6 +18,7 @@ from structlog.stdlib import get_logger
 import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import hash_sha256
+from meltano.core.utils.singleton import SingletonMeta
 
 logger = get_logger(__name__)
 
@@ -25,7 +26,7 @@ logger = get_logger(__name__)
 release_marker_path = Path(__file__).parent / ".release_marker"
 
 
-class EnvironmentContext(SelfDescribingJson):
+class EnvironmentContext(SelfDescribingJson, metaclass=SingletonMeta):
     """Environment context for the Snowplow tracker."""
 
     def __init__(self):
@@ -117,6 +118,3 @@ class EnvironmentContext(SelfDescribingJson):
             return len(os.sched_getaffinity(0))
         except AttributeError:
             return os.cpu_count()
-
-
-environment_context = EnvironmentContext()
