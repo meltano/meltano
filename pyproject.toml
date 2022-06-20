@@ -111,4 +111,5 @@ skip_glob = ["*.md", "*.vue", "*.js"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+build-backend = "build:api"
+backend-path = ["src/meltano"]
