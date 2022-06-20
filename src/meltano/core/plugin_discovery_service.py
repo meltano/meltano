@@ -8,7 +8,6 @@ import re
 from abc import ABCMeta, abstractmethod
 from typing import Iterable
 
-import requests
 import yaml
 
 import meltano
@@ -278,6 +277,8 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The discovery file.
         """
+        import requests
+
         discovery_url = self.discovery_url
         if not discovery_url:
             return None

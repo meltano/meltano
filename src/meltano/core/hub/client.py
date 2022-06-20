@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import requests
 from structlog.stdlib import get_logger
 
 import meltano
@@ -92,6 +91,8 @@ class MeltanoHubService(PluginRepository):
         Args:
             project: The Meltano project.
         """
+        import requests
+
         self.project = project
         self.session = requests.Session()
         self.session.headers.update(
@@ -171,6 +172,8 @@ class MeltanoHubService(PluginRepository):
             PluginNotFoundError: If the plugin definition could not be found.
             HubPluginVariantNotFound: If the plugin variant could not be found.
         """
+        import requests
+
         plugins = self.get_plugins_of_type(plugin_type)
 
         try:
@@ -240,6 +243,8 @@ class MeltanoHubService(PluginRepository):
         Raises:
             HubPluginTypeNotFound: If the plugin type is not supported.
         """
+        import requests
+
         if not plugin_type.discoverable:
             return {}
 
