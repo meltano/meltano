@@ -15,7 +15,7 @@
                 "integer",
                 "null"
             ],
-            "minimum": 0,
+            "minimum": -255,
             "maximum": 255
         },
         "exit_timestamp": {
