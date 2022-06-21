@@ -66,7 +66,7 @@ class EnvironmentContext(SelfDescribingJson, metaclass=SingletonMeta):
             "system_release": platform.release() or None,
             "system_version": platform.version() or None,
             "machine": platform.machine() or None,
-            "windows_edition": getattr(platform, 'win32_edition', lambda: None)(),
+            "windows_edition": getattr(platform, "win32_edition", lambda: None)(),
             "freedesktop_id": freedesktop_data["ID"],
             "freedesktop_id_like": freedesktop_data.get("ID_LIKE", None),
             "freedesktop_version_id": freedesktop_data.get("VERSION_ID", None),
