@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-from meltano.core import bundle
+import meltano.core.bundle as bundle
 
 from .file import FilePlugin
 

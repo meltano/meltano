@@ -436,11 +436,11 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        import werkzeug.utils
+        from werkzeug.utils import secure_filename
 
         return self.run_dir(
             "elt",
-            werkzeug.utils.secure_filename(state_id),
+            secure_filename(state_id),
             *joinpaths,
             make_dirs=make_dirs,
         )
@@ -457,11 +457,11 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        import werkzeug.utils
+        from werkzeug.utils import secure_filename
 
         return self.logs_dir(
             "elt",
-            werkzeug.utils.secure_filename(state_id),
+            secure_filename(state_id),
             *joinpaths,
             make_dirs=make_dirs,
         )

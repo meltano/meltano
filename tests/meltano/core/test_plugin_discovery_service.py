@@ -304,7 +304,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
             cached_discovery_yaml = yaml.safe_load(cached_discovery)
             assert cached_discovery_yaml["version"] == remote_discovery["version"]
 
-    @mock.patch("meltano.core.plugin_discovery_service.requests.get")
+    @mock.patch("requests.get")
     def test_remote_discovery_with_valid_auth(
         self,
         mock_discovery_request,
@@ -326,7 +326,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
         self.assert_discovery_yaml(subject, discovery)
 
-    @mock.patch("meltano.core.plugin_discovery_service.requests.get")
+    @mock.patch("requests.get")
     def test_remote_discovery_with_invalid_auth(
         self, mock_discovery_request, subject, enabled_remote_discovery_auth
     ):
@@ -345,7 +345,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         assert expected_auth == actual_auth
         assert discovery is None
 
-    @mock.patch("meltano.core.plugin_discovery_service.requests.get")
+    @mock.patch("requests.get")
     def test_remote_discovery_with_no_auth(self, mock_discovery_request, subject):
         mock_discovery_request.return_value.status_code = 401
         mock_discovery_request.return_value.raise_for_status.side_effect = (

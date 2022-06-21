@@ -119,6 +119,14 @@ class PluginsTrackingContext(SelfDescribingJson):
     def from_blocks(
         cls, parsed_blocks: list[BlockSet | PluginCommandBlock]
     ) -> PluginsTrackingContext:
+        """Create a PluginsTrackingContext from a list of BlockSet or PluginCommandBlock objects.
+
+        Parameters:
+            parsed_blocks: The blocks to create the context for.
+
+        Returns:
+            The PluginsTrackingContext for the given blocks.
+        """
         plugins: list[tuple[ProjectPlugin, str]] = []
         for blk in parsed_blocks:
             if isinstance(blk, BlockSet):
