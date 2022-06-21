@@ -50,15 +50,9 @@ jobs:
         poetry env use "${{ matrix.python-version }}"
         poetry install
 
-    - name: Run pytest linux
-      if: (matrix.os != 'windows-latest')
+    - name: Run pytest
       run: |
-        poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS"
-    
-    - name: Run pytest windows
-      if: (matrix.os == 'windows-latest')
-      run: |
-        poetry run coverage run --parallel -m pytest -m $Env:PYTEST_MARKERS
+        poetry run coverage run --parallel -m pytest -m "${{ env.PYTEST_MARKERS }}"
 
     - name: Upload coverage data
       if: always() && (matrix.python-version == '3.9') && (matrix.os == 'ubuntu-latest')
