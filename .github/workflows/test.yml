@@ -23,6 +23,10 @@ jobs:
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
     services:
+      # Running a Postgres service even when it's not needed
+      # (in tests using SQLite as backend) is wasteful but currently
+      # there doesn't seem to be any way around that:
+      # https://github.community/t/conditional-services-in-a-job/135301
       postgres:
         # Docker Hub image
         image: postgres:11
