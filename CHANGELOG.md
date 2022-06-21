@@ -11,11 +11,40 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
+- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
+- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
 
 ### Fixes
 
 ### Breaks
 
+
+## 2.1.0 - (2022-06-17)
+---
+
+### New
+
+- [#5961](https://github.com/meltano/meltano/issues/5961) - Add `meltano lock` command to create or update plugin lock artifacts.
+- [#6199](https://github.com/meltano/meltano/pull/6199/) - Restore project_id from analytics.json & improve analytics.json handling.
+- [#6203](https://github.com/meltano/meltano/pull/6203) - Fire exit event exactly once & include detailed exception context.
+- [#6141](https://github.com/meltano/meltano/pull/6141) - Add tracking for job command.
+- [#6137](https://github.com/meltano/meltano/pull/6137) - Add telemetry for meltano config.
+- [#6114](https://github.com/meltano/meltano/pull/6114) - Add meltano lock.
+
+### Changes
+- [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions.
+
+### Fixes
+
+- [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all <jobId> with <stateId> to fix pipeline running bug.
+
+## 2.0.3 - (2022-06-15)
+---
+
+### Changes
+
+- [#6186](https://github.com/meltano/meltano/pull/6186) Improve CLI startup performance
 
 ## 2.0.2 - (2022-06-14)
 ---
@@ -62,7 +91,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for the legacy "Dashboards" and "Explore" UX in Meltano UI.
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for legacy `model` and `dashboard` plugin types.
 - [#3048](https://github.com/meltano/meltano/issues/3048) Drop support for `env_aliases` feature and remove its references in `discovery.yml`.
-- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag. 
+- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag.
 
 ### Fixes
 

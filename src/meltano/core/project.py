@@ -9,6 +9,7 @@ import sys
 import threading
 from contextlib import contextmanager
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import fasteners
 from dotenv import dotenv_values
@@ -19,9 +20,12 @@ from meltano.core.plugin.base import PluginRef
 
 from .behavior.versioned import Versioned
 from .error import Error
-from .meltano_file import MeltanoFile
 from .project_files import ProjectFiles
 from .utils import makedirs, truthy
+
+if TYPE_CHECKING:
+    from .meltano_file import MeltanoFile as MeltanoFileHint
+
 
 logger = logging.getLogger(__name__)
 
@@ -220,12 +224,14 @@ class Project(Versioned):  # noqa: WPS214
         return self._project_files
 
     @property
-    def meltano(self) -> MeltanoFile:
+    def meltano(self) -> MeltanoFileHint:
         """Return a copy of the current meltano config.
 
         Returns:
             the current meltano config
         """
+        from .meltano_file import MeltanoFile
+
         with self._meltano_rw_lock.read_lock():
             return MeltanoFile.parse(self.project_files.load())
 
@@ -244,6 +250,8 @@ class Project(Versioned):  # noqa: WPS214
         """
         if self.readonly:
             raise ProjectReadonly
+
+        from .meltano_file import MeltanoFile
 
         # fmt: off
         with self._meltano_rw_lock.write_lock(), self._meltano_ip_lock:

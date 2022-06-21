@@ -1,5 +1,4 @@
 import json
-import logging
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
@@ -10,7 +9,6 @@ from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project_plugins_service import ProjectPluginsService
 
-from .db import project_engine
 from .project import Project
 
 

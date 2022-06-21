@@ -350,11 +350,9 @@ class CatalogExecutor:
 
     def stream_node(self, node: Node, path: str):
         """Process stream node."""
-        pass
 
     def property_node(self, node: Node, path: str):
         """Process property node."""
-        pass
 
     def metadata_node(self, node: Node, path: str):
         """Process metadata node."""
@@ -365,11 +363,9 @@ class CatalogExecutor:
 
     def stream_metadata_node(self, node: Node, path: str):
         """Process stream metadata node."""
-        pass
 
     def property_metadata_node(self, node: Node, path: str):
         """Process property metadata node."""
-        pass
 
     def __call__(self, node_type, node: Node, path: str):
         """Call this instance as a function."""
