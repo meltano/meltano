@@ -22,7 +22,7 @@ Merge conflicts, failing tests and/or missing checkboxes should not be used as g
 
 ## Semantic PRs
 
-The `meltano` repo uses the [semantic-prs](https://github.com/Ezard/semantic-prs) GitHub app to check all PRs againts the conventional commit syntax.
+The `meltano` repo uses the [semantic-prs](https://github.com/Ezard/semantic-prs) GitHub app to check all PRs againts the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) syntax.
 
 Pull requests should be named according to the conventional commit syntax to streamline changelog and release notes management. We encourage (but do not require) the use of conventional commits in commit messages as well.
 
