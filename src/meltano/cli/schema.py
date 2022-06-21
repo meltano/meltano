@@ -1,3 +1,4 @@
+"""Meltano schema management CLI."""
 import click
 
 from meltano.cli.cli import cli
@@ -6,11 +7,11 @@ from meltano.core.db import DB, project_engine
 
 
 @cli.commands.schema
-def schema():
+def schema_cli():
     """Manage system DB schema."""
 
 
-@schema.command(short_help="Create system DB schema, if not exists.")
+@schema_cli.command(short_help="Create system DB schema, if not exists.")
 @click.argument("schema")
 @click.argument("roles", nargs=-1, required=True)
 @pass_project()

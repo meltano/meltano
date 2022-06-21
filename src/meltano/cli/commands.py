@@ -1,3 +1,5 @@
+"""The (lazy) commands that make up the top-level of the Meltano CLI."""
+
 from __future__ import annotations
 
 import inspect
@@ -12,6 +14,17 @@ from meltano.cli.cli import cli
 
 
 class LazyCommand:
+    """A lazy stand-in for a Click group/command that becomes real as needed.
+
+    A `LazyCommand` instance is initialized with and stores some basic info that a group/command
+    would have, such as its `name` and `short_help`. When an attribute which it doesn't have is
+    accessed (i.e. by Click) the `LazyCommand` transparently replaces itself with a real
+    group/command.
+
+    Should be called as a decorator on the function defining the group/command instead of the
+    regular top-level group/command decorator.
+    """
+
     def __init__(
         self,
         *,
@@ -19,9 +32,20 @@ class LazyCommand:
         short_help: str | None = None,
         hidden: bool = False,
         import_path: str | None = None,
-        cls: Type[click.BaseCommand] | None = None,
+        cls: Type[click.BaseCommand] = click.Command,  # noqa: WPS117
         **kwargs,
     ):
+        """Initialize a `LazyCommand` instance.
+
+        Parameters:
+            name: The name of the group/command.
+            short_help: The short help text for the group/command.
+            hidden: Whether the group/command should be hidden (i.e. appear in help text and
+                tab-completion).
+            import_path: The module which implements the real version of this group/command which
+                will be used to replace the `LazyCommand`. Defaults to `f"meltano.cli.{name}"`.
+            cls: The class the real group/command that the `LazyCommand` will become.
+        """
         # Attributes necessary to avoid prematurely loading the command:
         self.name = name
         self.hidden = hidden
@@ -33,9 +57,10 @@ class LazyCommand:
             f"meltano.cli.{name}" if import_path is None else import_path
         )
         self._kwargs = kwargs
-        self._cls = click.Command if cls is None else cls
+        self._cls = cls
 
     def __call__(self, f: Callable) -> LazyCommand:
+        """Decorate the given function to transform it into this `LazyCommand` instance."""
         # Take what we need from the function object, then return the LazyCommand instance.
         update_wrapper(self, f)
         self._kwargs.update(
@@ -63,6 +88,14 @@ class LazyCommand:
         )
 
     def __getattr__(self, key: str) -> Any:
+        """Turn this instance into a real Click group/command, then get the requested attribute.
+
+        Parameters:
+            key: The name of the attribute that this instance lacked.
+
+        Returns:
+            The requested attribute from the real group/command object created from this instance.
+        """
         self._activate()
         return getattr(self, key)
 

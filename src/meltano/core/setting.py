@@ -1,4 +1,5 @@
-from sqlalchemy import Column, types
+import sqlalchemy.types as types
+from sqlalchemy import Column
 
 from .models import SystemModel
 
