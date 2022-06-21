@@ -27,6 +27,7 @@ from meltano.core.project_add_service import (
 )
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
+from meltano.core.tracking import CliContext, CliEvent
 
 setup_logging()
 
@@ -510,3 +511,15 @@ def check_dependencies_met(
     else:
         message = f"Dependencies not met: {'; '.join(messages)}"
     return passed, message
+
+
+class InstrumentedCmd(click.Command):
+    """A click.Command that automatically fires an instrumentation 'start' event, if a tracker is available."""
+
+    def invoke(self, ctx):
+        """Fire at start event and then invoke the requested command."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+            ctx.obj["tracker"].track_command_event(CliEvent.started)
+        super().invoke(ctx)  # noqa: WPS608

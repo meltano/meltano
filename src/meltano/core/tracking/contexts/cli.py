@@ -3,9 +3,11 @@ from __future__ import annotations
 
 from enum import Enum, auto
 
+import click
 from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.tracking.schemas import CliContextSchema
+from meltano.core.utils import hash_sha256
 
 
 class CliEvent(Enum):
@@ -61,4 +63,41 @@ class CliContext(SelfDescribingJson):
             command=command,
             sub_command=sub_command,
             option_keys=[key for key, val in kwargs.items() if val],
+        )
+
+    @classmethod
+    def from_click_context(cls, ctx: click.Context) -> CliContext:
+        """Initialize a CLI context.
+
+        Args:
+            ctx: The click.Context to derive our invocation args from.
+
+        Returns:
+            A CLI context.
+        """
+
+        def _recursively_collect_params(crawl_ctx: click.Context) -> dict:
+            options = {}
+            for key, val in crawl_ctx.params.items():
+                if isinstance(val, (bool, int, float)) or val is None:
+                    options[key] = val
+                else:
+                    options[key] = hash_sha256(str(val))
+            if crawl_ctx.parent:
+                options.update(_recursively_collect_params(crawl_ctx.parent))
+            return options
+
+        options = _recursively_collect_params(ctx)
+
+        if ctx.parent and ctx.parent.command.name != "cli":
+            return cls(
+                command=ctx.parent.command.name,
+                sub_command=ctx.command.name,
+                options=options,
+            )
+
+        return cls(
+            command=ctx.command.name,
+            sub_command=None,
+            options=options,
         )
