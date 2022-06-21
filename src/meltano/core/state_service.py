@@ -185,25 +185,25 @@ class StateService:
         src_state = json.dumps(src_state_dict)
         self.add_state(state_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
 
-    def copy_state(self, job_id_src: str, job_id_dst: str):
-        """Copy state from Job job_id_src onto Job job_id_dst.
+    def copy_state(self, state_id_src: str, state_id_dst: str):
+        """Copy state from Job state_id_src onto Job state_id_dst.
 
         Args:
-            job_id_src: the job_id to get state from
-            job_id_dst: the job_id_to copy state onto
+            state_id_src: the state_id to get state from
+            state_id_dst: the state_id_to copy state onto
         """
-        src_state_dict = self.get_state(job_id_src)
+        src_state_dict = self.get_state(state_id_src)
         src_state = json.dumps(src_state_dict)
-        self.set_state(job_id_dst, src_state)
+        self.set_state(state_id_dst, src_state)
 
-    def move_state(self, job_id_src: str, job_id_dst: str):
-        """Move state from Job job_id_src to Job job_id_dst.
+    def move_state(self, state_id_src: str, state_id_dst: str):
+        """Move state from Job state_id_src to Job state_id_dst.
 
         Args:
-            job_id_src: the job_id to get state from and clear
-            job_id_dst: the job_id_to move state onto
+            state_id_src: the state_id to get state from and clear
+            state_id_dst: the state_id_to move state onto
         """
-        src_state_dict = self.get_state(job_id_src)
+        src_state_dict = self.get_state(state_id_src)
         src_state = json.dumps(src_state_dict)
-        self.set_state(job_id_dst, src_state)
-        self.clear_state(job_id_src)
+        self.set_state(state_id_dst, src_state)
+        self.clear_state(state_id_src)

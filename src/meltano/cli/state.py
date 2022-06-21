@@ -143,49 +143,49 @@ def list_state(
 
 @meltano_state.command(name="copy")
 @prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
-@click.argument("src_job_id", type=str)
-@click.argument("dst_job_id", type=str)
+@click.argument("src-state-id", type=str)
+@click.argument("dst-state-id", type=str)
 @pass_project(migrate=True)
 @click.pass_context
 def copy_state(
-    ctx: click.Context, project: Project, src_job_id: str, dst_job_id: str, force: bool
+    ctx: click.Context, project: Project, src_state_id: str, dst_state_id: str, force: bool
 ):
     """Copy state to another job id."""
     # Retrieve state for copying
     state_service = (
-        state_service_from_job_id(project, src_job_id) or ctx.obj[STATE_SERVICE_KEY]
+        state_service_from_state_id(project, src_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_state("copy", dst_job_id)
+    tracker = LegacyTracker(project)
+    tracker.track_meltano_state("copy", dst_state_id)
 
-    state_service.copy_state(src_job_id, dst_job_id)
+    state_service.copy_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {dst_job_id} was successfully copied from {src_job_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {dst_state_id} was successfully copied from {src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 
 @meltano_state.command(name="move")
 @prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
-@click.argument("src_job_id", type=str)
-@click.argument("dst_job_id", type=str)
+@click.argument("src-state-id", type=str)
+@click.argument("dst-state-id", type=str)
 @pass_project(migrate=True)
 @click.pass_context
 def move_state(
-    ctx: click.Context, project: Project, src_job_id: str, dst_job_id: str, force: bool
+    ctx: click.Context, project: Project, src_state_id: str, dst_state_id: str, force: bool
 ):
     """Move state to another job id, clearing the original."""
     # Retrieve state for moveing
     state_service = (
-        state_service_from_job_id(project, dst_job_id) or ctx.obj[STATE_SERVICE_KEY]
+        state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_state("move", dst_job_id)
+    tracker = LegacyTracker(project)
+    tracker.track_meltano_state("move", dst_state_id)
 
-    state_service.move_state(src_job_id, dst_job_id)
+    state_service.move_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {src_job_id} was successfully moved to {dst_job_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {src_state_id} was successfully moved to {dst_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 
