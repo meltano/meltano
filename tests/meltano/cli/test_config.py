@@ -11,7 +11,7 @@ from meltano.cli import cli
 class TestCliConfig:
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
     )
     def test_config(self, project, cli_runner, tap, project_plugins_service):
         with mock.patch(
@@ -37,7 +37,7 @@ class TestCliConfig:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
     )
     def test_config_env(self, project, cli_runner, tap, project_plugins_service):
         with mock.patch(

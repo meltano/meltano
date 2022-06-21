@@ -18,7 +18,7 @@ class TestSuperset:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
     )
     @pytest.mark.asyncio  # noqa:  WPS210
     async def test_hooks(  # noqa:  WPS210

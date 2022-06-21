@@ -28,6 +28,7 @@ def update(payload):
 
 class IndefiniteThread(threading.Thread):
     """Never ending thread"""
+
     def __init__(self):
         super().__init__()
         self._stop_event = threading.Event()
@@ -42,6 +43,7 @@ class IndefiniteThread(threading.Thread):
 
 class ProjectReader(IndefiniteThread):
     """Project using a never ending thread"""
+
     def __init__(self, project):
         self.project = project
         super().__init__()
@@ -102,7 +104,7 @@ class TestProject:
     @pytest.mark.concurrent
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
     )
     def test_meltano_concurrency(self, project, concurrency):
         payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]

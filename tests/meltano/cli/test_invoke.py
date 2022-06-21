@@ -1,8 +1,8 @@
 import asyncio
 import json
 import platform
-import mock
 
+import mock
 import pytest
 from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
@@ -86,7 +86,7 @@ class TestCliInvoke:
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://gitlab.com/meltano/meltano/-/issues/3530 ",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
     )
     def test_invoke_command_containerized(  # noqa: WPS210
         self,

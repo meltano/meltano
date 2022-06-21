@@ -22,10 +22,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import Tracker
-from meltano.core.tracking import cli as cli_tracking
-from meltano.core.tracking import cli_context_builder
-from meltano.core.tracking.plugins import plugins_tracking_context_from_elt_context
+from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -117,7 +114,7 @@ async def elt(
     tracker = Tracker(project)
     legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
 
-    cmd_ctx = cli_context_builder(
+    cmd_ctx = CliContext.from_command_and_kwargs(
         "elt",
         None,
         dry=dry,
@@ -132,7 +129,7 @@ async def elt(
         force=force,
     )
     tracker.add_contexts(cmd_ctx)
-    tracker.track_command_event(cli_tracking.STARTED)
+    tracker.track_command_event(CliEvent.started)
 
     # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
     # if transform is None we still need manually default to skip after firing the tracking event above.
@@ -169,12 +166,12 @@ async def elt(
         else:
             await _run_job(tracker, project, job, session, context_builder, force=force)
     except Exception as err:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(CliEvent.failed)
         raise err
     finally:
         session.close()
 
-    tracker.track_command_event(cli_tracking.COMPLETED)
+    tracker.track_command_event(CliEvent.completed)
     legacy_tracker.track_meltano_elt(
         extractor=extractor, loader=loader, transform=transform
     )
@@ -286,7 +283,7 @@ async def _run_elt(
     async with _redirect_output(log, output_logger):
         try:
             elt_context = context_builder.context()
-            tracker.add_contexts(plugins_tracking_context_from_elt_context(elt_context))
+            tracker.add_contexts(PluginsTrackingContext.from_elt_context(elt_context))
 
             if elt_context.only_transform:
                 log.info("Extract & load skipped.")
