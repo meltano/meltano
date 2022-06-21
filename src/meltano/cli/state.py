@@ -142,7 +142,7 @@ def list_state(
 
 
 @meltano_state.command(name="copy")
-@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
+@prompt_for_confirmation(prompt="This will overwrite state for the destination. Continue?")
 @click.argument("src-state-id", type=str)
 @click.argument("dst-state-id", type=str)
 @pass_project(migrate=True)
@@ -166,7 +166,7 @@ def copy_state(
 
 
 @meltano_state.command(name="move")
-@prompt_for_confirmation(prompt="This will overwrite state for the job. Continue?")
+@prompt_for_confirmation(prompt="This will clear the source state and overwrite destination state. Continue?")
 @click.argument("src-state-id", type=str)
 @click.argument("dst-state-id", type=str)
 @pass_project(migrate=True)
