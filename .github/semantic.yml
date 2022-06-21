@@ -4,7 +4,7 @@
 titleOnly: true
 
 # Provides a custom URL for the "Details" link, which appears next to the success/failure message from the app:
-targetUrl: https://github.com/meltano/meltano/blob/main/CONTRIBUTING.md#semantic-pull-requests
+targetUrl: https://docs.meltano.com/contribute/merge#semantic-prs
 
 # The values allowed for the "type" part of the PR title/commit message.
 # e.g. for a PR title/commit message of "feat: add some stuff", the type would be "feat"

@@ -12,13 +12,41 @@ Meltano uses an approval workflow for all pull requests.
 1. Once the review is done the reviewer may approve the pull request or send it back for further iteration.
 1. Once approved, the pull request will be merged by any Meltano maintainer.
 
-### Reviews
+## Reviews
 
 A contributor can ask for a review on any pull request, without this pull request being done and/or ready to merge.
 
 Asking for a review is asking for feedback on the implementation, not approval of the pull request. It is also the perfect time to familiarize yourself with the code base. If you don’t understand why a certain code path would solve a particular problem, that should be sent as feedback: it most probably means the code is cryptic/complex or that the problem is bigger than anticipated.
 
 Merge conflicts, failing tests and/or missing checkboxes should not be used as ground for sending back a pull request without feedback, unless specified by the reviewer.
+
+## Semantic PRs
+
+The `meltano` repo uses the [semantic-prs](https://github.com/Ezard/semantic-prs) GitHub app to check all PRs againts the conventional commit syntax.
+
+Pull requests should be named according to the conventional commit syntax to streamline changelog and release notes management. We encourage (but do not require) the use of conventional commits in commit messages as well.
+
+In general, PR titles should follow the format "<type>: <desc>", where type is any one of these:
+
+- `ci`
+- `chore`
+- `build`
+- `docs`
+- `feat`
+- `fix`
+- `perf`
+- `refactor`
+- `revert`
+- `style`
+- `test`
+
+Optionally, you may use the expanded syntax to specify a scope in the form `<type>(<scope>): <desc>`. Currently scopes are:
+
+- `ui`
+- `core`
+- `cli`
+
+The latest rules and settings are found within the file [`.github/semantic.yml`](https://github.com/meltano/meltano/blob/main/.github/semantic.yml).
 
 ## Architectural Decision Records
 
