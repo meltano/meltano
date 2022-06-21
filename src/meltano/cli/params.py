@@ -1,7 +1,9 @@
+"""Decorators for Meltano CLI commands."""
+
 import functools
 
 import click
-import click.globals
+from click.globals import get_current_context
 
 from meltano.core.db import project_engine
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -10,6 +12,15 @@ from .utils import CliError
 
 
 def database_uri_option(func):
+    """Decorate the provided CLI function to add the `--database-uri` CLI option.
+
+    Parameters:
+        func: The function to be decorated.
+
+    Returns:
+        The decorated function.
+    """
+
     @click.option("--database-uri", help="System database URI.")
     def decorate(*args, database_uri=None, **kwargs):
         if database_uri:
@@ -26,18 +37,32 @@ class pass_project:  # noqa: N801
     __name__ = "project"
 
     def __init__(self, migrate=False):
+        """Initialize the decorator.
+
+        Parameters:
+            migrate: Whether a silent upgrade should be performed.
+        """
         self.migrate = migrate
 
     def __call__(self, func):
+        """Decorate the given function to supply the project as its first argument.
+
+        Parameters:
+            func: The function to be decorated.
+
+        Returns:
+            The decorated function.
+        """
+
         @database_uri_option
         def decorate(*args, **kwargs):
-            ctx = click.globals.get_current_context()
+            ctx = get_current_context()
 
             project = ctx.obj["project"]
             if not project:
                 raise CliError(
                     f"`{ctx.command_path}` must be run inside a Meltano project."
-                    "\nUse `meltano init <project_name>` to create one."
+                    + "\nUse `meltano init <project_name>` to create one."
                 )
 
             # register the system database connection

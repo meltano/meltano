@@ -57,17 +57,25 @@ class LazyCommand:
             f"meltano.cli.{name}" if import_path is None else import_path
         )
         self._kwargs = kwargs
-        self._cls = cls
+        self._cls = cls  # noqa: WPS117
 
-    def __call__(self, f: Callable) -> LazyCommand:
-        """Decorate the given function to transform it into this `LazyCommand` instance."""
+    def __call__(self, fn: Callable) -> LazyCommand:
+        """Decorate the given function to transform it into this `LazyCommand` instance.
+
+        Parameters:
+            fn: The original (non-lazy) CLI group/command function, likely decorated by various
+                standard Click decorators.
+
+        Returns:
+            The `LazyCommand` instance.
+        """
         # Take what we need from the function object, then return the LazyCommand instance.
-        update_wrapper(self, f)
+        update_wrapper(self, fn)
         self._kwargs.update(
             {
-                "callback": f,
-                "params": list(reversed(getattr(f, "__click_params__", []))),
-                "help": inspect.getdoc(f) if f else "",
+                "callback": fn,
+                "params": list(reversed(getattr(fn, "__click_params__", []))),
+                "help": inspect.getdoc(fn) if fn else "",
             }
         )
         return self

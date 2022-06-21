@@ -1,3 +1,9 @@
+"""The implementation of the top-level Meltano CLI group.
+
+Sub-groups/commands are registered in `src/meltano/cli/commands.py`, and implemented in the
+`meltano.cli` sub-modules.
+"""
+
 from __future__ import annotations
 
 import logging  # noqa: D100
