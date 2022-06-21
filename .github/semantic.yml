@@ -25,6 +25,6 @@ types:
 # e.g. for a PR title/commit message of "feat(awesome-feature): add some stuff",
 #      the scope would be "awesome-feature"
 scopes:
-  - ui      # target SDK only
-  - core    # mappers only
-  - cli     # cookiecutters
+  - ui
+  - core
+  - cli
