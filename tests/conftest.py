@@ -25,6 +25,7 @@ pytest_plugins = [
     "fixtures.core",
     "fixtures.api",
     "fixtures.cli",
+    "fixtures.docker",
 ]
 
 if PYTEST_BACKEND == "sqlite":

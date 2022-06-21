@@ -1,23 +1,37 @@
+from __future__ import annotations
+
 import logging
 import os
 import shutil
 from pathlib import Path
+from typing import Any
 
 import pytest
 from click.testing import CliRunner
 
+from fixtures.docker.snowplow import SnowplowMicro
 from meltano.core.project import Project
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 
 
-@pytest.fixture()
-def cli_runner(pushd):
-    # this will make sure we are back at `cwd`
-    # after this test is finished
-    pushd(os.getcwd())
+class MeltanoCliRunner(CliRunner):
+    def __init__(self, *args, snowplow: SnowplowMicro | None = None, **kwargs):
+        """Initialize the `MeltanoCliRunner`."""
+        self.snowplow = snowplow
+        super().__init__(*args, **kwargs)
 
-    yield CliRunner(mix_stderr=False)
+    def invoke(self, *args, **kwargs) -> Any:
+        results = super().invoke(*args, **kwargs)
+        if self.snowplow:
+            assert self.snowplow.all()["bad"] == 0
+        return results
+
+
+@pytest.fixture()
+def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
+    pushd(os.getcwd())  # Ensure the CWD is reset after the test
+    return MeltanoCliRunner(mix_stderr=False, snowplow=snowplow_optional)
 
 
 @pytest.fixture(scope="class")

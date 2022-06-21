@@ -1,15 +1,9 @@
 import logging
 
-import pytest
 from snowplow_tracker import Emitter
 
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
-
-
-@pytest.mark.meta
-def test_tracking_disabled(project):
-    assert not ProjectSettingsService(project).get("snowplow.collector_endpoints")
 
 
 def test_get_snowplow_tracker_invalid_endpoint(project, caplog):

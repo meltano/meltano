@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import uuid
 from contextlib import contextmanager
 from typing import Any
@@ -9,6 +10,7 @@ from unittest import mock
 
 import pytest
 
+from fixtures.docker import SnowplowMicro
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.tracker import TelemetrySettings, Tracker
@@ -254,3 +256,14 @@ class TestTracker:
     def test_default_send_anonymous_usage_stats(self, project: Project):
         clear_telemetry_settings(project)
         assert Tracker(project).send_anonymous_usage_stats
+
+    def test_exit_event_is_fired(project: Project, snowplow: SnowplowMicro):
+        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
+
+        event_summary = snowplow.all()
+        assert event_summary["good"] > 0
+        assert event_summary["bad"] == 0
+
+        exit_event = snowplow.good()[0]["event"]
+        assert "exit_event" == exit_event["event_name"]
+        assert 1 == exit_event["unstruct_event"]["data"]["data"]["exit_code"]
