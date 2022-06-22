@@ -23,6 +23,7 @@ class MeltanoFile(Canonical):
         schedules: List[dict] = None,
         environments: List[dict] = None,
         jobs: List[dict] = None,
+        env: dict[str, str] = None,
         **extras,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
@@ -34,6 +35,7 @@ class MeltanoFile(Canonical):
             schedules: Schedule configuration for this project.
             environments: Environment configuration for this project.
             jobs: Job configuration for this project.
+            env: Environment variables for this project.
             extras: Additional configuration for this project.
         """
         super().__init__(
@@ -45,6 +47,7 @@ class MeltanoFile(Canonical):
             schedules=self.load_schedules(schedules or []),
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
+            env=env or {},
         )
 
     def load_plugins(self, plugins: Dict[str, dict]) -> Canonical:
