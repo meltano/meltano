@@ -215,7 +215,7 @@ export default {
                     <p>
                       View the
                       <a
-                        href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
+                        href="https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
                         target="_blank"
                         >CHANGELOG.md</a
                       >
