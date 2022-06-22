@@ -28,21 +28,20 @@ aiohttp = "^3.4.4"
 alembic = "^1.5.0"
 async_generator = "^1.10"
 atomicwrites = "^1.2.1"
-authlib = "^0.10"
+authlib = "^0.10" # "^1.0.1"
 cached-property = "^1" # Remove after Python 3.7 support is dropped
 bcrypt = "^3.2.0" # Needs to be installed explicitly so it can be used as a backend for passlib
 click = "^8.0"
 click-default-group = "^1.2.1"
 email-validator = "^1.1.2"
-fasteners = "^0.15.0"
+fasteners = "^0.15.0" # "^0.17.3"
 flask = "^2.1"
 flask-cors = "^3.0.7"
 flask-executor = "^0.10"
 flask-restful = "^0.3.7"
 flask-sqlalchemy = "^2.4.4"
 flatten-dict = "^0"
-gunicorn = "^19.9.0"
-ipython = "^7.5.0"
+gunicorn = "^20.1.0"
 jsonschema = "^3.0.0"
 markdown = "^3.0.1"
 MarkupSafe = "<2.1.0"
@@ -72,10 +71,11 @@ werkzeug = "^2.1"
 
 [tool.poetry.extras]
 infra = ["ansible"]
+repl = ["ipython"]
 
 [tool.poetry.dev-dependencies]
 asynctest = "^0.12.2"
-black = "^21.12b0"
+black = "^22.3.0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
