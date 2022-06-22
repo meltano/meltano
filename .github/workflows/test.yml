@@ -112,6 +112,23 @@ jobs:
         poetry env use "${{ matrix.python-version }}"
         poetry install
 
+    - name: Start Postgres Container
+      if: always() && (matrix.backend-db == 'postgresql')
+      run: >
+        docker run -d
+        -p "5432:5432"
+        -e "POSTGRES_PASSWORD=postgres"
+        --name postgres
+        --health-cmd "pg_isready -d postgres -U postgres"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        postgres:11
+
+    - name: Check running containers
+      run: |
+        docker ps -a
+
     - name: Run pytest
       env:
         PYTEST_BACKEND: ${{ matrix.backend-db }}
