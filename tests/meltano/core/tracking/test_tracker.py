@@ -11,6 +11,8 @@ import pytest
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking.contexts.environment import EnvironmentContext
+from meltano.core.tracking.contexts.exception import ExceptionContext
 from meltano.core.tracking.contexts.project import ProjectContext
 from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
@@ -270,12 +272,13 @@ class TestTracker:
                 # Can't put asserts in here because this method is executed withing a try-except
                 # block that catches all exceptions.
                 nonlocal passed
+                expected_contexts = [EnvironmentContext, ProjectContext]
                 if send_anonymous_usage_stats:
-                    passed = len(contexts) > 1
-                else:
-                    passed = len(contexts) == 1 and isinstance(
-                        contexts[0], ProjectContext
-                    )
+                    expected_contexts.append(ExceptionContext)
+                passed = len(set(contexts)) == len(expected_contexts) and all(
+                    isinstance(ctx, tuple(expected_contexts))
+                    for ctx in contexts
+                )
 
         tracker.snowplow_tracker = MockSnowplowTracker()
 
