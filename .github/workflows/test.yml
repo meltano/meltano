@@ -125,6 +125,20 @@ jobs:
         --health-retries 5
         postgres:11
 
+    - name: Start MSSQL Container
+      if: always() && (matrix.backend-db == 'mssql')
+      run: >
+        docker run -d
+        -p "1433:1433"
+        -e "SA_PASSWORD=Meltan0admin"
+        -e "ACCEPT_EULA=Y"
+        --name mssql
+        --health-cmd "/opt/mssql-tools/bin/sqlcmd -U -P Meltan0admin -Q 'select 1' -b -o /dev/null"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        mcr.microsoft.com/mssql/server:2019-latest
+
     - name: Check running containers
       run: |
         docker ps -a
