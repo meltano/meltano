@@ -21,6 +21,9 @@ jobs:
         - { python-version: "3.7", os: "ubuntu-latest", backend-db: mssql }
         - { python-version: "3.8", os: "ubuntu-latest", backend-db: mssql }
         - { python-version: "3.9", os: "ubuntu-latest", backend-db: mssql }
+        - { python-version: "3.7", os: "ubuntu-latest", backend-db: mysql }
+        - { python-version: "3.8", os: "ubuntu-latest", backend-db: mysql }
+        - { python-version: "3.9", os: "ubuntu-latest", backend-db: mysql }
       fail-fast: false
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
@@ -54,13 +57,28 @@ jobs:
           ACCEPT_EULA: "Y"
         # Set health checks to wait until mssql has started
         options: >-
-          --health-cmd /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Meltan0admin -Q "SELECT 1" -b -o /dev/null
+          --health-cmd /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $$SA_PASSWORD -Q "SELECT 1" -b -o /dev/null
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
           # Maps tcp port 1433 on service container to the host
           - 1433:1433
+      mysql:
+        # Mysql image
+        image: mysql:8-oracle
+        # Provide the password for mysql
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
+        # Set health checks to wait until mysql has started
+        options: >-
+          --health-cmd mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 3306 on service container to the host
+          - 3306:3306
     env:
       PYTEST_MARKERS: not concurrent
 
@@ -112,6 +130,13 @@ jobs:
         MSSQL_USER: sa
         MSSQL_PASSWORD: Meltan0admin
         MSSQL_DB: pytest_warehouse
+
+        # MySQL backend
+        MYSQL_ADDRESS: localhost
+        MYSQL_PORT: 3306
+        MYSQL_USER: root
+        MYSQL_PASSWORD: mysql
+        MYSQL_DB: pytest_warehouse
       run: |
         poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS"
 
