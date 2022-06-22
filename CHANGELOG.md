@@ -11,6 +11,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
+- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
+- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
 
 ### Fixes
 
@@ -88,7 +91,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for the legacy "Dashboards" and "Explore" UX in Meltano UI.
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for legacy `model` and `dashboard` plugin types.
 - [#3048](https://github.com/meltano/meltano/issues/3048) Drop support for `env_aliases` feature and remove its references in `discovery.yml`.
-- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag. 
+- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag.
 
 ### Fixes
 
