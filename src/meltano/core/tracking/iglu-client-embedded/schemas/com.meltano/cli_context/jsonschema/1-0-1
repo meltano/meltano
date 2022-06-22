@@ -38,7 +38,9 @@
                 "description": "",
                  "type": ["string", "boolean", "number", "null"
                 ],
-                "maxLength": 1024
+                "maxLength": 1024,
+                "minimum": -65536,
+                "maximum": 65535
             }
         }
     },

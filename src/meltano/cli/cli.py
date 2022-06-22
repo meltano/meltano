@@ -79,6 +79,10 @@ def cli(  # noqa: WPS231
             )
 
         ctx.obj["project"] = project
+        ctx.obj["tracker"] = Tracker(project)
+        ctx.obj["legacy_tracker"] = LegacyTracker(
+            project, context_overrides=ctx.obj["tracker"].contexts
+        )
     except ProjectNotFound:
         ctx.obj["project"] = None
     except IncompatibleVersionError:
@@ -90,8 +94,3 @@ def cli(  # noqa: WPS231
             "For more details, visit http://meltano.com/docs/installation.html#upgrading-meltano-version"
         )
         sys.exit(3)
-
-    ctx.obj["tracker"] = Tracker(project)
-    ctx.obj["legacy_tracker"] = LegacyTracker(
-        project, context_overrides=ctx.obj["tracker"].contexts
-    )
