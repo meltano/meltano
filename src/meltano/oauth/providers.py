@@ -1,4 +1,4 @@
-from authlib.flask.client import OAuth as OAuthClient
+from authlib.integrations.flask_client import OAuth as OAuthClient
 from flask import Blueprint, render_template, url_for
 
 OAuth = OAuthClient()

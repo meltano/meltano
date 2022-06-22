@@ -2,7 +2,7 @@ import base64
 import json
 
 import gitlab
-from authlib.flask.client import OAuth as OAuthClient
+from authlib.integrations.flask_client import OAuth as OAuthClient
 from flask import Blueprint, redirect, url_for
 from flask_security import current_user
 from flask_security.utils import do_flash, login_user, url_for_security
