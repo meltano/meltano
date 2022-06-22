@@ -22,7 +22,9 @@
 <a href="https://libraries.io/pypi/meltano">
 <img alt="Libraries.io dependency status for latest release" src="https://img.shields.io/librariesio/release/pypi/meltano?label=Dependencies"/>
 </a>
+</div>
 
+<div align="center">
 <a href="https://github.com/meltano/meltano/graphs/contributors">
 <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/meltano/meltano?label=Contributors"/>
 </a>
