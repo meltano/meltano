@@ -35,7 +35,15 @@ class CustomException(Exception):
 class AnyInt:
     """A class whoses instances are equal to any int."""
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        """Check if `other` is an int.
+
+        Parameters:
+            other: Any object.
+
+        Returns:
+            Whether the object is an int.
+        """
         return isinstance(other, int)
 
 
