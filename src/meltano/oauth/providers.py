@@ -12,7 +12,7 @@ def facebook(app):
         authorize_url="https://www.facebook.com/v5.0/dialog/oauth",
     )
 
-    oauthBP = Blueprint("OAuth.Facebook", __name__, url_prefix="/facebook")
+    oauthBP = Blueprint("OAuth-Facebook", __name__, url_prefix="/facebook")
 
     @oauthBP.route("/", strict_slashes=False)
     def login():
@@ -39,7 +39,7 @@ def google_adwords(app):
         access_token_url="https://oauth2.googleapis.com/token",
     )
 
-    oauthBP = Blueprint("OAuth.GoogleAdwords", __name__, url_prefix="/google-adwords")
+    oauthBP = Blueprint("OAuth-GoogleAdwords", __name__, url_prefix="/google-adwords")
 
     @oauthBP.route("/", strict_slashes=False)
     def login():

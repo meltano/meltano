@@ -35,7 +35,7 @@ def setup_oauth_gitlab(oauth):
         authorize_url="https://gitlab.com/oauth/authorize",
     )
 
-    oauthBP = Blueprint("OAuth.GitLab", __name__, url_prefix="/oauth/gitlab")
+    oauthBP = Blueprint("OAuth-GitLab", __name__, url_prefix="/oauth/gitlab")
 
     @oauthBP.route("/login")
     def login():
