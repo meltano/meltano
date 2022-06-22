@@ -4,8 +4,9 @@ import sys
 from pathlib import Path
 from unittest import mock
 
-import meltano
 import pytest
+
+import meltano
 from meltano.core.meltano_invoker import MELTANO_COMMAND, MeltanoInvoker
 
 
