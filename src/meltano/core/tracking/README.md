@@ -82,6 +82,8 @@ Snowplow Micro will be run under Pytest automatically if `docker-compose` is ava
 
 Tests can use the `snowplow` fixture to access Snowplow Micro through its REST interface. The `snowplow` fixture yields a `SnowplowMicro` instance which is reset before and after every test. It has methods `all`, `good`, `bad`, which all return the JSON that their REST endpoints return, and `reset`, which resets Snowplow Micro and returns `None`.
 
+Tests using this fixture will automatically have `send_anonymous_usage_stats` enabled, and have their collection endpoint set to the local Snowplow Micro service.
+
 If `pytest-docker` was unable to start Snowplow Micro, tests that use the `Snowplow` fixture will be skipped. To avoid having a test skipped one can use the `snowplow_optional` fixture instead, which is the same as the `snowplow` fixture, but yields `None` if `pytest-docker` was not able to start Snowplow Micro. If you use the `snowplow_optional` fixture, you should handle the case where it yields `None`.
 
 If Snowplow Micro is available, all tests that use `CliRunner.invoke` are automatically checked to ensure that no "bad" events (according to Snowplow Micro) were fired. More complex checks must be done manually.
