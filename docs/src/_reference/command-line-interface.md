@@ -1174,7 +1174,7 @@ Move state from one state ID to another, equivalent to a rename
 
 ```bash
 # Move state from one ID to another
-meltano move move <src_state_id> <dst_state_id>
+meltano state move <src_state_id> <dst_state_id>
 ```
 
 #### Examples
