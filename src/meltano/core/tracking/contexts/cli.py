@@ -28,6 +28,7 @@ class CliContext(SelfDescribingJson):
         command: str,
         sub_command: str | None = None,
         option_keys: list(str) | None = None,
+        options: dict | None = None,
     ):
         """Initialize a CLI context.
 
@@ -35,6 +36,7 @@ class CliContext(SelfDescribingJson):
             command: The command name e.g. `schedule`.
             sub_command: The sub-command name e.g. `add` or `set`.
             option_keys: The list of option keys e.g. `loader`, `job`.
+            options: A dict of options keys and sanitized values.
         """
         super().__init__(
             CliContextSchema.url,
@@ -42,6 +44,7 @@ class CliContext(SelfDescribingJson):
                 "command": command,
                 "sub_command": sub_command,
                 "option_keys": option_keys or [],
+                "options": options or {},
             },
         )
 
