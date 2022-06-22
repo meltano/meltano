@@ -32,7 +32,7 @@ def upgrade():
         sa.Column("id", sa.Integer, nullable=False),
         sa.Column("username", sa.String(255)),
         sa.Column("email", sa.String(255)),
-        sa.Column("password", sa.String(max_string_length)),
+        sa.Column("password", sa.String(255)),
         sa.Column("active", sa.Boolean),
         sa.Column("confirmed_at", datetime_type, nullable=True),
         sa.PrimaryKeyConstraint("id"),
@@ -44,7 +44,7 @@ def upgrade():
         "role",
         sa.Column("id", sa.Integer, nullable=False),
         sa.Column("name", sa.String(80)),
-        sa.Column("description", sa.String(max_string_length), nullable=True),
+        sa.Column("description", sa.String(255), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
