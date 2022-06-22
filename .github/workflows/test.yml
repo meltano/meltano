@@ -28,57 +28,6 @@ jobs:
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
-    services:
-      # Running a Postgres service even when it's not needed
-      # (in tests using SQLite as backend) is wasteful but currently
-      # there doesn't seem to be any way around that:
-      # https://github.community/t/conditional-services-in-a-job/135301
-      postgres:
-        # Docker Hub image
-        image: postgres:11
-        # Provide the password for postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      mssql:
-        # SQL Server image
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        # Provide the password for mssql
-        env:
-          SA_PASSWORD: Meltan0admin
-          ACCEPT_EULA: "Y"
-        # Set health checks to wait until mssql has started
-        options: >-
-          --health-cmd /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $$SA_PASSWORD -Q "SELECT 1" -b -o /dev/null
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 1433 on service container to the host
-          - 1433:1433
-      mysql:
-        # Mysql image
-        image: mysql:8-oracle
-        # Provide the password for mysql
-        env:
-          MYSQL_ROOT_PASSWORD: mysql
-        # Set health checks to wait until mysql has started
-        options: >-
-          --health-cmd mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 3306 on service container to the host
-          - 3306:3306
     env:
       PYTEST_MARKERS: not concurrent
 
@@ -138,6 +87,19 @@ jobs:
         --health-timeout 5s
         --health-retries 5
         mcr.microsoft.com/mssql/server:2019-latest
+
+    - name: Start MYSQL Container
+      if: always() && (matrix.backend-db == 'mysql')
+      run: >
+        docker run -d
+        -p "3306:3306"
+        -e "MYSQL_ROOT_PASSWORD=mysql"
+        --name mysql
+        --health-cmd "mysqladmin ping -h 127.0.0.1 -u root --password=mysql"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        mysql:8-oracle
 
     - name: Check running containers
       run: |
