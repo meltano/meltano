@@ -759,6 +759,7 @@ class StandalonePlugin(Canonical):
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
+            env=env or {},
             extras=extras,
         )
 
