@@ -217,15 +217,14 @@ To learn more about how Full-Table Replication works and its limitations, refer 
 
 ## Incremental replication state
 
-Most extractors (Singer taps) generate [state](https://hub.meltano.com/singer/spec#state) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time (made possible by the `--state-id` argument).
+Most extractors (Singer taps) generate [state](https://hub.meltano.com/singer/spec#state) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time (handled automatically for [`meltano run`](/reference/command-line-interface#run) and with the `--state-id` argument for `meltano elt`).
 
 Loaders (Singer targets) take in data and state messages from extractors and are responsible for forwarding the extractor state to Meltano once the associated data has been successfully persisted in the destination.
 
-Meltano stores this pipeline state in its [system database](/concepts/project#system-database), identified by the [`meltano elt`](/reference/command-line-interface#elt) run's State ID defined with the `--state-id` argument. The State ID should be a unique string identifier for the pipeline and must be present in each execution in order for incremental replication to work.
+Meltano stores this pipeline state in its [system database](/concepts/project#system-database), identified by the [`meltano run`](/reference/command-line-interface#run) State ID automatically generated based on the extractor name, loader name, and active environment name. For [`meltano run`](/reference/command-line-interface#elt) the State ID has to be created and set manually using the `--state-id` argument, make sure to use a unique string identifier for the pipeline always include it since it must be present in each execution in order for incremental replication to work.
 
-If you'd like to manually inspect a job's state for debugging purposes, or so that you can store it somewhere other than the system database and explicitly pass it along to the next invocation, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using [`meltano elt`](/reference/command-line-interface#elt)'s `--dump=state` option.
+If you'd like to manually inspect a job's state for debugging purposes, or so that you can store it somewhere other than the system database you can use the [`meltano state`](/reference/command-line-interface#state) command to do things like list all states, get state by name, set state, etc.
 
-If you know the `state_id` of the relevant job, you can also manually view and edit state using [the `meltano state` CLI command](/reference/command-line-interface#state).
 
 ### Internal State Merge Logic
 

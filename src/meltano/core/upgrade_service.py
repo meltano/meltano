@@ -1,7 +1,5 @@
-import importlib
 import logging
 import os
-import shutil
 import signal
 import subprocess
 import sys
@@ -11,17 +9,13 @@ import click
 import psutil
 
 import meltano
-import meltano.core.bundle as bundle
 from meltano.cli.utils import PluginInstallReason, install_plugins
-from meltano.core.migration_service import MigrationError, MigrationService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginType, ProjectPluginsService
 
 
 class UpgradeError(Exception):
     """Occurs when the Meltano upgrade fails"""
-
-    pass
 
 
 class AutomaticPackageUpgradeError(Exception):
@@ -114,6 +108,8 @@ class UpgradeService:
 
     def migrate_database(self):
         click.secho("Applying migrations to system database...", fg="blue")
+
+        from meltano.core.migration_service import MigrationError, MigrationService
 
         try:
             migration_service = MigrationService(self.engine)

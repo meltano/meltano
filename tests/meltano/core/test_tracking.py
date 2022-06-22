@@ -1,5 +1,4 @@
 import logging
-import os
 
 import pytest
 from snowplow_tracker import Emitter
@@ -10,8 +9,7 @@ from meltano.core.tracking import Tracker
 
 @pytest.mark.meta
 def test_tracking_disabled(project):
-    assert os.getenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS") == "False"
-    assert ProjectSettingsService(project).get("send_anonymous_usage_stats") is False
+    assert not ProjectSettingsService(project).get("snowplow.collector_endpoints")
 
 
 def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
@@ -23,10 +21,11 @@ def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
             "https://other.endpoint/path/to/collector"
         ]
     """
-    ProjectSettingsService(project).set("snowplow.collector_endpoints", endpoints)
+    with caplog.at_level(logging.INFO, logger="meltano.core.project_settings_service"):
+        ProjectSettingsService(project).set("snowplow.collector_endpoints", endpoints)
 
-    with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
-        tracker = Tracker(project)
+        with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
+            tracker = Tracker(project)
 
     assert len(caplog.records) == 2
     assert caplog.records[0].levelname == "WARNING"

@@ -5,6 +5,7 @@ import sys
 from unittest import mock
 
 import pytest
+
 from meltano.core.project import Project
 from meltano.core.venv_service import VenvService, VirtualEnv
 

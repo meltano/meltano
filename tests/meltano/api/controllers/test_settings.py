@@ -1,7 +1,8 @@
 import pytest
 from flask import url_for
+
 from meltano.api.models.security import Role, db
-from meltano.api.security import users
+from meltano.api.security.identity import users
 from meltano.core.project_settings_service import ProjectSettingsService
 
 

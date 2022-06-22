@@ -98,9 +98,4 @@ class ProjectContext(SelfDescribingJson):
             project_id = uuid.uuid4()
             self._project_uuid_source = ProjectUUIDSource.random
 
-            if self.send_anonymous_usage_stats:
-                # If we are set to track anonymous usage stats, also store the generated project_id
-                # back to the project config file so that it persists between meltano runs.
-                self.settings_service.set("project_id", str(project_id))
-
         return project_id

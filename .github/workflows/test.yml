@@ -1,4 +1,4 @@
-name: Test
+name: Tests
 
 on:
   pull_request: {}
@@ -12,13 +12,36 @@ jobs:
     strategy:
       matrix:
         include:
-        - { python-version: "3.7", os: "ubuntu-latest" }
-        - { python-version: "3.8", os: "ubuntu-latest" }
-        - { python-version: "3.9", os: "ubuntu-latest" }
+        - { python-version: "3.7", os: "ubuntu-latest", backend-db: sqlite }
+        - { python-version: "3.8", os: "ubuntu-latest", backend-db: sqlite }
+        - { python-version: "3.9", os: "ubuntu-latest", backend-db: sqlite }
+        - { python-version: "3.7", os: "ubuntu-latest", backend-db: postgresql }
+        - { python-version: "3.8", os: "ubuntu-latest", backend-db: postgresql }
+        - { python-version: "3.9", os: "ubuntu-latest", backend-db: postgresql }
       fail-fast: false
 
-    name: Pytest on py${{ matrix.python-version }} (${{ matrix.os }})
+    name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
+    services:
+      # Running a Postgres service even when it's not needed
+      # (in tests using SQLite as backend) is wasteful but currently
+      # there doesn't seem to be any way around that:
+      # https://github.community/t/conditional-services-in-a-job/135301
+      postgres:
+        # Docker Hub image
+        image: postgres:11
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
     env:
       PYTEST_MARKERS: not concurrent
 
@@ -34,7 +57,7 @@ jobs:
         poetry --version
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3.1.2
+      uses: actions/setup-python@v4.0.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
@@ -53,6 +76,16 @@ jobs:
         poetry install
 
     - name: Run pytest
+      env:
+        PYTEST_BACKEND: ${{ matrix.backend-db }}
+
+        # Postgres backend
+        POSTGRES_HOST_AUTH_METHOD: trust
+        POSTGRES_ADDRESS: localhost
+        POSTGRES_PORT: 5432
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: pytest_warehouse
       run: |
         poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS"
 
@@ -76,7 +109,7 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v3.1.2
+      uses: actions/setup-python@v4.0.0
       with:
         python-version: '3.9'
         cache: 'poetry'
