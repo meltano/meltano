@@ -82,7 +82,7 @@ jobs:
         -e "SA_PASSWORD=Meltan0admin"
         -e "ACCEPT_EULA=Y"
         --name mssql
-        --health-cmd "/opt/mssql-tools/bin/sqlcmd -U -P Meltan0admin -Q 'select 1' -b -o /dev/null"
+        --health-cmd "/opt/mssql-tools/bin/sqlcmd -U sa -P Meltan0admin -Q 'select 1' -b -o /dev/null"
         --health-interval 10s
         --health-timeout 5s
         --health-retries 5
