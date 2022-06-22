@@ -13,7 +13,7 @@
 <a href="https://github.com/meltano/meltano/actions/workflows/test.yml?query=branch%3Amain">
 <img alt="Tests" src="https://github.com/meltano/meltano/actions/workflows/test.yml/badge.svg"/>
 </a>
-<a href="https://github.com/meltano/meltano/actions/workflows/test.yml?query=branch%3Amain">
+<a href="https://codecov.io/github/meltano/meltano">
 <img alt="Codecov" src="https://img.shields.io/codecov/c/github/meltano/meltano?label=Coverage"/>
 </a>
 <a href="https://libraries.io/pypi/meltano/sourcerank">
