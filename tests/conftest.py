@@ -31,10 +31,12 @@ if PYTEST_BACKEND == "sqlite":
     pytest_plugins.append("fixtures.db.sqlite")
 elif PYTEST_BACKEND == "postgresql":
     pytest_plugins.append("fixtures.db.postgresql")
+elif PYTEST_BACKEND == "mssql":
+    pytest_plugins.append("fixtures.db.mssql")
 else:
     raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")
 
-BACKEND = ["sqlite", "postgresql"]
+BACKEND = ["sqlite", "postgresql", "mssql"]
 
 
 def pytest_runtest_setup(item):

@@ -37,7 +37,7 @@ def upgrade():
         op.alter_column(
             table_name="job",
             column_name="state",
-            type_=sa.types.String(128),
+            type_=sa.types.String,
             existing_type=sa.Enum(State, name="job_state"),
         )
 
@@ -56,5 +56,5 @@ def downgrade():
             table_name="job",
             column_name="state",
             _type=sa.Enum(State, name="job_state"),
-            existing_type=sa.types.String(128),
+            existing_type=sa.types.String,
         )

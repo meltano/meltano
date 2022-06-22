@@ -24,7 +24,7 @@ def engine_uri():
     port = os.getenv("POSTGRES_PORT", 5432)
     user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
-    database = "pytest_meltano"
+    database = os.getenv("POSTGRES_DB", "pytest_meltano")
 
     # create the database
     engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"

@@ -18,7 +18,7 @@ Session = sa.orm.sessionmaker()
 
 
 def upgrade():
-    op.add_column("embed_tokens", sa.Column("resource_type", sa.String(128)))
+    op.add_column("embed_tokens", sa.Column("resource_type", sa.String))
 
     metadata = sa.MetaData(bind=op.get_bind())
     Embed_Tokens = sa.Table("embed_tokens", metadata, autoload=True)

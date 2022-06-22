@@ -12,5 +12,5 @@ LOCK_PATH = MIGRATION_DIR.joinpath("db.lock")
 # create a version for this type for all migrations that
 # would follow.
 GUID = types.GUID
-JSONEncodedDict = types.JSONEncodedDict(length=128)
+JSONEncodedDict = types.JSONEncodedDict
 IntFlag = types.IntFlag
