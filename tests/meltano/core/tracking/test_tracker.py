@@ -267,3 +267,39 @@ class TestTracker:
         exit_event = snowplow.good()[0]["event"]
         assert exit_event["event_name"] == "exit_event"
         assert exit_event["unstruct_event"]["data"]["data"]["exit_code"] == 1
+
+    @pytest.mark.parametrize("send_anonymous_usage_stats", (True, False))
+    def test_context_with_telemetry_state_change_event(
+        self, project: Project, send_anonymous_usage_stats: bool
+    ):
+        tracker = Tracker(project)
+        tracker.send_anonymous_usage_stats = send_anonymous_usage_stats
+
+        passed = False
+
+        class MockSnowplowTracker:
+            def track_unstruct_event(self, _, contexts):
+                # Can't put asserts in here because this method is executed withing a try-except
+                # block that catches all exceptions.
+                nonlocal passed
+                if send_anonymous_usage_stats:
+                    passed = contexts is not None
+                else:
+                    passed = contexts is None
+
+        tracker.snowplow_tracker = MockSnowplowTracker()
+
+        tracker.track_telemetry_state_change_event(
+            "project_id", uuid.uuid4(), uuid.uuid4()
+        )
+        assert passed
+
+        tracker.track_telemetry_state_change_event(
+            "send_anonymous_usage_stats", True, False
+        )
+        assert passed
+
+        tracker.track_telemetry_state_change_event(
+            "send_anonymous_usage_stats", False, True
+        )
+        assert passed

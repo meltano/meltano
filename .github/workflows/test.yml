@@ -22,26 +22,6 @@ jobs:
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
-    services:
-      # Running a Postgres service even when it's not needed
-      # (in tests using SQLite as backend) is wasteful but currently
-      # there doesn't seem to be any way around that:
-      # https://github.community/t/conditional-services-in-a-job/135301
-      postgres:
-        # Docker Hub image
-        image: postgres:11
-        # Provide the password for postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
     env:
       PYTEST_MARKERS: not concurrent
 
@@ -74,6 +54,23 @@ jobs:
       run: |
         poetry env use "${{ matrix.python-version }}"
         poetry install
+
+    - name: Start Postgres Container
+      if: always() && (matrix.backend-db == 'postgresql')
+      run: >
+        docker run -d
+        -p "5432:5432"
+        -e "POSTGRES_PASSWORD=postgres"
+        --name postgres
+        --health-cmd "pg_isready -d postgres -U postgres"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        postgres:11
+
+    - name: Check running containers
+      run: |
+        docker ps -a
 
     - name: Run pytest
       env:
