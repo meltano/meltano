@@ -32,7 +32,7 @@ def upgrade():
         sa.Column("email", sa.String(128)),
         sa.Column("password", sa.String),
         sa.Column("active", sa.Boolean),
-        sa.Column("confirmed_at", sa.DateTime, nullable=True),
+        sa.Column("confirmed_at", datetime_type, nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
     )
@@ -74,7 +74,7 @@ def upgrade():
         sa.Column("provider_id", sa.String(255)),
         sa.Column("provider_user_id", sa.Integer, nullable=True),
         sa.Column("access_token", sa.String(255)),
-        sa.Column("created_at", sa.DateTime, nullable=True),
+        sa.Column("created_at", datetime_type, nullable=True),
         sa.Column("id_token", sa.String),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.PrimaryKeyConstraint("id"),
