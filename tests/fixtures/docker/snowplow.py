@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 from contextlib import contextmanager
 from typing import Any
+from urllib.request import urlopen
 
+import backoff
 import pytest
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -38,27 +38,28 @@ class SnowplowMicro:
         """
         self.collector_endpoint = collector_endpoint
         self.url = f"{collector_endpoint}/micro"
-        self.session = requests.Session()
-        self.session.mount(
-            "http://", HTTPAdapter(max_retries=Retry(connect=5, backoff_factor=0.5))
-        )
         self.all()  # Wait until a connection is established
+
+    @backoff.on_exception(backoff.expo, ConnectionError, max_tries=5)
+    def get(self, endpoint: str) -> Any:
+        with urlopen(f"{self.url}/{endpoint}") as response:
+            return json.load(response)
 
     def all(self) -> dict[str, int]:
         """Get a dict counting the number of good/bad events, and the total number of events."""
-        return self.session.get(f"{self.url}/all").json()
+        return self.get("all")
 
     def good(self) -> list[dict[str, Any]]:
         """Get a list of good events."""
-        return self.session.get(f"{self.url}/good").json()
+        return self.get("good")
 
     def bad(self) -> list[dict[str, Any]]:
         """Get a list of bad events (e.g. those which failed schema validation)."""
-        return self.session.get(f"{self.url}/bad").json()
+        return self.get("bad")
 
     def reset(self) -> None:
         """Delete all data stored by Snowplow Micro."""
-        self.session.get(f"{self.url}/reset")
+        self.get("reset")
 
 
 @pytest.fixture(scope="session")
@@ -99,25 +100,26 @@ def snowplow_optional(snowplow_session: SnowplowMicro | None) -> SnowplowMicro |
     Yields:
         A freshly reset `SnowplowMicro` instance, or `None` if it could not be created.
     """
-    snowplow_session.reset()
-
-    if isinstance(ProjectSettingsService.config_override, dict):
-        original_config_override = ProjectSettingsService.config_override.copy()
-        ProjectSettingsService.config_override.pop(
-            "send_anonymous_usage_stats", None
-        )
+    if snowplow_session is None:
+        yield None
     else:
-        original_config_override = ProjectSettingsService.config_override
+        if isinstance(ProjectSettingsService.config_override, dict):
+            original_config_override = ProjectSettingsService.config_override.copy()
+            ProjectSettingsService.config_override.pop(
+                "send_anonymous_usage_stats", None
+            )
+        else:
+            original_config_override = ProjectSettingsService.config_override
 
-    with env(
-        MELTANO_SEND_ANONYMOUS_USAGE_STATS="True",
-        MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS=f'["{snowplow_session.collector_endpoint}"]',
-    ):
-        try:
-            yield snowplow_session
-        finally:
-            ProjectSettingsService.config_override = original_config_override
-            snowplow_session.reset()
+        with env(
+            MELTANO_SEND_ANONYMOUS_USAGE_STATS="True",
+            MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS=f'["{snowplow_session.collector_endpoint}"]',
+        ):
+            try:
+                yield snowplow_session
+            finally:
+                ProjectSettingsService.config_override = original_config_override
+                snowplow_session.reset()
 
 
 @pytest.fixture()

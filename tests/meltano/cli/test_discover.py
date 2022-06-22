@@ -5,12 +5,13 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
+from meltano.core.project import Project
 
 
 class TestCliDiscover:
     def test_discover(
         self,
-        project,
+        project: Project,
         cli_runner,
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,
@@ -39,7 +40,7 @@ class TestCliDiscover:
 
     def test_discover_extractors(
         self,
-        project,
+        project: Project,
         cli_runner,
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,

@@ -36,6 +36,8 @@ ignore =
     # flake8-bandit
     # Allow subprocess module to be used
     S404
+    # Allow `urllib.open`
+    S310
     # Allow `subprocess.run(..., shell=False)`
     S603
     # pycodestyle
