@@ -8,7 +8,10 @@ Create Date: 2020-01-09 14:23:56.880364
 import sqlalchemy as sa
 from alembic import op
 
-from meltano.migrations.dialect_typing import datetime_for_dialect, get_dialect_name
+from meltano.migrations.utils.dialect_typing import (
+    datetime_for_dialect,
+    get_dialect_name,
+)
 
 # revision identifiers, used by Alembic.
 revision = "a3e2b0a4937d"
