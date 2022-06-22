@@ -1150,13 +1150,13 @@ meltano state merge dev:tap-gitlab-to-target-jsonl --from-state-id prod:tap-gitl
 
 ### copy
 
-Copy state from one job to another
+Copy state from one state ID to another
 
 #### How to use
 
 ```bash
-# Copy state from one job to another
-meltano state copy <src_job_id> <dst_job_id>
+# Copy state from one state ID to another
+meltano state copy <src_state_id> <dst_state_id>
 ```
 
 #### Examples
@@ -1168,13 +1168,13 @@ meltano state copy prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-json
 
 ### move
 
-Move state from one job to another, equivalent to a job rename
+Move state from one state ID to another, equivalent to a rename
 
 #### How to use
 
 ```bash
-# Move state from one job to another
-meltano move copy <src_job_id> <dst_job_id>
+# Move state from one ID to another
+meltano move move <src_state_id> <dst_state_id>
 ```
 
 #### Examples
