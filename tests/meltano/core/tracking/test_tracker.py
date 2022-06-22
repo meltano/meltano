@@ -257,7 +257,7 @@ class TestTracker:
         clear_telemetry_settings(project)
         assert Tracker(project).send_anonymous_usage_stats
 
-    def test_exit_event_is_fired(project: Project, snowplow: SnowplowMicro):
+    def test_exit_event_is_fired(self, project: Project, snowplow: SnowplowMicro):
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
 
         event_summary = snowplow.all()
@@ -265,5 +265,5 @@ class TestTracker:
         assert event_summary["bad"] == 0
 
         exit_event = snowplow.good()[0]["event"]
-        assert "exit_event" == exit_event["event_name"]
-        assert 1 == exit_event["unstruct_event"]["data"]["data"]["exit_code"]
+        assert exit_event["event_name"] == "exit_event"
+        assert exit_event["unstruct_event"]["data"]["data"]["exit_code"] == 1
