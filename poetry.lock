@@ -1290,7 +1290,7 @@ asn1crypto = ">=1.5.1"
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -2286,7 +2286,7 @@ infra = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "4fe6485b819d0e0179d22507eb50637484ef1c094f7057c8931efbb82ec7df85"
+content-hash = "ec06c04f8f9a273c9333a579209265d1f8528c5ec28bbe071e67ac6545e736a1"
 
 [metadata.files]
 aenum = [
