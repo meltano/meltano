@@ -5,7 +5,8 @@ import click
 import structlog
 
 from meltano.core.block.parser import BlockParser, validate_block_sets
-from meltano.core.legacy_tracking import LegacyTracker
+from meltano.core.elt_context import PluginContext
+from meltano.core.legacy_tracking import LegacyTracker, legacy_tracker
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
@@ -13,6 +14,7 @@ from meltano.core.task_sets_service import (
     JobNotFoundError,
     TaskSetsService,
 )
+from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
 
 from . import CliError, cli
 from .params import pass_project
@@ -21,10 +23,10 @@ logger = structlog.getLogger(__name__)
 
 
 def _list_single_job(
-    project: Project,
     task_sets_service: TaskSetsService,
     list_format: str,
     job_name: str,
+    ctx: click.Context,
 ) -> None:
     """List a single job.
 
@@ -34,9 +36,11 @@ def _list_single_job(
         list_format: The format to use.
         job_name: The job name to list.
     """
+    tracker: Tracker = ctx.obj["tracker"]
     try:
         task_set = task_sets_service.get(job_name)
     except JobNotFoundError:
+        tracker.track_command_event(CliEvent.failed)
         click.secho(f"Job '{job_name}' does not exist.", fg="yellow")
         return
 
@@ -46,12 +50,15 @@ def _list_single_job(
         click.echo(
             json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2)
         )
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_job("list", job_name)
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
+    legacy_tracker.track_meltano_job("list", job_name)
+    tracker.track_command_event(CliEvent.completed)
 
 
 def _list_all_jobs(
-    project: Project, task_sets_service: TaskSetsService, list_format: str
+    task_sets_service: TaskSetsService,
+    list_format: str,
+    ctx: click.Context,
 ) -> None:
     """List all jobs.
 
@@ -75,8 +82,10 @@ def _list_all_jobs(
                 indent=2,
             )
         )
-        tracker = LegacyTracker(project)
-        tracker.track_meltano_job("list")
+    tracker: Tracker = ctx.obj["tracker"]
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
+    legacy_tracker.track_meltano_job("list")
+    tracker.track_command_event(CliEvent.completed)
 
 
 @cli.group(short_help="Manage jobs.")
@@ -111,6 +120,12 @@ def job(project, ctx):
     """
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
+    tracker = Tracker(project)
+    tracker.add_contexts(CliContext("job", ctx.invoked_subcommand or None))
+    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
+    tracker.track_command_event(CliEvent.started)
+    ctx.obj["tracker"] = tracker
+    ctx.obj["legacy_tracker"] = legacy_tracker
 
 
 @job.command(name="list", short_help="List job(s).")
@@ -124,13 +139,12 @@ def job(project, ctx):
 @click.pass_context
 def list_jobs(ctx, list_format: str, job_name: str):
     """List available jobs."""
-    project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
     if job_name:
-        _list_single_job(project, task_sets_service, list_format, job_name)
+        _list_single_job(task_sets_service, list_format, job_name, ctx)
     else:
-        _list_all_jobs(project, task_sets_service, list_format)
+        _list_all_jobs(task_sets_service, list_format, ctx)
 
 
 @job.command(name="add", short_help="Add a new job with tasks.")
@@ -161,28 +175,33 @@ def add(ctx, job_name: str, raw_tasks: str):
     \tmeltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """
-    project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
+    tracker: Tracker = ctx.obj["tracker"]
+    project: Project = ctx.obj["project"]
 
     try:
         task_sets = tasks_from_yaml_str(job_name, raw_tasks)
     except InvalidTasksError as yerr:
+        tracker.track_command_event(CliEvent.aborted)
         raise CliError(yerr)
 
     try:
-        _validate_tasks(project, task_sets)
+        _validate_tasks(project, task_sets, ctx)
     except InvalidTasksError as err:
+        tracker.track_command_event(CliEvent.aborted)
         raise CliError(err)
 
     try:
         task_sets_service.add(task_sets)
     except JobAlreadyExistsError as serr:
+        tracker.track_command_event(CliEvent.failed)
         raise CliError(f"Job '{task_sets.name}' already exists.") from serr
 
     click.echo(f"Added job {task_sets.name}: {task_sets.tasks}")
 
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_job("add", job_name)
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
+    legacy_tracker.track_meltano_job("add", job_name)
+    tracker.track_command_event(CliEvent.completed)
 
 
 @job.command(name="set", short_help="Update an existing jobs tasks")
@@ -213,26 +232,30 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     \tmeltano job set NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """
+    tracker: Tracker = ctx.obj["tracker"]
     project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
     task_sets = tasks_from_yaml_str(job_name, raw_tasks)
 
     try:
-        _validate_tasks(project, task_sets)
+        _validate_tasks(project, task_sets, ctx)
     except InvalidTasksError as err:
+        tracker.track_command_event(CliEvent.aborted)
         raise CliError(err)
 
     try:
         task_sets_service.update(task_sets)
     except JobNotFoundError:
+        tracker.track_command_event(CliEvent.failed)
         click.secho(f"Job '{job_name}' does not exist.", fg="yellow")
         return
 
     click.echo(f"Updated job {task_sets.name}: {task_sets.tasks}")
 
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_job("set", job_name)
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
+    legacy_tracker.track_meltano_job("set", job_name)
+    tracker.track_command_event(CliEvent.completed)
 
 
 @job.command(name="remove", short_help="Remove a job.")
@@ -244,15 +267,16 @@ def remove(ctx, job_name: str):  # noqa: WPS442
     Usage:
         meltano job remove <job_name>
     """
-    project = ctx.obj["project"]
+    tracker: Tracker = ctx.obj["tracker"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     task_sets = task_sets_service.remove(job_name)
     click.echo(f"Removed job '{task_sets.name}'.")
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_job("remove", job_name)
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
+    legacy_tracker.track_meltano_job("remove", job_name)
+    tracker.track_command_event(CliEvent.completed)
 
 
-def _validate_tasks(project: Project, task_set: TaskSets) -> bool:
+def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) -> bool:
     """Validate the job's tasks by attempting to parse them into valid Blocks and using the Block's validation logic.
 
     Args:
@@ -266,6 +290,7 @@ def _validate_tasks(project: Project, task_set: TaskSets) -> bool:
         InvalidTasksError: If the job's tasks are invalid.
     """
     logger.debug("validating job tasks", job=task_set.name, tasks=task_set.tasks)
+    tracker: Tracker = ctx.obj["tracker"]
     for task in task_set.flat_args_per_set:
         blocks = task
         logger.debug(
@@ -277,9 +302,12 @@ def _validate_tasks(project: Project, task_set: TaskSets) -> bool:
         try:
             block_parser = BlockParser(logger, project, blocks)
             parsed_blocks = list(block_parser.find_blocks(0))
+            tracker.add_contexts(PluginsTrackingContext.from_blocks(parsed_blocks))
         except Exception as err:
+            tracker.track_command_event(CliEvent.aborted)
             raise InvalidTasksError(task_set.name, err)
         if not validate_block_sets(logger, parsed_blocks):
+            tracker.track_command_event(CliEvent.aborted)
             raise InvalidTasksError(
                 task_set.name,
                 "BlockSet validation failed.",

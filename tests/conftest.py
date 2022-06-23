@@ -10,7 +10,6 @@ from typing import Any, Mapping
 
 import pytest
 import requests
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436 (protected module)
 from requests.adapters import BaseAdapter
 
 from meltano.core.hub.client import MeltanoHubService
@@ -56,16 +55,6 @@ def concurrency():
         "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),
         "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),  # noqa: WPS432
     }
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_env():
-    monkeypatch = MonkeyPatch()
-    monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
-
-    yield
-
-    monkeypatch.undo()
 
 
 class MockAdapter(BaseAdapter):
