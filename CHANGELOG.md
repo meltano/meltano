@@ -76,6 +76,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 ### New
 
 - [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
+- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Add job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
 - [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX.
 - [#3348](https://github.com/meltano/meltano/issues/3348) Add [`env_var_strict_mode`](https://docs.meltano.com/reference/settings#ffenv_var_strict_mode) feature flag to raise an exception if unset environment variables are referenced in settings.
 - [#6060](https://github.com/meltano/meltano/pull/6060) Generate lockfiles when running `meltano add` to install new plugins (now enabled by default).
@@ -109,7 +110,6 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 ### New
 
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
-- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
