@@ -1,4 +1,6 @@
-from importlib.machinery import SourceFileLoader
+import sys
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
 from types import ModuleType
 
 import pytest
@@ -8,6 +10,25 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.superset import SupersetInvoker
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import asyncio
+
+
+def load_module_from_path(name: str, path: Path) -> ModuleType:
+    """Load a module given its name and filesystem path.
+
+    Replacement for the deprecated `imp.load_source`.
+
+    Parameters:
+        name: The name of the module as it would be in `sys.modules`.
+        path: The path of the `.py` file.
+
+    Returns:
+        The imported module.
+    """
+    spec = spec_from_file_location(name, path)
+    module = module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 class TestSuperset:
@@ -70,9 +91,7 @@ class TestSuperset:
                 assert config_path.exists()
                 assert project.plugin_dir(subject, "superset.db").exists()
 
-                loader = SourceFileLoader("superset_config", config_path)
-                config_module = ModuleType(loader.name)
-                loader.exec_module(config_module)
+                config_module = load_module_from_path("superset_config", config_path)
 
                 config_keys = dir(config_module)  # noqa: WPS421
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
@@ -98,9 +117,7 @@ class TestSuperset:
             async with invoker.prepared(session):
                 await invoker.invoke_async("--version")
 
-                loader = SourceFileLoader("superset_config", config_path)
-                config_module = ModuleType(loader.name)
-                loader.exec_module(config_module)
+                config_module = load_module_from_path("superset_config", config_path)
 
                 config_keys = dir(config_module)  # noqa: WPS421
                 # Verify default Meltano-managed settings are here
