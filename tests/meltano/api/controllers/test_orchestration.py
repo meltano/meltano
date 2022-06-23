@@ -1,10 +1,9 @@
 import json
 
-import pytest
-from asynctest import CoroutineMock, mock
 from flask import Flask, url_for
 from flask.testing import FlaskClient
 from flask.wrappers import Response
+from mock import AsyncMock, mock
 
 from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
 
@@ -141,10 +140,10 @@ class TestOrchestration:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.wait = AsyncMock(return_value=0)
         mock_invoke.returncode = 0
         payload = json.dumps({"type": "RECORD"}).encode()
-        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
+        mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
         mock_invoke_async.return_value = mock_invoke
 
@@ -172,10 +171,10 @@ class TestOrchestration:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.wait = AsyncMock(return_value=0)
         mock_invoke.returncode = 0
         payload = b"test"
-        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
+        mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
         mock_invoke_async.return_value = mock_invoke
 

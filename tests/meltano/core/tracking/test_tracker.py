@@ -5,8 +5,8 @@ import os
 import uuid
 from contextlib import contextmanager
 from typing import Any
-from unittest import mock
 
+import mock
 import pytest
 
 from meltano.core.project import Project

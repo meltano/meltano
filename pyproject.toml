@@ -70,7 +70,6 @@ infra = ["ansible"]
 repl = ["ipython"]
 
 [tool.poetry.dev-dependencies]
-asynctest = "^0.13"
 black = "^22.3.0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"

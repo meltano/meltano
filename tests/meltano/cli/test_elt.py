@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import pytest
 import structlog
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import CliError, cli
@@ -156,9 +156,9 @@ def process_mock_factory():
     def _factory(name):
         process_mock = mock.Mock()
         process_mock.name = name
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
-        process_mock.stdin.wait_closed = CoroutineMock(return_value=True)
+        process_mock.stdin.wait_closed = AsyncMock(return_value=True)
         return process_mock
 
     return _factory
@@ -168,11 +168,11 @@ def process_mock_factory():
 def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
-    tap.stdout.readline = CoroutineMock(
+    tap.stdout.readline = AsyncMock(
         side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
     )
     tap.stderr.at_eof.side_effect = (False, False, False, True)
-    tap.stderr.readline = CoroutineMock(
+    tap.stderr.readline = AsyncMock(
         side_effect=(b"Starting\n", b"Running\n", b"Done\n")
     )
     return tap
@@ -190,11 +190,11 @@ def target_process(process_mock_factory, target):
     target.wait.side_effect = wait_mock
 
     target.stdout.at_eof.side_effect = (False, False, False, True)
-    target.stdout.readline = CoroutineMock(
+    target.stdout.readline = AsyncMock(
         side_effect=(b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
     )
     target.stderr.at_eof.side_effect = (False, False, False, True)
-    target.stderr.readline = CoroutineMock(
+    target.stderr.readline = AsyncMock(
         side_effect=(b"Starting\n", b"Running\n", b"Done\n")
     )
     return target
@@ -213,7 +213,7 @@ def dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
     dbt.stdout.at_eof.side_effect = (True,)
     dbt.stderr.at_eof.side_effect = (False, False, False, True)
-    dbt.stderr.readline = CoroutineMock(
+    dbt.stderr.readline = AsyncMock(
         side_effect=(b"Starting\n", b"Running\n", b"Done\n")
     )
     return dbt
@@ -245,7 +245,7 @@ class TestCliEltScratchpadOne:
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         # exit cleanly when everything is fine
-        create_subprocess_exec = CoroutineMock(
+        create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, target_process)
         )
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
@@ -335,7 +335,7 @@ class TestCliEltScratchpadOne:
 
         job_logging_service.delete_all_logs(state_id)
 
-        create_subprocess_exec = CoroutineMock(
+        create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, target_process)
         )
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
@@ -453,7 +453,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -523,8 +523,8 @@ class TestCliEltScratchpadOne:
         # Writing to target stdin will fail because (we'll pretend) it has already died
         target_process.stdin = mock.Mock(spec=asyncio.StreamWriter)
         target_process.stdin.write.side_effect = BrokenPipeError
-        target_process.stdin.drain = CoroutineMock(side_effect=ConnectionResetError)
-        target_process.stdin.wait_closed = CoroutineMock(return_value=True)
+        target_process.stdin.drain = AsyncMock(side_effect=ConnectionResetError)
+        target_process.stdin.wait_closed = AsyncMock(return_value=True)
 
         # Have `target_process.wait` take 1s to make sure the `stdin.write`/`drain` exceptions can be raised
         async def target_wait_mock():
@@ -539,7 +539,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -605,7 +605,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -679,7 +679,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -762,7 +762,7 @@ class TestCliEltScratchpadOne:
 
         tap_process.wait.side_effect = wait_mock
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -825,7 +825,7 @@ class TestCliEltScratchpadOne:
 
         tap_process.wait.side_effect = wait_mock
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -1036,7 +1036,7 @@ class TestCliEltScratchpadTwo:
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(
                 tap_process,
                 target_process,
@@ -1123,7 +1123,7 @@ class TestCliEltScratchpadTwo:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(
                 tap_process,
                 target_process,
@@ -1205,7 +1205,7 @@ class TestCliEltScratchpadThree:
             "meltano.core.transform_add_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch.object(
-            DbtRunner, "run", new=CoroutineMock()
+            DbtRunner, "run", new=AsyncMock()
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -1245,7 +1245,7 @@ class TestCliEltScratchpadThree:
             "meltano.core.transform_add_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch.object(
-            DbtRunner, "run", new=CoroutineMock()
+            DbtRunner, "run", new=AsyncMock()
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)

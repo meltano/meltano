@@ -1,10 +1,10 @@
 import json
 import os
 from pathlib import Path
-from unittest import mock
 
+import mock
 import pytest
-from asynctest import CoroutineMock
+from mock import AsyncMock
 
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, Payload, State
@@ -75,7 +75,7 @@ class TestSingerRunner:
         def _factory(name):
             process_mock = mock.Mock()
             process_mock.name = name
-            process_mock.wait = CoroutineMock(return_value=0)
+            process_mock.wait = AsyncMock(return_value=0)
             return process_mock
 
         return _factory
@@ -83,7 +83,7 @@ class TestSingerRunner:
     @pytest.fixture()
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
-        tap.stdout.readline = CoroutineMock(return_value="{}")
+        tap.stdout.readline = AsyncMock(return_value="{}")
         return tap
 
     @pytest.fixture()
@@ -135,7 +135,7 @@ class TestSingerRunner:
         async with tap_invoker.prepared(  # noqa: WPS316
             session
         ), target_invoker.prepared(session):
-            invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+            invoke_async = AsyncMock(side_effect=(tap_process, target_process))
             with mock.patch.object(
                 PluginInvoker, "invoke_async", new=invoke_async
             ) as invoke_async:
@@ -178,7 +178,7 @@ class TestSingerRunner:
         # complicated.
         target_process.stdout = mock.MagicMock()
         target_process.stdout.at_eof.side_effect = (False, False, False, True)
-        target_process.stdout.readline = CoroutineMock(side_effect=lines)
+        target_process.stdout.readline = AsyncMock(side_effect=lines)
 
         subject.context.full_refresh = full_refresh
         subject.context.select_filter = select_filter

@@ -2,8 +2,8 @@ import json
 import logging
 import sys
 import tempfile
-from unittest import mock
 
+import mock
 import pytest
 import structlog
 from structlog.testing import LogCapture

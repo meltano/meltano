@@ -2,8 +2,8 @@ import os
 import re
 import subprocess
 import sys
-from unittest import mock
 
+import mock
 import pytest
 
 from meltano.core.project import Project

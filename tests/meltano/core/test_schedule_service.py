@@ -1,6 +1,6 @@
 from datetime import datetime
-from unittest import mock
 
+import mock
 import pytest
 
 from meltano.core.plugin import PluginType

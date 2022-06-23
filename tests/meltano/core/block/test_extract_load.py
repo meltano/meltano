@@ -1,16 +1,11 @@
 import json
 import os
-import sys
 import tempfile
 from pathlib import Path
-from unittest import mock
 
+import mock
 import pytest
-
-if sys.version_info >= (3, 8):
-    from unittest.mock import AsyncMock
-else:
-    from mock import AsyncMock
+from mock import AsyncMock
 
 from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import (

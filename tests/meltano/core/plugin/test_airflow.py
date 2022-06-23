@@ -1,7 +1,7 @@
 from configparser import ConfigParser
 
 import pytest
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.airflow import AirflowInvoker
@@ -29,9 +29,9 @@ class TestAirflow:
 
         handle_mock = mock.Mock()
         handle_mock.name = subject.name
-        handle_mock.wait = CoroutineMock(return_value=0)
+        handle_mock.wait = AsyncMock(return_value=0)
         handle_mock.returncode = 0
-        handle_mock.communicate = CoroutineMock(return_value=(b"2.0.1", None))
+        handle_mock.communicate = AsyncMock(return_value=(b"2.0.1", None))
         handle_mock.stdout.at_eof.side_effect = (False, True)
 
         original_exec = asyncio.create_subprocess_exec

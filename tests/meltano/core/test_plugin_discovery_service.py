@@ -1,7 +1,7 @@
 import json
 from contextlib import contextmanager
-from unittest import mock
 
+import mock
 import pytest
 import requests
 import requests_mock

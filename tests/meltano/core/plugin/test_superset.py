@@ -1,7 +1,7 @@
 import imp
 
 import pytest
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.superset import SupersetInvoker
@@ -24,7 +24,7 @@ class TestSuperset:
 
         handle_mock = mock.Mock()
         handle_mock.name = subject.name
-        handle_mock.wait = CoroutineMock(return_value=0)
+        handle_mock.wait = AsyncMock(return_value=0)
         handle_mock.returncode = 0
 
         original_exec = asyncio.create_subprocess_exec
