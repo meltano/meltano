@@ -460,12 +460,11 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
 
     # This was added to assist api_worker threads
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
     except RuntimeError:
         logging.debug("../configuration/test no asyncio event loop detected")
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
 
     success = loop.run_until_complete(test_extractor())
     return jsonify({"is_success": success}), 200

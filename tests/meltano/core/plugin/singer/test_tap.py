@@ -712,9 +712,7 @@ class TestSingerTap:
             False,
             True,
         )  # first check needs to be false so loop starts read, after 1 line, we'll return true
-        process_mock.stdout.readline = AsyncMock(
-            return_value=b'{"discovered": true}\n'
-        )
+        process_mock.stdout.readline = AsyncMock(return_value=b'{"discovered": true}\n')
 
         invoke_async = AsyncMock(return_value=process_mock)
         invoker = plugin_invoker_factory(subject)
@@ -722,7 +720,7 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         await subject.run_discovery(invoker, catalog_path)
-        assert invoke_async.called_with(["--discover"])
+        assert await invoke_async.called_with(["--discover"])
 
         with catalog_path.open("r") as catalog_file:
             resp = json.load(catalog_file)

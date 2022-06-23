@@ -168,9 +168,7 @@ def process_mock_factory():
 def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
-    tap.stdout.readline = AsyncMock(
-        side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
-    )
+    tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
     tap.stderr.at_eof.side_effect = (False, False, False, True)
     tap.stderr.readline = AsyncMock(
         side_effect=(b"Starting\n", b"Running\n", b"Done\n")
@@ -245,9 +243,7 @@ class TestCliEltScratchpadOne:
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         # exit cleanly when everything is fine
-        create_subprocess_exec = AsyncMock(
-            side_effect=(tap_process, target_process)
-        )
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -335,9 +331,7 @@ class TestCliEltScratchpadOne:
 
         job_logging_service.delete_all_logs(state_id)
 
-        create_subprocess_exec = AsyncMock(
-            side_effect=(tap_process, target_process)
-        )
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(

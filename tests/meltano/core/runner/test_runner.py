@@ -143,8 +143,8 @@ class TestSingerRunner:
                 await subject.invoke(tap_invoker, target_invoker, session)
 
                 # correct bins are called
-                assert invoke_async.awaited_with(tap_invoker)
-                assert invoke_async.awaited_with(target_invoker)
+                assert await invoke_async.awaited_with(tap_invoker)
+                assert await invoke_async.awaited_with(target_invoker)
 
                 tap_process.wait.assert_awaited()
                 target_process.wait.assert_awaited()

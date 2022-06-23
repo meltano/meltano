@@ -252,7 +252,9 @@ class PluginInstallService:
         states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
         for state in states:
             self.status_cb(state)
-        states.extend(asyncio.run(self.install_plugins_async(new_plugins, reason=reason)))
+        states.extend(
+            asyncio.run(self.install_plugins_async(new_plugins, reason=reason))
+        )
         return states
 
     async def install_plugins_async(

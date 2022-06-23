@@ -1,8 +1,10 @@
 import logging
+import warnings
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from sqlalchemy import MetaData, create_engine
+from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
 
 
@@ -47,7 +49,12 @@ def connection(engine_sessionmaker):
     try:
         yield connection
     finally:
-        transaction.rollback()
+        with warnings.catch_warnings():
+            # Ignore warnings about rolling back the same transaction twice
+            warnings.filterwarnings(
+                "ignore", "transaction already deassociated from connection", SAWarning
+            )
+            transaction.rollback()
         connection.close()
 
 

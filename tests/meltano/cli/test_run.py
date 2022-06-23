@@ -74,9 +74,7 @@ def process_mock_factory():
 def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
-    tap.stdout.readline = AsyncMock(
-        side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
-    )
+    tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
     tap.stderr.at_eof.side_effect = (False, False, False, True)
     tap.stderr.readline = AsyncMock(
         side_effect=(b"tap starting\n", b"tap running\n", b"tap done\n")
@@ -219,9 +217,7 @@ class TestCliRunScratchpadOne:
         args = ["run", tap.name]
 
         # exit cleanly when everything is fine
-        create_subprocess_exec = AsyncMock(
-            side_effect=(tap_process, target_process)
-        )
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
         # check that the various ELB validation checks actually run and fail as expected
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
@@ -540,9 +536,7 @@ class TestCliRunScratchpadOne:
             b"dbt failure\n",
         )
 
-        invoke_async = AsyncMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -623,9 +617,7 @@ class TestCliRunScratchpadOne:
             b"tap failure\n",
         )
 
-        invoke_async = AsyncMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -732,9 +724,7 @@ class TestCliRunScratchpadOne:
             b"target failure\n",
         )
 
-        invoke_async = AsyncMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -821,9 +811,7 @@ class TestCliRunScratchpadOne:
             b"target failure\n",
         )
 
-        invoke_async = AsyncMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -918,9 +906,7 @@ class TestCliRunScratchpadOne:
             b"target failure\n",
         )
 
-        invoke_async = AsyncMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
