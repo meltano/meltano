@@ -87,6 +87,11 @@ jobs:
         --health-timeout 5s
         --health-retries 5
         mcr.microsoft.com/mssql/server:2019-latest
+      
+    - name: Install MSSQL Driver
+      if: always() && (matrix.backend-db == 'mssql')
+      run: |
+        pip install 'pyodbc==4.0.*'
 
     - name: Start MYSQL Container
       if: always() && (matrix.backend-db == 'mysql')
@@ -100,6 +105,11 @@ jobs:
         --health-timeout 5s
         --health-retries 5
         mysql:8-oracle
+      
+    - name: Install MYSQL Driver
+      if: always() && (matrix.backend-db == 'mysql')
+      run: |
+        pip install 'pymysql==1.0.*'
 
     - name: Check running containers
       run: |
