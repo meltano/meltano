@@ -1,4 +1,5 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
+
 import asyncio
 import functools
 import logging
@@ -13,7 +14,7 @@ from .error import AsyncSubprocessError, PluginInstallError, PluginInstallWarnin
 from .plugin import PluginType
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
-from .utils import noop, run_async
+from .utils import noop
 from .venv_service import VenvService
 
 logger = logging.getLogger(__name__)
@@ -182,7 +183,7 @@ class PluginInstallService:
     ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
-        Trying to install multiple plugins into the same venv via `run_async` will fail
+        Trying to install multiple plugins into the same venv via `asyncio.run` will fail
         due to a race condition between the duplicate installs. This is particularly
         problematic if `clean` is set as one async `clean` operation causes the other
         install to fail.
@@ -251,7 +252,7 @@ class PluginInstallService:
         states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
         for state in states:
             self.status_cb(state)
-        states.extend(run_async(self.install_plugins_async(new_plugins, reason=reason)))
+        states.extend(asyncio.run(self.install_plugins_async(new_plugins, reason=reason)))
         return states
 
     async def install_plugins_async(
@@ -291,7 +292,7 @@ class PluginInstallService:
         Returns:
             PluginInstallState state instance.
         """
-        return run_async(
+        return asyncio.run(
             self.install_plugin_async(
                 plugin,
                 reason=reason,
