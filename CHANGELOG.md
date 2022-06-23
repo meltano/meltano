@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
+
 ### Breaks
 
 
