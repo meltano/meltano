@@ -68,13 +68,71 @@ export <PLUGIN_NAME>_<SETTING_NAME>=<value>
 export TAP_GITLAB_API_URL=https://gitlab.example.com
 ```
 
-Plugins can also specify alternative variables (aliases) for their settings, to match existing usage or variables expected by plugin executables. You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin along with their variables, in order of precedence.
+Plugins can also specify alternative variables ([aliases](#aliases) for their settings, to match existing usage or variables expected by plugin executables. You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin along with their variables, in order of precedence.
 
 Since environment variable values are always strings, Meltano will cast values to the appropriate type before passing them on to the plugin.
 
 To verify that any environment variables you've set will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 To learn how to use environment variables to specify pipeline-specific configuration, refer to the [Data Integration (EL) guide](/guide/integration#pipeline-specific-configuration).
+
+#### aliases
+
+Aliases allow for configuration values to be set via one of multiple keys.
+Environment variable aliases are listed next to the canonical names for the variable in the output of the [`meltano config <plugin> list`](/reference/command-line-interface#config) command.
+They can be defined via the `aliases` key in a custom plugin's `settings` configuration.
+For example, the following defines a `my_custom_username` setting with aliases `custom_tap_username` and `username`:
+
+```yaml
+# meltano.yml
+...
+plugins:
+  extractors:
+  - name: my-custom-tap
+    namespace: my_custom_tap
+    pip_url: git+https://github.com/my-organization/my-custom-tap.git
+    executable: my-custom-tap
+    capabilities:
+    - discover
+    - catalog
+    settings:
+    - name: password
+      kind: password
+    - name: my_custom_tap_username
+      aliases: [custom_tap_username, username]
+```
+
+Within a given configuration layer, a setting can be set via only a single name, whether that name is its canonical name or one of its aliases.
+So given the custom extractor defined above, the `my_custom_tap_username` setting could be set via the `MY_CUSTOM_TAP_MY_CUSTOM_TAP_USERNAME` environment variable or either the `MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME` or `MY_CUSTOM_TAP_USERNAME` variables.
+But if more than one of these variables is set in the terminal environment, then an exception will be raised--even if all the relevant environment variables have the same value.
+
+To see what name or alias a setting's value is being derived from, you can run `meltano config <plugin-name> list`:
+
+```shell
+$ export MY_CUSTOM_TAP_USERNAME=some_username
+$ meltano config my-custom-tap list
+2022-06-22T10:00:00Z [info     ] Environment 'dev' is active
+password [env: MY_CUSTOM_TAP_PASSWORD] current value: 'some_very_secure_password' (from the MY_CUSTOM_TAP_PASSWORD variable in `.env`)
+my_custom_tap_username [env: MY_CUSTOM_TAP_MY_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_USERNAME] current value: 'some_username' (from the MY_CUSTOM_TAP_USERNAME variable in the environment)
+```
+
+If a setting's value is being set via multiple environment variables, the resulting error message will list the environment variables where it is being set:
+
+```shell
+$ export MY_CUSTOM_TAP_USERNAME=some_username
+$ export MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME=some_username
+$ meltano config my-custom-tap
+Setting value set via multiple environment variables: ['MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME', 'MY_CUSTOM_TAP_USERNAME']
+```
+
+If the values for the multiple environment variables differ, the error message will also list what the values are:
+
+```shell
+$ export MY_CUSTOM_TAP_USERNAME=some_username
+$ export MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME=some_other_username
+$ meltano config my-custom-tap
+Conflicting values for setting found in: {'MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME': 'some_other_username', 'MY_CUSTOM_TAP_USERNAME': 'some_username'}
+```
 
 ### Expansion in setting values
 
@@ -127,12 +185,14 @@ When Meltano invokes a plugin's executable as part of [`meltano elt`](/reference
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
 
 Within a [Meltano environment](/concepts/environments) environment variables can be specified using the `env` key:
+
 ```yml
 environments:
   - name: dev
     env:
       AN_ENVIRONMENT_VARIABLE: dev
 ```
+
 Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
 
 ## Multiple plugin configurations
@@ -175,18 +235,18 @@ they can [directly inherit](/guide/plugin-management#explicit-inheritance) from 
 ```yml
 plugins:
   extractors:
-  - name: tap-postgres--billing
-    inherit_from: tap-postgres
-    config:
-      host: one.postgres.example.com
-      user: billing_user
-      dbname: billing_db
-  - name: tap-postgres--events
-    inherit_from: tap-postgres
-    config:
-      host: two.postgres.example.com
-      user: events_user
-      dbname: events_db
+    - name: tap-postgres--billing
+      inherit_from: tap-postgres
+      config:
+        host: one.postgres.example.com
+        user: billing_user
+        dbname: billing_db
+    - name: tap-postgres--events
+      inherit_from: tap-postgres
+      config:
+        host: two.postgres.example.com
+        user: events_user
+        dbname: events_db
 ```
 
 To configure `tap-postgres`'s `password` setting, you would typically set the `TAP_POSTGRES_PASSWORD` [environment variable](#configuring-settings),
@@ -234,6 +294,7 @@ Plugin extras are additional configuration options specific to the type of plugi
 that are handled by Meltano instead of the plugin itself.
 
 Meltano currently knows these extras for these plugin types:
+
 - [Extractors](/concepts/plugins#extractors)
   - [`catalog`](/concepts/plugins#catalog-extra)
   - [`load_schema`](/concepts/plugins#load-schema-extra)
