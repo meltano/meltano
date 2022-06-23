@@ -27,6 +27,14 @@ from .params import pass_project
 from .utils import CliError
 
 
+def store_comparison_message(source, store):
+    """Compare SettingsValueStores and return relevant message.
+
+    Args:
+
+    """
+
+
 @cli.group(
     invoke_without_command=True, short_help="Display Meltano or plugin configuration."
 )
@@ -297,10 +305,14 @@ def set_(ctx, setting_name, value, store):
         fg="green",
     )
 
-    current_value, source = settings.get_with_source(name, session=session)
+    current_value, metadata = settings.get_with_metadata(name, session=session)
+    source = metadata["source"]
     if source != store:
+        message = f"Current value is still: {current_value!r} (from {source.label})"
+        if "env_var" in metadata:
+            message = f"Current value is still: {current_value!r} (from {metadata['env_var']} in {source.label})"
         click.secho(
-            f"Current value is still: {current_value!r} (from {source.label})",
+            message,
             fg="yellow",
         )
     tracker.track_command_event(CliEvent.completed)
