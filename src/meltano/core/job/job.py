@@ -3,11 +3,10 @@ import asyncio
 import os
 import signal
 import uuid
-from contextlib import contextmanager, suppress
+from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 
-from async_generator import asynccontextmanager
 from sqlalchemy import Column, literal, types
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict

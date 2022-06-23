@@ -5,10 +5,10 @@ import enum
 import logging
 import os
 import uuid
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Union
 
-from async_generator import asynccontextmanager
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService

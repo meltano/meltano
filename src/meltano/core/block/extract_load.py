@@ -1,10 +1,10 @@
 """Extract_load is a basic EL style BlockSet implementation."""
 import asyncio
 import logging
+from contextlib import asynccontextmanager
 from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
-from async_generator import asynccontextmanager
 from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine

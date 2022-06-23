@@ -2,11 +2,16 @@ import asyncio
 import logging
 import os
 import sys
-from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppress
+from contextlib import (
+    asynccontextmanager,
+    contextmanager,
+    redirect_stderr,
+    redirect_stdout,
+    suppress,
+)
 from typing import Optional
 
 import structlog
-from async_generator import asynccontextmanager
 
 from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from .utils import capture_subprocess_output
