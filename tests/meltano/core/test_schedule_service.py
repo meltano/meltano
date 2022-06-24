@@ -159,11 +159,12 @@ class TestScheduleService:
             schedule = add_elt("with_no_start_date", None)
             assert schedule.start_date
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Test will hold up other tests by running indefinietly",
-    )
     def test_run_elt_schedule(self, subject, session, tap, target):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3443"
+            )
+
         schedule = subject.add_elt(
             session,
             "tap-to-target",

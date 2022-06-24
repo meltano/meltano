@@ -17,11 +17,6 @@ def assert_lines(output, *lines):
         assert line in output
 
 
-# TODO Do we actually need to skip this whole class for windows?
-@pytest.mark.skipif(
-    platform.system() == "Windows",
-    reason="Windows implementation doesn't like something about the way we're redircting stdout / stderr",
-)
 class TestOutputLogger:
     @pytest.fixture
     def log(self, tmp_path):
@@ -54,6 +49,10 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_stdio_capture(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3443"
+            )
 
         stdout_out = subject.out("stdout")
         stderr_out = subject.out("stderr")
@@ -98,6 +97,11 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_out_writers(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3443"
+            )
+
         writer_out = subject.out("writer")
         line_writer_out = subject.out("lwriter")
         basic_out = subject.out("basic")
@@ -146,6 +150,11 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_set_custom_logger(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3443"
+            )
+
         logger = structlog.getLogger()
         out = subject.out("basic", logger.bind(is_test=True))
 
@@ -162,6 +171,11 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3443"
+            )
+
         logging_out = subject.out("logging")
 
         with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
@@ -181,6 +195,11 @@ class TestOutputLogger:
         )
 
     def test_logging_exception(self, log, subject, redirect_handler):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3443"
+            )
+
         logging_out = subject.out("logging")
 
         # it raises logs unhandled exceptions

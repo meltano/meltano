@@ -89,11 +89,12 @@ class TestJob:
         assert subject.payload["error"] == "This is a test."
 
     @pytest.mark.asyncio
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="This signal is not supported on Windows, tracked here https://gitlab.com/meltano/meltano/-/issues/2901",
-    )
     async def test_run_interrupted(self, session):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+            )
         subject = self.sample_job({"original_state": 1}).save(session)
 
         with pytest.raises(KeyboardInterrupt):
@@ -106,11 +107,12 @@ class TestJob:
         assert subject.payload["error"] == "The process was interrupted"
 
     @pytest.mark.asyncio
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="This signal is not supported on Windows, tracked here https://gitlab.com/meltano/meltano/-/issues/2901",
-    )
     async def test_run_terminated(self, session):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+            )
         subject = self.sample_job({"original_state": 1}).save(session)
 
         with pytest.raises(SystemExit):
