@@ -9,15 +9,16 @@ from meltano.cli import cli
 
 
 class TestCliConfig:
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_config(self, project, cli_runner, tap, project_plugins_service):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
+
+            if platform.system() == "Windows":
+                pytest.xfail(
+                    "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                )
             result = cli_runner.invoke(cli, ["config", tap.name])
             assert_cli_runner(result)
 
@@ -35,15 +36,16 @@ class TestCliConfig:
             json_config = json.loads(result.stdout)
             assert "_select" in json_config
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_config_env(self, project, cli_runner, tap, project_plugins_service):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
+
+            if platform.system() == "Windows":
+                pytest.xfail(
+                    "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                )
             result = cli_runner.invoke(cli, ["config", "--format=env", tap.name])
             assert_cli_runner(result)
 

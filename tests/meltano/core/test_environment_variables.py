@@ -178,10 +178,6 @@ _env_var_resolution_expectations = {
 
 
 class TestEnvVarResolution:
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     @pytest.mark.parametrize(
         "scenario,env_var_resolution_expectation,",
         _env_var_resolution_expectations.items(),
@@ -189,6 +185,11 @@ class TestEnvVarResolution:
     def test_env_var_resolution(
         self, scenario, env_var_resolution_expectation, cli_runner, project, monkeypatch
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
 
         with project.meltano_update() as meltanofile:
             meltanofile.update(env_var_resolution_expectation.meltanofile_updates)

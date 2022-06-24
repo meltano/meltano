@@ -147,13 +147,14 @@ class TestCliState:
                     job_src_state, job_dst_state
                 )
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_merge_from_file(
         self, mkdtemp, state_service, state_ids, payloads, cli_runner
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         tmp_path = mkdtemp()
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_pairs = []

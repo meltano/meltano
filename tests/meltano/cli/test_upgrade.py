@@ -9,11 +9,12 @@ from meltano.cli import cli
 
 
 class TestCliUpgrade:
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_upgrade(self, project, cli_runner):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         result = cli_runner.invoke(cli, ["upgrade"])
         assert_cli_runner(result)
 
@@ -40,11 +41,12 @@ class TestCliUpgrade:
 
         assert "Your Meltano project has been upgraded!" in result.output
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_upgrade_package(self, project, cli_runner):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         result = cli_runner.invoke(cli, ["upgrade", "package"])
         assert_cli_runner(result)
 
@@ -53,13 +55,14 @@ class TestCliUpgrade:
         )
         assert "run `meltano upgrade --skip-package`" not in result.output
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_upgrade_files(
         self, session, project, cli_runner, config_service, meltano_hub_service
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 

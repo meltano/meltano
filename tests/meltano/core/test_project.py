@@ -102,11 +102,13 @@ class TestProject:
         assert all(map(lambda x: x is project, projects))
 
     @pytest.mark.concurrent
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_meltano_concurrency(self, project, concurrency):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]
 
         reader = ProjectReader(project)

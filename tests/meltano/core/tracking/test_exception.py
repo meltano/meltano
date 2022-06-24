@@ -99,11 +99,13 @@ def test_simple_exception_context():
         assert key in tb_data[0]
 
 
-@pytest.mark.skipif(
-    platform.system() == "Windows",
-    reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-)
 def test_complex_exception_context():
+
+    if platform.system() == "Windows":
+        pytest.xfail(
+            "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+        )
+
     line_nums: list[int] = []
 
     def _function_to_deepen_traceback() -> None:

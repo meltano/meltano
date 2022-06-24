@@ -16,14 +16,15 @@ class TestSuperset:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     @pytest.mark.asyncio  # noqa:  WPS210
     async def test_hooks(  # noqa:  WPS210
         self, subject, project, session, plugin_invoker_factory, monkeypatch
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         run_dir = project.run_dir("superset")
         config_path = run_dir.joinpath("superset_config.py")
 

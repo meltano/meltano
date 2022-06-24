@@ -84,16 +84,18 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_invoke_command_containerized(  # noqa: WPS210
         self,
         project,
         cli_runner,
         mock_invoke_containers,
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         async def async_generator(*args, **kwargs):
             yield "Line 1"
             yield "Line 2"  # noqa: WPS354

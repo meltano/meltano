@@ -25,11 +25,13 @@ class TestVenvService:
         assert not file.exists()
 
     @pytest.mark.asyncio
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     async def test_clean_install(self, project, subject: VenvService):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         await subject.install("example", clean=True)
         venv_dir = subject.project.venvs_dir("namespace", "name")
 
@@ -79,11 +81,13 @@ class TestVenvService:
             )
 
     @pytest.mark.asyncio
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     async def test_install(self, project, subject: VenvService):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         # Make sure the venv exists already
         await subject.install("example", clean=True)
         venv_dir = subject.project.venvs_dir("namespace", "name")

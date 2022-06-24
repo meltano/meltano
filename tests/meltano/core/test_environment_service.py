@@ -54,13 +54,14 @@ class TestEnvironmentService:
         ):
             subject.remove("i-do-not-exist")
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_list_environments(
         self,
         subject: EnvironmentService,
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         new_environment = subject.add("new-environment")
         assert subject.list_environments() == [new_environment]

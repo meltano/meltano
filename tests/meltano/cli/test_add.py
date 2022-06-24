@@ -160,10 +160,6 @@ class TestCliAdd:
             "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}"
         }
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_add_files_with_updates(
         self,
         project,
@@ -171,6 +167,11 @@ class TestCliAdd:
         project_plugins_service,
         plugin_settings_service_factory,
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         # if plugin is locked, we actually wouldn't expect it to update.
         # So we must remove lockfile
         shutil.rmtree("plugins/files", ignore_errors=True)
@@ -217,13 +218,14 @@ class TestCliAdd:
         # File does not have "managed" header
         assert "This file is managed" not in file_path.read_text()
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_add_files_that_already_exists(
         self, project, cli_runner, project_plugins_service
     ):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         # dbt lockfile was created in an upstream test. Need to remove.
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
