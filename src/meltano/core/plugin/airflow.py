@@ -3,7 +3,8 @@ import configparser
 import logging
 import os
 import subprocess
-from distutils.version import StrictVersion
+
+from packaging.version import Version
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import AsyncSubprocessError
@@ -146,9 +147,7 @@ class Airflow(BasePlugin):
 
         version = stdout.decode()
         init_db_cmd = (
-            ["initdb"]
-            if StrictVersion(version) < StrictVersion("2.0.0")
-            else ["db", "init"]
+            ["initdb"] if Version(version) < Version("2.0.0") else ["db", "init"]
         )
 
         handle = await invoker.invoke_async(
