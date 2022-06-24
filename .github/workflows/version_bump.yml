@@ -47,12 +47,6 @@ jobs:
         # committer_username: 'test'
         # committer_email: 'test@test.com'
 
-    - name: Print Changelog Outputs
-      run: |
-        echo "NEW_VERSION: ${{ steps.auto-changelog.outputs.version }}"
-        echo -e "\n\n=======\n\n"
-        echo "${{ steps.auto-changelog.outputs.clean_changelog }}"
-
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
