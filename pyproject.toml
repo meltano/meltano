@@ -79,6 +79,7 @@ black = "^21.12b0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
+commitizen = "^2.27.1"
 coverage = "^4.5.4"
 freezegun = "^0.3.12"
 isort = "^5.10.1"
@@ -91,13 +92,18 @@ pytest-asyncio = "^0.10.0"
 pytest-cov = "^2.6.1"
 pyupgrade = "^2.29.1"
 requests-mock = "^1.6.0"
+wemake-python-styleguide = "^0.16.1"
 tox = "^3.24.4"
-wemake-python-styleguide = "^0.15.3"
 flake8-bandit = "==2.1.2"
 bandit = "==1.7.2"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "2.0.2"
+tag_format = "v$version"
 
 [tool.isort]
 multi_line_output = 3
