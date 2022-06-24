@@ -15,8 +15,7 @@ on:
         default: false
 
 jobs:
-  version_bump:
-
+  create_release_branch_pr:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -53,6 +52,26 @@ jobs:
     - name: Poetry install
       run: |
         poetry install
+
+    - name: Conventional Changelog Action
+      uses: TriPSs/conventional-changelog-action@v3
+      with:
+        github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+        output-file: 'CHANGELOG.md'
+        tag-prefix: 'v'
+        release-count: '0'  # preserves all release history
+        skip-on-empty: 'true'
+        skip-version-file: 'true'
+        skip-commit: 'true'
+        # Other settings options:
+        # https://github.com/marketplace/actions/conventional-changelog-action
+        # TODO: delete these extras before merging:
+#         git-message: 'chore(release): {version}'
+#         preset: 'angular'
+#         git-user-name: 'Awesome Changelog Action'
+#         git-user-email: 'awesome_changelog@github.actions.com'
+#         version-file: './my_custom_version_file.json'
+#         version-path: 'path.to.version'
 
     - name: Bump version
       run: |
