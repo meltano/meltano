@@ -2,6 +2,7 @@ import json
 
 import pytest
 from asynctest import CoroutineMock, Mock, patch
+
 from meltano.core.plugin.error import PluginNotSupportedError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_test_service import (

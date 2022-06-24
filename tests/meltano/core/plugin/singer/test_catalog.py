@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from meltano.core.plugin.singer.catalog import (
     CatalogRule,
     ListExecutor,
