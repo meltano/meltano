@@ -161,7 +161,7 @@ class TestScheduleService:
     def test_run_elt_schedule(self, subject, session, tap, target):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3443"
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
             )
 
         schedule = subject.add_elt(
