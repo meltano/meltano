@@ -12,6 +12,8 @@ types:
   - ci
   - chore
   - build
+  - break
+  - change
   - docs
   - feat
   - fix
