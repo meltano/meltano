@@ -43,7 +43,7 @@ jobs:
         github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
         release_version: ${{ github.event.inputs.version }}
         changelog_filename: CHANGELOG.md
-        config_file: .github/workflows/changelog-ci/changelog-ci.config.yml
+        config_file: .github/workflows/resources/changelog-ci.config.yml
         # committer_username: 'test'
         # committer_email: 'test@test.com'
 

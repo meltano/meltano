@@ -31,7 +31,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/constraints.txt
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -45,7 +45,7 @@ jobs:
 
     - name: Upgrade pip
       env:
-        PIP_CONSTRAINT: .github/workflows/constraints.txt
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
         pip install pip
         pip --version
@@ -102,7 +102,7 @@ jobs:
 
     - name: Install Poetry
       run: |
-        pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+        pipx install --pip-args=--constraint=.github/workflows/resources/constraints.txt poetry
         poetry --version
 
     - name: Set up Python
@@ -113,7 +113,7 @@ jobs:
 
     - name: Upgrade pip
       run: |
-        pip install --constraint=.github/workflows/constraints.txt pip
+        pip install --constraint=.github/workflows/resources/constraints.txt pip
         pip --version
 
     - name: Download coverage data
