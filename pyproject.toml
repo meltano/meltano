@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.0.3"
+version = "2.0.2"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -48,10 +48,10 @@ markdown = "^3.0.1"
 MarkupSafe = "<2.1.0"
 meltano-flask-security = "^0.1.0"
 networkx = "^2.2"
+packaging = "^21.3"
 psutil = "^5.6.3"
 psycopg2-binary = "^2.8.5"
 pyhocon = "^0.3.51"
-pyhumps = "^3.0.0"
 pypika = "^0.25.1"
 python = ">=3.7,<3.10"
 python-dotenv = "^0.14.0"
@@ -83,7 +83,6 @@ commitizen = "^2.27.1"
 coverage = "^4.5.4"
 freezegun = "^0.3.12"
 isort = "^5.10.1"
-mock = "^4.0.3"
 mypy = "^0.960"
 pre-commit = "^2.9.2"
 pylint = "^2.12.2"
@@ -96,7 +95,6 @@ wemake-python-styleguide = "^0.16.1"
 tox = "^3.24.4"
 flake8-bandit = "==2.1.2"
 bandit = "==1.7.2"
-
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
 
@@ -104,11 +102,6 @@ meltano = "meltano.cli:main"
 name = "cz_conventional_commits"
 version = "2.0.2"
 tag_format = "v$version"
-
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 88

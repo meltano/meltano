@@ -35,11 +35,13 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
 1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
     ```bash
+    #For Windows (PowerShell): New-Alias Python3 Python
     python3 -m pip install --user pipx
     python3 -m pipx ensurepath
-    #Note that the below commands are not needed in most cases
-    source ~/.bashrc
+    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables 
+    source ~/.bashrc 
     ```
+    
     <div class="notification is-info">
       <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
     </div>

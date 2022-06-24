@@ -3,19 +3,14 @@ name: Auto Assign to Project(s)
 on:
   issues:
     types: [opened]
-  pull_request_target:
-    types: [opened]
-env:
-  MY_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   assign_one_project:
-    runs-on: ubuntu-latest
     name: Assign to Product Roadmap Project
+    runs-on: ubuntu-latest
     steps:
-    - name: Assign NEW issues and NEW pull requests to Product Roadmap
-      uses: srggrs/assign-one-project-github-action@1.3.1
-      if: github.event.action == 'opened'
-      continue-on-error: true  # https://github.com/meltano/meltano/issues/6008
+    - name: Assign NEW issues to Product Roadmap
+      uses: actions/add-to-project@main
       with:
-        project: 'https://github.com/orgs/meltano/projects/4/'
+        project-url: 'https://github.com/orgs/meltano/projects/4'
+        github-token: ${{ secrets.MELTYBOT_GITHUB_PROJECT_AUTH_TOKEN }}

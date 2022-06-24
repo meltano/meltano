@@ -50,3 +50,7 @@ class TestPluginsTrackingContext:
                 assert plugin.get("pip_url_hash") == hash_sha256(dbt.formatted_pip_url)
                 assert plugin.get("parent_name_hash") == hash_sha256(dbt.parent.name)
                 assert plugin.get("command") == "test"
+
+        # verify that passing a None object results in an empty plugin context.
+        plugin_ctx = PluginsTrackingContext([(None, None)])
+        assert plugin_ctx.data.get("plugins") == [{}]
