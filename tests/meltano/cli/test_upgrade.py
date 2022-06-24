@@ -10,7 +10,6 @@ from meltano.cli import cli
 
 class TestCliUpgrade:
     def test_upgrade(self, project, cli_runner):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
@@ -42,7 +41,6 @@ class TestCliUpgrade:
         assert "Your Meltano project has been upgraded!" in result.output
 
     def test_upgrade_package(self, project, cli_runner):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
@@ -58,7 +56,6 @@ class TestCliUpgrade:
     def test_upgrade_files(
         self, session, project, cli_runner, config_service, meltano_hub_service
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

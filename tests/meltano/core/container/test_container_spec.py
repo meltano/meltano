@@ -62,7 +62,6 @@ class TestContainerService:
     @pytest.mark.asyncio
     async def test_docker_config(self, spec: ContainerSpec, payload: dict):
         """Check Docker container config from container spec."""
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

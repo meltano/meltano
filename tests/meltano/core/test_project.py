@@ -103,7 +103,6 @@ class TestProject:
 
     @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

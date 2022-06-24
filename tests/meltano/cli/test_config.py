@@ -14,7 +14,6 @@ class TestCliConfig:
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-
             if platform.system() == "Windows":
                 pytest.xfail(
                     "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
@@ -41,7 +40,6 @@ class TestCliConfig:
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
-
             if platform.system() == "Windows":
                 pytest.xfail(
                     "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

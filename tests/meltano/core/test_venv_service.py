@@ -26,7 +26,6 @@ class TestVenvService:
 
     @pytest.mark.asyncio
     async def test_clean_install(self, project, subject: VenvService):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
@@ -82,7 +81,6 @@ class TestVenvService:
 
     @pytest.mark.asyncio
     async def test_install(self, project, subject: VenvService):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

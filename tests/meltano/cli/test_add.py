@@ -167,7 +167,6 @@ class TestCliAdd:
         project_plugins_service,
         plugin_settings_service_factory,
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
@@ -221,7 +220,6 @@ class TestCliAdd:
     def test_add_files_that_already_exists(
         self, project, cli_runner, project_plugins_service
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

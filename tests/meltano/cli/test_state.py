@@ -150,7 +150,6 @@ class TestCliState:
     def test_merge_from_file(
         self, mkdtemp, state_service, state_ids, payloads, cli_runner
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

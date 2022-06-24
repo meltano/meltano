@@ -20,7 +20,6 @@ class TestSuperset:
     async def test_hooks(  # noqa:  WPS210
         self, subject, project, session, plugin_invoker_factory, monkeypatch
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

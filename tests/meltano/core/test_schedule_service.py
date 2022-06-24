@@ -87,7 +87,6 @@ class TestScheduleService:
             subject.add_schedule(all_schedules[0])
 
     def test_remove_schedule(self, subject):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
@@ -202,7 +201,6 @@ class TestScheduleService:
             )
 
     def test_run_job_schedule(self, subject, session, tap, target):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

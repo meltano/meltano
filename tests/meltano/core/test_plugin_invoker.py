@@ -72,7 +72,6 @@ class TestPluginInvoker:
     async def test_expanded_environment_env(
         self, project_with_environment, tap, session, plugin_invoker_factory
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
@@ -154,7 +153,6 @@ class TestPluginInvoker:
     async def test_expand_nonpip_command_exec_args(
         self, nonpip_plugin_invoker, session, executable_str, assert_fn
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"

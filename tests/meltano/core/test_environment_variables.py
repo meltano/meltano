@@ -185,7 +185,6 @@ class TestEnvVarResolution:
     def test_env_var_resolution(
         self, scenario, env_var_resolution_expectation, cli_runner, project, monkeypatch
     ):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
