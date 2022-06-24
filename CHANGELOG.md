@@ -11,6 +11,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 2.1.1 - (2022-06-24)
+---
+
+### Changes
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
 - [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
 - [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
@@ -18,8 +28,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
-
-### Breaks
 
 
 ## 2.1.0 - (2022-06-17)
