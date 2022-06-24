@@ -1,3 +1,27 @@
+# Version: 2.1.1
+
+
+#### Unlabeled Changes
+
+* [#6245](https://github.com/meltano/meltano/pull/6245): Update workflow to add assignment column
+* [#5967](https://github.com/meltano/meltano/pull/5967): Windows CI test added to gitlab, Windows Docs added for installation
+* [#6241](https://github.com/meltano/meltano/pull/6241): Remove old oppty assessment issue template.
+* [#6244](https://github.com/meltano/meltano/pull/6244): Permit null exit code in exit events
+* [#6254](https://github.com/meltano/meltano/pull/6254): fix: Update Assign to Project action to use GitHub supported flavor
+* [#6251](https://github.com/meltano/meltano/pull/6251): ci: Add Postgres tests to matrix
+* [#5929](https://github.com/meltano/meltano/pull/5929): ci: Test Meltano on latest Python 3.9 in GitLab CI
+* [#6259](https://github.com/meltano/meltano/pull/6259): Add badges to `README.md`
+* [#6261](https://github.com/meltano/meltano/pull/6261): Run isort & clean-up `tox.ini`
+* [#6263](https://github.com/meltano/meltano/pull/6263): docs: Fix link in coverage badge
+* [#6225](https://github.com/meltano/meltano/pull/6225): Conditionally include context with telemetry state change event
+* [#6268](https://github.com/meltano/meltano/pull/6268): ci: Use `docker run` instead of `services`
+* [#6275](https://github.com/meltano/meltano/pull/6275): Update Changelog to fix when jobs landed
+* [#6276](https://github.com/meltano/meltano/pull/6276): fix(plugins): Replace deprecated `distutils.version.StrictVersion`
+* [#6265](https://github.com/meltano/meltano/pull/6265): fix(ui): fix stale 'update' link in Meltano UI
+* [#6248](https://github.com/meltano/meltano/pull/6248): ci: add config and docs for semantic-prs
+* [#6284](https://github.com/meltano/meltano/pull/6284): ci: auto changelog when creating release branch
+
+
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
