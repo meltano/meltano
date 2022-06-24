@@ -10,6 +10,11 @@ from enum import Enum
 import sqlalchemy as sa
 from alembic import op
 
+from meltano.migrations.utils.dialect_typing import (
+    get_dialect_name,
+    max_string_length_for_dialect,
+)
+
 # revision identifiers, used by Alembic.
 revision = "13e8639c6d2b"
 down_revision = "d135f52a6f49"
@@ -30,6 +35,9 @@ class State(Enum):
 
 
 def upgrade():
+    dialect_name = get_dialect_name(op)
+    max_string_length = max_string_length_for_dialect(dialect_name)
+    
     conn = op.get_bind()
     # In sqlite, the field is already a varchar.
     # "ALTER COLUMN" statements are also not supported.
@@ -37,7 +45,7 @@ def upgrade():
         op.alter_column(
             table_name="job",
             column_name="state",
-            type_=sa.types.String,
+            type_=sa.types.String(max_string_length),
             existing_type=sa.Enum(State, name="job_state"),
         )
 

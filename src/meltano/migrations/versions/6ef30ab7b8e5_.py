@@ -22,7 +22,6 @@ depends_on = None
 
 
 def upgrade():
-    conn = op.get_bind()
     dialect_name = get_dialect_name(op)
     datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)

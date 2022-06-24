@@ -101,6 +101,12 @@ jobs:
         --health-retries 5
         mysql
         --default-authentication-plugin=mysql_native_password
+        --collation_server=utf8_general_ci 
+        --character_set_server=utf8
+        
+    - name: Wait for MYSQL Container
+      if: always() && (matrix.backend-db == 'mysql')
+      run: sleep 15
 
     - name: Check running containers
       run: |

@@ -11,6 +11,7 @@ from alembic import op
 from meltano.migrations.utils.dialect_typing import (
     datetime_for_dialect,
     get_dialect_name,
+    max_string_length_for_dialect,
 )
 
 # revision identifiers, used by Alembic.
@@ -23,12 +24,13 @@ depends_on = None
 def upgrade():
     dialect_name = get_dialect_name(op)
     datetime_type = datetime_for_dialect(dialect_name)
+    max_string_length = max_string_length_for_dialect(dialect_name)
 
     op.create_table(
         "embed_tokens",
         sa.Column("id", sa.Integer, primary_key=True),
         sa.Column("token", sa.String(64), unique=True),
-        sa.Column("resource_id", sa.String, nullable=False),
+        sa.Column("resource_id", sa.String(max_string_length), nullable=False),
         sa.Column("created_at", datetime_type),
     )
 
