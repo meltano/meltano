@@ -2,7 +2,7 @@
 
 changelog_type: pull_request  # or commit_message
 header_prefix: ""
-commit_changelog: true
+commit_changelog: false
 comment_changelog: true
 include_unlabeled_changes: true
 pull_request_title_regex: '^Release'
