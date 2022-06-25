@@ -16,8 +16,12 @@ def cli_runner(pushd):
     # this will make sure we are back at `cwd`
     # after this test is finished
     pushd(os.getcwd())
-
-    yield CliRunner(mix_stderr=False)
+    root_logger = logging.getLogger()
+    log_level = root_logger.level
+    try:
+        yield CliRunner(mix_stderr=False)
+    finally:
+        root_logger.setLevel(log_level)
 
 
 @pytest.fixture(scope="class")
