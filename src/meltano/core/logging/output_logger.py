@@ -128,9 +128,14 @@ class Out:  # noqa: WPS230
         """Redirect log entries to a temporarily added file handler."""
         logger = logging.getLogger()
         logger.addHandler(self.redirect_log_handler)
+        ignored_errors = (
+            KeyboardInterrupt,
+            asyncio.CancelledError,
+            *ignore_errors,
+        )
         try:
             yield
-        except (KeyboardInterrupt, asyncio.CancelledError, *ignore_errors):
+        except ignored_errors:
             raise
         except Exception as err:
             logger.error(str(err), exc_info=True)
