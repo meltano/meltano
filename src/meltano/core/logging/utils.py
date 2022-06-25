@@ -100,6 +100,11 @@ def default_config(log_level: str) -> dict:
                 "level": logging.INFO,
                 "propagate": False,
             },
+            "asyncio": {
+                "handlers": ["console"],
+                "level": logging.INFO,
+                "propagate": False,
+            },
         },
     }
 
