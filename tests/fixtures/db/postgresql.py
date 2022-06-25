@@ -1,5 +1,4 @@
 import contextlib
-import logging
 import os
 
 import pytest
@@ -8,9 +7,7 @@ from sqlalchemy import create_engine, text
 
 
 def recreate_database(engine, db_name):
-    """
-    Drop & Create a new database, PostgreSQL only.
-    """
+    """Drop & Create a new database, PostgreSQL only."""
     with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
         engine.execute(text(f"DROP DATABASE {db_name}"))
 

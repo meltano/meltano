@@ -23,7 +23,7 @@ def vacuum_db(engine_sessionmaker):
     try:
         yield
     finally:
-        logging.debug(f"Cleaning system database...")
+        logging.debug("Cleaning system database...")
         engine, _ = engine_sessionmaker
         close_all_sessions()
         metadata = MetaData(bind=engine)
@@ -60,10 +60,10 @@ def connection(engine_sessionmaker):
 
 @pytest.fixture()
 def session(project, engine_sessionmaker, connection):
-    """Creates a new database session for a test."""
-    _, Session = engine_sessionmaker
+    """Create a new database session for a test."""
+    _, create_session = engine_sessionmaker
 
-    session = Session(bind=connection)
+    session = create_session(bind=connection)
     try:
         yield session
     finally:

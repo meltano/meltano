@@ -41,7 +41,7 @@ def test_dir(tmp_path_factory):
     cwd = os.getcwd()
     test_dir = tmp_path_factory.mktemp("meltano_root")
 
-    try:  # noqa: WPS229
+    try:
         os.chdir(test_dir)
         yield test_dir
     finally:
