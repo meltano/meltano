@@ -1,28 +1,28 @@
 # CHANGELOG
 
-All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
-
-
-
 ## Unreleased
+
 ---
 
 ### New
 
-### Changes
+### Docs
+
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
-- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
-- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
+- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows installation instructions added
 
 ### Fixes
 
 - [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
 
+### Under the Hood
+
+- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
+
 ### Breaks
 
-
 ## 2.1.0 - (2022-06-17)
+
 ---
 
 ### New
@@ -35,6 +35,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6114](https://github.com/meltano/meltano/pull/6114) - Add meltano lock.
 
 ### Changes
+
 - [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions.
 
 ### Fixes
@@ -42,6 +43,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all <jobId> with <stateId> to fix pipeline running bug.
 
 ## 2.0.3 - (2022-06-15)
+
 ---
 
 ### Changes
@@ -49,6 +51,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6186](https://github.com/meltano/meltano/pull/6186) Improve CLI startup performance
 
 ## 2.0.2 - (2022-06-14)
+
 ---
 
 ### Fixes
@@ -64,6 +67,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6149](https://github.com/meltano/meltano/pull/6149),[#6142](https://github.com/meltano/meltano/pull/6142) Add anonymized telemetry handling for exceptions.
 
 ## 2.0.1 - (2022-06-09)
+
 ---
 
 ### Fixes
@@ -71,6 +75,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6143](https://github.com/meltano/meltano/issues/6143) Resolve issue where Meltano UI would not start.
 
 ## 2.0.0 - (2022-06-08)
+
 ---
 
 _**Meltano 2.0** is a major update with multiple new features and some breaking changes. See our [2.0 Migration Guide](https://docs.meltano.com/reference/v2-migration) for more information._
@@ -105,8 +110,8 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 - Improved [telemetry](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry) coverage across the product.
 
-
 ## 1.105.0 - (2022-05-19)
+
 ---
 
 ### New
@@ -124,7 +129,6 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 - [#3483](https://gitlab.com/meltano/meltano/-/issues/3483) Fixes a bug where pipx installed meltano can not find executable(.exe) meltano dependency packages. _Thanks **[Dan Norman](https://gitlab.com/BuzzCutNorman)**!_
 - [#3500](https://gitlab.com/meltano/meltano/-/issues/3500) Fixes bug where lock file was added but not used.
-
 
 ## 1.104.0 - (2022-05-13)
 
@@ -352,7 +356,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 - [#3132](https://gitlab.com/meltano/meltano/-/issues/3132) Bump `pyhumps` dependency to fix a bug in converting `SCREAMING_SNAKE_CASE` variables in the API.
 - [#3116](https://gitlab.com/meltano/meltano/-/issues/3116) Fix a unicode decode issue during discovery when debug logging is enabled.
-- [#2716](https://gitlab.com/meltano/meltano/-/issues/2716) Add `--help `docs for all Meltano CLI commands and options.
+- [#2716](https://gitlab.com/meltano/meltano/-/issues/2716) Add `--help`docs for all Meltano CLI commands and options.
 
 ## 1.90.1 - (2021-12-16)
 
