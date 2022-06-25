@@ -27,16 +27,16 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def __init__(
         self,
         project: Project,
-        tracking_id: str = None,
-        request_timeout: float = None,
-        context_overrides: tuple[SelfDescribingJson] = None,
+        tracking_id: str | None = None,
+        request_timeout: float | None = None,
+        context_overrides: tuple[SelfDescribingJson] | None = None,
     ):
         """Create a new Google Analytics tracker.
 
         Args:
             project: Meltano project.
-            tracking_id: Unique identifier for tracking. Defaults to None.
-            request_timeout: For GA requests. Defaults to None.
+            tracking_id: Unique identifier for tracking.
+            request_timeout: For GA requests.
             context_overrides: A list of explicit context overrides that will be set on the underlying Tracker.
         """
         self.project = project

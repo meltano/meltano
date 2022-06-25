@@ -1,4 +1,7 @@
-"""Extract_load is a basic EL style BlockSet implementation."""
+"""Basic EL style BlockSet implementation."""
+
+from __future__ import annotations
+
 import asyncio
 import logging
 from contextlib import asynccontextmanager
@@ -201,13 +204,13 @@ class ELBContextBuilder:
     def plugin_context(
         self,
         plugin: ProjectPlugin,
-        env: dict = None,
+        env: dict | None = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
         Args:
             plugin: The plugin to create the context for.
-            env: Environment override dictionary. Defaults to None.
+            env: Environment override dictionary.
 
         Returns:
             A new `PluginContext` object.
