@@ -32,7 +32,7 @@ MELTANO_WEBAPP = src/webapp
 MELTANO_API = src/meltano/api
 MELTANO_RELEASE_MARKER_FILE = ./src/meltano/core/tracking/.release_marker
 
-.PHONY: build test clean docker_images release
+.PHONY: build test clean docker_images
 
 build: ui api
 
@@ -199,14 +199,3 @@ show_lint: show_lint_python show_lint_eslint
 explain_makefile:
 	docker stop explain_makefile || echo 'booting server'
 	${DOCKER_RUN} --name explain_makefile -p 8081:8081 node ./Makefile_explain.sh
-
-# Release
-# =====================
-# Note:
-# - this code is old and may be stale.
-# - process currently runs in CI
-release:
-	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
-	yes | poetry run changelog release --$(type)
-	git add CHANGELOG.md
-	poetry run bumpversion --tag --allow-dirty --new-version `poetry run changelog current` $(type)
