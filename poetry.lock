@@ -312,25 +312,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "bump2version"
-version = "1.0.1"
-description = "Version-bump your software with a single command!"
-category = "dev"
-optional = false
-python-versions = ">=3.5"
-
-[[package]]
-name = "bumpversion"
-version = "0.6.0"
-description = "Version-bump your software with a single command!"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-bump2version = "*"
-
-[[package]]
 name = "cached-property"
 version = "1.5.2"
 description = "A decorator for caching properties in classes."
@@ -364,20 +345,6 @@ description = "Validate configuration and produce human readable error messages.
 category = "dev"
 optional = false
 python-versions = ">=3.6.1"
-
-[[package]]
-name = "changelog-cli"
-version = "0.6.2"
-description = "Command line interface for managing CHANGELOG.md files"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-click = "*"
-
-[package.extras]
-dev = ["coverage", "invoke", "mock", "prospector", "twine", "wheel"]
 
 [[package]]
 name = "chardet"
@@ -2334,7 +2301,7 @@ infra = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "e230fdd6c191329b46d14b26327ad3f58a8c6e51ef62d0926c3c3a9913b3730b"
+content-hash = "96391661515886138e0dbb2572b6e71d50583c52ecf17ce9f8e86d1a16663c6d"
 
 [metadata.files]
 aenum = [
@@ -2499,14 +2466,6 @@ black = [
 blinker = [
     {file = "blinker-1.4.tar.gz", hash = "sha256:471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d606f8b6"},
 ]
-bump2version = [
-    {file = "bump2version-1.0.1-py2.py3-none-any.whl", hash = "sha256:37f927ea17cde7ae2d7baf832f8e80ce3777624554a653006c9144f8017fe410"},
-    {file = "bump2version-1.0.1.tar.gz", hash = "sha256:762cb2bfad61f4ec8e2bdf452c7c267416f8c70dd9ecb1653fd0bbb01fa936e6"},
-]
-bumpversion = [
-    {file = "bumpversion-0.6.0-py2.py3-none-any.whl", hash = "sha256:4eb3267a38194d09f048a2179980bb4803701969bff2c85fa8f6d1ce050be15e"},
-    {file = "bumpversion-0.6.0.tar.gz", hash = "sha256:4ba55e4080d373f80177b4dabef146c07ce73c7d1377aabf9d3c3ae1f94584a6"},
-]
 cached-property = [
     {file = "cached-property-1.5.2.tar.gz", hash = "sha256:9fa5755838eecbb2d234c3aa390bd80fbd3ac6b6869109bfc1b499f7bd89a130"},
     {file = "cached_property-1.5.2-py2.py3-none-any.whl", hash = "sha256:df4f613cf7ad9a588cc381aaf4a512d26265ecebd5eb9e1ba12f1319eb85a6a0"},
@@ -2570,10 +2529,6 @@ cffi = [
 cfgv = [
     {file = "cfgv-3.3.1-py2.py3-none-any.whl", hash = "sha256:c6a0883f3917a037485059700b9e75da2464e6c27051014ad85ba6aaa5884426"},
     {file = "cfgv-3.3.1.tar.gz", hash = "sha256:f5a830efb9ce7a445376bb66ec94c638a9787422f96264c98edc6bdeed8ab736"},
-]
-changelog-cli = [
-    {file = "changelog-cli-0.6.2.tar.gz", hash = "sha256:594f5288553d8a16306f6ee2426dd473323a665b8bc40b9a56467a6844764b80"},
-    {file = "changelog_cli-0.6.2-py2.py3-none-any.whl", hash = "sha256:97627b920dbfdf4a1924d6010633e3406eec7e3f1fb25162b15af6d31b7fd238"},
 ]
 chardet = [
     {file = "chardet-4.0.0-py2.py3-none-any.whl", hash = "sha256:f864054d66fd9118f2e67044ac8981a54775ec5b67aed0441892edb553d21da5"},

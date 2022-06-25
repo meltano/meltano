@@ -65,22 +65,17 @@ jobs:
       run: |
         poetry install
 
-    - name: Bump version
+    - name: Bump version and auto-changelog
       run: |
         BUMP_TYPE="${{ steps.validate-version.outputs.bump-type }}"
-        echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
-        poetry run changelog release --$BUMP_TYPE --yes
-        echo "Adding changelog to git..."
-        git add CHANGELOG.md
-        echo "Bumping version entries..."
-        poetry run bumpversion "$BUMP_TYPE" --new-version="$NEW_VER" --allow-dirty --no-commit --no-tag
+        poetry run cz --changelog --files-only --increment=$BUMP_TYPE --yes
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v4
       id: create-pull-request
       with:
         # https://github.com/peter-evans/create-pull-request
-        commit-message: version bump (auto)
+        commit-message: version bump and changelog (auto)
         title: Release v${{ github.event.inputs.version }}
         body: |
           Bump changelog for release v${{ github.event.inputs.version }}

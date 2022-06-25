@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.0.2"
+version = "2.1.0"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -76,8 +76,6 @@ infra = ["ansible"]
 [tool.poetry.dev-dependencies]
 asynctest = "^0.12.2"
 black = "^21.12b0"
-bumpversion = "^0.6.0"
-changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
 commitizen = "^2.27.1"
 coverage = "^4.5.4"
@@ -100,13 +98,20 @@ meltano = "meltano.cli:main"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "2.0.2"
+version = "2.1.0"
 tag_format = "v$version"
 use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 88
 src_paths = ["src/", "tests/"]
 skip_glob = ["*.md", "*.vue", "*.js"]
+version_files = [
+    "pyproject.toml:version",
+    "src/meltano/__init__.py:__version__",
+    "package.json:version",
+    "src/webapp/package.json:version",
+    "docs/package.json:version"
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
