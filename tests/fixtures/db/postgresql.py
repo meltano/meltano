@@ -32,13 +32,3 @@ def engine_uri():
     recreate_database(engine, database)
 
     return f"postgresql://{user}:{password}@{host}:{port}/{database}"
-
-
-@pytest.fixture()
-def pg_stats(request, session):
-    yield
-
-    from meltano.core.job import Job
-
-    jobs = session.query(Job).all()
-    print(f"{request.node.name} created {len(jobs)} Job.")

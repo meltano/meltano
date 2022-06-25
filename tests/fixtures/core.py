@@ -435,11 +435,12 @@ def job_schedule(project, tap, target, schedule_service):
 @pytest.fixture(scope="function")
 def environment_service(project):
     service = EnvironmentService(project)
-    yield service
-
-    # Cleanup: remove any added Environments
-    for environment in service.list_environments():
-        service.remove(environment.name)
+    try:
+        yield service
+    finally:
+        # Remove any added Environments
+        for environment in service.list_environments():
+            service.remove(environment.name)
 
 
 @pytest.fixture(scope="class")
@@ -466,13 +467,13 @@ def project(test_dir, project_init_service):
     # cd into the new project root
     os.chdir(project.root)
 
-    yield project
-
-    # clean-up
-    Project.deactivate()
-    os.chdir(test_dir)
-    shutil.rmtree(project.root)
-    logging.debug(f"Cleaned project at {project.root}")
+    try:
+        yield project
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        shutil.rmtree(project.root)
+        logging.debug(f"Cleaned project at {project.root}")
 
 
 @pytest.fixture(scope="class")
@@ -489,13 +490,13 @@ def project_files(test_dir, compatible_copy_tree):
     # cd into the new project root
     os.chdir(project.root)
 
-    yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-
-    # clean-up
-    Project.deactivate()
-    os.chdir(test_dir)
-    shutil.rmtree(project.root)
-    logging.debug(f"Cleaned project at {project.root}")
+    try:
+        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        shutil.rmtree(project.root)
+        logging.debug(f"Cleaned project at {project.root}")
 
 
 @pytest.fixture(scope="class")
@@ -755,5 +756,7 @@ def project_with_environment(project: Project) -> Project:
     project.active_environment.env[
         "ENVIRONMENT_ENV_VAR"
     ] = "${MELTANO_PROJECT_ROOT}/file.txt"
-    yield project
-    project.active_environment = None
+    try:
+        yield project
+    finally:
+        project.active_environment = None

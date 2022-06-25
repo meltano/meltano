@@ -38,10 +38,10 @@ def project_files_cli(test_dir, compatible_copy_tree):
     # cd into the new project root
     os.chdir(project.root)
 
-    yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-
-    # clean-up
-    Project.deactivate()
-    os.chdir(test_dir)
-    shutil.rmtree(project.root)
-    logging.debug(f"Cleaned project at {project.root}")
+    try:
+        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        shutil.rmtree(project.root)
+        logging.debug(f"Cleaned project at {project.root}")

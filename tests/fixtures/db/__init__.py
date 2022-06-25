@@ -12,23 +12,23 @@ from sqlalchemy.orm import close_all_sessions, sessionmaker
 def engine_uri_env(engine_uri):
     monkeypatch = MonkeyPatch()
     monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
-
-    yield
-
-    monkeypatch.undo()
+    try:
+        yield
+    finally:
+        monkeypatch.undo()
 
 
 @pytest.fixture(scope="class", autouse=True)
 def vacuum_db(engine_sessionmaker):
-    yield
-
-    logging.debug(f"Cleaning system database...")
-
-    engine, _ = engine_sessionmaker
-    close_all_sessions()
-    metadata = MetaData(bind=engine)
-    metadata.reflect()
-    metadata.drop_all()
+    try:
+        yield
+    finally:
+        logging.debug(f"Cleaning system database...")
+        engine, _ = engine_sessionmaker
+        close_all_sessions()
+        metadata = MetaData(bind=engine)
+        metadata.reflect()
+        metadata.drop_all()
 
 
 @pytest.fixture(scope="class")
@@ -63,8 +63,8 @@ def session(project, engine_sessionmaker, connection):
     """Creates a new database session for a test."""
     _, Session = engine_sessionmaker
 
+    session = Session(bind=connection)
     try:
-        session = Session(bind=connection)
         yield session
     finally:
         session.close()
