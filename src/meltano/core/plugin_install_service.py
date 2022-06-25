@@ -1,5 +1,7 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 
+from __future__ import annotations
+
 import asyncio
 import functools
 import logging
@@ -7,6 +9,8 @@ import sys
 from enum import Enum
 from multiprocessing import cpu_count
 from typing import Any, Callable, Iterable, Tuple
+
+from cached_property import cached_property
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
@@ -154,28 +158,30 @@ class PluginInstallService:
         project: Project,
         plugins_service: ProjectPluginsService = None,
         status_cb: Callable[[PluginInstallState], Any] = noop,
-        parallelism=None,
-        clean=False,
+        parallelism: int | None = None,
+        clean: bool = False,
     ):
         """Initialize new PluginInstallService instance.
 
         Args:
             project: Meltano Project.
-            plugins_service: (optional) Project plugins service to use.
-            status_cb: (optional) Status call-back function.
-            parallelism: (optional) Number of parallel installation processes to use.
-            clean: (optional) Clean install flag.
+            plugins_service: Project plugins service to use.
+            status_cb: Status call-back function.
+            parallelism: Number of parallel installation processes to use.
+            clean: Clean install flag.
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.status_cb = status_cb
-
         if parallelism is None:
-            parallelism = cpu_count()
-        if parallelism < 1:
-            parallelism = sys.maxsize  # unbounded
-        self.semaphore = asyncio.Semaphore(parallelism)
+            self.parallelism = cpu_count()
+        elif parallelism < 1:
+            self.parallelism = sys.maxsize
         self.clean = clean
+
+    @cached_property
+    def semaphore(self):
+        return asyncio.Semaphore(self.parallelism)
 
     @staticmethod
     def remove_duplicates(
@@ -409,7 +415,7 @@ class PipPluginInstaller:
         Args:
             project: Meltano Project.
             plugin: ProjectPlugin to install.
-            venv_service: (optional) VenvService instance to use when installing.
+            venv_service: VenvService instance to use when installing.
         """
         self.plugin = plugin
         self.venv_service = venv_service or VenvService(

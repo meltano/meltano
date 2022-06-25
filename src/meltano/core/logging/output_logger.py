@@ -184,8 +184,6 @@ class Out:  # noqa: WPS230
         read_protocol = asyncio.StreamReaderProtocol(reader)
 
         loop = asyncio.get_event_loop()
-        read_transport, _ = await loop.connect_read_pipe(
-            lambda: read_protocol, os.fdopen(read_fd)
-        )
+        await loop.connect_read_pipe(lambda: read_protocol, os.fdopen(read_fd))
 
         await capture_subprocess_output(reader, self)

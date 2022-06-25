@@ -56,8 +56,7 @@ def fetch_urls(
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
-        # Fix for when asyncio runs inside a sub-thread so there is no
-        #  event_loop available
+        # Fix for when asyncio runs inside a sub-thread so there is no event loop available
         asyncio.set_event_loop(asyncio.new_event_loop())
         loop = asyncio.get_event_loop()
 

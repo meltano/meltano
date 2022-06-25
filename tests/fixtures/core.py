@@ -455,6 +455,10 @@ def job_logging_service(project):
 
 @pytest.fixture(scope="class")
 def project(test_dir, project_init_service):
+    # Clean up whatever might be left behind. Nothing should be left, but some fixtures
+    # occasionally do not clean up after themselves properly.
+    shutil.rmtree(test_dir / PROJECT_NAME, ignore_errors=True)
+
     project = project_init_service.init(add_discovery=True)
     logging.debug(f"Created new project at {project.root}")
 

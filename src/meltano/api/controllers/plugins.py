@@ -157,12 +157,10 @@ def install_batch():  # noqa: WPS210
 
     # This was added to assist api_worker threads
     try:
-        loop = asyncio.get_event_loop()
+        asyncio.get_event_loop()
     except RuntimeError:
         logging.debug("/plugins/install/batch no asyncio event loop detected")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_results = install_service.install_plugins(
@@ -195,12 +193,10 @@ def install():
 
     # This was added to assist api_worker threads
     try:
-        loop = asyncio.get_event_loop()
+        asyncio.get_event_loop()
     except RuntimeError:
         logging.debug("/plugins/install no asyncio event loop detected")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_service.install_plugin(plugin, reason=PluginInstallReason.ADD)

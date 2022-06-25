@@ -35,7 +35,6 @@ def app(create_app):
         root_logger.setLevel(log_level)
 
 
-
 @pytest.fixture(scope="class")
 def create_app(request, project, vacuum_db):
     def _factory(**kwargs):
