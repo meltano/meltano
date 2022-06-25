@@ -11,11 +11,9 @@ from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 
 
-@pytest.fixture()
+@pytest.fixture
 def cli_runner(pushd):
-    # this will make sure we are back at `cwd`
-    # after this test is finished
-    pushd(os.getcwd())
+    pushd(os.getcwd())  # Ensure we return to the CWD after the test
     root_logger = logging.getLogger()
     log_level = root_logger.level
     try:

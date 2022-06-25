@@ -47,17 +47,15 @@ class TestSingerRunner:
             .context()
         )
 
-    @pytest.fixture()
-    def tap_config_dir(self, mkdtemp, elt_context):
-        tap_config_dir = mkdtemp()
-        create_plugin_files(tap_config_dir, elt_context.extractor.plugin)
-        return tap_config_dir
+    @pytest.fixture
+    def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
+        create_plugin_files(tmp_path, elt_context.extractor.plugin)
+        return tmp_path
 
-    @pytest.fixture()
-    def target_config_dir(self, mkdtemp, elt_context):
-        target_config_dir = mkdtemp()
-        create_plugin_files(target_config_dir, elt_context.loader.plugin)
-        return target_config_dir
+    @pytest.fixture
+    def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
+        create_plugin_files(tmp_path, elt_context.loader.plugin)
+        return tmp_path
 
     @pytest.fixture()
     def subject(self, session, elt_context):

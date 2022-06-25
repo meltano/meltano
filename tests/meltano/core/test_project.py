@@ -50,7 +50,7 @@ class ProjectReader(IndefiniteThread):
 
 class TestProject:
     @pytest.mark.usefixtures("deactivate_project")
-    def test_find(self, project, mkdtemp, monkeypatch):
+    def test_find(self, project, tmp_path, monkeypatch):
         # defaults to the cwd
         found = Project.find(activate=False)
         assert found == project
@@ -75,11 +75,7 @@ class TestProject:
 
         # and it fails if there isn't a meltano.yml
         with pytest.raises(ProjectNotFound):
-            try:
-                empty_dir = mkdtemp("meltano_empty_project")
-                Project.find(empty_dir)
-            finally:
-                shutil.rmtree(empty_dir)
+            Project.find(tmp_path)
 
     def test_activate(self, project):
         Project.deactivate()

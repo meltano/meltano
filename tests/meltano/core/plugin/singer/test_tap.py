@@ -21,7 +21,7 @@ class TestSingerTap:
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.mark.asyncio
-    async def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
+    async def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]

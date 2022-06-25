@@ -186,23 +186,20 @@ class TestExtractLoadBlocks:
     def log(self, tmp_path):
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
-    @pytest.fixture()
-    def tap_config_dir(self, mkdtemp, tap):
-        tap_config_dir = mkdtemp()
-        create_plugin_files(tap_config_dir, tap)
-        return tap_config_dir
+    @pytest.fixture
+    def tap_config_dir(self, tmp_path: Path, tap) -> Path:
+        create_plugin_files(tmp_path, tap)
+        return tmp_path
 
-    @pytest.fixture()
-    def mapper_config_dir(self, mkdtemp, tap):
-        mapper_config_dir = mkdtemp()
-        create_plugin_files(mapper_config_dir, tap)
-        return mapper_config_dir
+    @pytest.fixture
+    def mapper_config_dir(self, tmp_path: Path, tap) -> Path:
+        create_plugin_files(tmp_path, tap)
+        return tmp_path
 
-    @pytest.fixture()
-    def target_config_dir(self, mkdtemp, target):
-        target_config_dir = mkdtemp()
-        create_plugin_files(target_config_dir, target)
-        return target_config_dir
+    @pytest.fixture
+    def target_config_dir(self, tmp_path: Path, target) -> Path:
+        create_plugin_files(tmp_path, target)
+        return tmp_path
 
     @pytest.fixture
     def subject(self, session, elb_context):
@@ -215,7 +212,7 @@ class TestExtractLoadBlocks:
 
         return SingerRunner(elb_context)
 
-    @pytest.fixture()
+    @pytest.fixture
     def process_mock_factory(self):
         def _factory(name):
             process_mock = mock.Mock()
@@ -225,21 +222,21 @@ class TestExtractLoadBlocks:
 
         return _factory
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
         tap.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
         tap.wait = AsyncMock(return_value=0)
         return tap
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapper_process(self, process_mock_factory, mapper):
         mapper = process_mock_factory(mapper)
         mapper.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
         mapper.wait = AsyncMock(return_value=0)
         return mapper
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
         target.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
