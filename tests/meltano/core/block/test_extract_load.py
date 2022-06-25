@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import tempfile
 from pathlib import Path
@@ -183,7 +184,17 @@ class TestELBContextBuilder:
 
 class TestExtractLoadBlocks:
     @pytest.fixture
-    def log(self, tmp_path):
+    def log_level_debug(self):
+        root_logger = logging.getLogger()
+        log_level = root_logger.level
+        try:
+            root_logger.setLevel(logging.DEBUG)
+            yield
+        finally:
+            root_logger.setLevel(log_level)
+
+    @pytest.fixture
+    def log(self, tmp_path: Path):
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
     @pytest.fixture
@@ -260,6 +271,7 @@ class TestExtractLoadBlocks:
         plugin_invoker_factory,
         elb_context,
         log,
+        log_level_debug,
     ):
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
