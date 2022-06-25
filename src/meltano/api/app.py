@@ -12,7 +12,6 @@ from meltano.api import config as api_config
 from meltano.api.headers import *
 from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.db import project_engine
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.utils import FORMAT, setup_logging
 from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
