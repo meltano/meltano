@@ -1,12 +1,55 @@
-![](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
-=========================================================================================================================================================================================
 
-Meltano
--------
+<h1 align="center">Meltano</h1>
+<h3 align="center">Your Open Source DataOps Infrastructure</h3>
+
+---
+
+![Meltano Logo](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
+
+<div align="center">
+<a href="https://docs.meltano.com/">
+<img alt="Docs" src="https://img.shields.io/website?down_color=red&down_message=offline&label=Docs&up_color=blue&up_message=online&url=https%3A%2F%2Fdocs.meltano.com%2F"/>
+</a>
+<a href="https://github.com/meltano/meltano/actions/workflows/test.yml?query=branch%3Amain">
+<img alt="Tests" src="https://github.com/meltano/meltano/actions/workflows/test.yml/badge.svg"/>
+</a>
+<a href="https://codecov.io/github/meltano/meltano">
+<img alt="Codecov" src="https://codecov.io/gh/meltano/meltano/branch/main/graph/badge.svg"/>
+</a>
+<a href="https://libraries.io/pypi/meltano/sourcerank">
+<img alt="Libraries.io SourceRank" src="https://img.shields.io/librariesio/sourcerank/pypi/meltano?label=SourceRank"/>
+</a>
+<a href="https://libraries.io/pypi/meltano">
+<img alt="Libraries.io dependency status for latest release" src="https://img.shields.io/librariesio/release/pypi/meltano?label=Dependencies"/>
+</a>
+</div>
+
+<div align="center">
+<a href="https://github.com/meltano/meltano/graphs/contributors">
+<img alt="GitHub contributors" src="https://img.shields.io/github/contributors/meltano/meltano?label=Contributors"/>
+</a>
+<a href="https://github.com/meltano/meltano/blob/main/LICENSE">
+<img alt="GitHub" src="https://img.shields.io/github/license/meltano/meltano?color=blue&label=License"/>
+</a>
+<a href="https://pypi.org/project/meltano/">
+<img alt="Meltano Python Package Version" src="https://img.shields.io/pypi/v/meltano?label=Version"/>
+</a>
+<a href="https://pypi.org/project/meltano/">
+<img alt="Supported Python Versions" src="https://img.shields.io/pypi/pyversions/meltano?label=Python"/>
+</a>
+<a href="https://pypi.org/project/meltano/">
+<img alt="Monthly PyPI Downloads" src="https://img.shields.io/pypi/dm/meltano?label=PyPI%20Downloads"/>
+</a>
+<a href="https://hub.docker.com/r/meltano/meltano">
+<img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/meltano/meltano?label=Docker%20Pulls"/>
+</a>
+</div>
+
+---
 
 Welcome to your Open Source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
 
-![](https://lh3.googleusercontent.com/1uzR_ETj6Kj1eleSjkbCpi5ZfqxFDm4hd6jzZ7JVxi2ajI9gPyjEyg6bspvha7O8dYpO3s9Y-CN6hfwiY8rvsmh9rsZ4oACh-FhvwfRBJS8oCsE76Twkf_UCHWLSmxEdvSaYyDTIqKVrdpsvsg)
+![Meltano as a computer chip](https://lh3.googleusercontent.com/1uzR_ETj6Kj1eleSjkbCpi5ZfqxFDm4hd6jzZ7JVxi2ajI9gPyjEyg6bspvha7O8dYpO3s9Y-CN6hfwiY8rvsmh9rsZ4oACh-FhvwfRBJS8oCsE76Twkf_UCHWLSmxEdvSaYyDTIqKVrdpsvsg)
 
 Integrations
 ------------

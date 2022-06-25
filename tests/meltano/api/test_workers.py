@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+
 from meltano.api.workers import UIAvailableWorker
 
 

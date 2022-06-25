@@ -11,8 +11,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
+- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
+- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
 
 ### Fixes
+
+- [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
 
 ### Breaks
 
@@ -73,6 +78,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 ### New
 
 - [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
+- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Add job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
 - [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX.
 - [#3348](https://github.com/meltano/meltano/issues/3348) Add [`env_var_strict_mode`](https://docs.meltano.com/reference/settings#ffenv_var_strict_mode) feature flag to raise an exception if unset environment variables are referenced in settings.
 - [#6060](https://github.com/meltano/meltano/pull/6060) Generate lockfiles when running `meltano add` to install new plugins (now enabled by default).
@@ -88,7 +94,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for the legacy "Dashboards" and "Explore" UX in Meltano UI.
 - [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for legacy `model` and `dashboard` plugin types.
 - [#3048](https://github.com/meltano/meltano/issues/3048) Drop support for `env_aliases` feature and remove its references in `discovery.yml`.
-- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag. 
+- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag.
 
 ### Fixes
 
@@ -106,7 +112,6 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 ### New
 
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
-- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
