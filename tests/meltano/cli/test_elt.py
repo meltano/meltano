@@ -251,7 +251,7 @@ class TestWindowsELT:
 
 @pytest.mark.skipif(
     platform.system() == "Windows",
-    reason="ELT doesn't work for Windows, don't run these tests on Windows as they fail in horrible ways.",
+    reason="ELT is not supported on Windows",
 )
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
@@ -1048,7 +1048,7 @@ class TestCliEltScratchpadOne:
 
 @pytest.mark.skipif(
     platform.system() == "Windows",
-    reason="ELT doesn't work for Windows, don't run these tests on Windows as they fail in horrible ways.",
+    reason="ELT is not supported on Windows",
 )
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
@@ -1219,7 +1219,7 @@ class TestCliEltScratchpadTwo:
 
 @pytest.mark.skipif(
     platform.system() == "Windows",
-    reason="ELT doesn't work for Windows, don't run these tests on Windows as they fail in horrible ways.",
+    reason="ELT is not supported on Windows",
 )
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
