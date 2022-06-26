@@ -169,6 +169,10 @@ class TestOutputLogger:
             },
         )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     @pytest.mark.asyncio
     async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
         if platform.system() == "Windows":
@@ -194,6 +198,10 @@ class TestOutputLogger:
             {"event": "error"},
         )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     def test_logging_exception(self, log, subject, redirect_handler):
         if platform.system() == "Windows":
             pytest.xfail(

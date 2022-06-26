@@ -71,6 +71,10 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     def test_resolve_from_subdir(self, project_files, cd_temp_subdir):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -84,6 +88,10 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     def test_resolve_from_any_dir(self, project_files, cd_temp_dir):
         if platform.system() == "Windows":
             pytest.xfail(
