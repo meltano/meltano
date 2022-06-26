@@ -38,8 +38,6 @@ from meltano.core.state_service import StateService
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
-PROJECT_NAME = "a_meltano_project"
-
 
 @pytest.fixture(scope="class")
 def discovery():  # noqa: WPS213
