@@ -18,23 +18,25 @@ In the section below, we will install Meltano locally on your system, so that yo
 
 ## Unix-like
 
-For MacOS (Including the M1), Linux Distributions, and more! 
+For MacOS (Including the M1), Linux Distributions, and more!
 
 ### Requirements
 
 Before you install Meltano, make sure you have the following requirements installed and up to date.
 
-#### Python 3.7, 3.8 or 3.9
+#### Python
 
 <div class="notification is-info">
   <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
 </div>
 
-Use the following command to check that you have the correct Python version installed:
+Use the following command to check that you have a supported Python version installed:
 
 ```bash
 python --version
 ```
+
+For development off of Meltano's main Git branch, you can find out which versions of Python are supported in [`pyproject.toml`](https://github.com/meltano/meltano/blob/main/pyproject.toml) in the `tool.poetry.dependencies` section. Find the line that begins with `python = `. As an example, if it is `python = ">=3.7,<3.11"`, then you can use Python version 3.7, 3.8, 3.9, or 3.10.
 
 #### Install pipx
 
@@ -77,17 +79,17 @@ Now that you've installed Meltano and its requirements, you can continue setting
 
 ## Windows
 
-Please note that Windows is not fully supported yet so some features like the UI, and the ELT command may not work yet. 
-See the [Meltano on Windows](https://gitlab.com/groups/meltano/-/epics/115) Epic for more information. 
+Please note that Windows is not fully supported yet so some features like the UI, and the ELT command may not work yet.
+See the [Meltano on Windows](https://gitlab.com/groups/meltano/-/epics/115) Epic for more information.
 
-If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). 
+If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about).
 You may also try [installing Meltano on Docker](#installing-on-docker).
 
 ### Requirements
 
 Before you install Meltano, make sure you have the following requirements installed and up to date.
 
-#### Python 3.7, 3.8 or 3.9
+#### Python
 
 <div class="notification is-info">
   <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
