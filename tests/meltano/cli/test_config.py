@@ -47,7 +47,7 @@ class TestCliConfig:
             result = cli_runner.invoke(cli, ["config", "--format=env", tap.name])
             assert_cli_runner(result)
 
-            assert 'TAP_MOCK_TEST="mock"' in result.stdout
+            assert "TAP_MOCK_TEST='mock'" in result.stdout
 
     def test_config_meltano(
         self, project, cli_runner, engine_uri, project_plugins_service
