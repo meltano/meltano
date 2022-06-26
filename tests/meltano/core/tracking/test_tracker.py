@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import uuid
 from contextlib import contextmanager
 from typing import Any
@@ -85,6 +86,10 @@ class TestTracker:
             != analytics_json_post["send_anonymous_usage_stats"]
         )
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_restore_project_id_from_analytics_json(self, project: Project):
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
@@ -103,6 +108,10 @@ class TestTracker:
 
         assert original_project_id == restored_project_id
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
         clear_telemetry_settings(project)
         setting_service = ProjectSettingsService(project)
@@ -142,6 +151,10 @@ class TestTracker:
             Tracker(project)
             check_analytics_json(project)
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     @pytest.mark.parametrize(
         "analytics_json_content",
         [
@@ -169,6 +182,10 @@ class TestTracker:
 
             check_analytics_json(project)
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_restore_project_id_and_telemetry_state_change(self, project: Project):
         """
         Test that `project_id` is restored from `analytics.json`, and a telemetry state change
@@ -205,6 +222,10 @@ class TestTracker:
             finally:
                 ProjectSettingsService.config_override = original_config_override
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     @pytest.mark.parametrize(
         "snowplow_endpoints,send_stats,expected",
         (
@@ -226,6 +247,10 @@ class TestTracker:
         setting_service.set("send_anonymous_usage_stats", send_stats)
         assert Tracker(project).can_track() is expected
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_send_anonymous_usage_stats(self, project: Project):
         clear_telemetry_settings(project)
 
@@ -251,10 +276,18 @@ class TestTracker:
         ProjectSettingsService(project).set("send_anonymous_usage_stats", True)
         assert Tracker(project).send_anonymous_usage_stats is True
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_default_send_anonymous_usage_stats(self, project: Project):
         clear_telemetry_settings(project)
         assert Tracker(project).send_anonymous_usage_stats
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     @pytest.mark.parametrize("send_anonymous_usage_stats", (True, False))
     def test_context_with_telemetry_state_change_event(
         self, project: Project, send_anonymous_usage_stats: bool
