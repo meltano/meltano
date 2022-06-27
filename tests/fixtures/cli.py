@@ -4,15 +4,17 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from click.testing import CliRunner
 
-from fixtures.docker.snowplow import SnowplowMicro
 from meltano.core.project import Project
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
+
+if TYPE_CHECKING:
+    from fixtures.docker import SnowplowMicro
 
 
 class MeltanoCliRunner(CliRunner):

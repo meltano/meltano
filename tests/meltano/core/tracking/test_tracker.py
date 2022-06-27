@@ -5,16 +5,18 @@ import os
 import subprocess
 import uuid
 from contextlib import contextmanager
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
 
-from fixtures.docker import SnowplowMicro
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
+
+if TYPE_CHECKING:
+    from fixtures.docker import SnowplowMicro
 
 
 def load_analytics_json(project: Project) -> dict[str, Any]:
