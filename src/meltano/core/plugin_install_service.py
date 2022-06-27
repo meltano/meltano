@@ -8,7 +8,7 @@ import logging
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
-from typing import Any, Callable, Iterable, Tuple
+from typing import Any, Callable, Iterable
 
 from cached_property import cached_property
 
@@ -224,7 +224,7 @@ class PluginInstallService:
 
     def install_all_plugins(
         self, reason=PluginInstallReason.INSTALL
-    ) -> Tuple[PluginInstallState]:
+    ) -> tuple[PluginInstallState]:
         """
         Install all the plugins for the project.
 
@@ -242,7 +242,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> Tuple[PluginInstallState]:
+    ) -> tuple[PluginInstallState]:
         """
         Install all the provided plugins.
 
@@ -267,7 +267,7 @@ class PluginInstallService:
         self,
         plugins: Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> Tuple[PluginInstallState]:
+    ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
 
         Args:
