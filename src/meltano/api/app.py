@@ -9,7 +9,7 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from meltano import __version__ as meltano_version
 from meltano.api import config as api_config
-from meltano.api.headers import *
+from meltano.api.headers import VERSION_HEADER
 from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.db import project_engine
 from meltano.core.logging.utils import FORMAT, setup_logging
@@ -114,8 +114,10 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     @app.before_request
     def setup_js_context():
         # setup the appUrl
-        appUrl = urlsplit(request.host_url)
-        g.jsContext = {"appUrl": appUrl.geturl()[:-1], "version": meltano_version}
+        g.jsContext = {
+            "appUrl": urlsplit(request.host_url).geturl()[:-1],
+            "version": meltano_version,
+        }
 
         setting_map = {
             "isSendAnonymousUsageStats": "send_anonymous_usage_stats",

@@ -1,4 +1,3 @@
-import shutil
 import threading
 import time
 from multiprocessing import Pool

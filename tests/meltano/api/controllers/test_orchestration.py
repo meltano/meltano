@@ -44,19 +44,19 @@ class TestOrchestration:
                 "secure", session=session
             ) == ("thisisatest", SettingValueStore.DOTENV)
             assert config["secure"] == REDACTED_VALUE
-            assert config_metadata["secure"]["redacted"] == True
+            assert config_metadata["secure"]["redacted"] is True
             assert config_metadata["secure"]["source"] == "dotenv"
             assert config_metadata["secure"]["auto_store"] == "dotenv"
-            assert config_metadata["secure"]["overwritable"] == True
+            assert config_metadata["secure"]["overwritable"] is True
 
             # make sure that `boolean` cannot be overwritten
             assert plugin_settings_service.get_with_source(
                 "boolean", session=session
             ) == (False, SettingValueStore.ENV)
-            assert config["boolean"] == False
+            assert config["boolean"] is False
             assert config_metadata["boolean"]["source"] == "env"
             assert config_metadata["boolean"]["auto_store"] == "dotenv"
-            assert config_metadata["boolean"]["overwritable"] == False
+            assert config_metadata["boolean"]["overwritable"] is False
 
             # make sure the `hidden` setting is still present
             # but hidden in the response

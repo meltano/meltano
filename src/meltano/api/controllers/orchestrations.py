@@ -134,8 +134,8 @@ orchestrationsAPI = Api(  # noqa: N816
 )
 
 
-@orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
-def _handle(ex):  # noqa: F811
+@orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)  # noqa: F811
+def _handle(ex):
     return (
         jsonify(
             {
@@ -147,8 +147,8 @@ def _handle(ex):  # noqa: F811
     )
 
 
-@orchestrationsBP.errorhandler(ScheduleDoesNotExistError)
-def _handle(ex):  # noqa: F811, WPS440
+@orchestrationsBP.errorhandler(ScheduleDoesNotExistError)  # noqa: F811
+def _handle(ex):  # noqa: WPS440
     return (
         jsonify(
             {
@@ -160,13 +160,13 @@ def _handle(ex):  # noqa: F811, WPS440
     )
 
 
-@orchestrationsBP.errorhandler(InvalidFileNameError)
-def _handle(ex):  # noqa: F811,WPS440
+@orchestrationsBP.errorhandler(InvalidFileNameError)  # noqa: F811
+def _handle(ex):  # noqa: WPS440
     return (jsonify({"error": True, "code": "The file lacks a valid name."}), 400)
 
 
-@orchestrationsBP.errorhandler(InvalidFileTypeError)
-def _handle(ex):  # noqa: F811,WPS440
+@orchestrationsBP.errorhandler(InvalidFileTypeError)  # noqa: F811
+def _handle(ex):  # noqa: WPS440
     return (
         jsonify(
             {
@@ -178,8 +178,8 @@ def _handle(ex):  # noqa: F811,WPS440
     )
 
 
-@orchestrationsBP.errorhandler(InvalidFileSizeError)
-def _handle(ex):  # noqa: F811,WPS440
+@orchestrationsBP.errorhandler(InvalidFileSizeError)  # noqa: F811
+def _handle(ex):  # noqa: WPS440
     return (
         jsonify(
             {
@@ -191,8 +191,8 @@ def _handle(ex):  # noqa: F811,WPS440
     )
 
 
-@orchestrationsBP.errorhandler(MissingJobLogException)
-def _handle(ex):  # noqa: F811,WPS440
+@orchestrationsBP.errorhandler(MissingJobLogException)  # noqa: F811
+def _handle(ex):  # noqa: WPS440
     return (jsonify({"error": False, "code": str(ex)}), 204)
 
 

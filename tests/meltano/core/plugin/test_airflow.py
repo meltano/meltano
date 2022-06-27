@@ -16,9 +16,7 @@ AIRFLOW_CONFIG = """
 class TestAirflow:
     @pytest.fixture(scope="class")
     def subject(self, project_add_service):
-        with mock.patch.object(
-            PluginInstallService, "install_plugin"
-        ) as install_plugin:
+        with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
     @pytest.mark.asyncio  # noqa:  WPS210

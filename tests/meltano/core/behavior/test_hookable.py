@@ -63,9 +63,6 @@ class TestHookable:
     @pytest.mark.asyncio
     async def test_trigger_hook_raise(self):
         subject = Hooked()
-        process = mock.MagicMock()
-
-        # it raises exceptions correctly
         with pytest.raises(Exception):
             async with subject.trigger_hooks("test"):
                 raise Exception()

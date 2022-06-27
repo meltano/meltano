@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 logger = logging.getLogger(__name__)
 
 
-class hook:
+class hook:  # noqa: N801
     """
     This decorator marks a function as a __hook__.
     It will be found by the Hookable metaclass and
@@ -33,21 +33,21 @@ class Hookable(type):
     Hooks are registered in declaration order.
     """
 
-    def __new__(metacls, name, bases, dct):
-        cls = type.__new__(metacls, name, bases, dct)
-        cls.__hooks__ = {}
+    def __new__(cls, name, bases, dct):
+        new_type = type.__new__(cls, name, bases, dct)
+        new_type.__hooks__ = {}
 
         for hook_name, hook in (
             (func.__hook__.name, func)
             for func in dct.values()
             if hasattr(func, "__hook__")
         ):
-            cls.__hooks__[hook_name] = cls.__hooks__.get(hook_name, [])
-            cls.__hooks__[hook_name].append(hook)
+            new_type.__hooks__[hook_name] = new_type.__hooks__.get(hook_name, [])
+            new_type.__hooks__[hook_name].append(hook)
 
-        return cls
+        return new_type
 
-    def __prepare__(name, bases, **kwds):
+    def __prepare__(cls, bases, **kwds):
         return OrderedDict()
 
 

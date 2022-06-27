@@ -1,8 +1,6 @@
 import os
 import shutil
 import sys
-import tempfile
-from contextlib import contextmanager
 from distutils import dir_util
 from functools import partial
 from pathlib import Path

@@ -76,6 +76,7 @@ ignore =
     WPS212
     # Various WPS refactor heavy warnings to ignore that currently have a poor risk/reward tradeoff.
     WPS100
+    WPS111
     WPS112
     WPS201
     WPS220
