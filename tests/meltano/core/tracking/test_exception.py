@@ -29,7 +29,7 @@ with open(
 
 
 class CustomException(Exception):
-    pass
+    """A custom exception type to be used in `test_complex_exception_context`."""
 
 
 class AnyInt:
@@ -73,7 +73,7 @@ def test_simple_exception_context():
     msg = "The error message"
 
     ex = ValueError(msg)
-    try:
+    try:  # noqa: WPS328
         raise ex
     except Exception:
         ctx = ExceptionContext()
@@ -111,13 +111,13 @@ def test_complex_exception_context():
     def _function_to_deepen_traceback() -> None:
         try:
             line_nums.append(1 + inspect.currentframe().f_lineno)
-            Path("/tmp/fake/path/that/definitely/does/not/exist").resolve(strict=True)
+            Path("/tmp/fake/path/will/not/resolve").resolve(strict=True)  # noqa: S108
         except Exception as ex:
             line_nums.append(1 + inspect.currentframe().f_lineno)
             raise ValueError("that path was a bad value") from ex
 
     try:
-        try:
+        try:  # noqa: WPS505
             line_nums.append(1 + inspect.currentframe().f_lineno)
             _function_to_deepen_traceback()
         except Exception:

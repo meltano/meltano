@@ -276,8 +276,7 @@ class TestTracker:
                 if send_anonymous_usage_stats:
                     expected_contexts.append(ExceptionContext)
                 passed = len(set(contexts)) == len(expected_contexts) and all(
-                    isinstance(ctx, tuple(expected_contexts))
-                    for ctx in contexts
+                    isinstance(ctx, tuple(expected_contexts)) for ctx in contexts
                 )
 
         tracker.snowplow_tracker = MockSnowplowTracker()
