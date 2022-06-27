@@ -1,6 +1,9 @@
 name: Integration Tests
 
 on:
+  push:
+    branches:
+    - '6218-integration-test-framework'
   workflow_dispatch:
     inputs: {}
 
