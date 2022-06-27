@@ -195,7 +195,9 @@ def _prompt_plugin_capabilities(plugin_type):
         click.style("(capabilities)", fg="blue"),
         type=list,
         default=[],
-        value_proc=lambda value: [word.strip() for word in value.split(",")],
+        value_proc=lambda value: [word.strip() for word in value.split(",")]
+        if value
+        else [],
     )
 
 
@@ -253,7 +255,9 @@ def _prompt_plugin_settings(plugin_type):
             default=[],
             value_proc=lambda value: [
                 setting.strip().partition(":") for setting in value.split(",")
-            ],
+            ]
+            if value
+            else [],
         )
         try:
             settings = [

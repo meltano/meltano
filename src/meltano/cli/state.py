@@ -108,7 +108,7 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session)
+    ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
 
 
 @meltano_state.command(name="list")
@@ -139,6 +139,66 @@ def list_state(
                 click.secho(state_id, fg="yellow")
     else:
         logger.info("No state IDs found.")
+
+
+@meltano_state.command(name="copy")
+@prompt_for_confirmation(
+    prompt="This will overwrite state for the destination. Continue?"
+)
+@click.argument("src-state-id", type=str)
+@click.argument("dst-state-id", type=str)
+@pass_project(migrate=True)
+@click.pass_context
+def copy_state(
+    ctx: click.Context,
+    project: Project,
+    src_state_id: str,
+    dst_state_id: str,
+    force: bool,
+):
+    """Copy state to another job id."""
+    # Retrieve state for copying
+    state_service = (
+        state_service_from_state_id(project, src_state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    tracker = LegacyTracker(project)
+    tracker.track_meltano_state("copy", dst_state_id)
+
+    state_service.copy_state(src_state_id, dst_state_id)
+
+    logger.info(
+        f"State for {dst_state_id} was successfully copied from {src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+    )
+
+
+@meltano_state.command(name="move")
+@prompt_for_confirmation(
+    prompt="This will clear the source state and overwrite destination state. Continue?"
+)
+@click.argument("src-state-id", type=str)
+@click.argument("dst-state-id", type=str)
+@pass_project(migrate=True)
+@click.pass_context
+def move_state(
+    ctx: click.Context,
+    project: Project,
+    src_state_id: str,
+    dst_state_id: str,
+    force: bool,
+):
+    """Move state to another job id, clearing the original."""
+    # Retrieve state for moveing
+    state_service = (
+        state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    tracker = LegacyTracker(project)
+    tracker.track_meltano_state("move", dst_state_id)
+
+    state_service.move_state(src_state_id, dst_state_id)
+
+    logger.info(
+        f"State for {src_state_id} was successfully moved to {dst_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+    )
 
 
 @meltano_state.command(name="merge")
