@@ -1,6 +1,6 @@
 from contextlib import contextmanager
-from unittest import mock
 
+import mock
 import pytest
 
 from meltano.core.environment import Environment

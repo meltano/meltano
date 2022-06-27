@@ -1,5 +1,4 @@
-from unittest import mock
-
+import mock
 import pytest
 
 from meltano.core.behavior.hookable import HookObject, hook
@@ -36,7 +35,7 @@ class Hooked(HookObject):
 class DerivedHooked(Hooked):
     @hook("before_test")
     async def derived_before_test(self):
-        super().call("derived_before_test")
+        super().call("derived_before_test")  # noqa: WPS613
 
 
 class Hooked2(HookObject):
@@ -64,9 +63,6 @@ class TestHookable:
     @pytest.mark.asyncio
     async def test_trigger_hook_raise(self):
         subject = Hooked()
-        process = mock.MagicMock()
-
-        # it raises exceptions correctly
         with pytest.raises(Exception):
             async with subject.trigger_hooks("test"):
                 raise Exception()

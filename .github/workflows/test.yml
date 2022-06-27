@@ -12,12 +12,14 @@ jobs:
     strategy:
       matrix:
         include:
-        - { python-version: "3.7", os: "ubuntu-latest", backend-db: sqlite }
-        - { python-version: "3.8", os: "ubuntu-latest", backend-db: sqlite }
-        - { python-version: "3.9", os: "ubuntu-latest", backend-db: sqlite }
-        - { python-version: "3.7", os: "ubuntu-latest", backend-db: postgresql }
-        - { python-version: "3.8", os: "ubuntu-latest", backend-db: postgresql }
-        - { python-version: "3.9", os: "ubuntu-latest", backend-db: postgresql }
+        - { python-version: "3.7",  os: "ubuntu-latest", backend-db: sqlite }
+        - { python-version: "3.8",  os: "ubuntu-latest", backend-db: sqlite }
+        - { python-version: "3.9",  os: "ubuntu-latest", backend-db: sqlite }
+        - { python-version: "3.10", os: "ubuntu-latest", backend-db: sqlite }
+        - { python-version: "3.7",  os: "ubuntu-latest", backend-db: postgresql }
+        - { python-version: "3.8",  os: "ubuntu-latest", backend-db: postgresql }
+        - { python-version: "3.9",  os: "ubuntu-latest", backend-db: postgresql }
+        - { python-version: "3.10", os: "ubuntu-latest", backend-db: postgresql }
       fail-fast: false
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"

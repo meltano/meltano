@@ -21,7 +21,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-If you're running Linux, macOS, or Windows and have [Python](https://www.python.org/) 3.7, 3.8 or 3.9 installed,
+If you're running Linux, macOS, or Windows and have [Python](https://www.python.org/) 3.7, 3.8, 3.9, or 3.10 installed,
 we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
 inside the directory that will hold your [Meltano projects](/concepts/project).
 
@@ -38,10 +38,10 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
     #For Windows (PowerShell): New-Alias Python3 Python
     python3 -m pip install --user pipx
     python3 -m pipx ensurepath
-    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables 
-    source ~/.bashrc 
+    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
+    source ~/.bashrc
     ```
-    
+
     <div class="notification is-info">
       <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
     </div>

@@ -1,12 +1,9 @@
-import os
-import shutil
 import threading
 import time
 from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
 
 import pytest
-import yaml
 
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.project import PROJECT_ROOT_ENV, Project, ProjectNotFound
@@ -52,7 +49,7 @@ class ProjectReader(IndefiniteThread):
 
 class TestProject:
     @pytest.mark.usefixtures("deactivate_project")
-    def test_find(self, project, mkdtemp, monkeypatch):
+    def test_find(self, project, tmp_path, monkeypatch):
         # defaults to the cwd
         found = Project.find(activate=False)
         assert found == project
@@ -77,11 +74,7 @@ class TestProject:
 
         # and it fails if there isn't a meltano.yml
         with pytest.raises(ProjectNotFound):
-            try:
-                empty_dir = mkdtemp("meltano_empty_project")
-                Project.find(empty_dir)
-            finally:
-                shutil.rmtree(empty_dir)
+            Project.find(tmp_path)
 
     def test_activate(self, project):
         Project.deactivate()
@@ -95,8 +88,7 @@ class TestProject:
     def test_find_threadsafe(self, project, concurrency):
         workers = ThreadPool(concurrency["threads"])
         projects = workers.map(Project.find, range(concurrency["cases"]))
-
-        assert all(map(lambda x: x is project, projects))
+        assert all(x is project for x in projects)
 
     @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
@@ -112,7 +104,8 @@ class TestProject:
         reader.join()
 
         meltano = project.meltano
-        for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
+        unpacked_items = (item for payload in payloads for item in payload.items())
+        for key, val in unpacked_items:
             assert meltano.extras[key] == val
 
 
