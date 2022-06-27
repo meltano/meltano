@@ -21,9 +21,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-If you're running Linux, macOS, or Windows and have a supported version of [Python](https://www.python.org/) installed,
-we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
-inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.7, 3.8, or 3.9 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1. Create and navigate to a directory to hold your Meltano projects:
 
