@@ -780,13 +780,11 @@ This can be useful for debugging a failing extractor or loader.
 Now that you've successfully run your first data integration (EL) pipeline using Meltano,
 you have a few possible next steps:
 
-- [Example](#example)
-  - [Next Steps](#next-steps)
-    - [Schedule Pipelines to Run Regularly](#schedule-pipelines-to-run-regularly)
-    - [Transform Loaded Data for Analysis](#transform-loaded-data-for-analysis)
-    - [Analyze Your Data with Superset](#analyze-your-data-with-superset)
-    - [Containerize Your Project](#containerize-your-project)
-    - [Deploy Your Pipelines in Production](#deploy-your-pipelines-in-production)
+- [Schedule Pipelines to Run Regularly](#schedule-pipelines-to-run-regularly)
+- [Transform Loaded Data for Analysis](#transform-loaded-data-for-analysis)
+- [Analyze Your Data with Superset](#analyze-your-data-with-superset)
+- [Containerize Your Project](#containerize-your-project)
+- [Deploy Your Pipelines in Production](#deploy-your-pipelines-in-production)
 
 ### Schedule Pipelines to Run Regularly
 
