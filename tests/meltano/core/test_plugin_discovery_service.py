@@ -283,7 +283,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     @pytest.fixture
     def bundled_discovery(self):
-        with bundle.find("discovery.yml").open() as bundled_discovery:
+        with open(bundle.root / "discovery.yml") as bundled_discovery:
             return yaml.safe_load(bundled_discovery)
 
     def test_local_discovery(self, subject, local_discovery):
