@@ -18,7 +18,7 @@ class MeltanoInvoker:
 
         Parameters:
             project: Project class
-            settings_service: ProjectSettingService Class blank
+            settings_service: ProjectSettingsService Class blank
         """
         self.project = project
         self.settings_service = settings_service or ProjectSettingsService(project)
