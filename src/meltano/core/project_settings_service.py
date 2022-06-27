@@ -27,7 +27,7 @@ UI_CFG_SETTINGS = {
 }
 
 
-class ProjectSettingsService(SettingsService):
+class ProjectSettingsService(SettingsService):  # noqa: WPS214
     """Project Settings Service."""
 
     config_override = {}
@@ -72,6 +72,26 @@ class ProjectSettingsService(SettingsService):
             logger.debug(
                 "Cannot update `project_id` in `meltano.yml`: project is read-only."
             )
+
+    @property
+    def env(self):
+        """Return Project environment variables (from the `meltano.yml` `env:` key).
+
+        Returns:
+            A dict of env vars from the `meltano.yml` `env:` key
+        """
+        return self.config_service.env
+
+    @property
+    def environment_env(self) -> dict:
+        """Return environment variables from the currently active Meltano environment.
+
+        Returns:
+            A dict of env vars from from the currently active Meltano environment.
+        """
+        if self.project.active_environment:
+            return self.project.active_environment.env
+        return {}
 
     def ensure_project_id(self) -> None:
         """Ensure `project_id` is configured properly.
