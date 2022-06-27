@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
+BASE_DIR=$(git rev-parse --show-toplevel)
+INTEGRATION_DIR="${BASE_DIR}/integration"
+
 inject_logging_yaml(){
   TARGET_DIR=$1
   if [ ! -d "$TARGET_DIR" ]; then
     echo "Target directory $TARGET_DIR does not exist"
     exit 1
   fi
-  cp logging.yml "$TARGET_DIR"/logging.yml
+  cp "${INTEGRATION_DIR}"/logging.yaml "$TARGET_DIR"/logging.yaml
 }
 
 compile_script(){
