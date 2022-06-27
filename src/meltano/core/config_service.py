@@ -130,3 +130,12 @@ class ConfigService:
     def make_meltano_secret_dir(self):
         """Create the secret directory."""
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
+
+    @property
+    def env(self):
+        """Return the top-level env vars from meltano.yml.
+
+        Returns:
+            A dictionary of (unexpanded) environment variables.
+        """
+        return self.current_meltano_yml.env
