@@ -90,8 +90,10 @@ def snowplow_session(request) -> SnowplowMicro | None:
             yield None
 
 
-@pytest.fixture()
-def snowplow_optional(snowplow_session: SnowplowMicro | None) -> SnowplowMicro | None:
+@pytest.fixture
+def snowplow_optional(
+    snowplow_session: SnowplowMicro | None, monkeypatch
+) -> SnowplowMicro | None:
     """Provide a clean `SnowplowMicro` instance.
 
     This fixture resets the `SnowplowMicro` instance, and enables the
@@ -104,34 +106,32 @@ def snowplow_optional(snowplow_session: SnowplowMicro | None) -> SnowplowMicro |
         yield None
     else:
         if isinstance(ProjectSettingsService.config_override, dict):
-            original_config_override = ProjectSettingsService.config_override.copy()
-            ProjectSettingsService.config_override.pop(
-                "send_anonymous_usage_stats", None
+            monkeypatch.delitem(
+                ProjectSettingsService.config_override,
+                "send_anonymous_usage_stats",
+                raising=False,
             )
-        else:
-            original_config_override = ProjectSettingsService.config_override
-
-        with env(
-            MELTANO_SEND_ANONYMOUS_USAGE_STATS="True",
-            MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS=f'["{snowplow_session.collector_endpoint}"]',
-        ):
-            try:
-                yield snowplow_session
-            finally:
-                ProjectSettingsService.config_override = original_config_override
-                snowplow_session.reset()
+        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
+        monkeypatch.setenv(
+            "MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS",
+            f'["{snowplow_session.collector_endpoint}"]',
+        )
+        try:
+            yield snowplow_session
+        finally:
+            snowplow_session.reset()
 
 
-@pytest.fixture()
+@pytest.fixture
 def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     """Provide a clean `SnowplowMicro` instance.
 
     This fixture resets the `SnowplowMicro` instance, and enables the
     `send_anonymous_usage_stats` setting.
 
-    Returns:
+    Yields:
         A freshly reset `SnowplowMicro` instance.
     """
     if snowplow_session is None:
         pytest.skip("Unable to start Snowplow Micro")
-    return snowplow_optional
+    yield snowplow_optional
