@@ -19,12 +19,12 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 from . import cli
 from .params import pass_project
-from .utils import CliError
+from .utils import CliError, InstrumentedCmd
 
 
 @cli.group(
@@ -56,17 +56,7 @@ def config(  # noqa: WPS231
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
     """
-    tracker = Tracker(project)
-    tracker.add_contexts(
-        CliContext.from_command_and_kwargs(
-            "config",
-            ctx.invoked_subcommand or None,
-            plugin_type=plugin_type,
-            format=format,
-            extras=extras,
-        )
-    )
-
+    tracker = ctx.obj["tracker"]
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
     except ValueError:
@@ -90,7 +80,7 @@ def config(  # noqa: WPS231
 
     if plugin:
         tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
-    tracker.track_command_event(CliEvent.started)
+    tracker.track_command_event(CliEvent.inflight)
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -135,11 +125,11 @@ def config(  # noqa: WPS231
         raise
     finally:
         session.close()
-    ctx.obj["tracker"] = tracker
 
 
 @config.command(
-    "list",
+    cls=InstrumentedCmd,
+    name="list",
     short_help=(
         "List all settings for the specified plugin with their names, environment variables, and current values."
     ),
@@ -227,7 +217,7 @@ def list_settings(ctx, extras: bool):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command()
+@config.command(cls=InstrumentedCmd)
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
@@ -258,7 +248,7 @@ def reset(ctx, store):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command("set")
+@config.command(cls=InstrumentedCmd, name="set")
 @click.argument("setting_name", nargs=-1, required=True)
 @click.argument("value")
 @click.option(
@@ -306,7 +296,7 @@ def set_(ctx, setting_name, value, store):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command("test")
+@config.command(cls=InstrumentedCmd, name="test")
 @click.pass_context
 def test(ctx):
     """Test the configuration of a plugin."""
@@ -337,7 +327,7 @@ def test(ctx):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command()
+@config.command(cls=InstrumentedCmd)
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",
