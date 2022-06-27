@@ -2,6 +2,8 @@
 
 BASE_DIR=$(git rev-parse --show-toplevel)
 INTEGRATION_DIR="${BASE_DIR}/integration"
+MDSH_PATH="${INTEGRATION_DIR}"
+
 
 inject_logging_yaml(){
   TARGET_DIR=$1
@@ -19,7 +21,7 @@ compile_script(){
     echo "Source file $SOURCE_FILE does not exist"
     exit 1
   fi
-  mdsh -c  "$SOURCE_FILE" > "$OUTPUT_SCRIPT"
+  "${INTEGRATION_DIR}"/mdsh -c  "$SOURCE_FILE" > "$OUTPUT_SCRIPT"
 }
 
 check_meltano_yaml(){
