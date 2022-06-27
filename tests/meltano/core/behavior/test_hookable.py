@@ -35,7 +35,7 @@ class Hooked(HookObject):
 class DerivedHooked(Hooked):
     @hook("before_test")
     async def derived_before_test(self):
-        super().call("derived_before_test")
+        super().call("derived_before_test")  # noqa: WPS613
 
 
 class Hooked2(HookObject):

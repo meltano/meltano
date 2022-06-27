@@ -17,6 +17,8 @@ from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.oauth.app import create_app as create_oauth_service
 
+STATUS_SERVER_ERROR = 500
+
 setup_logging()
 
 # the file logger we will set up below is for the `meltano.api` module
@@ -146,10 +148,10 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         res.headers[VERSION_HEADER] = meltano_version
         return res
 
-    @app.errorhandler(500)
+    @app.errorhandler(STATUS_SERVER_ERROR)
     def internal_error(exception):
         logger.info(f"Error: {exception}")
-        return jsonify({"error": True, "code": str(exception)}), 500
+        return jsonify({"error": True, "code": str(exception)}), STATUS_SERVER_ERROR
 
     @app.errorhandler(ProjectReadonly)
     def _handle(ex):

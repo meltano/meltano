@@ -147,8 +147,8 @@ def _handle(ex):
     )
 
 
-@orchestrationsBP.errorhandler(ScheduleDoesNotExistError)  # noqa: F811
-def _handle(ex):  # noqa: WPS440
+@orchestrationsBP.errorhandler(ScheduleDoesNotExistError)  # noqa: F811, WPS440
+def _handle(ex):
     return (
         jsonify(
             {
@@ -160,13 +160,13 @@ def _handle(ex):  # noqa: WPS440
     )
 
 
-@orchestrationsBP.errorhandler(InvalidFileNameError)  # noqa: F811
-def _handle(ex):  # noqa: WPS440
+@orchestrationsBP.errorhandler(InvalidFileNameError)  # noqa: F811, WPS440
+def _handle(ex):
     return (jsonify({"error": True, "code": "The file lacks a valid name."}), 400)
 
 
-@orchestrationsBP.errorhandler(InvalidFileTypeError)  # noqa: F811
-def _handle(ex):  # noqa: WPS440
+@orchestrationsBP.errorhandler(InvalidFileTypeError)  # noqa: F811, WPS440
+def _handle(ex):
     return (
         jsonify(
             {
@@ -178,8 +178,8 @@ def _handle(ex):  # noqa: WPS440
     )
 
 
-@orchestrationsBP.errorhandler(InvalidFileSizeError)  # noqa: F811
-def _handle(ex):  # noqa: WPS440
+@orchestrationsBP.errorhandler(InvalidFileSizeError)  # noqa: F811, WPS440
+def _handle(ex):
     return (
         jsonify(
             {
@@ -191,8 +191,8 @@ def _handle(ex):  # noqa: WPS440
     )
 
 
-@orchestrationsBP.errorhandler(MissingJobLogException)  # noqa: F811
-def _handle(ex):  # noqa: WPS440
+@orchestrationsBP.errorhandler(MissingJobLogException)  # noqa: F811, WPS440
+def _handle(ex):
     return (jsonify({"error": False, "code": str(ex)}), 204)
 
 
@@ -430,7 +430,6 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
         JSON with the job sucess status.
     """
     project = Project.find()
-    payload = request.get_json()
     plugins_service = ProjectPluginsService(project)
     plugin = plugins_service.get_plugin(plugin_ref)
 
@@ -438,7 +437,7 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
         project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
-    config = payload.get("config", {})
+    config = request.get_json().get("config", {})
     valid_config = {
         name: value
         for name, value in config.items()

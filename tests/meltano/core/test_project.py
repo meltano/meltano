@@ -88,8 +88,7 @@ class TestProject:
     def test_find_threadsafe(self, project, concurrency):
         workers = ThreadPool(concurrency["threads"])
         projects = workers.map(Project.find, range(concurrency["cases"]))
-
-        assert all(map(lambda x: x is project, projects))
+        assert all(x is project for x in projects)
 
     @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
@@ -105,7 +104,8 @@ class TestProject:
         reader.join()
 
         meltano = project.meltano
-        for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
+        unpacked_items = (item for payload in payloads for item in payload.items())
+        for key, val in unpacked_items:
             assert meltano.extras[key] == val
 
 

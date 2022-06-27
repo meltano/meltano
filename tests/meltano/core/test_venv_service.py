@@ -64,9 +64,7 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        assert venv_dir.joinpath(".meltano_plugin_fingerprint").exists()
-        with open(
-            venv_dir.joinpath(".meltano_plugin_fingerprint")) as fingerprint_file:
+        with open(venv_dir / ".meltano_plugin_fingerprint") as fingerprint_file:
             assert (
                 fingerprint_file.read()
                 # sha256 of "example"

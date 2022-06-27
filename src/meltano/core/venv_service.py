@@ -159,8 +159,6 @@ class VenvService:
             # If the VirtualEnv has never been created before do nothing
             logger.debug("No old virtual environment to remove")
 
-        return
-
     async def create(self):
         """
         Create a new virtual environment.

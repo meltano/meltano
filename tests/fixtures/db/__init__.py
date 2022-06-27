@@ -2,7 +2,7 @@ import logging
 import warnings
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
+from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
@@ -41,9 +41,9 @@ def engine_sessionmaker(engine_uri):
 
 
 @pytest.fixture()
-def connection(engine_sessionmaker):
+def connection(engine_sessionmaker):  # noqa: WPS442
     engine, _ = engine_sessionmaker
-    connection = engine.connect()
+    connection = engine.connect()  # noqa: WPS442
     transaction = connection.begin()
 
     try:
@@ -59,11 +59,11 @@ def connection(engine_sessionmaker):
 
 
 @pytest.fixture()
-def session(project, engine_sessionmaker, connection):
+def session(project, engine_sessionmaker, connection):  # noqa: WPS442
     """Create a new database session for a test."""
     _, create_session = engine_sessionmaker
 
-    session = create_session(bind=connection)
+    session = create_session(bind=connection)  # noqa: WPS442
     try:
         yield session
     finally:

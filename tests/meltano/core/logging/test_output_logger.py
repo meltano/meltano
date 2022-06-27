@@ -55,7 +55,7 @@ class TestOutputLogger:
         async with stdout_out.redirect_stdout():
             sys.stdout.write("STD")
             sys.stdout.write("OUT\n")
-            print("STDOUT 2")
+            print("STDOUT 2")  # noqa: WPS421
 
         assert_lines(
             log_output.entries,
@@ -74,7 +74,7 @@ class TestOutputLogger:
         async with stderr_out.redirect_stderr():
             sys.stderr.write("STD")
             sys.stderr.write("ERR\n")
-            print("STDERR 2", file=sys.stderr)
+            print("STDERR 2", file=sys.stderr)  # noqa: WPS421
 
         assert_lines(
             log_output.entries,
@@ -186,7 +186,7 @@ class TestOutputLogger:
                     raise exception
 
         # make sure it let the exception through
-        assert exc.value is exception
+        assert exc.value is exception  # noqa: WPS441
 
         log_content = json.loads(log.read())
 

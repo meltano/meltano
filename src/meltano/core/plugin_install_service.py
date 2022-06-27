@@ -277,11 +277,9 @@ class PluginInstallService:
         Returns:
             Install state of installed plugins.
         """
-        results = await asyncio.gather(
+        return await asyncio.gather(
             *[self.install_plugin_async(plugin, reason) for plugin in plugins]
         )
-
-        return results
 
     def install_plugin(
         self,

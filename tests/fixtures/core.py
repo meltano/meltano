@@ -3,7 +3,7 @@ import itertools
 import logging
 import os
 import shutil
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from copy import deepcopy
 from pathlib import Path
 
@@ -698,42 +698,39 @@ def state_ids_with_expected_states(  # noqa: WPS210
 
     for state_id, job_list in state_ids_with_jobs.items():
         expectations[state_id] = {}
-
-        complete_jobs = []
-        incomplete_jobs = []
-        dummy_jobs = []
+        jobs = defaultdict(list)
         # Get latest complete non-dummy job.
         for job in job_list:
             if job.state == State.STATE_EDIT:
-                dummy_jobs.append(job)
+                jobs["dummy"].append(job)
             elif job.payload_flags == Payload.STATE:
-                complete_jobs.append(job)
+                jobs["complete"].append(job)
             elif job.payload_flags == Payload.INCOMPLETE_STATE:
-                incomplete_jobs.append(job)
-        latest_complete_job = None
-        if complete_jobs:
-            latest_complete_job = max(complete_jobs, key=lambda _job: _job.ended_at)
-        # Get all incomplete jobs since latest complete non-dummy job.
-        latest_incomplete_job = None
-        if incomplete_jobs:
-            latest_incomplete_job = max(incomplete_jobs, key=lambda _job: _job.ended_at)
-        if latest_complete_job:
+                jobs["incomplete"].append(job)
+        latest_job = {
+            kind: (
+                max(jobs[kind], key=lambda _job: _job.ended_at) if jobs[kind] else None
+            )
+            for kind in ("complete", "incomplete")
+        }
+        if latest_job["complete"]:
             expectations[state_id] = merge(
-                expectations[state_id], latest_complete_job.payload
+                expectations[state_id], latest_job["complete"].payload
             )
 
-        for job in incomplete_jobs:
-            if (not latest_complete_job) or (
-                job.ended_at > latest_complete_job.ended_at
+        for job in jobs["incomplete"]:
+            if (not latest_job["complete"]) or (
+                job.ended_at > latest_job["complete"].ended_at
             ):
                 expectations[state_id] = merge(expectations[state_id], job.payload)
         # Get all dummy jobs since latest non-dummy job.
-        for job in dummy_jobs:
+        for job in jobs["dummy"]:
             if (
-                not latest_complete_job or (job.ended_at > latest_complete_job.ended_at)
+                not latest_job["complete"]
+                or (job.ended_at > latest_job["complete"].ended_at)
             ) and (
-                (not latest_incomplete_job)
-                or (job.ended_at > latest_incomplete_job.ended_at)
+                (not latest_job["incomplete"])
+                or (job.ended_at > latest_job["incomplete"].ended_at)
             ):
                 expectations[state_id] = merge(expectations[state_id], job.payload)
     return [

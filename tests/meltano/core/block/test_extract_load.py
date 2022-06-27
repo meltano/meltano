@@ -390,7 +390,6 @@ class TestExtractLoadBlocks:
             side_effect=(tap_process, mapper_process, target_process)
         )
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
-
             blocks = (
                 SingerBlock(
                     block_ctx=elb_context,

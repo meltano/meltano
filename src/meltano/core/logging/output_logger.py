@@ -135,7 +135,7 @@ class Out:  # noqa: WPS230
         )
         try:
             yield
-        except ignored_errors:
+        except ignored_errors:  # noqa: WPS329
             raise
         except Exception as err:
             logger.error(str(err), exc_info=True)
