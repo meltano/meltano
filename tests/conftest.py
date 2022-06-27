@@ -35,8 +35,6 @@ elif PYTEST_BACKEND == "postgresql":
 else:
     raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")
 
-BACKEND = ["sqlite", "postgresql"]
-
 
 def pytest_runtest_setup(item):
     backend_marker = item.get_closest_marker("backend")
