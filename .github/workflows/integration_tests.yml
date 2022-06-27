@@ -1,0 +1,43 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  basic_integration_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install poetry
+        poetry --version
+
+    - name: Setup Python 3.8
+      uses: actions/setup-python@v4.0.0
+      with:
+        python-version: 3.8
+        architecture: x64
+        cache: 'poetry'
+
+    - name: Upgrade pip
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pip install pip
+        pip --version
+
+    - name: Install Dependencies
+      run: |
+        poetry env use "3.8"
+        poetry install
+
+    - name: Run integration tests
+      run: |
+        poetry env use "3.8"
+        poetry run bash integration/meltano-basics/validate.sh
