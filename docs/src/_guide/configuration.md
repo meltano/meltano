@@ -76,7 +76,7 @@ To verify that any environment variables you've set will be picked up by Meltano
 
 To learn how to use environment variables to specify pipeline-specific configuration, refer to the [Data Integration (EL) guide](/guide/integration#pipeline-specific-configuration).
 
-#### aliases
+#### Settings Aliases
 
 Aliases allow for configuration values to be set via one of multiple keys.
 Environment variable aliases are listed next to the canonical names for the variable in the output of the [`meltano config <plugin> list`](/reference/command-line-interface#config) command.
