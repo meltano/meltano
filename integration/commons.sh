@@ -37,7 +37,7 @@ inject_logging_yaml(){
 }
 
 compile_script(){
-  "${INTEGRATION_BASE_DIR}"/mdsh -c  "${TEST_SCRIPT_SOURCE}" > "${TEST_SCRIPT_NAME}"
+  "${INTEGRATION_BASE_DIR}"/mdsh -c  "${TEST_SCRIPT_SOURCE}" > "${TEST_DOCS_DIR}/${TEST_SCRIPT_NAME}"
 }
 
 check_meltano_yaml(){
