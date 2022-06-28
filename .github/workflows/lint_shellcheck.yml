@@ -1,4 +1,4 @@
-me: Lint integration test shell scripts
+name: Lint integration test shell scripts
 
 on:
   pull_request:
