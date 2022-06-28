@@ -1,5 +1,0 @@
-[paths]
-source =
-  src/meltano
-  **/site-packages/meltano
-  **/site-packages/meltano*/meltano

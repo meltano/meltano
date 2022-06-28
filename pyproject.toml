@@ -75,7 +75,7 @@ black = "^22.3.0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
-coverage = "^6.4.1"
+coverage = {extras = ["toml"], version = "^6.4.1"}
 freezegun = "^0.3.12"
 isort = "^5.10.1"
 mock = "^4.0.3"
@@ -102,6 +102,27 @@ ensure_newline_before_comments = true
 line_length = 88
 src_paths = ["src/", "tests/"]
 skip_glob = ["*.md", "*.vue", "*.js"]
+
+[tool.coverage.run]
+concurrency = [ "multiprocessing" ]
+parallel = true
+branch = true
+
+[tool.coverage.paths]
+source = [
+  "src/meltano",
+  "**/site-packages/meltano",
+  "**/site-packages/meltano*/meltano",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 2
+exclude_lines = [
+    "nocov",
+    "if TYPE_CHECKING:",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
