@@ -1,7 +1,7 @@
 import platform
 import shutil
-from unittest import mock
 
+import mock
 import pytest
 
 from asserts import assert_cli_runner

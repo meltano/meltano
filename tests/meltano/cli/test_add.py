@@ -1,8 +1,8 @@
 import os
 import platform
 import shutil
-from unittest import mock
 
+import mock
 import pytest
 import yaml
 

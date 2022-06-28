@@ -3,8 +3,8 @@ import logging
 import platform
 import sys
 import tempfile
-from unittest import mock
 
+import mock
 import pytest
 import structlog
 from structlog.testing import LogCapture

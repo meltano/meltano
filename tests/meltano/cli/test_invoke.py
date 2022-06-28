@@ -4,8 +4,8 @@ import platform
 
 import mock
 import pytest
-from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
+from mock import AsyncMock, Mock, patch
 
 from meltano.cli import cli
 from meltano.core.legacy_tracking import LegacyTracker
@@ -27,7 +27,7 @@ class TestCliInvoke:
 
         process_mock = Mock()
         process_mock.name = "utility-mock"
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
 
         with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
@@ -164,7 +164,7 @@ class TestCliInvoke:
     ):
         process_mock = Mock()
         process_mock.name = "utility-mock"
-        process_mock.wait = CoroutineMock(return_value=2)
+        process_mock.wait = AsyncMock(return_value=2)
 
         with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",

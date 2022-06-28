@@ -3,11 +3,10 @@
 import datetime
 import logging
 import platform
-from contextlib import contextmanager
+from contextlib import asynccontextmanager, contextmanager
 
 import click
 import structlog
-from async_generator import asynccontextmanager
 from structlog import stdlib as structlog_stdlib
 
 from meltano.core.db import project_engine
