@@ -41,3 +41,6 @@ def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
         tracker.snowplow_tracker.emitters[1].endpoint
         == "https://other.endpoint/path/to/collector/i"
     )
+
+    # Remove the seemingly valid emitters to prevent a logging error on exit.
+    tracker.snowplow_tracker.emitters = []

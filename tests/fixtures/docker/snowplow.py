@@ -102,7 +102,7 @@ def snowplow_optional(
     Yields:
         A freshly reset `SnowplowMicro` instance, or `None` if it could not be created.
     """
-    if snowplow_session:
+    if snowplow_session is None:
         yield None
     else:
         if isinstance(ProjectSettingsService.config_override, dict):
