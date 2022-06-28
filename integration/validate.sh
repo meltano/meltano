@@ -12,7 +12,7 @@ source $(git rev-parse --show-toplevel)/integration/commons.sh
 
 inject_logging_yaml
 compile_script
-echo bash -xeuo pipefail "${TEST_NAME}.sh"
+bash -xeuo pipefail "${TEST_NAME}.sh"
 check_meltano_yaml
 
 # if theres a per test validate.sh, run it as well
