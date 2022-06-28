@@ -7,10 +7,14 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.settings_service import REDACTED_VALUE  # noqa: F401
 from meltano.core.settings_service import SettingMissingError  # noqa: F401
 from meltano.core.settings_service import SettingValueStore  # noqa: F401
-from meltano.core.settings_service import SettingsService
+from meltano.core.settings_service import (  # noqa: F401
+    REDACTED_VALUE,
+    FeatureFlags,
+    SettingsService,
+)
+from meltano.core.utils import expand_env_vars
 
 
 class PluginSettingsService(SettingsService):
@@ -38,17 +42,6 @@ class PluginSettingsService(SettingsService):
         self.plugin = plugin
         self.plugins_service = plugins_service or ProjectPluginsService(self.project)
 
-        project_settings_service = ProjectSettingsService(
-            self.project, config_service=self.plugins_service.config_service
-        )
-
-        self.env_override = {
-            **project_settings_service.env,
-            **project_settings_service.as_env(),
-            **self.env_override,
-            **self.plugin.info_env,
-        }
-
         self._inherited_settings_service = None
         if self.project.active_environment:
             environment = self.project.active_environment
@@ -58,6 +51,37 @@ class PluginSettingsService(SettingsService):
             )
         else:
             self.environment_plugin_config = None
+
+        project_settings_service = ProjectSettingsService(
+            self.project, config_service=self.plugins_service.config_service
+        )
+
+        environment_env = {}
+        if self.project.active_environment:
+            with self.feature_flag(
+                FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+            ) as strict_env_var_mode:
+                environment_env = {
+                    var: expand_env_vars(
+                        value,
+                        project_settings_service.env,
+                        raise_if_missing=strict_env_var_mode,
+                    )
+                    for var, value in self.project.active_environment.env.items()
+                }
+
+        environment_plugin_env = (
+            self.environment_plugin_config.env if self.environment_plugin_config else {}
+        )
+
+        self.env_override = {
+            **project_settings_service.env,  # project level environment variables
+            **project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
+            **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
+            **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition
+            **environment_env,  # active Meltano Environment top level `env:` key
+            **environment_plugin_env,  # env vars stored under the `env:` key of the plugin definition of the active meltano Environment
+        }
 
     @property
     def label(self):

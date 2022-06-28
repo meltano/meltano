@@ -1,6 +1,7 @@
 """Project Settings Service."""
 
 import json
+import os
 from typing import List
 
 import structlog
@@ -8,12 +9,7 @@ from dotenv import dotenv_values
 
 from meltano.core.project import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.settings_service import (
-    FeatureFlags,
-    SettingsService,
-    SettingValueStore,
-)
-from meltano.core.utils import expand_env_vars as do_expand_env_vars
+from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
 from .config_service import ConfigService
@@ -45,23 +41,11 @@ class ProjectSettingsService(SettingsService):
         self.config_service = config_service or ConfigService(self.project)
 
         self.env_override = {
-            # terminal environment variables already present from SettingService.env
+            **os.environ,  # terminal environment variables already present from SettingService.env
             **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
             **self.project.dotenv_env,  # env vars stored in the dotenv file
             **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key
         }
-
-        if self.project.active_environment:
-            with self.feature_flag(
-                FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
-            ) as strict_env_var_mode:
-                environment_env = {
-                    var: do_expand_env_vars(
-                        value, self.env_override, raise_if_missing=strict_env_var_mode
-                    )
-                    for var, value in self.project.active_environment.env.items()
-                }
-            self.env_override.update(environment_env)
 
         self.config_override = {  # noqa: WPS601
             **self.__class__.config_override,

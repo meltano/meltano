@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import os
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
@@ -97,6 +96,7 @@ class SettingsService(ABC):  # noqa: WPS214
         self.show_hidden = show_hidden
 
         self.env_override = env_override or {}
+
         self.config_override = config_override or {}
 
         self._setting_defs = None
@@ -189,7 +189,7 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             the environment as a dict.
         """
-        return {**os.environ, **self.env_override}
+        return {**self.env_override}
 
     @classmethod
     def unredact(cls, values: dict) -> dict:
