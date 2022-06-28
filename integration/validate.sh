@@ -15,6 +15,7 @@ compile_script
 
 CURRENT_DIR=$(pwd)
 cd "${TEST_DOCS_DIR}"
+echo "Running orchestration script..."
 bash -xeuo pipefail "${TEST_NAME}.sh"
 cd "${CURRENT_DIR}"
 
@@ -22,5 +23,6 @@ check_meltano_yaml
 
 # if theres a per test validate.sh, run it as well
 if [ -f "${INTEGRATION_DIR}/${TEST_NAME}/validate.sh" ]; then
+  echo "Running per test validate.sh..."
   bash -xeuo pipefail "${TEST_DOCS_DIR}/validate.sh"
 fi

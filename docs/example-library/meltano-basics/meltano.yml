@@ -17,13 +17,5 @@ plugins:
     pip_url: target-jsonl
 environments:
 - name: dev
-  config:
-    plugins:
-      extractors:
-      - name: tap-gitlab
-        config:
-          start_date: '2022-04-25T00:00:01Z'
-      loaders:
-      - name: target-jsonl
 - name: staging
 - name: prod

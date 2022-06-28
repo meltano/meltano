@@ -33,13 +33,16 @@ fi
 
 
 inject_logging_yaml(){
+  echo "Injecting a logging.yaml file..."
   cp "${INTEGRATION_BASE_DIR}"/logging.yaml "${TEST_DOCS_DIR}"/logging.yaml
 }
 
 compile_script(){
+  echo "Generating shell script from $TEST_SCRIPT_SOURCE..."
   "${INTEGRATION_BASE_DIR}"/mdsh -c  "${TEST_SCRIPT_SOURCE}" > "${TEST_DOCS_DIR}/${TEST_SCRIPT_NAME}"
 }
 
 check_meltano_yaml(){
-  diff -q "${TEST_MELTANO_YML}" "${TEST_MELTANO_YML_EXPECTED}"
+  echo "Checking to see if the resulting meltano.yml matches the expected meltano.yml..."
+  diff "${TEST_MELTANO_YML}" "${TEST_MELTANO_YML_EXPECTED}"
 }
