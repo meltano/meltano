@@ -102,7 +102,7 @@ def snowplow_optional(
     Yields:
         A freshly reset `SnowplowMicro` instance, or `None` if it could not be created.
     """
-    if snowplow_session is None:
+    if snowplow_session:
         yield None
     else:
         if isinstance(ProjectSettingsService.config_override, dict):
@@ -132,6 +132,6 @@ def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     Yields:
         A freshly reset `SnowplowMicro` instance.
     """
-    if snowplow_session is None:
+    if snowplow_optional is None:
         pytest.skip("Unable to start Snowplow Micro")
     yield snowplow_optional
