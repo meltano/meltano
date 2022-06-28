@@ -54,7 +54,7 @@ def _meltanofile_update_dict(
         )
     if environment_level_env:
         environment.update(
-            {"env": {"TEST_ENV_RESOLUTION_FROM": "environment_level_env"}}
+            {"env": {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"}}
         )
     if environment_level_plugin_config_indirected:
         environment.update(
@@ -86,13 +86,11 @@ _env_var_resolution_expectations = {
         {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"},
         _meltanofile_update_dict(),
         _terminal_env_var,
-        xfail=True,
     ),
     "Environment-level env (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(environment_level_env=True),
         _terminal_env_var,
-        xfail=True,
     ),
     "Top-level plugin setting (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},
@@ -138,7 +136,6 @@ _env_var_resolution_expectations = {
     "Environment-level env": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(environment_level_env=True),
-        xfail=True,
     ),
     "Top-level plugin setting": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},

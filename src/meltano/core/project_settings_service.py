@@ -44,18 +44,20 @@ class ProjectSettingsService(SettingsService):
 
         self.config_service = config_service or ConfigService(self.project)
 
-        self.env_override = {**self.project.env, **self.env_override}
+        self.env_override = {
+            # terminal environment variables already present from SettingService.env
+            **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
+            **self.project.dotenv_env,  # env vars stored in the dotenv file
+            **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key
+        }
 
         if self.project.active_environment:
-            # Update this with `self.project.dotenv_env`, `self.env`, etc. to expand
-            # other environment variables in the Environment's `env`.
-            expandable_env = {**self.project.env}
             with self.feature_flag(
                 FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
             ) as strict_env_var_mode:
                 environment_env = {
                     var: do_expand_env_vars(
-                        value, expandable_env, raise_if_missing=strict_env_var_mode
+                        value, self.env_override, raise_if_missing=strict_env_var_mode
                     )
                     for var, value in self.project.active_environment.env.items()
                 }
