@@ -94,7 +94,7 @@ def snowplow_session(request) -> SnowplowMicro | None:
 
 
 snowplow_lock = fasteners.InterProcessLock(
-    Path(gettempdir()) / f"meltano_pytest_{os.getpid()}_snowplow.lock"
+    Path(gettempdir()) / "meltano_pytest_snowplow.lock"
 )
 
 
