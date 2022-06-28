@@ -81,8 +81,11 @@ class Superset(BasePlugin):
             if custom_config_path.exists():
                 config_script_lines.extend(
                     [
-                        "import imp",
-                        f'custom_config = imp.load_source("superset_config", "{str(custom_config_path)}")',
+                        "from importlib.util import module_from_spec, spec_from_file_location",
+                        f'spec = spec_from_file_location("superset_config", {str(custom_config_path)!r})',
+                        "custom_config = module_from_spec(spec)",
+                        'sys.modules["superset_config"] = custom_config',
+                        "spec.loader.exec_module(custom_config)",
                         "for key in dir(custom_config):",
                         "    if key.isupper():",
                         "        setattr(module, key, getattr(custom_config, key))",

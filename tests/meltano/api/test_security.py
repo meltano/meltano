@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
-from unittest import mock
 
+import mock
 import pytest
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from flask import url_for

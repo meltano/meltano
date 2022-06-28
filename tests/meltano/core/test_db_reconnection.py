@@ -1,6 +1,5 @@
-from unittest.mock import Mock
-
 import pytest
+from mock import Mock
 from sqlalchemy.exc import OperationalError
 
 from meltano.core.db import check_db_connection

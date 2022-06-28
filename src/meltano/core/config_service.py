@@ -37,7 +37,7 @@ class ConfigService:
             The project settings.
         """
         if self._settings is None:
-            with bundle.find("settings.yml").open() as settings_yaml:
+            with open(bundle.root / "settings.yml") as settings_yaml:
                 settings = yaml.safe_load(settings_yaml)
             self._settings = list(map(SettingDefinition.parse, settings["settings"]))
 
