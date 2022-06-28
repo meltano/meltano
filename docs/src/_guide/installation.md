@@ -36,7 +36,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-For development off of Meltano's main Git branch, you can find out which versions of Python are supported in [`pyproject.toml`](https://github.com/meltano/meltano/blob/main/pyproject.toml) in the `tool.poetry.dependencies` section. Find the line that begins with `python = `. As an example, if it is `python = ">=3.7,<3.11"`, then you can use Python version 3.7, 3.8, 3.9, or 3.10.
+Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet support Python 3.10.
 
 #### Install pipx
 
@@ -95,11 +95,13 @@ Before you install Meltano, make sure you have the following requirements instal
   <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
 </div>
 
-Use the following command in PowerShell to check that you have the correct Python version installed:
+Use the following command to check that you have a supported Python version installed:
 
 ```powershell
 python --version
 ```
+
+Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet support Python 3.10.
 
 #### Install pipx
 

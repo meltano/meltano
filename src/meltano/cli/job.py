@@ -5,8 +5,7 @@ import click
 import structlog
 
 from meltano.core.block.parser import BlockParser, validate_block_sets
-from meltano.core.elt_context import PluginContext
-from meltano.core.legacy_tracking import LegacyTracker, legacy_tracker
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
