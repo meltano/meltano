@@ -1,5 +1,7 @@
 """Defines helpers related to the system database."""
 
+from __future__ import annotations
+
 import logging
 import time
 
@@ -13,10 +15,10 @@ from .project_settings_service import ProjectSettingsService
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
-_engines = dict()
+_engines = {}
 
 
-def project_engine(project, default=False) -> ("Engine", sessionmaker):
+def project_engine(project, default=False) -> tuple(Engine, sessionmaker):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
 
     existing_engine = _engines.get(project)
@@ -50,7 +52,7 @@ def check_db_connection(engine, max_retries, retry_timeout):  # noqa: WPS231
     """Check if the database is available the first time a project's engine is created."""
     attempt = 0
     while True:
-        try:
+        try:  # noqa: WPS503
             engine.connect()
         except OperationalError:
             if attempt == max_retries:

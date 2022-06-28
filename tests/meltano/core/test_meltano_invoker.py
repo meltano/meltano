@@ -2,8 +2,8 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from unittest import mock
 
+import mock
 import pytest
 
 import meltano

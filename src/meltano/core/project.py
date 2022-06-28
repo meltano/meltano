@@ -326,7 +326,7 @@ class Project(Versioned):  # noqa: WPS214
         """Retrieve an environment configuration.
 
         Args:
-            name: Name of the environment. Defaults to None.
+            name: Name of the environment.
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
 

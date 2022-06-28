@@ -1,11 +1,12 @@
 import json
+import logging
 import os
 import tempfile
 from pathlib import Path
-from unittest import mock
 
+import mock
 import pytest
-from asynctest import CoroutineMock, Mock
+from mock import AsyncMock
 
 from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import (
@@ -183,26 +184,33 @@ class TestELBContextBuilder:
 
 class TestExtractLoadBlocks:
     @pytest.fixture
-    def log(self, tmp_path):
+    def log_level_debug(self):
+        root_logger = logging.getLogger()
+        log_level = root_logger.level
+        try:
+            root_logger.setLevel(logging.DEBUG)
+            yield
+        finally:
+            root_logger.setLevel(log_level)
+
+    @pytest.fixture
+    def log(self, tmp_path: Path):
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
-    @pytest.fixture()
-    def tap_config_dir(self, mkdtemp, tap):
-        tap_config_dir = mkdtemp()
-        create_plugin_files(tap_config_dir, tap)
-        return tap_config_dir
+    @pytest.fixture
+    def tap_config_dir(self, tmp_path: Path, tap) -> Path:
+        create_plugin_files(tmp_path, tap)
+        return tmp_path
 
-    @pytest.fixture()
-    def mapper_config_dir(self, mkdtemp, tap):
-        mapper_config_dir = mkdtemp()
-        create_plugin_files(mapper_config_dir, tap)
-        return mapper_config_dir
+    @pytest.fixture
+    def mapper_config_dir(self, tmp_path: Path, tap) -> Path:
+        create_plugin_files(tmp_path, tap)
+        return tmp_path
 
-    @pytest.fixture()
-    def target_config_dir(self, mkdtemp, target):
-        target_config_dir = mkdtemp()
-        create_plugin_files(target_config_dir, target)
-        return target_config_dir
+    @pytest.fixture
+    def target_config_dir(self, tmp_path: Path, target) -> Path:
+        create_plugin_files(tmp_path, target)
+        return tmp_path
 
     @pytest.fixture
     def subject(self, session, elb_context):
@@ -215,35 +223,35 @@ class TestExtractLoadBlocks:
 
         return SingerRunner(elb_context)
 
-    @pytest.fixture()
+    @pytest.fixture
     def process_mock_factory(self):
         def _factory(name):
-            process_mock = Mock()
+            process_mock = mock.Mock()
             process_mock.name = name
-            process_mock.wait = CoroutineMock(return_value=0)
+            process_mock.wait = AsyncMock(return_value=0)
             return process_mock
 
         return _factory
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
-        tap.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
-        tap.wait = CoroutineMock(return_value=0)
+        tap.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        tap.wait = AsyncMock(return_value=0)
         return tap
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapper_process(self, process_mock_factory, mapper):
         mapper = process_mock_factory(mapper)
-        mapper.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
-        mapper.wait = CoroutineMock(return_value=0)
+        mapper.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        mapper.wait = AsyncMock(return_value=0)
         return mapper
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
-        target.stdout.readline = CoroutineMock(return_value="{}")  # noqa: P103
-        target.wait = CoroutineMock(return_value=0)
+        target.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        target.wait = AsyncMock(return_value=0)
         return target
 
     @pytest.mark.asyncio
@@ -263,10 +271,11 @@ class TestExtractLoadBlocks:
         plugin_invoker_factory,
         elb_context,
         log,
+        log_level_debug,
     ):
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
-        tap_process.stdout.readline = CoroutineMock(
+        tap_process.stdout.readline = AsyncMock(
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -275,7 +284,7 @@ class TestExtractLoadBlocks:
 
         mapper_process.sterr.at_eof.side_effect = True
         mapper_process.stdout.at_eof.side_effect = (False, False, True)
-        mapper_process.stdout.readline = CoroutineMock(
+        mapper_process.stdout.readline = AsyncMock(
             side_effect=(
                 b"%b" % json.dumps({"key": "mapper-mocked-value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -286,7 +295,7 @@ class TestExtractLoadBlocks:
         mapper_invoker = plugin_invoker_factory(mapper, config_dir=mapper_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
@@ -357,7 +366,7 @@ class TestExtractLoadBlocks:
     ):
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
-        tap_process.stdout.readline = CoroutineMock(
+        tap_process.stdout.readline = AsyncMock(
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -366,7 +375,7 @@ class TestExtractLoadBlocks:
 
         mapper_process.sterr.at_eof.side_effect = True
         mapper_process.stdout.at_eof.side_effect = (False, False, True)
-        mapper_process.stdout.readline = CoroutineMock(
+        mapper_process.stdout.readline = AsyncMock(
             side_effect=(
                 b"%b" % json.dumps({"key": "mapper-value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -377,11 +386,10 @@ class TestExtractLoadBlocks:
         mapper_invoker = plugin_invoker_factory(mapper, config_dir=mapper_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
-
             blocks = (
                 SingerBlock(
                     block_ctx=elb_context,
@@ -441,7 +449,7 @@ class TestExtractLoadBlocks:
 
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
-        tap_process.stdout.readline = CoroutineMock(
+        tap_process.stdout.readline = AsyncMock(
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -451,7 +459,7 @@ class TestExtractLoadBlocks:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
 
             blocks = (
@@ -545,7 +553,7 @@ class TestExtractLoadBlocks:
     ):
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
-        tap_process.stdout.readline = CoroutineMock(
+        tap_process.stdout.readline = AsyncMock(
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -554,7 +562,7 @@ class TestExtractLoadBlocks:
 
         mapper_process.sterr.at_eof.side_effect = True
         mapper_process.stdout.at_eof.side_effect = (False, False, True)
-        mapper_process.stdout.readline = CoroutineMock(
+        mapper_process.stdout.readline = AsyncMock(
             side_effect=(
                 b"%b" % json.dumps({"key": "mapper-value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -567,7 +575,7 @@ class TestExtractLoadBlocks:
 
         project.active_environment = Environment(name="test")
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
@@ -604,7 +612,7 @@ class TestExtractLoadBlocks:
             for block in blocks:
                 assert block.context.job.job_id == "test:tap-mock-to-target-mock"
 
-            elb.run_with_job = CoroutineMock()
+            elb.run_with_job = AsyncMock()
 
             await elb.run()
             assert elb.run_with_job.call_count == 1

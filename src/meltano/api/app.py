@@ -9,14 +9,15 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from meltano import __version__ as meltano_version
 from meltano.api import config as api_config
-from meltano.api.headers import *
+from meltano.api.headers import VERSION_HEADER
 from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.db import project_engine
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.utils import FORMAT, setup_logging
 from meltano.core.project import Project, ProjectReadonly
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.oauth.app import create_app as create_oauth_service
+
+STATUS_SERVER_ERROR = 500
 
 setup_logging()
 
@@ -115,8 +116,10 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     @app.before_request
     def setup_js_context():
         # setup the appUrl
-        appUrl = urlsplit(request.host_url)
-        g.jsContext = {"appUrl": appUrl.geturl()[:-1], "version": meltano_version}
+        g.jsContext = {
+            "appUrl": urlsplit(request.host_url).geturl()[:-1],
+            "version": meltano_version,
+        }
 
         setting_map = {
             "isSendAnonymousUsageStats": "send_anonymous_usage_stats",
@@ -145,10 +148,10 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         res.headers[VERSION_HEADER] = meltano_version
         return res
 
-    @app.errorhandler(500)
+    @app.errorhandler(STATUS_SERVER_ERROR)
     def internal_error(exception):
         logger.info(f"Error: {exception}")
-        return jsonify({"error": True, "code": str(exception)}), 500
+        return jsonify({"error": True, "code": str(exception)}), STATUS_SERVER_ERROR
 
     @app.errorhandler(ProjectReadonly)
     def _handle(ex):

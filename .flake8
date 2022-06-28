@@ -14,8 +14,6 @@ select =
     D
     # flake8-eradicate
     E80
-    # flake8-rst-docstrings
-    RST
     # flake8-string-format
     P
     # mccabe
@@ -36,11 +34,17 @@ ignore =
     # flake8-bandit
     # Allow subprocess module to be used
     S404
+    # Allow `urllib.open`
+    S310
+    # Allow `subprocess.run(..., shell=False)`
+    S603
     # pycodestyle
     # Allow for line breaks where Black decides are valid
     W503
     # Allow for long lines since we delegate to Black for enforcement
     E501
+    # Allow format strings with unindex parameters (because the pyupgrade pre-commit hook enforces their usage)
+    P101
     # wemake-python-styleguide
     # Allow blacklisted variable names that can be clear enough in method context
     WPS110
@@ -68,6 +72,8 @@ ignore =
     WPS420
     # Allow nested classes
     WPS431
+    # Import name collisions - disabled because it raises many false positives
+    WPS458
     # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
     WPS600
     # Allow using @staticmethod
@@ -76,6 +82,7 @@ ignore =
     WPS212
     # Various WPS refactor heavy warnings to ignore that currently have a poor risk/reward tradeoff.
     WPS100
+    WPS111
     WPS112
     WPS201
     WPS220
@@ -114,12 +121,14 @@ extended_default_ignore = []
 max_imports = 20
 docstring_style = google
 
-per_file_ignores =
+per-file-ignores =
     tests/*:
         # Don't warn on use of asserts in tests
         S101
         # Don't require docstrings in tests
         DAR101
+        DAR201
+        DAR301
         D100
         D101
         D102
@@ -136,6 +145,8 @@ per_file_ignores =
         WPS213
         # Don't warn on too many methods in test modules
         WPS214
+        # Don't warn about there being too many await expressions
+        WPS217
         # Don't warn on too many string constants in test methods
         WPS226
         # Context manager with too many assignments
@@ -159,8 +170,8 @@ per_file_ignores =
         # Found boolean non-keyword argument
         WPS425
 
-	# Found too long name
-	WPS118
+    # Found too long name
+    WPS118
 
     !tests/*:
         T
@@ -242,7 +253,7 @@ per_file_ignores =
         # Lots of docstrings reference other class methods
         RST210
         # Lots of docstrings document **kwargs
-	RST213
+    RST213
     src/meltano/core/settings_store.py:
         WPS202
         # Found overused expression: allow settings store implementations to all return vars with the same names

@@ -36,7 +36,7 @@ class MeltanoInvoker:
         Returns:
             A CompletedProcess class object from subprocess.run().
         """
-        return subprocess.run(  # noqa: S603
+        return subprocess.run(
             [self._executable_path(command), *args],
             **kwargs,
             env=self._executable_env(env),

@@ -1,9 +1,8 @@
 import os
 import re
 import subprocess
-import sys
-from unittest import mock
 
+import mock
 import pytest
 
 from meltano.core.project import Project
@@ -53,7 +52,7 @@ class TestVenvService:
             stderr=subprocess.PIPE,
         )
         for line in str(run.stdout).splitlines():
-            assert line.startswith("pip ") == False
+            assert not line.startswith("pip ")
 
         assert subject.exec_path("some_exe").parts[-6:] == (
             ".meltano",
@@ -65,10 +64,7 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        assert venv_dir.joinpath(".meltano_plugin_fingerprint").exists()
-        with open(
-            venv_dir.joinpath(".meltano_plugin_fingerprint"), "rt"
-        ) as fingerprint_file:
+        with open(venv_dir / ".meltano_plugin_fingerprint") as fingerprint_file:
             assert (
                 fingerprint_file.read()
                 # sha256 of "example"
@@ -120,16 +116,12 @@ class TestVenvService:
 class TestVirtualEnv:
     @pytest.mark.parametrize("system", ["Linux", "Darwin", "Windows"])
     def test_cross_platform(self, system, project):
-        python = f"python{sys.version[:3]}"
-
         with mock.patch("platform.system", return_value=system):
             subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
             assert subject._specs == VirtualEnv.PLATFORM_SPECS[system]
 
-    def test_unknown_platform(self):
-        # fmt: off
-        with mock.patch("platform.system", return_value="commodore64"), \
-          pytest.raises(Exception):
-        # fmt: on
-            subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
-            assert str(ex) == "Platform commodore64 is not supported."
+    def test_unknown_platform(self, project):
+        with mock.patch("platform.system", return_value="commodore64"), pytest.raises(
+            Exception, match="(?i)Platform commodore64.*?not supported."
+        ):
+            VirtualEnv(project.venvs_dir("pytest", "pytest"))

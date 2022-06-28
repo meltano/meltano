@@ -1,5 +1,4 @@
-from unittest import mock
-
+import mock
 import pytest
 
 from meltano.api.workers import UIAvailableWorker
@@ -14,9 +13,9 @@ class TestUIAvailableWorker:
     @mock.patch("webbrowser.open")
     @mock.patch("requests.get")
     def test_open_browser(self, requests_get, webbrowser_open, sleep, subject):
-        ERROR = mock.Mock(status_code=400)
-        OK = mock.Mock(status_code=200)
-        requests_get.side_effect = [ERROR, ERROR, OK]
+        error = mock.Mock(status_code=400)
+        ok = mock.Mock(status_code=200)
+        requests_get.side_effect = [error, error, ok]
         sleep.return_value = None
 
         subject.run()
