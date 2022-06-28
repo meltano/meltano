@@ -115,10 +115,13 @@ exclude =
     src/meltano/core/utils/__init__.py
     tests/meltano/core/runner/test_runner.py
 inline_quotes = double
-max_line_length = 88
 show_source = true
 extended_default_ignore = []
 max_imports = 20
+max_methods = 15
+max_arguments = 10
+max_line_length = 88
+max_local_variables = 10
 docstring_style = google
 
 per_file_ignores =
