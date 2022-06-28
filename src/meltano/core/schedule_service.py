@@ -36,6 +36,7 @@ class ScheduleDoesNotExistError(Exception):
 
         Args:
             name: The name of the schedule that does not exist.
+
         """
         self.name = name
 

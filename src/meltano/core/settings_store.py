@@ -31,15 +31,15 @@ logger = logging.getLogger(__name__)
 class ConflictingSettingValueException(Exception):
     """Occurs when a setting has multiple conflicting values via aliases."""
 
-    def __init__(self, settings):
+    def __init__(self, setting_names):
         """Instantiate the error.
 
         Args:
             setting_names: the name/aliases where conflicting values are set
 
         """
-        self.settings = settings
-        super().__init__(settings)
+        self.setting_names = setting_names
+        super().__init__(setting_names)
 
     def __str__(self) -> str:
         """Represent the error as a string.
@@ -47,7 +47,7 @@ class ConflictingSettingValueException(Exception):
         Returns:
             string representation of the error
         """
-        return f"Conflicting values for setting found in: {self.settings}"
+        return f"Conflicting values for setting found in: {self.setting_names}"
 
 
 class MultipleEnvVarsSetException(Exception):
@@ -328,7 +328,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
         if len(vals_with_metadata) > 1:
             if not reduce(eq, (val for val, _ in vals_with_metadata)):
                 raise ConflictingSettingValueException(
-                    {metadata["env_var"]: val for val, metadata in vals_with_metadata}
+                    [metadata["env_var"] for _, metadata in vals_with_metadata]
                 )
             else:
                 raise MultipleEnvVarsSetException(

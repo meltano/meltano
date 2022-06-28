@@ -104,7 +104,20 @@ plugins:
 
 Within a given configuration layer, a setting can be set via only a single name, whether that name is its canonical name or one of its aliases.
 So given the custom extractor defined above, the `my_custom_tap_username` setting could be set via the `MY_CUSTOM_TAP_MY_CUSTOM_TAP_USERNAME` environment variable or either the `MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME` or `MY_CUSTOM_TAP_USERNAME` variables.
+
 But if more than one of these variables is set in the terminal environment, then an exception will be raised--even if all the relevant environment variables have the same value.
+
+The configuration setting could also be set via the [`meltano config set`](/reference/command-line-interface#config) by setting either the canonical name or any of its aliases. Again using the custom extractor defined above as an example, the `my_custom_tap_username` could be set by any of the following commands:
+```bash
+# The canonical name
+meltano config my-custom-tap set my_custom_tap_username some_value
+
+# Alias 1
+meltano config my-custom-tap set custom_tap_username some_value
+
+# Alias 2
+meltano config my-custom-tap set username some_value
+```
 
 To see what name or alias a setting's value is being derived from, you can run `meltano config <plugin-name> list`:
 
@@ -131,7 +144,7 @@ If the values for the multiple environment variables differ, the error message w
 $ export MY_CUSTOM_TAP_USERNAME=some_username
 $ export MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME=some_other_username
 $ meltano config my-custom-tap
-Conflicting values for setting found in: {'MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME': 'some_other_username', 'MY_CUSTOM_TAP_USERNAME': 'some_username'}
+Conflicting values for setting found in: ['MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME', 'MY_CUSTOM_TAP_USERNAME']
 ```
 
 ### Expansion in setting values
