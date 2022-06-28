@@ -1102,12 +1102,12 @@ meltano state list --pattern '*tap-gitlab*'
 Merge new state onto existing state for a state ID.
 
 <div class="notification is-info">
-	<p><strong>Not seeing merged state in the system database?</strong></p>
-	<p>Merged state is computed at <em>execution</em> time.
-	The <samp>merge</samp> command merely
-	adds a new <samp>payload</samp> to the database which is merged together with
-	existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
-	</p>
+  <p><strong>Not seeing merged state in the system database?</strong></p>
+  <p>Merged state is computed at <em>execution</em> time.
+  The <samp>merge</samp> command merely
+  adds a new <samp>payload</samp> to the database which is merged together with
+  existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
+  </p>
 </div>
 
 #### How to use

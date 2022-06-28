@@ -25,6 +25,7 @@ pytest_plugins = [
     "fixtures.core",
     "fixtures.api",
     "fixtures.cli",
+    "fixtures.docker",
 ]
 
 if PYTEST_BACKEND == "sqlite":
@@ -33,8 +34,6 @@ elif PYTEST_BACKEND == "postgresql":
     pytest_plugins.append("fixtures.db.postgresql")
 else:
     raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")
-
-BACKEND = ["sqlite", "postgresql"]
 
 
 def pytest_runtest_setup(item):

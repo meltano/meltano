@@ -58,8 +58,8 @@ def _handle(ex):
     return (jsonify({"error": True, "code": str(ex)}), 502)
 
 
-@pluginsBP.route("/all", methods=["GET"])
-def all():  # noqa: WPS125
+@pluginsBP.route("/all", methods=["GET"])  # noqa: WPS125
+def all():
     """Plugins found by the PluginDiscoveryService.
 
     Returns:
@@ -139,13 +139,12 @@ def install_batch():  # noqa: WPS210
         JSON cotaining all plugins installed.
     """
     payload = request.get_json()
-    plugin_type = PluginType(payload["plugin_type"])
-    plugin_name = payload["name"]
-
     project = Project.find()
 
     plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
+    plugin = plugins_service.find_plugin(
+        payload["name"], plugin_type=PluginType(payload["plugin_type"])
+    )
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
     related_plugins = add_service.add_related(plugin)
@@ -157,12 +156,10 @@ def install_batch():  # noqa: WPS210
 
     # This was added to assist api_worker threads
     try:
-        loop = asyncio.get_event_loop()
+        asyncio.get_event_loop()
     except RuntimeError:
         logging.debug("/plugins/install/batch no asyncio event loop detected")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_results = install_service.install_plugins(
@@ -195,12 +192,10 @@ def install():
 
     # This was added to assist api_worker threads
     try:
-        loop = asyncio.get_event_loop()
+        asyncio.get_event_loop()
     except RuntimeError:
         logging.debug("/plugins/install no asyncio event loop detected")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_service.install_plugin(plugin, reason=PluginInstallReason.ADD)

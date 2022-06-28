@@ -1,4 +1,5 @@
 """ELT Context."""
+
 from __future__ import annotations
 
 from collections import namedtuple
@@ -388,15 +389,15 @@ class ELTContextBuilder:  # noqa: WPS214
     def plugin_context(
         self,
         plugin_ref: PluginRef,
-        env: dict = None,
-        config: dict = None,
+        env: dict | None = None,
+        config: dict | None = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
         Args:
             plugin_ref: Plugin reference object.
-            env: Environment override dictionary. Defaults to None.
-            config: Plugin configuration override dictionary. Defaults to None.
+            env: Environment override dictionary.
+            config: Plugin configuration override dictionary.
 
         Returns:
             A new `PluginContext` object.

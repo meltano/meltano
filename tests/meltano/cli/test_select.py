@@ -1,6 +1,6 @@
 import json
 
-from asynctest import mock
+from mock import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli

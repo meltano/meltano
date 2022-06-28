@@ -1,29 +1,18 @@
+from __future__ import annotations
+
 import asyncio
 from typing import Iterator
 
 import aiohttp
+import sqlalchemy
 import yaml
-from sqlalchemy import (
-    BIGINT,
-    JSON,
-    REAL,
-    SMALLINT,
-    TEXT,
-    TIMESTAMP,
-    Boolean,
-    Column,
-    Date,
-    Float,
-    Integer,
-    MetaData,
-    String,
-    Table,
-)
+
+STATUS_OK = 200
 
 
 async def fetch(url, session):
     async with session.get(url) as response:
-        if response.status != 200:
+        if response.status != STATUS_OK:
             response.raise_for_status()
         return await response.text()
 
@@ -56,8 +45,7 @@ def fetch_urls(
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
-        # Fix for when asyncio runs inside a sub-thread so there is no
-        #  event_loop available
+        # Fix for when asyncio runs inside a sub-thread so there is no event loop available
         asyncio.set_event_loop(asyncio.new_event_loop())
         loop = asyncio.get_event_loop()
 
@@ -67,56 +55,50 @@ def fetch_urls(
     yield from responses
 
 
+SQLALCHEMY_COL_TYPE_NAME_MAP = {
+    "timestamp without time zone": sqlalchemy.TIMESTAMP(timezone=False),
+    "timestamp with time zone": sqlalchemy.TIMESTAMP(timezone=True),
+    "date": sqlalchemy.Date,
+    "real": sqlalchemy.REAL,
+    "integer": sqlalchemy.Integer,
+    "smallint": sqlalchemy.SMALLINT,
+    "text": sqlalchemy.TEXT,
+    "bigint": sqlalchemy.BIGINT,
+    "float": sqlalchemy.Float,
+    "boolean": sqlalchemy.Boolean,
+    "json": sqlalchemy.JSON,
+}
+
+
 def get_sqlalchemy_col(
     column_name: str, column_type_name: str, primary_key_col_name: str
-) -> Column:
+) -> sqlalchemy.Column:
     """
     Helper method that returns the sqlalchemy Column object to be used for Table def.
     """
-    if column_type_name == "timestamp without time zone":
-        col = Column(column_name, TIMESTAMP(timezone=False))
-    elif column_type_name == "timestamp with time zone":
-        col = Column(column_name, TIMESTAMP(timezone=True))
-    elif column_type_name == "date":
-        col = Column(column_name, Date)
-    elif column_type_name == "real":
-        col = Column(column_name, REAL)
-    elif column_type_name == "integer":
-        col = Column(column_name, Integer)
-    elif column_type_name == "smallint":
-        col = Column(column_name, SMALLINT)
-    elif column_type_name == "text":
-        col = Column(column_name, TEXT)
-    elif column_type_name == "bigint":
-        col = Column(column_name, BIGINT)
-    elif column_type_name == "float":
-        col = Column(column_name, Float)
-    elif column_type_name == "boolean":
-        col = Column(column_name, Boolean)
-    elif column_type_name == "json":
-        col = Column(column_name, JSON)
-    else:
-        col = Column(column_name, String)
-
+    col = sqlalchemy.Column(
+        column_name,
+        SQLALCHEMY_COL_TYPE_NAME_MAP.get(column_type_name, sqlalchemy.String),
+    )
     if column_name == primary_key_col_name:
         col.primary_key = True
     return col
 
 
 def tables_from_manifest(
-    manifest_file_path: str, metadata: MetaData, schema_name: str
-) -> {str: Table}:
+    manifest_file_path: str, metadata: sqlalchemy.MetaData, schema_name: str
+) -> dict[str, sqlalchemy.Table]:
     with open(manifest_file_path) as file:
         schema_manifest: dict = yaml.safe_load(file)
         tables = {}
-        for table_name in schema_manifest:
-            primary_key_col_name = schema_manifest[table_name]["primary_key"]
-            columns: {str: str} = schema_manifest[table_name]["columns"]
+        for table_name, schema in schema_manifest.items():
+            primary_key_col_name = schema["primary_key"]
+            columns: dict[str, str] = schema["columns"]
             columns_list = [
                 get_sqlalchemy_col(column_name, column_type_name, primary_key_col_name)
                 for column_name, column_type_name in columns.items()
             ]
-
-            table = Table(table_name, metadata, *columns_list, schema=schema_name)
-            tables[table_name] = table
+            tables[table_name] = sqlalchemy.Table(
+                table_name, metadata, *columns_list, schema=schema_name
+            )
     return tables

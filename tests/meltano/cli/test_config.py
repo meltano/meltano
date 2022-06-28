@@ -1,6 +1,6 @@
 import json
 
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
@@ -59,10 +59,10 @@ class TestCliConfig:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.wait = AsyncMock(return_value=0)
         mock_invoke.returncode = 0
         payload = json.dumps({"type": "RECORD"}).encode()
-        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
+        mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
         with mock.patch(
             "meltano.core.plugin_test_service.PluginInvoker.invoke_async",
