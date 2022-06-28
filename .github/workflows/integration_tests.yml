@@ -1,6 +1,10 @@
 name: Integration Tests
 
 on:
+  pull_request:
+    paths:
+      - 'docs/example-library/**'
+      - 'integration/**'
   workflow_dispatch:
     inputs: {}
 

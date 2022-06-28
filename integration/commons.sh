@@ -2,7 +2,6 @@
 
 BASE_DIR=$(git rev-parse --show-toplevel)
 INTEGRATION_BASE_DIR="${BASE_DIR}/integration"
-MDSH_PATH="${INTEGRATION_BASE_DIR}"
 
 # What we'll "compile" the markdown to.
 TEST_SCRIPT_NAME="${TEST_NAME}.sh"

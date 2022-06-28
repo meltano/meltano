@@ -8,7 +8,7 @@ if [ -z "$TEST_NAME" ]; then
   exit 1
 fi
 
-source $(git rev-parse --show-toplevel)/integration/commons.sh
+source "$(git rev-parse --show-toplevel)/integration/commons.sh"
 
 inject_logging_yaml
 compile_script
