@@ -124,12 +124,14 @@ max_line_length = 88
 max_local_variables = 10
 docstring_style = google
 
-per_file_ignores =
+per-file-ignores =
     tests/*:
         # Don't warn on use of asserts in tests
         S101
         # Don't require docstrings in tests
         DAR101
+        DAR201
+        DAR301
         D100
         D101
         D102
@@ -171,8 +173,8 @@ per_file_ignores =
         # Found boolean non-keyword argument
         WPS425
 
-	# Found too long name
-	WPS118
+    # Found too long name
+    WPS118
 
     !tests/*:
         T
@@ -254,7 +256,7 @@ per_file_ignores =
         # Lots of docstrings reference other class methods
         RST210
         # Lots of docstrings document **kwargs
-	RST213
+    RST213
     src/meltano/core/settings_store.py:
         WPS202
         # Found overused expression: allow settings store implementations to all return vars with the same names

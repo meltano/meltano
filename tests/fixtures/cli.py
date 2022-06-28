@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import logging
 import os
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from click.testing import CliRunner
@@ -10,14 +13,30 @@ from meltano.core.project import Project
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 
+if TYPE_CHECKING:
+    from fixtures.docker import SnowplowMicro
+
+
+class MeltanoCliRunner(CliRunner):
+    def __init__(self, *args, snowplow: SnowplowMicro | None = None, **kwargs):
+        """Initialize the `MeltanoCliRunner`."""
+        self.snowplow = snowplow
+        super().__init__(*args, **kwargs)
+
+    def invoke(self, *args, **kwargs) -> Any:
+        results = super().invoke(*args, **kwargs)
+        if self.snowplow:
+            assert self.snowplow.all()["bad"] == 0
+        return results
+
 
 @pytest.fixture
-def cli_runner(pushd):
+def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
     pushd(os.getcwd())  # Ensure we return to the CWD after the test
     root_logger = logging.getLogger()
     log_level = root_logger.level
     try:
-        yield CliRunner(mix_stderr=False)
+        yield MeltanoCliRunner(mix_stderr=False, snowplow=snowplow_optional)
     finally:
         root_logger.setLevel(log_level)
 
