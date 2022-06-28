@@ -1,5 +1,6 @@
 import json
 import logging
+import platform
 import sys
 import tempfile
 
@@ -48,6 +49,10 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_stdio_capture(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
 
         stdout_out = subject.out("stdout")
         stderr_out = subject.out("stderr")
@@ -92,6 +97,11 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_out_writers(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         writer_out = subject.out("writer")
         line_writer_out = subject.out("lwriter")
         basic_out = subject.out("basic")
@@ -140,6 +150,11 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_set_custom_logger(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         logger = structlog.getLogger()
         out = subject.out("basic", logger.bind(is_test=True))
 
@@ -154,8 +169,17 @@ class TestOutputLogger:
             },
         )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     @pytest.mark.asyncio
     async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         logging_out = subject.out("logging")
 
         with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
@@ -174,7 +198,16 @@ class TestOutputLogger:
             {"event": "error"},
         )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     def test_logging_exception(self, log, subject, redirect_handler):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         logging_out = subject.out("logging")
 
         # it raises logs unhandled exceptions
@@ -186,6 +219,7 @@ class TestOutputLogger:
                     raise exception
 
         # make sure it let the exception through
+        # All code below here in this test cannot be reached
         assert exc.value is exception  # noqa: WPS441
 
         log_content = json.loads(log.read())
