@@ -6,13 +6,10 @@ import json
 import os
 import subprocess
 from contextlib import contextmanager
-from pathlib import Path
-from tempfile import gettempdir
 from typing import Any
 from urllib.request import urlopen
 
 import backoff
-import fasteners
 import pytest
 
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -93,11 +90,6 @@ def snowplow_session(request) -> SnowplowMicro | None:
             yield None
 
 
-snowplow_lock = fasteners.InterProcessLock(
-    Path(gettempdir()) / "meltano_pytest_snowplow.lock"
-)
-
-
 @pytest.fixture
 def snowplow_optional(
     snowplow_session: SnowplowMicro | None, monkeypatch
@@ -113,22 +105,21 @@ def snowplow_optional(
     if snowplow_session is None:
         yield None
     else:
-        with snowplow_lock:
-            if isinstance(ProjectSettingsService.config_override, dict):
-                monkeypatch.delitem(
-                    ProjectSettingsService.config_override,
-                    "send_anonymous_usage_stats",
-                    raising=False,
-                )
-            monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
-            monkeypatch.setenv(
-                "MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS",
-                f'["{snowplow_session.collector_endpoint}"]',
+        if isinstance(ProjectSettingsService.config_override, dict):
+            monkeypatch.delitem(
+                ProjectSettingsService.config_override,
+                "send_anonymous_usage_stats",
+                raising=False,
             )
-            try:
-                yield snowplow_session
-            finally:
-                snowplow_session.reset()
+        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
+        monkeypatch.setenv(
+            "MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS",
+            f'["{snowplow_session.collector_endpoint}"]',
+        )
+        try:
+            yield snowplow_session
+        finally:
+            snowplow_session.reset()
 
 
 @pytest.fixture
