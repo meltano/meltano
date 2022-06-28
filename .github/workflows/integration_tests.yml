@@ -40,4 +40,4 @@ jobs:
     - name: Run integration tests
       run: |
         poetry env use "3.8"
-        poetry run bash integration/meltano-basics/validate.sh
+        poetry run bash integration/validate.sh meltano-basics
