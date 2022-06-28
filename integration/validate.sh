@@ -12,7 +12,12 @@ source $(git rev-parse --show-toplevel)/integration/commons.sh
 
 inject_logging_yaml
 compile_script
+
+CURRENT_DIR=$(pwd)
+cd "${TEST_DOCS_DIR}"
 bash -xeuo pipefail "${TEST_NAME}.sh"
+cd "${CURRENT_DIR}"
+
 check_meltano_yaml
 
 # if theres a per test validate.sh, run it as well
