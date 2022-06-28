@@ -1,11 +1,17 @@
 import logging
+import platform
 
+import pytest
 from snowplow_tracker import Emitter
 
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
 
 
+@pytest.mark.xfail(
+    platform.system() == "Windows",
+    reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+)
 def test_get_snowplow_tracker_invalid_endpoint(project, caplog):
     endpoints = """
         [
