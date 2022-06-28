@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 import os
 import platform
+import subprocess
 import uuid
 from contextlib import contextmanager
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import mock
 import pytest
@@ -14,6 +15,9 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
+
+if TYPE_CHECKING:
+    from fixtures.docker import SnowplowMicro
 
 
 def load_analytics_json(project: Project) -> dict[str, Any]:
@@ -288,6 +292,17 @@ class TestTracker:
         platform.system() == "Windows",
         reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
     )
+    def test_exit_event_is_fired(self, project: Project, snowplow: SnowplowMicro):
+        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
+
+        event_summary = snowplow.all()
+        assert event_summary["good"] > 0
+        assert event_summary["bad"] == 0
+
+        exit_event = snowplow.good()[0]["event"]
+        assert exit_event["event_name"] == "exit_event"
+        assert exit_event["unstruct_event"]["data"]["data"]["exit_code"] == 1
+
     @pytest.mark.parametrize("send_anonymous_usage_stats", (True, False))
     def test_context_with_telemetry_state_change_event(
         self, project: Project, send_anonymous_usage_stats: bool
