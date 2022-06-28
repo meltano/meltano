@@ -3,7 +3,11 @@ settings:
 - name: send_anonymous_usage_stats
   kind: boolean
   value: true
-  env_aliases: ["!MELTANO_DISABLE_TRACKING"]
+  # Previously:
+  # env_aliases: ["!MELTANO_DISABLE_TRACKING"]
+- name: disable_tracking
+  kind: boolean
+  # Replaces negated env_alias from `send_anonymous_usage_stats`
 - name: project_id
 - name: database_uri
   value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db

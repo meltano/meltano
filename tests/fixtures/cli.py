@@ -11,13 +11,15 @@ from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 
 
-@pytest.fixture()
+@pytest.fixture
 def cli_runner(pushd):
-    # this will make sure we are back at `cwd`
-    # after this test is finished
-    pushd(os.getcwd())
-
-    yield CliRunner(mix_stderr=False)
+    pushd(os.getcwd())  # Ensure we return to the CWD after the test
+    root_logger = logging.getLogger()
+    log_level = root_logger.level
+    try:
+        yield CliRunner(mix_stderr=False)
+    finally:
+        root_logger.setLevel(log_level)
 
 
 @pytest.fixture(scope="class")
@@ -34,10 +36,10 @@ def project_files_cli(test_dir, compatible_copy_tree):
     # cd into the new project root
     os.chdir(project.root)
 
-    yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-
-    # clean-up
-    Project.deactivate()
-    os.chdir(test_dir)
-    shutil.rmtree(project.root)
-    logging.debug(f"Cleaned project at {project.root}")
+    try:
+        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        shutil.rmtree(project.root)
+        logging.debug(f"Cleaned project at {project.root}")

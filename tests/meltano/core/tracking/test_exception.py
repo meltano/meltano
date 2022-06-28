@@ -32,21 +32,6 @@ class CustomException(Exception):
     """A custom exception type to be used in `test_complex_exception_context`."""
 
 
-class AnyInt:
-    """A class whoses instances are equal to any int."""
-
-    def __eq__(self, other: Any) -> bool:
-        """Check if `other` is an int.
-
-        Parameters:
-            other: Any object.
-
-        Returns:
-            Whether the object is an int.
-        """
-        return isinstance(other, int)
-
-
 def is_valid_exception_context(instance: dict[str, Any]) -> bool:
     try:
         with warnings.catch_warnings():
@@ -128,38 +113,28 @@ def test_complex_exception_context():
 
     assert is_valid_exception_context(ctx.data)
 
-    pathlib_relative_path = "lib/python{}.{}/pathlib.py".format(
-        *python_version_tuple()[:2]
+    major, minor, _ = python_version_tuple()
+
+    cause = ctx.data["exception"]["context"].pop("cause")
+    context = ctx.data["exception"]["context"].pop("context")
+
+    assert cause == context
+    assert cause["type"] == "FileNotFoundError"
+    assert (
+        cause["str_hash"]
+        == "8604732e6dd06fbcccf2f97979f6ec308a21b6b253fd42de5cf79a0b758155d0"
     )
-    path_resolve_exception_context = {
-        "type": "FileNotFoundError",
-        "str_hash": "8604732e6dd06fbcccf2f97979f6ec308a21b6b253fd42de5cf79a0b758155d0",
-        "repr_hash": "b4f0f46612e4904b5c3861b2596331b62edf2b82ba33aba8d8a3bc19741e587e",
-        "traceback": [
-            {
-                "file": f".../{THIS_FILE_BASENAME}",
-                "line_number": line_nums[1],
-            },
-            {
-                "file": pathlib_relative_path,
-                "line_number": AnyInt(),
-            },
-            {
-                "file": pathlib_relative_path,
-                "line_number": AnyInt(),
-            },
-            {
-                "file": pathlib_relative_path,
-                "line_number": AnyInt(),
-            },
-            {
-                "file": pathlib_relative_path,
-                "line_number": AnyInt(),
-            },
-        ],
-        "cause": None,
-        "context": None,
+    assert (
+        cause["repr_hash"]
+        == "b4f0f46612e4904b5c3861b2596331b62edf2b82ba33aba8d8a3bc19741e587e"
+    )
+    assert cause["traceback"][0] == {
+        "file": f".../{THIS_FILE_BASENAME}",
+        "line_number": line_nums[1],
     }
+    assert cause["traceback"][1]["file"] == f"lib/python{major}.{minor}/pathlib.py"
+    assert cause["cause"] is None
+    assert cause["context"] is None
 
     assert ctx.data == {
         "context_uuid": ctx.data["context_uuid"],
@@ -188,8 +163,6 @@ def test_complex_exception_context():
                         "line_number": line_nums[2],
                     },
                 ],
-                "cause": path_resolve_exception_context,
-                "context": path_resolve_exception_context,
             },
         },
     }
