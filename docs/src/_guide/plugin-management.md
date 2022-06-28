@@ -216,11 +216,11 @@ Hit Return to accept the default: plugin name with underscores instead of dashes
 
 Specify the plugin's `pip install` argument, for example:
 - PyPI package name:
-	tap-covid-19
+  tap-covid-19
 - Git repository URL:
-	git+https://gitlab.com/meltano/tap-covid-19.git
+  git+https://gitlab.com/meltano/tap-covid-19.git
 - local directory, in editable/development mode:
-	-e extract/tap-covid-19
+  -e extract/tap-covid-19
 - 'n' if using a local executable (nothing to install)
 
 Default: plugin name as PyPI package name
@@ -234,10 +234,10 @@ Default: name derived from `pip_url`
 (executable) [tap-covid-19]: tap-covid-19
 
 Specify the tap's supported Singer features (executable flags), for example:
-	`catalog`: supports the `--catalog` flag
-	`discover`: supports the `--discover` flag
-	`properties`: supports the `--properties` flag
-	`state`: supports the `--state` flag
+  `catalog`: supports the `--catalog` flag
+  `discover`: supports the `--discover` flag
+  `properties`: supports the `--properties` flag
+  `state`: supports the `--state` flag
 
 To find out what features a tap supports, reference its documentation or try one
 of the tricks under [how to test a tap](/contribute/plugins#how-to-test-a-tap).
