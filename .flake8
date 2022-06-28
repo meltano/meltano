@@ -34,11 +34,17 @@ ignore =
     # flake8-bandit
     # Allow subprocess module to be used
     S404
+    # Allow `urllib.open`
+    S310
+    # Allow `subprocess.run(..., shell=False)`
+    S603
     # pycodestyle
     # Allow for line breaks where Black decides are valid
     W503
     # Allow for long lines since we delegate to Black for enforcement
     E501
+    # Allow format strings with unindex parameters (because the pyupgrade pre-commit hook enforces their usage)
+    P101
     # wemake-python-styleguide
     # Allow blacklisted variable names that can be clear enough in method context
     WPS110
@@ -66,6 +72,8 @@ ignore =
     WPS420
     # Allow nested classes
     WPS431
+    # Import name collisions - disabled because it raises many false positives
+    WPS458
     # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
     WPS600
     # Allow using @staticmethod
@@ -74,6 +82,7 @@ ignore =
     WPS212
     # Various WPS refactor heavy warnings to ignore that currently have a poor risk/reward tradeoff.
     WPS100
+    WPS111
     WPS112
     WPS201
     WPS220
@@ -134,6 +143,8 @@ per_file_ignores =
         WPS213
         # Don't warn on too many methods in test modules
         WPS214
+        # Don't warn about there being too many await expressions
+        WPS217
         # Don't warn on too many string constants in test methods
         WPS226
         # Context manager with too many assignments

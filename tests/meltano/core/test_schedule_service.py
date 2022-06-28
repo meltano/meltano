@@ -1,6 +1,6 @@
 from datetime import datetime
-from unittest import mock
 
+import mock
 import pytest
 
 from meltano.core.plugin import PluginType
@@ -111,7 +111,7 @@ class TestScheduleService:
         subject.update_schedule(schedule)
 
         # there should be only 1 element with the set interval
-        assert sum(map(lambda sbj: sbj.interval == "@pytest", subject.schedules())) == 1
+        assert sum(sbj.interval == "@pytest" for sbj in subject.schedules()) == 1
 
         # it should be the first element
         assert subject.schedules()[0].interval == "@pytest"

@@ -1,5 +1,7 @@
 """The Meltano REPL."""
 
+import click
+
 from meltano.cli.cli import cli
 from meltano.cli.params import database_uri_option
 
@@ -8,8 +10,12 @@ from meltano.cli.params import database_uri_option
 @database_uri_option
 def repl():
     """Start the Meltano REPL."""
-    # dynamic includes
-    import IPython
+    try:
+        import IPython
+    except ImportError as ex:
+        click.secho("The 'ipython' package must be installed to use the REPL", fg="red")
+        raise click.Abort from ex
+
     from traitlets.config import Config
 
     # First create a config object from the traitlets library

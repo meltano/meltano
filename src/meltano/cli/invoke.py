@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import sys
 
@@ -23,7 +24,6 @@ from meltano.core.plugin_invoker import (
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
-from meltano.core.utils import run_async
 
 from .utils import CliError, propagate_stop_signals
 
@@ -117,7 +117,7 @@ def invoke(
 
     invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
     try:
-        exit_code = run_async(
+        exit_code = asyncio.run(
             _invoke(
                 invoker,
                 project,

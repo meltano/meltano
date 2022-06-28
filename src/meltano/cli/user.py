@@ -79,4 +79,4 @@ def add(ctx, username, password, role, **flags):
             users.db.session.commit()
     except Exception as err:
         click.secho(f"Could not create user '{username}': {err}", fg="red")
-        click.Abort()
+        raise click.Abort from err

@@ -1,5 +1,7 @@
 """Meltano runtime environments."""
 
+from __future__ import annotations
+
 import copy
 from typing import Any, Dict, Iterable, List, Optional, Type, TypeVar
 
@@ -129,11 +131,16 @@ class EnvironmentConfig(Canonical):
 class Environment(NameEq, Canonical):
     """Runtime environment for Meltano runs."""
 
-    def __init__(self, name: str, config: dict = None, env: dict = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        config: dict | None = None,
+        env: dict | None = None,
+    ) -> None:
         """Create a new environment object.
 
         Args:
-            name: Environment name. Must be unique. Defaults to None.
+            name: Environment name. Must be unique.
             config: Dictionary with environment configuration.
             env: Optional override environment values.
         """
