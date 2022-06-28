@@ -4,7 +4,7 @@ A quick overview of how to use meltano - using a prepopulated meltano.yml.
 
 ## Setup
 
-To begin, copy `docs/example-library/meltano-basics/meltano.yml` to a new directory and run `meltano install`:
+To begin, download or copy the [meltano.yml](/docs/example-library/meltano-basic/meltano.yml) to an empty directory and run:
 
 ```shell
 meltano install

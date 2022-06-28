@@ -22,13 +22,18 @@ handlers:
     level: INFO
     formatter: structured_plain
     stream: "ext://sys.stderr"
-  file:
+  jsonl_file:
     class: logging.FileHandler
     level: DEBUG
     filename: integration-test.log.jsonl
     formatter: json
+  plain_file:
+    class: logging.FileHandler
+    level: DEBUG
+    filename: integration-test.log
+    formatter: structured_plain
 
 root:
   level: DEBUG
   propagate: yes
-  handlers: [console, file]
+  handlers: [console, jsonl_file, plain_file]
