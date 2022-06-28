@@ -1,39 +1,45 @@
 #!/usr/bin/env bash
 
 BASE_DIR=$(git rev-parse --show-toplevel)
-INTEGRATION_DIR="${BASE_DIR}/integration"
-MDSH_PATH="${INTEGRATION_DIR}"
+INTEGRATION_BASE_DIR="${BASE_DIR}/integration"
+MDSH_PATH="${INTEGRATION_BASE_DIR}"
+
+# What we'll "compile" the markdown to.
+TEST_SCRIPT_NAME="${TEST_NAME}.sh"
+
+TEST_DOCS_DIR="./docs/example-library/$TEST_NAME"
+if [ ! -d "$TEST_DOCS_DIR" ]; then
+  echo "Test directory $TEST_DOCS_DIR does not exist"
+  exit 1
+fi
+
+TEST_SCRIPT_SOURCE="${TEST_DOCS_DIR}/index.md"
+if [ ! -f "$TEST_SCRIPT_SOURCE" ]; then
+  echo "Test script source: $TEST_SCRIPT_SOURCE does not exist"
+  exit 1
+fi
+
+TEST_MELTANO_YML="${TEST_DOCS_DIR}/meltano.yml"
+if [ ! -f "$TEST_MELTANO_YML" ]; then
+  echo "Test meltano.yml: $TEST_MELTANO_YML does not exist"
+  exit 1
+fi
+
+TEST_MELTANO_YML_EXPECTED="${TEST_DOCS_DIR}/ending-meltano.yml"
+if [ ! -f "$TEST_MELTANO_YML_EXPECTED" ]; then
+  echo "Test expected ending meltano.yml: $TEST_MELTANO_YML_EXPECTED does not exist"
+  exit 1
+fi
 
 
 inject_logging_yaml(){
-  TARGET_DIR=$1
-  if [ ! -d "$TARGET_DIR" ]; then
-    echo "Target directory $TARGET_DIR does not exist"
-    exit 1
-  fi
-  cp "${INTEGRATION_DIR}"/logging.yaml "$TARGET_DIR"/logging.yaml
+  cp "${INTEGRATION_BASE_DIR}"/logging.yaml "${TEST_DOCS_DIR}"/logging.yaml
 }
 
 compile_script(){
-  SOURCE_FILE=$1
-  OUTPUT_SCRIPT=$2
-  if [ ! -f "$SOURCE_FILE" ]; then
-    echo "Source file $SOURCE_FILE does not exist"
-    exit 1
-  fi
-  "${INTEGRATION_DIR}"/mdsh -c  "$SOURCE_FILE" > "$OUTPUT_SCRIPT"
+  "${INTEGRATION_BASE_DIR}"/mdsh -c  "${TEST_SCRIPT_SOURCE}" > "${TEST_SCRIPT_NAME}"
 }
 
 check_meltano_yaml(){
-  SOURCE_FILE=$1
-  TARGET_FILE=$2
-  if [ ! -f "$SOURCE_FILE" ]; then
-    echo "Source file $SOURCE_FILE does not exist"
-    exit 1
-  fi
-  if [ ! -f "$TARGET_FILE" ]; then
-    echo "Target file $TARGET_FILE does not exist"
-    exit 1
-  fi
-  diff -q "$SOURCE_FILE" "$TARGET_FILE"
+  diff -q "${TEST_MELTANO_YML}" "${TEST_MELTANO_YML_EXPECTED}"
 }
