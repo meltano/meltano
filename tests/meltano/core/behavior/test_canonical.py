@@ -1,7 +1,9 @@
+import io
+
 import pytest
-import yaml
 
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.yaml import configure_yaml
 
 definition = {
     # a, b, …, z
@@ -22,7 +24,12 @@ class TestCanonical:
         subject.test = "hello"
         yaml_definition = "\n".join(f"{k}: {v}" for k, v in iter(subject))
 
-        assert yaml.dump(subject).strip() == yaml_definition
+        yaml = configure_yaml()
+        buf = io.StringIO()
+        yaml.dump(subject, buf)
+        buf.seek(0)
+
+        assert buf.read().strip() == yaml_definition
 
     def test_false(self, subject):
         subject.false_value = False
@@ -70,7 +77,7 @@ class TestCanonical:
 
     def test_defaults(self, subject):
         with pytest.raises(AttributeError):
-            subject.test
+            subject.test  # noqa: WPS428
 
         subject.test = None
 
@@ -92,7 +99,7 @@ class TestCanonical:
     def test_fallbacks(self, subject):
         # Calling an unknown attribute is not supported
         with pytest.raises(AttributeError):
-            subject.unknown
+            subject.unknown  # noqa: WPS428
 
         fallback = Canonical(unknown="value", known="value")
         # This would typically be set from a Canonical subclass

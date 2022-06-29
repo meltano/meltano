@@ -7,6 +7,8 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Any
 
+from ruamel.yaml import Representer
+
 from . import utils
 from .behavior import NameEq
 from .behavior.canonical import Canonical
@@ -97,6 +99,32 @@ class YAMLEnum(str, Enum):
             Object in yaml string form.
         """
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
+
+    @classmethod
+    def to_yaml(cls, representer: Representer, node: Any):
+        """Represent as yaml.
+
+        Args:
+            representer: YAML representer.
+            node: Object to dump.
+
+        Returns:
+            Object in yaml string form.
+        """
+        return representer.represent_scalar("tag:yaml.org,2002:str", str(node))
+
+    @classmethod
+    def from_yaml(cls, constructor, node):
+        """Construct from yaml.
+
+        Args:
+            constructor: Class constructor.
+            node: YAML node.
+
+        Returns:
+            Object from yaml node.
+        """
+        return cls(node.value)
 
 
 class SettingKind(YAMLEnum):

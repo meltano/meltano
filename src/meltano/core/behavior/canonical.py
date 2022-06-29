@@ -6,6 +6,7 @@ from os import PathLike
 from typing import Any, Type, TypeVar, Union
 
 import yaml
+from ruamel.yaml import Representer
 
 T = TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
 
@@ -267,6 +268,22 @@ class Canonical:  # noqa: WPS214 (too many methods)
         """
         return dumper.represent_mapping(
             "tag:yaml.org,2002:map", Canonical.as_canonical(obj), flow_style=False
+        )
+
+    @classmethod
+    def to_yaml(cls, representer: Representer, obj: Any):
+        """YAML serializer for Canonical objects.
+
+        Args:
+            representer: The YAML representer.
+            obj: The Canonical object to serialize.
+
+        Returns:
+            The serialized YAML representation of the object.
+        """
+        return representer.represent_mapping(
+            "tag:yaml.org,2002:map",
+            Canonical.as_canonical(obj),
         )
 
     @classmethod

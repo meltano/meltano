@@ -1,21 +1,33 @@
 """Module for handling multiple project .yml files."""
 
+from __future__ import annotations
+
 import copy
 import logging
 from collections import OrderedDict
+from os import PathLike
 from pathlib import Path
-from typing import List
 
-import yaml
 from atomicwrites import atomic_write
+from ruamel.yaml import YAMLError
+
+from meltano.core.yaml import configure_yaml
 
 logger = logging.getLogger(__name__)
 
 BLANK_SUBFILE = {"plugins": {}, "schedules": []}  # noqa: WPS407
 
 
-def deep_merge(parent: dict, children: List[dict]) -> dict:
-    """Deep merge a list of child dicts with a given parent."""
+def deep_merge(parent: dict, children: list[dict]) -> dict:
+    """Deep merge a list of child dicts with a given parent.
+
+    Args:
+        parent: The parent dict.
+        children: The child dicts.
+
+    Returns:
+        The merged dict.
+    """
     base = copy.deepcopy(parent)
     for child in children:
         for key, value in child.items():
@@ -38,38 +50,63 @@ class InvalidIncludePath(Exception):
 class ProjectFiles:  # noqa: WPS214
     """Interface for working with multiple project yaml files."""
 
-    def __init__(self, root: Path, meltano_file_path: Path):
-        """Instantiate ProjectFiles interface from project root and meltano.yml path."""
+    def __init__(self, root: Path, meltano_file_path: Path) -> None:
+        """Instantiate ProjectFiles interface from project root and meltano.yml path.
+
+        Args:
+            root: The project root path.
+            meltano_file_path: The path to the meltano.yml file.
+        """
         self.root = root.resolve()
-        self._meltano = None
+        self._meltano: dict | None = None
         self._meltano_file_path = meltano_file_path.resolve()
         self._plugin_file_map = {}
+        self._yaml = configure_yaml()
 
     @property
-    def meltano(self):
-        """Return the contents of this projects `meltano.yml`."""
+    def meltano(self) -> dict:
+        """Return the contents of this projects `meltano.yml`.
+
+        Returns:
+            The contents of this projects `meltano.yml`.
+        """
         if self._meltano is None:
             with open(self._meltano_file_path) as melt_f:
-                self._meltano = yaml.safe_load(melt_f)
+                self._meltano = self._yaml.load(melt_f)
         return self._meltano
 
     @property
-    def include_paths(self) -> List[Path]:
-        """Return list of paths derived from glob patterns defined in the meltanofile."""
+    def include_paths(self) -> list[Path]:
+        """Return list of paths derived from glob patterns defined in the meltanofile.
+
+        Returns:
+            List of paths derived from glob patterns defined in the meltanofile.
+        """
         include_path_patterns = self.meltano.get("include_paths", [])
         return self._resolve_include_paths(include_path_patterns)
 
     def load(self) -> dict:
-        """Load all project files into a single dict representation."""
+        """Load all project files into a single dict representation.
+
+        Returns:
+            A dict representation of all project files.
+        """
         # meltano file may have changed in another process, so reset cache first
         self.reset_cache()
         included_file_contents = self._load_included_files()
         return deep_merge(self.meltano, included_file_contents)
 
-    def update(self, meltano_config: dict):
+    def update(self, meltano_config: dict) -> dict:
         """Update config by overriding current config with new, changed config.
 
-        Note: `.update()` will write blank entities for those no longer in use (i.e. contained config on load, but not on save).
+        Note: `.update()` will write blank entities for those no longer in use
+        (i.e. contained config on load, but not on save).
+
+        Args:
+            meltano_config: The new config to update with.
+
+        Returns:
+            The updated config dictionary.
         """
         file_dicts = self._split_config_dict(meltano_config)
         for file_path, contents in file_dicts.items():
@@ -81,17 +118,37 @@ class ProjectFiles:  # noqa: WPS214
         self.reset_cache()
         return meltano_config
 
-    def reset_cache(self):
+    def reset_cache(self) -> None:
         """Reset cached view of the meltano.yml file."""
         self._meltano = None
 
-    def _is_valid_include_path(self, file_path: Path):
-        """Determine if given path is a valid `include_paths` file."""
+    def _is_valid_include_path(self, file_path: Path) -> None:
+        """Determine if given path is a valid `include_paths` file.
+
+        Args:
+            file_path: The path to check.
+
+        Raises:
+            InvalidIncludePath: If the included path is not a valid file.
+        """
         if not (file_path.is_file() and file_path.exists()):
             raise InvalidIncludePath(f"Included path '{file_path}' not found.")
 
-    def _resolve_include_paths(self, include_path_patterns: List[str]) -> List[Path]:
-        """Return a list of paths from a list of glob pattern strings, not including `meltano.yml` (even if it is matched by a pattern)."""
+    def _resolve_include_paths(self, include_path_patterns: list[str]) -> list[Path]:
+        """Return a list of paths from a list of glob pattern strings.
+
+        Not including `meltano.yml` (even if it is matched by a pattern).
+
+        Args:
+            include_path_patterns: List of glob pattern strings.
+
+        Returns:
+            List of paths matching the given glob patterns.
+
+        Raises:
+            InvalidIncludePath: If a path is matched by a pattern but is not a valid
+                file.
+        """
         include_paths = []
         for pattern in include_path_patterns:
             for path in self.root.glob(pattern):
@@ -108,7 +165,15 @@ class ProjectFiles:  # noqa: WPS214
         return list(OrderedDict.fromkeys(include_paths))
 
     def _add_to_index(self, key: tuple, include_path: Path) -> None:
-        """Add a new key:path to the `_plugin_file_map`."""
+        """Add a new key:path to the `_plugin_file_map`.
+
+        Args:
+            key: The key to add.
+            include_path: The path to add.
+
+        Raises:
+            Exception: If the plugin file is already in the index.
+        """
         if key in self._plugin_file_map:
             key_path_string = ":".join(key)
             existing_key_file_path = self._plugin_file_map.get(key)
@@ -124,7 +189,12 @@ class ProjectFiles:  # noqa: WPS214
     ) -> None:
         """Populate map of plugins/schedules to their respective files.
 
-        This allows us to know exactly which plugin is configured where when we come to update plugins.
+        This allows us to know exactly which plugin is configured where when we come to
+        update plugins.
+
+        Args:
+            include_file_path: The path to the included file.
+            include_file_contents: The contents of the included file.
         """
         # index plugins
         all_plugins = include_file_contents.get("plugins", {})
@@ -143,20 +213,27 @@ class ProjectFiles:  # noqa: WPS214
             environment_key = ("environments", environment["name"])
             self._add_to_index(key=environment_key, include_path=include_file_path)
 
-    def _load_included_files(self):
-        """Read and index included files."""
+    def _load_included_files(self) -> list:
+        """Read and index included files.
+
+        Returns:
+            A list representation of all included files.
+
+        Raises:
+            YAMLError: If a file is invalid YAML.
+        """
         self._plugin_file_map = {}
         included_file_contents = []
         for path in self.include_paths:
             try:
                 with path.open() as file:
-                    contents = yaml.safe_load(file)
+                    contents = self._yaml.load(file)
                     # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
                     self._index_file(
                         include_file_path=path, include_file_contents=contents
                     )
                     included_file_contents.append(contents)
-            except yaml.YAMLError as exc:
+            except YAMLError as exc:
                 logger.critical(f"Error while parsing YAML file: {path} \n {exc}")
                 raise exc
         return included_file_contents
@@ -218,7 +295,6 @@ class ProjectFiles:  # noqa: WPS214
                 file_dict[key] = value
         return file_dicts
 
-    @staticmethod
-    def _write_file(file_path, contents):
+    def _write_file(self, file_path: PathLike, contents: dict):
         with atomic_write(file_path, overwrite=True) as fl:
-            yaml.dump(contents, fl, default_flow_style=False, sort_keys=False)
+            self._yaml.dump(contents, fl)
