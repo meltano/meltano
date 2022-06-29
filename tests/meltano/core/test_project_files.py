@@ -351,6 +351,14 @@ class TestProjectFiles:
             - ./*/subconfig_[0-9].yml
             - ./*/**/subconfig_[0-9].yml
 
+            schedules:
+            - name: modified-test-meltano-yml
+              extractor: tap-meltano-yml
+              loader: target-meltano-yml
+              transform: only  # Only update dbt models
+              start_date: 2020-08-05 00:00:00
+              interval: '@once' # Run only once
+
             plugins:
               extractors:
               - name: tap-meltano-yml # Comment on array element
@@ -373,14 +381,6 @@ class TestProjectFiles:
               - name: target-meltano-yml
 
               - name: modified-target-subconfig-1-yml
-
-            schedules:
-            - name: modified-test-meltano-yml
-              extractor: tap-meltano-yml
-              loader: target-meltano-yml
-              transform: only  # Only update dbt models
-              start_date: 2020-08-05 00:00:00
-              interval: '@once' # Run only once
 
             environments:
             - name: test-meltano-environment
