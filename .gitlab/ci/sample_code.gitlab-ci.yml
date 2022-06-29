@@ -24,8 +24,8 @@ homepage_sample_code:
     ### https://docs.meltano.com/guide/installation
 
     # For these examples to work, ensure that:
-    # - you are running Linux or macOS
-    # - Python 3.7, 3.8, or 3.9 has been installed
+    # - You are running Linux or macOS
+    # - A supported version of Python is installed and active
     - python3 --version
 
     # Create directory for Meltano projects

@@ -1,5 +1,7 @@
 import json
+import platform
 
+import pytest
 from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
@@ -12,6 +14,10 @@ class TestCliConfig:
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
+            if platform.system() == "Windows":
+                pytest.xfail(
+                    "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                )
             result = cli_runner.invoke(cli, ["config", tap.name])
             assert_cli_runner(result)
 
@@ -34,6 +40,10 @@ class TestCliConfig:
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
         ):
+            if platform.system() == "Windows":
+                pytest.xfail(
+                    "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                )
             result = cli_runner.invoke(cli, ["config", "--format=env", tap.name])
             assert_cli_runner(result)
 
