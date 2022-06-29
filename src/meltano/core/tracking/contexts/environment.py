@@ -56,11 +56,10 @@ class EnvironmentContext(SelfDescribingJson):
         Returns:
             A dictionary containing system information.
         """
-        freedesktop_data = (
-            platform.freedesktop_os_release()
-            if safe_hasattr(platform, "freedesktop_os_release")
-            else defaultdict(type(None))
-        )
+        try:
+            freedesktop_data = platform.freedesktop_os_release()
+        except Exception:
+            freedesktop_data = defaultdict(type(None))
 
         return {
             "system_name": platform.system() or None,
