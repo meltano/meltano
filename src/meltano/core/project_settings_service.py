@@ -1,7 +1,6 @@
 """Project Settings Service."""
 
 import json
-import os
 from typing import List
 
 import structlog
@@ -41,7 +40,7 @@ class ProjectSettingsService(SettingsService):
         self.config_service = config_service or ConfigService(self.project)
 
         self.env_override = {
-            **os.environ,  # terminal environment variables already present from SettingService.env
+            # terminal environment variables already present from SettingService.env
             **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
             **self.project.dotenv_env,  # env vars stored in the dotenv file
             **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key

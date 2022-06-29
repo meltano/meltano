@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
@@ -189,7 +190,7 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             the environment as a dict.
         """
-        return {**self.env_override}
+        return {**os.environ, **self.env_override}
 
     @classmethod
     def unredact(cls, values: dict) -> dict:
@@ -340,7 +341,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
-        expandable_env = {**self.env}
+        expandable_env = {**self.project.dotenv_env, **self.env}
         if setting_def and setting_def.is_extra:
             expandable_env.update(
                 self.as_env(
