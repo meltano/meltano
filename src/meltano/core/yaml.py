@@ -8,7 +8,7 @@ from meltano.core.setting_definition import SettingKind
 
 
 def configure_yaml() -> YAML:
-    """Configure YAML to use the canonical serializer.
+    """Configure YAML instance.
 
     Returns:
         The configured YAML instance.

@@ -131,8 +131,6 @@ class TestProject:
         with open(project.meltanofile) as f:
             contents = f.read()
 
-        # raise
-
         with project.meltano_update() as meltano:
             meltano.extras["a_new_key"] = "New Key"
 

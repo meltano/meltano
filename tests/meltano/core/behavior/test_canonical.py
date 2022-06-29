@@ -1,6 +1,8 @@
 import io
+from textwrap import dedent
 
 import pytest
+from ruamel.yaml.comments import CommentedMap
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.yaml import configure_yaml
@@ -131,3 +133,32 @@ class TestCanonical:
         subject.known = "value"
         assert subject.known == "value"
         assert subject.canonical()["known"] == "value"
+
+    def test_preserve_comments(self):
+        contents = """\
+            # This is a top-level comment
+            test: value
+
+            object:
+              key: value # Comment in a nested value
+
+            array:
+            - value # Comment in an array element
+        """
+        contents = dedent(contents)
+        yaml = configure_yaml()
+        in_stream = io.StringIO(contents)
+        mapping = yaml.load(in_stream)
+        subject = Canonical.parse(mapping)
+        assert subject.test == "value"
+        assert subject.object["key"] == "value"
+        assert subject.array[0] == "value"
+
+        obj = subject.as_canonical(subject)
+        assert isinstance(obj, CommentedMap)
+
+        out_stream = io.StringIO(contents)
+        yaml.dump(obj, out_stream)
+        out_stream.seek(0)
+        new_contents = out_stream.read()
+        assert new_contents == contents
