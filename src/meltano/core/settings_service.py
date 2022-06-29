@@ -126,7 +126,7 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             prefixes for settings environment variables
         """
-        return []
+        return ["meltano"]
 
     @property
     @abstractmethod
@@ -340,7 +340,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         metadata = {"name": name, "source": source, "setting": setting_def}
 
-        expandable_env = {**self.project.dotenv_env, **self.env}
+        expandable_env = {**self.env}
         if setting_def and setting_def.is_extra:
             expandable_env.update(
                 self.as_env(

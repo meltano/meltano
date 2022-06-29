@@ -56,6 +56,14 @@ class PluginSettingsService(SettingsService):
             self.project, config_service=self.plugins_service.config_service
         )
 
+        self.env_override = {
+            **project_settings_service.env,  # project level environment variables
+            **project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
+            **self.env_override,  # overrides
+            **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
+            **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition
+        }
+
         environment_env = {}
         if self.project.active_environment:
             with self.feature_flag(
@@ -64,24 +72,21 @@ class PluginSettingsService(SettingsService):
                 environment_env = {
                     var: expand_env_vars(
                         value,
-                        project_settings_service.env,
+                        self.env_override,
                         raise_if_missing=strict_env_var_mode,
                     )
                     for var, value in self.project.active_environment.env.items()
                 }
+            self.env_override.update(
+                environment_env
+            )  # active Meltano Environment top level `env:` key
 
         environment_plugin_env = (
             self.environment_plugin_config.env if self.environment_plugin_config else {}
         )
-
-        self.env_override = {
-            **project_settings_service.env,  # project level environment variables
-            **project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
-            **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
-            **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition
-            **environment_env,  # active Meltano Environment top level `env:` key
-            **environment_plugin_env,  # env vars stored under the `env:` key of the plugin definition of the active meltano Environment
-        }
+        self.env_override.update(
+            environment_plugin_env
+        )  # env vars stored under the `env:` key of the plugin definition of the active meltano Environment
 
     @property
     def label(self):

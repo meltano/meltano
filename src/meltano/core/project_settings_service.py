@@ -45,6 +45,7 @@ class ProjectSettingsService(SettingsService):
             **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
             **self.project.dotenv_env,  # env vars stored in the dotenv file
             **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key
+            **self.env_override,  # overrides
         }
 
         self.config_override = {  # noqa: WPS601
@@ -115,15 +116,6 @@ class ProjectSettingsService(SettingsService):
             URL for Meltano doc site.
         """
         return "https://docs.meltano.com/reference/settings"
-
-    @property
-    def env_prefixes(self) -> List[str]:
-        """Return prefixes for setting environment variables.
-
-        Returns:
-            A list of project ENV VAR prefix strings.
-        """
-        return ["meltano"]
 
     @property
     def db_namespace(self) -> str:
