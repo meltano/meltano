@@ -880,7 +880,7 @@ class TestCliEltScratchpadOne:
         state_id = "already_running"
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
-        existing_job = Job(job_id=state_id, state=State.RUNNING)
+        existing_job = Job(job_name=state_id, state=State.RUNNING)
         existing_job.save(session)
 
         with mock.patch(

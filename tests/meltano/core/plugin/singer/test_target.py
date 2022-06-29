@@ -24,7 +24,7 @@ class TestSingerTarget:
         self, subject, session, plugin_invoker_factory, elt_context_builder
     ):
 
-        job = Job(job_id="pytest_test_runner")
+        job = Job(job_name="pytest_test_runner")
 
         # test noop run outside of pipeline context
         invoker = plugin_invoker_factory(subject, context=None)
