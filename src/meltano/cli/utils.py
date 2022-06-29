@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from typing import List, Optional, Tuple
 
 import click
+from click_default_group import DefaultGroup
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
@@ -517,11 +518,33 @@ def check_dependencies_met(
     return passed, message
 
 
+class InstrumentedDefaultGroup(DefaultGroup):
+    """A variation of a DefaultGroup that instruments its invocation by updating the telemetry context."""
+
+    def invoke(self, ctx):
+        """Update the telemetry context and invoke the group."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+        super().invoke(ctx)  # noqa: WPS608
+
+
+class InstrumentedGroup(click.Group):
+    """A click.Group that instruments its invocation by updating the telemetry context."""
+
+    def invoke(self, ctx):
+        """Update the telemetry context and invoke the group."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+        super().invoke(ctx)  # noqa: WPS608
+
+
 class InstrumentedCmd(click.Command):
     """A click.Command that automatically fires an instrumentation 'start' event, if a tracker is available."""
 
     def invoke(self, ctx):
-        """Fire at start event and then invoke the requested command."""
+        """Fire a start event and then invoke the requested command."""
         ctx.ensure_object(dict)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))

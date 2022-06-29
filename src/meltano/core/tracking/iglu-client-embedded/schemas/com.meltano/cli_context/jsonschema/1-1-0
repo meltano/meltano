@@ -5,7 +5,7 @@
         "vendor": "com.meltano",
         "name": "cli_context",
         "format": "jsonschema",
-        "version": "1-0-1"
+        "version": "1-1-0"
     },
     "type": "object",
     "properties": {
@@ -14,22 +14,13 @@
             "type": "string",
             "maxLength": 1024
         },
-        "sub_command": {
+        "parent_command_hint": {
             "description": "",
             "type": [
                 "string",
                 "null"
             ],
             "maxLength": 1024
-        },
-        "option_keys": {
-            "description": "",
-            "type": "array",
-            "items": {
-                "description": "",
-                "type": "string",
-                "maxLength": 256
-            }
         },
         "options": {
             "description": "",
@@ -46,8 +37,7 @@
     },
     "required": [
         "command",
-        "sub_command",
-        "option_keys",
+        "parent_command_hint",
         "options"
     ],
     "additionalProperties": false

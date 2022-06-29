@@ -5,17 +5,18 @@ import warnings  # noqa: F401
 import click
 
 import meltano
+from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import Tracker
+from meltano.core.tracking import CliContext, Tracker
 
 logger = logging.getLogger(__name__)
 
 
-@click.group(invoke_without_command=True, no_args_is_help=True)
+@click.group(cls=InstrumentedGroup, invoke_without_command=True, no_args_is_help=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
 @click.option(
     "--log-config", type=str, help="Path to a python logging yaml config file."
@@ -80,6 +81,9 @@ def cli(  # noqa: WPS231
 
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
+        ctx.obj["tracker"].add_contexts(
+            CliContext.from_click_context(ctx)
+        )  # backfill the `cli` CliContext
         ctx.obj["legacy_tracker"] = LegacyTracker(
             project, context_overrides=ctx.obj["tracker"].contexts
         )

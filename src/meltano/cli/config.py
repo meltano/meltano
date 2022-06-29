@@ -24,11 +24,13 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, InstrumentedCmd
+from .utils import CliError, InstrumentedCmd, InstrumentedGroup
 
 
 @cli.group(
-    invoke_without_command=True, short_help="Display Meltano or plugin configuration."
+    cls=InstrumentedGroup,
+    invoke_without_command=True,
+    short_help="Display Meltano or plugin configuration.",
 )
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None

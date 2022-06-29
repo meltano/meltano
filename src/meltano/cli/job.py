@@ -17,7 +17,7 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 
 from . import CliError, cli
 from .params import pass_project
-from .utils import InstrumentedCmd
+from .utils import InstrumentedCmd, InstrumentedGroup
 
 logger = structlog.getLogger(__name__)
 
@@ -88,7 +88,7 @@ def _list_all_jobs(
     tracker.track_command_event(CliEvent.completed)
 
 
-@cli.group(short_help="Manage jobs.")
+@cli.group(cls=InstrumentedGroup, short_help="Manage jobs.")
 @click.pass_context
 @pass_project(migrate=True)
 def job(project, ctx):

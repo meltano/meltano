@@ -5,7 +5,6 @@ import json
 import sys
 
 import click
-from click_default_group import DefaultGroup
 from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
@@ -19,10 +18,12 @@ from meltano.core.utils import coerce_datetime
 
 from . import cli
 from .params import pass_project
-from .utils import InstrumentedCmd
+from .utils import InstrumentedCmd, InstrumentedDefaultGroup
 
 
-@cli.group(cls=DefaultGroup, default="add", short_help="Manage pipeline schedules.")
+@cli.group(
+    cls=InstrumentedDefaultGroup, default="add", short_help="Manage pipeline schedules."
+)
 @click.pass_context
 @pass_project(migrate=True)
 def schedule(project, ctx):

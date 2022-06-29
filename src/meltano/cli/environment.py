@@ -8,12 +8,12 @@ from meltano.core.project import Project
 from meltano.core.tracking import CliEvent
 
 from . import cli
-from .utils import InstrumentedCmd
+from .utils import InstrumentedCmd, InstrumentedGroup
 
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 
 
-@cli.group(name="environment", short_help="Manage environments.")
+@cli.group(cls=InstrumentedGroup, name="environment", short_help="Manage environments.")
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_environment(project: Project, ctx: click.Context):

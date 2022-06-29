@@ -35,46 +35,23 @@ class CliContext(SelfDescribingJson):
     def __init__(
         self,
         command: str,
-        sub_command: str | None = None,
-        option_keys: list(str) | None = None,
+        parent_command_hint: str | None = None,
         options: dict | None = None,
     ):
         """Initialize a CLI context.
 
         Args:
-            command: The command name e.g. `schedule`.
-            sub_command: The sub-command name e.g. `add` or `set`.
-            option_keys: The list of option keys e.g. `loader`, `job`.
+            command: The command name e.g. `schedule` or `list`.
+            parent_command_hint: The upstream parent command e.g. `cli`, `schedule`.
             options: A dict of options keys and sanitized values.
         """
         super().__init__(
             CliContextSchema.url,
             {
                 "command": command,
-                "sub_command": sub_command,
-                "option_keys": option_keys or [],
+                "parent_command_hint": parent_command_hint,
                 "options": options or {},
             },
-        )
-
-    @classmethod
-    def from_command_and_kwargs(
-        cls, command: str, sub_command: str | None = None, **kwargs
-    ) -> CliContext:
-        """Initialize a CLI context.
-
-        Args:
-            command: The CLI command.
-            sub_command: The CLI sub command.
-            kwargs: Additional key-value pairs to evaluate as option_keys if they are not None/False.
-
-        Returns:
-            A CLI context.
-        """
-        return cls(
-            command=command,
-            sub_command=sub_command,
-            option_keys=[key for key, val in kwargs.items() if val],
         )
 
     @classmethod
@@ -82,34 +59,27 @@ class CliContext(SelfDescribingJson):
         """Initialize a CLI context.
 
         Args:
-            ctx: The click.Context to derive our invocation args from.
+            ctx: The click.Context to derive our tracking context from.
 
         Returns:
             A CLI context.
         """
+        options = {}
+        for key, val in ctx.params.items():
+            if isinstance(val, (bool, int, float)) or val is None:
+                options[key] = val
+            else:
+                options[key] = hash_sha256(str(val))
 
-        def _recursively_collect_params(crawl_ctx: click.Context) -> dict:
-            options = {}
-            for key, val in crawl_ctx.params.items():
-                if isinstance(val, (bool, int, float)) or val is None:
-                    options[key] = val
-                else:
-                    options[key] = hash_sha256(str(val))
-            if crawl_ctx.parent:
-                options.update(_recursively_collect_params(crawl_ctx.parent))
-            return options
-
-        options = _recursively_collect_params(ctx)
-
-        if ctx.parent and ctx.parent.command.name != "cli":
+        if ctx.parent:
             return cls(
-                command=ctx.parent.command.name,
-                sub_command=ctx.command.name,
+                command=ctx.command.name,
+                parent_command_hint=ctx.parent.command.name,
                 options=options,
             )
 
         return cls(
             command=ctx.command.name,
-            sub_command=None,
+            parent_command_hint=None,
             options=options,
         )
