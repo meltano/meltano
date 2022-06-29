@@ -36,6 +36,10 @@ class TestOutputLogger:
             logger_factory=structlog.stdlib.LoggerFactory(),
             wrapper_class=structlog.stdlib.BoundLogger,
         )
+        try:
+            yield
+        finally:
+            structlog.reset_defaults()
 
     @pytest.fixture(name="redirect_handler")
     def redirect_handler(self, subject: OutputLogger) -> logging.Handler:
