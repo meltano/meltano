@@ -27,6 +27,64 @@ and the YAML files are used during test validation.
 - [`integration/validate.sh`](https://github.com/meltano/meltano/tree/main/integration/validate.sh) is the main entry point for all integration tests. It takes care of producing the script from the markdown, injecting a logging YAML, diffing the meltano yaml's, and calling the additional per-test validations when required.
 - `integration/<test-name>/validate.sh` - optional additional tests to run for a test. Often, this won't even be needed, but the ability is available if you want to run extended checks (i.e. grepping logs, running sql, etc)
 
+### Example library entry
+
+For example if you wanted to test and document how to transition from using `elt` to `run` you might create an entry like
+the bellow in `docs/example-library/transition-from-elt-to-run/index.md`:
+
+````markdown
+# Example of how to transition from `meltano elt` to `meltano run`
+
+This example shows how to transition an `etl` task with a custom state-id to a `job` executed via `run`.
+To follow along with this example, download link to meltano yml to a fresh project and run:
+
+```
+meltano install
+```
+
+Then assuming you had an `elt` job invoked like so:
+
+```shell
+meltano elt --state-id=my-custom-id tap-gitlab target-postgres
+```
+
+You would first need to rename the id to match meltano's internal pattern:
+
+```shell
+meltano state copy my-custom-id tap-gitlab-to-target-postgres
+```
+
+Then you can create a job and execute it using `meltano run`:
+
+
+```shell
+meltano job add my-new-job --task="tap-gitlab target-postgres"
+meltano run my-new-job
+```
+````
+
+Our integration framework will then parse this markdown, searching for code fences marked as `shell` and generate orchestration script for you that looks something like:
+
+```shell
+meltano install
+meltano elt --state-id=my-custom-id tap-gitlab target-postgres
+meltano state copy my-custom-id tap-gitlab-to-target-postgres
+meltano job add my-new-job --task="tap-gitlab target-postgres"
+meltano run my-new-job
+```
+
+Every example should also include:
+
+1. a `meltano.yml` that users can start with.
+2. a `ending-meltano.yml` that covers what the meltano.yml should look like after having run through the guide.
+
+These two are required for examples that will be used as integration tests. The `meltano.yml` will be used at the start
+of the test when starting the orchestration script. At the end of the test's the resulting `meltano.yml` yielded by the orchestration script will be diffed against the `ending-meltano.yml` and will need to match!
+
+### Validating a new example library entry
+
+To actually have the `docs/example-library/transition-from-elt-to-run/` guide created above tested, it must be added to test matrix in [integration_tests.yml](https://github.com/meltano/meltano/tree/main/.github/workflows) workflow.
+
 ## meltano yaml jsonschema validations
 
 To validate the meltano.yml jsonschema the workflow [`.github/workflows/check_jsonschema.yml`](https://github.com/meltano/meltano/blob/main/.github/workflows/check_jsonschema.yml) is used. It runs [check_jsonschema](https://github.com/python-jsonschema/check-jsonschema) on the various meltano.yml files shipped in the example library.
