@@ -77,4 +77,4 @@ a new feature or feature change may already be covered indirectly by one of the 
 If you need an explicit test you can do so by either updating an existing guide (e.g. to include calling your new feature)
 or by creating a new guide to demo (and thus test) a more complex behavior.
 
-If adding a net-new entry or changing the bahvior of an existing example, please be sure to update [the table of contents in the README.md](https://github.com/meltano/meltano/tree/main/docs/example-library) accordingly.
+If adding a net-new entry or changing the behavior of an existing example, please be sure to update [the table of contents in the README.md](https://github.com/meltano/meltano/tree/main/docs/example-library) accordingly.

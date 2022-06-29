@@ -19,7 +19,7 @@ Take care to ensure that if `docker-compose` is not available, tests that rely o
 
 ## Integration Tests
 
-Meltano use a small homegrown framework for integration tests that are generated from the markdown guides in our example library and managed via [Github Workflows](https://docs.github.com/en/actions/workflows/):
+Meltano use a small homegrown framework:q! for integration tests that are generated from the markdown guides in our example library and managed via [Github Workflows](https://docs.github.com/en/actions/workflows/):
 
 - [`docs/example-library/<test-name>`](https://github.com/meltano/meltano/tree/main/docs/example-library) holds the markdown guide and the meltano YAML files. The test script is created from the markdown guide via [mdsh](https://github.com/bashup/mdsh),
 and the YAML files are used during test validation.
