@@ -7,7 +7,7 @@ Within each directory you'll find:
 - a `index.md` file that contains step-by-step instructions for the example
 - a `ending-meltano.yml` file that represents what the end state of your meltano yaml should look like
 
-These examples actually double as our integration tests, and so should always be up-to-date and functional with the latest Meltano release.
+I many cases, these examples actually double as our [integration tests](https://docs.meltano.com/contribute/tests), and so should always be up-to-date and functional with the latest Meltano release.
 
 ## Library Index
 
