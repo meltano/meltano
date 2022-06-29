@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import datetime
 import logging
-from contextlib import contextmanager
+import platform
+from contextlib import asynccontextmanager, contextmanager
 
 import click
 import structlog
-from async_generator import asynccontextmanager
 from structlog import stdlib as structlog_stdlib
 
 from meltano.core.db import project_engine
@@ -111,6 +111,11 @@ async def elt(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    if platform.system() == "Windows":
+        raise CliError(
+            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
+        )
+
     tracker = ctx.obj["tracker"]
     legacy_tracker = ctx.obj["legacy_tracker"]
 
@@ -125,7 +130,6 @@ async def elt(
         job_id=state_id
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
-
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:

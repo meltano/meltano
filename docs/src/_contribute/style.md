@@ -86,24 +86,23 @@ from meltano.core.settings_service import EXPERIMENTAL
 
 class ExistingClass:
 
-	def __init__(self):
-		self.project = Project.find()
-		self.settings_service = ProjectSettingsService(self.project)
+    def __init__(self):
+        self.project = Project.find()
+        self.settings_service = ProjectSettingsService(self.project)
 
-	# If this method is called elsewhere in the code and experimental features are
-	# not allowed, it will throw an error:
-	def experimental_method(self):
-		with self.settings_service.feature_flag(EXPERIMENTAL):
-			print("Doing experimental behavior...")
+    # If this method is called elsewhere in the code and experimental features are
+    # not allowed, it will throw an error:
+    def experimental_method(self):
+        with self.settings_service.feature_flag(EXPERIMENTAL):
+            print("Doing experimental behavior...")
 
-	# If this method is called elsewhere, its behavior will vary based on whether
-	# the feature flag is set in the project
-	# The same pattern can be used to deprecate existing behavior
-	def existing_method_with_new_behavior(self):
-		with self.settings_service.feature_flag("new_behavior") as new_behavior:
-			if new_behavior:
-				print("Doing the new behavior...")
-			else:
-				print("Doing the existing behavior...")
-
+    # If this method is called elsewhere, its behavior will vary based on whether
+    # the feature flag is set in the project
+    # The same pattern can be used to deprecate existing behavior
+    def existing_method_with_new_behavior(self):
+        with self.settings_service.feature_flag("new_behavior") as new_behavior:
+            if new_behavior:
+                print("Doing the new behavior...")
+            else:
+                print("Doing the existing behavior...")
 ```

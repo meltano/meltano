@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  snowplow:
+    image: "snowplow/snowplow-micro:1.3.1"
+    user: "1000:0"
+    command: --collector-config /config/micro.conf --iglu /config/iglu.json
+    ports:
+      - "127.0.0.1::9090"
+    volumes:
+      - ../../../src/meltano/core/tracking:/config

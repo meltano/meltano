@@ -1,8 +1,9 @@
 import json
 import os
+import platform
 import sys
-from unittest import mock
 
+import mock
 import pytest
 
 from asserts import assert_cli_runner
@@ -106,9 +107,8 @@ class TestCliState:
                     assert state_service.get_state(state_id) == state_payload
 
     def test_set_from_file(
-        self, mkdtemp, state_service, state_ids, payloads, cli_runner
+        self, tmp_path, state_service, state_ids, payloads, cli_runner
     ):
-        tmp_path = mkdtemp()
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for idx_i, state_id in enumerate(state_ids):
                 for idx_j, state_payload in enumerate(payloads.mock_state_payloads):
@@ -147,9 +147,12 @@ class TestCliState:
                 )
 
     def test_merge_from_file(
-        self, mkdtemp, state_service, state_ids, payloads, cli_runner
+        self, tmp_path, state_service, state_ids, payloads, cli_runner
     ):
-        tmp_path = mkdtemp()
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_pairs = []
             for idx in range(0, len(state_ids) - 1, 2):
@@ -202,7 +205,7 @@ class TestCliState:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for job_src_id in state_ids:
                 job_src_state = state_service.get_state(job_src_id)
-                job_dst_id = "{0}-test-copy".format(job_src_id)
+                job_dst_id = f"{job_src_id}-test-copy"
                 result = cli_runner.invoke(
                     cli,
                     ["state", "copy", job_src_id, job_dst_id, "--force"],

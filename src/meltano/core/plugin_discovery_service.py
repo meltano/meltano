@@ -327,7 +327,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The discovery file.
         """
-        with bundle.find("discovery.yml").open() as bundled_discovery:
+        with open(bundle.root / "discovery.yml") as bundled_discovery:
             discovery = self.load_discovery(bundled_discovery, cache=True)
 
         return discovery

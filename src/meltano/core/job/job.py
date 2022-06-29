@@ -3,11 +3,10 @@ import asyncio
 import os
 import signal
 import uuid
-from contextlib import contextmanager, suppress
+from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 
-from async_generator import asynccontextmanager
 from sqlalchemy import Column, literal, types
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
@@ -128,8 +127,8 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return State[self._state]
 
-    @state.setter
-    def state(self, value):  # noqa: WPS440
+    @state.setter  # noqa: WPS440
+    def state(self, value):
         """Set the _state value for this Job from a State enum.
 
         Args:
@@ -138,7 +137,7 @@ class Job(SystemModel):  # noqa: WPS214
         self._state = str(value)
 
     @state.comparator  # noqa: WPS440
-    def state(cls):  # noqa: N805, WPS440
+    def state(cls):  # noqa: N805
         """Use this comparison to compare Job.state to State.
 
         See:

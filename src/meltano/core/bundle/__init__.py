@@ -1,15 +1,5 @@
-"""
-This module files should be created via
-`make bundle` at the project root.
-"""
+"""Bundled yaml files."""
 
-import os
 from pathlib import Path
 
-
-def root() -> Path:
-    return Path(os.path.dirname(__file__))
-
-
-def find(file_path: Path) -> Path:
-    return root().joinpath(file_path)
+root = Path(__file__).parent
