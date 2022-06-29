@@ -121,20 +121,17 @@ class TestProject:
             assert meltano.extras[key] == val
 
     def test_preserve_comments(self, project: Project):
-        with open(project.meltanofile) as f:
-            original_contents = f.read()
-            new_contents = f"# Please don't delete me :)\n{original_contents}"
+        original_contents = project.meltanofile.read_text()
 
-        with open(project.meltanofile, "w") as f:
-            f.write(new_contents)
+        new_contents = f"# Please don't delete me :)\n{original_contents}"
+        project.meltanofile.write_text(new_contents)
 
         with project.meltano_update() as meltano:
             meltano.extras["a_new_key"] = "New Key"
 
-        with open(project.meltanofile) as f:
-            contents = f.read()
-            assert contents.startswith("# Please don't delete me :)\n")
-            assert "a_new_key: New Key" in contents
+        contents = project.meltanofile.read_text()
+        assert contents.startswith("# Please don't delete me :)\n")
+        assert "a_new_key: New Key" in contents
 
 
 class TestIncompatibleProject:
