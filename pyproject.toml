@@ -45,7 +45,6 @@ gunicorn = "^20.1.0"
 jsonschema = "^3.2" # Held back because of our dependency on docker-compose v1.29.2; update after https://github.com/avast/pytest-docker/pull/72 is merged.
 markdown = "^3.0.1"
 meltano-flask-security = "^0.1.0"
-networkx = "^2.2"
 packaging = "^21.3"
 psutil = "^5.6.3"
 psycopg2-binary = "^2.8.5"
