@@ -22,7 +22,7 @@ class NoWindowsGlobbingGroup(click.Group):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(*args, **kwargs) -> NoReturn:
+    def main(self, *args, **kwargs) -> NoReturn:
         """Invoke the Click CLI with Windows globbing disabled.
 
         Parameters:
