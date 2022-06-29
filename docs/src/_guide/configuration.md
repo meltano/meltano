@@ -181,7 +181,7 @@ Generic `MELTANO_<PLUGIN_TYPE_VERB>_<SETTING_NAME>` variables can be used when t
 Inside the plugin `config` objects in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
 these variables can be referenced using standard variable expansion syntax, i.e. `$VAR` (as a single word) or `${VAR}` (inside a word):
 
-```yaml{4-7}
+```yaml
 extractors:
 - name: tap-example
   config:
@@ -214,7 +214,7 @@ Every [plugin in your project](/concepts/plugins#project-plugins) has its own co
 but you can use [plugin inheritance](/concepts/plugins#plugin-inheritance) to define multiple plugins
 that use the same package but still have their own configuration:
 
-```yml{8-18}
+```yml
 plugins:
   extractors:
   - name: tap-google-analytics
@@ -287,7 +287,7 @@ Instead, you can define a custom setting by adding the setting name (key) to you
 meltano config tap-example set custom_setting value
 ```
 
-```yaml{5}
+```yaml
 extractors:
 - name: tap-example
   config:
@@ -327,7 +327,7 @@ Meltano currently knows these extras for these plugin types:
 
 The values of these extras are stored in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) among the plugin's other properties, _outside_ of the `config` object:
 
-```yaml{6-7}
+```yaml
 extractors:
 - name: tap-example
   config:
