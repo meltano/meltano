@@ -1438,20 +1438,6 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
-name = "pyhocon"
-version = "0.3.59"
-description = "HOCON parser for Python"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-pyparsing = ">=2.0,<3.0"
-
-[package.extras]
-Duration = ["python-dateutil (>=2.8.0)"]
-
-[[package]]
 name = "pyhumps"
 version = "3.7.2"
 description = "🐫  Convert strings (and dictionary keys) between snake case, camel case and pascal case in Python. Inspired by Humps for Node"
@@ -2156,7 +2142,7 @@ repl = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "e161b80771a8038da4c39ded530792c90df36c80dcc1de540233a0e0053c5599"
+content-hash = "1da78e1748c99320b2b5abb96c769d2cfa6be9467d42acaee1b6caacecb75db3"
 
 [metadata.files]
 aiodocker = [
@@ -3207,9 +3193,6 @@ pyflakes = [
 pygments = [
     {file = "Pygments-2.12.0-py3-none-any.whl", hash = "sha256:dc9c10fb40944260f6ed4c688ece0cd2048414940f1cea51b8b226318411c519"},
     {file = "Pygments-2.12.0.tar.gz", hash = "sha256:5eb116118f9612ff1ee89ac96437bb6b49e8f04d8a13b514ba26f620208e26eb"},
-]
-pyhocon = [
-    {file = "pyhocon-0.3.59.tar.gz", hash = "sha256:bb0eee59b57ecea5c30d14efc7ee7e55c935d58f03025ccdfc49237e920aa48c"},
 ]
 pyhumps = [
     {file = "pyhumps-3.7.2-py3-none-any.whl", hash = "sha256:f554bc742138c01ef85176534a411b105c3e7b20133b3c68bd4e613dcb425241"},
