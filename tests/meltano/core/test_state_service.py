@@ -1,4 +1,5 @@
 import json
+import platform
 
 import pytest
 
@@ -39,6 +40,11 @@ class TestStateService:
         assert state_service.get_state(mock_state_id) == payloads.mock_state_payloads[0]
 
     def test_set_state(self, job_history_session, jobs, payloads, state_service):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         for job in jobs:
             for state in payloads.mock_state_payloads:
                 state_service.set_state(job.job_id, json.dumps(state))
@@ -59,3 +65,22 @@ class TestStateService:
             merged_dst = merge(state_src, state_dst)
             state_service.merge_state(job_src.job_id, job_dst.job_id)
             assert merged_dst == state_service.get_state(job_dst.job_id)
+
+    def test_copy(self, state_ids, state_service):
+        state_id_pairs = []
+        for idx in range(0, len(state_ids) - 1, 2):
+            state_id_pairs.append((state_ids[idx], state_ids[idx + 1]))
+        for (state_id_src, state_id_dst) in state_id_pairs:
+            state_src = state_service.get_state(state_id_src)
+            state_service.copy_state(state_id_src, state_id_dst)
+            assert state_service.get_state(state_id_dst) == state_src
+
+    def test_move(self, state_ids, state_service):
+        state_id_pairs = []
+        for idx in range(0, len(state_ids) - 1, 2):
+            state_id_pairs.append((state_ids[idx], state_ids[idx + 1]))
+        for (state_id_src, state_id_dst) in state_id_pairs:
+            state_src = state_service.get_state(state_id_src)
+            state_service.move_state(state_id_src, state_id_dst)
+            assert not state_service.get_state(state_id_src)
+            assert state_service.get_state(state_id_dst) == state_src

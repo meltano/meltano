@@ -1,5 +1,5 @@
 import pytest
-from asynctest import Mock
+from mock import Mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project

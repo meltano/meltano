@@ -15,8 +15,7 @@ on:
         default: false
 
 jobs:
-  version_bump:
-
+  create_release_branch_pr:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -35,6 +34,18 @@ jobs:
         version-proposed: ${{ github.event.inputs.version }}
     - name: Debug version bump type
       run: echo "${{ steps.validate-version.outputs.bump-type }}"
+
+    - name: Conventional Changelog Action
+      uses: saadmk11/changelog-ci@v1.0.0
+      id: auto-changelog
+      with:
+        # https://github.com/saadmk11/changelog-ci
+        github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+        release_version: ${{ github.event.inputs.version }}
+        changelog_filename: CHANGELOG.md
+        config_file: .github/workflows/resources/changelog-ci.config.yml
+        # committer_username: 'test'
+        # committer_email: 'test@test.com'
 
     - name: Install Poetry
       uses: snok/install-poetry@v1

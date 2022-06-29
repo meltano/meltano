@@ -1,5 +1,6 @@
 """Validation command."""
 
+import asyncio
 import shutil
 import sys
 from typing import Dict, Iterable, Tuple
@@ -12,7 +13,6 @@ from meltano.cli.utils import propagate_stop_signals
 from meltano.core.db import project_engine
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
-from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
 from . import cli
@@ -99,7 +99,7 @@ def test(
         else:
             collected[plugin_name].select_all()
 
-    exit_codes = run_async(_run_plugin_tests(session, collected.values()))
+    exit_codes = asyncio.run(_run_plugin_tests(session, collected.values()))
 
     tracker = LegacyTracker(project)
     tracker.track_meltano_test(

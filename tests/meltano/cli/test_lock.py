@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
+import mock
 import pytest
 from click.testing import CliRunner
 

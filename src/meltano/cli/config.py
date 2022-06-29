@@ -1,6 +1,7 @@
 """Config management CLI."""
 from __future__ import annotations
 
+import asyncio
 import json
 import tempfile
 from pathlib import Path
@@ -20,7 +21,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
-from meltano.core.utils import run_async
 
 from . import cli
 from .params import pass_project
@@ -324,7 +324,7 @@ def test(ctx):
             return await plugin_test_service.validate()
 
     try:
-        is_valid, detail = run_async(_validate())
+        is_valid, detail = asyncio.run(_validate())
     except Exception:
         tracker.track_command_event(CliEvent.failed)
         raise
