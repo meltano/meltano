@@ -9,7 +9,7 @@ on:
     inputs: {}
 
 jobs:
-  shell_lint:
+  check_meltano_schema:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the repository
