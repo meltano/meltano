@@ -32,11 +32,16 @@ class TestOutputLogger:
 
     @pytest.fixture(autouse=True)
     def fixture_configure_structlog(self, log_output):
+        original_config = structlog.get_config()
         structlog.configure(
             processors=[log_output],
             logger_factory=structlog.stdlib.LoggerFactory(),
             wrapper_class=structlog.stdlib.BoundLogger,
         )
+        try:
+            yield
+        finally:
+            structlog.configure(**original_config)
 
     @pytest.fixture(name="redirect_handler")
     def redirect_handler(self, subject: OutputLogger) -> logging.Handler:
