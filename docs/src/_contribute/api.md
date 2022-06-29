@@ -35,7 +35,7 @@ The development build of the Meltano API and a production build of the UI will n
 
 ## Debugging Your Code
 
-To debug your code, we recommend using [the Python debugger](https://docs.python.org/3/library/pdb.html). It can be invoked by adding [`breakpoint()`](https://docs.python.org/3/library/functions.html#breakpoint) in your Python code at the location you want to drop into the debugger.
+To debug your code, we recommend using [the Python debugger](https://docs.python.org/3/library/pdb.html). It can be invoked by adding [`breakpoint()`](https://docs.python.org/3/library/functions.html#breakpoint) in your Python code at the location you want to drop into the debugger. From there you can drop into a Python interactive console by entering `interact`.
 
 ## API V2 Design Guidelines
 
