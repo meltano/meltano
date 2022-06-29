@@ -4,10 +4,13 @@ import os
 import platform
 import tempfile
 from pathlib import Path
+from textwrap import dedent
 
-import pytest  # noqa: F401
+import pytest
 import yaml
 from jsonschema import validate
+
+from meltano.core.project_files import deep_merge
 
 
 @pytest.fixture
@@ -30,6 +33,19 @@ def cd_temp_dir():
     os.chdir(original_dir)
 
 
+@pytest.mark.parametrize(
+    "parent,children,expected",
+    [
+        ({"a": 1}, [{"a": 1}], {"a": 1}),
+        ({"a": 1}, [{"a": 2}], {"a": 2}),
+        ({"a": 1}, [{"a": 2, "b": 2}], {"a": 2, "b": 2}),
+        ({"a": [1, 2, 3]}, [{"a": [3, 4, 5]}], {"a": [1, 2, 3, 3, 4, 5]}),
+    ],
+)
+def test_deep_merge(parent, children, expected):
+    assert deep_merge(parent, children) == expected
+
+
 class TestProjectFiles:
     def test_resolve_subfiles(self, project_files):
         assert project_files._meltano_file_path == (project_files.root / "meltano.yml")
@@ -43,7 +59,18 @@ class TestProjectFiles:
                 "./*/**/subconfig_[0-9].yml",
             ],
             "plugins": {
-                "extractors": [{"name": "tap-meltano-yml"}],
+                "extractors": [
+                    {
+                        "name": "tap-meltano-yml",
+                        "settings": [
+                            {
+                                "name": "token",
+                                "kind": "password",
+                                "description": "Token for the API. This is a secret.",
+                            }
+                        ],
+                    }
+                ],
                 "mappers": [
                     {
                         "name": "map-meltano-yml",
@@ -144,7 +171,16 @@ class TestProjectFiles:
             ],
             "plugins": {
                 "extractors": [
-                    {"name": "tap-meltano-yml"},
+                    {
+                        "name": "tap-meltano-yml",
+                        "settings": [
+                            {
+                                "name": "token",
+                                "kind": "password",
+                                "description": "Token for the API. This is a secret.",
+                            }
+                        ],
+                    },
                     {"name": "tap-subconfig-2-yml"},
                     {"name": "tap-subconfig-1-yml"},
                 ],
@@ -223,7 +259,16 @@ class TestProjectFiles:
             ],
             "plugins": {
                 "extractors": [
-                    {"name": "tap-meltano-yml"},
+                    {
+                        "name": "tap-meltano-yml",
+                        "settings": [
+                            {
+                                "name": "token",
+                                "kind": "password",
+                                "description": "Token for the API. This is a secret.",
+                            }
+                        ],
+                    },
                     {"name": "modified-tap-subconfig-2-yml"},
                     {"name": "tap-subconfig-1-yml"},
                 ],
@@ -280,3 +325,67 @@ class TestProjectFiles:
         }
         read_result = project_files.load()
         assert read_result == expected_result
+
+    def test_preserve_format(self, project_files):
+        meltano_config = project_files.load()
+        meltano_config["version"] = 3
+        meltano_config["schedules"][0]["transform"] = "only"
+        meltano_config["schedules"][0].yaml_add_eol_comment(
+            "Only update dbt models\n",
+            "transform",
+        )
+
+        project_files.update(meltano_config)
+
+        contents = project_files._meltano_file_path.read_text()
+
+        expected_contents = """\
+            # Top-level comment
+            version: 3
+            default_environment: test-meltano-environment
+            database_uri: sqlite:///.meltano/meltano.db
+
+            include_paths:
+            - ./subconfig_[0-9].yml
+            # Config files inside a subfolder
+            - ./*/subconfig_[0-9].yml
+            - ./*/**/subconfig_[0-9].yml
+
+            plugins:
+              extractors:
+              - name: tap-meltano-yml # Comment on array element
+                settings:
+                - name: token
+                  kind: password
+                  description: >-
+                    Token for the API.
+                    This is a secret.
+
+              - name: modified-tap-subconfig-2-yml
+
+              mappers:
+              - name: map-meltano-yml
+                # These are some mappings
+                mappings:
+                - name: transform-meltano-yml
+
+              loaders:
+              - name: target-meltano-yml
+
+              - name: modified-target-subconfig-1-yml
+
+            schedules:
+            - name: modified-test-meltano-yml
+              extractor: tap-meltano-yml
+              loader: target-meltano-yml
+              transform: only  # Only update dbt models
+              start_date: 2020-08-05 00:00:00
+              interval: '@once' # Run only once
+
+            environments:
+            - name: test-meltano-environment
+              env:
+                TEST: TEST-MELTANO
+        """
+
+        assert contents == dedent(expected_contents)

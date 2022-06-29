@@ -7,18 +7,21 @@ import logging
 from collections import OrderedDict
 from os import PathLike
 from pathlib import Path
+from typing import Mapping, MutableMapping, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import YAMLError
+from ruamel.yaml.comments import CommentedMap
 
 from meltano.core.yaml import configure_yaml
 
 logger = logging.getLogger(__name__)
+TMapping = TypeVar("TMapping", bound=MutableMapping)
 
 BLANK_SUBFILE = {"plugins": {}, "schedules": []}  # noqa: WPS407
 
 
-def deep_merge(parent: dict, children: list[dict]) -> dict:
+def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
     """Deep merge a list of child dicts with a given parent.
 
     Args:
@@ -33,10 +36,10 @@ def deep_merge(parent: dict, children: list[dict]) -> dict:
         for key, value in child.items():
             if isinstance(value, dict):
                 # get node or create one
-                node = base.setdefault(key, {})
+                node = base.setdefault(key, value.__class__())
                 base[key] = deep_merge(node, [value])
             elif isinstance(value, list):
-                node = base.setdefault(key, [])
+                node = base.setdefault(key, value.__class__())
                 node.extend(value)
             else:
                 base[key] = value
@@ -64,7 +67,7 @@ class ProjectFiles:  # noqa: WPS214
         self._yaml = configure_yaml()
 
     @property
-    def meltano(self) -> dict:
+    def meltano(self) -> CommentedMap:
         """Return the contents of this projects `meltano.yml`.
 
         Returns:
@@ -85,7 +88,7 @@ class ProjectFiles:  # noqa: WPS214
         include_path_patterns = self.meltano.get("include_paths", [])
         return self._resolve_include_paths(include_path_patterns)
 
-    def load(self) -> dict:
+    def load(self) -> CommentedMap:
         """Load all project files into a single dict representation.
 
         Returns:
@@ -185,7 +188,7 @@ class ProjectFiles:  # noqa: WPS214
             self._plugin_file_map.update({key: str(include_path)})
 
     def _index_file(  # noqa: WPS210
-        self, include_file_path: Path, include_file_contents: dict
+        self, include_file_path: Path, include_file_contents: CommentedMap
     ) -> None:
         """Populate map of plugins/schedules to their respective files.
 
@@ -213,7 +216,7 @@ class ProjectFiles:  # noqa: WPS214
             environment_key = ("environments", environment["name"])
             self._add_to_index(key=environment_key, include_path=include_file_path)
 
-    def _load_included_files(self) -> list:
+    def _load_included_files(self) -> list[CommentedMap]:
         """Read and index included files.
 
         Returns:
@@ -227,7 +230,7 @@ class ProjectFiles:  # noqa: WPS214
         for path in self.include_paths:
             try:
                 with path.open() as file:
-                    contents = self._yaml.load(file)
+                    contents: CommentedMap = self._yaml.load(file)
                     # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
                     self._index_file(
                         include_file_path=path, include_file_contents=contents
@@ -254,7 +257,7 @@ class ProjectFiles:  # noqa: WPS214
             schedules.append(schedule)
 
     @staticmethod
-    def _add_environment(file_dicts, file, environment):
+    def _add_environment(file_dicts, file, environment: CommentedMap):
         file_dict = file_dicts.setdefault(file, {})
         environments = file_dict.setdefault("environments", [])
         if environment["name"] not in {env["name"] for env in environments}:
@@ -274,14 +277,14 @@ class ProjectFiles:  # noqa: WPS214
             file = self._plugin_file_map.get(key, str(self._meltano_file_path))
             self._add_schedule(file_dicts, file, schedule)
 
-    def _add_environments(self, file_dicts, environments):
+    def _add_environments(self, file_dicts, environments: list[CommentedMap]):
         for environment in environments:
             key = ("environments", environment["name"])
             file = self._plugin_file_map.get(key, str(self._meltano_file_path))
             self._add_environment(file_dicts, file, environment)
 
-    def _split_config_dict(self, config: dict):
-        file_dicts = {}
+    def _split_config_dict(self, config: CommentedMap):
+        file_dicts: dict[str, CommentedMap] = {}
         for key, value in config.items():
             if key == "plugins":
                 self._add_plugins(file_dicts, value)
@@ -291,10 +294,12 @@ class ProjectFiles:  # noqa: WPS214
                 self._add_environments(file_dicts, value)
             else:
                 file = str(self._meltano_file_path)
-                file_dict = file_dicts.setdefault(file, {})
+                file_dict = file_dicts.setdefault(file, CommentedMap())
                 file_dict[key] = value
+
+        config.copy_attributes(file_dicts[str(self._meltano_file_path)])
         return file_dicts
 
-    def _write_file(self, file_path: PathLike, contents: dict):
+    def _write_file(self, file_path: PathLike, contents: Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
             self._yaml.dump(contents, fl)

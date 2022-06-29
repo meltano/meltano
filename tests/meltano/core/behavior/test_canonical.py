@@ -140,9 +140,11 @@ class TestCanonical:
             test: value
 
             object:
+              # Comment in an object
               key: value # Comment in a nested value
 
             array:
+            # Comment in an array
             - value # Comment in an array element
         """
         contents = dedent(contents)

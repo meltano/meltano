@@ -128,15 +128,13 @@ class TestProject:
         with open(project.meltanofile, "w") as f:
             f.write(new_contents)
 
-        with open(project.meltanofile) as f:
-            contents = f.read()
-
         with project.meltano_update() as meltano:
             meltano.extras["a_new_key"] = "New Key"
 
         with open(project.meltanofile) as f:
             contents = f.read()
             assert contents.startswith("# Please don't delete me :)\n")
+            assert "a_new_key: New Key" in contents
 
 
 class TestIncompatibleProject:

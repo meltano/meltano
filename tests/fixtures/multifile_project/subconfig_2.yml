@@ -1,3 +1,4 @@
+# Top-level comment
 plugins:
   extractors:
     - name: tap-subconfig-2-yml
@@ -6,6 +7,7 @@ plugins:
     - name: target-subconfig-2-yml
 
 schedules:
+  # Comment on schedules
   - name: test-subconfig-2-yml
     extractor: tap-subconfig-2-yml
     loader: target-subconfig-2-yml
@@ -14,6 +16,7 @@ schedules:
     interval: '@once'
 
 environments:
+  # Comment on environments
   - name: test-subconfig-2-yml
     env:
       TEST: TEST-SUBCONFIG-2-YML
