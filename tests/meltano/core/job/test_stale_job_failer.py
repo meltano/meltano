@@ -9,7 +9,7 @@ from meltano.core.job.stale_job_failer import StaleJobFailer
 class TestStaleJobFailer:
     @pytest.fixture
     def live_job(self, session):
-        job = Job(job_id="test")
+        job = Job(job_name="test")
         job.start()
         job.save(session)
 
@@ -17,7 +17,7 @@ class TestStaleJobFailer:
 
     @pytest.fixture
     def stale_job(self, session):
-        job = Job(job_id="test")
+        job = Job(job_name="test")
         job.start()
         job.last_heartbeat_at = datetime.utcnow() - timedelta(minutes=10)
         job.save(session)
@@ -26,7 +26,7 @@ class TestStaleJobFailer:
 
     @pytest.fixture
     def other_stale_job(self, session):
-        job = Job(job_id="other")
+        job = Job(job_name="other")
         job.start()
         job.last_heartbeat_at = datetime.utcnow() - timedelta(minutes=10)
         job.save(session)
@@ -35,7 +35,7 @@ class TestStaleJobFailer:
 
     @pytest.fixture
     def complete_job(self, session):
-        job = Job(job_id="other")
+        job = Job(job_name="other")
         job.start()
         job.success()
         job.save(session)
@@ -73,7 +73,7 @@ class TestStaleJobFailer:
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
 
-        failer = StaleJobFailer(state_id=stale_job.job_id)
+        failer = StaleJobFailer(state_id=stale_job.job_name)
         failer.fail_stale_jobs(session)
 
         session.refresh(live_job)
