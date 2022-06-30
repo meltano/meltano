@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import inspect
 import json
+import platform
 import uuid
 import warnings
 from pathlib import Path
 from platform import python_version_tuple
 from typing import Any
 
+import pytest
 from jsonschema import ValidationError, validate
 
 from meltano.core.tracking import ExceptionContext
@@ -91,6 +93,11 @@ def test_simple_exception_context():
 
 
 def test_complex_exception_context():
+    if platform.system() == "Windows":
+        pytest.xfail(
+            "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+        )
+
     line_nums: list[int] = []
 
     def _function_to_deepen_traceback() -> None:

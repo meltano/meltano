@@ -1,6 +1,6 @@
 import logging  # noqa: D100
 import sys
-import warnings  # noqa: F401
+from typing import NoReturn
 
 import click
 
@@ -13,7 +13,28 @@ from meltano.core.project_settings_service import ProjectSettingsService
 logger = logging.getLogger(__name__)
 
 
-@click.group(invoke_without_command=True, no_args_is_help=True)
+class NoWindowsGlobbingGroup(click.Group):
+    """A Click group that does not perform glob expansion on Windows.
+
+    This restores the behaviour of Click's globbing to how it was before v8.
+    Click (as of version 8.1.3) ignores quotes around an asterisk, which makes
+    it behave differently than most shells that support globbing, and make some
+    typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
+    """
+
+    def main(self, *args, **kwargs) -> NoReturn:
+        """Invoke the Click CLI with Windows globbing disabled.
+
+        Parameters:
+            args: Positional arguments for the Click group.
+            kwargs: Keyword arguments for the Click group.
+        """
+        return super().main(*args, windows_expand_args=False, **kwargs)
+
+
+@click.group(
+    cls=NoWindowsGlobbingGroup, invoke_without_command=True, no_args_is_help=True
+)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
 @click.option(
     "--log-config", type=str, help="Path to a python logging yaml config file."
