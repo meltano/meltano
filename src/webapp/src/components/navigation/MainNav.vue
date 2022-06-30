@@ -215,7 +215,7 @@ export default {
                     <p>
                       View the
                       <a
-                        href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
+                        href="https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
                         target="_blank"
                         >CHANGELOG.md</a
                       >
@@ -283,7 +283,7 @@ export default {
                   v-if="!updateAvailable && version"
                   class="button is-small is-text has-background-transparent tooltip is-tooltip-left"
                   data-tooltip="View this version's additions, changes, & fixes"
-                  href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
+                  href="https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
                   target="_blank"
                 >
                   <span class="icon">
@@ -319,7 +319,7 @@ export default {
                   class="button is-small has-background-transparent tooltip is-tooltip-left"
                   data-tooltip="I need help"
                   target="_blank"
-                  href="https://docs.meltano.com/the-project/community"
+                  href="https://www.meltano.com/slack"
                 >
                   <span class="icon">
                     <font-awesome-icon

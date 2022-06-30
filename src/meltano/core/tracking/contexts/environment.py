@@ -16,15 +16,13 @@ from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 import meltano
+from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import hash_sha256, safe_hasattr
 
 logger = get_logger(__name__)
 
 # This file is only ever created in CI when building a release
 release_marker_path = Path(__file__).parent / ".release_marker"
-
-ENV_CONTEXT_SCHEMA = "iglu:com.meltano/environment_context/jsonschema"
-ENV_CONTEXT_SCHEMA_VERSION = "1-0-0"
 
 
 class EnvironmentContext(SelfDescribingJson):
@@ -34,7 +32,7 @@ class EnvironmentContext(SelfDescribingJson):
         """Initialize the environment context."""
         ci_markers = ("GITHUB_ACTIONS", "CI")
         super().__init__(
-            f"{ENV_CONTEXT_SCHEMA}/{ENV_CONTEXT_SCHEMA_VERSION}",
+            EnvironmentContextSchema.url,
             {
                 "context_uuid": str(uuid.uuid4()),
                 "meltano_version": meltano.__version__,
@@ -58,11 +56,10 @@ class EnvironmentContext(SelfDescribingJson):
         Returns:
             A dictionary containing system information.
         """
-        freedesktop_data = (
-            platform.freedesktop_os_release()
-            if safe_hasattr(platform, "freedesktop_os_release")
-            else defaultdict(type(None))
-        )
+        try:
+            freedesktop_data = platform.freedesktop_os_release()
+        except Exception:
+            freedesktop_data = defaultdict(type(None))
 
         return {
             "system_name": platform.system() or None,

@@ -124,7 +124,7 @@ It's a game changer for development and it's worth the effort!
 
 ### Requirements
 
-1. [tmux](https://github.com/tmux/tmux) - Recommended to install with brew
+1. [tmux](https://github.com/tmux/tmux) - Recommended to install with brew if on macOS
 1. [tmuxinator](https://github.com/tmuxinator/tmuxinator)
 
 This config uses `$MELTANO_VENV` to source the virtual environment from. Set it to the correct directory before running tmuxinator.

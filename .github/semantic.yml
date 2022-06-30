@@ -1,0 +1,33 @@
+# Config ref: https://github.com/Ezard/semantic-prs
+
+# Validate the PR title, and ignore all commit messages
+titleOnly: true
+
+# Provides a custom URL for the "Details" link, which appears next to the success/failure message from the app:
+targetUrl: https://docs.meltano.com/contribute/merge#semantic-prs
+
+# The values allowed for the "type" part of the PR title/commit message.
+# e.g. for a PR title/commit message of "feat: add some stuff", the type would be "feat"
+types:
+  - ci
+  - chore
+  - build
+  - break
+  - change
+  - docs
+  - feat
+  - fix
+  - perf
+  - refactor
+  - revert
+  - style
+  - test
+
+# The values allowed for the "scope" part of the PR title/commit message.
+# e.g. for a PR title/commit message of "feat(awesome-feature): add some stuff",
+#      the scope would be "awesome-feature"
+scopes:
+  - ui
+  - core
+  - cli
+  - deps

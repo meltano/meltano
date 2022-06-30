@@ -11,6 +11,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking.schemas import ProjectContextSchema
 from meltano.core.utils import hash_sha256
 
 logger = get_logger(__name__)
@@ -27,10 +28,6 @@ class ProjectUUIDSource(Enum):
 
     # The UUID was randomly generated (UUID v4) since no `project_id` was configured.
     random = auto()
-
-
-PROJECT_CONTEXT_SCHEMA = "iglu:com.meltano/project_context/jsonschema"
-PROJECT_CONTEXT_SCHEMA_VERSION = "1-0-0"
 
 
 class ProjectContext(SelfDescribingJson):
@@ -50,7 +47,7 @@ class ProjectContext(SelfDescribingJson):
         )
 
         super().__init__(
-            f"{PROJECT_CONTEXT_SCHEMA}/{PROJECT_CONTEXT_SCHEMA_VERSION}",
+            ProjectContextSchema.url,
             {
                 "context_uuid": str(uuid.uuid4()),
                 "project_uuid": str(self.project_uuid),
@@ -100,10 +97,5 @@ class ProjectContext(SelfDescribingJson):
         else:
             project_id = uuid.uuid4()
             self._project_uuid_source = ProjectUUIDSource.random
-
-            if self.send_anonymous_usage_stats:
-                # If we are set to track anonymous usage stats, also store the generated project_id
-                # back to the project config file so that it persists between meltano runs.
-                self.settings_service.set("project_id", str(project_id))
 
         return project_id

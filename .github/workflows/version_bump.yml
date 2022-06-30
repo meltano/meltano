@@ -1,4 +1,4 @@
-name: Create release draft
+name: Version bump
 
 on:
   workflow_dispatch:
@@ -15,8 +15,7 @@ on:
         default: false
 
 jobs:
-  draft_release:
-
+  create_release_branch_pr:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -36,6 +35,18 @@ jobs:
     - name: Debug version bump type
       run: echo "${{ steps.validate-version.outputs.bump-type }}"
 
+    - name: Conventional Changelog Action
+      uses: saadmk11/changelog-ci@v1.0.0
+      id: auto-changelog
+      with:
+        # https://github.com/saadmk11/changelog-ci
+        github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+        release_version: ${{ github.event.inputs.version }}
+        changelog_filename: CHANGELOG.md
+        config_file: .github/workflows/resources/changelog-ci.config.yml
+        # committer_username: 'test'
+        # committer_email: 'test@test.com'
+
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
@@ -44,7 +55,7 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Set up Python
-      uses: actions/setup-python@v3.1.2
+      uses: actions/setup-python@v4.0.0
       with:
         # https://github.com/actions/setup-python
         python-version: 3.9
@@ -76,17 +87,6 @@ jobs:
         branch: release/v${{ github.event.inputs.version }}
         base: main
         labels: release
-
-    - name: Create release draft
-      # # Can't be run from forks:
-      # if: ${{ github.event.repository.name == 'meltano/meltano' }}
-      uses: release-drafter/release-drafter@v5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        # https://github.com/release-drafter/release-drafter
-        version: ${{ github.event.inputs.version }}
-        commitish: release/v${{ github.event.inputs.version }}
 
     - name: Approve Pull Request
       if: ${{ steps.create-pull-request.outputs.pull-request-number != 0 }}

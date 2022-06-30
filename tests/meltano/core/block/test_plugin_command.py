@@ -1,5 +1,5 @@
 import pytest
-from asynctest import CoroutineMock
+from mock import AsyncMock
 
 from meltano.core.block.plugin_command import plugin_command_invoker
 
@@ -15,7 +15,7 @@ class TestInvokerCommand:
             command="test",
         )
 
-        start_mock = CoroutineMock()
+        start_mock = AsyncMock()
         cmd.start = start_mock
 
         await cmd._start()
@@ -28,7 +28,7 @@ class TestInvokerCommand:
             command_args=["--foo", "--bar"],
         )
 
-        start_mock = CoroutineMock()
+        start_mock = AsyncMock()
         cmd.start = start_mock
 
         await cmd._start()

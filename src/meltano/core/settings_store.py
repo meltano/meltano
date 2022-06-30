@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 class ConflictingSettingValueException(Exception):
     """Occurs when a setting has multiple conflicting values via aliases."""
 
-    def __init__(self, *setting_names):
+    def __init__(self, setting_names):
         """Instantiate the error.
 
         Args:
@@ -39,7 +39,7 @@ class ConflictingSettingValueException(Exception):
 
         """
         self.setting_names = setting_names
-        super().__init__()
+        super().__init__(setting_names)
 
     def __str__(self) -> str:
         """Represent the error as a string.
@@ -48,6 +48,30 @@ class ConflictingSettingValueException(Exception):
             string representation of the error
         """
         return f"Conflicting values for setting found in: {self.setting_names}"
+
+
+class MultipleEnvVarsSetException(Exception):
+    """Occurs when a setting value is set via multiple environment variable names."""
+
+    def __init__(self, names):
+        """Instantiate the error.
+
+        Args:
+            setting_names: the name/aliases where conflicting values are set
+
+        """
+        self.names = names
+        super().__init__(names)
+
+    def __str__(self) -> str:
+        """Represent the error as a string.
+
+        Returns:
+            string representation of the error
+        """
+        return (
+            f"Error: Setting value set via multiple environment variables: {self.names}"
+        )
 
 
 class StoreNotSupportedError(Error):
@@ -174,7 +198,7 @@ class SettingsStoreManager(ABC):
 
         Args:
             name: Setting name.
-            setting_def: (optional) SettingDefinition instance. Defaults to None.
+            setting_def: SettingDefinition instance.
         """
 
     def set(
@@ -190,7 +214,7 @@ class SettingsStoreManager(ABC):
             name: Setting name.
             path: Setting path.
             value: New value to set.
-            setting_def: (optional) SettingDefinition instance. Defaults to None.
+            setting_def: SettingDefinition instance.
 
         Raises:
             NotImplementedError: always.
@@ -303,12 +327,15 @@ class BaseEnvStoreManager(SettingsStoreManager):
                 vals_with_metadata.append((value, {"env_var": env_var.key}))
             except KeyError:
                 pass
-        if len(vals_with_metadata) > 1 and not reduce(
-            eq, (val for val, _ in vals_with_metadata)
-        ):
-            raise ConflictingSettingValueException(
-                metadata["env_var"] for _, metadata in vals_with_metadata
-            )
+        if len(vals_with_metadata) > 1:
+            if not reduce(eq, (val for val, _ in vals_with_metadata)):
+                raise ConflictingSettingValueException(
+                    [metadata["env_var"] for _, metadata in vals_with_metadata]
+                )
+            else:
+                raise MultipleEnvVarsSetException(
+                    [metadata["env_var"] for _, metadata in vals_with_metadata]
+                )
         return vals_with_metadata[0] if vals_with_metadata else (None, {})
 
     def setting_env_vars(self, *args, **kwargs) -> dict:
@@ -1114,7 +1141,7 @@ class AutoStoreManager(SettingsStoreManager):
         Args:
             name: Setting name.
             source: Default SettingValueStore.
-            setting_def: (optional) SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
             A SettingValueStore, if found, else None.
@@ -1159,11 +1186,11 @@ class AutoStoreManager(SettingsStoreManager):
     def get(
         self, name: str, setting_def: SettingDefinition | None = None, **kwargs
     ) -> tuple[str, dict]:
-        """Get a Setting value by name and (optional) SettingDefinition.
+        """Get a Setting value by name and SettingDefinition.
 
         Args:
             name: Setting name.
-            setting_def: (optional) SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
             kwargs: Additional keword arguments to pass to `manager.get()`
 
         Returns:
@@ -1202,7 +1229,7 @@ class AutoStoreManager(SettingsStoreManager):
             name: Setting name.
             path: Setting path.
             value: New Setting value.
-            setting_def: (optional) SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
             A dictionary of metadata pertaining to the set operation.
@@ -1246,12 +1273,12 @@ class AutoStoreManager(SettingsStoreManager):
         path: list[str],
         setting_def: SettingDefinition | None = None,
     ) -> dict:
-        """Unset value, by name, path and (optional) SettingDefinition, in all stores.
+        """Unset value, by name, path and SettingDefinition, in all stores.
 
         Args:
             name: Setting name.
             path: Setting path.
-            setting_def: (optional) SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
             A metadata dictionary containing details of the last value unset.

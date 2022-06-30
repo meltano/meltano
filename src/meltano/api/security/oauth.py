@@ -1,68 +1,101 @@
+"""OAuth setup and utilities."""
+
+from __future__ import annotations
+
 import base64
 import json
 
 import gitlab
-from authlib.flask.client import OAuth as OAuthClient
-from flask import Blueprint, current_app, jsonify, redirect, url_for
-from flask_security import AnonymousUser, current_user
+from authlib.integrations.flask_client import OAuth as OAuthClient
+from flask import Blueprint, Flask, redirect, url_for
+from flask_security import current_user
 from flask_security.utils import do_flash, login_user, url_for_security
-from meltano.api.models.oauth import OAuth, db
-from meltano.core.utils import compose
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
+
+from meltano.api.models.oauth import OAuth, db
+from meltano.core.utils import compose
 
 from .identity import FreeUser, users
 
 
 class OAuthError(Exception):
-    pass
+    """Base exception class for OAuth exceptions."""
 
 
-def base64_pad(s):
-    padding = 4 - (len(s) % 4)
-    return s + ("=" * padding)
+def base64_pad(unpadded: str) -> str:
+    """Add padding to a base64-encoded string.
+
+    Parameters:
+        unpadded: The unpadded base64-encoded string.
+
+    Returns:
+        The padded base64-encoded string.
+    """
+    padding = 4 - (len(unpadded) % 4)
+    return unpadded + ("=" * padding)
 
 
 jwt_decode = compose(json.loads, base64.urlsafe_b64decode, base64_pad)
 
 
-def setup_oauth_gitlab(oauth):
-    oauth.register(
+def setup_oauth_gitlab(oauth: OAuthClient) -> None:
+    """Register OAuth for GitLab.
+
+    Parameters:
+        oauth: The `OAuthClient` which has a Flask app for which the OAuth
+            blueprint will be registered.
+    """
+    oauth.register(  # noqa: S106
         "gitlab",
         access_token_url="https://gitlab.com/oauth/token",
         client_kwargs={"scope": "openid read_user"},
         authorize_url="https://gitlab.com/oauth/authorize",
     )
 
-    oauthBP = Blueprint("OAuth.GitLab", __name__, url_prefix="/oauth/gitlab")
+    oauth_bp = Blueprint("OAuth-GitLab", __name__, url_prefix="/oauth/gitlab")
 
-    @oauthBP.route("/login")
+    @oauth_bp.route("/login")
     def login():
         redirect_uri = url_for(".authorize", _external=True)
         return oauth.gitlab.authorize_redirect(redirect_uri)
 
-    @oauthBP.route("/authorize")
+    @oauth_bp.route("/authorize")
     def authorize():
         token = oauth.gitlab.authorize_access_token()
 
         try:
             identity = gitlab_token_identity(token)
             login_user(identity.user, remember=False)
-
             return redirect(url_for("root.default"))
-        except OAuthError as e:
-            do_flash(str(e))
+        except OAuthError as ex:
+            do_flash(str(ex))
             return redirect(url_for_security("login"))
 
-    oauth.app.register_blueprint(oauthBP)
+    oauth.app.register_blueprint(oauth_bp)
 
 
-def setup_oauth(app):
-    oauth = OAuthClient(app)
-    setup_oauth_gitlab(oauth)
+def setup_oauth(app: Flask) -> None:
+    """Set up OAuth for the given Flask app.
+
+    Parameters:
+        app: The Flask app for which OAuth should be setup.
+    """
+    setup_oauth_gitlab(OAuthClient(app))
 
 
-def gitlab_token_identity(token):
+def gitlab_token_identity(token: dict[str, str]) -> OAuth:
+    """Get an OAuth identity from a GitLab token.
+
+    Parameters:
+        token: A dictionary with the token keyed by 'access_token'.
+
+    Raises:
+        OAuthError: Unable to get the identity for the given token.
+
+    Returns:
+        The `OAuth` instance derived from the provided token.
+    """
     # TODO: having to do another GET to grab the user info
     #       is subpar, but the returned JWT lacks the user's email
     #
@@ -101,12 +134,13 @@ def gitlab_token_identity(token):
         identity = OAuth.from_token("gitlab", client.user.id, token)
 
     if current_user.is_authenticated and not isinstance(
-        current_user._get_current_object(), FreeUser
+        current_user._get_current_object(),  # noqa: WPS437
+        FreeUser,
     ):
         # map the identity to the current_user
         identity.user = current_user
         db.session.add(identity)
-    elif not token_user:
+    elif not token_user:  # noqa: WPS504
         # no user has claimed this email yet
         # reserve it
         token_user = users.create_user(

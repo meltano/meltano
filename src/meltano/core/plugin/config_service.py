@@ -1,12 +1,10 @@
 import logging
 import os
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Union
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
 
 
 class PluginConfigService:

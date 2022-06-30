@@ -62,8 +62,8 @@ export default {
       'updatePipelineSchedule',
       'getPipelineSchedules'
     ]),
-    goToLog(jobId) {
-      this.$router.push({ name: 'runLog', params: { jobId } })
+    goToLog(stateId) {
+      this.$router.push({ name: 'runLog', params: { stateId } })
     },
     onChangeItem(option, pipeline, item) {
       const newPipelineValue = option.srcElement.selectedOptions[0].value
@@ -73,11 +73,11 @@ export default {
           pipeline.extractor
         ).namespace
         if (newPipelineValue === '@other') {
-          const jobId = pipeline.jobId
+          const stateId = pipeline.stateId
           const cronDefault = this.defaultCronInterval
           this.$router.push({
             name: 'cronJobSettings',
-            params: { jobId, cronDefault }
+            params: { stateId, cronDefault }
           })
         } else {
           if (item === 'interval' && newPipelineValue != '@other') {
@@ -97,10 +97,10 @@ export default {
         }
       }
     },
-    setCRONInterval(jobId, cronInterval) {
+    setCRONInterval(stateId, cronInterval) {
       this.$router.push({
         name: 'cronJobSettings',
-        params: { jobId, cronInterval }
+        params: { stateId, cronInterval }
       })
     },
     removePipeline(pipeline) {
@@ -232,7 +232,7 @@ export default {
                 : 'View the last run of this ELT pipeline.'
             }`
           "
-          @click="goToLog(pipeline.jobId)"
+          @click="goToLog(pipeline.stateId)"
         >
           <span>
             {{ getLastRunLabel(pipeline) }}
@@ -274,7 +274,7 @@ export default {
             data-tooltip="Set the CRON interval you'd like"
             :class="{ 'is-loading': pipeline.isRunning }"
             :disabled="getIsDisabled(pipeline)"
-            @click="setCRONInterval(pipeline.jobId, pipeline.cronExpression)"
+            @click="setCRONInterval(pipeline.stateId, pipeline.cronExpression)"
           >
             <span>Interval Details</span>
             <span class="icon is-small">

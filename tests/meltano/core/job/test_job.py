@@ -1,10 +1,12 @@
 import asyncio
+import platform
 import signal
 import uuid
 from datetime import datetime, timedelta
 
 import psutil
 import pytest
+
 from meltano.core.job.job import (
     HEARTBEAT_VALID_MINUTES,
     HEARTBEATLESS_JOB_VALID_HOURS,
@@ -15,7 +17,9 @@ from meltano.core.job.job import (
 
 class TestJob:
     def sample_job(self, payload=None):
-        return Job(job_id="meltano:sample-elt", state=State.IDLE, payload=payload or {})
+        return Job(
+            job_name="meltano:sample-elt", state=State.IDLE, payload=payload or {}
+        )
 
     def test_save(self, session):
         subject = self.sample_job().save(session)
@@ -26,7 +30,7 @@ class TestJob:
         for key in range(0, 10):
             session.add(self.sample_job({"key": key}))
 
-        subjects = session.query(Job).filter_by(job_id="meltano:sample-elt")
+        subjects = session.query(Job).filter_by(job_name="meltano:sample-elt")
 
         assert len(subjects.all()) == 10
         session.rollback()
@@ -88,6 +92,11 @@ class TestJob:
 
     @pytest.mark.asyncio
     async def test_run_interrupted(self, session):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+            )
         subject = self.sample_job({"original_state": 1}).save(session)
 
         with pytest.raises(KeyboardInterrupt):
@@ -101,6 +110,11 @@ class TestJob:
 
     @pytest.mark.asyncio
     async def test_run_terminated(self, session):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+            )
         subject = self.sample_job({"original_state": 1}).save(session)
 
         with pytest.raises(SystemExit):

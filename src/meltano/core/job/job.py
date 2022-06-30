@@ -3,11 +3,10 @@ import asyncio
 import os
 import signal
 import uuid
-from contextlib import contextmanager, suppress
+from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 
-from async_generator import asynccontextmanager
 from sqlalchemy import Column, literal, types
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
@@ -95,10 +94,10 @@ class Job(SystemModel):  # noqa: WPS214
     state == State.STATE_EDIT.
     """
 
-    __tablename__ = "job"
+    __tablename__ = "runs"
 
     id = Column(types.Integer, primary_key=True)
-    job_id = Column(types.String)
+    job_name = Column(types.String)
     run_id = Column(GUID, nullable=False, default=uuid.uuid4)
     _state = Column(name="state", type_=types.String)
     started_at = Column(types.DateTime)
@@ -128,8 +127,8 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return State[self._state]
 
-    @state.setter
-    def state(self, value):  # noqa: WPS440
+    @state.setter  # noqa: WPS440
+    def state(self, value):
         """Set the _state value for this Job from a State enum.
 
         Args:
@@ -138,7 +137,7 @@ class Job(SystemModel):  # noqa: WPS214
         self._state = str(value)
 
     @state.comparator  # noqa: WPS440
-    def state(cls):  # noqa: N805, WPS440
+    def state(cls):  # noqa: N805
         """Use this comparison to compare Job.state to State.
 
         See:
@@ -316,7 +315,7 @@ class Job(SystemModel):  # noqa: WPS214
         Returns:
             a string representation of the job
         """
-        return f"<Job(id='{self.id}', job_id='{self.job_id}', state='{self.state}', started_at='{self.started_at}', ended_at='{self.ended_at}')>"
+        return f"<Job(id='{self.id}', job_name='{self.job_name}', state='{self.state}', started_at='{self.started_at}', ended_at='{self.ended_at}')>"
 
     def save(self, session):
         """Save the job in the db.

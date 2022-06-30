@@ -18,7 +18,7 @@
 .parallel:python_version:
   parallel:
     matrix:
-      - PYTHON_VERSION: ["3.7", "3.8", "3.9.6"]
+      - PYTHON_VERSION: ["3.7", "3.8", "3.9"]
 
 .parallel:python_image_version:
   parallel:
@@ -29,3 +29,7 @@
   parallel:
     matrix:
       - IMAGE_TAG_SUFFIX: ["", "-python3.7", "-python3.8", "-python3.9"]
+
+.windows:defaults:
+  variables:
+    PYTHONIOENCODING: utf-8

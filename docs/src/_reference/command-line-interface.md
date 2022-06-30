@@ -604,6 +604,30 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> <PLUGIN_NAME>
 meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_ENVIRONMENT_VARIABLE_2> <PLUGIN_NAME>
 ```
 
+## `lock`
+
+`meltano lock` creates lock files for [non-custom](/concepts/plugins#custom-plugins) plugins in the project.
+
+### How to use
+
+```bash
+# Lock all plugins
+meltano lock --all
+
+# Lock all plugins of a certain type
+meltano lock --all --plugin-type=<type>
+
+# Lock specific plugins
+meltano lock <name> <name_two>
+
+# Lock specific plugins and disambiguate by type
+meltano lock <name> <name_two> --plugin-type=<type>
+
+# Use --update in combination with any of the above to update the lock file
+# with the latest definition from MeltanoHub
+meltano lock --all --update
+```
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
@@ -654,9 +678,9 @@ In addition to explicitly specifying plugin names you can also execute one or mo
 
 ```bash
 meltano run tap-gitlab target-postgres
-meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run
+meltano run tap-gitlab target-postgres dbt-postgres:clean dbt-postgres:test dbt-postgres:run
 meltano run tap-gitlab target-postgres tap-salesforce target-mysql
-meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
+meltano run tap-gitlab target-postgres dbt-postgres:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
 meltano run tap-gitlab one-mapping another-mapping target-postgres
 meltano run tap-gitlab target-postgres simple-job
@@ -701,8 +725,10 @@ Note that if no environment is active, `meltano run` _does not_ generate a state
 
 ## `job`
 
-Use the `job` command to define one or more related tasks. A job can contain a single task, or many tasks. Today all tasks
-are run sequentially. You can run a specified job by passing the job name as an argument to `meltano run`. You can also schedule jobs using `meltano schedule`.
+Use the `job` command to define one or more sequences of tasks. A job can contain a single task or many tasks.
+As of today all tasks are run sequentially.
+You can run a specified job by passing the job name as an argument to [`meltano run`](#run).
+You can also schedule jobs using [`meltano schedule`](#schedule).
 
 ### How to use
 
@@ -710,7 +736,12 @@ are run sequentially. You can run a specified job by passing the job name as an 
 # Add a job with a single task representing a run command
 meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
 
-# Add a new job with multiple tasks by passing arrays in yaml format, where each item representing a run command.
+# Add a new job with multiple tasks by passing arrays in yaml format, where each item represents a run command.
+# This will generate one task per array element:
+# task 1: <tap_name> <target_name>
+# task 2: <command>
+# task 3: <tap2_name> <target2_name>
+# etc.
 meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
 
 # Update an existing job with new tasks
@@ -729,15 +760,24 @@ meltano job list <job_name> --format=json
 meltano job remove <job_name>
 ```
 
-### Examples
+##### Tasks
 
-##### Tasks and Blocks
+A task should be of the same format as arguments supplied to [the `meltano run` command](#run), which can be any valid sequence of plugins (e.g. extractors, mappers, loaders, utilities, etc.) and [plugin commands](/concepts/project#plugin-commands).
+Note that such a sequence is only valid if it is one of:
 
-A task in a job consists of one or more _blocks_. A block is simply a set of related plugins that will be executed serially.
-For example, you can create a job that consists of a single tap and target:
+1. An extractor followed directly by a loader. E.g. `tap-gitlab target-postgres`
+1. An extractor followed by one or more mappers and then a loader. E.g. `tap-gitlab hide-gitlab-secrets target-postgres`
+1. A plugin command invocation. E.g. `dbt-postgres:run`
+1. Any sequence of the above. E.g. `tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run tap-zendesk target-csv`
+
+If a job has only one task, that task can be supplied as a single quoted argument:
 
 ```bash
+# A task with a single extractor and loader
 meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
+
+# A more complex task
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run"
 ```
 
 This would add the following to your `meltano.yml`:
@@ -747,52 +787,45 @@ jobs:
   - name: tap-gitlab-to-target-postgres
     tasks:
       - tap-gitlab target-postgres
+  - name: tap-gitlab-to-target-postgres-processed
+    tasks:
+      - tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run
 ```
 
-Plugins in the same block should be separated by a space and blocks should be separted by a comma.
+When an Airflow DAG is generated for a job, each task in the job definition will become a single task in the generated DAG.
+So while it is certainly possible to define all your jobs using only one task each, there are many scenarios in which it would
+be useful or even necessary to split your job into multiple tasks.
+For instance, job steps which must always run, fail, and be retried as a group should always be a part of the same task.
+And long-running job steps should likely be grouped into a separate task from shorter-running downstream steps so that those downstream steps can be rerun on their own.
 
-You can also provide tasks in YAML format. For example, the following is equivalent to the above:
+Each individual task must itself be a valid sequence of extractors, mappers, loaders, and plugin commands.
+When multiple tasks are defined in a job, they should be supplied to the `meltano job add` command as an array in YAML format.
+
+For instance the `tap-gitlab-to-target-postgres-processed` job in the above example could also be created as:
 
 ```bash
-meltano job add tap-gitlab-to-target-postgres --tasks "[tap-gitlab target-postgres]"
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt-postgres:run]"
 ```
 
-Note that any single block which includes a tap _must_ also include a target and vice versa.
-The tap must also precede the target.
+This would add the following to your `meltano.yml`:
 
-All of the following are invalid:
-
-```bash
-# A block with a tap must also include a target.
-meltano job add invalid-job --tasks "tap-gitlab"
->>> Job 'invalid-job' has invalid tasks. block violates set requirements: Found no end in block set!
-
-# Within a block, a target must be preceded by a tap.
-meltano job add invalid-job --tasks target-postgres
->>> Job 'invalid-job' has invalid tasks. block violates set requirements: Unknown command type or bad block sequence at index 1, starting block 'target-postgres'
-
-# Blocks are separated by commas, so Meltano considers this tap and target as two separate invalid blocks.
-meltano job add invalid-job --tasks "tap-gitlab, target-postgres"
->>> Job 'invalid-job' has invalid tasks. Block tap-gitlab, not found
+```yaml
+jobs:
+  - name: tap-gitlab-to-target-postgres-processed-multiple-tasks
+    tasks:
+      - tap-gitlab hide-gitlab-secrets target-postgres
+      - dbt-postgres:run
 ```
 
-A job can consist of multiple blocks, which will be executed serially in the order they are provided:
+While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting of a single task while scheduling the latter will result in a generated DAG consisting of two tasks.
 
-```bash
-# This job consists of two blocks:
-meltano add tap-gitlab-to-target-postgres-with-dbt --tasks "[tap-gitlab target-postgres, dbt:run]"
-
-# This job consists of one block, but runs the same three tasks in the same order as above. It is functionally equivalent to the comma-sparated approach.
-meltano add tap-gitlab-to-target-postgres-with-dbt-single-block --tasks "tap-gitlab target-postgres dbt:run"
-```
-
-##### Adding, listing, running, and removing:
+### Examples
 
 ```bash
 # Add a new job named "simple-demo" that contains two tasks
 # Task 1: tap-gitlab hide-gitlab-secrets target-mysql
 # Task 2: tap-gitlab target-csv
-meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-mysql dbt:run, tap-gitlab target-csv]"
+meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run, tap-gitlab target-csv]"
 
 # list the job named "simple-demo"
 meltano job list simple-demo --format=json
@@ -1069,12 +1102,12 @@ meltano state list --pattern '*tap-gitlab*'
 Merge new state onto existing state for a state ID.
 
 <div class="notification is-info">
-	<p><strong>Not seeing merged state in the system database?</strong></p>
-	<p>Merged state is computed at <em>execution</em> time.
-	The <samp>merge</samp> command merely
-	adds a new <samp>payload</samp> to the database which is merged together with
-	existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
-	</p>
+  <p><strong>Not seeing merged state in the system database?</strong></p>
+  <p>Merged state is computed at <em>execution</em> time.
+  The <samp>merge</samp> command merely
+  adds a new <samp>payload</samp> to the database which is merged together with
+  existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
+  </p>
 </div>
 
 #### How to use
@@ -1113,6 +1146,42 @@ meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.jso
 
 # Provide state via existing state.
 meltano state merge dev:tap-gitlab-to-target-jsonl --from-state-id prod:tap-gitlab-to-target-jsonl
+```
+
+### copy
+
+Copy state from one state ID to another
+
+#### How to use
+
+```bash
+# Copy state from one state ID to another
+meltano state copy <src_state_id> <dst_state_id>
+```
+
+#### Examples
+
+```bash
+# Use prod state to update dev environemnt
+meltano state copy prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
+```
+
+### move
+
+Move state from one state ID to another, equivalent to a rename
+
+#### How to use
+
+```bash
+# Move state from one ID to another
+meltano state move <src_state_id> <dst_state_id>
+```
+
+#### Examples
+
+```bash
+# Use previous state with a new tap variant, clearing the original
+meltano state move original-tap-postgres-to-target-jsonl variant-tap-postgres-to-target-jsonl
 ```
 
 ### set

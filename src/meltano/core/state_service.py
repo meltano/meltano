@@ -47,8 +47,8 @@ class StateService:
         states = defaultdict(dict)
         query = self.session.query(Job)
         if state_id_pattern:
-            query = query.filter(Job.job_id.like(state_id_pattern.replace("*", "%")))
-        for state_id in {job.job_id for job in query}:  # noqa: WPS335
+            query = query.filter(Job.job_name.like(state_id_pattern.replace("*", "%")))
+        for state_id in {job.job_name for job in query}:  # noqa: WPS335
             states[state_id] = self.get_state(state_id)
         return states
 
@@ -66,7 +66,9 @@ class StateService:
         """
         if isinstance(job, str):
             now = datetime.datetime.utcnow()
-            return Job(job_id=job, state=State.STATE_EDIT, started_at=now, ended_at=now)
+            return Job(
+                job_name=job, state=State.STATE_EDIT, started_at=now, ended_at=now
+            )
         elif isinstance(job, Job):
             return job
         raise TypeError("job must be of type Job or of type str")
@@ -109,7 +111,7 @@ class StateService:
         state_to_add_to.payload_flags = payload_flags
         state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to state {state_to_add_to.job_id} state payload {new_state_dict}"
+            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
 
     def get_state(self, state_id: str) -> Dict:
@@ -184,3 +186,26 @@ class StateService:
         src_state_dict = self.get_state(state_id_src)
         src_state = json.dumps(src_state_dict)
         self.add_state(state_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
+
+    def copy_state(self, state_id_src: str, state_id_dst: str):
+        """Copy state from Job state_id_src onto Job state_id_dst.
+
+        Args:
+            state_id_src: the state_id to get state from
+            state_id_dst: the state_id_to copy state onto
+        """
+        src_state_dict = self.get_state(state_id_src)
+        src_state = json.dumps(src_state_dict)
+        self.set_state(state_id_dst, src_state)
+
+    def move_state(self, state_id_src: str, state_id_dst: str):
+        """Move state from Job state_id_src to Job state_id_dst.
+
+        Args:
+            state_id_src: the state_id to get state from and clear
+            state_id_dst: the state_id_to move state onto
+        """
+        src_state_dict = self.get_state(state_id_src)
+        src_state = json.dumps(src_state_dict)
+        self.set_state(state_id_dst, src_state)
+        self.clear_state(state_id_src)

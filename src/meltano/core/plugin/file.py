@@ -1,8 +1,4 @@
-import logging
-from pathlib import Path
-
 from meltano.core.behavior.hookable import hook
-from meltano.core.db import project_engine
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
