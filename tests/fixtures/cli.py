@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -60,5 +59,4 @@ def project_files_cli(test_dir, compatible_copy_tree):
     finally:
         Project.deactivate()
         os.chdir(test_dir)
-        shutil.rmtree(project.root)
         logging.debug(f"Cleaned project at {project.root}")

@@ -1,5 +1,6 @@
 import asyncio
 import json
+import platform
 
 import mock
 import pytest
@@ -89,6 +90,11 @@ class TestCliInvoke:
         cli_runner,
         mock_invoke_containers,
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         async def async_generator(*args, **kwargs):
             yield "Line 1"
             yield "Line 2"  # noqa: WPS354
