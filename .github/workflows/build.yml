@@ -9,47 +9,32 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-        - { python-version: '3.7', os: 'ubuntu-latest' }
-        - { python-version: '3.8', os: 'ubuntu-latest' }
-        - { python-version: '3.9', os: 'ubuntu-latest' }
-        # - { python-version: '3.7', os: 'macos-latest' }
-        # - { python-version: '3.8', os: 'macos-latest' }
-        # - { python-version: '3.9', os: 'macos-latest' }
-      fail-fast: false
-
-    name: Build artifacts on py${{ matrix.python-version }} (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Build artifacts
+    runs-on: ubuntu-latest
 
     steps:
     - name: Check out the repository
       uses: actions/checkout@v3.0.2
 
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3.1.2
+    - name: Setup Poetry
+      uses: snok/install-poetry@v1
       with:
-        python-version: ${{ matrix.python-version }}
+        # Version of Poetry to use
+        version: 1.1.13
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v4.0.0
+      with:
+        # https://github.com/actions/setup-python
+        python-version: 3.9
         architecture: x64
-        cache-dependency-path: .github/workflows/constraints.txt
+        cache: 'poetry'
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: .github/workflows/constraints.txt
+    - name: Poetry install
       run: |
-        pipx install poetry --python=python${{ matrix.python-version }}
-        poetry --version
-
-    - name: Release Marker
-      if: ${{ github.event.release }}
-      run: |
-        touch src/meltano/core/tracking/.release_marker
-
-    - name: Build sdist
-      if: always() && (matrix.python-version == '3.9') && (matrix.os == 'ubuntu-latest')
-      run: |
-        poetry build -f sdist
+        poetry install
 
     - name: Setup Node
       uses: actions/setup-node@v3.3.0
@@ -58,9 +43,14 @@ jobs:
         cache: 'yarn'
         cache-dependency-path: src/webapp/yarn.lock
 
-    - name: Build wheel
+    - name: Release Marker
+      if: ${{ github.event.release }}
       run: |
-        poetry build -f wheel
+        touch src/meltano/core/tracking/.release_marker
+
+    - name: Build distribution
+      run: |
+        make sdist_public
 
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
@@ -78,7 +68,7 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.0.2
 
-    - name: Download coverage data
+    - name: Download artifacts
       uses: actions/download-artifact@v3.0.0
       with:
         name: python-artifacts
