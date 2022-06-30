@@ -68,7 +68,7 @@ class Superset(BasePlugin):
         config_script_lines = [
             "import sys",
             "module = sys.modules[__name__]",
-            f"config = {str(config)}",
+            f"config = {config!r}",
             "for key, value in config.items():",
             "    if key.isupper():",
             "        setattr(module, key, value)",
