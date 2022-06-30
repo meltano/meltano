@@ -21,16 +21,17 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, propagate_stop_signals
+from .utils import CliError, InstrumentedCmd, propagate_stop_signals
 
 logger = logging.getLogger(__name__)
 
 
 @cli.command(
+    cls=InstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",
 )
@@ -59,9 +60,11 @@ logger = logging.getLogger(__name__)
     is_flag=True,
     help="Execute plugins using containers where possible.",
 )
+@click.pass_context
 @pass_project(migrate=True)
 def invoke(
     project: Project,
+    ctx: click.Context,
     plugin_type: str,
     dump: str,
     list_commands: bool,
@@ -75,20 +78,8 @@ def invoke(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
-    tracker = Tracker(project)
-    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
-    # the `started` event is delayed until we've had a chance to try to resolve the requested plugin
-    tracker.add_contexts(
-        CliContext.from_command_and_kwargs(
-            "invoke",
-            None,
-            plugin_type=plugin_type,
-            dump=dump,
-            list_commands=list_commands,
-            containers=containers,
-            print_var=print_var,
-        )
-    )
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
 
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -106,10 +97,8 @@ def invoke(
             plugin_name, plugin_type=plugin_type, invokable=True
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
-        tracker.track_command_event(CliEvent.started)
+        tracker.track_command_event(CliEvent.inflight)
     except PluginNotFoundError:
-        # if the plugin is not found, we fire started and aborted tracking events together to keep tracking consistent
-        tracker.track_command_event(CliEvent.started)
         tracker.track_command_event(CliEvent.aborted)
         raise
 
