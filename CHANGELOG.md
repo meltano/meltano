@@ -16,11 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
 - [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
 - [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
-<<<<<<< 3135-alias-behavior
 - [#3135](https://github.com/meltano/meltano/issues/3135) - Formalize settings alias behavior and disallow conflicting values between setting name and aliases
-=======
 - [#2035](https://github.com/meltano/meltano/issues/2035) Rename `job` table and `job_id` column in backend db
->>>>>>> main
 
 ### Fixes
 
