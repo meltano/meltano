@@ -27,6 +27,21 @@ from .params import pass_project
 from .utils import CliError
 
 
+def get_label(metadata) -> str:
+    """Get the label for an environment variable's source.
+
+    Args:
+        metadata: the metadata for the variable
+
+    Returns:
+        string describing the source of the variable's value
+    """
+    source = metadata["source"]
+    if "env_var" in metadata:
+        return f"from the {metadata['env_var']} variable in {source.label}"
+    else:
+        return f"from {source.label}"
+
 @cli.group(
     invoke_without_command=True, short_help="Display Meltano or plugin configuration."
 )
@@ -201,7 +216,7 @@ def list_settings(ctx, extras: bool):
         elif source is SettingValueStore.INHERITED:
             label = f"inherited from '{settings.plugin.parent.name}'"
         else:
-            label = f"from {source.label}"
+            label = f"{get_label(config_metadata)}"
 
         current_value = click.style(f"{value!r}", fg="green")
         click.echo(f" current value: {current_value}", nl=False)
@@ -297,10 +312,12 @@ def set_(ctx, setting_name, value, store):
         fg="green",
     )
 
-    current_value, source = settings.get_with_source(name, session=session)
+    current_value, metadata = settings.get_with_metadata(name, session=session)
+    source = metadata["source"]
     if source != store:
+        message = f"Current value is still: {current_value!r} {get_label(metadata)}"
         click.secho(
-            f"Current value is still: {current_value!r} (from {source.label})",
+            message,
             fg="yellow",
         )
     tracker.track_command_event(CliEvent.completed)
@@ -372,7 +389,7 @@ def unset(ctx, setting_name, store):
     current_value, source = settings.get_with_source(name, session=session)
     if source is not SettingValueStore.DEFAULT:
         click.secho(
-            f"Current value is now: {current_value!r} (from {source.label})",
+            f"Current value is now: {current_value!r} ({get_label(metadata)})",
             fg="yellow",
         )
     tracker.track_command_event(CliEvent.completed)

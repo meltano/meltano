@@ -12,17 +12,17 @@ jobs:
     strategy:
       matrix:
         include:
-        - { python-version: "3.7",  os: "ubuntu-latest", backend-db: sqlite }
-        - { python-version: "3.8",  os: "ubuntu-latest", backend-db: sqlite }
-        - { python-version: "3.9",  os: "ubuntu-latest", backend-db: sqlite }
-        - { python-version: "3.10", os: "ubuntu-latest", backend-db: sqlite }
-        - { python-version: "3.7",  os: "ubuntu-latest", backend-db: postgresql }
-        - { python-version: "3.8",  os: "ubuntu-latest", backend-db: postgresql }
-        - { python-version: "3.9",  os: "ubuntu-latest", backend-db: postgresql }
-        - { python-version: "3.10", os: "ubuntu-latest", backend-db: postgresql }
-        - { python-version: "3.7", os: "windows-latest", backend-db: sqlite } # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
-        - { python-version: "3.8", os: "windows-latest", backend-db: sqlite }
-        - { python-version: "3.9", os: "windows-latest", backend-db: sqlite }
+        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.7",  os: "windows-latest", backend-db: sqlite } # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
+        - { python-version: "3.8",  os: "windows-latest", backend-db: sqlite }
+        - { python-version: "3.9",  os: "windows-latest", backend-db: sqlite }
         - { python-version: "3.10", os: "windows-latest", backend-db: sqlite }
       fail-fast: false
 
