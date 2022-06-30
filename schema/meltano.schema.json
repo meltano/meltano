@@ -106,6 +106,13 @@
     },
     "env": {
       "$ref": "#/definitions/env"
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/jobs"
+      },
+      "description": "Jobs, added using 'meltano job'"
     }
   },
   "definitions": {
@@ -723,13 +730,18 @@
     },
     "schedules": {
       "type": "object",
-      "required": [
-        "name",
-        "extractor",
-        "loader",
-        "transform",
-        "interval",
-        "start_date"
+      "oneOf": [
+        { "required": ["name", "job", "interval"] },
+        {
+          "required": [
+            "name",
+            "extractor",
+            "loader",
+            "transform",
+            "interval",
+            "start_date"
+          ]
+        }
       ],
       "description": "https://www.meltano.com/docs/orchestration.html#orchestration",
       "additionalProperties": false,
@@ -738,6 +750,11 @@
           "type": "string",
           "description": "The schedule's unique name",
           "examples": ["gitlab-to-jsonl"]
+        },
+        "job": {
+          "type": "string",
+          "description": "The name of a meltano job",
+          "examples": ["some-custom-job"]
         },
         "extractor": {
           "type": "string",
@@ -765,6 +782,42 @@
           "type": "string",
           "description": "The date when the schedule should first execute",
           "examples": ["2020-08-06 00:00:00"]
+        }
+      }
+    },
+    "jobs": {
+      "type": "object",
+      "required": ["name", "tasks"],
+      "description": "https://docs.meltano.com/reference/command-line-interface#job",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "This jobs unique name",
+          "examples": ["gitlab-to-jsonl"]
+        },
+        "tasks": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     },
