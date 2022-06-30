@@ -10,7 +10,7 @@ include_paths:
 - ./*/**/subconfig_[0-9].yml
 
 schedules:
-# TODO: This will not be preserved :(
+# My schedules
 - name: test-meltano-yml
   extractor: tap-meltano-yml
   loader: target-meltano-yml
@@ -30,7 +30,7 @@ plugins:
         This is a secret.
 
   mappers:
-  # TODO: This will not be preserved :(
+  # My mappers
   - name: map-meltano-yml
     # These are some mappings
     mappings:
@@ -40,7 +40,7 @@ plugins:
     - name: target-meltano-yml
 
 environments:
-# TODO: This will not be preserved :(
+# My meltano environments
 - name: test-meltano-environment
   env:
     TEST: TEST-MELTANO

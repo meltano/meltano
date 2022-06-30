@@ -11,7 +11,7 @@ from typing import Mapping, MutableMapping, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import YAMLError
-from ruamel.yaml.comments import CommentedMap
+from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
 from meltano.core.yaml import configure_yaml
 
@@ -61,9 +61,10 @@ class ProjectFiles:  # noqa: WPS214
             meltano_file_path: The path to the meltano.yml file.
         """
         self.root = root.resolve()
-        self._meltano: dict | None = None
+        self._meltano: CommentedMap | None = None
         self._meltano_file_path = meltano_file_path.resolve()
         self._plugin_file_map = {}
+        self._raw_contents_map: dict[str, CommentedMap] = {}
         self._yaml = configure_yaml()
 
     @property
@@ -96,6 +97,8 @@ class ProjectFiles:  # noqa: WPS214
         """
         # meltano file may have changed in another process, so reset cache first
         self.reset_cache()
+        self._raw_contents_map.clear()
+        self._raw_contents_map[str(self._meltano_file_path)] = self.meltano
         included_file_contents = self._load_included_files()
         return deep_merge(self.meltano, included_file_contents)
 
@@ -225,12 +228,13 @@ class ProjectFiles:  # noqa: WPS214
         Raises:
             YAMLError: If a file is invalid YAML.
         """
-        self._plugin_file_map = {}
+        self._plugin_file_map.clear()
         included_file_contents = []
         for path in self.include_paths:
             try:
                 with path.open() as file:
                     contents: CommentedMap = self._yaml.load(file)
+                    self._raw_contents_map[str(path)] = contents
                     # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
                     self._index_file(
                         include_file_path=path, include_file_contents=contents
@@ -241,25 +245,22 @@ class ProjectFiles:  # noqa: WPS214
                 raise exc
         return included_file_contents
 
-    @staticmethod
-    def _add_plugin(file_dicts, file, plugin_type, plugin):
-        file_dict = file_dicts.setdefault(file, {})
-        plugins_dict = file_dict.setdefault("plugins", {})
-        plugins = plugins_dict.setdefault(plugin_type, [])
+    def _add_plugin(self, file_dicts, file, plugin_type, plugin):
+        file_dict = file_dicts.setdefault(file, CommentedMap())
+        plugins_dict = file_dict.setdefault("plugins", CommentedMap())
+        plugins = plugins_dict.setdefault(plugin_type, CommentedSeq())
         if plugin["name"] not in {plg["name"] for plg in plugins}:
             plugins.append(plugin)
 
-    @staticmethod
-    def _add_schedule(file_dicts, file, schedule):
-        file_dict = file_dicts.setdefault(file, {})
-        schedules = file_dict.setdefault("schedules", [])
+    def _add_schedule(self, file_dicts, file, schedule):
+        file_dict = file_dicts.setdefault(file, CommentedMap())
+        schedules = file_dict.setdefault("schedules", CommentedSeq())
         if schedule["name"] not in {scd["name"] for scd in schedules}:
             schedules.append(schedule)
 
-    @staticmethod
-    def _add_environment(file_dicts, file, environment: CommentedMap):
-        file_dict = file_dicts.setdefault(file, {})
-        environments = file_dict.setdefault("environments", [])
+    def _add_environment(self, file_dicts, file, environment: CommentedMap):
+        file_dict = file_dicts.setdefault(file, CommentedMap())
+        environments = file_dict.setdefault("environments", CommentedSeq())
         if environment["name"] not in {env["name"] for env in environments}:
             environments.append(environment)
 
@@ -298,6 +299,18 @@ class ProjectFiles:  # noqa: WPS214
                 file_dict[key] = value
 
         config.copy_attributes(file_dicts[str(self._meltano_file_path)])
+
+        for file, file_dict in file_dicts.items():  # noqa: WPS440
+            original_contents = self._raw_contents_map[file]
+            original_contents.copy_attributes(file_dict)
+            original_contents["environments"].copy_attributes(file_dict["environments"])
+            original_contents["plugins"].copy_attributes(file_dict["plugins"])
+            for plugin_type, _ in file_dict["plugins"].items():
+                original_contents["plugins"][plugin_type].copy_attributes(
+                    file_dict["plugins"][plugin_type]
+                )
+            original_contents["schedules"].copy_attributes(file_dict["schedules"])
+
         return file_dicts
 
     def _write_file(self, file_path: PathLike, contents: Mapping):

@@ -376,6 +376,7 @@ class TestProjectFiles:
             - ./*/**/subconfig_[0-9].yml
 
             schedules:
+            # My schedules
             - name: modified-test-meltano-yml
               extractor: tap-meltano-yml
               loader: target-meltano-yml
@@ -397,6 +398,7 @@ class TestProjectFiles:
               - name: modified-tap-subconfig-2-yml
 
               mappers:
+              # My mappers
               - name: map-meltano-yml
                 # These are some mappings
                 mappings:
@@ -408,6 +410,7 @@ class TestProjectFiles:
               - name: modified-target-subconfig-1-yml
 
             environments:
+            # My meltano environments
             - name: test-meltano-environment
               env:
                 TEST: TEST-MELTANO
