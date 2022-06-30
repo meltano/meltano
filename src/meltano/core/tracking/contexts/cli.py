@@ -11,7 +11,7 @@ from meltano.core.utils import hash_sha256
 
 
 class CliEvent(Enum):
-    """The kind of event that is occuring in the command-line interface."""
+    """The kind of event that is occurring in the command-line interface."""
 
     # The cli command has started, this is fired automatically in most cases when the command is called.
     started = auto()
@@ -71,15 +71,8 @@ class CliContext(SelfDescribingJson):
             else:
                 options[key] = hash_sha256(repr(val))
 
-        if ctx.parent:
-            return cls(
-                command=ctx.command.name,
-                parent_command_hint=ctx.parent.command.name,
-                options=options,
-            )
-
         return cls(
             command=ctx.command.name,
-            parent_command_hint=None,
+            parent_command_hint=ctx.parent.command.name if ctx.parent else None,
             options=options,
         )
