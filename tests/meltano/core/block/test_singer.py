@@ -1,10 +1,10 @@
 import asyncio
 import tempfile
-from unittest import mock
 
+import mock
 import pytest
 import structlog
-from asynctest import CoroutineMock, Mock
+from mock import AsyncMock, Mock
 from structlog.testing import capture_logs
 
 from meltano.core.block.singer import SingerBlock
@@ -19,7 +19,7 @@ class TestSingerBlocks:
 
     @pytest.fixture()
     def elt_context(self, project, session, tap, target, elt_context_builder):
-        job = Job(job_id="pytest_test_runner")
+        job = Job(job_name="pytest_test_runner")
 
         return (
             elt_context_builder.with_session(session)
@@ -34,7 +34,7 @@ class TestSingerBlocks:
         def _factory(name):
             process_mock = Mock()
             process_mock.name = name
-            process_mock.wait = CoroutineMock(return_value=0)
+            process_mock.wait = AsyncMock(return_value=0)
             return process_mock
 
         return _factory
@@ -47,32 +47,32 @@ class TestSingerBlocks:
         tap_process = process_mock_factory(tap)
         tap_process.stdout = mock.MagicMock()
         tap_process.stdout.at_eof.side_effect = (False, False, False, True)
-        tap_process.stdout.readline = CoroutineMock(side_effect=stdout_lines)
+        tap_process.stdout.readline = AsyncMock(side_effect=stdout_lines)
         tap_process.stderr = mock.MagicMock()
         tap_process.stderr.at_eof.side_effect = (False, False, False, True)
-        tap_process.stderr.readline = CoroutineMock(side_effect=stderr_lines)
+        tap_process.stderr.readline = AsyncMock(side_effect=stderr_lines)
 
         tap_process.stdin = mock.MagicMock()
-        tap_process.stdin.wait_closed = CoroutineMock(return_value=True)
+        tap_process.stdin.wait_closed = AsyncMock(return_value=True)
 
-        tap_process.wait = CoroutineMock(return_value=0)
+        tap_process.wait = AsyncMock(return_value=0)
 
         invoker = Mock()
-        invoker.invoke_async = CoroutineMock(return_value=tap_process)
+        invoker.invoke_async = AsyncMock(return_value=tap_process)
         invoker.plugin = tap
-        invoker.cleanup = CoroutineMock()
+        invoker.cleanup = AsyncMock()
         return invoker
 
     @pytest.fixture()
     def mock_target_plugin_invoker(self, process_mock_factory, target):
         target_process = process_mock_factory(target)
         target_process.stdin = mock.MagicMock()
-        target_process.stdin.wait_closed = CoroutineMock(return_value=True)
+        target_process.stdin.wait_closed = AsyncMock(return_value=True)
 
         invoker = Mock()
-        invoker.invoke_async = CoroutineMock(return_value=target_process)
+        invoker.invoke_async = AsyncMock(return_value=target_process)
         invoker.plugin = target
-        invoker.cleanup = CoroutineMock()
+        invoker.cleanup = AsyncMock()
         return invoker
 
     @pytest.mark.asyncio

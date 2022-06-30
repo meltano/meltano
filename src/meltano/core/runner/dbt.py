@@ -37,9 +37,12 @@ class DbtRunner(Runner):
 
         await asyncio.wait(
             [
-                capture_subprocess_output(handle.stdout, log),
-                capture_subprocess_output(handle.stderr, log),
-                handle.wait(),
+                asyncio.create_task(coro)
+                for coro in (
+                    capture_subprocess_output(handle.stdout, log),
+                    capture_subprocess_output(handle.stderr, log),
+                    handle.wait(),
+                )
             ],
             return_when=asyncio.ALL_COMPLETED,
         )

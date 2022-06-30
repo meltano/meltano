@@ -1,4 +1,5 @@
 """ELT Context."""
+
 from __future__ import annotations
 
 from collections import namedtuple
@@ -143,7 +144,7 @@ class ELTContext:  # noqa: WPS230
             The job dir, if a Job is provided, else None.
         """
         if self.job:
-            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+            return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
     def invoker_for(self, plugin_type: PluginType) -> PluginInvoker:
         """Get invoker for given plugin type.
@@ -388,15 +389,15 @@ class ELTContextBuilder:  # noqa: WPS214
     def plugin_context(
         self,
         plugin_ref: PluginRef,
-        env: dict = None,
-        config: dict = None,
+        env: dict | None = None,
+        config: dict | None = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
         Args:
             plugin_ref: Plugin reference object.
-            env: Environment override dictionary. Defaults to None.
-            config: Plugin configuration override dictionary. Defaults to None.
+            env: Environment override dictionary.
+            config: Plugin configuration override dictionary.
 
         Returns:
             A new `PluginContext` object.

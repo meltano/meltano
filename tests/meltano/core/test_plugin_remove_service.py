@@ -1,7 +1,7 @@
 import errno
 import os
-from unittest import mock
 
+import mock
 import pytest
 import yaml
 from sqlalchemy.exc import OperationalError

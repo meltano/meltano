@@ -1,10 +1,13 @@
-"""Extract_load is a basic EL style BlockSet implementation."""
+"""Basic EL style BlockSet implementation."""
+
+from __future__ import annotations
+
 import asyncio
 import logging
+from contextlib import asynccontextmanager
 from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
 
 import structlog
-from async_generator import asynccontextmanager
 from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
@@ -86,7 +89,7 @@ class ELBContext:  # noqa: WPS230
             The run directory for the current job.
         """
         if self.job:
-            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+            return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
 class ELBContextBuilder:
@@ -201,13 +204,13 @@ class ELBContextBuilder:
     def plugin_context(
         self,
         plugin: ProjectPlugin,
-        env: dict = None,
+        env: dict | None = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
         Args:
             plugin: The plugin to create the context for.
-            env: Environment override dictionary. Defaults to None.
+            env: Environment override dictionary.
 
         Returns:
             A new `PluginContext` object.
@@ -252,7 +255,7 @@ class ELBContextBuilder:
             The run directory for the current job.
         """
         if self._job:
-            return self.project.job_dir(self._job.job_id, str(self._job.run_id))
+            return self.project.job_dir(self._job.job_name, str(self._job.run_id))
 
     def context(self) -> ELBContext:
         """Create an ELBContext object from the current builder state.
@@ -300,10 +303,10 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         elif self.context.update_state:
             state_id = generate_state_id(self.context.project, self.head, self.tail)
-            self.context.job = Job(job_id=state_id)
+            self.context.job = Job(job_name=state_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
-                self.context.job.job_id, self.context.job.run_id
+                self.context.job.job_name, self.context.job.run_id
             )
             self.output_logger = OutputLogger(log_file)
 
@@ -447,12 +450,12 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
         job = self.context.job
-        StaleJobFailer(job.job_id).fail_stale_jobs(self.context.session)
+        StaleJobFailer(job.job_name).fail_stale_jobs(self.context.session)
         if not self.context.force:
-            existing = JobFinder(job.job_id).latest_running(self.context.session)
+            existing = JobFinder(job.job_name).latest_running(self.context.session)
             if existing:
                 raise RunnerError(
-                    f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                    f"Another '{job.job_name}' pipeline is already running which started at {existing.started_at}. "
                     + "To ignore this check use the '--force' option."
                 )
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-import meltano.core.bundle as bundle
+from meltano.core import bundle
 
 from .file import FilePlugin
 
@@ -13,13 +13,13 @@ class MeltanoFilePlugin(FilePlugin):
         self._discovery = discovery
 
     def file_contents(self, project):
-        initialize_file = bundle.find("initialize.yml")
+        initialize_file = bundle.root / "initialize.yml"
         file_contents = {
             Path(relative_path): content
             for relative_path, content in yaml.safe_load(initialize_file.open()).items()
         }
         if self._discovery:
-            file_contents["discovery.yml"] = bundle.find("discovery.yml").read_text()
+            file_contents["discovery.yml"] = (bundle.root / "discovery.yml").read_text()
         return file_contents
 
     def update_config(self, project):

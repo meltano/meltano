@@ -1,10 +1,11 @@
 import asyncio
 import json
+import platform
 
 import mock
 import pytest
-from asynctest import CoroutineMock, Mock, patch
 from click.testing import CliRunner
+from mock import AsyncMock, Mock, patch
 
 from meltano.cli import cli
 from meltano.core.legacy_tracking import LegacyTracker
@@ -26,7 +27,7 @@ class TestCliInvoke:
 
         process_mock = Mock()
         process_mock.name = "utility-mock"
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
 
         with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",
@@ -89,6 +90,11 @@ class TestCliInvoke:
         cli_runner,
         mock_invoke_containers,
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         async def async_generator(*args, **kwargs):
             yield "Line 1"
             yield "Line 2"  # noqa: WPS354
@@ -158,7 +164,7 @@ class TestCliInvoke:
     ):
         process_mock = Mock()
         process_mock.name = "utility-mock"
-        process_mock.wait = CoroutineMock(return_value=2)
+        process_mock.wait = AsyncMock(return_value=2)
 
         with patch.object(LegacyTracker, "track_event", return_value=None), patch(
             "meltano.core.plugin_invoker.invoker_factory",

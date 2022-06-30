@@ -198,7 +198,7 @@ class SettingsStoreManager(ABC):
 
         Args:
             name: Setting name.
-            setting_def: (optional) SettingDefinition instance. Defaults to None.
+            setting_def: SettingDefinition instance.
         """
 
     def set(
@@ -214,7 +214,7 @@ class SettingsStoreManager(ABC):
             name: Setting name.
             path: Setting path.
             value: New value to set.
-            setting_def: (optional) SettingDefinition instance. Defaults to None.
+            setting_def: SettingDefinition instance.
 
         Raises:
             NotImplementedError: always.
@@ -1141,7 +1141,7 @@ class AutoStoreManager(SettingsStoreManager):
         Args:
             name: Setting name.
             source: Default SettingValueStore.
-            setting_def: (optional) SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
             A SettingValueStore, if found, else None.
@@ -1186,11 +1186,11 @@ class AutoStoreManager(SettingsStoreManager):
     def get(
         self, name: str, setting_def: SettingDefinition | None = None, **kwargs
     ) -> tuple[str, dict]:
-        """Get a Setting value by name and (optional) SettingDefinition.
+        """Get a Setting value by name and SettingDefinition.
 
         Args:
             name: Setting name.
-            setting_def: (optional) SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
             kwargs: Additional keword arguments to pass to `manager.get()`
 
         Returns:
@@ -1229,7 +1229,7 @@ class AutoStoreManager(SettingsStoreManager):
             name: Setting name.
             path: Setting path.
             value: New Setting value.
-            setting_def: (optional) SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
             A dictionary of metadata pertaining to the set operation.
@@ -1273,12 +1273,12 @@ class AutoStoreManager(SettingsStoreManager):
         path: list[str],
         setting_def: SettingDefinition | None = None,
     ) -> dict:
-        """Unset value, by name, path and (optional) SettingDefinition, in all stores.
+        """Unset value, by name, path and SettingDefinition, in all stores.
 
         Args:
             name: Setting name.
             path: Setting path.
-            setting_def: (optional) SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
             A metadata dictionary containing details of the last value unset.

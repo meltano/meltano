@@ -21,9 +21,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-If you're running Linux, macOS, or Windows and have [Python](https://www.python.org/) 3.7, 3.8 or 3.9 installed,
-we recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment)
-inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.7, 3.8, 3.9, or 3.10 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1. Create and navigate to a directory to hold your Meltano projects:
 
@@ -38,10 +36,10 @@ inside the directory that will hold your [Meltano projects](/concepts/project).
     #For Windows (PowerShell): New-Alias Python3 Python
     python3 -m pip install --user pipx
     python3 -m pipx ensurepath
-    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables 
-    source ~/.bashrc 
+    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
+    source ~/.bashrc
     ```
-    
+
     <div class="notification is-info">
       <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
     </div>
@@ -780,10 +778,11 @@ This can be useful for debugging a failing extractor or loader.
 Now that you've successfully run your first data integration (EL) pipeline using Meltano,
 you have a few possible next steps:
 
-- [Schedule pipelines to run regularly](#schedule-pipelines-to-run-regularly)
-- [Transform loaded data for analysis](#transform-loaded-data-for-analysis)
-- [Containerize your project](#containerize-your-project)
-- [Deploy your pipelines in production](#deploy-your-pipelines-in-production)
+- [Schedule Pipelines to Run Regularly](#schedule-pipelines-to-run-regularly)
+- [Transform Loaded Data for Analysis](#transform-loaded-data-for-analysis)
+- [Analyze Your Data with Superset](#analyze-your-data-with-superset)
+- [Containerize Your Project](#containerize-your-project)
+- [Deploy Your Pipelines in Production](#deploy-your-pipelines-in-production)
 
 ### Schedule Pipelines to Run Regularly
 

@@ -1102,12 +1102,12 @@ meltano state list --pattern '*tap-gitlab*'
 Merge new state onto existing state for a state ID.
 
 <div class="notification is-info">
-	<p><strong>Not seeing merged state in the system database?</strong></p>
-	<p>Merged state is computed at <em>execution</em> time.
-	The <samp>merge</samp> command merely
-	adds a new <samp>payload</samp> to the database which is merged together with
-	existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
-	</p>
+  <p><strong>Not seeing merged state in the system database?</strong></p>
+  <p>Merged state is computed at <em>execution</em> time.
+  The <samp>merge</samp> command merely
+  adds a new <samp>payload</samp> to the database which is merged together with
+  existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
+  </p>
 </div>
 
 #### How to use
@@ -1146,6 +1146,42 @@ meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.jso
 
 # Provide state via existing state.
 meltano state merge dev:tap-gitlab-to-target-jsonl --from-state-id prod:tap-gitlab-to-target-jsonl
+```
+
+### copy
+
+Copy state from one state ID to another
+
+#### How to use
+
+```bash
+# Copy state from one state ID to another
+meltano state copy <src_state_id> <dst_state_id>
+```
+
+#### Examples
+
+```bash
+# Use prod state to update dev environemnt
+meltano state copy prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
+```
+
+### move
+
+Move state from one state ID to another, equivalent to a rename
+
+#### How to use
+
+```bash
+# Move state from one ID to another
+meltano state move <src_state_id> <dst_state_id>
+```
+
+#### Examples
+
+```bash
+# Use previous state with a new tap variant, clearing the original
+meltano state move original-tap-postgres-to-target-jsonl variant-tap-postgres-to-target-jsonl
 ```
 
 ### set
