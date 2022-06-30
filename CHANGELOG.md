@@ -9,12 +9,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#3452](https://gitlab.com/meltano/meltano/-/issues/3452) Add `copy` and `move` commands to `meltano state` 
+- [#3452](https://gitlab.com/meltano/meltano/-/issues/3452) Add `copy` and `move` commands to `meltano state`
 
 ### Changes
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
 - [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
 - [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
+- [#2035](https://github.com/meltano/meltano/issues/2035) Rename `job` table and `job_id` column in backend db
 
 ### Fixes
 

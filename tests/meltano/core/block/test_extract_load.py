@@ -42,7 +42,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 @pytest.fixture
 def test_job(session) -> Job:
     return Job(
-        job_id=TEST_STATE_ID,
+        job_name=TEST_STATE_ID,
         state=State.SUCCESS,
         payload_flags=Payload.STATE,
         payload={"singer_state": {"bookmarks": []}},
@@ -67,7 +67,7 @@ def elb_context(project, session, test_job, output_logger) -> ELBContext:
 
 class TestELBContext:
     def test_elt_run_dir_is_returned(self, project, test_job, elb_context: ELBContext):
-        expected_path = project.job_dir(test_job.job_id, str(test_job.run_id))
+        expected_path = project.job_dir(test_job.job_name, str(test_job.run_id))
         assert elb_context.elt_run_dir == Path(expected_path)
 
 
@@ -215,7 +215,7 @@ class TestExtractLoadBlocks:
     @pytest.fixture
     def subject(self, session, elb_context):
         Job(
-            job_id=TEST_STATE_ID,
+            job_name=TEST_STATE_ID,
             state=State.SUCCESS,
             payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},
@@ -606,11 +606,11 @@ class TestExtractLoadBlocks:
             elb = ExtractLoadBlocks(elb_context, blocks)
             elb.validate_set()
 
-            assert elb.context.job.job_id == "test:tap-mock-to-target-mock"
+            assert elb.context.job.job_name == "test:tap-mock-to-target-mock"
 
             # just to be sure, we'll double-check the state_id is the same for each block
             for block in blocks:
-                assert block.context.job.job_id == "test:tap-mock-to-target-mock"
+                assert block.context.job.job_name == "test:tap-mock-to-target-mock"
 
             elb.run_with_job = AsyncMock()
 
@@ -619,7 +619,7 @@ class TestExtractLoadBlocks:
 
 
 class TestExtractLoadUtils:
-    def test_generate_job_id(self):
+    def test_generate_job_name(self):
         """Verify that the job id is generated correctly when an environment is provided."""
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"

@@ -138,7 +138,7 @@ async def elt(
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
-        job_id=state_id
+        job_name=state_id
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
     _, Session = project_engine(project)  # noqa: N806
@@ -232,24 +232,24 @@ async def dump_file(context_builder, dumpable):
 
 
 async def _run_job(tracker, project, job, session, context_builder, force=False):
-    StaleJobFailer(job.job_id).fail_stale_jobs(session)
+    StaleJobFailer(job.job_name).fail_stale_jobs(session)
 
     if not force:
-        existing = JobFinder(job.job_id).latest_running(session)
+        existing = JobFinder(job.job_name).latest_running(session)
         if existing:
             raise CliError(
-                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                f"Another '{job.job_name}' pipeline is already running which started at {existing.started_at}. "
                 + "To ignore this check use the '--force' option."
             )
 
     async with job.run(session):
         job_logging_service = JobLoggingService(project)
-        log_file = job_logging_service.generate_log_name(job.job_id, job.run_id)
+        log_file = job_logging_service.generate_log_name(job.job_name, job.run_id)
 
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
 
-        log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_id)
+        log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_name)
 
         await _run_elt(tracker, log, context_builder, output_logger)
 
@@ -309,7 +309,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_name,
         stdio="stderr",
     )
 
@@ -325,7 +325,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(
             run_id=str(elt_context.job.run_id),
-            state_id=elt_context.job.job_id,
+            state_id=elt_context.job.job_name,
             stdio="stdout",
         )
         extractor_out = output_logger.out(
@@ -377,7 +377,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_name,
         stdio="stderr",
         cmd_type="transformer",
     )
