@@ -1,9 +1,10 @@
 import json
 import logging
+import platform
 import sys
 import tempfile
-from unittest import mock
 
+import mock
 import pytest
 import structlog
 from structlog.testing import LogCapture
@@ -31,11 +32,16 @@ class TestOutputLogger:
 
     @pytest.fixture(autouse=True)
     def fixture_configure_structlog(self, log_output):
+        original_config = structlog.get_config()
         structlog.configure(
             processors=[log_output],
             logger_factory=structlog.stdlib.LoggerFactory(),
             wrapper_class=structlog.stdlib.BoundLogger,
         )
+        try:
+            yield
+        finally:
+            structlog.configure(**original_config)
 
     @pytest.fixture(name="redirect_handler")
     def redirect_handler(self, subject: OutputLogger) -> logging.Handler:
@@ -48,6 +54,10 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_stdio_capture(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
 
         stdout_out = subject.out("stdout")
         stderr_out = subject.out("stderr")
@@ -55,7 +65,7 @@ class TestOutputLogger:
         async with stdout_out.redirect_stdout():
             sys.stdout.write("STD")
             sys.stdout.write("OUT\n")
-            print("STDOUT 2")
+            print("STDOUT 2")  # noqa: WPS421
 
         assert_lines(
             log_output.entries,
@@ -74,7 +84,7 @@ class TestOutputLogger:
         async with stderr_out.redirect_stderr():
             sys.stderr.write("STD")
             sys.stderr.write("ERR\n")
-            print("STDERR 2", file=sys.stderr)
+            print("STDERR 2", file=sys.stderr)  # noqa: WPS421
 
         assert_lines(
             log_output.entries,
@@ -92,6 +102,11 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_out_writers(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         writer_out = subject.out("writer")
         line_writer_out = subject.out("lwriter")
         basic_out = subject.out("basic")
@@ -140,6 +155,11 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio
     async def test_set_custom_logger(self, log, subject, log_output):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         logger = structlog.getLogger()
         out = subject.out("basic", logger.bind(is_test=True))
 
@@ -154,8 +174,17 @@ class TestOutputLogger:
             },
         )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     @pytest.mark.asyncio
     async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         logging_out = subject.out("logging")
 
         with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
@@ -174,7 +203,16 @@ class TestOutputLogger:
             {"event": "error"},
         )
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Test fails if even attempted to be run, xfail can't save us here.",
+    )
     def test_logging_exception(self, log, subject, redirect_handler):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         logging_out = subject.out("logging")
 
         # it raises logs unhandled exceptions
@@ -186,7 +224,8 @@ class TestOutputLogger:
                     raise exception
 
         # make sure it let the exception through
-        assert exc.value is exception
+        # All code below here in this test cannot be reached
+        assert exc.value is exception  # noqa: WPS441
 
         log_content = json.loads(log.read())
 

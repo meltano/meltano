@@ -1,3 +1,4 @@
+import logging
 from contextlib import contextmanager
 
 import pytest
@@ -26,7 +27,12 @@ def impersonate(app):
 
 @pytest.fixture(scope="class")
 def app(create_app):
-    return create_app()
+    root_logger = logging.getLogger()
+    log_level = root_logger.level
+    try:
+        yield create_app()
+    finally:
+        root_logger.setLevel(log_level)
 
 
 @pytest.fixture(scope="class")

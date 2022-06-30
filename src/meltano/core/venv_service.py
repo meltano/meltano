@@ -22,7 +22,11 @@ VenvSpecs = namedtuple("VenvSpecs", ("lib_dir", "bin_dir", "site_packages_dir"))
 POSIX = VenvSpecs(
     lib_dir="lib",
     bin_dir="bin",
-    site_packages_dir=os.path.join("lib", f"python{sys.version[:3]}", "site-packages"),
+    site_packages_dir=os.path.join(
+        "lib",
+        f"python{'.'.join(str(part) for part in sys.version_info[:2])}",
+        "site-packages",
+    ),
 )
 
 NT = VenvSpecs(
@@ -155,8 +159,6 @@ class VenvService:
             # If the VirtualEnv has never been created before do nothing
             logger.debug("No old virtual environment to remove")
 
-        return
-
     async def create(self):
         """
         Create a new virtual environment.
@@ -197,7 +199,7 @@ class VenvService:
         """Return the fingerprint of the existing virtual environment, if any."""
         if not self.plugin_fingerprint_path.exists():
             return None
-        with open(self.plugin_fingerprint_path, "rt") as fingerprint_file:
+        with open(self.plugin_fingerprint_path) as fingerprint_file:
             return fingerprint_file.read()
 
     def write_fingerprint(self, pip_urls: List[str]):

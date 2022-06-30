@@ -1,10 +1,10 @@
 import json
 import os
 from pathlib import Path
-from unittest import mock
 
+import mock
 import pytest
-from asynctest import CoroutineMock
+from mock import AsyncMock
 
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, Payload, State
@@ -37,7 +37,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 class TestSingerRunner:
     @pytest.fixture()
     def elt_context(self, project, session, tap, target, elt_context_builder):
-        job = Job(job_id="pytest_test_runner")
+        job = Job(job_name="pytest_test_runner")
 
         return (
             elt_context_builder.with_session(session)
@@ -47,22 +47,20 @@ class TestSingerRunner:
             .context()
         )
 
-    @pytest.fixture()
-    def tap_config_dir(self, mkdtemp, elt_context):
-        tap_config_dir = mkdtemp()
-        create_plugin_files(tap_config_dir, elt_context.extractor.plugin)
-        return tap_config_dir
+    @pytest.fixture
+    def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
+        create_plugin_files(tmp_path, elt_context.extractor.plugin)
+        return tmp_path
 
-    @pytest.fixture()
-    def target_config_dir(self, mkdtemp, elt_context):
-        target_config_dir = mkdtemp()
-        create_plugin_files(target_config_dir, elt_context.loader.plugin)
-        return target_config_dir
+    @pytest.fixture
+    def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
+        create_plugin_files(tmp_path, elt_context.loader.plugin)
+        return tmp_path
 
     @pytest.fixture()
     def subject(self, session, elt_context):
         Job(
-            job_id=TEST_STATE_ID,
+            job_name=TEST_STATE_ID,
             state=State.SUCCESS,
             payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},
@@ -75,7 +73,7 @@ class TestSingerRunner:
         def _factory(name):
             process_mock = mock.Mock()
             process_mock.name = name
-            process_mock.wait = CoroutineMock(return_value=0)
+            process_mock.wait = AsyncMock(return_value=0)
             return process_mock
 
         return _factory
@@ -83,7 +81,7 @@ class TestSingerRunner:
     @pytest.fixture()
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
-        tap.stdout.readline = CoroutineMock(return_value="{}")
+        tap.stdout.readline = AsyncMock(return_value="{}")
         return tap
 
     @pytest.fixture()
@@ -135,7 +133,7 @@ class TestSingerRunner:
         async with tap_invoker.prepared(  # noqa: WPS316
             session
         ), target_invoker.prepared(session):
-            invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+            invoke_async = AsyncMock(side_effect=(tap_process, target_process))
             with mock.patch.object(
                 PluginInvoker, "invoke_async", new=invoke_async
             ) as invoke_async:
@@ -143,8 +141,8 @@ class TestSingerRunner:
                 await subject.invoke(tap_invoker, target_invoker, session)
 
                 # correct bins are called
-                assert invoke_async.awaited_with(tap_invoker)
-                assert invoke_async.awaited_with(target_invoker)
+                assert await invoke_async.awaited_with(tap_invoker)
+                assert await invoke_async.awaited_with(target_invoker)
 
                 tap_process.wait.assert_awaited()
                 target_process.wait.assert_awaited()
@@ -178,7 +176,7 @@ class TestSingerRunner:
         # complicated.
         target_process.stdout = mock.MagicMock()
         target_process.stdout.at_eof.side_effect = (False, False, False, True)
-        target_process.stdout.readline = CoroutineMock(side_effect=lines)
+        target_process.stdout.readline = AsyncMock(side_effect=lines)
 
         subject.context.full_refresh = full_refresh
         subject.context.select_filter = select_filter

@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
-from unittest import mock
 
+import mock
 import pytest
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from flask import url_for
@@ -70,7 +70,7 @@ class TestNothingEnabled:
             res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == HTTPStatus.FOUND
-            assert res.location == url_for("root.default", _external=True)
+            assert res.location == url_for("root.default")
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
@@ -135,7 +135,7 @@ class TestProjectReadonlyEnabled:
             res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == HTTPStatus.FOUND
-            assert res.location == url_for("root.default", _external=True)
+            assert res.location == url_for("root.default")
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
@@ -212,7 +212,7 @@ class TestReadonlyEnabled:
             res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == HTTPStatus.FOUND
-            assert res.location == url_for("root.default", _external=True)
+            assert res.location == url_for("root.default")
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
@@ -337,7 +337,7 @@ class TestAuthenticationEnabled:
             res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == HTTPStatus.FOUND
-            assert res.location.startswith(url_for("security.login", _external=True))
+            assert res.location.startswith(url_for("security.login"))
 
     def test_bootstrap_authenticated(self, app, api, impersonate):
         with app.test_request_context():
@@ -345,7 +345,7 @@ class TestAuthenticationEnabled:
                 res = api.get(url_for("root.bootstrap"))
 
                 assert res.status_code == HTTPStatus.FOUND
-                assert res.location == url_for("root.default", _external=True)
+                assert res.location == url_for("root.default")
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
@@ -439,7 +439,7 @@ class TestAuthenticationAndReadonlyEnabled:
             res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == HTTPStatus.FOUND
-            assert res.location.startswith(url_for("security.login", _external=True))
+            assert res.location.startswith(url_for("security.login"))
 
     def test_bootstrap_authenticated(self, app, api, impersonate):
         with app.test_request_context():
@@ -447,7 +447,7 @@ class TestAuthenticationAndReadonlyEnabled:
                 res = api.get(url_for("root.bootstrap"))
 
                 assert res.status_code == HTTPStatus.FOUND
-                assert res.location == url_for("root.default", _external=True)
+                assert res.location == url_for("root.default")
 
     def test_upgrade(self, app, api):
         with app.test_request_context():
@@ -542,7 +542,7 @@ class TestAuthenticationAndAnonymousReadonlyEnabled:
             res = api.get(url_for("root.bootstrap"))
 
             assert res.status_code == HTTPStatus.FOUND
-            assert res.location == url_for("root.default", _external=True)
+            assert res.location == url_for("root.default")
 
     def test_bootstrap_authenticated(self, app, api, impersonate):
         with app.test_request_context():
@@ -550,7 +550,7 @@ class TestAuthenticationAndAnonymousReadonlyEnabled:
                 res = api.get(url_for("root.bootstrap"))
 
                 assert res.status_code == HTTPStatus.FOUND
-                assert res.location == url_for("root.default", _external=True)
+                assert res.location == url_for("root.default")
 
     def test_upgrade(self, app, api):
         with app.test_request_context():

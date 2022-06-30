@@ -1,17 +1,9 @@
-import contextlib
-import os
-
 import pytest
-import sqlalchemy
 
 
 @pytest.fixture(scope="session")
-def engine_uri(test_dir):
-    database_path = test_dir.joinpath("pytest_meltano.db")
-
-    try:
-        database_path.unlink()
-    except FileNotFoundError:
-        pass
-
-    return f"sqlite:///{database_path}"
+def engine_uri(tmp_path_factory) -> str:
+    database_path = (
+        tmp_path_factory.mktemp("fixture_db_sqlite_engine_uri") / "pytest_meltano.db"
+    )
+    return f"sqlite:///{database_path.as_posix()}"
