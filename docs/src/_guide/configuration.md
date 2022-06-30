@@ -52,6 +52,50 @@ can be used to pass along arbitrary key-value data to the new process.
 Meltano [reads settings from environment variables](#configuring-settings) when you run the [`meltano` command](/reference/command-line-interface),
 and populates them when it [evaluates plugin configuration](#expansion-in-setting-values)
 and [invokes plugin executables](#accessing-from-plugins).
+Meltano also supports specifying environment variables under the `env:` keys of `meltano.yml`, a Meltano Environment or on the Plugin.
+
+### Specifying environment variables
+
+In addition to the terminal environment and the `.env ` file, Meltano supports the specification of environment variables at the following configuration levels:
+
+```yaml
+env:
+  # root level env
+  MY_ENV_VAR: top_level_env_var
+plugins:
+  extractors:
+    - name: tap-google-analytics
+      variant: meltano
+      env:
+        # root level plugin env
+        MY_ENV_VAR: plugin_level_env_var
+environments:
+  - name: dev
+    env:
+      # environment level env
+      MY_ENV_VAR: environment_level_env_var
+    config:
+      plugins:
+        extractors:
+          - name: tap-google-analytics
+            variant: meltano
+            env:
+              # environment level plugin env
+              MY_ENV_VAR: environment_level_plugin_env_var
+```
+
+Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context), as you would expect:
+
+```yaml
+- environment level plugin env # highest
+- environment level env
+- root level plugin env
+- root level env
+- .env file
+- terminal env # lowest
+```
+
+This allows you to override environment variables per plugin and per environment, as needed for your use case.
 
 ### Configuring settings
 
@@ -127,12 +171,14 @@ When Meltano invokes a plugin's executable as part of [`meltano elt`](/reference
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
 
 Within a [Meltano environment](/concepts/environments) environment variables can be specified using the `env` key:
+
 ```yml
 environments:
   - name: dev
     env:
       AN_ENVIRONMENT_VARIABLE: dev
 ```
+
 Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
 
 ## Multiple plugin configurations
@@ -175,18 +221,18 @@ they can [directly inherit](/guide/plugin-management#explicit-inheritance) from 
 ```yml
 plugins:
   extractors:
-  - name: tap-postgres--billing
-    inherit_from: tap-postgres
-    config:
-      host: one.postgres.example.com
-      user: billing_user
-      dbname: billing_db
-  - name: tap-postgres--events
-    inherit_from: tap-postgres
-    config:
-      host: two.postgres.example.com
-      user: events_user
-      dbname: events_db
+    - name: tap-postgres--billing
+      inherit_from: tap-postgres
+      config:
+        host: one.postgres.example.com
+        user: billing_user
+        dbname: billing_db
+    - name: tap-postgres--events
+      inherit_from: tap-postgres
+      config:
+        host: two.postgres.example.com
+        user: events_user
+        dbname: events_db
 ```
 
 To configure `tap-postgres`'s `password` setting, you would typically set the `TAP_POSTGRES_PASSWORD` [environment variable](#configuring-settings),
@@ -234,6 +280,7 @@ Plugin extras are additional configuration options specific to the type of plugi
 that are handled by Meltano instead of the plugin itself.
 
 Meltano currently knows these extras for these plugin types:
+
 - [Extractors](/concepts/plugins#extractors)
   - [`catalog`](/concepts/plugins#catalog-extra)
   - [`load_schema`](/concepts/plugins#load-schema-extra)
