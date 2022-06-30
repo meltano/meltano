@@ -69,7 +69,7 @@ class CliContext(SelfDescribingJson):
             if isinstance(val, (bool, int, float)) or val is None:
                 options[key] = val
             else:
-                options[key] = hash_sha256(str(val))
+                options[key] = hash_sha256(repr(val))
 
         if ctx.parent:
             return cls(
