@@ -284,7 +284,7 @@ class ProjectFiles:  # noqa: WPS214
             file = self._plugin_file_map.get(key, str(self._meltano_file_path))
             self._add_environment(file_dicts, file, environment)
 
-    def _split_config_dict(self, config: CommentedMap):
+    def _split_config_dict(self, config: CommentedMap):  # noqa: WPS210
         file_dicts: dict[str, CommentedMap] = {}
         for key, value in config.items():
             if key == "plugins":
@@ -303,13 +303,24 @@ class ProjectFiles:  # noqa: WPS214
         for file, file_dict in file_dicts.items():  # noqa: WPS440
             original_contents = self._raw_contents_map[file]
             original_contents.copy_attributes(file_dict)
-            original_contents["environments"].copy_attributes(file_dict["environments"])
-            original_contents["plugins"].copy_attributes(file_dict["plugins"])
-            for plugin_type, _ in file_dict["plugins"].items():
-                original_contents["plugins"][plugin_type].copy_attributes(
-                    file_dict["plugins"][plugin_type]
+
+            original_environments = original_contents.get(
+                "environments", CommentedSeq()
+            )
+            environments = file_dict.get("environments", CommentedSeq())
+            original_environments.copy_attributes(environments)
+
+            original_plugins = original_contents.get("plugins", CommentedMap())
+            plugins = file_dict.get("plugins", CommentedMap())
+            for plugin_type, plugin_type_plugins in plugins.items():
+                original_plugin_type_plugins = original_plugins.get(
+                    plugin_type, CommentedSeq()
                 )
-            original_contents["schedules"].copy_attributes(file_dict["schedules"])
+                original_plugin_type_plugins.copy_attributes(plugin_type_plugins)
+
+            original_schedules = original_contents.get("schedules", CommentedSeq())
+            schedules = file_dict.get("schedules", CommentedSeq())
+            original_schedules.copy_attributes(schedules)
 
         return file_dicts
 
