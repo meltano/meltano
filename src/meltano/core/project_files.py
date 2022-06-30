@@ -284,7 +284,7 @@ class ProjectFiles:  # noqa: WPS214
             file = self._plugin_file_map.get(key, str(self._meltano_file_path))
             self._add_environment(file_dicts, file, environment)
 
-    def _split_config_dict(self, config: CommentedMap):  # noqa: WPS210
+    def _split_config_dict(self, config: CommentedMap):
         file_dicts: dict[str, CommentedMap] = {}
         for key, value in config.items():
             if key == "plugins":
@@ -299,8 +299,14 @@ class ProjectFiles:  # noqa: WPS214
                 file_dict[key] = value
 
         config.copy_attributes(file_dicts[str(self._meltano_file_path)])
+        self._copy_yaml_attributes(file_dicts)
+        return file_dicts
 
-        for file, file_dict in file_dicts.items():  # noqa: WPS440
+    def _copy_yaml_attributes(  # noqa: WPS210
+        self,
+        file_dicts: dict[str, CommentedMap],
+    ):
+        for file, file_dict in file_dicts.items():
             original_contents = self._raw_contents_map[file]
             original_contents.copy_attributes(file_dict)
 
@@ -321,8 +327,6 @@ class ProjectFiles:  # noqa: WPS214
             original_schedules = original_contents.get("schedules", CommentedSeq())
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
-
-        return file_dicts
 
     def _write_file(self, file_path: PathLike, contents: Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
