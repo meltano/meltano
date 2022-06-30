@@ -17,7 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
 
 ### Fixes
-
+- [#6240](https://github.com/meltano/meltano/issues/6240) - Address race condition in access to meltano config when running Meltano UI via uvicorn
 - [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
 
 ### Breaks
