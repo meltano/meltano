@@ -1,3 +1,40 @@
+# Version: 2.2.0
+
+
+#### Unlabeled Changes
+
+* [#5929](https://github.com/meltano/meltano/pull/5929): ci: Test Meltano on latest Python 3.9 in GitLab CI
+* [#6245](https://github.com/meltano/meltano/pull/6245): Update workflow to add assignment column
+* [#6251](https://github.com/meltano/meltano/pull/6251): ci: Add Postgres tests to matrix
+* [#6254](https://github.com/meltano/meltano/pull/6254): fix: Update Assign to Project action to use GitHub supported flavor
+* [#6263](https://github.com/meltano/meltano/pull/6263): docs: Fix link in coverage badge
+* [#6244](https://github.com/meltano/meltano/pull/6244): Permit null exit code in exit events
+* [#6241](https://github.com/meltano/meltano/pull/6241): Remove old oppty assessment issue template.
+* [#6259](https://github.com/meltano/meltano/pull/6259): Add badges to `README.md`
+* [#6261](https://github.com/meltano/meltano/pull/6261): Run isort & clean-up `tox.ini`
+* [#6225](https://github.com/meltano/meltano/pull/6225): Conditionally include context with telemetry state change event
+* [#6275](https://github.com/meltano/meltano/pull/6275): Update Changelog to fix when jobs landed
+* [#6268](https://github.com/meltano/meltano/pull/6268): ci: Use `docker run` instead of `services`
+* [#6276](https://github.com/meltano/meltano/pull/6276): fix(plugins): Replace deprecated `distutils.version.StrictVersion`
+* [#6248](https://github.com/meltano/meltano/pull/6248): ci: add config and docs for semantic-prs
+* [#6265](https://github.com/meltano/meltano/pull/6265): fix(ui): fix stale 'update' link in Meltano UI
+* [#6284](https://github.com/meltano/meltano/pull/6284): ci: auto changelog when creating release branch
+* [#5967](https://github.com/meltano/meltano/pull/5967): Windows CI test added to gitlab, Windows Docs added for installation
+* [#6296](https://github.com/meltano/meltano/pull/6296): ci: Bump virtualenv from 20.14.1 to 20.15.0 in /.github/workflows
+* [#6294](https://github.com/meltano/meltano/pull/6294): chore: Update misleading module docstring in `src/meltano/core/bundle`
+* [#6155](https://github.com/meltano/meltano/pull/6155): ci: add `pytest` support on windows; change: add `meltano elt` guidance for windows users
+* [#6257](https://github.com/meltano/meltano/pull/6257): test: Run & test against Snowplow Micro under Pytest
+* [#6271](https://github.com/meltano/meltano/pull/6271): chore: Update dependencies that `libraries.io` consider "out of date"
+* [#5920](https://github.com/meltano/meltano/pull/5920): Add "move" and "copy" subcommands for "meltano state"
+* [#6233](https://github.com/meltano/meltano/pull/6233): fix: add missing `disable_tracking` setting entry
+* [#6293](https://github.com/meltano/meltano/pull/6293): feat: add support for Python 3.10, including CI tests
+* [#6310](https://github.com/meltano/meltano/pull/6310): test: Reset structlog config after `fixture_configure_structlog`
+* [#6304](https://github.com/meltano/meltano/pull/6304): chore: Move Coverage config into `pyproject.toml` & update it
+* [#6309](https://github.com/meltano/meltano/pull/6309): fix: update schedule schema entry to support job ref and add a jobs entry
+* [#6302](https://github.com/meltano/meltano/pull/6302): chore: Upgrade Pytest to `^7.1.2`
+* [#6320](https://github.com/meltano/meltano/pull/6320): fix: Disable CLI globbing performed by Click on Windows
+
+
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
