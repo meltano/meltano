@@ -217,12 +217,11 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             ProjectFiles file manager
         """
-        with self._meltano_rw_lock.read_lock():
-            if self._project_files is None:
-                self._project_files = ProjectFiles(
-                    root=self.root, meltano_file_path=self.meltanofile
-                )
-            return self._project_files
+        if self._project_files is None:
+            self._project_files = ProjectFiles(
+                root=self.root, meltano_file_path=self.meltanofile
+            )
+        return self._project_files
 
     @property
     def meltano(self) -> MeltanoFileHint:
@@ -233,7 +232,8 @@ class Project(Versioned):  # noqa: WPS214
         """
         from .meltano_file import MeltanoFile
 
-        return MeltanoFile.parse(self.project_files.load())
+        with self._meltano_rw_lock.write_lock():
+            return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
     def meltano_update(self):
