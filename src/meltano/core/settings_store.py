@@ -69,7 +69,9 @@ class MultipleEnvVarsSetException(Exception):
         Returns:
             string representation of the error
         """
-        return f"Setting value set via multiple environment variables: {self.names}"
+        return (
+            f"Error: Setting value set via multiple environment variables: {self.names}"
+        )
 
 
 class StoreNotSupportedError(Error):
