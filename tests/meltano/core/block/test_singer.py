@@ -19,7 +19,7 @@ class TestSingerBlocks:
 
     @pytest.fixture()
     def elt_context(self, project, session, tap, target, elt_context_builder):
-        job = Job(job_id="pytest_test_runner")
+        job = Job(job_name="pytest_test_runner")
 
         return (
             elt_context_builder.with_session(session)

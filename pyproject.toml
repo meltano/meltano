@@ -43,7 +43,7 @@ flask-sqlalchemy = "^2.4.4"
 flatten-dict = "^0"
 gunicorn = "^20.1.0"
 jsonschema = "^3.2" # Held back because of our dependency on docker-compose v1.29.2; update after https://github.com/avast/pytest-docker/pull/72 is merged.
-markdown = "^3.0.1"
+markdown = "^3.3.7"
 meltano-flask-security = "^0.1.0"
 packaging = "^21.3"
 psutil = "^5.6.3"
@@ -71,23 +71,21 @@ black = "^22.3.0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
-coverage = "^4.5.4"
+coverage = {extras = ["toml"], version = "^6.4.1"}
 freezegun = "^0.3.12"
 isort = "^5.10.1"
 mock = "^4.0.3"
 mypy = "^0.960"
 pre-commit = "^2.9.2"
 pylint = "^2.12.2"
-pytest = "^6.2.5"
+pytest = "^7.1.2"
 pytest-asyncio = "^0.18.3"
-pytest-cov = "^2.6.1"
+pytest-cov = "^3.0.0"
 pytest-docker = "^0.12.0"
 pyupgrade = "^2.29.1"
 requests-mock = "^1.6.0"
 tox = "^3.24.4"
-wemake-python-styleguide = "^0.15.3"
-flake8-bandit = "==2.1.2"
-bandit = "==1.7.2"
+wemake-python-styleguide = "^0.16.1"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
@@ -101,6 +99,27 @@ ensure_newline_before_comments = true
 line_length = 88
 src_paths = ["src/", "tests/"]
 skip_glob = ["*.md", "*.vue", "*.js"]
+
+[tool.coverage.run]
+concurrency = [ "multiprocessing" ]
+parallel = true
+branch = true
+
+[tool.coverage.paths]
+source = [
+  "src/meltano",
+  "**/site-packages/meltano",
+  "**/site-packages/meltano*/meltano",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 2
+exclude_lines = [
+    "nocov",
+    "if TYPE_CHECKING:",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
