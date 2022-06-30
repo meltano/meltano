@@ -10,6 +10,7 @@ include_paths:
 - ./*/**/subconfig_[0-9].yml
 
 schedules:
+# TODO: This will not be preserved :(
 - name: test-meltano-yml
   extractor: tap-meltano-yml
   loader: target-meltano-yml
@@ -18,6 +19,7 @@ schedules:
   interval: '@once' # Run only once
 
 plugins:
+  # Project plugins
   extractors:
   - name: tap-meltano-yml # Comment on array element
     settings:
@@ -28,6 +30,7 @@ plugins:
         This is a secret.
 
   mappers:
+  # TODO: This will not be preserved :(
   - name: map-meltano-yml
     # These are some mappings
     mappings:
@@ -37,6 +40,17 @@ plugins:
     - name: target-meltano-yml
 
 environments:
+# TODO: This will not be preserved :(
 - name: test-meltano-environment
   env:
     TEST: TEST-MELTANO
+
+# My jobs
+jobs:
+# An EL job with mapping
+- name: my-job
+  tasks:
+  - >-
+    tap-meltano-yml
+    map-meltano-yml
+    target-meltano-yml

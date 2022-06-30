@@ -92,6 +92,14 @@ class TestProjectFiles:
             "environments": [
                 {"name": "test-meltano-environment", "env": {"TEST": "TEST-MELTANO"}}
             ],
+            "jobs": [
+                {
+                    "name": "my-job",
+                    "tasks": [
+                        "tap-meltano-yml map-meltano-yml target-meltano-yml",
+                    ],
+                },
+            ],
         }
         assert project_files.include_paths == [
             (project_files.root / "subconfig_2.yml"),
@@ -233,6 +241,14 @@ class TestProjectFiles:
                     "env": {"TEST": "TEST-SUBCONFIG-1-YML"},
                 },
             ],
+            "jobs": [
+                {
+                    "name": "my-job",
+                    "tasks": [
+                        "tap-meltano-yml map-meltano-yml target-meltano-yml",
+                    ],
+                },
+            ],
         }
         read_result = project_files.load()
         assert read_result == expected_result
@@ -321,6 +337,14 @@ class TestProjectFiles:
                     "env": {"TEST": "TEST-SUBCONFIG-1-YML"},
                 },
             ],
+            "jobs": [
+                {
+                    "name": "my-job",
+                    "tasks": [
+                        "tap-meltano-yml map-meltano-yml target-meltano-yml",
+                    ],
+                },
+            ],
             "version": 2,
         }
         read_result = project_files.load()
@@ -360,6 +384,7 @@ class TestProjectFiles:
               interval: '@once' # Run only once
 
             plugins:
+              # Project plugins
               extractors:
               - name: tap-meltano-yml # Comment on array element
                 settings:
@@ -386,6 +411,16 @@ class TestProjectFiles:
             - name: test-meltano-environment
               env:
                 TEST: TEST-MELTANO
+
+            # My jobs
+            jobs:
+            # An EL job with mapping
+            - name: my-job
+              tasks:
+              - >-
+                tap-meltano-yml
+                map-meltano-yml
+                target-meltano-yml
         """
 
         assert contents == dedent(expected_contents)
