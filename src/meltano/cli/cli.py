@@ -83,20 +83,22 @@ def cli(  # noqa: WPS231
 
         # detect active environment
         selected_environment = None
+        is_default_environment = False
         if no_environment or (environment and environment.lower() == "null"):
             logger.info("No environment is active")
         elif environment:
             selected_environment = environment
         elif project.meltano.default_environment:
             selected_environment = project.meltano.default_environment
+            is_default_environment = True
         # activate environment
         if selected_environment:
             project.activate_environment(selected_environment)
             logger.info(
                 "Environment '%s' is active", selected_environment  # noqa: WPS323
             )
-
         ctx.obj["project"] = project
+        ctx.obj["is_default_environment"] = is_default_environment
     except ProjectNotFound:
         ctx.obj["project"] = None
     except IncompatibleVersionError:

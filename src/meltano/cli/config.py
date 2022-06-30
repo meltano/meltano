@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import tempfile
 from pathlib import Path
 
@@ -25,6 +26,8 @@ from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, 
 from . import cli
 from .params import pass_project
 from .utils import CliError
+
+logger = logging.getLogger(__name__)
 
 
 @cli.group(
@@ -66,6 +69,13 @@ def config(  # noqa: WPS231
             extras=extras,
         )
     )
+
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"Deactivated Environment '{project.active_environment.name}' (the default) as the `meltano config` command does not adhere to your projects `default_environment`. "
+            + "To configure a specific Environment, please use `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
 
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
