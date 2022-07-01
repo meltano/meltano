@@ -121,6 +121,18 @@ exclude_lines = [
     "if TYPE_CHECKING:",
 ]
 
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "2.1.0"
+tag_format = "v$major.$minor.$patch$prerelease"
+version_files = [
+    "pyproject.toml:^version =",
+    "src/meltano/__init__.py:^__version__ =",
+    'package.json:^  "version":',
+    'src/webapp/package.json:^  "version":',
+    'docs/package.json:^  "version":',
+]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
