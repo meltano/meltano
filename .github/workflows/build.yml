@@ -38,6 +38,10 @@ jobs:
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
         if [ "v$version" != $tag ]; then echo "Release tag and package version do not match!"; exit 1; fi;
 
+    - name: Poetry install
+      run: |
+        poetry install
+
     - name: Setup Node
       uses: actions/setup-node@v3.3.0
       with:
