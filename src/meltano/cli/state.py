@@ -262,6 +262,7 @@ def set_state(
     state_id: str,
     state: Optional[str],
     input_file: Optional[click.Path],
+    force: bool,
 ):
     """Set state."""
     state_service = (
