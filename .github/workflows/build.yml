@@ -99,7 +99,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@v1.5.0
       with:
         user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
+        password: ${{ secrets.PYPI_SECRET_TOKEN }}
         packages_dir: dist/
         ## Test PyPI can be used here
         # password: ${{ secrets.TEST_PYPI_TOKEN }}
