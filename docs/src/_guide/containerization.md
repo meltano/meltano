@@ -43,7 +43,7 @@ appropriate `Dockerfile` and `.dockerignore` files to your project by adding the
 docker --version
 
 # Add Docker files to your project
-meltano add files docker
+meltano add files files-docker
 
 # Build Docker image containing
 # Meltano, your project, and all of its plugins
