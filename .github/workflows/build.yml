@@ -1,7 +1,6 @@
 name: Build and Publish to PyPI
 
 on:
-  push: {} # TODO: remove me before merging
   workflow_dispatch:
     inputs: {}
   release:
