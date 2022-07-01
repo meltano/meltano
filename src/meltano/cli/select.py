@@ -8,7 +8,6 @@ from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.project import Project
 from meltano.core.select_service import SelectService
-from meltano.core.tracking import CliEvent
 from meltano.core.utils import click_run_async
 
 from . import cli
@@ -89,7 +88,6 @@ async def select(
                 exclude=flags["exclude"],
                 remove=flags["remove"],
             )
-        ctx.obj["tracker"].track_command_event(CliEvent.completed)
         ctx.obj["legacy_tracker"].track_meltano_select(
             extractor=extractor,
             entities_filter=entities_filter,

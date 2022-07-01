@@ -8,7 +8,6 @@ import signal
 import click
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
@@ -103,8 +102,8 @@ def start(ctx, reload, bind, bind_port):
         ProjectSettingsService.config_override["ui.bind_port"] = bind_port
 
     project = ctx.obj["project"]
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_ui()
+    legacy_tracker = ctx.obj["legacy_tracker"]
+    legacy_tracker.track_meltano_ui()
 
     ensure_secure_setup(project)
 
