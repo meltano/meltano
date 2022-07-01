@@ -1,7 +1,7 @@
-name: Build
+name: Build and Publish to PyPI
 
 on:
-  push: {}
+  push: {} # TODO: remove me before merging
   workflow_dispatch:
     inputs: {}
   release:
@@ -32,9 +32,12 @@ jobs:
         architecture: x64
         cache: 'poetry'
 
-    - name: Poetry install
+    - name: Check version
+      if: ${{ github.event.release }}
       run: |
-        poetry install
+        version=$(poetry version | awk '{print $2}')
+        tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
+        if [ "v$version" != $tag ]; then echo "Release tag and package version do not match!"; exit 1; fi;
 
     - name: Setup Node
       uses: actions/setup-node@v3.3.0
@@ -78,12 +81,12 @@ jobs:
       run: |
         ls dist/
 
-    # - name: Publish
-    #   if: ${{ github.event.release }}
-    #   uses: pypa/gh-action-pypi-publish@release/v1.5.0
-    #   with:
-    #     user: __token__
-    #     password: ${{ secrets.PYPI_TOKEN }}
-    #     ## Test PyPI can be used here
-    #     # password: ${{ secrets.TEST_PYPI_TOKEN }}
-    #     # repository_url: https://test.pypi.org/legacy/
+    - name: Publish
+      if: ${{ github.event.release }}
+      uses: pypa/gh-action-pypi-publish@v1.5.0
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_TOKEN }}
+        ## Test PyPI can be used here
+        # password: ${{ secrets.TEST_PYPI_TOKEN }}
+        # repository_url: https://test.pypi.org/legacy/
