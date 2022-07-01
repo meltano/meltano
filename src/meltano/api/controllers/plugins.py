@@ -147,7 +147,7 @@ def install_batch():  # noqa: WPS210
     )
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
-    related_plugins = add_service.add_related(plugin)
+    related_plugins = add_service.add_required(plugin)
 
     # We will install the plugins in reverse order, since dependencies
     # are listed after their dependents in `related_plugins`, but should
