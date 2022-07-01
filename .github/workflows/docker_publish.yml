@@ -36,6 +36,8 @@ jobs:
           is-default-python: true  # will be used in 'latest' images
         - python-version: "3.9"
           is-default-python: false
+        - python-version: "3.10"
+          is-default-python: false
 
     steps:
     - uses: actions/checkout@v2
