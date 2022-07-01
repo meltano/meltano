@@ -17,7 +17,7 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import CliError, cli
 from .params import pass_project
-from .utils import InstrumentedCmd
+from .utils import PartialInstrumentedCmd
 
 if TYPE_CHECKING:
     from meltano.core.project import Project
@@ -27,7 +27,7 @@ __all__ = ["lock"]
 logger = structlog.get_logger(__name__)
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Lock plugin definitions.")
+@cli.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
 @click.option(
     "--all",
     "all_plugins",

@@ -25,13 +25,13 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, InstrumentedCmd, propagate_stop_signals
+from .utils import CliError, PartialInstrumentedCmd, propagate_stop_signals
 
 logger = logging.getLogger(__name__)
 
 
 @cli.command(
-    cls=InstrumentedCmd,
+    cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",
 )

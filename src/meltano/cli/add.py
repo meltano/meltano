@@ -16,7 +16,7 @@ from . import cli
 from .params import pass_project
 from .utils import (
     CliError,
-    InstrumentedCmd,
+    PartialInstrumentedCmd,
     add_plugin,
     add_required_plugins,
     check_dependencies_met,
@@ -24,7 +24,7 @@ from .utils import (
 )
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Add a plugin to your project.")
+@cli.command(cls=PartialInstrumentedCmd, short_help="Add a plugin to your project.")
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
 @click.option(

@@ -27,7 +27,7 @@ from meltano.core.utils import click_run_async
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, InstrumentedCmd
+from .utils import CliError, PartialInstrumentedCmd
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -40,7 +40,7 @@ logger = structlog_stdlib.get_logger(__name__)
 
 
 @cli.command(
-    cls=InstrumentedCmd,
+    cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
 )
 @click.argument("extractor")

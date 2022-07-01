@@ -10,10 +10,10 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, InstrumentedCmd, install_plugins
+from .utils import CliError, PartialInstrumentedCmd, install_plugins
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Install project dependencies.")
+@cli.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
 @click.argument(
     "plugin_type", type=click.Choice(PluginType.cli_arguments()), required=False
 )
