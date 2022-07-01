@@ -63,7 +63,7 @@ class DbtTransformPluginInstaller:
         except FileNotFoundError as err:
             relative_path = Path(err.filename).relative_to(self.project.root)
             raise PluginInstallError(
-                f"File {relative_path}' could not be found. Run `meltano add files dbt` to set up a dbt project."
+                f"File {relative_path}' could not be found. Run `meltano add files files-dbt` to set up a dbt project."
             )
 
 
