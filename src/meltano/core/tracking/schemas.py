@@ -25,8 +25,8 @@ class IgluSchema:
         return f"iglu:{self.vendor}/{self.name}/jsonschema/{self.version}"
 
 
-CliContextSchema = IgluSchema("cli_context", "1-0-0")
-CliEventSchema = IgluSchema("cli_event", "1-0-0")
+CliContextSchema = IgluSchema("cli_context", "1-1-0")
+CliEventSchema = IgluSchema("cli_event", "1-0-1")
 BlockEventSchema = IgluSchema("block_event", "1-0-0")
 EnvironmentContextSchema = IgluSchema("environment_context", "1-0-0")
 ExceptionContextSchema = IgluSchema("exception_context", "1-0-0")

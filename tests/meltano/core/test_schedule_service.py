@@ -1,6 +1,7 @@
+import platform
 from datetime import datetime
-from unittest import mock
 
+import mock
 import pytest
 
 from meltano.core.plugin import PluginType
@@ -86,6 +87,11 @@ class TestScheduleService:
             subject.add_schedule(all_schedules[0])
 
     def test_remove_schedule(self, subject):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         schedules = list(subject.schedules())
         schedules_count = len(schedules)
 
@@ -111,7 +117,7 @@ class TestScheduleService:
         subject.update_schedule(schedule)
 
         # there should be only 1 element with the set interval
-        assert sum(map(lambda sbj: sbj.interval == "@pytest", subject.schedules())) == 1
+        assert sum(sbj.interval == "@pytest" for sbj in subject.schedules()) == 1
 
         # it should be the first element
         assert subject.schedules()[0].interval == "@pytest"
@@ -153,6 +159,11 @@ class TestScheduleService:
             assert schedule.start_date
 
     def test_run_elt_schedule(self, subject, session, tap, target):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         schedule = subject.add_elt(
             session,
             "tap-to-target",
@@ -190,6 +201,11 @@ class TestScheduleService:
             )
 
     def test_run_job_schedule(self, subject, session, tap, target):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         schedule = subject.add(
             "mock-job-schedule",
             "mock-job",

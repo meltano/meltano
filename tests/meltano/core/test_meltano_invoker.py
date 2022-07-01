@@ -1,9 +1,10 @@
 import os
+import platform
 import subprocess
 import sys
 from pathlib import Path
-from unittest import mock
 
+import mock
 import pytest
 
 import meltano
@@ -16,11 +17,19 @@ class TestMeltanoInvoker:
         return MeltanoInvoker(project)
 
     def test_invoke(self, subject):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
         assert meltano.__version__ in str(process.stdout)  # noqa: WPS609
 
     def test_invoke_executable(self, subject, project):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         process_mock = mock.Mock(returncode=0)
         with mock.patch("subprocess.run", return_value=process_mock) as run_mock:
             subject.invoke(["--version"])

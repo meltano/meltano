@@ -6,13 +6,12 @@ you to register functions to be called before or after given trigger.
 """
 import logging
 from collections import OrderedDict
-
-from async_generator import asynccontextmanager
+from contextlib import asynccontextmanager
 
 logger = logging.getLogger(__name__)
 
 
-class hook:
+class hook:  # noqa: N801
     """
     This decorator marks a function as a __hook__.
     It will be found by the Hookable metaclass and
@@ -24,7 +23,7 @@ class hook:
         self.can_fail = can_fail
 
     def __call__(self, func):
-        func.__hook__ = self
+        func.__hook__ = self  # noqa: WPS609
         return func
 
 
@@ -34,21 +33,23 @@ class Hookable(type):
     Hooks are registered in declaration order.
     """
 
-    def __new__(metacls, name, bases, dct):
-        cls = type.__new__(metacls, name, bases, dct)
-        cls.__hooks__ = {}
+    def __new__(cls, name, bases, dct):
+        new_type = type.__new__(cls, name, bases, dct)  # noqa: WPS609
+        new_type.__hooks__ = {}  # noqa: WPS609
 
-        for hook_name, hook in (
-            (func.__hook__.name, func)
+        for hook_name, hook in (  # noqa: WPS442
+            (func.__hook__.name, func)  # noqa: WPS609, WPS335
             for func in dct.values()
-            if hasattr(func, "__hook__")
+            if hasattr(func, "__hook__")  # noqa: WPS421
         ):
-            cls.__hooks__[hook_name] = cls.__hooks__.get(hook_name, [])
-            cls.__hooks__[hook_name].append(hook)
+            new_type.__hooks__[hook_name] = new_type.__hooks__.get(  # noqa: WPS609
+                hook_name, []
+            )  # noqa: WPS609
+            new_type.__hooks__[hook_name].append(hook)  # noqa: WPS609
 
-        return cls
+        return new_type
 
-    def __prepare__(name, bases, **kwds):
+    def __prepare__(cls, bases, **kwds):
         return OrderedDict()
 
 
@@ -58,9 +59,6 @@ class HookObject(metaclass=Hookable):
     Hooks are triggered in reverse MRO order, which means
     derived classes hooks are called after their base class.
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     @asynccontextmanager
     async def trigger_hooks(self, hook_name, *args, **kwargs):
@@ -98,15 +96,15 @@ class HookObject(metaclass=Hookable):
         hooks = [
             hook
             for hook_cls in reversed(cls.__mro__)
-            if hasattr(hook_cls, "__hooks__")
-            for hook in hook_cls.__hooks__.get(hook_name, [])
+            if hasattr(hook_cls, "__hooks__")  # noqa: WPS421
+            for hook in hook_cls.__hooks__.get(hook_name, [])  # noqa: WPS361, WPS609
         ]
 
         for hook_func in hooks:
             try:
                 await hook_func(target, *args, **kwargs)
             except Exception as err:
-                if hook_func.__hook__.can_fail:
+                if hook_func.__hook__.can_fail:  # noqa: WPS609
                     logger.debug(str(err), exc_info=True)
                     logger.warning(
                         f"{hook_name} hook '{hook_func.__name__}' has failed: {err}"

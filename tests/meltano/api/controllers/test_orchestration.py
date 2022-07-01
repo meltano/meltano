@@ -1,10 +1,9 @@
 import json
 
-import pytest
-from asynctest import CoroutineMock, mock
 from flask import Flask, url_for
 from flask.testing import FlaskClient
 from flask.wrappers import Response
+from mock import AsyncMock, mock
 
 from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
 
@@ -45,19 +44,19 @@ class TestOrchestration:
                 "secure", session=session
             ) == ("thisisatest", SettingValueStore.DOTENV)
             assert config["secure"] == REDACTED_VALUE
-            assert config_metadata["secure"]["redacted"] == True
+            assert config_metadata["secure"]["redacted"] is True
             assert config_metadata["secure"]["source"] == "dotenv"
             assert config_metadata["secure"]["auto_store"] == "dotenv"
-            assert config_metadata["secure"]["overwritable"] == True
+            assert config_metadata["secure"]["overwritable"] is True
 
             # make sure that `boolean` cannot be overwritten
             assert plugin_settings_service.get_with_source(
                 "boolean", session=session
             ) == (False, SettingValueStore.ENV)
-            assert config["boolean"] == False
+            assert config["boolean"] is False
             assert config_metadata["boolean"]["source"] == "env"
             assert config_metadata["boolean"]["auto_store"] == "dotenv"
-            assert config_metadata["boolean"]["overwritable"] == False
+            assert config_metadata["boolean"]["overwritable"] is False
 
             # make sure the `hidden` setting is still present
             # but hidden in the response
@@ -141,10 +140,10 @@ class TestOrchestration:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.wait = AsyncMock(return_value=0)
         mock_invoke.returncode = 0
         payload = json.dumps({"type": "RECORD"}).encode()
-        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
+        mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
         mock_invoke_async.return_value = mock_invoke
 
@@ -172,10 +171,10 @@ class TestOrchestration:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = CoroutineMock(return_value=0)
+        mock_invoke.wait = AsyncMock(return_value=0)
         mock_invoke.returncode = 0
         payload = b"test"
-        mock_invoke.stdout.readline = CoroutineMock(return_value=b"%b" % payload)
+        mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
         mock_invoke_async.return_value = mock_invoke
 

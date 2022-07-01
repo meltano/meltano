@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from typing import List, Optional, Tuple
 
 import click
+from click_default_group import DefaultGroup
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
@@ -27,6 +28,7 @@ from meltano.core.project_add_service import (
 )
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
+from meltano.core.tracking import CliContext, CliEvent
 
 setup_logging()
 
@@ -194,7 +196,9 @@ def _prompt_plugin_capabilities(plugin_type):
         click.style("(capabilities)", fg="blue"),
         type=list,
         default=[],
-        value_proc=lambda value: [word.strip() for word in value.split(",")],
+        value_proc=lambda value: [word.strip() for word in value.split(",")]
+        if value
+        else [],
     )
 
 
@@ -252,7 +256,9 @@ def _prompt_plugin_settings(plugin_type):
             default=[],
             value_proc=lambda value: [
                 setting.strip().partition(":") for setting in value.split(",")
-            ],
+            ]
+            if value
+            else [],
         )
         try:
             settings = [
@@ -510,3 +516,37 @@ def check_dependencies_met(
     else:
         message = f"Dependencies not met: {'; '.join(messages)}"
     return passed, message
+
+
+class InstrumentedDefaultGroup(DefaultGroup):
+    """A variation of a DefaultGroup that instruments its invocation by updating the telemetry context."""
+
+    def invoke(self, ctx):
+        """Update the telemetry context and invoke the group."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+        super().invoke(ctx)  # noqa: WPS608
+
+
+class InstrumentedGroup(click.Group):
+    """A click.Group that instruments its invocation by updating the telemetry context."""
+
+    def invoke(self, ctx):
+        """Update the telemetry context and invoke the group."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+        super().invoke(ctx)  # noqa: WPS608
+
+
+class InstrumentedCmd(click.Command):
+    """A click.Command that automatically fires an instrumentation 'start' event, if a tracker is available."""
+
+    def invoke(self, ctx):
+        """Fire a start event and then invoke the requested command."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+            ctx.obj["tracker"].track_command_event(CliEvent.started)
+        super().invoke(ctx)  # noqa: WPS608
