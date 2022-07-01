@@ -58,8 +58,8 @@ def _handle(ex):
     return (jsonify({"error": True, "code": str(ex)}), 502)
 
 
-@pluginsBP.route("/all", methods=["GET"])  # noqa: WPS125
-def all():
+@pluginsBP.route("/all", methods=["GET"])
+def all():  # noqa: WPS125
     """Plugins found by the PluginDiscoveryService.
 
     Returns:
