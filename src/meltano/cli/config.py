@@ -38,9 +38,9 @@ def get_label(metadata) -> str:
     """
     source = metadata["source"]
     if "env_var" in metadata:
-        return f"from the {metadata['env_var']} variable in {source.label}"
-    else:
-        return f"from {source.label}"
+        return f"from the {metadata.get('env_var')} variable in {source.label}"
+    return f"from {source.label}"
+
 
 @cli.group(
     cls=InstrumentedGroup,
@@ -77,7 +77,6 @@ def config(  # noqa: WPS231
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
     except ValueError:
-        tracker.track_command_event(CliEvent.started)
         tracker.track_command_event(CliEvent.aborted)
         raise
 
@@ -91,7 +90,6 @@ def config(  # noqa: WPS231
         if plugin_name == "meltano":
             plugin = None
         else:
-            tracker.track_command_event(CliEvent.started)
             tracker.track_command_event(CliEvent.aborted)
             raise
 

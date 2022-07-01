@@ -8,12 +8,14 @@ from meltano.core.plugin_location_remove import (
     PluginLocationRemoveManager,
 )
 from meltano.core.plugin_remove_service import PluginRemoveService
+from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
+from .utils import InstrumentedCmd
 
 
-@cli.command(short_help="Remove plugins from your project.")
+@cli.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()
@@ -28,7 +30,10 @@ def remove(ctx, project, plugin_type, plugin_names):
         ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
         for plugin_name in plugin_names
     ]
-
+    tracker = ctx.obj["tracker"]
+    for plugin in plugins:
+        tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
+    tracker.track_command_event(CliEvent.inflight)
     remove_plugins(project, plugins)
 
 

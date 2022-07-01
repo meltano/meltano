@@ -4,13 +4,12 @@ import logging
 import click
 
 from meltano.core.error import SubprocessError
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
 
 from . import cli
 from .params import database_uri_option
-from .utils import CliError
+from .utils import CliError, InstrumentedCmd
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"
@@ -19,7 +18,7 @@ ALL = "all"
 logger = logging.getLogger(__name__)
 
 
-@cli.command(short_help="Create a new Meltano project.")
+@cli.command(cls=InstrumentedCmd, short_help="Create a new Meltano project.")
 @click.pass_context
 @click.argument("project_name", required=False)
 @click.option(
@@ -47,10 +46,9 @@ def init(ctx, project_name, no_usage_stats):
 
     init_service = ProjectInitService(project_name)
     try:  # noqa: WPS229
-        project = init_service.init()
+        init_service.init()
         init_service.echo_instructions()
-        tracker = LegacyTracker(project)
-        tracker.track_meltano_init(project_name=project_name)
+        ctx.obj["legacy_tracker"].track_meltano_init(project_name=project_name)
     except SubprocessError as err:
         logger.error(err.stderr)
         raise
