@@ -46,6 +46,7 @@ repos:
     language: system
     types: [python]
     files: '.py'
+    exclude: build.py
   - id: isort
     name: isort
     entry: poetry run isort

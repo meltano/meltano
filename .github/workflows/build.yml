@@ -1,0 +1,102 @@
+name: Build and Publish to PyPI
+
+on:
+  workflow_dispatch:
+    inputs: {}
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Setup Poetry
+      uses: snok/install-poetry@v1
+      with:
+        # Version of Poetry to use
+        version: 1.1.13
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v4.0.0
+      with:
+        # https://github.com/actions/setup-python
+        python-version: 3.9
+        architecture: x64
+        cache: 'poetry'
+
+    - name: Check version
+      if: ${{ github.event.release }}
+      run: |
+        version=$(poetry version | awk '{print $2}')
+        tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
+        if [ "v$version" != $tag ]; then echo "Release tag and package version do not match!"; exit 1; fi;
+
+    - name: Setup Node
+      uses: actions/setup-node@v3.3.0
+      with:
+        node-version: '14'
+        cache: 'yarn'
+        cache-dependency-path: src/webapp/yarn.lock
+
+    - name: Release Marker
+      if: ${{ github.event.release }}
+      run: |
+        touch src/meltano/core/tracking/.release_marker
+
+    - name: Build distribution
+      run: |
+        make sdist_public
+
+    # This is for temporary testing purposes only,
+    # these files should probably be added to a release
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: python-artifacts
+        path: 'dist/*'
+
+  pypi_release:
+    name: Publish to PyPI
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: python-artifacts
+        path: dist/
+
+    - name: Verify artifacts
+      run: |
+        ls dist/
+
+    - name: Upload wheel to release
+      if: ${{ github.event.release }}
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: dist/*.whl
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+
+    - name: Publish
+      if: ${{ github.event.release }}
+      uses: pypa/gh-action-pypi-publish@v1.5.0
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_TOKEN }}
+        packages_dir: dist/
+        ## Test PyPI can be used here
+        # password: ${{ secrets.TEST_PYPI_TOKEN }}
+        # repository_url: https://test.pypi.org/legacy/

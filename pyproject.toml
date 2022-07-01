@@ -17,9 +17,9 @@ include = [
   "*.m5o",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
-  "src/meltano/api/templates/webapp.html",
   "src/meltano/api/templates/embed.html",
-  "src/meltano/core/tracking/.release_marker"
+  "src/meltano/api/templates/webapp.html",
+  "src/meltano/core/tracking/.release_marker",
 ]
 
 [tool.poetry.dependencies]
