@@ -53,7 +53,7 @@ class PluginSettingsService(SettingsService):
         self.env_override = {
             **project_settings_service.env,  # project level environment variables
             **project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
-            **self.env_override,  # overrides
+            **self.env_override,  # plugin level overrides, passed in as **kwargs and set to self.env_overrides by super().__init__ above
             **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
             **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition
         }
