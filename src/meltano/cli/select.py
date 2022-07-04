@@ -1,19 +1,18 @@
 """Extractor selection management CLI."""
 
-from typing import Dict
+from __future__ import annotations
 
 import click
 
 from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError
 from meltano.core.db import project_engine
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.select_service import SelectService
 from meltano.core.utils import click_run_async
-
-from .utils import CliError
 
 
 def selection_color(selection):
@@ -68,7 +67,7 @@ async def select(
     extractor,
     entities_filter,
     attributes_filter,
-    **flags: Dict[str, bool],
+    **flags: dict[str, bool],
 ):
     """
     Manage extractor selection patterns.

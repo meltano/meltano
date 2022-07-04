@@ -1,3 +1,5 @@
+import platform
+
 import dotenv
 import pytest
 
@@ -70,6 +72,10 @@ class TestPluginInvoker:
     async def test_expanded_environment_env(
         self, project_with_environment, tap, session, plugin_invoker_factory
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
             env = subject.env()
@@ -138,19 +144,23 @@ class TestPluginInvoker:
     @pytest.mark.parametrize(
         "executable_str,assert_fn",
         [
-            ("tap-test", lambda exe: exe == "tap-test"),
-            ("./tap-test", lambda exe: exe.endswith("meltano_project/tap-test")),
-            ("/apps/tap-test", lambda exe: exe == "/apps/tap-test"),
+            ("tap-test", lambda exe, name: exe == "tap-test"),
+            ("./tap-test", lambda exe, name: exe.endswith(f"{name}/tap-test")),
+            ("/apps/tap-test", lambda exe, name: exe == "/apps/tap-test"),
         ],
     )
     @pytest.mark.asyncio
     async def test_expand_nonpip_command_exec_args(
         self, nonpip_plugin_invoker, session, executable_str, assert_fn
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         nonpip_plugin_invoker.plugin.executable = executable_str
         exec_args = nonpip_plugin_invoker.exec_args()
 
-        assert assert_fn(exec_args[0])
+        assert assert_fn(exec_args[0], nonpip_plugin_invoker.project.root)
 
         await nonpip_plugin_invoker.prepare(session)
         env = nonpip_plugin_invoker.env()

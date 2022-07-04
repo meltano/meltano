@@ -4,9 +4,10 @@ import click
 
 from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.project import Project
-from meltano.core.tracking import CliContext, CliEvent, Tracker
+from meltano.core.tracking import CliEvent
 
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 
@@ -21,17 +22,9 @@ def meltano_environment(project: Project, ctx: click.Context):
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#environment
     """
     ctx.obj[ENVIRONMENT_SERVICE_KEY] = EnvironmentService(project)
-    tracker = Tracker(project)
-    tracker.add_contexts(
-        CliContext.from_command_and_kwargs(
-            "environment", ctx.invoked_subcommand or None
-        )
-    )
-    tracker.track_command_event(CliEvent.started)
-    ctx.obj["tracker"] = Tracker(project)
 
 
-@meltano_environment.command()
+@meltano_environment.command(cls=InstrumentedCmd)
 @click.argument("name")
 @click.pass_context
 def add(ctx: click.Context, name: str):
@@ -47,7 +40,7 @@ def add(ctx: click.Context, name: str):
     tracker.track_command_event(CliEvent.completed)
 
 
-@meltano_environment.command()
+@meltano_environment.command(cls=InstrumentedCmd)
 @click.argument("name")
 @click.pass_context
 def remove(ctx: click.Context, name: str):
@@ -63,7 +56,7 @@ def remove(ctx: click.Context, name: str):
     tracker.track_command_event(CliEvent.completed)
 
 
-@meltano_environment.command(name="list")
+@meltano_environment.command(cls=InstrumentedCmd, name="list")
 @click.pass_context
 def list_environments(ctx: click.Context):
     """List available environments."""

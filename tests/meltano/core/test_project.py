@@ -1,3 +1,4 @@
+import platform
 import threading
 import time
 from multiprocessing import Pool
@@ -25,7 +26,10 @@ def update(payload):
 
 
 class IndefiniteThread(threading.Thread):
+    """Never ending thread."""
+
     def __init__(self):
+        """Set stop event."""
         super().__init__()
         self._stop_event = threading.Event()
 
@@ -38,7 +42,10 @@ class IndefiniteThread(threading.Thread):
 
 
 class ProjectReader(IndefiniteThread):
+    """Project using a never ending thread."""
+
     def __init__(self, project):
+        """Set the project."""
         self.project = project
         super().__init__()
 
@@ -92,6 +99,11 @@ class TestProject:
 
     @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]
 
         reader = ProjectReader(project)

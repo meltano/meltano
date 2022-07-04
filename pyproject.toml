@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.1.0"
+version = "2.2.0"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -17,9 +17,9 @@ include = [
   "*.m5o",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
-  "src/meltano/api/templates/webapp.html",
   "src/meltano/api/templates/embed.html",
-  "src/meltano/core/tracking/.release_marker"
+  "src/meltano/api/templates/webapp.html",
+  "src/meltano/core/tracking/.release_marker",
 ]
 
 [tool.poetry.dependencies]
@@ -29,8 +29,9 @@ alembic = "^1.5.0"
 atomicwrites = "^1.2.1"
 authlib = "^1.0.1"
 cached-property = "^1" # Remove after Python 3.7 support is dropped
+backoff = "^2.1.2"
 bcrypt = "^3.2.0" # Needs to be installed explicitly so it can be used as a backend for passlib
-click = "^8.0"
+click = "^8.1"
 click-default-group = "^1.2.1"
 email-validator = "^1.1.2"
 fasteners = "^0.17.3"
@@ -41,24 +42,19 @@ flask-restful = "^0.3.7"
 flask-sqlalchemy = "^2.4.4"
 flatten-dict = "^0"
 gunicorn = "^20.1.0"
-jsonschema = "^4.6"
-markdown = "^3.0.1"
+jsonschema = "^3.2" # Held back because of our dependency on docker-compose v1.29.2; update after https://github.com/avast/pytest-docker/pull/72 is merged.
+markdown = "^3.3.7"
 meltano-flask-security = "^0.1.0"
-networkx = "^2.2"
 packaging = "^21.3"
 psutil = "^5.6.3"
 psycopg2-binary = "^2.8.5"
-pyhocon = "^0.3.51"
 pyhumps = "^3.0.0"
 python = ">=3.7,<3.11"
 python-dotenv = "^0.20.0"
 python-gitlab = "^3.5.0"
 pyyaml = "^5.3.1"
 requests = "^2.23.0"
-simplejson = "^3.16.0"
 smtpapi = "^0.4.1"
-snowflake-sqlalchemy = "^1.2.3"
-snowflake-connector-python = '^2.0.2' # Only listed to speed up Poetry dependency resolution
 snowplow-tracker = "^0.10.0"
 sqlalchemy = "^1.3.19"
 structlog = "^21.2.0"
@@ -75,22 +71,21 @@ black = "^22.3.0"
 bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
-coverage = "^4.5.4"
+coverage = {extras = ["toml"], version = "^6.4.1"}
 freezegun = "^0.3.12"
 isort = "^5.10.1"
 mock = "^4.0.3"
 mypy = "^0.960"
 pre-commit = "^2.9.2"
 pylint = "^2.12.2"
-pytest = "^6.2.5"
+pytest = "^7.1.2"
 pytest-asyncio = "^0.18.3"
-pytest-cov = "^2.6.1"
+pytest-cov = "^3.0.0"
+pytest-docker = "^0.12.0"
 pyupgrade = "^2.29.1"
 requests-mock = "^1.6.0"
 tox = "^3.24.4"
-wemake-python-styleguide = "^0.15.3"
-flake8-bandit = "==2.1.2"
-bandit = "==1.7.2"
+wemake-python-styleguide = "^0.16.1"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
@@ -104,6 +99,39 @@ ensure_newline_before_comments = true
 line_length = 88
 src_paths = ["src/", "tests/"]
 skip_glob = ["*.md", "*.vue", "*.js"]
+
+[tool.coverage.run]
+concurrency = [ "multiprocessing" ]
+parallel = true
+branch = true
+
+[tool.coverage.paths]
+source = [
+  "src/meltano",
+  "**/site-packages/meltano",
+  "**/site-packages/meltano*/meltano",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 2
+exclude_lines = [
+    "nocov",
+    "if TYPE_CHECKING:",
+]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "2.2.0"
+tag_format = "v$major.$minor.$patch$prerelease"
+version_files = [
+    "pyproject.toml:^version =",
+    "src/meltano/__init__.py:^__version__ =",
+    'package.json:^  "version":',
+    'src/webapp/package.json:^  "version":',
+    'docs/package.json:^  "version":',
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

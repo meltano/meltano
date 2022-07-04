@@ -57,9 +57,10 @@ class EnvironmentContext(SelfDescribingJson, metaclass=SingletonMeta):
         Returns:
             A dictionary containing system information.
         """
-        freedesktop_data = getattr(
-            platform, "freedesktop_os_release", lambda: defaultdict(type(None))
-        )()
+        try:
+            freedesktop_data = platform.freedesktop_os_release()
+        except Exception:
+            freedesktop_data = defaultdict(type(None))
 
         return {
             "system_name": platform.system() or None,

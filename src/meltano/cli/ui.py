@@ -10,13 +10,12 @@ import click
 from meltano.api.workers import APIWorker, UIAvailableWorker
 from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
-
-from .utils import CliError
 
 logger = logging.getLogger(__name__)
 

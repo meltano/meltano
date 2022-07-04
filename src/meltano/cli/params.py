@@ -5,10 +5,9 @@ import functools
 import click
 from click.globals import get_current_context
 
+from meltano.cli.utils import CliError
 from meltano.core.db import project_engine
 from meltano.core.project_settings_service import ProjectSettingsService
-
-from .utils import CliError
 
 
 def database_uri_option(func):

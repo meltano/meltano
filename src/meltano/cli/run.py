@@ -4,7 +4,9 @@ from __future__ import annotations
 import click
 import structlog
 
+from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -13,11 +15,9 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, CliContext, CliEvent, Tracker
+from meltano.core.tracking import BlockEvents, CliEvent, Tracker
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
-
-from . import CliError, cli
 
 logger = structlog.getLogger(__name__)
 
@@ -49,8 +49,10 @@ logger = structlog.getLogger(__name__)
     nargs=-1,
 )
 @pass_project(migrate=True)
+@click.pass_context
 @click_run_async
 async def run(
+    ctx: click.Context,
     project: Project,
     dry_run: bool,
     full_refresh: bool,
@@ -87,46 +89,34 @@ async def run(
             logger.info("Setting 'console' handler log level to 'debug' for dry run")
             change_console_log_level()
 
-    tracker = Tracker(project)
-    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
+    tracker: Tracker = ctx.obj["tracker"]
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
 
-    cmd_ctx = CliContext.from_command_and_kwargs(
-        "run",
-        None,
-        dry_run=dry_run,
-        full_refresh=full_refresh,
-        no_state_update=no_state_update,
-        force=force,
-    )
-    with tracker.with_contexts(cmd_ctx):
-        tracker.track_command_event(CliEvent.started)
-
-        parser_blocks = []  # noqa: F841
-        try:
-            parser = BlockParser(
-                logger, project, blocks, full_refresh, no_state_update, force
-            )
-            parsed_blocks = list(parser.find_blocks(0))
-            if not parsed_blocks:
-                tracker.track_command_event(CliEvent.aborted)
-                logger.info("No valid blocks found.")
-                return
-        except Exception as parser_err:
+    parser_blocks = []  # noqa: F841
+    try:
+        parser = BlockParser(
+            logger, project, blocks, full_refresh, no_state_update, force
+        )
+        parsed_blocks = list(parser.find_blocks(0))
+        if not parsed_blocks:
             tracker.track_command_event(CliEvent.aborted)
-            raise parser_err
+            logger.info("No valid blocks found.")
+            return
+    except Exception as parser_err:
+        tracker.track_command_event(CliEvent.aborted)
+        raise parser_err
 
-        if validate_block_sets(logger, parsed_blocks):
-            logger.debug("All ExtractLoadBlocks validated, starting execution.")
-        else:
-            tracker.track_command_event(CliEvent.aborted)
-            raise CliError("Some ExtractLoadBlocks set failed validation.")
-        try:
-            await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
-        except Exception as err:
-            tracker.track_command_event(CliEvent.failed)
-            raise err
-        tracker.track_command_event(CliEvent.completed)
-
+    if validate_block_sets(logger, parsed_blocks):
+        logger.debug("All ExtractLoadBlocks validated, starting execution.")
+    else:
+        tracker.track_command_event(CliEvent.aborted)
+        raise CliError("Some ExtractLoadBlocks set failed validation.")
+    try:
+        await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+    except Exception as err:
+        tracker.track_command_event(CliEvent.failed)
+        raise err
+    tracker.track_command_event(CliEvent.completed)
     legacy_tracker.track_meltano_run(blocks)
 
 

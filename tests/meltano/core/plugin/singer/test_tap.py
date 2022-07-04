@@ -64,7 +64,7 @@ class TestSingerTap:
         elt_context_builder,
         monkeypatch,
     ):
-        job = Job(job_id="pytest_test_runner")
+        job = Job(job_name="pytest_test_runner")
         elt_context = (
             elt_context_builder.with_session(session)
             .with_extractor(subject.name)
@@ -76,7 +76,7 @@ class TestSingerTap:
 
         @contextmanager
         def create_job():
-            new_job = Job(job_id=job.job_id)
+            new_job = Job(job_name=job.job_name)
             new_job.start()
             yield new_job
             new_job.save(session)

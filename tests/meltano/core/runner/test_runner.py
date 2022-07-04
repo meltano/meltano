@@ -37,7 +37,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 class TestSingerRunner:
     @pytest.fixture()
     def elt_context(self, project, session, tap, target, elt_context_builder):
-        job = Job(job_id="pytest_test_runner")
+        job = Job(job_name="pytest_test_runner")
 
         return (
             elt_context_builder.with_session(session)
@@ -60,7 +60,7 @@ class TestSingerRunner:
     @pytest.fixture()
     def subject(self, session, elt_context):
         Job(
-            job_id=TEST_STATE_ID,
+            job_name=TEST_STATE_ID,
             state=State.SUCCESS,
             payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},

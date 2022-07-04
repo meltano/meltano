@@ -3,16 +3,25 @@ name: Version bump
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "Version Number"
-        type: string
+      bump:
+        description: "Version bump type"
         required: true
-        default: 2.0.0
-      force:
-        description: "Force Push (ignore validation)"
-        type: boolean
-        required: true
-        default: false
+        type: choice
+        default: PATCH
+        options:
+        - PATCH
+        - MINOR
+        - MAJOR
+      prerelease:
+        description: "Increase to this prerelease version"
+        required: false
+        type: choice
+        default: none
+        options:
+        - none
+        - alpha
+        - beta
+        - rc
 
 jobs:
   create_release_branch_pr:
@@ -24,67 +33,50 @@ jobs:
       pull-requests: write  # to create and update PRs
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Validate version input
-      if: ${{ github.event.inputs.force != true }}
-      id: validate-version
-      uses: ./.github/actions/validate-version-sequence
+    - uses: actions/checkout@v3.0.2
       with:
-        version-proposed: ${{ github.event.inputs.version }}
-    - name: Debug version bump type
-      run: echo "${{ steps.validate-version.outputs.bump-type }}"
+        fetch-depth: 0
 
-    - name: Conventional Changelog Action
-      uses: saadmk11/changelog-ci@v1.0.0
-      id: auto-changelog
-      with:
-        # https://github.com/saadmk11/changelog-ci
-        github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
-        release_version: ${{ github.event.inputs.version }}
-        changelog_filename: CHANGELOG.md
-        config_file: .github/workflows/resources/changelog-ci.config.yml
-        # committer_username: 'test'
-        # committer_email: 'test@test.com'
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        # Version of Poetry to use
-        version: 1.1.13
-        virtualenvs-create: true
-        virtualenvs-in-project: true
     - name: Set up Python
       uses: actions/setup-python@v4.0.0
       with:
-        # https://github.com/actions/setup-python
-        python-version: 3.9
+        python-version: "3.10"
         architecture: x64
-        cache: 'poetry'
-    - name: Poetry install
-      run: |
-        poetry install
 
     - name: Bump version
+      id: cz-bump
+      # TODO: https://github.com/commitizen-tools/commitizen-action/pull/38
+      uses: edgarrmondragon/commitizen-action@feat-add-increment-option
+      with:
+        increment: ${{ github.event.inputs.bump }}
+        prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
+        commit: "false"
+        push: "false"
+        changelog: "false"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        # changelog_increment_filename: _changelog_fragment.md
+
+    - env:
+        PIP_CONSTRAINT: .github/workflows/constraints.txt
       run: |
-        BUMP_TYPE="${{ steps.validate-version.outputs.bump-type }}"
-        echo "Flushing changelog entries with '--$BUMP_TYPE' flag..."
-        poetry run changelog release --$BUMP_TYPE --yes
-        echo "Adding changelog to git..."
-        git add CHANGELOG.md
-        echo "Bumping version entries..."
-        poetry run bumpversion "$BUMP_TYPE" --new-version="$NEW_VER" --allow-dirty --no-commit --no-tag
+        pipx install changelog-cli
+
+    - name: Prepare Changelog
+      if: always() && (github.event.inputs.prerelease == 'none')
+      run: |
+        bump_lowercase=$(echo "${{ github.event.inputs.bump }}" | tr '[:upper:]' '[:lower:]')
+        changelog release --$bump_lowercase --yes
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v4
       id: create-pull-request
       with:
         # https://github.com/peter-evans/create-pull-request
-        commit-message: version bump (auto)
-        title: Release v${{ github.event.inputs.version }}
+        commit-message: "chore: Bump package version"
+        title: "chore: Release v${{ steps.cz-bump.outputs.version }}"
         body: |
-          Bump changelog for release v${{ github.event.inputs.version }}
-        branch: release/v${{ github.event.inputs.version }}
+          Bump changelog for release v${{ steps.cz-bump.outputs.version }}
+        branch: release/v${{ steps.cz-bump.outputs.version }}
         base: main
         labels: release
 

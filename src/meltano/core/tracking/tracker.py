@@ -330,9 +330,14 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         try:
             self.snowplow_tracker.track_unstruct_event(
                 event_json,
-                # If tracking is disabled, then include no Snowplow contexts so as to avoid
-                # sending any extra information beyond the 'telemetry_state_change' event itself.
-                self.contexts if self.send_anonymous_usage_stats else None,
+                # If tracking is disabled, then include only the minimal Snowplow contexts required
+                self.contexts
+                if self.send_anonymous_usage_stats
+                else tuple(
+                    ctx
+                    for ctx in self.contexts
+                    if isinstance(ctx, (EnvironmentContext, ProjectContext))
+                ),
             )
         except Exception as err:
             logger.debug(

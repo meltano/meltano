@@ -1,3 +1,4 @@
+import platform
 from datetime import date, datetime
 
 import dotenv
@@ -15,7 +16,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
 from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
-from meltano.core.settings_store import ConflictingSettingValueException
+from meltano.core.settings_store import ConflictingSettingValueException, MultipleEnvVarsSetException
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 
@@ -496,6 +497,10 @@ class TestPluginSettingsService:
     def test_env_var_expansion(
         self, session, subject, project, tap, monkeypatch, env_var
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")
 
@@ -848,13 +853,21 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-    def test_find_setting_raises_with_multiple(
+    def test_find_setting_raises_with_conflicting(
         self, tap, plugin_settings_service_factory, monkeypatch
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
         monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_1")
         with pytest.raises(ConflictingSettingValueException):
+            subject.get("aliased")
+
+    def test_find_setting_raises_with_multiple(
+            self, tap, plugin_settings_service_factory, monkeypatch):
+        subject = plugin_settings_service_factory(tap)
+        monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
+        monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_0")
+        with pytest.raises(MultipleEnvVarsSetException):
             subject.get("aliased")
 
     def test_find_setting_aliases(self, tap, plugin_settings_service_factory):

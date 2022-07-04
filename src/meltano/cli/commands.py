@@ -5,12 +5,17 @@ from __future__ import annotations
 import inspect
 from functools import update_wrapper
 from importlib import import_module
-from typing import Any, Callable, Type
+from typing import Any, Callable
 
 import click
 from click_default_group import DefaultGroup
 
 from meltano.cli.cli import cli
+from meltano.cli.utils import (
+    InstrumentedCmd,
+    InstrumentedDefaultGroup,
+    InstrumentedGroup,
+)
 
 
 class LazyCommand:
@@ -32,7 +37,7 @@ class LazyCommand:
         short_help: str | None = None,
         hidden: bool = False,
         import_path: str | None = None,
-        cls: Type[click.BaseCommand] = click.Command,  # noqa: WPS117
+        cls: type[click.BaseCommand] = click.Command,  # noqa: WPS117
         **kwargs,
     ):
         """Initialize a `LazyCommand` instance.
@@ -112,12 +117,13 @@ for command in (
     LazyCommand(
         name="add",
         short_help="Add a plugin to your project.",
+        cls=InstrumentedCmd,
     ),
     LazyCommand(
         name="config",
         short_help="Display Meltano or plugin configuration.",
         invoke_without_command=True,
-        cls=click.Group,
+        cls=InstrumentedGroup,
     ),
     LazyCommand(
         name="discover",
@@ -131,11 +137,12 @@ for command in (
     LazyCommand(
         name="elt",
         short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
+        cls=InstrumentedCmd,
     ),
     LazyCommand(
         name="environment",
         short_help="Manage environments.",
-        cls=click.Group,
+        cls=InstrumentedGroup,
     ),
     LazyCommand(
         name="init",
@@ -145,6 +152,7 @@ for command in (
     LazyCommand(
         name="install",
         short_help="Install project dependencies.",
+        cls=InstrumentedCmd,
     ),
     LazyCommand(
         name="invoke",
@@ -153,15 +161,17 @@ for command in (
             "ignore_unknown_options": True,
             "allow_interspersed_args": False,
         },
+        cls=InstrumentedCmd,
     ),
     LazyCommand(
         name="job",
         short_help="Manage jobs.",
-        cls=click.Group,
+        cls=InstrumentedGroup,
     ),
     LazyCommand(
         name="lock",
         short_help="Lock plugin definitions.",
+        cls=InstrumentedCmd,
     ),
     LazyCommand(
         name="remove",
@@ -174,11 +184,12 @@ for command in (
     LazyCommand(
         name="run",
         short_help="[preview] Run a set of plugins in series.",
+        cls=InstrumentedCmd,
     ),
     LazyCommand(
         name="schedule",
         short_help="Manage pipeline schedules.",
-        cls=DefaultGroup,
+        cls=InstrumentedDefaultGroup,
         default="add",
     ),
     LazyCommand(

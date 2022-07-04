@@ -1,4 +1,5 @@
 """State management in CLI."""
+
 import json
 import re
 from datetime import datetime as dt
