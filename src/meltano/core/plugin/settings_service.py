@@ -7,13 +7,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.settings_service import SettingMissingError  # noqa: F401
-from meltano.core.settings_service import SettingValueStore  # noqa: F401
-from meltano.core.settings_service import (  # noqa: F401
-    REDACTED_VALUE,
-    FeatureFlags,
-    SettingsService,
-)
+from meltano.core.settings_service import FeatureFlags, SettingsService
 from meltano.core.utils import expand_env_vars
 
 
