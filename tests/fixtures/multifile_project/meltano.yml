@@ -18,6 +18,12 @@ schedules:
   start_date: 2020-08-05 00:00:00
   interval: '@once' # Run only once
 
+environments:
+# My meltano environments
+- name: test-meltano-environment
+  env:
+    TEST: TEST-MELTANO
+
 plugins:
   # Project plugins
   extractors:
@@ -39,14 +45,7 @@ plugins:
   loaders:
     - name: target-meltano-yml
 
-environments:
-# My meltano environments
-- name: test-meltano-environment
-  env:
-    TEST: TEST-MELTANO
-
-# My jobs
-jobs:
+jobs:  # My jobs
 # An EL job with mapping
 - name: my-job
   tasks:

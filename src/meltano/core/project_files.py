@@ -46,7 +46,7 @@ def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
     return base
 
 
-class InvalidIncludePath(Exception):
+class InvalidIncludePathError(Exception):
     """Occurs when an included file path matches a provided pattern but is not a valid config file."""
 
 
@@ -135,10 +135,10 @@ class ProjectFiles:  # noqa: WPS214
             file_path: The path to check.
 
         Raises:
-            InvalidIncludePath: If the included path is not a valid file.
+            InvalidIncludePathError: If the included path is not a valid file.
         """
         if not (file_path.is_file() and file_path.exists()):
-            raise InvalidIncludePath(f"Included path '{file_path}' not found.")
+            raise InvalidIncludePathError(f"Included path '{file_path}' not found.")
 
     def _resolve_include_paths(self, include_path_patterns: list[str]) -> list[Path]:
         """Return a list of paths from a list of glob pattern strings.
@@ -152,7 +152,7 @@ class ProjectFiles:  # noqa: WPS214
             List of paths matching the given glob patterns.
 
         Raises:
-            InvalidIncludePath: If a path is matched by a pattern but is not a valid
+            InvalidIncludePathError: If a path is matched by a pattern but is not a valid
                 file.
         """
         include_paths = []
@@ -160,7 +160,7 @@ class ProjectFiles:  # noqa: WPS214
             for path in self.root.glob(pattern):
                 try:
                     self._is_valid_include_path(path)
-                except InvalidIncludePath as err:
+                except InvalidIncludePathError as err:
                     logger.critical(f"Include path '{path}' is invalid: \n {err}")
                     raise err
                 include_paths.append(path)
@@ -245,24 +245,24 @@ class ProjectFiles:  # noqa: WPS214
                 raise exc
         return included_file_contents
 
+    def _add_mapping_entry(self, file_dicts, file, key, value):
+        file_dict = file_dicts.setdefault(file, CommentedMap())
+        entries = file_dict.setdefault(key, CommentedSeq())
+        if value["name"] not in {scd["name"] for scd in entries}:
+            entries.append(value)
+
+    def _add_sequence_entry(self, file_dicts, key, elements):
+        for elem in elements:
+            file_key = (key, elem["name"])
+            file = self._plugin_file_map.get(file_key, str(self._meltano_file_path))
+            self._add_mapping_entry(file_dicts, file, key, elem)
+
     def _add_plugin(self, file_dicts, file, plugin_type, plugin):
         file_dict = file_dicts.setdefault(file, CommentedMap())
         plugins_dict = file_dict.setdefault("plugins", CommentedMap())
         plugins = plugins_dict.setdefault(plugin_type, CommentedSeq())
         if plugin["name"] not in {plg["name"] for plg in plugins}:
             plugins.append(plugin)
-
-    def _add_schedule(self, file_dicts, file, schedule):
-        file_dict = file_dicts.setdefault(file, CommentedMap())
-        schedules = file_dict.setdefault("schedules", CommentedSeq())
-        if schedule["name"] not in {scd["name"] for scd in schedules}:
-            schedules.append(schedule)
-
-    def _add_environment(self, file_dicts, file, environment: CommentedMap):
-        file_dict = file_dicts.setdefault(file, CommentedMap())
-        environments = file_dict.setdefault("environments", CommentedSeq())
-        if environment["name"] not in {env["name"] for env in environments}:
-            environments.append(environment)
 
     def _add_plugins(self, file_dicts, all_plugins):
         for plugin_type, plugins in all_plugins.items():
@@ -272,40 +272,56 @@ class ProjectFiles:  # noqa: WPS214
                 file = self._plugin_file_map.get(key, str(self._meltano_file_path))
                 self._add_plugin(file_dicts, file, plugin_type, plugin)
 
-    def _add_schedules(self, file_dicts, schedules):
-        for schedule in schedules:
-            key = ("schedules", schedule["name"])
-            file = self._plugin_file_map.get(key, str(self._meltano_file_path))
-            self._add_schedule(file_dicts, file, schedule)
-
-    def _add_environments(self, file_dicts, environments: list[CommentedMap]):
-        for environment in environments:
-            key = ("environments", environment["name"])
-            file = self._plugin_file_map.get(key, str(self._meltano_file_path))
-            self._add_environment(file_dicts, file, environment)
-
     def _split_config_dict(self, config: CommentedMap):
         file_dicts: dict[str, CommentedMap] = {}
+        self._restore_included_file_key_order(file_dicts)
+
+        # Fill in the top-level entries
         for key, value in config.items():
             if key == "plugins":
                 self._add_plugins(file_dicts, value)
-            elif key == "schedules":
-                self._add_schedules(file_dicts, value)
-            elif key == "environments":
-                self._add_environments(file_dicts, value)
+            elif key in {"schedules", "environments"}:
+                self._add_sequence_entry(file_dicts, key, value)
             else:
                 file = str(self._meltano_file_path)
                 file_dict = file_dicts.setdefault(file, CommentedMap())
                 file_dict[key] = value
 
+        # Copy comments from the original config to the new config
         config.copy_attributes(file_dicts[str(self._meltano_file_path)])
         self._copy_yaml_attributes(file_dicts)
         return file_dicts
+
+    def _restore_included_file_key_order(self, file_dicts: dict[str, CommentedMap]):
+        """Restore the order of the keys in the included files.
+
+        Args:
+            file_dicts: The dictionary mapping included files to their contents.
+        """
+        # Create the top-level entries in the right order first
+        for file, contents in self._raw_contents_map.items():
+            # Keep project settings at the top in meltano.yml
+            if file == str(self._meltano_file_path):
+                continue
+
+            # Restore sorting in project files
+            file_dicts[file] = CommentedMap()
+            for key, value in contents.items():
+                if key in {"plugins", "schedules", "environments"}:
+                    file_dicts[file][key] = value.__class__()
 
     def _copy_yaml_attributes(  # noqa: WPS210
         self,
         file_dicts: dict[str, CommentedMap],
     ):
+        """Restore comments from top-level YAML entries in project files.
+
+        For every file, use the top-level entries (e.g. "plugins") to copy the comments
+        from the original config.
+
+        Args:
+            file_dicts: The dictionary mapping included files to their contents.
+        """
         for file, file_dict in file_dicts.items():
             original_contents = self._raw_contents_map[file]
             original_contents.copy_attributes(file_dict)

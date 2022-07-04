@@ -384,6 +384,12 @@ class TestProjectFiles:
               start_date: 2020-08-05 00:00:00
               interval: '@once' # Run only once
 
+            environments:
+            # My meltano environments
+            - name: test-meltano-environment
+              env:
+                TEST: TEST-MELTANO
+
             plugins:
               # Project plugins
               extractors:
@@ -409,14 +415,7 @@ class TestProjectFiles:
 
               - name: modified-target-subconfig-1-yml
 
-            environments:
-            # My meltano environments
-            - name: test-meltano-environment
-              env:
-                TEST: TEST-MELTANO
-
-            # My jobs
-            jobs:
+            jobs:  # My jobs
             # An EL job with mapping
             - name: my-job
               tasks:
@@ -427,3 +426,28 @@ class TestProjectFiles:
         """
 
         assert contents == dedent(expected_contents)
+
+        expected_subconfig_2_contents = """\
+            plugins:
+              # Subconfig 2 Plugins
+              loaders:
+              - name: target-subconfig-2-yml  # Subconfig 2 Loader
+
+            schedules:
+            # Subconfig 2 Schedules
+            - name: test-subconfig-2-yml
+              extractor: tap-subconfig-2-yml
+              loader: target-subconfig-2-yml
+              transform: skip
+              start_date: 2020-08-04 00:00:00
+              interval: '@once' # Run only once
+
+            environments:
+            # Subconfig 2 Environments
+            - name: test-subconfig-2-yml
+              env:
+                TEST: TEST-SUBCONFIG-2-YML
+        """
+
+        included_path = project_files.root / "subconfig_2.yml"
+        assert included_path.read_text() == dedent(expected_subconfig_2_contents)
