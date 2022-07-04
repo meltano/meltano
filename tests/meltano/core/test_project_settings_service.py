@@ -143,6 +143,12 @@ class TestProjectSettingsService:
             subject.get("project_id")
             subject.get("disable_tracking")
 
+            ProjectSettingsService.config_override.pop(
+                "send_anonymous_usage_stats", None
+            )
+            subject.config_override.pop("send_anonymous_usage_stats", None)
+            subject.unset("send_anonymous_usage_stats")
+
             monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
             assert subject.get("send_anonymous_usage_stats")
             monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
