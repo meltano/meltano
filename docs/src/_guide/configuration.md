@@ -52,7 +52,7 @@ can be used to pass along arbitrary key-value data to the new process.
 Meltano [reads settings from environment variables](#configuring-settings) when you run the [`meltano` command](/reference/command-line-interface),
 and populates them when it [evaluates plugin configuration](#expansion-in-setting-values)
 and [invokes plugin executables](#accessing-from-plugins).
-Meltano also supports specifying environment variables under the `env:` keys of `meltano.yml`, a Meltano Environment or on the Plugin.
+Meltano also supports specifying environment variables under the `env:` keys of `meltano.yml`, a Meltano Environment, or on the Plugin.
 
 ### Specifying environment variables
 
