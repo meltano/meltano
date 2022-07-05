@@ -87,7 +87,7 @@ def config(  # noqa: WPS231
     if ctx.obj["is_default_environment"]:
         logger.info(
             f"Deactivated Environment '{project.active_environment.name}' (the default) as the `meltano config` command does not adhere to your projects `default_environment`. "
-            + "To configure a specific Environment, please use `--environment=<environment name>`."
+            + "To configure a specific Environment, please use option `--environment=<environment name>`."
         )
         project.deactivate_environment()
 

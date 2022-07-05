@@ -1,5 +1,6 @@
 """Extractor selection management CLI."""
 
+import logging
 from typing import Dict
 
 import click
@@ -14,6 +15,8 @@ from meltano.core.utils import click_run_async
 from . import cli
 from .params import pass_project
 from .utils import CliError
+
+logger = logging.getLogger(__name__)
 
 
 def selection_color(selection):
@@ -61,10 +64,12 @@ def selection_mark(selection):
     is_flag=True,
     help="Exclude all attributes that match specified pattern.",
 )
+@click.pass_context
 @pass_project(migrate=True)
 @click_run_async
 async def select(
     project,
+    ctx,
     extractor,
     entities_filter,
     attributes_filter,
@@ -75,6 +80,13 @@ async def select(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#select
     """
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"Deactivated Environment '{project.active_environment.name}' (the default) as the `meltano select` command does not adhere to your projects `default_environment`. "
+            + "To configure a specific Environment, please use option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
+
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])
@@ -133,9 +145,9 @@ async def show(project, extractor, show_all=False):
 
     click.secho("\nSelected attributes:")
     for stream, prop in tuple(
-        (stream, prop)
-        for stream in sorted(list_all.streams)
-        for prop in sorted(list_all.properties[stream.key])
+        (strm, prp)
+        for strm in sorted(list_all.streams)
+        for prp in sorted(list_all.properties[strm.key])
     ):
         entry_selection = stream.selection + prop.selection
         mark = selection_mark(entry_selection)
