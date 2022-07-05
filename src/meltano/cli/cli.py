@@ -5,16 +5,19 @@ from typing import NoReturn
 import click
 
 import meltano
+from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking import CliContext, Tracker
 
 logger = logging.getLogger(__name__)
 
 
-class NoWindowsGlobbingGroup(click.Group):
-    """A Click group that does not perform glob expansion on Windows.
+class NoWindowsGlobbingGroup(InstrumentedGroup):
+    """A instrumented Click group that does not perform glob expansion on Windows.
 
     This restores the behaviour of Click's globbing to how it was before v8.
     Click (as of version 8.1.3) ignores quotes around an asterisk, which makes
@@ -63,13 +66,14 @@ def cli(  # noqa: WPS231
 
     \b\nRead more at https://www.meltano.com/docs/command-line-interface.html
     """
+    ctx.ensure_object(dict)
+
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level
 
     if log_config:
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
-    ctx.ensure_object(dict)
     ctx.obj["verbosity"] = verbose
     try:  # noqa: WPS229
         project = Project.find()
@@ -97,8 +101,15 @@ def cli(  # noqa: WPS231
             logger.info(
                 "Environment '%s' is active", selected_environment  # noqa: WPS323
             )
-        ctx.obj["project"] = project
         ctx.obj["is_default_environment"] = is_default_environment
+        ctx.obj["project"] = project
+        ctx.obj["tracker"] = Tracker(project)
+        ctx.obj["tracker"].add_contexts(
+            CliContext.from_click_context(ctx)
+        )  # backfill the `cli` CliContext
+        ctx.obj["legacy_tracker"] = LegacyTracker(
+            project, context_overrides=ctx.obj["tracker"].contexts
+        )
     except ProjectNotFound:
         ctx.obj["project"] = None
     except IncompatibleVersionError:

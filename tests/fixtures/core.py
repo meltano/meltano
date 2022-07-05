@@ -604,21 +604,21 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
         state_ids.single_incomplete_state_id: [
             Job(
-                job_id=state_ids.single_incomplete_state_id,
+                job_name=state_ids.single_incomplete_state_id,
                 **job_args.incomplete_job_args,
                 payload=payloads.mock_state_payloads[0],
             )
         ],
         state_ids.single_complete_state_id: [
             Job(
-                job_id=state_ids.single_complete_state_id,
+                job_name=state_ids.single_complete_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ],
         state_ids.multiple_incompletes_state_id: [
             Job(
-                job_id=state_ids.multiple_incompletes_state_id,
+                job_name=state_ids.multiple_incompletes_state_id,
                 **job_args.incomplete_job_args,
                 payload=payload,
             )
@@ -626,7 +626,7 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.multiple_completes_state_id: [
             Job(
-                job_id=state_ids.multiple_completes_state_id,
+                job_name=state_ids.multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )
@@ -634,14 +634,14 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.single_complete_then_multiple_incompletes_state_id: [
             Job(
-                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
+                job_name=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ]
         + [
             Job(
-                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
+                job_name=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payload,
                 **job_args.incomplete_job_args,
             )
@@ -649,14 +649,14 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.single_incomplete_then_multiple_completes_state_id: [
             Job(
-                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
+                job_name=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.incomplete_job_args,
             )
         ]
         + [
             Job(
-                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
+                job_name=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )

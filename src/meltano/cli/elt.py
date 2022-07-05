@@ -1,4 +1,5 @@
 """Defines `meltano elt` command."""
+from __future__ import annotations
 
 import datetime
 import logging
@@ -13,20 +14,20 @@ from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import click_run_async
 
 from . import cli
 from .params import pass_project
-from .utils import CliError
+from .utils import CliError, InstrumentedCmd
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -38,7 +39,10 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.command(short_help="Run an ELT pipeline to Extract, Load, and Transform data.")
+@cli.command(
+    cls=InstrumentedCmd,
+    short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
+)
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]))
@@ -78,22 +82,24 @@ logger = structlog_stdlib.get_logger(__name__)
     help="Force a new run even when a pipeline with the same state ID is already running.",
     is_flag=True,
 )
+@click.pass_context
 @pass_project(migrate=True)
 @click_run_async
 async def elt(
-    project,
-    extractor,
-    loader,
-    transform,
-    dry,
-    full_refresh,
-    select,
-    exclude,
-    catalog,
-    state,
-    dump,
-    state_id,
-    force,
+    project: Project,
+    ctx: click.Context,
+    extractor: str,
+    loader: str,
+    transform: str,
+    dry: bool,
+    full_refresh: bool,
+    select: list[str],
+    exclude: list[str],
+    catalog: str,
+    state: str,
+    dump: str,
+    state_id: str,
+    force: bool,
 ):
     """
     Run an ELT pipeline to Extract, Load, and Transform data.
@@ -110,25 +116,8 @@ async def elt(
             "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
         )
 
-    tracker = Tracker(project)
-    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
-
-    cmd_ctx = CliContext.from_command_and_kwargs(
-        "elt",
-        None,
-        dry=dry,
-        transform=transform,
-        full_refresh=full_refresh,
-        select=select,
-        exclude=exclude,
-        catalog=catalog,
-        state=state,
-        dump=dump,
-        state_id=state_id,
-        force=force,
-    )
-    tracker.add_contexts(cmd_ctx)
-    tracker.track_command_event(CliEvent.started)
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
 
     # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
     # if transform is None we still need manually default to skip after firing the tracking event above.
@@ -138,7 +127,7 @@ async def elt(
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
-        job_id=state_id
+        job_name=state_id
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
     _, Session = project_engine(project)  # noqa: N806
@@ -232,24 +221,24 @@ async def dump_file(context_builder, dumpable):
 
 
 async def _run_job(tracker, project, job, session, context_builder, force=False):
-    StaleJobFailer(job.job_id).fail_stale_jobs(session)
+    StaleJobFailer(job.job_name).fail_stale_jobs(session)
 
     if not force:
-        existing = JobFinder(job.job_id).latest_running(session)
+        existing = JobFinder(job.job_name).latest_running(session)
         if existing:
             raise CliError(
-                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                f"Another '{job.job_name}' pipeline is already running which started at {existing.started_at}. "
                 + "To ignore this check use the '--force' option."
             )
 
     async with job.run(session):
         job_logging_service = JobLoggingService(project)
-        log_file = job_logging_service.generate_log_name(job.job_id, job.run_id)
+        log_file = job_logging_service.generate_log_name(job.job_name, job.run_id)
 
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
 
-        log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_id)
+        log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_name)
 
         await _run_elt(tracker, log, context_builder, output_logger)
 
@@ -283,6 +272,7 @@ async def _run_elt(
         try:
             elt_context = context_builder.context()
             tracker.add_contexts(PluginsTrackingContext.from_elt_context(elt_context))
+            tracker.track_command_event(CliEvent.inflight)
 
             if elt_context.only_transform:
                 log.info("Extract & load skipped.")
@@ -309,7 +299,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_name,
         stdio="stderr",
     )
 
@@ -325,7 +315,7 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(
             run_id=str(elt_context.job.run_id),
-            state_id=elt_context.job.job_id,
+            state_id=elt_context.job.job_name,
             stdio="stdout",
         )
         extractor_out = output_logger.out(
@@ -377,7 +367,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_name,
         stdio="stderr",
         cmd_type="transformer",
     )
