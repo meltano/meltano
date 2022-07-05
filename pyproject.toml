@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.1.0"
+version = "2.2.0"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -17,9 +17,9 @@ include = [
   "*.m5o",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
-  "src/meltano/api/templates/webapp.html",
   "src/meltano/api/templates/embed.html",
-  "src/meltano/core/tracking/.release_marker"
+  "src/meltano/api/templates/webapp.html",
+  "src/meltano/core/tracking/.release_marker",
 ]
 
 [tool.poetry.dependencies]
@@ -123,7 +123,7 @@ exclude_lines = [
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "2.1.0"
+version = "2.2.0"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
     "pyproject.toml:^version =",

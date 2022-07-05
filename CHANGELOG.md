@@ -9,21 +9,33 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 2.2.0 - (2022-07-01)
+---
+
+### New
+
+- [#2830](https://github.com/meltano/meltano/issues/2830) Add support for Python 3.10.
 - [#3452](https://gitlab.com/meltano/meltano/-/issues/3452) Add `copy` and `move` commands to `meltano state`
 
 ### Changes
 
-- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend pipx over manually created virtual environments.
-- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) - Windows instllation instructions added
-- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) - Windows now covered in CI for some basic cases
-- [#3135](https://github.com/meltano/meltano/issues/3135) - Formalize settings alias behavior and disallow conflicting values between setting name and aliases
-- [#2035](https://github.com/meltano/meltano/issues/2035) Rename `job` table and `job_id` column in backend db
+- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) We now recommend pipx over manually created virtual environments.
+- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) Added installation instructions for Windows.
+- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) Windows now covered in CI for some basic cases.
+- [#3135](https://github.com/meltano/meltano/issues/3135) Formalize settings alias behavior and disallow conflicting values between setting name and aliases.
+- [#2035](https://github.com/meltano/meltano/issues/2035) Rename `job` table and `job_id` column in backend db.
 
 ### Fixes
 
 - [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
-
-### Breaks
 
 
 ## 2.1.0 - (2022-06-17)

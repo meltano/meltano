@@ -24,7 +24,7 @@ logger = structlog.getLogger(__name__)
 
 
 @cli.command(
-    cls=PartialInstrumentedCmd, short_help="[preview] Run a set of plugins in series."
+    cls=PartialInstrumentedCmd, short_help="Run a set of plugins in series."
 )
 @click.option(
     "--dry-run",
@@ -70,7 +70,7 @@ async def run(
     `meltano run some_extractor some_loader some_plugin:some_command` and are run in the order they are specified
     from left to right. A failure in any block will cause the entire run to abort.
 
-    Multiple commmand blocks can be chained together or repeated, and tap/target pairs will automatically be linked:
+    Multiple command blocks can be chained together or repeated, and tap/target pairs will automatically be linked:
 
         `meltano run tap-gitlab target-postgres dbt:test dbt:run`\n
         `meltano run tap-gitlab target-postgres tap-salesforce target-mysql ...`\n
@@ -82,8 +82,6 @@ async def run(
         `meltano --environment=prod run tap-gitlab target-postgres tap-salesforce target-mysql`\n
 
     The above command will create two jobs with state IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
-
-    This a preview feature - its functionality and cli signature is still evolving.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
     """
