@@ -17,7 +17,10 @@ from meltano.core.settings_service import (
     FeatureFlags,
     SettingValueStore,
 )
-from meltano.core.settings_store import ConflictingSettingValueException
+from meltano.core.settings_store import (
+    ConflictingSettingValueException,
+    MultipleEnvVarsSetException,
+)
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 
@@ -854,13 +857,22 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-    def test_find_setting_raises_with_multiple(
+    def test_find_setting_raises_with_conflicting(
         self, tap, plugin_settings_service_factory, monkeypatch
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
         monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_1")
         with pytest.raises(ConflictingSettingValueException):
+            subject.get("aliased")
+
+    def test_find_setting_raises_with_multiple(
+        self, tap, plugin_settings_service_factory, monkeypatch
+    ):
+        subject = plugin_settings_service_factory(tap)
+        monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
+        monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_0")
+        with pytest.raises(MultipleEnvVarsSetException):
             subject.get("aliased")
 
     def test_find_setting_aliases(self, tap, plugin_settings_service_factory):
