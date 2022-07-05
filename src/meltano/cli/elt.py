@@ -38,7 +38,7 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.commands.elt
+@cli.commands.elt  # Refer to `src/meltano/cli/commands.py`
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]))

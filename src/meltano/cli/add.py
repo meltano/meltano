@@ -22,7 +22,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 
-@cli.commands.add  # noqa: WPS238
+@cli.commands.add  # Refer to `src/meltano/cli/commands.py`  # noqa: WPS238
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
 @click.option(

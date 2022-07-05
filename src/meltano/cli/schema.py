@@ -6,7 +6,7 @@ from meltano.cli.params import pass_project
 from meltano.core.db import DB, project_engine
 
 
-@cli.commands.schema
+@cli.commands.schema  # Refer to `src/meltano/cli/commands.py`
 def schema_cli():
     """Manage system DB schema."""
 

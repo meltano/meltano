@@ -12,7 +12,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 
-@cli.commands.install
+@cli.commands.install  # Refer to `src/meltano/cli/commands.py`
 @click.argument(
     "plugin_type", type=click.Choice(PluginType.cli_arguments()), required=False
 )

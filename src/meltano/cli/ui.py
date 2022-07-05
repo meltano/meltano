@@ -72,7 +72,7 @@ def start_workers(workers):
     return stop_all
 
 
-@cli.commands.ui
+@cli.commands.ui  # Refer to `src/meltano/cli/commands.py`
 @pass_project(migrate=True)
 @click.pass_context
 def ui(ctx, project):

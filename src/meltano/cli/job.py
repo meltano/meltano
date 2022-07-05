@@ -87,7 +87,7 @@ def _list_all_jobs(
     tracker.track_command_event(CliEvent.completed)
 
 
-@cli.commands.job
+@cli.commands.job  # Refer to `src/meltano/cli/commands.py`
 @click.pass_context
 @pass_project(migrate=True)
 def job(project, ctx):

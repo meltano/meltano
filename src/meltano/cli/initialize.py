@@ -18,7 +18,7 @@ ALL = "all"
 logger = logging.getLogger(__name__)
 
 
-@cli.commands.init
+@cli.commands.init  # Refer to `src/meltano/cli/commands.py`
 @click.pass_context
 @click.argument("project_name", required=False)
 @click.option(

@@ -1,4 +1,11 @@
-"""Main entry point for the meltano CLI."""
+"""Main entry point for the meltano CLI.
+
+The root `meltano` command is implemented in `src/meltano/cli/cli.py`.
+
+All sub-commands/groups are implemented in their own modules within
+`src/meltano/cli`, and registered in `src/meltano/cli/commands.py`.
+"""
+
 from __future__ import annotations
 
 import logging

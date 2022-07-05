@@ -97,7 +97,7 @@ def state_service_from_state_id(
     return None
 
 
-@cli.commands.state
+@cli.commands.state  # Refer to `src/meltano/cli/commands.py`
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_state(project: Project, ctx: click.Context):

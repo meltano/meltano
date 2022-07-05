@@ -11,7 +11,7 @@ from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
 
 
-@cli.commands.upgrade
+@cli.commands.upgrade  # Refer to `src/meltano/cli/commands.py`
 @pass_project()
 @click.pass_context
 def upgrade(ctx, project):
@@ -31,7 +31,7 @@ def upgrade(ctx, project):
     ctx.obj["upgrade_service"] = upgrade_service
 
 
-@upgrade.command(
+@upgrade.command(  # noqa: WPS125
     short_help="Upgrade Meltano and your entire project to the latest version."
 )
 @click.option(

@@ -58,7 +58,7 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.commands.test
+@cli.commands.test  # Refer to `src/meltano/cli/commands.py`
 @click.option(
     "--all",
     "all_tests",

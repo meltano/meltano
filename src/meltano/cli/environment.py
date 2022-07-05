@@ -12,7 +12,7 @@ from meltano.core.tracking import CliEvent
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 
 
-@cli.commands.environment
+@cli.commands.environment  # Refer to `src/meltano/cli/commands.py`
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_environment(project: Project, ctx: click.Context):

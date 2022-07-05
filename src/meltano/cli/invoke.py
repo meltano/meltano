@@ -29,7 +29,7 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext
 logger = logging.getLogger(__name__)
 
 
-@cli.commands.invoke
+@cli.commands.invoke  # Refer to `src/meltano/cli/commands.py`
 @click.option(
     "--print-var",
     help="Print to stdout the values for the provided environment variables, as passed to the plugininvoker context. Useful for debugging.",

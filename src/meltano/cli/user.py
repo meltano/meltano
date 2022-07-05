@@ -7,7 +7,7 @@ from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
 
 
-@cli.commands.user
+@cli.commands.user  # Refer to `src/meltano/cli/commands.py`
 @pass_project(migrate=True)
 @click.pass_context
 def user(ctx, project):

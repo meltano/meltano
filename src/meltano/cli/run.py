@@ -22,7 +22,7 @@ from meltano.core.utils import click_run_async
 logger = structlog.getLogger(__name__)
 
 
-@cli.commands.run
+@cli.commands.run  # Refer to `src/meltano/cli/commands.py`
 @click.option(
     "--dry-run",
     help="Do not run, just parse the invocation, validate it, and explain what would be executed.",

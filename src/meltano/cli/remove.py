@@ -12,7 +12,7 @@ from meltano.core.plugin_location_remove import (
 from meltano.core.plugin_remove_service import PluginRemoveService
 
 
-@cli.commands.remove
+@cli.commands.remove  # Refer to `src/meltano/cli/commands.py`
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()

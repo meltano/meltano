@@ -6,7 +6,7 @@ from meltano.cli.cli import cli
 from meltano.cli.params import database_uri_option
 
 
-@cli.commands.repl
+@cli.commands.repl  # Refer to `src/meltano/cli/commands.py`
 @database_uri_option
 def repl():
     """Start the Meltano REPL."""

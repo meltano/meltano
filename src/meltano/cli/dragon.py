@@ -14,7 +14,7 @@ from meltano.core.cli_messages import (
 )
 
 
-@cli.commands.dragon
+@cli.commands.dragon  # Refer to `src/meltano/cli/commands.py`
 @click.pass_context
 def dragon(ctx):
     """Summon a dragon."""

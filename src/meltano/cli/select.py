@@ -38,7 +38,7 @@ def selection_mark(selection):
     return f"[{selection:<{colwidth}}]"
 
 
-@cli.commands.select
+@cli.commands.select  # Refer to `src/meltano/cli/commands.py`
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")

@@ -20,7 +20,7 @@ from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
 
 
-@cli.commands.schedule
+@cli.commands.schedule  # Refer to `src/meltano/cli/commands.py`
 @click.pass_context
 @pass_project(migrate=True)
 def schedule(project, ctx):

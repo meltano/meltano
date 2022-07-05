@@ -1,4 +1,18 @@
-"""The (lazy) commands that make up the top-level of the Meltano CLI."""
+"""The (lazy) commands that make up the top-level of the Meltano CLI.
+
+This module defines the `LazyCommand` class, and registers each Meltano
+sub-command/group (i.e. creates a `LazyCommand` instance for it).
+
+To add a new top-level command or command group, it must be registered in this
+module like the others. Any arguments that would normally be provided to the
+`cli.command`/`cli.group` decorator must be provided to the initialization
+method of the `LazyCommand` instead.
+
+Then, in the `meltano.cli` sub-module that implements the new command/group,
+you must decorate the function that implements the command/group with
+`cli.commands.<command_name>`. This essentially connects the `LazyCommand`
+instance to the actual implementation of the command.
+"""
 
 from __future__ import annotations
 

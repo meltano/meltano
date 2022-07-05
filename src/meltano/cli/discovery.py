@@ -10,7 +10,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 
 
-@cli.commands.discover
+@cli.commands.discover  # Refer to `src/meltano/cli/commands.py`
 @click.argument(
     "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )

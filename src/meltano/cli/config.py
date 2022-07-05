@@ -42,7 +42,7 @@ def get_label(metadata) -> str:
         return f"from {source.label}"
 
 
-@cli.commands.config
+@cli.commands.config  # Refer to `src/meltano/cli/commands.py`
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
 )

@@ -25,7 +25,7 @@ __all__ = ["lock"]
 logger = structlog.get_logger(__name__)
 
 
-@cli.commands.lock
+@cli.commands.lock  # Refer to `src/meltano/cli/commands.py`
 @click.option(
     "--all",
     "all_plugins",
