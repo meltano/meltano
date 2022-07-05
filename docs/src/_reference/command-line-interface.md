@@ -823,9 +823,9 @@ While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgr
 same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting
 of a single task while scheduling the latter will result in a generated DAG consisting of two tasks:
 
-```bash
+```
 task 1: "meltano run tap-gitlab hide-gitlab-secrets target-postgres"
-task 2: "meltano run dbt-postgres:run" , depends on task 2
+task 2: "meltano run dbt-postgres:run" , depends on task 1
 ```
 
 ### Examples
