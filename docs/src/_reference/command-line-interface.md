@@ -793,13 +793,15 @@ jobs:
 ```
 
 When an Airflow DAG is generated for a job, each task in the job definition will become a single task in the generated DAG.
-So while it is certainly possible to define all your jobs using only one task each, there are many scenarios in which it would
-be useful or even necessary to split your job into multiple tasks.
-For instance, job steps which must always run, fail, and be retried as a group should always be a part of the same task.
-And long-running job steps should likely be grouped into a separate task from shorter-running downstream steps so that those downstream steps can be rerun on their own.
+So while it is certainly possible to define all your jobs using only one task each, there are many scenarios in which it
+would be useful or even necessary to split your job into multiple tasks. For instance, job steps which must always run,
+fail, and be retried as a group should always be a part of the same task. And long-running job steps should likely be
+grouped into a separate task from shorter-running downstream steps so that those downstream steps can be rerun on their
+own.
 
-Each individual task must itself be a valid sequence of extractors, mappers, loaders, and plugin commands.
-When multiple tasks are defined in a job, they should be supplied to the `meltano job add` command as an array in YAML format.
+Meltano does support this by allowing a job to consist of multiple tasks. Each individual task must itself be a valid
+sequence of extractors, mappers, loaders, and plugin commands. When multiple tasks are defined in a job, they must be
+supplied to the `meltano job add` command as an array in YAML format.
 
 For instance the `tap-gitlab-to-target-postgres-processed` job in the above example could also be created as:
 
@@ -817,15 +819,23 @@ jobs:
       - dbt-postgres:run
 ```
 
-While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting of a single task while scheduling the latter will result in a generated DAG consisting of two tasks.
+While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the
+same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting
+of a single task while scheduling the latter will result in a generated DAG consisting of two tasks:
+
+```bash
+task 1: "meltano run tap-gitlab hide-gitlab-secrets target-postgres"
+task 2: "meltano run dbt-postgres:run" , depends on task 2
+```
 
 ### Examples
 
 ```bash
-# Add a new job named "simple-demo" that contains two tasks
-# Task 1: tap-gitlab hide-gitlab-secrets target-mysql
-# Task 2: tap-gitlab target-csv
-meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run, tap-gitlab target-csv]"
+# Add a new job named "simple-demo" that contains three tasks
+# Task 1: tap-gitlab hide-gitlab-secrets target-postgres
+# Task 2: dbt-postgres:run
+# Task 3: tap-gitlab target-csv
+meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt-postgres:run, tap-gitlab target-csv]"
 
 # list the job named "simple-demo"
 meltano job list simple-demo --format=json
