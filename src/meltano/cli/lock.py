@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING
 import click
 import structlog
 
-from meltano.cli.cli import CliError, cli
+from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
