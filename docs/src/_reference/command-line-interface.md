@@ -212,6 +212,9 @@ If you have multiple [Meltano Environments](/concepts/environments) you can spec
 meltano --environment=<ENVIRONMENT> config <plugin>
 ```
 
+> Note: Unlike other commands like [`meltano run`](#run) and [`meltano invoke`](#invoke), the `meltano config` command ignores any configured [default environment](/concepts/environments#default-environment).
+> This is to make it easier to configure plugins' base configuration before adding environment-specific overrides.
+
 ### How to use: Plugin extras
 
 In the context of `meltano config`, [plugin extras](/guide/configuration#plugin-extras) are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the [environment variables](/guide/configuration#configuring-settings) that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an extra underscore to separate them from the plugin name, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
