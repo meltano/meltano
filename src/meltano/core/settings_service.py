@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import logging
 import os
+import warnings
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
 from typing import Generator, Iterable
-from warnings import warn
 
 from meltano.core.project import Project
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
@@ -419,7 +419,7 @@ class SettingsService(ABC):  # noqa: WPS214
         self.log(f"Got setting {name!r} with metadata: {metadata}")
 
         if setting_def is None and metadata["source"] is SettingValueStore.DEFAULT:
-            warn(
+            warnings.warn(
                 f"Unknown setting {name!r} - the default value `{value!r}` will be used",
                 RuntimeWarning,
             )
@@ -657,14 +657,17 @@ class SettingsService(ABC):  # noqa: WPS214
         Raises:
             FeatureNotAllowedException: if raise_error is True and feature flag is disallowed
         """
-        # experimental is a top-level setting
-        if feature == EXPERIMENTAL:
-            allowed = self.get(EXPERIMENTAL) or False
-        # other feature flags are nested under feature flag
-        else:
-            allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
-        try:
-            yield allowed
-        finally:
-            if raise_error and not allowed:
-                raise FeatureNotAllowedException(feature)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
+
+            # experimental is a top-level setting
+            if feature == EXPERIMENTAL:
+                allowed = self.get(EXPERIMENTAL) or False
+            # other feature flags are nested under feature flag
+            else:
+                allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
+            try:
+                yield allowed
+            finally:
+                if raise_error and not allowed:
+                    raise FeatureNotAllowedException(feature)
