@@ -666,8 +666,9 @@ class SettingsService(ABC):  # noqa: WPS214
             # other feature flags are nested under feature flag
             else:
                 allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
-            try:
-                yield allowed
-            finally:
-                if raise_error and not allowed:
-                    raise FeatureNotAllowedException(feature)
+
+        try:
+            yield allowed
+        finally:
+            if raise_error and not allowed:
+                raise FeatureNotAllowedException(feature)
