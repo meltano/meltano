@@ -2960,7 +2960,7 @@ transformers:
     variant: dbt-labs
     requires:
       files:
-      - name: files-dbt
+      - name: dbt
         variant: meltano
     settings:
       - name: project_dir
@@ -3181,7 +3181,7 @@ transformers:
         variant: meltano
     settings:
     - name: project_dir
-      lable: Project Directory
+      label: Project Directory
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
       label: Profiles Directory
