@@ -82,7 +82,7 @@ async def select(
     """
     if ctx.obj["is_default_environment"]:
         logger.info(
-            f"Deactivated Environment '{project.active_environment.name}' (the default) as the `meltano select` command does not adhere to your projects `default_environment`. "
+            f"The default environment ({project.active_environment.name}) will be ignored for `meltano select`. "
             + "To configure a specific Environment, please use option `--environment=<environment name>`."
         )
         project.deactivate_environment()
