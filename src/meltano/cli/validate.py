@@ -9,7 +9,7 @@ import click
 import structlog
 from sqlalchemy.orm.session import sessionmaker
 
-from meltano.cli.utils import propagate_stop_signals
+from meltano.cli.utils import InstrumentedCmd, propagate_stop_signals
 from meltano.core.db import project_engine
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
@@ -59,7 +59,7 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.command(short_help="Run validations using plugins' tests.")
+@cli.command(cls=InstrumentedCmd, short_help="Run validations using plugins' tests.")
 @click.option(
     "--all",
     "all_tests",

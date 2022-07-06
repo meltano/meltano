@@ -541,10 +541,34 @@ class InstrumentedGroup(click.Group):
 
 
 class InstrumentedCmd(click.Command):
+    """A click.Command that automatically fires telemetry events when invoked.
+
+    Both starting and ending events are fired. The ending event fired is dependent on whether invocation of the command
+    resulted in an Exception.
+    """
+
+    def invoke(self, ctx):
+        """Invoke the requested command firing start and events accordingly."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            tracker = ctx.obj["tracker"]
+            tracker.add_contexts(CliContext.from_click_context(ctx))
+            tracker.track_command_event(CliEvent.started)
+            try:
+                super().invoke(ctx)  # noqa: WPS608
+            except Exception:
+                tracker.track_command_event(CliEvent.failed)
+                raise
+            tracker.track_command_event(CliEvent.completed)
+        else:
+            super().invoke(ctx)
+
+
+class PartialInstrumentedCmd(click.Command):
     """A click.Command that automatically fires an instrumentation 'start' event, if a tracker is available."""
 
     def invoke(self, ctx):
-        """Fire a start event and then invoke the requested command."""
+        """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))

@@ -7,16 +7,20 @@ import pytest
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.settings_service import (
-    REDACTED_VALUE,
-    PluginSettingsService,
-    SettingValueStore,
-)
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
-from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
-from meltano.core.settings_store import ConflictingSettingValueException, MultipleEnvVarsSetException
+from meltano.core.settings_service import (
+    FEATURE_FLAG_PREFIX,
+    REDACTED_VALUE,
+    FeatureFlags,
+    SettingValueStore,
+)
+from meltano.core.settings_store import (
+    ConflictingSettingValueException,
+    MultipleEnvVarsSetException,
+)
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 
@@ -863,7 +867,8 @@ class TestPluginSettingsService:
             subject.get("aliased")
 
     def test_find_setting_raises_with_multiple(
-            self, tap, plugin_settings_service_factory, monkeypatch):
+        self, tap, plugin_settings_service_factory, monkeypatch
+    ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
         monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_0")
