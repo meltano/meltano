@@ -384,12 +384,6 @@ class TestProjectFiles:
               start_date: 2020-08-05 00:00:00
               interval: '@once' # Run only once
 
-            environments:
-            # My meltano environments
-            - name: test-meltano-environment
-              env:
-                TEST: TEST-MELTANO
-
             jobs:  # My jobs
             # An EL job with mapping
             - name: my-job
@@ -398,6 +392,12 @@ class TestProjectFiles:
                 tap-meltano-yml
                 map-meltano-yml
                 target-meltano-yml
+
+            environments:
+            # My meltano environments
+            - name: test-meltano-environment
+              env:
+                TEST: TEST-MELTANO
 
             plugins:
               # Project plugins

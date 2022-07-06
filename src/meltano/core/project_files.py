@@ -225,6 +225,11 @@ class ProjectFiles:  # noqa: WPS214
             environment_key = ("environments", environment["name"])
             self._add_to_index(key=environment_key, include_path=include_file_path)
 
+        jobs = include_file_contents.get("jobs", [])
+        for job in jobs:
+            job_key = ("jobs", job["name"])
+            self._add_to_index(key=job_key, include_path=include_file_path)
+
     def _load_included_files(self) -> list[CommentedMap]:
         """Read and index included files.
 
@@ -306,15 +311,10 @@ class ProjectFiles:  # noqa: WPS214
         """
         # Create the top-level entries in the right order first
         for file, contents in self._raw_contents_map.items():
-            # Keep project settings at the top in meltano.yml
-            if file == str(self._meltano_file_path):
-                continue
-
             # Restore sorting in project files
             file_dicts[file] = CommentedMap()
             for key, value in contents.items():
-                if key in {"plugins", "schedules", "environments"}:
-                    file_dicts[file][key] = value.__class__()
+                file_dicts[file][key] = value.__class__()
 
     def _copy_yaml_attributes(  # noqa: WPS210
         self,
@@ -337,6 +337,10 @@ class ProjectFiles:  # noqa: WPS214
             )
             environments = file_dict.get("environments", CommentedSeq())
             original_environments.copy_attributes(environments)
+
+            original_jobs = original_contents.get("jobs", CommentedSeq())
+            jobs = file_dict.get("jobs", CommentedSeq())
+            original_jobs.copy_attributes(jobs)
 
             original_plugins = original_contents.get("plugins", CommentedMap())
             plugins = file_dict.get("plugins", CommentedMap())
