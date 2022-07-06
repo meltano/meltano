@@ -3004,10 +3004,6 @@ transformers:
       test:
         args: test
         description: Runs tests on data in deployed models.
-    requires:
-      files:
-        - name: dbt
-          variant: meltano
   - name: dbt-snowflake
     executable: dbt
     namespace: dbt_snowflake
@@ -3483,13 +3479,11 @@ files:
     pip_url: git+https://gitlab.com/meltano/files-airflow.git
     update:
       orchestrate/dags/meltano.py: true
-    variant: meltano
   - name: dbt
     variant: meltano
     namespace: dbt
     repo: https://gitlab.com/meltano/files-dbt
     pip_url: git+https://gitlab.com/meltano/files-dbt.git@3120-deprecate-env-aliases-config-v2
-    variant: meltano
   - name: docker
     variant: meltano
     namespace: docker
