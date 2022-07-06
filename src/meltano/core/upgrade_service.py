@@ -65,7 +65,7 @@ class UpgradeService:
         run = subprocess.run(
             [sys.executable, "-m", "pip", "install", "--upgrade", pip_url],
             stderr=subprocess.PIPE,
-            universal_newlines=True,
+            text=True,
         )
 
         if run.returncode != 0:

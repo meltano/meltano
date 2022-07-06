@@ -42,6 +42,7 @@ def get_label(metadata) -> str:
     else:
         return f"from {source.label}"
 
+
 @cli.group(
     cls=InstrumentedGroup,
     invoke_without_command=True,
