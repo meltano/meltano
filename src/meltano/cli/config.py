@@ -11,7 +11,7 @@ import dotenv
 
 from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, InstrumentedCmd
+from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -73,7 +73,6 @@ def config(  # noqa: WPS231
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
     except ValueError:
-        tracker.track_command_event(CliEvent.started)
         tracker.track_command_event(CliEvent.aborted)
         raise
 
@@ -87,7 +86,6 @@ def config(  # noqa: WPS231
         if plugin_name == "meltano":
             plugin = None
         else:
-            tracker.track_command_event(CliEvent.started)
             tracker.track_command_event(CliEvent.aborted)
             raise
 
@@ -141,7 +139,7 @@ def config(  # noqa: WPS231
 
 
 @config.command(
-    cls=InstrumentedCmd,
+    cls=PartialInstrumentedCmd,
     name="list",
     short_help=(
         "List all settings for the specified plugin with their names, environment variables, and current values."
@@ -230,7 +228,7 @@ def list_settings(ctx, extras: bool):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd)
+@config.command(cls=PartialInstrumentedCmd)
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
@@ -261,7 +259,7 @@ def reset(ctx, store):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd, name="set")
+@config.command(cls=PartialInstrumentedCmd, name="set")
 @click.argument("setting_name", nargs=-1, required=True)
 @click.argument("value")
 @click.option(
@@ -311,7 +309,7 @@ def set_(ctx, setting_name, value, store):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd, name="test")
+@config.command(cls=PartialInstrumentedCmd, name="test")
 @click.pass_context
 def test(ctx):
     """Test the configuration of a plugin."""
@@ -342,7 +340,7 @@ def test(ctx):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd)
+@config.command(cls=PartialInstrumentedCmd)
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",

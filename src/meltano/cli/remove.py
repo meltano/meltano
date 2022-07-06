@@ -27,7 +27,6 @@ def remove(ctx, project, plugin_type, plugin_names):
         ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
         for plugin_name in plugin_names
     ]
-
     remove_plugins(project, plugins)
 
 

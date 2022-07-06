@@ -22,13 +22,13 @@ from importlib import import_module
 from typing import Any, Callable
 
 import click
-from click_default_group import DefaultGroup
 
 from meltano.cli.cli import cli
 from meltano.cli.utils import (
     InstrumentedCmd,
     InstrumentedDefaultGroup,
     InstrumentedGroup,
+    PartialInstrumentedCmd,
 )
 
 
@@ -51,7 +51,7 @@ class LazyCommand:
         short_help: str | None = None,
         hidden: bool = False,
         import_path: str | None = None,
-        cls: type[click.BaseCommand] = click.Command,  # noqa: WPS117
+        cls: type[click.BaseCommand] = InstrumentedCmd,  # noqa: WPS117
         **kwargs,
     ):
         """Initialize a `LazyCommand` instance.
@@ -131,7 +131,7 @@ for command in (
     LazyCommand(
         name="add",
         short_help="Add a plugin to your project.",
-        cls=InstrumentedCmd,
+        cls=PartialInstrumentedCmd,
     ),
     LazyCommand(
         name="config",
@@ -151,7 +151,7 @@ for command in (
     LazyCommand(
         name="elt",
         short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
-        cls=InstrumentedCmd,
+        cls=PartialInstrumentedCmd,
     ),
     LazyCommand(
         name="environment",
@@ -166,7 +166,7 @@ for command in (
     LazyCommand(
         name="install",
         short_help="Install project dependencies.",
-        cls=InstrumentedCmd,
+        cls=PartialInstrumentedCmd,
     ),
     LazyCommand(
         name="invoke",
@@ -175,7 +175,7 @@ for command in (
             "ignore_unknown_options": True,
             "allow_interspersed_args": False,
         },
-        cls=InstrumentedCmd,
+        cls=PartialInstrumentedCmd,
     ),
     LazyCommand(
         name="job",
@@ -185,7 +185,7 @@ for command in (
     LazyCommand(
         name="lock",
         short_help="Lock plugin definitions.",
-        cls=InstrumentedCmd,
+        cls=PartialInstrumentedCmd,
     ),
     LazyCommand(
         name="remove",
@@ -198,7 +198,7 @@ for command in (
     LazyCommand(
         name="run",
         short_help="Run a set of plugins in series.",
-        cls=InstrumentedCmd,
+        cls=PartialInstrumentedCmd,
     ),
     LazyCommand(
         name="schedule",
@@ -209,7 +209,7 @@ for command in (
     LazyCommand(
         name="schema",
         short_help="Manage system DB schema.",
-        cls=click.Group,
+        cls=InstrumentedGroup,
     ),
     LazyCommand(
         name="select",
@@ -218,7 +218,7 @@ for command in (
     LazyCommand(
         name="state",
         short_help="Manage Singer state.",
-        cls=click.Group,
+        cls=InstrumentedGroup,
     ),
     LazyCommand(
         name="test",
@@ -228,14 +228,14 @@ for command in (
     LazyCommand(
         name="ui",
         short_help="Start the Meltano UI webserver.",
-        cls=DefaultGroup,
+        cls=InstrumentedDefaultGroup,
         default="start",
         default_if_no_args=True,
     ),
     LazyCommand(
         name="upgrade",
         short_help="Upgrade Meltano and your entire project to the latest version.",
-        cls=DefaultGroup,
+        cls=InstrumentedDefaultGroup,
         default="all",
         default_if_no_args=True,
     ),
@@ -243,7 +243,7 @@ for command in (
         name="user",
         invoke_without_command=True,
         short_help="Manage Meltano user accounts.",
-        cls=click.Group,
+        cls=InstrumentedGroup,
     ),
 ):
     cli.add_command(command)

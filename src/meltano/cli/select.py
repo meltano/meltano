@@ -8,9 +8,9 @@ from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError
 from meltano.core.db import project_engine
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
+from meltano.core.project import Project
 from meltano.core.select_service import SelectService
 from meltano.core.utils import click_run_async
 
@@ -61,12 +61,14 @@ def selection_mark(selection):
     help="Exclude all attributes that match specified pattern.",
 )
 @pass_project(migrate=True)
+@click.pass_context
 @click_run_async
 async def select(
-    project,
-    extractor,
-    entities_filter,
-    attributes_filter,
+    ctx: click.Context,
+    project: Project,
+    extractor: str,
+    entities_filter: str,
+    attributes_filter: str,
     **flags: dict[str, bool],
 ):
     """
@@ -86,9 +88,7 @@ async def select(
                 exclude=flags["exclude"],
                 remove=flags["remove"],
             )
-
-        tracker = LegacyTracker(project)
-        tracker.track_meltano_select(
+        ctx.obj["legacy_tracker"].track_meltano_select(
             extractor=extractor,
             entities_filter=entities_filter,
             attributes_filter=attributes_filter,
@@ -131,14 +131,11 @@ async def show(project, extractor, show_all=False):
         click.secho(f"\t{select_pattern.raw}", fg=color)
 
     click.secho("\nSelected attributes:")
-    for stream, prop in tuple(
-        (stream, prop)
-        for stream in sorted(list_all.streams)
-        for prop in sorted(list_all.properties[stream.key])
-    ):
-        entry_selection = stream.selection + prop.selection
-        mark = selection_mark(entry_selection)
-        if show_all or entry_selection:
-            click.secho(f"\t{mark} ", fg=selection_color(entry_selection), nl=False)
-            click.secho(stream.key, fg=selection_color(stream.selection), nl=False)
-            click.secho(f".{prop.key}", fg=selection_color(entry_selection))
+    for stream in sorted(list_all.streams):
+        for prop in sorted(list_all.properties[stream.key]):
+            entry_selection = stream.selection + prop.selection
+            mark = selection_mark(entry_selection)
+            if show_all or entry_selection:
+                click.secho(f"\t{mark} ", fg=selection_color(entry_selection), nl=False)
+                click.secho(stream.key, fg=selection_color(stream.selection), nl=False)
+                click.secho(f".{prop.key}", fg=selection_color(entry_selection))

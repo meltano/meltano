@@ -5,6 +5,7 @@ import click
 from meltano.api.app import create_app
 from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd
 
 
 @cli.commands.user  # Refer to `src/meltano/cli/commands.py`
@@ -21,7 +22,7 @@ def user(ctx, project):
     ctx.obj["project"] = project
 
 
-@user.command(short_help="Create a Meltano user account.")
+@user.command(cls=InstrumentedCmd, short_help="Create a Meltano user account.")
 @click.argument("username")
 @click.argument("password")
 @click.option(

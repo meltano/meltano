@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from meltano.cli.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedCmd
+from meltano.cli.utils import PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import StaleJobFailer
 from meltano.core.legacy_tracking import LegacyTracker
@@ -84,7 +84,9 @@ def _add_job(ctx, name: str, job: str, interval: str):
         session.close()
 
 
-@schedule.command(cls=InstrumentedCmd, short_help="[default] Add a new schedule.")
+@schedule.command(
+    cls=PartialInstrumentedCmd, short_help="[default] Add a new schedule."
+)
 @click.argument("name")
 @click.option("--interval", required=True, help="Interval of the schedule.")
 @click.option("--job", help="The name of the job to run.")
@@ -168,7 +170,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
 
 
 @schedule.command(  # noqa: WPS125
-    cls=InstrumentedCmd, short_help="List available schedules."
+    cls=PartialInstrumentedCmd, short_help="List available schedules."
 )  # noqa: WPS441
 @click.option("--format", type=click.Choice(["json", "text"]), default="text")
 @click.pass_context
@@ -229,7 +231,7 @@ def list(ctx, format):  # noqa: WPS125
 
 
 @schedule.command(
-    cls=InstrumentedCmd,
+    cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Run a schedule.",
 )
@@ -251,7 +253,9 @@ def run(ctx, name, elt_options):
         sys.exit(exitcode)
 
 
-@schedule.command(cls=InstrumentedCmd, name="remove", short_help="Remove a schedule.")
+@schedule.command(
+    cls=PartialInstrumentedCmd, name="remove", short_help="Remove a schedule."
+)
 @click.argument("name", required=True)
 @click.pass_context
 def remove(ctx, name):
@@ -334,7 +338,9 @@ def _update_elt_schedule(
     return candidate
 
 
-@schedule.command(cls=InstrumentedCmd, name="set", short_help="Update a schedule.")
+@schedule.command(
+    cls=PartialInstrumentedCmd, name="set", short_help="Update a schedule."
+)
 @click.argument("name", required=True)
 @click.option("--interval", help="Update the interval of the schedule.")
 @click.option("--job", help="Update the name of the job to run a scheduled job.")

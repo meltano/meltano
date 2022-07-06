@@ -37,9 +37,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
         "pip_url_hash": hash_sha256(plugin.formatted_pip_url)
         if plugin.formatted_pip_url
         else None,
-        "parent_name_hash": hash_sha256(plugin.parent.name)
-        if plugin.parent.name
-        else None,
+        "parent_name_hash": hash_sha256(plugin.parent.name) if plugin.parent else None,
         "command": cmd,
     }
 
@@ -119,10 +117,10 @@ class PluginsTrackingContext(SelfDescribingJson):
     def from_blocks(
         cls, parsed_blocks: list[BlockSet | PluginCommandBlock]
     ) -> PluginsTrackingContext:
-        """Create a PluginsTrackingContext from a list of BlockSet or PluginCommandBlock objects.
+        """Create a PluginsTrackingContext from a list of BlockSets or PluginCommandBlocks.
 
         Parameters:
-            parsed_blocks: The blocks to create the context for.
+            parsed_blocks: The blocks to create the context from.
 
         Returns:
             The PluginsTrackingContext for the given blocks.

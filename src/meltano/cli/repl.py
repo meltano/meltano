@@ -8,7 +8,8 @@ from meltano.cli.params import database_uri_option
 
 @cli.commands.repl  # Refer to `src/meltano/cli/commands.py`
 @database_uri_option
-def repl():
+@click.pass_context
+def repl(ctx: click.Context):
     """Start the Meltano REPL."""
     try:
         import IPython
