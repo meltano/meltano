@@ -14,6 +14,7 @@ jobs:
         include:
         - { integration_test: "meltano-basics", needs_postgres: false }
         - { integration_test: "meltano-run", needs_postgres: true }
+        - { integration_test: "meltano-objects", needs_postgres: false }
       fail-fast: false
 
     runs-on: ubuntu-latest
