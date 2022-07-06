@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, Dict, List, Optional, Set, Tuple
+from typing import AsyncIterator
 
 import structlog
 from sqlalchemy.orm import Session
