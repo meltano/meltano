@@ -60,7 +60,7 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 
 - When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
-- To disable tracking in all projects in one go, disable the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable
+- To disable tracking in all projects in one go, set the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable to `false`
 
 #### How to use
 
