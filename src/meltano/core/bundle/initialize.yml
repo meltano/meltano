@@ -1,10 +1,14 @@
 meltano.yml: |
   version: 1
   default_environment: dev
+  env: {}
   environments:
   - name: dev
+    env: {}
   - name: staging
+    env: {}
   - name: prod
+    env: {}
 README.md: ""
 requirements.txt: ""
 output/.gitignore: |

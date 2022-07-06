@@ -197,7 +197,7 @@ for command in (
     ),
     LazyCommand(
         name="run",
-        short_help="[preview] Run a set of plugins in series.",
+        short_help="Run a set of plugins in series.",
         cls=InstrumentedCmd,
     ),
     LazyCommand(
