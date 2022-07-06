@@ -5,7 +5,7 @@ from flask.testing import FlaskClient
 from flask.wrappers import Response
 from mock import AsyncMock, mock
 
-from meltano.core.plugin.settings_service import REDACTED_VALUE, SettingValueStore
+from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
 
 class TestOrchestration:

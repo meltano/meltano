@@ -104,6 +104,9 @@
       },
       "description": "Scheduled ELT jobs, added using 'meltano schedule'"
     },
+    "env": {
+      "$ref": "#/definitions/env"
+    },
     "jobs": {
       "type": "array",
       "items": {
@@ -269,6 +272,9 @@
           },
           "requires": {
             "$ref": "#/definitions/requires"
+          },
+          "env": {
+            "$ref": "#/definitions/env"
           }
         }
       },
@@ -725,14 +731,17 @@
     "schedules": {
       "type": "object",
       "oneOf": [
-        {"required": ["name", "job", "interval"]},
-        {"required": [
-          "name",
-          "extractor",
-          "loader",
-          "transform",
-          "interval",
-          "start_date"]}
+        { "required": ["name", "job", "interval"] },
+        {
+          "required": [
+            "name",
+            "extractor",
+            "loader",
+            "transform",
+            "interval",
+            "start_date"
+          ]
+        }
       ],
       "description": "https://www.meltano.com/docs/orchestration.html#orchestration",
       "additionalProperties": false,
@@ -778,10 +787,7 @@
     },
     "jobs": {
       "type": "object",
-      "required": [
-        "name",
-        "tasks"
-      ],
+      "required": ["name", "tasks"],
       "description": "https://docs.meltano.com/reference/command-line-interface#job",
       "additionalProperties": false,
       "properties": {
@@ -953,6 +959,21 @@
           "description": "The variant of the required plugin"
         }
       }
+    },
+    "env": {
+      "type": "object",
+      "description": "Mapping of environment variables for use in config.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
+      "examples": [
+        {
+          "SNOWFLAKE_ACCOUNT": "my.snowflake.account.com"
+        }
+      ]
     }
   }
 }
