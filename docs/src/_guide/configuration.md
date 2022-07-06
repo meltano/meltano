@@ -84,7 +84,7 @@ environments:
               MY_ENV_VAR: environment_level_plugin_env_var
 ```
 
-Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context), as you would expect:
+Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context):
 
 ```yaml
 - environment level plugin env # highest
@@ -129,21 +129,21 @@ For example, the following defines a `my_custom_username` setting with aliases `
 
 ```yaml
 # meltano.yml
-...
+---
 plugins:
   extractors:
-  - name: my-custom-tap
-    namespace: my_custom_tap
-    pip_url: git+https://github.com/my-organization/my-custom-tap.git
-    executable: my-custom-tap
-    capabilities:
-    - discover
-    - catalog
-    settings:
-    - name: password
-      kind: password
-    - name: my_custom_tap_username
-      aliases: [custom_tap_username, username]
+    - name: my-custom-tap
+      namespace: my_custom_tap
+      pip_url: git+https://github.com/my-organization/my-custom-tap.git
+      executable: my-custom-tap
+      capabilities:
+        - discover
+        - catalog
+      settings:
+        - name: password
+          kind: password
+        - name: my_custom_tap_username
+          aliases: [custom_tap_username, username]
 ```
 
 Within a given configuration layer, a setting can be set via only a single name, whether that name is its canonical name or one of its aliases.
@@ -152,6 +152,7 @@ So given the custom extractor defined above, the `my_custom_tap_username` settin
 But if more than one of these variables is set in the terminal environment, then an exception will be raised--even if all the relevant environment variables have the same value.
 
 The configuration setting could also be set via the [`meltano config set`](/reference/command-line-interface#config) by setting either the canonical name or any of its aliases. Again using the custom extractor defined above as an example, the `my_custom_tap_username` could be set by any of the following commands:
+
 ```bash
 # The canonical name
 meltano config my-custom-tap set my_custom_tap_username some_value
@@ -227,12 +228,12 @@ these variables can be referenced using standard variable expansion syntax, i.e.
 
 ```yaml
 extractors:
-- name: tap-example
-  config:
-    simple_setting: $MELTANO_EXTRACTOR_NAME
-    multiple_words: $MELTANO_EXTRACTOR_NAMESPACE foo
-    part_of_a_path: $MELTANO_PROJECT_ROOT/example.txt
-    inside_a_word: ${MELTANO_EXTRACTOR_NAMESPACE}_foo
+  - name: tap-example
+    config:
+      simple_setting: $MELTANO_EXTRACTOR_NAME
+      multiple_words: $MELTANO_EXTRACTOR_NAMESPACE foo
+      part_of_a_path: $MELTANO_PROJECT_ROOT/example.txt
+      inside_a_word: ${MELTANO_EXTRACTOR_NAMESPACE}_foo
 ```
 
 ### Accessing from plugins
@@ -261,22 +262,22 @@ that use the same package but still have their own configuration:
 ```yml
 plugins:
   extractors:
-  - name: tap-google-analytics
-    variant: meltano
-    config:
-      key_file_location: client_secrets.json
-      start_date: '2020-10-01T00:00:00Z'
-  - name: tap-ga--view-foo
-    inherit_from: tap-google-analytics
-    config:
-      # `key_file_location` and `start_date` are inherited
-      view_id: 123456
-  - name: tap-ga--view-bar
-    inherit_from: tap-google-analytics
-    config:
-      # `key_file_location` is inherited
-      start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
-      view_id: 789012
+    - name: tap-google-analytics
+      variant: meltano
+      config:
+        key_file_location: client_secrets.json
+        start_date: "2020-10-01T00:00:00Z"
+    - name: tap-ga--view-foo
+      inherit_from: tap-google-analytics
+      config:
+        # `key_file_location` and `start_date` are inherited
+        view_id: 123456
+    - name: tap-ga--view-bar
+      inherit_from: tap-google-analytics
+      config:
+        # `key_file_location` is inherited
+        start_date: "2020-12-01T00:00:00Z" # `start_date` is overridden
+        view_id: 789012
 ```
 
 In this example, `tap-ga--view-foo` and `tap-ga--view-bar` are separate plugins that
@@ -333,10 +334,10 @@ meltano config tap-example set custom_setting value
 
 ```yaml
 extractors:
-- name: tap-example
-  config:
-    known_setting: value
-    custom_setting: value
+  - name: tap-example
+    config:
+      known_setting: value
+      custom_setting: value
 ```
 
 As long as the custom setting exists in `meltano.yml`, it will behave and can be interacted with just like any regular (known) setting. It will show up in `meltano config <plugin> list` and `meltano config <plugin>`, and the value that will be passed on to the plugin can be [overridden using an environment variable](/guide/configuration#configuring-settings):
@@ -373,12 +374,12 @@ The values of these extras are stored in your [`meltano.yml` project file](/conc
 
 ```yaml
 extractors:
-- name: tap-example
-  config:
-    # Configuration goes here!
-    example_setting: value
-  # Extras go here!
-  example_extra: value
+  - name: tap-example
+    config:
+      # Configuration goes here!
+      example_setting: value
+    # Extras go here!
+    example_extra: value
 ```
 
 These extras can be thought of and interacted with as a special kind of setting,
