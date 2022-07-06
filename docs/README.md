@@ -79,7 +79,7 @@ This is added to all pages by default. It can be turned off by setting `toc: fal
 
 ### Add/Remove/Edit an Announcement
 
-You can edit the announcement and CTA under the `announcement` section in `_config.yml`.
+You can edit the announcement and CTA under the `announcement` section in `_config.yml`. 
 
 - `display` - Set this to `true` to display an announcement or set it to `false` to hide it.
 - `text` - This is the announcement text. Keep it short and sweet (~140 characters or less) so it's not intrusive on the page.

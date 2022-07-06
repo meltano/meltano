@@ -50,7 +50,7 @@ version_bump_trigger:
     - git config --global user.email "hello@meltano.com"
     - git config --global user.name "Gitlab CI (bot)"
     - pip install changelog-cli bumpversion
-    # - poetry install
+    # - poetry install 
   script:
     - |
       echo "Setting up 'discovery.yml' sync from 'hub.meltano.com'..."

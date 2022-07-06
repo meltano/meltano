@@ -1,21 +1,21 @@
 <aside class="menu is-fullheight is-narrow-mobile is-hidden-mobile">
-  <ul class="menu-list">
+  <ul class="menu-list">  
     <li>
       <a href="/getting-started" class="{% if page.url == '/getting-started' %}is-active{% endif %}">Getting Started</a>
-    </li>
+    </li>  
   </ul>
   {% if site.collections %}
     {% assign collections = site.collections | sort: 'weight' %}
     {% for collection in collections %}
       {% if collection.label != "posts" %}
-        <p class="menu-label">
+        <p class="menu-label"> 
         {% if collection.icon %}
           {% assign icon = collection.icon %}
           <span class="icon"><i class="fas {{ icon }}"></i></span>
         {% else %}
           <span class="icon"><i class="fas fa-book-open"></i></span>
         {% endif %}
-
+        
         {{ collection.name | capitalize }}
         </p>
         <ul class="menu-list">
@@ -33,4 +33,4 @@
       {% endif %}
     {% endfor %}
   {% endif %}
-</aside>
+</aside> 

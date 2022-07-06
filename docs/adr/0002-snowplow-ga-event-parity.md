@@ -8,8 +8,8 @@ Proposed
 
 ## Context
 
-We are aiming to move away from Google Anlaytics (GA) event tracking and towards Snowplow so that we can
-improve and increase the kind of data we're receiving from users.
+We are aiming to move away from Google Anlaytics (GA) event tracking and towards Snowplow so that we can 
+improve and increase the kind of data we're receiving from users. 
 This work is tracked in [epic 122](https://gitlab.com/groups/meltano/-/epics/122). (**Please Note:** We have recently migrated our projects to GitHub but have left this epic to preserve issue history. You can find links to these issues on GitHub  at the bottom of each issue that appears in this GitLab epic.)
 
 Part of the value of Snowplow is the ability to define schemas for events therby enabling a overall
@@ -18,7 +18,7 @@ better structure and understanding of event meaning for downstream analytics use
 ## Decision
 
 As a first iteration to gain parity between Google Anlaytics and Snowplow, we will implement a dual-reporting
-event structure and send identical events to both services.
+event structure and send identical events to both services. 
 
 This will enable us to have better continuity in metrics so there is no risk of data loss or misreporting.
 We will be able to validate Snowplow derived metrics with their GA equivalent prior to any GA deprecation.

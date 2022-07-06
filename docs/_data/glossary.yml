@@ -9,7 +9,7 @@
 - dag:
   term: DAG
   definition: "DAG means Directed Acyclic Graph. Within data workflows, any sequence of tasks can be represented as a DAG when the individual tasks are linked. This is done explicitly in dbt via the \"ref\" function."
-  link:
+  link: 
 - dataops:
   term: DataOps
   definition: "DataOps brings the benefits of DevOps best practices to the data lifecycle."
@@ -21,7 +21,7 @@
 - env:
   term: .env File
   definition: ".env (pronounced \"dot ehnv\") files allow you to configure environment variables within an application. This is useful for passing credentials and secrets to an app without so that you don't need to check passwords or keys into version control."
-  link:
+  link: 
 - docker:
   term: Docker
   definition: a thing
@@ -49,7 +49,7 @@
 - state:
   term: State
   definition: "In Singer extract-load pipelines, the word 'state' is used to refer to progress trackers and artifacts that enable incremental replication. The state for a tap is a JSON object contain the set of bookmarks that track the resume-point for all streams being replicated."
-  link:
+  link: 
 - streams:
   term: Streams
   definition: "In the Singer ecosystem, a stream typically represents a table, API endpoint, or discrete set of data."
@@ -65,7 +65,7 @@
 - target:
   term: Target
   definition: "In Singer extract-load pipelines, the word target is synonymous with loader. This is the plugin that defines how data should be written to the destination."
-  link:
+  link: 
 - transformation:
   term: Transformation
   definition: "Data transformation in a modern DataOps platform is a reproducible data shaping process that does not modify source data. Data transformation occurs after EL (extract-load) operations have been executed. Data is shaped or \"transformed\" into more usable datasets, according to the business logic and use cases which are most valuable to the audience."
