@@ -37,10 +37,11 @@ def get_label(metadata) -> str:
         string describing the source of the variable's value
     """
     source = metadata["source"]
-    if "env_var" in metadata:
+    try:
         return f"from the {metadata['env_var']} variable in {source.label}"
-    else:
+    except KeyError:
         return f"from {source.label}"
+
 
 @cli.group(
     cls=InstrumentedGroup,
