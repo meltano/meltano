@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 
 from meltano.core.project_settings_service import (
@@ -129,3 +131,37 @@ class TestProjectSettingsService:
             "${NONEXISTENT_ENV_VAR}@nonexistent_1",
         )
         assert subject.get("stacked_env_var") == "@nonexistent_1"
+
+    def test_warn_if_default_setting_is_used(self, subject, monkeypatch):
+        # Assert that warnings are not raised in the following cases:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+
+            for ff in FeatureFlags:
+                subject.get(f"{FEATURE_FLAG_PREFIX}.{ff}")
+
+            subject.get("project_id")
+            subject.get("disable_tracking")
+
+            ProjectSettingsService.config_override.pop(
+                "send_anonymous_usage_stats", None
+            )
+            subject.config_override.pop("send_anonymous_usage_stats", None)
+            subject.unset("send_anonymous_usage_stats")
+
+            monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
+            assert subject.get("send_anonymous_usage_stats")
+            monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
+            assert not subject.get("send_anonymous_usage_stats")
+            monkeypatch.delenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS")
+            subject.get("send_anonymous_usage_stats")
+
+        # Assert that warnings are raised in the following cases:
+        for setting in (
+            "projectID",
+            "tracking_disabled",
+            "MELTANO_SEND_ANONYMOUS_USAGE_STATS",
+            "send_anon_usage_stats",
+        ):
+            with pytest.warns(RuntimeWarning):
+                subject.get(setting)
