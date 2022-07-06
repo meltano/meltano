@@ -59,7 +59,7 @@ repos:
     language: system
     args:
     - "--py3-plus"
-    - "--py36-plus"
+    - "--py37-plus"
     - "--keep-mock"
     types: [python]
     files: '.py'
