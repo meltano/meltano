@@ -390,6 +390,15 @@ class TestProjectFiles:
               env:
                 TEST: TEST-MELTANO
 
+            jobs:  # My jobs
+            # An EL job with mapping
+            - name: my-job
+              tasks:
+              - >-
+                tap-meltano-yml
+                map-meltano-yml
+                target-meltano-yml
+
             plugins:
               # Project plugins
               extractors:
@@ -412,17 +421,8 @@ class TestProjectFiles:
 
               loaders:
               - name: target-meltano-yml
-
               - name: modified-target-subconfig-1-yml
 
-            jobs:  # My jobs
-            # An EL job with mapping
-            - name: my-job
-              tasks:
-              - >-
-                tap-meltano-yml
-                map-meltano-yml
-                target-meltano-yml
         """
 
         assert contents == dedent(expected_contents)

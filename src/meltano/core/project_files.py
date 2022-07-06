@@ -19,6 +19,12 @@ logger = logging.getLogger(__name__)
 TMapping = TypeVar("TMapping", bound=MutableMapping)
 
 BLANK_SUBFILE = {"plugins": {}, "schedules": []}  # noqa: WPS407
+MULTI_FILE_KEYS = {
+    "plugins",
+    "schedules",
+    "environments",
+    "jobs",
+}
 
 
 def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
@@ -280,7 +286,7 @@ class ProjectFiles:  # noqa: WPS214
         for key, value in config.items():
             if key == "plugins":
                 self._add_plugins(file_dicts, value)
-            elif key in {"schedules", "environments"}:
+            elif key in MULTI_FILE_KEYS:
                 self._add_sequence_entry(file_dicts, key, value)
             else:
                 file = str(self._meltano_file_path)

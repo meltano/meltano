@@ -24,6 +24,15 @@ environments:
   env:
     TEST: TEST-MELTANO
 
+jobs:  # My jobs
+# An EL job with mapping
+- name: my-job
+  tasks:
+  - >-
+    tap-meltano-yml
+    map-meltano-yml
+    target-meltano-yml
+
 plugins:
   # Project plugins
   extractors:
@@ -44,12 +53,3 @@ plugins:
 
   loaders:
     - name: target-meltano-yml
-
-jobs:  # My jobs
-# An EL job with mapping
-- name: my-job
-  tasks:
-  - >-
-    tap-meltano-yml
-    map-meltano-yml
-    target-meltano-yml
