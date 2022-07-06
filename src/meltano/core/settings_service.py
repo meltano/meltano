@@ -98,6 +98,7 @@ class SettingsService(ABC):  # noqa: WPS214
         self.show_hidden = show_hidden
 
         self.env_override = env_override or {}
+
         self.config_override = config_override or {}
 
         self._setting_defs = None
@@ -127,7 +128,7 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             prefixes for settings environment variables
         """
-        return []
+        return ["meltano"]
 
     @property
     @abstractmethod

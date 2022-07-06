@@ -7,15 +7,16 @@ import pytest
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.settings_service import (
-    REDACTED_VALUE,
-    PluginSettingsService,
-    SettingValueStore,
-)
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
-from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
+from meltano.core.settings_service import (
+    FEATURE_FLAG_PREFIX,
+    REDACTED_VALUE,
+    FeatureFlags,
+    SettingValueStore,
+)
 from meltano.core.settings_store import (
     ConflictingSettingValueException,
     MultipleEnvVarsSetException,

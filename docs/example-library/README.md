@@ -13,7 +13,7 @@ I many cases, these examples actually double as our [integration tests](https://
 
 | Example name                                           | Description                                                                                   |
 |--------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| [meltano basics](/docs/example-library/meltano-basic/) | A basic 30 second demo - using a prepopulated meltano.yml.                                    |
+| [meltano basics](/docs/example-library/meltano-basics/) | A basic 30 second demo - using a prepopulated meltano.yml.                                    |
 | [meltano run](/docs/example-library/meltano-run/)      | How to get up and running using `meltano run` with `tap-gitlab`, `target-postgres` and `dbt`. |
 
 ## Contributing to the Meltano example library
