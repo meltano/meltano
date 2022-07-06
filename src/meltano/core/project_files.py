@@ -285,7 +285,6 @@ class ProjectFiles:  # noqa: WPS214
 
     def _split_config_dict(self, config: CommentedMap):
         file_dicts: dict[str, CommentedMap] = {}
-        self._restore_included_file_key_order(file_dicts)
 
         # Fill in the top-level entries
         for key, value in config.items():
@@ -298,23 +297,39 @@ class ProjectFiles:  # noqa: WPS214
                 file_dict = file_dicts.setdefault(file, CommentedMap())
                 file_dict[key] = value
 
-        # Copy comments from the original config to the new config
-        config.copy_attributes(file_dicts[str(self._meltano_file_path)])
-        self._copy_yaml_attributes(file_dicts)
-        return file_dicts
+        # Make sure that the top-level keys are in the same order as the original files
+        sorted_file_dicts = self._restore_file_key_order(file_dicts)
 
-    def _restore_included_file_key_order(self, file_dicts: dict[str, CommentedMap]):
-        """Restore the order of the keys in the included files.
+        # Copy comments from the original config to the new config
+        config.copy_attributes(sorted_file_dicts[str(self._meltano_file_path)])
+        self._copy_yaml_attributes(sorted_file_dicts)
+        return sorted_file_dicts
+
+    def _restore_file_key_order(self, file_dicts: dict[str, CommentedMap]):
+        """Restore the order of the keys in the meltano project files.
 
         Args:
             file_dicts: The dictionary mapping included files to their contents.
+
+        Returns:
+            The file contents mapping with order preserved from the original files.∫
         """
-        # Create the top-level entries in the right order first
+        sorted_file_dicts: dict[str, CommentedMap] = {}
+
         for file, contents in self._raw_contents_map.items():
+            new_keys = [key for key in file_dicts[file] if key not in contents]
+
             # Restore sorting in project files
-            file_dicts[file] = CommentedMap()
-            for key, value in contents.items():
-                file_dicts[file][key] = value.__class__()
+            sorted_file_dicts[file] = CommentedMap()
+            for key in contents.keys():
+                if key in file_dicts[file]:
+                    sorted_file_dicts[file][key] = file_dicts[file][key]  # noqa: WPS529
+
+            # Add the new keys at the end
+            for new_key in new_keys:
+                sorted_file_dicts[file][new_key] = file_dicts[file][new_key]
+
+        return sorted_file_dicts
 
     def _copy_yaml_attributes(  # noqa: WPS210
         self,
