@@ -149,11 +149,6 @@ def install_batch():  # noqa: WPS210
     add_service = ProjectAddService(project, plugins_service=plugins_service)
     required_plugins = add_service.add_required(plugin)
 
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `required_plugins`, but should
-    # be installed first.
-    required_plugins.reverse()
-
     # This was added to assist api_worker threads
     try:
         asyncio.get_event_loop()
