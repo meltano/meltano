@@ -25,7 +25,6 @@
 
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
 /CHANGELOG.md @meltano/engineering
-/cookiecutter/**/pyproject.toml @meltano/engineering
 /docs/package.json @meltano/engineering
 /package.json  @meltano/engineering
 /pyproject.toml  @meltano/engineering
