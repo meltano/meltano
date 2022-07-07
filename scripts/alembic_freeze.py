@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+"""Script to freeze the Meltano database - executed by the Makefile."""
+
 from alembic.script import ScriptDirectory
 
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR

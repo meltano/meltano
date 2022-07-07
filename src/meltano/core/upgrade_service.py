@@ -1,12 +1,16 @@
+"""Meltano upgrade service."""
+
+from __future__ import annotations
+
 import logging
 import os
 import signal
 import subprocess
 import sys
-from typing import Optional
 
 import click
 import psutil
+from sqlalchemy.engine import Engine
 
 import meltano
 from meltano.cli.utils import PluginInstallReason, install_plugins
@@ -15,21 +19,38 @@ from meltano.core.project_plugins_service import PluginType, ProjectPluginsServi
 
 
 class UpgradeError(Exception):
-    """Occurs when the Meltano upgrade fails"""
+    """Occurs when the Meltano upgrade fails."""
 
 
 class AutomaticPackageUpgradeError(Exception):
-    def __init__(self, reason, instructions):
+    """Occurs when an automatic upgrade of Meltano fails."""
+
+    def __init__(self, reason: str, instructions: str):
+        """Initialize the `AutomaticPackageUpgradeError`.
+
+        Parameters:
+            reason: The reason the exception occured.
+            instructions: Instructions for how to manually resolve the exception.
+        """
         self.reason = reason
         self.instructions = instructions
 
 
 class UpgradeService:
-    def __init__(self, engine, project: Project):
+    """Meltano upgrade service."""
+
+    def __init__(self, engine: Engine, project: Project):
+        """Initialize the Meltano upgrade service.
+
+        Parameters:
+            engine: The SQLAlchemy engine to be used for the upgrade.
+            project: The Meltano project.
+        """
         self.project = project
         self.engine = engine
 
     def reload_ui(self):
+        """Reload the Meltano UI."""
         click.secho("Reloading UI...", fg="blue")
 
         pid_file_path = self.project.run_dir("gunicorn.pid")
@@ -44,11 +65,11 @@ class UpgradeService:
         except Exception as ex:
             logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
-    def _upgrade_package(self, pip_url: Optional[str] = None, force=False):
+    def _upgrade_package(self, pip_url: str | None, force: bool) -> bool:
         meltano_file_path = "/src/meltano/__init__.py"
         editable = meltano.__file__.endswith(meltano_file_path)
         if editable and not force:
-            meltano_dir = meltano.__file__[0 : -len(meltano_file_path)]
+            meltano_dir = meltano.__file__[: -len(meltano_file_path)]
             raise AutomaticPackageUpgradeError(
                 reason="it is installed from source",
                 instructions=f"navigate to `{meltano_dir}` and run `git pull`",
@@ -69,21 +90,24 @@ class UpgradeService:
         )
 
         if run.returncode != 0:
-            raise UpgradeError(f"Failed to upgrade `meltano`.", run)
+            raise UpgradeError("Failed to upgrade `meltano`.", run)
 
         return True
 
-    def upgrade_package(self, *args, **kwargs):
+    def upgrade_package(self, pip_url: str | None = None, force: bool = False) -> bool:
+        """Upgrade the Meltano package.
+
+        Parameters:
+            pip_url: The pip URL to use when upgrading the Meltano package.
+            force: Whether editable installations from source should be overwritten.
+
+        Returns:
+            Whether the upgrade was successful.
+        """
         click.secho("Upgrading `meltano` package...", fg="blue")
 
         try:
-            self._upgrade_package(*args, **kwargs)
-            click.echo("The `meltano` package has been upgraded.")
-
-            click.echo()
-            self.reload_ui()
-
-            return True
+            self._upgrade_package(pip_url, force)
         except AutomaticPackageUpgradeError as err:
             click.echo(
                 f"{click.style('The `meltano` package could not be upgraded automatically', fg='red')} because {err.reason}."
@@ -91,10 +115,13 @@ class UpgradeService:
             click.echo(f"To upgrade manually, {err.instructions}.")
             return False
 
+        click.echo("The `meltano` package has been upgraded.")
+        click.echo()
+        self.reload_ui()
+        return True
+
     def update_files(self):
-        """
-        Update the files managed by Meltano inside the current project.
-        """
+        """Update the files managed by Meltano inside the current project."""
         click.secho("Updating files managed by plugins...", fg="blue")
 
         file_plugins = ProjectPluginsService(self.project).get_plugins_of_type(
@@ -107,6 +134,11 @@ class UpgradeService:
         install_plugins(self.project, file_plugins, reason=PluginInstallReason.UPGRADE)
 
     def migrate_database(self):
+        """Migrate the Meltano database.
+
+        Raises:
+            UpgradeError: The migration failed.
+        """
         click.secho("Applying migrations to system database...", fg="blue")
 
         from meltano.core.migration_service import MigrationError, MigrationService
@@ -118,7 +150,13 @@ class UpgradeService:
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 
-    def upgrade(self, skip_package=False, **kwargs):
+    def upgrade(self, skip_package: bool = False, **kwargs):
+        """Upgrade Meltano.
+
+        Parameters:
+            skip_package: Whether the Meltano package should be upgraded.
+            kwargs: Keyword arguments for `UpgradeService.upgrade_package`.
+        """
         package_upgraded = False
         if not skip_package:
             package_upgraded = self.upgrade_package(**kwargs)
@@ -135,11 +173,10 @@ class UpgradeService:
         click.echo()
         self.migrate_database()
         click.echo()
-
         click.echo()
-        if package_upgraded:
-            click.secho(
-                "Meltano and your Meltano project have been upgraded!", fg="green"
-            )
-        else:
-            click.secho("Your Meltano project has been upgraded!", fg="green")
+        click.secho(
+            "Meltano and your Meltano project have been upgraded!"
+            if package_upgraded
+            else "Your Meltano project has been upgraded!",
+            fg="green",
+        )
