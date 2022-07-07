@@ -24,7 +24,6 @@
 /docs/example-library/ @meltano/product @meltano/engineering
 
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
-/.bumpversion.cfg @meltano/engineering
 /CHANGELOG.md @meltano/engineering
 /cookiecutter/**/pyproject.toml @meltano/engineering
 /docs/package.json @meltano/engineering
