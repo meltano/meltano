@@ -848,12 +848,19 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
-        monkeypatch.setenv(env_var(subject, "_vars.var"), "from_env")
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars.var"), "from_env")
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env", "other": "from_meltano_yml"},
+                SettingValueStore.ENV,
+            )
 
-        assert subject.get_with_source("_vars") == (
-            {"var": "from_env", "other": "from_meltano_yml"},
-            SettingValueStore.ENV,
-        )
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env"},
+                SettingValueStore.ENV,
+            )
 
         subject.set(
             "_vars",
@@ -862,11 +869,11 @@ class TestPluginSettingsService:
         )
         assert subject.get_with_source("_vars") == (
             {
-                "var": "from_env",
+                "var": "from_default",
                 "other": "from_meltano_yml",
                 "dev_setting": "from_dev_env",
             },
-            SettingValueStore.ENV,
+            SettingValueStore.MELTANO_ENV,
         )
 
     def test_find_setting_raises_with_conflicting(
