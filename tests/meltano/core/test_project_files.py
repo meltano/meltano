@@ -451,3 +451,37 @@ class TestProjectFiles:
 
         included_path = project_files.root / "subconfig_2.yml"
         assert included_path.read_text() == dedent(expected_subconfig_2_contents)
+
+    def test_remove_all_file_contents(self, project_files):
+        meltano_config = project_files.load()
+        meltano_config["plugins"]["extractors"] = [
+            entry
+            for entry in meltano_config["plugins"]["extractors"]
+            if entry["name"] != "tap-subconfig-2-yml"
+        ]
+        meltano_config["plugins"]["loaders"] = [
+            entry
+            for entry in meltano_config["plugins"]["loaders"]
+            if entry["name"] != "target-subconfig-2-yml"
+        ]
+        meltano_config["schedules"] = [
+            entry
+            for entry in meltano_config["schedules"]
+            if entry["name"] != "test-subconfig-2-yml"
+        ]
+        meltano_config["environments"] = [
+            entry
+            for entry in meltano_config["environments"]
+            if entry["name"] != "test-subconfig-2-yml"
+        ]
+        project_files.update(meltano_config)
+
+        expected_subconfig_2_contents = """\
+        plugins: {}
+        schedules: []
+        jobs: []
+        environments: []
+        """
+
+        included_path = project_files.root / "subconfig_2.yml"
+        assert included_path.read_text() == dedent(expected_subconfig_2_contents)

@@ -18,7 +18,14 @@ from meltano.core.yaml import configure_yaml
 logger = logging.getLogger(__name__)
 TMapping = TypeVar("TMapping", bound=MutableMapping)
 
-BLANK_SUBFILE = {"plugins": {}, "schedules": []}  # noqa: WPS407
+BLANK_SUBFILE = CommentedMap(
+    [
+        ("plugins", {}),
+        ("schedules", []),
+        ("jobs", []),
+        ("environments", []),
+    ]
+)
 MULTI_FILE_KEYS = {
     "plugins",
     "schedules",
@@ -317,6 +324,9 @@ class ProjectFiles:  # noqa: WPS214
         sorted_file_dicts: dict[str, CommentedMap] = {}
 
         for file, contents in self._raw_contents_map.items():
+            if file not in file_dicts:
+                continue
+
             new_keys = [key for key in file_dicts[file] if key not in contents]
 
             # Restore sorting in project files
