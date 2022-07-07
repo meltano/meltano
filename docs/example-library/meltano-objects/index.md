@@ -8,7 +8,7 @@ To begin, download or copy the [meltano.yml](/docs/example-library/meltano-objec
 
 ## Add a few plugins
 
-```
+```shell
 meltano add extractor tap-gitlab
 meltano add loader target-jsonl
 ```
