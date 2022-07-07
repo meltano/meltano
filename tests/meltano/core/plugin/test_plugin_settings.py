@@ -16,7 +16,10 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
 from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
-from meltano.core.settings_store import ConflictingSettingValueException, MultipleEnvVarsSetException
+from meltano.core.settings_store import (
+    ConflictingSettingValueException,
+    MultipleEnvVarsSetException,
+)
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 
@@ -793,6 +796,7 @@ class TestPluginSettingsService:
 
     def test_extra_object(
         self,
+        active_environment,
         subject,
         monkeypatch,
         env_var,
@@ -832,7 +836,11 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
-        subject.set("_vars", {"other": "from_meltano_yml"})
+        subject.set(
+            "_vars",
+            {"other": "from_meltano_yml"},
+            store=SettingValueStore.MELTANO_YML,
+        )
 
         assert subject.get_with_source("_vars") == (
             {"var": "from_default", "other": "from_meltano_yml"},
@@ -846,10 +854,17 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-        monkeypatch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
-
+        subject.set(
+            "_vars",
+            {"dev_setting": "from_dev_env"},
+            store=SettingValueStore.MELTANO_ENV,
+        )
         assert subject.get_with_source("_vars") == (
-            {"var": "from_env"},
+            {
+                "var": "from_env",
+                "other": "from_meltano_yml",
+                "dev_setting": "from_dev_env",
+            },
             SettingValueStore.ENV,
         )
 
@@ -863,7 +878,8 @@ class TestPluginSettingsService:
             subject.get("aliased")
 
     def test_find_setting_raises_with_multiple(
-            self, tap, plugin_settings_service_factory, monkeypatch):
+        self, tap, plugin_settings_service_factory, monkeypatch
+    ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
         monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_0")
