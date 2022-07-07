@@ -34,7 +34,7 @@ ELT is often used interchangeably with ETL. However, the two approaches have a f
 * The mechanics behind ELT mean that the data is loaded directly into the destination data warehouse or data lake, where it is transformed before being exported in the end-user format. The key detail is that transformation happens after the replication steps are complete. This is the key benefit we will touch on later.
 * In ETL, however, the transformation step happens earlier in a separate staging environment. After the ETL interprets, cleans up and organizes the data in this environment, it loads the ready-made information into the destination storage where end users can access it. The ETL process requires the transformation of data to happen while it is in midflight.
 
-The ultimate goal of both the ETL and ELT process is to transform raw, unprocessed data into valuable and comprehensible insights, such as analytics reports. Both methods achieve this but the latter is preferable for the following reasons. 
+The ultimate goal of both the ETL and ELT process is to transform raw, unprocessed data into valuable and comprehensible insights, such as analytics reports. Both methods achieve this but the latter is preferable for the following reasons.
 
 ## 4 Key Advantages ELT Has Over ETL
 While the two processes have their similarities, ELT has a few clear advantages over ETL, thanks to the inherent efficiency, reliability and scalability built into the flow. Let's look at four key points that make ELT the superior process between the two.
@@ -45,7 +45,7 @@ The transformation is where you want to apply your business logic you're cleansi
 #### Advantage #3: Fewer Errors and Duplicate Work
 When you do the transformation in the middle, then you're in, you're imposing your business logic on the data. While it's in flight, as your business laws changes, you have no way to rerun what you ran at that point in time. You're also going to have a lot more failures.
 #### Advantage #4: Collaborative and Cost Effective
-What is helpful about ELT is that you can have a kind of virtuous downstream cycle. The example being, I extract and load transform and publish. But my teammate also needs to extract from me and they can have the same process and so on and so on and so on. So you can have a core team doing ELT. They can also have subscribing teams which can have subscribing teams and so on and so on. 
+What is helpful about ELT is that you can have a kind of virtuous downstream cycle. The example being, I extract and load transform and publish. But my teammate also needs to extract from me and they can have the same process and so on and so on and so on. So you can have a core team doing ELT. They can also have subscribing teams which can have subscribing teams and so on and so on.
 The benefit of this ETL process here is that they have an official record of whatever we published on that day. You are able to restate everything to your downstream consumer who will have some record of what I published on that day. And that's one of the reasons why we have a separate EL step vs including the transformation in with the replication.
 
 ## When To Use The ELT Process
@@ -64,7 +64,7 @@ Meltano is an open-source ELT platform powered by:
 * dbt’s transformation protocols
 * Airflow’s workflow orchestration framework
 
-Aimed at data consultants, engineers and developers of data products, Meltano is a self-hosted solution that can be integrated into any local machine or production environment and managed via a built-in command line interface (CLI). 
+Aimed at data consultants, engineers and developers of data products, Meltano is a self-hosted solution that can be integrated into any local machine or production environment and managed via a built-in command line interface (CLI).
 True to our open-source roots, Meltano is supported by a global network of 1,900+ data specialists at startups and Fortune 500 companies alike. Our goal is to become the leading DataOps Ops and enable our users to build next-generation data stacks.
 
 ## Key ELT Facts To Remember
@@ -76,4 +76,3 @@ By comparison, ELT is more streamlined and follows the key principle of a data p
 In other words, ELT means cost-effectiveness, flexibility and limitless collaboration.
 
 Get Started with [Meltano ELT Today](/reference/command-line-interface#elt)
-
