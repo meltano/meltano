@@ -4,11 +4,13 @@ import click
 
 from meltano.cli.cli import cli
 from meltano.cli.params import database_uri_option
+from meltano.cli.utils import InstrumentedCmd
 
 
-@cli.command(hidden=True)
+@cli.command(cls=InstrumentedCmd, hidden=True)
 @database_uri_option
-def repl():
+@click.pass_context
+def repl(ctx: click.Context):
     """Start the Meltano REPL."""
     try:
         import IPython

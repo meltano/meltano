@@ -31,5 +31,8 @@
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-vue": "^5.0.0"
+  },
+  "prettier": {
+    "embeddedLanguageFormatting": "off"
   }
 }

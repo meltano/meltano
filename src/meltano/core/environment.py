@@ -27,6 +27,7 @@ class EnvironmentPluginConfig(PluginRef):
         plugin_type: PluginType,
         name: str,
         config: dict | None = None,
+        env: dict | None = None,
         **extras,
     ):
         """Create a new plugin configuration object.
@@ -35,10 +36,12 @@ class EnvironmentPluginConfig(PluginRef):
             plugin_type: Extractor, loader, etc.
             name: Name of the plugin.
             config: Plugin configuration.
+            env: Plugin environment variables.
             extras: Plugin extras.
         """
         super().__init__(plugin_type, name)
         self.config = copy.deepcopy(config or {})
+        self.env = copy.deepcopy(env or {})
         self.extras = extras
 
     @property
