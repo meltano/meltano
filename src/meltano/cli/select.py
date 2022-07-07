@@ -1,19 +1,18 @@
 """Extractor selection management CLI."""
-
-from typing import Dict
+from __future__ import annotations
 
 import click
 
 from meltano.core.db import project_engine
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
+from meltano.core.project import Project
 from meltano.core.select_service import SelectService
 from meltano.core.utils import click_run_async
 
 from . import cli
 from .params import pass_project
-from .utils import CliError
+from .utils import CliError, InstrumentedCmd
 
 
 def selection_color(selection):
@@ -39,7 +38,7 @@ def selection_mark(selection):
     return f"[{selection:<{colwidth}}]"
 
 
-@cli.command(short_help="Manage extractor selection patterns.")
+@cli.command(cls=InstrumentedCmd, short_help="Manage extractor selection patterns.")
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")
@@ -62,13 +61,15 @@ def selection_mark(selection):
     help="Exclude all attributes that match specified pattern.",
 )
 @pass_project(migrate=True)
+@click.pass_context
 @click_run_async
 async def select(
-    project,
-    extractor,
-    entities_filter,
-    attributes_filter,
-    **flags: Dict[str, bool],
+    ctx: click.Context,
+    project: Project,
+    extractor: str,
+    entities_filter: str,
+    attributes_filter: str,
+    **flags: dict[str, bool],
 ):
     """
     Manage extractor selection patterns.
@@ -87,9 +88,7 @@ async def select(
                 exclude=flags["exclude"],
                 remove=flags["remove"],
             )
-
-        tracker = LegacyTracker(project)
-        tracker.track_meltano_select(
+        ctx.obj["legacy_tracker"].track_meltano_select(
             extractor=extractor,
             entities_filter=entities_filter,
             attributes_filter=attributes_filter,

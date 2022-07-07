@@ -13,10 +13,11 @@ from meltano.core.task_sets_service import (
     JobNotFoundError,
     TaskSetsService,
 )
-from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 
 from . import CliError, cli
 from .params import pass_project
+from .utils import InstrumentedGroup, PartialInstrumentedCmd
 
 logger = structlog.getLogger(__name__)
 
@@ -87,7 +88,7 @@ def _list_all_jobs(
     tracker.track_command_event(CliEvent.completed)
 
 
-@cli.group(short_help="Manage jobs.")
+@cli.group(cls=InstrumentedGroup, short_help="Manage jobs.")
 @click.pass_context
 @pass_project(migrate=True)
 def job(project, ctx):
@@ -119,15 +120,9 @@ def job(project, ctx):
     """
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
-    tracker = Tracker(project)
-    tracker.add_contexts(CliContext("job", ctx.invoked_subcommand or None))
-    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
-    tracker.track_command_event(CliEvent.started)
-    ctx.obj["tracker"] = tracker
-    ctx.obj["legacy_tracker"] = legacy_tracker
 
 
-@job.command(name="list", short_help="List job(s).")
+@job.command(cls=PartialInstrumentedCmd, name="list", short_help="List job(s).")
 @click.option(
     "--format",
     "list_format",
@@ -146,7 +141,9 @@ def list_jobs(ctx, list_format: str, job_name: str):
         _list_all_jobs(task_sets_service, list_format, ctx)
 
 
-@job.command(name="add", short_help="Add a new job with tasks.")
+@job.command(
+    cls=PartialInstrumentedCmd, name="add", short_help="Add a new job with tasks."
+)
 @click.argument(
     "job_name",
     required=True,
@@ -203,7 +200,9 @@ def add(ctx, job_name: str, raw_tasks: str):
     tracker.track_command_event(CliEvent.completed)
 
 
-@job.command(name="set", short_help="Update an existing jobs tasks")
+@job.command(
+    cls=PartialInstrumentedCmd, name="set", short_help="Update an existing jobs tasks"
+)
 @click.argument(
     "job_name",
     required=True,
@@ -232,6 +231,8 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """
     tracker: Tracker = ctx.obj["tracker"]
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
+
     project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
@@ -252,12 +253,11 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
 
     click.echo(f"Updated job {task_sets.name}: {task_sets.tasks}")
 
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
     legacy_tracker.track_meltano_job("set", job_name)
     tracker.track_command_event(CliEvent.completed)
 
 
-@job.command(name="remove", short_help="Remove a job.")
+@job.command(cls=PartialInstrumentedCmd, name="remove", short_help="Remove a job.")
 @click.argument("job_name", required=True)
 @click.pass_context
 def remove(ctx, job_name: str):  # noqa: WPS442

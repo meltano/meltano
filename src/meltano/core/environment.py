@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Dict, Iterable, List, Optional, Type, TypeVar
+from typing import Any, Iterable, TypeVar
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -26,7 +26,8 @@ class EnvironmentPluginConfig(PluginRef):
         self,
         plugin_type: PluginType,
         name: str,
-        config: Optional[dict] = None,
+        config: dict | None = None,
+        env: dict | None = None,
         **extras,
     ):
         """Create a new plugin configuration object.
@@ -35,10 +36,12 @@ class EnvironmentPluginConfig(PluginRef):
             plugin_type: Extractor, loader, etc.
             name: Name of the plugin.
             config: Plugin configuration.
+            env: Plugin environment variables.
             extras: Plugin extras.
         """
         super().__init__(plugin_type, name)
         self.config = copy.deepcopy(config or {})
+        self.env = copy.deepcopy(env or {})
         self.extras = extras
 
     @property
@@ -60,7 +63,7 @@ class EnvironmentPluginConfig(PluginRef):
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
-    def config_with_extras(self, new_config_with_extras: Dict[str, Any]):
+    def config_with_extras(self, new_config_with_extras: dict[str, Any]):
         """Set plugin configuration values from the Meltano environment.
 
         Args:
@@ -77,7 +80,7 @@ class EnvironmentPluginConfig(PluginRef):
 
     def get_orphan_settings(
         self, existing: Iterable[SettingDefinition]
-    ) -> List[SettingDefinition]:
+    ) -> list[SettingDefinition]:
         """Get orphan settings for this plugin.
 
         Orphan settings are `config` entries that do not have a
@@ -95,7 +98,7 @@ class EnvironmentPluginConfig(PluginRef):
 class EnvironmentConfig(Canonical):
     """Meltano environment configuration."""
 
-    def __init__(self, plugins: Dict[str, List[dict]] = None, **extras):
+    def __init__(self, plugins: dict[str, list[dict]] = None, **extras):
         """Create a new environment configuration.
 
         Args:
@@ -107,8 +110,8 @@ class EnvironmentConfig(Canonical):
 
     def load_plugins(
         self,
-        plugins: Dict[str, List[dict]],
-    ) -> Dict[PluginType, List[EnvironmentPluginConfig]]:
+        plugins: dict[str, list[dict]],
+    ) -> dict[PluginType, list[EnvironmentPluginConfig]]:
         """Create plugin configurations from raw dictionary.
 
         Args:
@@ -151,7 +154,7 @@ class Environment(NameEq, Canonical):
         self.env = env or {}
 
     @classmethod
-    def find(cls: Type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
+    def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
         """Lookup an environment by name from an iterable.
 
         Args:

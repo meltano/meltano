@@ -3,20 +3,24 @@
 import click
 
 from meltano.core.hub import MeltanoHubService
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 
 from . import cli
 from .params import pass_project
+from .utils import InstrumentedCmd
 
 
-@cli.command(short_help="List the available plugins in Meltano Hub and their variants.")
+@cli.command(
+    cls=InstrumentedCmd,
+    short_help="List the available plugins in Meltano Hub and their variants.",
+)
 @click.argument(
     "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
 )
 @pass_project()
-def discover(project: Project, plugin_type: str):
+@click.pass_context
+def discover(ctx: click.Context, project: Project, plugin_type: str):
     """
     List the available discoverable plugins and their variants.
 
@@ -54,5 +58,4 @@ def discover(project: Project, plugin_type: str):
             else:
                 click.echo()
 
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_discover(plugin_type=plugin_type)
+    ctx.obj["legacy_tracker"].track_meltano_discover(plugin_type=plugin_type)

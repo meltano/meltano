@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
 from typing import Generator, Iterable
+from warnings import warn
 
 from meltano.core.project import Project
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
@@ -51,7 +52,7 @@ class FeatureFlags(Enum):
         return f"{FEATURE_FLAG_PREFIX}.{self.value}"
 
 
-class FeatureNotAllowedException(Exception):
+class FeatureNotAllowedException(Exception):  # noqa: N818
     """Occurs when a disallowed code path is run."""
 
     def __init__(self, feature):
@@ -97,6 +98,7 @@ class SettingsService(ABC):  # noqa: WPS214
         self.show_hidden = show_hidden
 
         self.env_override = env_override or {}
+
         self.config_override = config_override or {}
 
         self._setting_defs = None
@@ -126,7 +128,7 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             prefixes for settings environment variables
         """
-        return []
+        return ["meltano"]
 
     @property
     @abstractmethod
@@ -304,7 +306,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         return env
 
-    def get_with_metadata(  # noqa: WPS210
+    def get_with_metadata(  # noqa: WPS210, WPS615
         self,
         name: str,
         redacted=False,
@@ -414,7 +416,14 @@ class SettingsService(ABC):  # noqa: WPS214
                 metadata["redacted"] = True
                 value = REDACTED_VALUE
 
-        self.log(f"Got setting '{name}' with metadata: {metadata}")
+        self.log(f"Got setting {name!r} with metadata: {metadata}")
+
+        if setting_def is None and metadata["source"] is SettingValueStore.DEFAULT:
+            warn(
+                f"Unknown setting {name!r} - the default value `{value!r}` will be used",
+                RuntimeWarning,
+            )
+
         return value, metadata
 
     def get_with_source(self, *args, **kwargs):
@@ -443,7 +452,7 @@ class SettingsService(ABC):  # noqa: WPS214
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(
+    def set_with_metadata(  # noqa: WPS615
         self, path: list[str], value, store=SettingValueStore.AUTO, **kwargs
     ):
         """Set the value and metadata for a setting.

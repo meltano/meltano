@@ -52,7 +52,7 @@ and invoke the `airflow` executable with the provided arguments.
 You can add the Meltano DAG generator to your project without also installing the Airflow orchestrator plugin by adding the [`airflow` file bundle](https://github.com/meltano/files-airflow/):
 
 ```bash
-meltano add files airflow
+meltano add files files-airflow
 ```
 
 Now, you'll want to copy the DAG generator in to your Airflow installation's `dags_folder`,
