@@ -43,6 +43,8 @@ ignore =
     W503
     # Allow for long lines since we delegate to Black for enforcement
     E501
+    # Allow custom exceptions whose name ends with "Exception"
+    N818
     # Allow format strings with unindex parameters (because the pyupgrade pre-commit hook enforces their usage)
     P101
     # wemake-python-styleguide

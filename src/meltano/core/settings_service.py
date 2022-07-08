@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import warnings
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
@@ -305,7 +306,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         return env
 
-    def get_with_metadata(  # noqa: WPS210
+    def get_with_metadata(  # noqa: WPS210, WPS615
         self,
         name: str,
         redacted=False,
@@ -415,7 +416,14 @@ class SettingsService(ABC):  # noqa: WPS214
                 metadata["redacted"] = True
                 value = REDACTED_VALUE
 
-        self.log(f"Got setting '{name}' with metadata: {metadata}")
+        self.log(f"Got setting {name!r} with metadata: {metadata}")
+
+        if setting_def is None and metadata["source"] is SettingValueStore.DEFAULT:
+            warnings.warn(
+                f"Unknown setting {name!r} - the default value `{value!r}` will be used",
+                RuntimeWarning,
+            )
+
         return value, metadata
 
     def get_with_source(self, *args, **kwargs):
@@ -444,7 +452,7 @@ class SettingsService(ABC):  # noqa: WPS214
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(
+    def set_with_metadata(  # noqa: WPS615
         self, path: list[str], value, store=SettingValueStore.AUTO, **kwargs
     ):
         """Set the value and metadata for a setting.
@@ -649,12 +657,16 @@ class SettingsService(ABC):  # noqa: WPS214
         Raises:
             FeatureNotAllowedException: if raise_error is True and feature flag is disallowed
         """
-        # experimental is a top-level setting
-        if feature == EXPERIMENTAL:
-            allowed = self.get(EXPERIMENTAL) or False
-        # other feature flags are nested under feature flag
-        else:
-            allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
+
+            # experimental is a top-level setting
+            if feature == EXPERIMENTAL:
+                allowed = self.get(EXPERIMENTAL) or False
+            # other feature flags are nested under feature flag
+            else:
+                allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
+
         try:
             yield allowed
         finally:
