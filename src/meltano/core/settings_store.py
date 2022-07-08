@@ -1163,7 +1163,7 @@ class AutoStoreManager(SettingsStoreManager):
         while True:
             try:
                 manager = self.manager_for(store)
-                manager.ensure_supported(method="set", setting_def=setting_def)
+                manager.ensure_supported(method="set")
                 return store
             except StoreNotSupportedError:
                 tried.add(store)
