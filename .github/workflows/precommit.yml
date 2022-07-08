@@ -1,0 +1,24 @@
+name: Run pre-commit on the PR
+
+on:
+  pull_request: {}
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  precommit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3.0.2
+
+      - name: Setup Python 3.7
+        uses: actions/setup-python@v4.0.0
+        with:
+          python-version: 3.7
+          architecture: x64
+
+      - name: pre-commit
+        uses: pre-commit/action@v2.0.0
+        with:
+          extra_args: '--from-ref ${{ github.base_ref }} --to-ref ${{ github.head_ref }}'

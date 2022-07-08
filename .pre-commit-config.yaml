@@ -1,10 +1,9 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
-ci:
-  autofix_prs: false
-  autoupdate_schedule: weekly
-  autoupdate_commit_msg: "chore: pre-commit autoupdate"
+# pre-commit.ci cannot be used because it runs on all files, rather than just
+# the files added/modified by the PR. Instead, we use the deprecated pre-commit
+# action with arguments provided to limit it to the added/modified files.
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
