@@ -116,10 +116,16 @@ class ConfigService:
         Returns:
             The current environment configuration.
         """
+        
+        
+        
+        
+        
+        
         return self.project.active_environment.config.extras
 
     def update_environment_config(self, config):
-        """Update configuration in an environment.
+        """Update configuration in an environment
 
         Parameters:
             config: configuration dict
