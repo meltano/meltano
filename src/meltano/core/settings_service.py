@@ -145,6 +145,15 @@ class SettingsService(ABC):  # noqa: WPS214
         """Return settings service to inherit configuration from."""
 
     @property
+    def supports_environments(self):
+        """Return if this SettingsService instance supports storing config in a Meltano Environment.
+
+        Returns:
+            True
+        """
+        return True
+
+    @property
     @abstractmethod
     def meltano_yml_config(self) -> dict:
         """Return current configuration in `meltano.yml`."""

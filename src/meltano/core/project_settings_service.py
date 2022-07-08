@@ -66,15 +66,6 @@ class ProjectSettingsService(SettingsService):
 
         If it is not present, it will be restored from `analytics.json` if possible.
         """
-        if self.project.active_environment and "project_id" in self.environment_config:
-            # `project_id` is only valid at the top-level of the config, so we move it up there.
-            env_config = self.environment_config.copy()
-            self.update_meltano_yml_config(
-                # Potentially overwrite it with the existing top-level `project_id`
-                {"project_id": env_config.pop("project_id"), **self.meltano_yml_config}
-            )
-            self.update_meltano_environment_config(env_config)
-
         try:
             project_id = self.get("project_id")
         except OSError:
@@ -146,10 +137,19 @@ class ProjectSettingsService(SettingsService):
     def environment_config(self):
         """Return current environment configuration in `meltano.yml`.
 
-        Returns:
-            Current environment configuration in `meltano.yml`
+        Raises:
+            NotImplementedError: Meltano config not supported in Environments.
         """
-        return self.config_service.current_environment_config
+        raise NotImplementedError("Meltano config not supported in Environments.")
+
+    @property
+    def supports_environments(self):
+        """Return whether this SettingsService supports storing config in an Environment.
+
+        Returns:
+            False. Project config is not supported in a Meltano Environment.
+        """
+        return False
 
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
@@ -164,8 +164,11 @@ class ProjectSettingsService(SettingsService):
 
         Args:
             config: Updated environment config.
+
+        Raises:
+            NotImplementedError: Meltano config not supported in Environments.
         """
-        self.config_service.update_environment_config(config)
+        raise NotImplementedError("Meltano config not supported in Environments.")
 
     def process_config(self, config) -> dict:
         """Process configuration dictionary for presentation in `meltano config meltano`.

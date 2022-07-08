@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class ConflictingSettingValueException(Exception):
+class ConflictingSettingValueException(Exception):  # noqa: N818
     """Occurs when a setting has multiple conflicting values via aliases."""
 
     def __init__(self, setting_names):
@@ -50,15 +50,14 @@ class ConflictingSettingValueException(Exception):
         return f"Conflicting values for setting found in: {self.setting_names}"
 
 
-class MultipleEnvVarsSetException(Exception):
+class MultipleEnvVarsSetException(Exception):  # noqa: N818
     """Occurs when a setting value is set via multiple environment variable names."""
 
     def __init__(self, names):
         """Instantiate the error.
 
         Args:
-            setting_names: the name/aliases where conflicting values are set
-
+            names: the name/aliases where conflicting values are set
         """
         self.names = names
         super().__init__(names)
@@ -313,6 +312,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
         Raises:
             StoreNotSupportedError: if setting_def not passed.
             ConflictingSettingValueException: if multiple conflicting values for the same setting are provided.
+            MultipleEnvVarsSetException: if multiple conflicting values for the same setting are provided.
 
         Returns:
             A tuple the got value and a dictionary containing metadata.
@@ -327,15 +327,16 @@ class BaseEnvStoreManager(SettingsStoreManager):
                 vals_with_metadata.append((value, {"env_var": env_var.key}))
             except KeyError:
                 pass
+
         if len(vals_with_metadata) > 1:
-            if not reduce(eq, (val for val, _ in vals_with_metadata)):
-                raise ConflictingSettingValueException(
-                    [metadata["env_var"] for _, metadata in vals_with_metadata]
-                )
-            else:
+            if reduce(eq, (val for val, _ in vals_with_metadata)):
                 raise MultipleEnvVarsSetException(
                     [metadata["env_var"] for _, metadata in vals_with_metadata]
                 )
+            raise ConflictingSettingValueException(
+                [metadata["env_var"] for _, metadata in vals_with_metadata]
+            )
+
         return vals_with_metadata[0] if vals_with_metadata else (None, {})
 
     def setting_env_vars(self, *args, **kwargs) -> dict:
@@ -558,7 +559,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         super().__init__(*args, **kwargs)
         self._flat_config = None
 
-    def ensure_supported(self, method="get") -> None:
+    def ensure_supported(self, method: str = "get") -> None:
         """Ensure named method is supported and project is not read-only and an environment is active.
 
         Args:
@@ -761,7 +762,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             self._flat_config = flatten(self.settings_service.environment_config, "dot")
         return self._flat_config
 
-    def ensure_supported(self, method="get"):
+    def ensure_supported(self, method: str = "get"):
         """Ensure project is not read-only and an environment is active.
 
         Args:
@@ -771,6 +772,10 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             StoreNotSupportedError: if the project is read-only or no environment is active.
         """
         super().ensure_supported(method)
+        if not self.settings_service.supports_environments:
+            raise StoreNotSupportedError(
+                "Project config cannot be stored in an Environment."
+            )
         if self.settings_service.project.active_environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
 
@@ -1158,7 +1163,7 @@ class AutoStoreManager(SettingsStoreManager):
         while True:
             try:
                 manager = self.manager_for(store)
-                manager.ensure_supported("set")
+                manager.ensure_supported(method="set", setting_def=setting_def)
                 return store
             except StoreNotSupportedError:
                 tried.add(store)
