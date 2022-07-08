@@ -1,4 +1,4 @@
-name: Run pre-commit on the PR
+name: PR pre-commit checks
 
 on:
   pull_request: {}
@@ -6,11 +6,13 @@ on:
     inputs: {}
 
 jobs:
-  precommit:
+  pre-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3.0.2
+        with:
+          fetch-depth: 0
 
       - name: Setup Python 3.7
         uses: actions/setup-python@v4.0.0
