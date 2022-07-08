@@ -21,6 +21,6 @@ jobs:
           architecture: x64
 
       - name: pre-commit
-        uses: pre-commit/action@v2.0.0
+        uses: pre-commit/action@v3.0.0
         with:
           extra_args: '--from-ref ${{ github.base_ref }} --to-ref HEAD'
