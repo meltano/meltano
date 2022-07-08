@@ -212,6 +212,7 @@ If you have multiple [Meltano Environments](/concepts/environments) you can spec
 meltano --environment=<ENVIRONMENT> config <plugin>
 ```
 
+<br>
 > Note: Unlike other commands like [`meltano run`](#run) and [`meltano invoke`](#invoke), the `meltano config` command ignores any configured [default environment](/concepts/environments#default-environment).
 > This is to make it easier to configure plugins' base configuration before adding environment-specific overrides.
 
