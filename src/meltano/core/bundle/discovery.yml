@@ -3181,7 +3181,7 @@ transformers:
         variant: meltano
     settings:
     - name: project_dir
-      lable: Project Directory
+      label: Project Directory
       value: $MELTANO_PROJECT_ROOT/transform
     - name: profiles_dir
       label: Profiles Directory
