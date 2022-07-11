@@ -797,6 +797,7 @@ class TestPluginSettingsService:
 
     def test_extra_object(
         self,
+        active_environment,
         subject,
         monkeypatch,
         env_var,
@@ -836,25 +837,43 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
-        subject.set("_vars", {"other": "from_meltano_yml"})
+        subject.set(
+            "_vars",
+            {"other": "from_meltano_yml"},
+            store=SettingValueStore.MELTANO_YML,
+        )
 
         assert subject.get_with_source("_vars") == (
             {"var": "from_default", "other": "from_meltano_yml"},
             SettingValueStore.MELTANO_YML,
         )
 
-        monkeypatch.setenv(env_var(subject, "_vars.var"), "from_env")
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars.var"), "from_env")
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env", "other": "from_meltano_yml"},
+                SettingValueStore.ENV,
+            )
 
-        assert subject.get_with_source("_vars") == (
-            {"var": "from_env", "other": "from_meltano_yml"},
-            SettingValueStore.ENV,
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env"},
+                SettingValueStore.ENV,
+            )
+
+        subject.set(
+            "_vars",
+            {"dev_setting": "from_dev_env"},
+            store=SettingValueStore.MELTANO_ENV,
         )
-
-        monkeypatch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
-
         assert subject.get_with_source("_vars") == (
-            {"var": "from_env"},
-            SettingValueStore.ENV,
+            {
+                "var": "from_default",
+                "other": "from_meltano_yml",
+                "dev_setting": "from_dev_env",
+            },
+            SettingValueStore.MELTANO_ENV,
         )
 
     def test_find_setting_raises_with_conflicting(

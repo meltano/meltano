@@ -194,6 +194,14 @@ class SettingDefinition(NameEq, Canonical):
 
         self._verbatim.add("value")
 
+    def __repr__(self) -> str:
+        """Return string representation.
+
+        Returns:
+            String representation of this setting.
+        """
+        return f"<SettingDefinition {self.name} ({self.kind})>"
+
     @classmethod
     def from_missing(cls, defs: list[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
