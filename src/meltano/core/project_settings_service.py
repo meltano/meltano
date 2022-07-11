@@ -26,6 +26,7 @@ class ProjectSettingsService(SettingsService):
     """Project Settings Service."""
 
     config_override = {}
+    supports_environments = False
 
     def __init__(self, *args, config_service: ConfigService = None, **kwargs):
         """Instantiate ProjectSettingsService instance.
@@ -141,15 +142,6 @@ class ProjectSettingsService(SettingsService):
             NotImplementedError: Meltano config not supported in Environments.
         """
         raise NotImplementedError("Meltano config not supported in Environments.")
-
-    @property
-    def supports_environments(self):
-        """Return whether this SettingsService supports storing config in an Environment.
-
-        Returns:
-            False. Project config is not supported in a Meltano Environment.
-        """
-        return False
 
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.

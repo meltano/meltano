@@ -52,7 +52,7 @@ class FeatureFlags(Enum):
         return f"{FEATURE_FLAG_PREFIX}.{self.value}"
 
 
-class FeatureNotAllowedException(Exception):  # noqa: N818
+class FeatureNotAllowedException(Exception):
     """Occurs when a disallowed code path is run."""
 
     def __init__(self, feature):
@@ -77,6 +77,7 @@ class SettingsService(ABC):  # noqa: WPS214
     """Abstract base class for managing settings."""
 
     LOGGING = False
+    supports_environments = True
 
     def __init__(
         self,
@@ -143,15 +144,6 @@ class SettingsService(ABC):  # noqa: WPS214
     @property
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
-
-    @property
-    def supports_environments(self):
-        """Return if this SettingsService instance supports storing config in a Meltano Environment.
-
-        Returns:
-            True
-        """
-        return True
 
     @property
     @abstractmethod

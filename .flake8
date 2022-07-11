@@ -103,6 +103,8 @@ ignore =
     WPS433
     WPS454
     WPS501
+    # Allow Exceptions to have suffix 'Exception' rather than 'Error'
+    N818
 
 exclude =
     .venv

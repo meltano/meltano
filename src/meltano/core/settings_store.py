@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class ConflictingSettingValueException(Exception):  # noqa: N818
+class ConflictingSettingValueException(Exception):
     """Occurs when a setting has multiple conflicting values via aliases."""
 
     def __init__(self, setting_names):
@@ -50,7 +50,7 @@ class ConflictingSettingValueException(Exception):  # noqa: N818
         return f"Conflicting values for setting found in: {self.setting_names}"
 
 
-class MultipleEnvVarsSetException(Exception):  # noqa: N818
+class MultipleEnvVarsSetException(Exception):
     """Occurs when a setting value is set via multiple environment variable names."""
 
     def __init__(self, names):
