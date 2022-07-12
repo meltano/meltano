@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 class DbtInvoker(PluginInvoker):
-    def Popen_options(self):
-        return {**super().Popen_options(), "cwd": self.plugin_config["project_dir"]}
+    def popen_options(self):
+        return {**super().popen_options(), "cwd": self.plugin_config["project_dir"]}
 
 
 class DbtPlugin(BasePlugin):

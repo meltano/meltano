@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from meltano.core.behavior.canonical import Canonical
@@ -8,7 +10,12 @@ class TestCommand:
     @pytest.fixture
     def commands(self):
         return {
-            "foo": {"args": "foo", "description": "foo desc", "executable": "foo"},
+            "foo": {
+                "args": "foo",
+                "description": "foo desc",
+                "executable": "foo",
+                "cwd": "path",
+            },
             "bar": {"args": "bar"},
             "baz": "baz",
             "test": {"args": "--test", "description": "Run tests"},
@@ -25,15 +32,19 @@ class TestCommand:
         assert serialized["foo"].args == "foo"
         assert serialized["foo"].description == "foo desc"
         assert serialized["foo"].executable == "foo"
+        assert serialized["foo"].cwd == "path"
         assert serialized["bar"].args == "bar"
         assert serialized["bar"].description is None
         assert serialized["bar"].executable is None
+        assert serialized["bar"].cwd is None
         assert serialized["baz"].args == "baz"
         assert serialized["baz"].description is None
         assert serialized["baz"].executable is None
+        assert serialized["baz"].cwd is None
         assert serialized["test"].args == "--test"
         assert serialized["test"].description == "Run tests"
         assert serialized["test"].executable is None
+        assert serialized["test"].cwd is None
 
     def test_deserialize(self, commands):
         serialized = Command.parse_all(commands)
@@ -61,3 +72,11 @@ class TestCommand:
                 name="cmd",
                 env={},
             )
+
+    def test_expand_cwd(self, commands):
+        foo = Command.parse(commands["foo"])
+        bar = Command.parse(commands["bar"])
+
+        assert foo.expand_cwd(env={}) == Path.cwd() / Path("path")
+        assert foo.expand_cwd(env={}, root_dir=Path("/root")) == Path("/root/path")
+        assert bar.expand_cwd(env={}) is None

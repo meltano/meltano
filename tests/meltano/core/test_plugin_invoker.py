@@ -1,4 +1,5 @@
 import platform
+from pathlib import Path
 
 import dotenv
 import pytest
@@ -167,3 +168,16 @@ class TestPluginInvoker:
 
         assert "VIRTUAL_ENV" not in env
         assert "PYTHONPATH" not in env
+
+    def test_popen_options(self, plugin_invoker):
+        env = plugin_invoker.env()
+        assert not plugin_invoker.popen_options(command=None, env=env)
+        assert plugin_invoker.popen_options(command="cwd-relative", env=env) == {
+            "cwd": plugin_invoker.project.root / "transform"
+        }
+        assert plugin_invoker.popen_options(command="cwd-absolute", env=env) == {
+            "cwd": Path("/root")
+        }
+        assert plugin_invoker.popen_options(command="cwd-expansion", env=env) == {
+            "cwd": plugin_invoker.project.root / "transform"
+        }

@@ -1,5 +1,6 @@
 """Stored command arguments for plugins."""
 import shlex
+from pathlib import Path
 from typing import Dict, Optional, Type, TypeVar
 
 from meltano.core.behavior.canonical import Canonical
@@ -35,6 +36,7 @@ class Command(Canonical):
         description: Optional[str] = None,
         executable: Optional[str] = None,
         container_spec: Optional[dict] = None,
+        cwd: Optional[str] = None,
     ):
         """Initialize a Command.
 
@@ -43,11 +45,13 @@ class Command(Canonical):
             description: Command description.
             executable: Optional command executable.
             container_spec: Container specification for this command.
+            cwd: Change the working directory for execution.
         """
         super().__init__(
             args=args,
             description=description,
             executable=executable,
+            cwd=cwd,
         )
         if container_spec is not None:
             self.container_spec = ContainerSpec(**container_spec)
@@ -76,6 +80,26 @@ class Command(Canonical):
             expanded.append(value)
 
         return expanded
+
+    def expand_cwd(self, env: dict, root_dir: Optional[Path] = None) -> Optional[Path]:
+        """Resolve the working directory to execute the command.
+
+        Expands environment variables, and returns an absolute path relative to
+        the provided root.
+
+        Args:
+            env: Mapping of environment variables to expand the working directory.
+            root_dir: The path that relative directories should be resolved to.
+
+        Returns:
+            A Path to use for the working directory, if cwd is defined.
+        """
+        if not self.cwd:
+            return None
+        path = Path(expand_env_vars(self.cwd, env))
+        if root_dir:
+            path = root_dir / path
+        return path.resolve()
 
     def canonical(self):
         """Serialize the command.

@@ -281,7 +281,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Args:
             args: Optional plugin args.
             command: Plugin command name.
-            env: Environment variables
+            env: Environment variables.
 
         Returns:
             List of plugin invocation arguments.
@@ -341,13 +341,25 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def Popen_options(self) -> dict[str, Any]:  # noqa: N802
+    def popen_options(
+        self, command: str | None = None, env=None
+    ) -> dict[str, Any]:  # noqa: N802
         """Get options for subprocess.Popen.
+
+        Args:
+            command: Command name.
+            env: Environment variables to use for expansion.
 
         Returns:
             Mapping of subprocess options.
         """
-        return {}
+        env = env or {}
+        opts = {}
+        if command is not None:
+            opts["cwd"] = self.find_command(command).expand_cwd(
+                env, self.project.root_dir()
+            )
+        return opts
 
     @asynccontextmanager
     async def _invoke(
@@ -364,8 +376,11 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             raise InvokerNotPreparedError()
 
         async with self.plugin.trigger_hooks("invoke", self, args):
-            popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
+            popen_options = {
+                **self.popen_options(command=command, env=popen_env),
+                **kwargs,
+            }
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")
             logging.debug(f"Env: {popen_env}")

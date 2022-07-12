@@ -196,6 +196,18 @@ def discovery():  # noqa: WPS213
                         "volumes": ["$MELTANO_PROJECT_ROOT/example/:/usr/app/"],
                     },
                 },
+                "cwd-relative": {
+                    "args": "-v",
+                    "cwd": "transform",
+                },
+                "cwd-absolute": {
+                    "args": "-v",
+                    "cwd": "/root",
+                },
+                "cwd-expansion": {
+                    "args": "-v",
+                    "cwd": "$MELTANO_PROJECT_ROOT/transform",
+                },
             },
         }
     )
