@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class ConflictingSettingValueException(Exception):
+class ConflictingSettingValueException(Exception):  # noqa: N818
     """Occurs when a setting has multiple conflicting values via aliases."""
 
     def __init__(self, setting_names):
@@ -50,15 +50,14 @@ class ConflictingSettingValueException(Exception):
         return f"Conflicting values for setting found in: {self.setting_names}"
 
 
-class MultipleEnvVarsSetException(Exception):
+class MultipleEnvVarsSetException(Exception):  # noqa: N818
     """Occurs when a setting value is set via multiple environment variable names."""
 
     def __init__(self, names):
         """Instantiate the error.
 
         Args:
-            setting_names: the name/aliases where conflicting values are set
-
+            names: the name/aliases where conflicting values are set
         """
         self.names = names
         super().__init__(names)
@@ -312,7 +311,10 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
         Raises:
             StoreNotSupportedError: if setting_def not passed.
-            ConflictingSettingValueException: if multiple conflicting values for the same setting are provided.
+            ConflictingSettingValueException: if multiple conflicting values for the
+                same setting are provided.
+            MultipleEnvVarsSetException: if multiple environment variables are set for
+                the same setting.
 
         Returns:
             A tuple the got value and a dictionary containing metadata.
@@ -328,14 +330,13 @@ class BaseEnvStoreManager(SettingsStoreManager):
             except KeyError:
                 pass
         if len(vals_with_metadata) > 1:
-            if not reduce(eq, (val for val, _ in vals_with_metadata)):
+            if not reduce(eq, (val for val, _ in vals_with_metadata)):  # noqa: WPS504
                 raise ConflictingSettingValueException(
                     [metadata["env_var"] for _, metadata in vals_with_metadata]
                 )
-            else:
-                raise MultipleEnvVarsSetException(
-                    [metadata["env_var"] for _, metadata in vals_with_metadata]
-                )
+            raise MultipleEnvVarsSetException(
+                [metadata["env_var"] for _, metadata in vals_with_metadata]
+            )
         return vals_with_metadata[0] if vals_with_metadata else (None, {})
 
     def setting_env_vars(self, *args, **kwargs) -> dict:
@@ -594,10 +595,12 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         for key in keys:
             try:
                 value = flat_config[key]
-                self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
-                vals_with_metadata.append((value, {"key": key, "expandable": True}))
             except KeyError:
-                pass
+                continue
+
+            self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
+            vals_with_metadata.append((value, {"key": key, "expandable": True}))
+
         if len(vals_with_metadata) > 1 and not reduce(
             eq, (val for val, _ in vals_with_metadata)
         ):
@@ -1205,10 +1208,15 @@ class AutoStoreManager(SettingsStoreManager):
         for source in self.sources:
             try:
                 manager = self.manager_for(source)
-                value, metadata = manager.get(name, setting_def=setting_def, **kwargs)
-                found_source = source
             except StoreNotSupportedError:
                 continue
+
+            try:
+                value, metadata = manager.get(name, setting_def=setting_def, **kwargs)
+            except StoreNotSupportedError:
+                continue
+
+            found_source = source
 
             if value is not None:
                 break

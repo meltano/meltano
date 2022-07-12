@@ -45,8 +45,7 @@ class TestVenvService:
         run = subprocess.run(
             [venv_dir.joinpath("bin/python"), "-m", "pip", "list"],
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
         )
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
@@ -54,8 +53,7 @@ class TestVenvService:
         run = subprocess.run(
             [venv_dir.joinpath("bin/python"), "-m", "pip", "list", "--outdated"],
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
         )
         for line in str(run.stdout).splitlines():
             assert not line.startswith("pip ")
@@ -99,8 +97,7 @@ class TestVenvService:
                 "example",
             ],
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
         )
 
         await subject.install("example")
@@ -109,8 +106,7 @@ class TestVenvService:
         run = subprocess.run(
             [venv_dir.joinpath("bin/python"), "-m", "pip", "list"],
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
         )
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
