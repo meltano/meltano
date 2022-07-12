@@ -100,6 +100,11 @@ def default_config(log_level: str) -> dict:
                 "level": logging.INFO,
                 "propagate": False,
             },
+            "asyncio": {
+                "handlers": ["console"],
+                "level": logging.INFO,
+                "propagate": False,
+            },
         },
     }
 
@@ -170,7 +175,6 @@ class SubprocessOutputWriter(Protocol):
         Args:
             lines: string to write
         """
-        pass
 
 
 async def _write_line_writer(writer, line):

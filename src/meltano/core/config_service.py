@@ -37,7 +37,7 @@ class ConfigService:
             The project settings.
         """
         if self._settings is None:
-            with bundle.find("settings.yml").open() as settings_yaml:
+            with open(bundle.root / "settings.yml") as settings_yaml:
                 settings = yaml.safe_load(settings_yaml)
             self._settings = list(map(SettingDefinition.parse, settings["settings"]))
 
@@ -130,3 +130,12 @@ class ConfigService:
     def make_meltano_secret_dir(self):
         """Create the secret directory."""
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
+
+    @property
+    def env(self):
+        """Return the top-level env vars from meltano.yml.
+
+        Returns:
+            A dictionary of (unexpanded) environment variables.
+        """
+        return self.current_meltano_yml.env

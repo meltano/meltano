@@ -139,41 +139,33 @@ def install_batch():  # noqa: WPS210
         JSON cotaining all plugins installed.
     """
     payload = request.get_json()
-    plugin_type = PluginType(payload["plugin_type"])
-    plugin_name = payload["name"]
-
     project = Project.find()
 
     plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
+    plugin = plugins_service.find_plugin(
+        payload["name"], plugin_type=PluginType(payload["plugin_type"])
+    )
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
-    related_plugins = add_service.add_related(plugin)
-
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `related_plugins`, but should
-    # be installed first.
-    related_plugins.reverse()
+    required_plugins = add_service.add_required(plugin)
 
     # This was added to assist api_worker threads
     try:
-        loop = asyncio.get_event_loop()
+        asyncio.get_event_loop()
     except RuntimeError:
         logging.debug("/plugins/install/batch no asyncio event loop detected")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_results = install_service.install_plugins(
-        related_plugins, reason=PluginInstallReason.ADD
+        required_plugins, reason=PluginInstallReason.ADD
     )
 
     for result in install_results:
         if not result.successful:
             raise PluginInstallError(result.message)
 
-    return jsonify([plugin.canonical() for plugin in related_plugins])
+    return jsonify([plugin.canonical() for plugin in required_plugins])
 
 
 @pluginsBP.route("/install", methods=["POST"])
@@ -195,12 +187,10 @@ def install():
 
     # This was added to assist api_worker threads
     try:
-        loop = asyncio.get_event_loop()
+        asyncio.get_event_loop()
     except RuntimeError:
         logging.debug("/plugins/install no asyncio event loop detected")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_service.install_plugin(plugin, reason=PluginInstallReason.ADD)

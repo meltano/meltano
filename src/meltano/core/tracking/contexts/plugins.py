@@ -17,11 +17,13 @@ logger = get_logger(__name__)
 
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
-    if not safe_hasattr(plugin, "info"):
+    if not plugin or not safe_hasattr(plugin, "info"):
+        # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?), or where passed None.
+        # this event will be routed to the "bad" bucket on the snowplow side. That makes it detectable on our end,
+        # unlike if we had just filtered it out completely.
         logger.debug(
             "Plugin tracker context some how encountered plugin without info attr."
         )
-        # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?)
         return {}
 
     return {
@@ -35,9 +37,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
         "pip_url_hash": hash_sha256(plugin.formatted_pip_url)
         if plugin.formatted_pip_url
         else None,
-        "parent_name_hash": hash_sha256(plugin.parent.name)
-        if plugin.parent.name
-        else None,
+        "parent_name_hash": hash_sha256(plugin.parent.name) if plugin.parent else None,
         "command": cmd,
     }
 
@@ -112,3 +112,26 @@ class PluginsTrackingContext(SelfDescribingJson):
             "Parameter 'blk' must be an instance of 'BlockSet' or 'PluginCommandBlock', "
             + f"not {type(blk)!r}"
         )
+
+    @classmethod
+    def from_blocks(
+        cls, parsed_blocks: list[BlockSet | PluginCommandBlock]
+    ) -> PluginsTrackingContext:
+        """Create a PluginsTrackingContext from a list of BlockSets or PluginCommandBlocks.
+
+        Parameters:
+            parsed_blocks: The blocks to create the context from.
+
+        Returns:
+            The PluginsTrackingContext for the given blocks.
+        """
+        plugins: list[tuple[ProjectPlugin, str]] = []
+        for blk in parsed_blocks:
+            if isinstance(blk, BlockSet):
+                for plugin_block in blk.blocks:
+                    plugins.append(
+                        (plugin_block.context.plugin, plugin_block.plugin_args)
+                    )
+            elif isinstance(blk, PluginCommandBlock):
+                plugins.append((blk.context.plugin, blk.command))
+        return PluginsTrackingContext(plugins)

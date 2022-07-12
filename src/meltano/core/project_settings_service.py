@@ -1,19 +1,19 @@
 """Project Settings Service."""
 
+import json
 from typing import List
 
+import structlog
 from dotenv import dotenv_values
 
+from meltano.core.project import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.settings_service import (
-    FeatureFlags,
-    SettingsService,
-    SettingValueStore,
-)
-from meltano.core.utils import expand_env_vars as do_expand_env_vars
+from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
 from .config_service import ConfigService
+
+logger = structlog.get_logger(__name__)
 
 UI_CFG_SETTINGS = {
     "ui.server_name": "SERVER_NAME",
@@ -39,27 +39,63 @@ class ProjectSettingsService(SettingsService):
 
         self.config_service = config_service or ConfigService(self.project)
 
-        self.env_override = {**self.project.env, **self.env_override}
-
-        if self.project.active_environment:
-            # Update this with `self.project.dotenv_env`, `self.env`, etc. to expand
-            # other environment variables in the Environment's `env`.
-            expandable_env = {**self.project.env}
-            with self.feature_flag(
-                FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
-            ) as strict_env_var_mode:
-                environment_env = {
-                    var: do_expand_env_vars(
-                        value, expandable_env, raise_if_missing=strict_env_var_mode
-                    )
-                    for var, value in self.project.active_environment.env.items()
-                }
-            self.env_override.update(environment_env)
+        self.env_override = {
+            # terminal environment variables already present from SettingService.env
+            **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
+            **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key
+            **self.env_override,  # overrides
+        }
 
         self.config_override = {  # noqa: WPS601
             **self.__class__.config_override,
             **self.config_override,
         }
+
+        try:
+            self.ensure_project_id()
+        except ProjectReadonly:
+            logger.debug(
+                "Cannot update `project_id` in `meltano.yml`: project is read-only."
+            )
+
+    def ensure_project_id(self) -> None:
+        """Ensure `project_id` is configured properly.
+
+        Every `meltano.yml` file should contain the `project_id` key-value pair. It should be
+        present in the top-level config, rather than in any environment-level configs.
+
+        If it is not present, it will be restored from `analytics.json` if possible.
+        """
+        if self.project.active_environment and "project_id" in self.environment_config:
+            # `project_id` is only valid at the top-level of the config, so we move it up there.
+            env_config = self.environment_config.copy()
+            self.update_meltano_yml_config(
+                # Potentially overwrite it with the existing top-level `project_id`
+                {"project_id": env_config.pop("project_id"), **self.meltano_yml_config}
+            )
+            self.update_meltano_environment_config(env_config)
+
+        try:
+            project_id = self.get("project_id")
+        except OSError:
+            project_id = None
+
+        if project_id is None:
+            try:
+                with open(
+                    self.project.meltano_dir() / "analytics.json"
+                ) as analytics_json_file:
+                    project_id = json.load(analytics_json_file)["project_id"]
+            except (OSError, KeyError, json.JSONDecodeError) as err:
+                logger.debug(
+                    "Unable to restore 'project_id' from 'analytics.json'", err=err
+                )
+            else:
+                self.update_meltano_yml_config(
+                    {"project_id": project_id, **self.meltano_yml_config}
+                )
+                self.set("project_id", project_id)
+                logger.debug("Restored 'project_id' from 'analytics.json'")
 
     @property
     def label(self) -> str:
@@ -78,15 +114,6 @@ class ProjectSettingsService(SettingsService):
             URL for Meltano doc site.
         """
         return "https://docs.meltano.com/reference/settings"
-
-    @property
-    def env_prefixes(self) -> List[str]:
-        """Return prefixes for setting environment variables.
-
-        Returns:
-            A list of project ENV VAR prefix strings.
-        """
-        return ["meltano"]
 
     @property
     def db_namespace(self) -> str:

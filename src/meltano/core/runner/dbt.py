@@ -1,16 +1,10 @@
 import asyncio
-import logging
-import os
 import sys
-from io import StringIO
 
-from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContext
-from meltano.core.error import SubprocessError
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.project import Project
 
 from . import Runner, RunnerError
 
@@ -43,9 +37,12 @@ class DbtRunner(Runner):
 
         await asyncio.wait(
             [
-                capture_subprocess_output(handle.stdout, log),
-                capture_subprocess_output(handle.stderr, log),
-                handle.wait(),
+                asyncio.create_task(coro)
+                for coro in (
+                    capture_subprocess_output(handle.stdout, log),
+                    capture_subprocess_output(handle.stderr, log),
+                    handle.wait(),
+                )
             ],
             return_when=asyncio.ALL_COMPLETED,
         )

@@ -9,8 +9,9 @@ from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
-from meltano.migrations import IntFlag, JSONEncodedDict
 from sqlalchemy.ext.mutable import MutableDict
+
+from meltano.migrations import IntFlag, JSONEncodedDict
 
 # revision identifiers, used by Alembic.
 revision = "b4c05e463b53"

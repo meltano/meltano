@@ -54,14 +54,7 @@ lint_eslint:
 .pytest:
   extends: .test
   script:
-    - poetry run pytest -v --cov-report= --cov meltano -m "$PYTEST_MARKERS"
-    - poetry run coverage combine .coverage
-    - poetry run coverage report
-    - poetry run coverage html
-  artifacts:
-    paths:
-      - htmlcov/
-    when: on_success
+    - poetry run pytest -v -m "$PYTEST_MARKERS"
 
 .pytest_postgres:
   extends: .pytest

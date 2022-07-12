@@ -12,17 +12,18 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, CliContext, CliEvent, Tracker
+from meltano.core.tracking import BlockEvents, CliEvent, Tracker
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
 
 from . import CliError, cli
 from .params import pass_project
+from .utils import PartialInstrumentedCmd
 
 logger = structlog.getLogger(__name__)
 
 
-@cli.command(short_help="[preview] Run a set of plugins in series.")
+@cli.command(cls=PartialInstrumentedCmd, short_help="Run a set of plugins in series.")
 @click.option(
     "--dry-run",
     help="Do not run, just parse the invocation, validate it, and explain what would be executed.",
@@ -49,8 +50,10 @@ logger = structlog.getLogger(__name__)
     nargs=-1,
 )
 @pass_project(migrate=True)
+@click.pass_context
 @click_run_async
 async def run(
+    ctx: click.Context,
     project: Project,
     dry_run: bool,
     full_refresh: bool,
@@ -65,7 +68,7 @@ async def run(
     `meltano run some_extractor some_loader some_plugin:some_command` and are run in the order they are specified
     from left to right. A failure in any block will cause the entire run to abort.
 
-    Multiple commmand blocks can be chained together or repeated, and tap/target pairs will automatically be linked:
+    Multiple command blocks can be chained together or repeated, and tap/target pairs will automatically be linked:
 
         `meltano run tap-gitlab target-postgres dbt:test dbt:run`\n
         `meltano run tap-gitlab target-postgres tap-salesforce target-mysql ...`\n
@@ -78,8 +81,6 @@ async def run(
 
     The above command will create two jobs with state IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
 
-    This a preview feature - its functionality and cli signature is still evolving.
-
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
     """
     if dry_run:
@@ -87,46 +88,34 @@ async def run(
             logger.info("Setting 'console' handler log level to 'debug' for dry run")
             change_console_log_level()
 
-    tracker = Tracker(project)
-    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
+    tracker: Tracker = ctx.obj["tracker"]
+    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
 
-    cmd_ctx = CliContext.from_command_and_kwargs(
-        "run",
-        None,
-        dry_run=dry_run,
-        full_refresh=full_refresh,
-        no_state_update=no_state_update,
-        force=force,
-    )
-    with tracker.with_contexts(cmd_ctx):
-        tracker.track_command_event(CliEvent.started)
-
-        parser_blocks = []  # noqa: F841
-        try:
-            parser = BlockParser(
-                logger, project, blocks, full_refresh, no_state_update, force
-            )
-            parsed_blocks = list(parser.find_blocks(0))
-            if not parsed_blocks:
-                tracker.track_command_event(CliEvent.aborted)
-                logger.info("No valid blocks found.")
-                return
-        except Exception as parser_err:
+    parser_blocks = []  # noqa: F841
+    try:
+        parser = BlockParser(
+            logger, project, blocks, full_refresh, no_state_update, force
+        )
+        parsed_blocks = list(parser.find_blocks(0))
+        if not parsed_blocks:
             tracker.track_command_event(CliEvent.aborted)
-            raise parser_err
+            logger.info("No valid blocks found.")
+            return
+    except Exception as parser_err:
+        tracker.track_command_event(CliEvent.aborted)
+        raise parser_err
 
-        if validate_block_sets(logger, parsed_blocks):
-            logger.debug("All ExtractLoadBlocks validated, starting execution.")
-        else:
-            tracker.track_command_event(CliEvent.aborted)
-            raise CliError("Some ExtractLoadBlocks set failed validation.")
-        try:
-            await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
-        except Exception as err:
-            tracker.track_command_event(CliEvent.failed)
-            raise err
-        tracker.track_command_event(CliEvent.completed)
-
+    if validate_block_sets(logger, parsed_blocks):
+        logger.debug("All ExtractLoadBlocks validated, starting execution.")
+    else:
+        tracker.track_command_event(CliEvent.aborted)
+        raise CliError("Some ExtractLoadBlocks set failed validation.")
+    try:
+        await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+    except Exception as err:
+        tracker.track_command_event(CliEvent.failed)
+        raise err
+    tracker.track_command_event(CliEvent.completed)
     legacy_tracker.track_meltano_run(blocks)
 
 

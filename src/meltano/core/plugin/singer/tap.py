@@ -282,7 +282,7 @@ class SingerTap(SingerPlugin):
 
             return
         # the `state.json` is stored in the database
-        state = StateService(elt_context.session).get_state(elt_context.job.job_id)
+        state = StateService(elt_context.session).get_state(elt_context.job.job_name)
 
         if state:
             with state_path.open("w") as state_file:

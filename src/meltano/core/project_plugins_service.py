@@ -85,6 +85,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self.settings_service = ProjectSettingsService(project)
 
         self._use_discovery_yaml: bool = True
+        self._prefer_source = None
 
     @contextmanager
     def disallow_discovery_yaml(self) -> Generator[None, None, None]:
@@ -460,7 +461,11 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             error: If the parent plugin is not found.
         """
         error = None
-        if plugin.inherit_from and not plugin.is_variant_set:
+        if (
+            plugin.inherit_from
+            and not plugin.is_variant_set
+            and self._prefer_source in {None, DefinitionSource.INHERITED}
+        ):
             try:
                 return (
                     self.find_plugin(
@@ -471,18 +476,22 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except PluginNotFoundError as inherited_exc:
                 error = inherited_exc
 
-        try:
-            return (
-                self.locked_definition_service.get_base_plugin(
-                    plugin,
-                    variant_name=plugin.variant,
-                ),
-                DefinitionSource.LOCKFILE,
-            )
-        except PluginNotFoundError as lockfile_exc:
-            error = lockfile_exc
+        if self._prefer_source in {None, DefinitionSource.LOCKFILE}:
+            try:
+                return (
+                    self.locked_definition_service.get_base_plugin(
+                        plugin,
+                        variant_name=plugin.variant,
+                    ),
+                    DefinitionSource.LOCKFILE,
+                )
+            except PluginNotFoundError as lockfile_exc:
+                error = lockfile_exc
 
-        if self._use_discovery_yaml:
+        if self._use_discovery_yaml and self._prefer_source in {
+            None,
+            DefinitionSource.DISCOVERY,
+        }:
             try:
                 return (
                     self._get_parent_from_discovery(plugin),
@@ -491,10 +500,11 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except Exception as discovery_exc:
                 error = discovery_exc
 
-        try:
-            return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
-        except Exception as hub_exc:
-            error = hub_exc
+        if self._prefer_source in {None, DefinitionSource.HUB}:
+            try:
+                return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
+            except Exception as hub_exc:
+                error = hub_exc
 
         if error:
             raise error
@@ -511,7 +521,10 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         parent, source = self.find_parent(plugin)
 
         logger.debug(
-            "Found plugin parent", plugin=plugin.name, parent=parent.name, source=source
+            "Found plugin parent",
+            plugin=plugin.name,
+            parent=parent.name,
+            source=source,
         )
         return parent
 
@@ -544,3 +557,18 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if not transformer:
             raise PluginNotFoundError("No Plugin of type Transformer found.")
         return transformer
+
+    @contextmanager
+    def use_preferred_source(self, source: DefinitionSource) -> None:
+        """Prefer a source of definition.
+
+        Args:
+            source: The source to prefer.
+
+        Yields:
+            None.
+        """
+        previous = self._prefer_source
+        self._prefer_source = source
+        yield
+        self._prefer_source = previous

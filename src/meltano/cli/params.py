@@ -1,15 +1,10 @@
 import functools
-import os
-import urllib
-from pathlib import Path
 
 import click
 import click.globals
+
 from meltano.core.db import project_engine
-from meltano.core.migration_service import MigrationService
-from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.utils import pop_all
 
 from .utils import CliError
 
@@ -49,6 +44,8 @@ class pass_project:  # noqa: N801
             engine, _ = project_engine(project, default=True)
 
             if self.migrate:
+                from meltano.core.migration_service import MigrationService
+
                 migration_service = MigrationService(engine)
                 migration_service.upgrade(silent=True)
                 migration_service.seed(project)

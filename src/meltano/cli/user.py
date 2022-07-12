@@ -1,15 +1,19 @@
 """User account management CLI."""
 
 import click
-from flask_security.utils import hash_password
 
 from meltano.api.app import create_app
 
 from . import cli
 from .params import pass_project
+from .utils import InstrumentedCmd, InstrumentedGroup
 
 
-@cli.group(invoke_without_command=True, short_help="Manage Meltano user accounts.")
+@cli.group(
+    cls=InstrumentedGroup,
+    invoke_without_command=True,
+    short_help="Manage Meltano user accounts.",
+)
 @pass_project(migrate=True)
 @click.pass_context
 def user(ctx, project):
@@ -23,7 +27,7 @@ def user(ctx, project):
     ctx.obj["project"] = project
 
 
-@user.command(short_help="Create a Meltano user account.")
+@user.command(cls=InstrumentedCmd, short_help="Create a Meltano user account.")
 @click.argument("username")
 @click.argument("password")
 @click.option(
@@ -49,7 +53,9 @@ def add(ctx, username, password, role, **flags):
     """
     app = create_app()
 
-    from meltano.api.security import users
+    from flask_security.utils import hash_password
+
+    from meltano.api.security.identity import users
 
     try:
         with app.app_context():
@@ -71,6 +77,7 @@ def add(ctx, username, password, role, **flags):
             current_user = users.get_user(username) or users.create_user(
                 username=username
             )
+
             current_user.password = hash_password(password)
             current_user.roles = roles
 
@@ -78,4 +85,4 @@ def add(ctx, username, password, role, **flags):
             users.db.session.commit()
     except Exception as err:
         click.secho(f"Could not create user '{username}': {err}", fg="red")
-        click.Abort()
+        raise click.Abort from err

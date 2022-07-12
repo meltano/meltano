@@ -1,3 +1,4 @@
+import platform
 from datetime import date, datetime
 
 import dotenv
@@ -6,16 +7,20 @@ import pytest
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.settings_service import (
-    REDACTED_VALUE,
-    PluginSettingsService,
-    SettingValueStore,
-)
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
-from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
-from meltano.core.settings_store import ConflictingSettingValueException
+from meltano.core.settings_service import (
+    FEATURE_FLAG_PREFIX,
+    REDACTED_VALUE,
+    FeatureFlags,
+    SettingValueStore,
+)
+from meltano.core.settings_store import (
+    ConflictingSettingValueException,
+    MultipleEnvVarsSetException,
+)
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 
@@ -496,6 +501,10 @@ class TestPluginSettingsService:
     def test_env_var_expansion(
         self, session, subject, project, tap, monkeypatch, env_var
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")
 
@@ -788,6 +797,7 @@ class TestPluginSettingsService:
 
     def test_extra_object(
         self,
+        active_environment,
         subject,
         monkeypatch,
         env_var,
@@ -827,34 +837,61 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
-        subject.set("_vars", {"other": "from_meltano_yml"})
+        subject.set(
+            "_vars",
+            {"other": "from_meltano_yml"},
+            store=SettingValueStore.MELTANO_YML,
+        )
 
         assert subject.get_with_source("_vars") == (
             {"var": "from_default", "other": "from_meltano_yml"},
             SettingValueStore.MELTANO_YML,
         )
 
-        monkeypatch.setenv(env_var(subject, "_vars.var"), "from_env")
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars.var"), "from_env")
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env", "other": "from_meltano_yml"},
+                SettingValueStore.ENV,
+            )
 
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env"},
+                SettingValueStore.ENV,
+            )
+
+        subject.set(
+            "_vars",
+            {"dev_setting": "from_dev_env"},
+            store=SettingValueStore.MELTANO_ENV,
+        )
         assert subject.get_with_source("_vars") == (
-            {"var": "from_env", "other": "from_meltano_yml"},
-            SettingValueStore.ENV,
+            {
+                "var": "from_default",
+                "other": "from_meltano_yml",
+                "dev_setting": "from_dev_env",
+            },
+            SettingValueStore.MELTANO_ENV,
         )
 
-        monkeypatch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
-
-        assert subject.get_with_source("_vars") == (
-            {"var": "from_env"},
-            SettingValueStore.ENV,
-        )
-
-    def test_find_setting_raises_with_multiple(
+    def test_find_setting_raises_with_conflicting(
         self, tap, plugin_settings_service_factory, monkeypatch
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
         monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_1")
         with pytest.raises(ConflictingSettingValueException):
+            subject.get("aliased")
+
+    def test_find_setting_raises_with_multiple(
+        self, tap, plugin_settings_service_factory, monkeypatch
+    ):
+        subject = plugin_settings_service_factory(tap)
+        monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
+        monkeypatch.setenv("TAP_MOCK_ALIASED_1", "value_0")
+        with pytest.raises(MultipleEnvVarsSetException):
             subject.get("aliased")
 
     def test_find_setting_aliases(self, tap, plugin_settings_service_factory):

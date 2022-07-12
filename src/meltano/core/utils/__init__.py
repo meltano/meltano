@@ -1,4 +1,5 @@
 """Defines helpers for the core codebase."""
+
 import asyncio
 import functools
 import hashlib
@@ -6,13 +7,12 @@ import logging
 import math
 import os
 import re
+import traceback
 from collections import OrderedDict
-from contextlib import suppress
 from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
-import traceback
-from typing import Any, Callable, Coroutine, Dict, Iterable, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, Optional, TypeVar, Union
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
@@ -43,34 +43,12 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def run_async(coro: Coroutine[Any, Any, T]) -> T:
-    """Run coroutine and handle event loop and cleanup."""
-    # Taken from https://stackoverflow.com/a/58532304
-    # and inspired by Python 3.7's `asyncio.run`
-    future = asyncio.ensure_future(coro)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(future)
-    try:
-        if future.exception():
-            raise future.exception()
-
-        return future.result()
-    except asyncio.CancelledError:
-        pass
-    finally:
-        all_tasks = asyncio.gather(*asyncio_all_tasks(loop), return_exceptions=True)
-        all_tasks.cancel()
-        with suppress(asyncio.CancelledError):
-            loop.run_until_complete(all_tasks)
-        loop.run_until_complete(loop.shutdown_asyncgens())
-
-
 def click_run_async(func):
-    """Small decorator to allow click invoked functions to leverage run_async and be declared as async."""
+    """Small decorator to allow click invoked functions to leverage `asyncio.run` and be declared as async."""
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):  # noqa: WPS430
-        return run_async(func(*args, **kwargs))
+        return asyncio.run(func(*args, **kwargs))
 
     return wrapper
 

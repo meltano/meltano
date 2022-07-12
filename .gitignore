@@ -1,3 +1,7 @@
+# CI
+
+_changelog_fragment.md
+
 requirements.txt
 */__pycache__
 *.log

@@ -52,6 +52,50 @@ can be used to pass along arbitrary key-value data to the new process.
 Meltano [reads settings from environment variables](#configuring-settings) when you run the [`meltano` command](/reference/command-line-interface),
 and populates them when it [evaluates plugin configuration](#expansion-in-setting-values)
 and [invokes plugin executables](#accessing-from-plugins).
+Meltano also supports specifying environment variables under the `env:` keys of `meltano.yml`, a Meltano Environment, or on the Plugin.
+
+### Specifying environment variables
+
+In addition to the terminal environment and the `.env ` file, Meltano supports the specification of environment variables at the following configuration levels:
+
+```yaml
+env:
+  # root level env
+  MY_ENV_VAR: top_level_env_var
+plugins:
+  extractors:
+  - name: tap-google-analytics
+    variant: meltano
+    env:
+      # root level plugin env
+      MY_ENV_VAR: plugin_level_env_var
+environments:
+- name: dev
+  env:
+    # environment level env
+    MY_ENV_VAR: environment_level_env_var
+  config:
+    plugins:
+      extractors:
+        - name: tap-google-analytics
+          variant: meltano
+          env:
+            # environment level plugin env
+            MY_ENV_VAR: environment_level_plugin_env_var
+```
+
+Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context):
+
+```yaml
+- environment level plugin env # highest
+- environment level env
+- root level plugin env
+- root level env
+- .env file
+- terminal env # lowest
+```
+
+This allows you to override environment variables per plugin and per environment, as needed for your use case.
 
 ### Configuring settings
 
@@ -68,13 +112,85 @@ export <PLUGIN_NAME>_<SETTING_NAME>=<value>
 export TAP_GITLAB_API_URL=https://gitlab.example.com
 ```
 
-Plugins can also specify alternative variables (aliases) for their settings, to match existing usage or variables expected by plugin executables. You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin along with their variables, in order of precedence.
+Plugins can also specify alternative variables ([aliases](#aliases) for their settings, to match existing usage or variables expected by plugin executables. You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin along with their variables, in order of precedence.
 
 Since environment variable values are always strings, Meltano will cast values to the appropriate type before passing them on to the plugin.
 
 To verify that any environment variables you've set will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 To learn how to use environment variables to specify pipeline-specific configuration, refer to the [Data Integration (EL) guide](/guide/integration#pipeline-specific-configuration).
+
+#### Settings Aliases
+
+Aliases allow for configuration values to be set via one of multiple keys.
+Environment variable aliases are listed next to the canonical names for the variable in the output of the [`meltano config <plugin> list`](/reference/command-line-interface#config) command.
+They can be defined via the `aliases` key in a custom plugin's `settings` configuration.
+For example, the following defines a `my_custom_username` setting with aliases `custom_tap_username` and `username`:
+
+```yaml
+# meltano.yml
+---
+plugins:
+  extractors:
+  - name: my-custom-tap
+    namespace: my_custom_tap
+    pip_url: git+https://github.com/my-organization/my-custom-tap.git
+    executable: my-custom-tap
+    capabilities:
+    - discover
+    - catalog
+    settings:
+    - name: password
+      kind: password
+    - name: my_custom_tap_username
+      aliases: [custom_tap_username, username]
+```
+
+Within a given configuration layer, a setting can be set via only a single name, whether that name is its canonical name or one of its aliases.
+So given the custom extractor defined above, the `my_custom_tap_username` setting could be set via the `MY_CUSTOM_TAP_MY_CUSTOM_TAP_USERNAME` environment variable or either the `MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME` or `MY_CUSTOM_TAP_USERNAME` variables.
+
+But if more than one of these variables is set in the terminal environment, then an exception will be raised--even if all the relevant environment variables have the same value.
+
+The configuration setting could also be set via the [`meltano config set`](/reference/command-line-interface#config) by setting either the canonical name or any of its aliases. Again using the custom extractor defined above as an example, the `my_custom_tap_username` could be set by any of the following commands:
+
+```bash
+# The canonical name
+meltano config my-custom-tap set my_custom_tap_username some_value
+
+# Alias 1
+meltano config my-custom-tap set custom_tap_username some_value
+
+# Alias 2
+meltano config my-custom-tap set username some_value
+```
+
+To see what name or alias a setting's value is being derived from, you can run `meltano config <plugin-name> list`:
+
+```shell
+$ export MY_CUSTOM_TAP_USERNAME=some_username
+$ meltano config my-custom-tap list
+2022-06-22T10:00:00Z [info     ] Environment 'dev' is active
+password [env: MY_CUSTOM_TAP_PASSWORD] current value: 'some_very_secure_password' (from the MY_CUSTOM_TAP_PASSWORD variable in `.env`)
+my_custom_tap_username [env: MY_CUSTOM_TAP_MY_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_USERNAME] current value: 'some_username' (from the MY_CUSTOM_TAP_USERNAME variable in the environment)
+```
+
+If a setting's value is being set via multiple environment variables, the resulting error message will list the environment variables where it is being set:
+
+```shell
+$ export MY_CUSTOM_TAP_USERNAME=some_username
+$ export MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME=some_username
+$ meltano config my-custom-tap
+Setting value set via multiple environment variables: ['MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME', 'MY_CUSTOM_TAP_USERNAME']
+```
+
+If the values for the multiple environment variables differ, the error message will also list what the values are:
+
+```shell
+$ export MY_CUSTOM_TAP_USERNAME=some_username
+$ export MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME=some_other_username
+$ meltano config my-custom-tap
+Conflicting values for setting found in: ['MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME', 'MY_CUSTOM_TAP_USERNAME']
+```
 
 ### Expansion in setting values
 
@@ -110,7 +226,7 @@ Generic `MELTANO_<PLUGIN_TYPE_VERB>_<SETTING_NAME>` variables can be used when t
 Inside the plugin `config` objects in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
 these variables can be referenced using standard variable expansion syntax, i.e. `$VAR` (as a single word) or `${VAR}` (inside a word):
 
-```yaml{4-7}
+```yaml
 extractors:
 - name: tap-example
   config:
@@ -127,12 +243,14 @@ When Meltano invokes a plugin's executable as part of [`meltano elt`](/reference
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
 
 Within a [Meltano environment](/concepts/environments) environment variables can be specified using the `env` key:
+
 ```yml
 environments:
-  - name: dev
-    env:
-      AN_ENVIRONMENT_VARIABLE: dev
+- name: dev
+  env:
+    AN_ENVIRONMENT_VARIABLE: dev
 ```
+
 Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
 
 ## Multiple plugin configurations
@@ -141,14 +259,14 @@ Every [plugin in your project](/concepts/plugins#project-plugins) has its own co
 but you can use [plugin inheritance](/concepts/plugins#plugin-inheritance) to define multiple plugins
 that use the same package but still have their own configuration:
 
-```yml{8-18}
+```yml
 plugins:
   extractors:
   - name: tap-google-analytics
     variant: meltano
     config:
       key_file_location: client_secrets.json
-      start_date: '2020-10-01T00:00:00Z'
+      start_date: "2020-10-01T00:00:00Z"
   - name: tap-ga--view-foo
     inherit_from: tap-google-analytics
     config:
@@ -158,7 +276,7 @@ plugins:
     inherit_from: tap-google-analytics
     config:
       # `key_file_location` is inherited
-      start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
+      start_date: "2020-12-01T00:00:00Z" # `start_date` is overridden
       view_id: 789012
 ```
 
@@ -214,7 +332,7 @@ Instead, you can define a custom setting by adding the setting name (key) to you
 meltano config tap-example set custom_setting value
 ```
 
-```yaml{5}
+```yaml
 extractors:
 - name: tap-example
   config:
@@ -234,6 +352,7 @@ Plugin extras are additional configuration options specific to the type of plugi
 that are handled by Meltano instead of the plugin itself.
 
 Meltano currently knows these extras for these plugin types:
+
 - [Extractors](/concepts/plugins#extractors)
   - [`catalog`](/concepts/plugins#catalog-extra)
   - [`load_schema`](/concepts/plugins#load-schema-extra)
@@ -253,7 +372,7 @@ Meltano currently knows these extras for these plugin types:
 
 The values of these extras are stored in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) among the plugin's other properties, _outside_ of the `config` object:
 
-```yaml{6-7}
+```yaml
 extractors:
 - name: tap-example
   config:
