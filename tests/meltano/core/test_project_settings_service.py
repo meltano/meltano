@@ -165,3 +165,13 @@ class TestProjectSettingsService:
         ):
             with pytest.warns(RuntimeWarning):
                 subject.get(setting)
+
+    def test_meltano_settings_with_active_environment(self, subject):
+        # make sure that meltano setting values are written to the root of `meltano.yml`
+        # even if there is an active environment
+        subject.project.activate_environment("dev")
+        assert subject.project.active_environment
+        subject.set("database_max_retries", 10000)
+        value, source = subject.get_with_source("database_max_retries")
+        assert source == SettingValueStore.MELTANO_YML
+        assert value == 10000
