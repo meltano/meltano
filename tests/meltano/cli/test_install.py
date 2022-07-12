@@ -1,3 +1,5 @@
+import shutil
+
 import mock
 import pytest
 
@@ -242,3 +244,12 @@ class TestCliInstall:
 
             mappers = [m for m in commands[0][1] if m == mapper]
             assert len(mappers) == 3
+
+
+# TODO is install_service the right place for this?
+def test_new_folder_should_autocreate_on_install(project, cli_runner, un_engine_uri):
+    # We had a case defined https://github.com/meltano/meltano/issues/6383 that caused the meltano db to not be recreated
+    shutil.rmtree(".meltano")
+    result = cli_runner.invoke(cli, ["install", "--clean"])
+    result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+    assert_cli_runner(result)

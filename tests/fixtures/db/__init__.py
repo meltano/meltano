@@ -1,4 +1,5 @@
 import logging
+import os
 import warnings
 
 import pytest
@@ -16,6 +17,17 @@ def engine_uri_env(engine_uri):
         yield
     finally:
         monkeypatch.undo()
+
+
+# When we want to test functinality that doesn't use the current DB URI
+@pytest.fixture
+def un_engine_uri():
+    monkeypatch = MonkeyPatch()
+    monkeypatch.delenv("MELTANO_DATABASE_URI")
+    try:
+        yield
+    finally:
+        monkeypatch.undo()  # Will set the URI back to the old engine_uri
 
 
 @pytest.fixture(scope="class", autouse=True)
