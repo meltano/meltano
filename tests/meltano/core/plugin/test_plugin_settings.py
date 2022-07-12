@@ -892,6 +892,7 @@ class TestPluginSettingsService:
 
         assert inherited_subject.get_with_source("_vars") == (
             {
+                "other": "from_meltano_yml",
                 "new": "from_inheriting",
             },
             SettingValueStore.MELTANO_YML,

@@ -374,9 +374,9 @@ class SettingsService(ABC):  # noqa: WPS214
                 value = expanded_value
 
         if setting_def:
-            if (
-                setting_def.kind == SettingKind.OBJECT
-                and metadata["source"] is SettingValueStore.DEFAULT
+            if setting_def.kind == SettingKind.OBJECT and (
+                metadata["source"]
+                in {SettingValueStore.DEFAULT, SettingValueStore.INHERITED}
             ):
                 object_value = {}
                 object_source = SettingValueStore.DEFAULT
