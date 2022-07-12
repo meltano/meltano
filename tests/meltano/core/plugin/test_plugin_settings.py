@@ -878,15 +878,11 @@ class TestPluginSettingsService:
 
         subject.project.active_environment = None
 
-        try:
-            inherited = project_add_service.add(
-                PluginType.TRANSFORMS,
-                "tap-mock-transform--inherited",
-                inherit_from=transform.name,
-            )
-        except PluginAlreadyAddedException as err:
-            inherited = err.plugin
-
+        inherited = project_add_service.add(
+            PluginType.TRANSFORMS,
+            "tap-mock-transform--inherited",
+            inherit_from=transform.name,
+        )
         inherited_subject = plugin_settings_service_factory(inherited)
         inherited_subject.set("_vars", {"new": "from_inheriting"})
 
