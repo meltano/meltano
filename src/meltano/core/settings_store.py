@@ -1133,6 +1133,23 @@ class AutoStoreManager(SettingsStoreManager):
         stores.remove(SettingValueStore.AUTO)
         return stores
 
+    def ensure_supported(self, store, method="set"):
+        """Return if a given store is supported for the given method.
+
+        Args:
+            store: The store to check.
+            method: The method to check for the given store.
+
+        Returns:
+            True if store supports method.
+        """
+        try:
+            manager = self.manager_for(store)
+            manager.ensure_supported(method)
+            return True
+        except StoreNotSupportedError:
+            return False
+
     def auto_store(  # noqa: WPS231 # Too complex
         self,
         name: str,
@@ -1151,38 +1168,24 @@ class AutoStoreManager(SettingsStoreManager):
         """
         setting_def = setting_def or self.find_setting(name)
 
-        store: SettingValueStore = source
+        if self.project.readonly:
+            # only the system database is available in readonly mode
+            if self.ensure_supported(store=SettingValueStore.DB):
+                return SettingValueStore.DB
 
-        prefer_dotenv = (
-            setting_def and (setting_def.is_redacted or setting_def.env_specific)
-        ) or source is SettingValueStore.ENV
+        if setting_def and (setting_def.is_redacted or setting_def.env_specific):
+            # value is a secret, return the dotenv store
+            if self.ensure_supported(store=SettingValueStore.DOTENV):
+                return SettingValueStore.DOTENV
 
-        tried = set()
-        while True:
-            try:
-                manager = self.manager_for(store)
-                manager.ensure_supported("set")
-                return store
-            except StoreNotSupportedError:
-                tried.add(store)
+        if not self.project.active_environment:
+            # no active meltano environment, return root `meltano.yml`
+            if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
+                return SettingValueStore.MELTANO_YML
 
-                if SettingValueStore.MELTANO_ENV not in tried and not prefer_dotenv:
-                    store = SettingValueStore.MELTANO_ENV
-                    continue
-
-                if SettingValueStore.MELTANO_YML not in tried and not prefer_dotenv:
-                    store = SettingValueStore.MELTANO_YML
-                    continue
-
-                if SettingValueStore.DOTENV not in tried:
-                    store = SettingValueStore.DOTENV
-                    continue
-
-                if SettingValueStore.DB not in tried:
-                    store = SettingValueStore.DB
-                    continue
-
-                break
+        if self.ensure_supported(store=SettingValueStore.MELTANO_ENV):
+            # any remaining config routed to meltano environment
+            return SettingValueStore.MELTANO_ENV
 
         return None
 
