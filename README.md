@@ -1,4 +1,3 @@
-
 <h1 align="center">Meltano</h1>
 <h3 align="center">Your Open Source DataOps Infrastructure</h3>
 
@@ -22,6 +21,7 @@
 <a href="https://libraries.io/pypi/meltano">
 <img alt="Libraries.io dependency status for latest release" src="https://img.shields.io/librariesio/release/pypi/meltano?label=Dependencies"/>
 </a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fmeltano%2Fmeltano?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmeltano%2Fmeltano.svg?type=shield"/></a>
 </div>
 
 <div align="center">
@@ -91,3 +91,7 @@ License
 -------
 
 This code is distributed under the MIT license, see the [LICENSE](https://github.com/meltano/meltano/blob/main/LICENSE) file.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmeltano%2Fmeltano.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmeltano%2Fmeltano?ref=badge_large)
