@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-from contextlib import contextmanager
 from typing import Any
 from urllib.request import urlopen
 
@@ -13,18 +12,6 @@ import backoff
 import pytest
 
 from meltano.core.project_settings_service import ProjectSettingsService
-
-
-@contextmanager
-def env(**environment) -> None:
-    """Temporarily update environment variables."""
-    original = dict(os.environ)
-    os.environ.update(environment)
-    try:
-        yield
-    finally:
-        os.environ.clear()
-        os.environ.update(original)
 
 
 class SnowplowMicro:
