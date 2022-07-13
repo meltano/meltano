@@ -50,8 +50,8 @@ Starting with Meltano [`2.0`](/reference/v2-migration), you can override the pro
 
 ```yaml
 plugins:
-  utilities:
-  - name: my-plugin
+  extractors:
+  - name: tap-example
     variant: meltanolabs
     capabilities:  # This will override the capabilities declared in the lockfile
     - state
