@@ -120,6 +120,19 @@ class TestProject:
         for key, val in unpacked_items:
             assert meltano.extras[key] == val
 
+    def test_preserve_comments(self, project: Project):
+        original_contents = project.meltanofile.read_text()
+
+        new_contents = f"# Please don't delete me :)\n{original_contents}"
+        project.meltanofile.write_text(new_contents)
+
+        with project.meltano_update() as meltano:
+            meltano.extras["a_new_key"] = "New Key"
+
+        contents = project.meltanofile.read_text()
+        assert contents.startswith("# Please don't delete me :)\n")
+        assert "a_new_key: New Key" in contents
+
 
 class TestIncompatibleProject:
     def test_incompatible(self, project):

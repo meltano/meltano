@@ -1,7 +1,11 @@
+import io
+from textwrap import dedent
+
 import pytest
-import yaml
+from ruamel.yaml.comments import CommentedMap
 
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.yaml import configure_yaml
 
 definition = {
     # a, b, …, z
@@ -22,7 +26,12 @@ class TestCanonical:
         subject.test = "hello"
         yaml_definition = "\n".join(f"{k}: {v}" for k, v in iter(subject))
 
-        assert yaml.dump(subject).strip() == yaml_definition
+        yaml = configure_yaml()
+        buf = io.StringIO()
+        yaml.dump(subject, buf)
+        buf.seek(0)
+
+        assert buf.read().strip() == yaml_definition
 
     def test_false(self, subject):
         subject.false_value = False
@@ -70,7 +79,7 @@ class TestCanonical:
 
     def test_defaults(self, subject):
         with pytest.raises(AttributeError):
-            subject.test
+            subject.test  # noqa: WPS428
 
         subject.test = None
 
@@ -92,7 +101,7 @@ class TestCanonical:
     def test_fallbacks(self, subject):
         # Calling an unknown attribute is not supported
         with pytest.raises(AttributeError):
-            subject.unknown
+            subject.unknown  # noqa: WPS428
 
         fallback = Canonical(unknown="value", known="value")
         # This would typically be set from a Canonical subclass
@@ -124,3 +133,34 @@ class TestCanonical:
         subject.known = "value"
         assert subject.known == "value"
         assert subject.canonical()["known"] == "value"
+
+    def test_preserve_comments(self):
+        contents = """\
+            # This is a top-level comment
+            test: value
+
+            object:
+              # Comment in an object
+              key: value # Comment in a nested value
+
+            array:
+            # Comment in an array
+            - value # Comment in an array element
+        """
+        contents = dedent(contents)
+        yaml = configure_yaml()
+        in_stream = io.StringIO(contents)
+        mapping = yaml.load(in_stream)
+        subject = Canonical.parse(mapping)
+        assert subject.test == "value"
+        assert subject.object["key"] == "value"
+        assert subject.array[0] == "value"
+
+        obj = subject.as_canonical(subject)
+        assert isinstance(obj, CommentedMap)
+
+        out_stream = io.StringIO(contents)
+        yaml.dump(obj, out_stream)
+        out_stream.seek(0)
+        new_contents = out_stream.read()
+        assert new_contents == contents
