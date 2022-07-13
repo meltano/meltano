@@ -243,6 +243,7 @@ class Variant(NameEq, Canonical):
         settings: list | None = None,
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
+        cwd: str | None = None,
         env: dict[str, str] | None = None,
         **extras,
     ):
@@ -261,6 +262,7 @@ class Variant(NameEq, Canonical):
             settings: The settings of the variant.
             commands: The commands of the variant.
             requires: Other plugins this plugin depends on.
+            cwd: The working directory to use for invocation.
             env: Environment variables to inject into plugins runtime context.
             extras: Additional keyword arguments.
         """
@@ -277,6 +279,7 @@ class Variant(NameEq, Canonical):
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
+            cwd=cwd,
             env=env or {},
             extras=extras,
         )
@@ -721,6 +724,7 @@ class StandalonePlugin(Canonical):
         settings: list | None = None,
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
+        cwd: str | None = None,
         env: dict[str, str] | None = None,
         **extras,
     ):
@@ -741,6 +745,7 @@ class StandalonePlugin(Canonical):
             settings: The settings of the plugin.
             commands: The commands of the plugin.
             requires: Other plugins this plugin depends on.
+            cwd: The working directory to use for invocation.
             env: Environment variables to inject into plugins runtime context.
             extras: Additional attributes to set on the plugin.
         """
@@ -759,6 +764,7 @@ class StandalonePlugin(Canonical):
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
+            cwd=cwd,
             env=env or {},
             extras=extras,
         )

@@ -22,6 +22,14 @@ class TestPluginInvoker:
         async with subject.prepared(session):
             yield subject
 
+    @pytest.fixture
+    async def alternate_cwd_plugin_invoker(
+        self, alternate_cwd_plugin, session, plugin_invoker_factory
+    ):
+        subject = plugin_invoker_factory(alternate_cwd_plugin)
+        async with subject.prepared(session):
+            yield subject
+
     @pytest.mark.asyncio
     async def test_env(self, project, tap, session, plugin_invoker_factory):
         project.dotenv.touch()
@@ -169,15 +177,18 @@ class TestPluginInvoker:
         assert "VIRTUAL_ENV" not in env
         assert "PYTHONPATH" not in env
 
-    def test_popen_options(self, plugin_invoker):
-        env = plugin_invoker.env()
-        assert not plugin_invoker.popen_options(command=None, env=env)
-        assert plugin_invoker.popen_options(command="cwd-relative", env=env) == {
-            "cwd": plugin_invoker.project.root / "transform"
-        }
-        assert plugin_invoker.popen_options(command="cwd-absolute", env=env) == {
-            "cwd": Path("/root")
-        }
-        assert plugin_invoker.popen_options(command="cwd-expansion", env=env) == {
-            "cwd": plugin_invoker.project.root / "transform"
-        }
+    def test_cwd(self, alternate_cwd_plugin_invoker):
+        root = alternate_cwd_plugin_invoker.project.root
+        assert alternate_cwd_plugin_invoker.cwd() == root / "path"
+        assert alternate_cwd_plugin_invoker.cwd(command="relative") == root / "path2"
+        assert alternate_cwd_plugin_invoker.cwd(command="absolute") == Path("/root")
+        assert (
+            alternate_cwd_plugin_invoker.cwd(command="expansion")
+            == root / "project" / "test"
+        )
+        assert (
+            alternate_cwd_plugin_invoker.cwd(
+                command="expansion", env={"UTILITY_CWD__CONFIG_PROJECT_DIR": "project2"}
+            )
+            == root / "project2" / "test"
+        )

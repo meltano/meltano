@@ -196,17 +196,38 @@ def discovery():  # noqa: WPS213
                         "volumes": ["$MELTANO_PROJECT_ROOT/example/:/usr/app/"],
                     },
                 },
-                "cwd-relative": {
+            },
+        }
+    )
+
+    discovery[PluginType.UTILITIES].append(
+        {
+            "name": "utility-cwd",
+            "namespace": "utility_cwd",
+            "pip_url": "utility-cwd",
+            "executable": "utility-cwd",
+            "cwd": "path",
+            "settings": [
+                {
+                    "name": "project_dir",
+                    "env": "PROJECT_DIR",
+                }
+            ],
+            "config": {
+                "project_dir": "project",
+            },
+            "commands": {
+                "relative": {
                     "args": "-v",
-                    "cwd": "transform",
+                    "cwd": "path2",
                 },
-                "cwd-absolute": {
+                "absolute": {
                     "args": "-v",
                     "cwd": "/root",
                 },
-                "cwd-expansion": {
+                "expansion": {
                     "args": "-v",
-                    "cwd": "$MELTANO_PROJECT_ROOT/transform",
+                    "cwd": "$UTILITY_CWD__CONFIG_PROJECT_DIR/test",
                 },
             },
         }
@@ -399,6 +420,14 @@ def transformer(project_add_service: ProjectAddService):
 def utility(project_add_service):
     try:
         return project_add_service.add(PluginType.UTILITIES, "utility-mock")
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def alternate_cwd_plugin(project_add_service: ProjectAddService):
+    try:
+        return project_add_service.add(PluginType.UTILITIES, "utility-cwd")
     except PluginAlreadyAddedException as err:
         return err.plugin
 

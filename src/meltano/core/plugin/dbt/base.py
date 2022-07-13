@@ -7,22 +7,18 @@ from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.transform_add_service import TransformAddService
 
 logger = logging.getLogger(__name__)
 
 
-class DbtInvoker(PluginInvoker):
-    def popen_options(self):
-        return {**super().popen_options(), "cwd": self.plugin_config["project_dir"]}
-
-
 class DbtPlugin(BasePlugin):
     __plugin_type__ = PluginType.TRANSFORMERS
 
-    invoker_class = DbtInvoker
+    @property
+    def cwd(self) -> str:
+        return self.plugin_config["project_dir"]
 
 
 class DbtTransformPluginInstaller:

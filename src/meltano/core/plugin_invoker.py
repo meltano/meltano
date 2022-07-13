@@ -15,6 +15,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
 from meltano.core.logging.utils import SubprocessOutputWriter
+from meltano.core.utils import expand_env_vars
 
 from .error import Error
 from .plugin import PluginRef
@@ -341,25 +342,34 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def popen_options(
-        self, command: str | None = None, env=None
-    ) -> dict[str, Any]:  # noqa: N802
-        """Get options for subprocess.Popen.
+    def cwd(self, command: str | None = None, env=None) -> Path | None:
+        """Resolve the working directory for invocation.
+
+        Expands environment variables, and resolves paths relative to
+        the project root into absolute paths.
 
         Args:
             command: Command name.
             env: Environment variables to use for expansion.
 
         Returns:
+            A Path to use for the working directory, if cwd is defined.
+        """
+        env = env or self.env()
+        base_cwd = self.find_command(command).cwd if command else self.plugin.cwd
+        if not base_cwd:
+            return None
+
+        path = self.project.root_dir() / Path(expand_env_vars(base_cwd, env))
+        return path.resolve()
+
+    def popen_options(self) -> dict[str, Any]:  # noqa: N802
+        """Get options for subprocess.Popen.
+
+        Returns:
             Mapping of subprocess options.
         """
-        env = env or {}
-        opts = {}
-        if command is not None:
-            opts["cwd"] = self.find_command(command).expand_cwd(
-                env, self.project.root_dir()
-            )
-        return opts
+        return {}
 
     @asynccontextmanager
     async def _invoke(
@@ -377,13 +387,17 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         async with self.plugin.trigger_hooks("invoke", self, args):
             popen_env = {**self.env(), **env}
+            cwd = self.cwd(command=command, env=popen_env)
             popen_options = {
+                "cwd": cwd,
                 **self.popen_options(command=command, env=popen_env),
                 **kwargs,
             }
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")
             logging.debug(f"Env: {popen_env}")
+            if cwd:
+                logging.debug(f"CWD: {cwd}")
 
             try:
                 yield (popen_args, popen_options, popen_env)
