@@ -1,8 +1,9 @@
 name: Docker Publish
 
-# This workflow will publish all public docker images to DockerHub
+# This workflow will publish all public docker images to Docker Hub.
 # Use the `dry-run=FALSE` input variable to debug the workflow without pushing
-# images.
+# images. Note that even in dry-run mode, the image built for the default
+# Python version with the commit hash tag will be pushed to Docker Hub.
 
 # For now, only run manually
 on:
@@ -29,7 +30,6 @@ jobs:
       fail-fast: true
       matrix:
         include:
-        # TODO: uncomment when basic functionality is working
         - python-version: "3.7"
           is-default-python: false
         - python-version: "3.8"
@@ -40,21 +40,22 @@ jobs:
           is-default-python: false
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: Get Meltano Version
+    - name: Get Meltano version
       id: get-meltano-version
       run: |
         pipx install poetry
         poetry version
         poetry version --short
         echo "::set-output name=release-version::$(poetry version --short)"
+
     - name: Print job inputs summary
       run: |
         echo "DRY_RUN=${{ env.DRY_RUN_STR }}"
         echo "PYTHON_VERSION=${{ matrix.python-version }}"
         echo "RELEASE_VERSION=${{ steps.get-meltano-version.outputs.release-version }}"
-        echo "COMMIT_SHA=${{ env.COMMIT_SHA }}"
+        echo "COMMIT_SHA=${{ github.sha }}"
         echo "DEBUG INFO: DRY_RUN is truthy=${{ env.DRY_RUN_STR == 'true' }}"
         echo "DEBUG INFO: DRY_RUN is falsey=${{ env.DRY_RUN_STR == 'false' }}"
 
@@ -64,6 +65,7 @@ jobs:
       run: |
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "NOTE: This job is a dry run and will not publish any images."
+
     - name: Print publish message (if applicable)
       if: ${{ env.DRY_RUN_STR == 'false' }}
       run: |
@@ -71,37 +73,25 @@ jobs:
         echo "NOTE: This job is planning to publish the docker images."
         echo "⚠️ If this is not intended, please cancel this job."
 
-    # Per: https://github.com/marketplace/actions/build-and-push-docker-images
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
     # e.g. meltano/meltano:SHA-73d02a3b693bbf38270bf23e4cc31e69cb2837ad
-    - name: Build and push images with SHA label 'meltano/meltano:SHA-${{ env.COMMIT_SHA }}'
+    - name: Build the image with the SHA label 'meltano/meltano:SHA-${{ github.sha }}'
       if: ${{ matrix.is-default-python }}
-      uses: docker/build-push-action@v3
+      uses: ./.github/actions/docker-build-scan-push
       with:
-        context: "{{defaultContext}}:docker/publish"
         push: true
         tags: |
-          meltano/meltano:SHA-${{ env.COMMIT_SHA }}
+          meltano/meltano:SHA-${{ github.sha }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+        dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+        dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # e.g. meltano/meltano:v2.0.0-python:3.8
     # e.g. meltano/meltano:latest-python:3.8
     - name: Build and push images with suffix '-python${{ matrix.python-version }}'
-      uses: docker/build-push-action@v3
+      uses: ./.github/actions/docker-build-scan-push
       with:
-        context: "{{defaultContext}}:docker/publish"
         push: ${{ env.DRY_RUN_STR == 'false' }}
         tags: |
           meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}
@@ -109,15 +99,16 @@ jobs:
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+        dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+        dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # e.g. meltano/meltano:v2.0.0
     #      meltano/meltano:latest
     #      meltano/meltano:latest-python:3.8
     - name: Build and push default Python versions (if ${{ matrix.python-version }}' is default)
       if: ${{ matrix.is-default-python }}
-      uses: docker/build-push-action@v3
+      uses: ./.github/actions/docker-build-scan-push
       with:
-        context: "{{defaultContext}}:docker/publish"
         push: ${{ env.DRY_RUN_STR == 'false' }}
         tags: |
           meltano/meltano:latest
@@ -126,3 +117,5 @@ jobs:
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+        dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+        dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
