@@ -39,5 +39,7 @@ jobs:
             MIT,
             MIT-0,
             MIT-Modern-Variant,
+            PSF-2.0,
+            Python-2.0,
             Ruby,
             Unlicense
