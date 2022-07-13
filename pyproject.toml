@@ -87,6 +87,7 @@ pyupgrade = "^2.29.1"
 requests-mock = "^1.6.0"
 tox = "^3.24.4"
 wemake-python-styleguide = "^0.16.1"
+wikipedia = "^1"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
