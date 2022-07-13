@@ -1150,7 +1150,7 @@ class AutoStoreManager(SettingsStoreManager):
         except StoreNotSupportedError:
             return False
 
-    def auto_store(  # noqa: WPS231 # Too complex
+    def auto_store(  # noqa: WPS231, WPS213 # Too complex
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
@@ -1169,45 +1169,60 @@ class AutoStoreManager(SettingsStoreManager):
         # only the system database is available in readonly mode
         if self.project.readonly:
             if self.ensure_supported(store=SettingValueStore.DB):
+                logger.debug("AutoStoreManager returned the system db")
                 return SettingValueStore.DB
             return None
 
         # value is a secret
         if setting_def and setting_def.is_redacted:
             if self.ensure_supported(store=SettingValueStore.DOTENV):
+                logger.debug("AutoStoreManager returned the dotenv file")
                 return SettingValueStore.DOTENV
             elif self.ensure_supported(store=SettingValueStore.DB):
+                logger.debug("AutoStoreManager returned the system db")
                 return SettingValueStore.DB
             # ensure secrets don't bleed into other stores
+            logger.debug("AutoStoreManager could not return a supported store")
             return None
 
         # value is env-specific
         if setting_def and setting_def.env_specific:
             if self.ensure_supported(store=SettingValueStore.DOTENV):
+                logger.debug("AutoStoreManager returned the dotenv file")
                 return SettingValueStore.DOTENV
 
         # no active meltano environment
         if not self.project.active_environment:
             # return root `meltano.yml`
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
+                logger.debug("AutoStoreManager returned the root `meltano.yml` file")
                 return SettingValueStore.MELTANO_YML
             # fall back to dotenv
             elif self.ensure_supported(store=SettingValueStore.DOTENV):
+                logger.debug("AutoStoreManager returned the dotenv file")
                 return SettingValueStore.DOTENV
             # fall back to meltano system db
             elif self.ensure_supported(store=SettingValueStore.DB):
+                logger.debug("AutoStoreManager returned the system db")
                 return SettingValueStore.DB
+            logger.debug("AutoStoreManager could not return a supported store")
             return None
 
         # any remaining config routed to meltano environment
         if self.ensure_supported(store=SettingValueStore.MELTANO_ENV):
+            logger.debug(
+                "AutoStoreManager returned the active environment in `meltano.yml`"
+            )
             return SettingValueStore.MELTANO_ENV
         # fall back to dotenv
         elif self.ensure_supported(store=SettingValueStore.DOTENV):
+            logger.debug("AutoStoreManager returned the dotenv file")
             return SettingValueStore.DOTENV
         # fall back to meltano system db
         elif self.ensure_supported(store=SettingValueStore.DB):
+            logger.debug("AutoStoreManager returned the system db")
             return SettingValueStore.DB
+        logger.debug("AutoStoreManager could not return a supported store")
         return None
 
     def get(
