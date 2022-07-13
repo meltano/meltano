@@ -1153,14 +1153,12 @@ class AutoStoreManager(SettingsStoreManager):
     def auto_store(  # noqa: WPS231 # Too complex
         self,
         name: str,
-        source: SettingValueStore,
         setting_def: SettingDefinition | None = None,
     ) -> SettingValueStore | None:
         """Get first valid writable SettingValueStore instance for a Setting.
 
         Args:
             name: Setting name.
-            source: Default SettingValueStore.
             setting_def: SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
@@ -1168,25 +1166,48 @@ class AutoStoreManager(SettingsStoreManager):
         """
         setting_def = setting_def or self.find_setting(name)
 
+        # only the system database is available in readonly mode
         if self.project.readonly:
-            # only the system database is available in readonly mode
             if self.ensure_supported(store=SettingValueStore.DB):
                 return SettingValueStore.DB
+            return None
 
-        if setting_def and (setting_def.is_redacted or setting_def.env_specific):
-            # value is a secret, return the dotenv store
+        # value is a secret
+        if setting_def and setting_def.is_redacted:
+            if self.ensure_supported(store=SettingValueStore.DOTENV):
+                return SettingValueStore.DOTENV
+            elif self.ensure_supported(store=SettingValueStore.DB):
+                return SettingValueStore.DB
+            # ensure secrets don't bleed into other stores
+            return None
+
+        # value is env-specific
+        if setting_def and setting_def.env_specific:
             if self.ensure_supported(store=SettingValueStore.DOTENV):
                 return SettingValueStore.DOTENV
 
+        # no active meltano environment
         if not self.project.active_environment:
-            # no active meltano environment, return root `meltano.yml`
+            # return root `meltano.yml`
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
                 return SettingValueStore.MELTANO_YML
+            # fall back to dotenv
+            elif self.ensure_supported(store=SettingValueStore.DOTENV):
+                return SettingValueStore.DOTENV
+            # fall back to meltano system db
+            elif self.ensure_supported(store=SettingValueStore.DB):
+                return SettingValueStore.DB
+            return None
 
+        # any remaining config routed to meltano environment
         if self.ensure_supported(store=SettingValueStore.MELTANO_ENV):
-            # any remaining config routed to meltano environment
             return SettingValueStore.MELTANO_ENV
-
+        # fall back to dotenv
+        elif self.ensure_supported(store=SettingValueStore.DOTENV):
+            return SettingValueStore.DOTENV
+        # fall back to meltano system db
+        elif self.ensure_supported(store=SettingValueStore.DB):
+            return SettingValueStore.DB
         return None
 
     def get(
@@ -1226,7 +1247,7 @@ class AutoStoreManager(SettingsStoreManager):
 
         metadata["source"] = found_source
 
-        auto_store = self.auto_store(name, found_source, setting_def=setting_def)
+        auto_store = self.auto_store(name, setting_def=setting_def)
         if auto_store:
             metadata["auto_store"] = auto_store
             metadata["overwritable"] = auto_store.can_overwrite(found_source)
@@ -1251,7 +1272,6 @@ class AutoStoreManager(SettingsStoreManager):
         setting_def = setting_def or self.find_setting(name)
 
         current_value, metadata = self.get(name, setting_def=setting_def)
-        source = metadata["source"]
 
         if setting_def:
             if value == setting_def.value:
@@ -1259,7 +1279,7 @@ class AutoStoreManager(SettingsStoreManager):
                 self.unset(name, path, setting_def=setting_def)
                 return {"store": SettingValueStore.DEFAULT}
 
-        store = self.auto_store(name, source, setting_def=setting_def)
+        store = self.auto_store(name, setting_def=setting_def)
         if store is None:
             raise StoreNotSupportedError("No storage method available")
 
