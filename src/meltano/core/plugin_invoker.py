@@ -9,7 +9,7 @@ import os
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any, Generator, Optional
 
 from structlog.stdlib import get_logger
 
@@ -342,7 +342,9 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def cwd(self, command: str | None = None, env=None) -> Path | None:
+    def cwd(
+        self, command: Optional[str] = None, env: Optional[dict] = None
+    ) -> Optional[Path]:
         """Resolve the working directory for invocation.
 
         Expands environment variables, and resolves paths relative to
