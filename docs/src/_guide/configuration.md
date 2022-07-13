@@ -44,6 +44,26 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 [`meltano config <plugin> set`](/reference/command-line-interface#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
+### Overriding discoverable plugin properties
+
+Starting with Meltano [`2.0`](/reference/v2-migration), you can override the properties of discoverable plugins and extend the default [`settings`](/reference/settings):
+
+```yaml
+plugins:
+  utilities:
+  - name: my-plugin
+    variant: meltanolabs
+    capabilities:  # This will override the capabilities declared in the lockfile
+    - state
+    - discover
+    - catalog
+    settings:  # These will be appended to the settings declared in the lockfile
+    - name: my-new-setting
+      kind: object
+      value:
+        key: value
+```
+
 ## Environment variables
 
 When you run an executable on your system, [environment variables](https://en.wikipedia.org/wiki/Environment_variable)
