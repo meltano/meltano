@@ -22,10 +22,10 @@ Next we'll need to configure a loader to store our gitlab data. We'll use [`targ
 which was installed by the `meltano install` command but may require tweaking of the configuration to match your environment:
 
 ```shell
-meltano config target-postgres set user postgres
-meltano config target-postgres set password postgres
-meltano config target-postgres set dbname warehouse
-meltano config target-postgres set default_target_schema public
+meltano --environment=dev config target-postgres set user postgres
+meltano --environment=dev config target-postgres set password postgres
+meltano --environment=dev config target-postgres set dbname warehouse
+meltano --environment=dev config target-postgres set default_target_schema public
 ```
 
 Note that sensitive config options such as `password` [aren't stored in your `meltano.yml` but in `.env` instead](https://docs.meltano.com/guide/configuration#configuration-layers). Print out the config to make sure it looks as expected:
@@ -44,7 +44,6 @@ You'll get quite a bit of output, two key lines near the end of the output that 
 <timestamps> [info     ] Incremental state has been updated at <timestamp>.
 <timestamps> [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True
 ```
-
 
 ### Adding a job
 
@@ -66,12 +65,12 @@ The meltano.yml didn't include dbt, so let's install that and get it configured 
 
 ```shell
 meltano add transformer dbt-postgres
-meltano config dbt-postgres set host localhost
-meltano config dbt-postgres set user postgres
-meltano config dbt-postgres set password postgres
-meltano config dbt-postgres set port 5432
-meltano config dbt-postgres set dbname warehouse
-meltano config dbt-postgres set schema analytics
+meltano --environment=dev config dbt-postgres set host localhost
+meltano --environment=dev config dbt-postgres set user postgres
+meltano --environment=dev config dbt-postgres set password postgres
+meltano --environment=dev config dbt-postgres set port 5432
+meltano --environment=dev config dbt-postgres set dbname warehouse
+meltano --environment=dev config dbt-postgres set schema analytics
 ```
 
 ### Prep the `dbt` transform for this demo
