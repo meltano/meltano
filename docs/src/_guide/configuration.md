@@ -46,7 +46,7 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 ### Overriding discoverable plugin properties
 
-Starting with Meltano [`2.0`](/reference/v2-migration), you can override the properties of discoverable plugins and extend the default [`settings`](/reference/settings):
+Starting with Meltano [`2.0`](/reference/v2-migration), you can override the properties of discoverable plugins, such as their [`capabilities`](/contribute/plugins#how-to-test-a-tap) and `settings_group_validation`, and extend their default [`settings`](/reference/settings):
 
 ```yaml
 plugins:
@@ -63,6 +63,8 @@ plugins:
       value:
         key: value
 ```
+
+All overrides replace the values of in the [lockfile](/concepts/plugins#lock-artifacts), except for `settings`, which extend the base definitions. If there is a collision on name, then the setting is taken from the override definition in `meltano.yml` and used at runtime, while the token setting definition in the lockfile is discarded.
 
 ## Environment variables
 
