@@ -472,6 +472,30 @@ def project(test_dir, project_init_service):
         logging.debug(f"Cleaned project at {project.root}")
 
 
+# Copied the fixture above in order to change the scope
+# Frees us from side affects from other tests in the same class
+@pytest.fixture(scope="function")
+def project_function(test_dir, project_init_service):
+    project = project_init_service.init(add_discovery=True)
+    logging.debug(f"Created new project at {project.root}")
+
+    # empty out the `plugins`
+    with project.meltano_update() as meltano:
+        meltano.plugins = Canonical()
+
+    ProjectSettingsService(project).set("snowplow.collector_endpoints", "[]")
+
+    # cd into the new project root
+    os.chdir(project.root)
+
+    try:
+        yield project
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        logging.debug(f"Cleaned project at {project.root}")
+
+
 @pytest.fixture(scope="class")
 def project_files(test_dir, compatible_copy_tree):
     project_init_service = ProjectInitService("a_multifile_meltano_project_core")
