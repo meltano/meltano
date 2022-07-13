@@ -49,9 +49,16 @@ runs:
         severity-threshold: MEDIUM
 
     - name: Scan the image with 'anchore/scan-action'
+      id: anchore-scan
       uses: anchore/scan-action@v3
       with:
         image: ${{ steps.get-image-id.outputs.id }}
+        acs-report-enable: true
+
+    - name: Upload Anchore scan SARIF report
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
 
     - name: Login to Docker Hub
       uses: docker/login-action@v2
