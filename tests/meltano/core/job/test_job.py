@@ -98,10 +98,9 @@ class TestJob:
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
             )
         subject = self.sample_job({"original_state": 1}).save(session)
-
         with pytest.raises(KeyboardInterrupt):
             async with subject.run(session):
-                psutil.Process().send_signal(signal.SIGINT)
+                send_signal(signal.SIGINT)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -119,7 +118,7 @@ class TestJob:
 
         with pytest.raises(SystemExit):
             async with subject.run(session):
-                psutil.Process().terminate()
+                send_signal(signal.SIGTERM)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -190,3 +189,15 @@ class TestJob:
         assert job.fail_stale()
         assert job.has_error()
         assert "5 minutes" in job.payload["error"]
+
+
+def send_signal(signal: int):
+    if platform.system() == "Windows":
+        # Replace once Python 3.7 has been dropped see https://github.com/meltano/meltano/issues/6223
+        import ctypes
+
+        ucrtbase = ctypes.CDLL("ucrtbase")
+        c_raise = ucrtbase["raise"]
+        c_raise(signal)
+    else:
+        psutil.Process().send_signal(signal)

@@ -16,7 +16,7 @@ TOTAL: 4 valid schemas
 TOTAL: 0 schemas didn't pass validation
 ```
 
-Note that `igluctl` is a Java program, and so will require local runtime to be installed. 
+Note that `igluctl` is a Java program, and so will require local runtime to be installed.
 
 # Snowcat Cloud access
 

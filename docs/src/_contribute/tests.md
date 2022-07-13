@@ -35,7 +35,7 @@ the bellow in `docs/example-library/transition-from-elt-to-run/index.md`:
 ````markdown
 # Example of how to transition from `meltano elt` to `meltano run`
 
-This example shows how to transition an `etl` task with a custom state-id to a `job` executed via `run`.
+This example shows how to transition an `elt` task with a custom state-id to a `job` executed via `run`.
 To follow along with this example, download link to meltano yml to a fresh project and run:
 
 ```

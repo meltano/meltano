@@ -93,12 +93,12 @@ class TestLock:
         cli_runner: CliRunner,
         project: Project,
         tap: ProjectPlugin,
-        alternative_tap: ProjectPlugin,
+        inherited_tap: ProjectPlugin,
         hub_endpoints: MeltanoHubService,
     ):
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
-        # 2 taps, 1 target
-        assert len(lockfiles) == 3
+        # 1 tap, 1 target
+        assert len(lockfiles) == 2
 
         result = cli_runner.invoke(
             cli,
@@ -107,4 +107,4 @@ class TestLock:
         assert result.exit_code == 0
         assert "Lockfile exists" not in result.output
         assert "Locked definition for extractor tap-mock" in result.output
-        assert "Locked definition for extractor tap-mock--singer-io" in result.output
+        assert "Extractor tap-mock-inherited is an inherited plugin" in result.output

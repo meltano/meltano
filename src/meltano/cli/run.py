@@ -18,12 +18,12 @@ from meltano.core.utils import click_run_async
 
 from . import CliError, cli
 from .params import pass_project
-from .utils import InstrumentedCmd
+from .utils import PartialInstrumentedCmd
 
 logger = structlog.getLogger(__name__)
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Run a set of plugins in series.")
+@cli.command(cls=PartialInstrumentedCmd, short_help="Run a set of plugins in series.")
 @click.option(
     "--dry-run",
     help="Do not run, just parse the invocation, validate it, and explain what would be executed.",
