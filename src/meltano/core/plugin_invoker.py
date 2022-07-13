@@ -356,7 +356,9 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             A Path to use for the working directory, if cwd is defined.
         """
         env = env or self.env()
-        base_cwd = self.find_command(command).cwd if command else self.plugin.cwd
+        base_cwd = self.plugin.cwd
+        if command:
+            base_cwd = self.find_command(command).cwd or base_cwd
         if not base_cwd:
             return None
 
@@ -390,7 +392,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             cwd = self.cwd(command=command, env=popen_env)
             popen_options = {
                 "cwd": cwd,
-                **self.popen_options(command=command, env=popen_env),
+                **self.popen_options(),
                 **kwargs,
             }
             popen_args = self.exec_args(*args, command=command, env=popen_env)
