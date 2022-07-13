@@ -64,8 +64,8 @@ def snowplow_session(request) -> SnowplowMicro | None:
     try:
         # Getting the `docker_services` fixture essentially causes `docker-compose up` to be run
         request.getfixturevalue("docker_services")
-    except Exception:  # nocov
-        yield None  # nocov
+    except Exception:  # pragma: no cover
+        yield None
     else:
         args = ("docker", "port", f"pytest{os.getpid()}_snowplow_1")
         proc = subprocess.run(args, capture_output=True, text=True)
@@ -73,8 +73,8 @@ def snowplow_session(request) -> SnowplowMicro | None:
         collector_endpoint = f"http://{address_and_port}"
         try:  # noqa: WPS505
             yield SnowplowMicro(collector_endpoint)
-        except Exception:  # nocov
-            yield None  # nocov
+        except Exception:  # pragma: no cover
+            yield None
 
 
 @pytest.fixture
@@ -89,8 +89,8 @@ def snowplow_optional(
     Yields:
         A freshly reset `SnowplowMicro` instance, or `None` if it could not be created.
     """
-    if snowplow_session is None:  # nocov
-        yield None  # nocov
+    if snowplow_session is None:  # pragma: no cover
+        yield None
     else:
         if isinstance(ProjectSettingsService.config_override, dict):
             monkeypatch.delitem(
@@ -119,6 +119,6 @@ def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     Yields:
         A freshly reset `SnowplowMicro` instance.
     """
-    if snowplow_optional is None:  # nocov
-        pytest.skip("Unable to start Snowplow Micro")  # nocov
+    if snowplow_optional is None:  # pragma: no cover
+        pytest.skip("Unable to start Snowplow Micro")
     yield snowplow_optional

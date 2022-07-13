@@ -24,9 +24,9 @@ class MeltanoCliRunner(CliRunner):
 
     def invoke(self, *args, **kwargs) -> Any:
         results = super().invoke(*args, **kwargs)
-        if self.snowplow:  # nocov
-            assert self.snowplow.all()["bad"] == 0  # nocov
-            assert not self.snowplow.bad()  # nocov
+        if self.snowplow:  # pragma: no cover
+            assert self.snowplow.all()["bad"] == 0  # pragma: no cover
+            assert not self.snowplow.bad()  # pragma: no cover
         return results
 
 

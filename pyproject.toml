@@ -118,7 +118,6 @@ show_missing = true
 skip_covered = true
 precision = 2
 exclude_lines = [
-    "nocov",
     "if TYPE_CHECKING:",
 ]
 
