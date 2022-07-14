@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import tempfile
 from pathlib import Path
 
@@ -24,6 +25,8 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliEvent, PluginsTrackingContext
+
+logger = logging.getLogger(__name__)
 
 
 def get_label(metadata) -> str:
@@ -75,6 +78,13 @@ def config(  # noqa: WPS231
     except ValueError:
         tracker.track_command_event(CliEvent.aborted)
         raise
+
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"The default environment ({project.active_environment.name}) will be ignored for `meltano config`. "
+            + "To configure a specific Environment, please use option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
 
     plugins_service = ProjectPluginsService(project)
 
