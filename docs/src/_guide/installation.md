@@ -80,7 +80,7 @@ Now that you've installed Meltano and its requirements, you can continue setting
 ## Windows
 
 Please note that Windows is not fully supported yet so some features like the UI, and the ELT command may not work yet.
-See the [Meltano on Windows](https://gitlab.com/groups/meltano/-/epics/115) Epic for more information.
+See the GitHub [Windows Label](https://github.com/meltano/meltano/labels/Windows) for more information.
 
 If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about).
 You may also try [installing Meltano on Docker](#installing-on-docker).
