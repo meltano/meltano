@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.2.0"
+version = "2.3.0a0"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -122,8 +122,8 @@ exclude_lines = [
 ]
 
 [tool.commitizen]
-name = "cz_conventional_commits"
-version = "2.2.0"
+name = "cz_customize"
+version = "2.3.0a0"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
     "pyproject.toml:^version =",

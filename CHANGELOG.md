@@ -3,19 +3,32 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
+## v2.3.0a0 (2022-07-14)
 
----
+### ✨ New
 
-### New
+- Resolve #3419 "Change default meltano config behavior to --no-environment" (#6327)
+- Preserve comments and flow style in `meltano.yml` (#6308)
+- Resolve #6207 "Add env as first-class attribute of MeltanoFile and ProjectPlugin classes (not an extra)" (#6267)
 
-### Changes
+### 🐛 Fixes
 
-- [#3419](https://github.com/meltano/meltano/issues/3419) Change default `meltano config` behavior to --no-environment.
+- Extras of kind `object` not honored in environments (#6376)
+- Swap add_related for add_required in api v1 plugins (#6355)
+- Do not attempt to lock inherited plugins when using `meltano lock` (#6368)
+- clarify job/task relation to airflow (#6358)
+- Emit `RuntimeWarning` if a setting uses the default value (#6350)
+- typo in `meltano-basics` example link (#6357)
+- removed run preview references (#6351)
 
-### Fixes
+### ⚙️ Under the Hood
 
-### Breaks
+- update to automatically fire start AND end events (#6341)
+
+### 📚 Documentation Improvements
+
+- Windows installation old gitlab link (#6420)
+- Fix typo etl -> elt (#6367)
 
 ## 2.2.0 - (2022-07-01)
 
