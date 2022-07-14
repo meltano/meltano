@@ -41,12 +41,12 @@ runs:
       shell: bash
       run: echo "::set-output name=id::$(docker images -q meltano/meltano | head -n 1)"
 
-    - name: Scan the image with 'Azure/container-scan'
-      uses: Azure/container-scan@v0
-      with:
-        image-name: ${{ steps.get-image-id.outputs.id }}
-        run-quality-checks: true
-        severity-threshold: MEDIUM
+    # - name: Scan the image with 'Azure/container-scan'
+    #   uses: Azure/container-scan@v0
+    #   with:
+    #     image-name: ${{ steps.get-image-id.outputs.id }}
+    #     run-quality-checks: true
+    #     severity-threshold: MEDIUM
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
