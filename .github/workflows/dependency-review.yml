@@ -17,10 +17,18 @@ jobs:
       - name: 'Checkout Repository'
         uses: actions/checkout@v3
 
-      - name: 'Dependency Review'
+      - name: 'GitHub Dependency Review'
         uses: actions/dependency-review-action@v2
 
-      - name: 'FOSSA Action'
+      - name: 'Run FOSSA Scan'
         uses: fossas/fossa-action@v1
         with:
           api-key: ${{ secrets.MELTYBOT_FOSSA_API_KEY }}
+          branch: ${{ github.ref_name }}
+
+      - name: 'Run FOSSA Test'
+        uses: fossas/fossa-action@v1
+        with:
+          api-key: ${{ secrets.MELTYBOT_FOSSA_API_KEY }}
+          branch: ${{ github.ref_name }}
+          run-tests: true
