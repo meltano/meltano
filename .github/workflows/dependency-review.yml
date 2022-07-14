@@ -30,5 +30,4 @@ jobs:
         uses: fossas/fossa-action@v1.3.1
         with:
           api-key: ${{ secrets.MELTYBOT_FOSSA_API_KEY }}
-          branch: ${{ github.ref_name || 'main' }}
           run-tests: true
