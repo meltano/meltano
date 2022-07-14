@@ -140,7 +140,7 @@ change_type_order = [
   "✨ New",
   "🐛 Fixes",
   "⚙️ Under the Hood",
-  "⚡ Performance",
+  "⚡ Performance Improvements",
   "📚 Documentation Improvements",
 ]
 
@@ -149,7 +149,7 @@ feat = "✨ New"
 fix = "🐛 Fixes"
 refactor = "⚙️ Under the Hood"
 docs = "📚 Documentation Improvements"
-perf = "⚡ Performance"
+perf = "⚡ Performance Improvements"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
