@@ -54,6 +54,7 @@ runs:
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         acs-report-enable: true
+        fail-build: false
 
     - name: Upload Anchore scan SARIF report
       uses: github/codeql-action/upload-sarif@v2
