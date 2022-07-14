@@ -66,10 +66,10 @@ runs:
         username: ${{ inputs.dockerhub-username }}
         password: ${{ inputs.dockerhub-password }}
 
-    - name: Push the scanned image to Docker Hub
-      if: ${{ inputs.push == 'true' }}
-      shell: bash
-      run: docker image push --all-tags meltano/meltano
+    # - name: Push the scanned image to Docker Hub
+    #   if: ${{ inputs.push == 'true' }}
+    #   shell: bash
+    #   run: docker image push --all-tags meltano/meltano
 
     - name: Delete the image
       shell: bash

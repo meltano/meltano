@@ -7,6 +7,7 @@ name: Docker Publish
 
 # For now, only run manually
 on:
+  pull_request: {}
   workflow_dispatch:
     inputs:
       dry-run:
