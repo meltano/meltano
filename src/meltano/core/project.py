@@ -330,6 +330,10 @@ class Project(Versioned):  # noqa: WPS214
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
 
+    def deactivate_environment(self) -> None:
+        """Deactivate the currently active environment."""
+        self.active_environment = None
+
     @contextmanager
     def dotenv_update(self):
         """Raise error if project is readonly.
