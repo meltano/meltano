@@ -134,7 +134,7 @@ version_files = [
 ]
 
 [tool.commitizen.customize]
-commit_parser = '^(?P<change_type>feat|fix|refactor|perf|BREAKING CHANGE|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?'
+commit_parser = '^(?P<change_type>feat|fix|refactor|perf|break|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?'
 change_type_order = [
   "BREAKING CHANGES",
   "✨ New",
