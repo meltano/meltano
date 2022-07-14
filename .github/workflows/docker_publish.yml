@@ -28,7 +28,7 @@ jobs:
       DRY_RUN_STR: ${{format('{0}', github.event.inputs.dry-run)}}
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
         - python-version: "3.7"
