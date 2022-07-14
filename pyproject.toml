@@ -133,6 +133,12 @@ version_files = [
     'docs/package.json:^  "version":',
 ]
 
+[tool.commitizen.customize.change_type_map]
+feat = "✨ New"
+fix = "🐛 Fixes"
+refactor = "⚙️ Under the hood"
+docs = "📚 Documentation"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
