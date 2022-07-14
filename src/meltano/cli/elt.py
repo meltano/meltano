@@ -4,7 +4,7 @@ from __future__ import annotations
 import datetime
 import logging
 import platform
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager, nullcontext
 
 import click
 import structlog
@@ -301,10 +301,6 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     extractor_log = output_logger.out(extractor, stderr_log.bind(cmd_type="extractor"))
     loader_log = output_logger.out(loader, stderr_log.bind(cmd_type="loader"))
-
-    @contextmanager
-    def nullcontext():
-        yield None
 
     extractor_out_writer_ctxmgr = nullcontext
     loader_out_writer_ctxmgr = nullcontext
