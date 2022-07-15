@@ -134,15 +134,6 @@ class ProjectSettingsService(SettingsService):
         """
         return self.config_service.current_config
 
-    @property
-    def environment_config(self):
-        """Return current environment configuration in `meltano.yml`.
-
-        Raises:
-            NotImplementedError: Meltano config not supported in Environments.
-        """
-        raise NotImplementedError("Meltano config not supported in Environments.")
-
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
 
@@ -150,17 +141,6 @@ class ProjectSettingsService(SettingsService):
             config: Updated config.
         """
         self.config_service.update_config(config)
-
-    def update_meltano_environment_config(self, config: dict):
-        """Update environment configuration in `meltano.yml`.
-
-        Args:
-            config: Updated environment config.
-
-        Raises:
-            NotImplementedError: Meltano config not supported in Environments.
-        """
-        raise NotImplementedError("Meltano config not supported in Environments.")
 
     def process_config(self, config) -> dict:
         """Process configuration dictionary for presentation in `meltano config meltano`.
