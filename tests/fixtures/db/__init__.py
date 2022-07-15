@@ -1,25 +1,25 @@
 import logging
+import os
 import warnings
+from typing import Generator
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri, monkeypatch) -> None:
+def engine_uri_env(engine_uri: str) -> None:
     """Use the correct meltano database URI for these tests."""
-    with monkeypatch.context():
-        monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
+    os.environ["MELTANO_DATABASE_URI"] = engine_uri
 
 
 @pytest.fixture
 def un_engine_uri(monkeypatch) -> None:
     """When we want to test functionality that doesn't use the current DB URI."""
-    with monkeypatch.context():
-        monkeypatch.delenv("MELTANO_DATABASE_URI")
+    with monkeypatch.context() as m:
+        m.delenv("MELTANO_DATABASE_URI")
 
 
 @pytest.fixture(scope="class", autouse=True)
