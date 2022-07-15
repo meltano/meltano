@@ -25,7 +25,7 @@ jobs:
       COMMIT_SHA: ${{ github.sha }}
       # Boolean values don't actually work so cast to 'true' and 'false'
       # https://github.com/actions/runner/issues/1483
-      DRY_RUN_STR: ${{format('{0}', github.event.inputs.dry-run)}}
+      DRY_RUN_STR: ${{ format('{0}', github.event.inputs.dry-run) || 'true' }}
 
     strategy:
       fail-fast: false
