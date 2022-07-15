@@ -74,7 +74,3 @@ runs:
     #   if: ${{ inputs.push == 'true' }}
     #   shell: bash
     #   run: docker image push --all-tags meltano/meltano
-
-    - name: Delete the image
-      shell: bash
-      run: docker image rm --force ${{ steps.get-image-id.outputs.id }}
