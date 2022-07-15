@@ -783,7 +783,7 @@ class TestSingerTap:
         ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
             await subject.run_discovery(invoker, catalog_path)
 
-            assert stream_mock.call_count == 1
+            assert stream_mock.call_count == 2
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
@@ -869,11 +869,6 @@ class TestSingerTap:
 
         assert sys.getdefaultencoding() == "utf-8"
 
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
-        ), mock.patch("sys.getdefaultencoding", return_value="ascii"):
-            with pytest.raises(UnicodeDecodeError):
-                await subject.run_discovery(invoker, catalog_path)
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
