@@ -9,6 +9,7 @@ import shutil
 import sys
 from asyncio.streams import StreamReader
 from hashlib import sha1
+from io import BytesIO
 from pathlib import Path
 from typing import Tuple
 
@@ -392,51 +393,39 @@ class SingerTap(SingerPlugin):
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
             )
-
-        try:
-            with catalog_path.open(mode="wb") as catalog:
-
-                # since we're using subproccess wait() - we need to ensure that that stderr's  buffer
-                # is drained regardless of whether or not we want the output.
-                if logger.isEnabledFor(logging.DEBUG):
-                    stderr_dst = asyncio.subprocess.PIPE
-                else:
-                    stderr_dst = asyncio.subprocess.DEVNULL
-
-                handle = await plugin_invoker.invoke_async(
-                    "--discover",
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=stderr_dst,
-                    universal_newlines=False,
-                )
-                invoke_futures = [
-                    asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
-                    asyncio.ensure_future(handle.wait()),
-                ]
-
-                if logger.isEnabledFor(logging.DEBUG) and handle.stderr:
-                    invoke_futures.append(
-                        _debug_logging_handler(self.name, plugin_invoker, handle.stderr)
+        with BytesIO(b"") as stderr_buff:
+            try:
+                with catalog_path.open(mode="wb") as catalog:
+                    handle = await plugin_invoker.invoke_async(
+                        "--discover",
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                        universal_newlines=False,
                     )
+                    invoke_futures = [
+                        asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
+                        asyncio.ensure_future(_stream_redirect(handle.stderr, stderr_buff)),
+                        asyncio.ensure_future(handle.wait())
+                    ]
+                    done, _ = await asyncio.wait(
+                        invoke_futures,
+                        return_when=asyncio.ALL_COMPLETED,
+                    )
+                    failed = [future for future in done if future.exception() is not None]
+                    if failed:
+                        failed_future = failed.pop()
+                        raise failed_future.exception()
+                exit_code = handle.returncode
+            except Exception:
+                catalog_path.unlink()
+                raise
 
-                done, _ = await asyncio.wait(
-                    invoke_futures,
-                    return_when=asyncio.ALL_COMPLETED,
+            if exit_code != 0:
+                catalog_path.unlink()
+                stderr_buff.seek(0)
+                raise PluginExecutionError(
+                    f"Catalog discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code} with stderr:\n {stderr_buff.read()}"
                 )
-                failed = [future for future in done if future.exception() is not None]
-                if failed:
-                    failed_future = failed.pop()
-                    raise failed_future.exception()
-            exit_code = handle.returncode
-        except Exception:
-            catalog_path.unlink()
-            raise
-
-        if exit_code != 0:
-            catalog_path.unlink()
-            raise PluginExecutionError(
-                f"Catalog discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}"
-            )
 
     @hook("before_invoke")
     async def apply_catalog_rules_hook(
