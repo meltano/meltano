@@ -117,5 +117,5 @@ class EnvironmentContext(SelfDescribingJson, metaclass=SingletonMeta):
         """
         try:
             return len(os.sched_getaffinity(0))
-        except AttributeError:
+        except AttributeError:  # pragme: no cover
             return os.cpu_count()

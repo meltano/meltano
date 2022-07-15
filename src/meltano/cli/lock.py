@@ -64,14 +64,12 @@ def lock(
         tracker.track_command_event(CliEvent.aborted)
         raise CliError("Exactly one of --all or plugin name must be specified.")
 
-    with plugins_service.use_preferred_source(DefinitionSource.HUB):
-        try:
-            # Make it a list so source preference is not lazily evaluated.
-            plugins = list(plugins_service.plugins())
-
-        except Exception:
-            tracker.track_command_event(CliEvent.aborted)
-            raise
+    try:
+        # Make it a list so source preference is not lazily evaluated.
+        plugins = list(plugins_service.plugins())
+    except Exception:
+        tracker.track_command_event(CliEvent.aborted)
+        raise
 
     if plugin_name:
         plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
@@ -86,7 +84,14 @@ def lock(
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
         if plugin.is_custom():
             click.secho(f"{descriptor.capitalize()} is a custom plugin", fg="yellow")
+        elif plugin.inherit_from is not None:
+            click.secho(
+                f"{descriptor.capitalize()} is an inherited plugin", fg="yellow"
+            )
         else:
+            plugin.parent = None
+            with plugins_service.use_preferred_source(DefinitionSource.HUB):
+                plugin = plugins_service.ensure_parent(plugin)
             try:
                 lock_service.save(plugin, exists_ok=update)
             except LockfileAlreadyExistsError as err:
