@@ -87,6 +87,7 @@ jobs:
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
         dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
         dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+        python-version: ${{ matrix.python-version }}
 
     # e.g. meltano/meltano:v2.0.0-python:3.8
     # e.g. meltano/meltano:latest-python:3.8
@@ -102,6 +103,7 @@ jobs:
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
         dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
         dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+        python-version: ${{ matrix.python-version }}
 
     # e.g. meltano/meltano:v2.0.0
     #      meltano/meltano:latest
@@ -120,3 +122,4 @@ jobs:
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
         dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
         dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+        python-version: ${{ matrix.python-version }}
