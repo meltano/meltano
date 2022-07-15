@@ -9,24 +9,17 @@ from sqlalchemy.orm import close_all_sessions, sessionmaker
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri):
-    monkeypatch = MonkeyPatch()
-    monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
-    try:
-        yield
-    finally:
-        monkeypatch.undo()
+def engine_uri_env(engine_uri, monkeypatch) -> None:
+    """Use the correct meltano database URI for these tests."""
+    with monkeypatch.context():
+        monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
 
 
 @pytest.fixture
-def un_engine_uri():
-    """When we want to test functionality that doesn't use the current DB URI"""
-    monkeypatch = MonkeyPatch()
-    monkeypatch.delenv("MELTANO_DATABASE_URI")
-    try:
-        yield
-    finally:
-        monkeypatch.undo()  # Will set the URI back to the old engine_uri
+def un_engine_uri(monkeypatch) -> None:
+    """When we want to test functionality that doesn't use the current DB URI."""
+    with monkeypatch.context():
+        monkeypatch.delenv("MELTANO_DATABASE_URI")
 
 
 @pytest.fixture(scope="class", autouse=True)
