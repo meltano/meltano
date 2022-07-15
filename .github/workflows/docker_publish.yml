@@ -80,9 +80,15 @@ jobs:
         echo "meltano/meltano:latest-python${{ matrix.python-version }}" >> tags
         [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:latest" >> tags
         [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
+
+        TAGS=$(cat tags)
+        TAGS="${TAGS//'%'/'%25'}"
+        TAGS="${TAGS//$'\n'/'%0A'}"
+        TAGS="${TAGS//$'\r'/'%0D'}"
+
         echo "If this is not a dry run, the image will be published with the following tags:"
         cat tags
-        echo "::set-output name=tags::$(cat tags)"
+        echo "::set-output name=tags::$TAGS"
 
     - name: Build, scan, then conditionally push the Docker image for a given Python version
       uses: ./.github/actions/docker-build-scan-push
