@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#3419](https://github.com/meltano/meltano/issues/3419) Change default `meltano config` behavior to --no-environment.
+- [#6150](https://github.com/meltano/meltano/issues/6150) Print full stderr for catalog discovery failures.
 
 ### Fixes
 
