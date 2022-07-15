@@ -404,14 +404,18 @@ class SingerTap(SingerPlugin):
                     )
                     invoke_futures = [
                         asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
-                        asyncio.ensure_future(_stream_redirect(handle.stderr, stderr_buff)),
-                        asyncio.ensure_future(handle.wait())
+                        asyncio.ensure_future(
+                            _stream_redirect(handle.stderr, stderr_buff)
+                        ),
+                        asyncio.ensure_future(handle.wait()),
                     ]
                     done, _ = await asyncio.wait(
                         invoke_futures,
                         return_when=asyncio.ALL_COMPLETED,
                     )
-                    failed = [future for future in done if future.exception() is not None]
+                    failed = [
+                        future for future in done if future.exception() is not None
+                    ]
                     if failed:
                         failed_future = failed.pop()
                         raise failed_future.exception()

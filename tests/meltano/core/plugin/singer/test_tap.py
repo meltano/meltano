@@ -869,7 +869,6 @@ class TestSingerTap:
 
         assert sys.getdefaultencoding() == "utf-8"
 
-
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
         ):
