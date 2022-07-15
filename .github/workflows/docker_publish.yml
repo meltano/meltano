@@ -75,7 +75,7 @@ jobs:
     - name: Assemble image tags
       id: assemble-tags
       run: |
-        echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
+        [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
         echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
         echo "meltano/meltano:latest-python${{ matrix.python-version }}" >> tags
         [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:latest" >> tags
