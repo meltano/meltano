@@ -93,9 +93,11 @@ async def run(
 
     parser_blocks = []  # noqa: F841
     try:
+        logger.debug("Run parser object created")
         parser = BlockParser(
             logger, project, blocks, full_refresh, no_state_update, force
         )
+        logger.debug("Run parsed_blocks filled list parser.find_blocks(0)")
         parsed_blocks = list(parser.find_blocks(0))
         if not parsed_blocks:
             tracker.track_command_event(CliEvent.aborted)

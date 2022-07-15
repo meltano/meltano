@@ -80,6 +80,7 @@ class BlockParser:  # noqa: D101
             ClickException: If a block name is not found.
         """
         self.log = log
+        self.log.debug("BlockParser __init__")
         self.project = project
 
         self._full_refresh = full_refresh
@@ -93,17 +94,23 @@ class BlockParser:  # noqa: D101
         self._mappings_ref: Dict[int, str] = {}
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
-
+        self.log.debug(
+            "BlockParser blocks = self._expand_jobs(blocks, task_sets_service"
+        )
         blocks = self._expand_jobs(blocks, task_sets_service)
 
         for idx, name in enumerate(blocks):
 
             try:
+                self.log.debug('BlockParser name.split(":")')
                 parsed_name, command_name = name.split(":")
             except ValueError:
                 parsed_name = name
                 command_name = None
 
+            self.log.debug(
+                f"BlackParser self._find_plugin_or_mapping(parsed_name): {parsed_name}"
+            )
             plugin = self._find_plugin_or_mapping(parsed_name)
             if plugin is None:
                 raise click.ClickException(f"Block {name} not found")
@@ -173,6 +180,7 @@ class BlockParser:  # noqa: D101
         cur = offset
         while cur < len(self._plugins):
             plugin = self._plugins[cur]
+            self.log.debug("BlockParser find_blocks()")
             elb, idx = self._find_next_elb_set(cur)
             if elb:
                 self.log.debug("found ExtractLoadBlocks set", offset=cur)
@@ -207,12 +215,16 @@ class BlockParser:  # noqa: D101
         Raises:
             ClickException: If mapping name returns multiple matches.
         """
+        self.log.debug(f"BlockParser self._plugins_service.find_plugin(name): {name}")
         try:
             return self._plugins_service.find_plugin(name)
         except PluginNotFoundError:
             pass
 
         mapper = None
+        self.log.debug(
+            f"BlockParser self._plugins_service.find_plugins_by_mapping_name(name): {name}"
+        )
         try:
             mapper = self._plugins_service.find_plugins_by_mapping_name(name)
         except PluginNotFoundError:
@@ -225,6 +237,7 @@ class BlockParser:  # noqa: D101
             raise click.ClickException(
                 f"Ambiguous mapping name {name}, found multiple matches."
             )
+        self.log.debug("BlackParser _find_plugin_or_mapping return mapper or none")
         return mapper[0] if mapper else None
 
     def _find_next_elb_set(  # noqa: WPS231, WPS213
@@ -290,11 +303,22 @@ class BlockParser:  # noqa: D101
                     mapping=self._mappings_ref.get(next_block),
                     idx=next_block,
                 )
-                blocks.append(
-                    builder.make_block(
-                        plugin,
+                # Checks to see if the mapper plugin name is the same as the mappings name
+                # If they both match then a validation error is raised because the
+                # meltano run command needs the mappings name to obtain the settings to
+                # pass to the parent mapper plugin.  We also want to fail if the user names them
+                # the same to stop errors due to ambiguous commands.
+                if plugin.name == self._mappings_ref.get(next_block):
+                    self.log.warning("mapper plugin name used")
+                    raise BlockSetValidationError(
+                        f"Expected unique mappings name not the mapper plugin name: {plugin.name}."
                     )
-                )
+                else:
+                    blocks.append(
+                        builder.make_block(
+                            plugin,
+                        )
+                    )
             elif plugin.type == PluginType.LOADERS:
                 self.log.debug("blocks", offset=offset, idx=next_block)
                 blocks.append(builder.make_block(plugin))
