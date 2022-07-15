@@ -876,6 +876,24 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_ENV,
         )
 
+        subject.project.active_environment = None
+
+        inherited = project_add_service.add(
+            PluginType.TRANSFORMS,
+            "tap-mock-transform--inherited",
+            inherit_from=transform.name,
+        )
+        inherited_subject = plugin_settings_service_factory(inherited)
+        inherited_subject.set("_vars", {"new": "from_inheriting"})
+
+        assert inherited_subject.get_with_source("_vars") == (
+            {
+                "other": "from_meltano_yml",
+                "new": "from_inheriting",
+            },
+            SettingValueStore.MELTANO_YML,
+        )
+
     def test_find_setting_raises_with_conflicting(
         self, tap, plugin_settings_service_factory, monkeypatch
     ):

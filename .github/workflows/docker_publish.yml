@@ -98,6 +98,6 @@ jobs:
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
-        dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+        dockerhub-username: meltano
         dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
         python-version: ${{ matrix.python-version }}
