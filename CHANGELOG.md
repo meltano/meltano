@@ -105,6 +105,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 - [#3348](https://github.com/meltano/meltano/issues/3348) Add [`env_var_strict_mode`](https://docs.meltano.com/reference/settings#ffenv_var_strict_mode) feature flag to raise an exception if unset environment variables are referenced in settings.
 - [#6060](https://github.com/meltano/meltano/pull/6060) Generate lockfiles when running `meltano add` to install new plugins (now enabled by default).
 - [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies using `requires:`, replaces implicitly "related" plugins.
+- [#6033](https://github.com/meltano/meltano/pull/6033) Let plugin in `meltano.yml` override capabilities and extend settings of parent/lockfile.
 
 ### Changes
 

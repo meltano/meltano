@@ -374,12 +374,14 @@ class SettingsService(ABC):  # noqa: WPS214
                 value = expanded_value
 
         if setting_def:
-            if (
-                setting_def.kind == SettingKind.OBJECT
-                and metadata["source"] is SettingValueStore.DEFAULT
+            # Expand flattened config values if the root value is the default
+            # or inherited empty object.
+            if setting_def.kind == SettingKind.OBJECT and (
+                metadata["source"]
+                in {SettingValueStore.DEFAULT, SettingValueStore.INHERITED}
             ):
                 object_value = {}
-                object_source = SettingValueStore.DEFAULT
+                object_source = metadata["source"]
                 for setting_key in [  # noqa: WPS335
                     setting_def.name,
                     *setting_def.aliases,
