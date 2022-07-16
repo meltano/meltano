@@ -5,11 +5,9 @@ name: Docker Publish
 
 # For now, only run manually
 on:
-  pull_request: {}
   workflow_dispatch:
     inputs:
       dry-run:
-        # True to only push SHA label
         description: "Dry run (skip push step)"
         type: boolean
         required: true

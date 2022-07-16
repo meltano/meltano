@@ -44,13 +44,6 @@ runs:
       shell: bash
       run: echo "::set-output name=id::$(docker images -q meltano/meltano | head -n 1)"
 
-    # - name: Scan the image with 'Azure/container-scan'
-    #   uses: Azure/container-scan@v0
-    #   with:
-    #     image-name: ${{ steps.get-image-id.outputs.id }}
-    #     run-quality-checks: true
-    #     severity-threshold: MEDIUM
-
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
       uses: anchore/scan-action@v3
@@ -79,7 +72,7 @@ runs:
         username: ${{ inputs.dockerhub-username }}
         password: ${{ inputs.dockerhub-password }}
 
-    # - name: Push the scanned image to Docker Hub
-    #   if: ${{ inputs.push == 'true' }}
-    #   shell: bash
-    #   run: docker image push --all-tags meltano/meltano
+    - name: Push the scanned image to Docker Hub
+      if: ${{ inputs.push == 'true' }}
+      shell: bash
+      run: docker image push --all-tags meltano/meltano
