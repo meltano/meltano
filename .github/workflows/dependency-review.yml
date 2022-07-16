@@ -26,6 +26,12 @@ jobs:
           api-key: ${{ secrets.MELTYBOT_FOSSA_API_KEY }}
           branch: ${{ github.ref_name || 'main' }}
 
+      - name: 'Check scan output'
+        run: |
+          echo 'v================================================================================v'
+          cat /tmp/fossa-analyze-scan-summary.txt
+          echo '^================================================================================^'
+
       - name: 'Run FOSSA Test'
         uses: fossas/fossa-action@v1.3.1
         with:
