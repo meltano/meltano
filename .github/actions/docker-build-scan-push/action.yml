@@ -69,10 +69,9 @@ runs:
     - name: Provide a link to results
       shell: bash
       run: |
-        cat ${{ steps.anchore-scan.outputs.sarif }}
         echo "View scan results at:"
         echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${GITHUB_REF}"
-        npx -y violations-command-line -print-violations false -max-violations 0 -v "SARIF" "." ".*sarif$" "" > /dev/null 2>&1
+        python ./.github/actions/docker-build-scan-push/check_sarif.py --severity-cutoff 4.0 ${{ steps.anchore-scan.outputs.sarif }}
 
     - name: Login to Docker Hub
       uses: docker/login-action@v2
