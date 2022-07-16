@@ -16,10 +16,11 @@ def engine_uri_env(engine_uri: str) -> None:
 
 
 @pytest.fixture
-def un_engine_uri(monkeypatch) -> None:
+def un_engine_uri(monkeypatch) -> Generator:
     """When we want to test functionality that doesn't use the current DB URI."""
     with monkeypatch.context() as m:
         m.delenv("MELTANO_DATABASE_URI")
+        yield
 
 
 @pytest.fixture(scope="class", autouse=True)

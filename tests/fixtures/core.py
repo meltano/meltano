@@ -5,6 +5,7 @@ import os
 from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 import yaml
@@ -26,6 +27,7 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_plugins_service import (
     PluginAlreadyAddedException,
@@ -477,12 +479,32 @@ def project(test_dir, project_init_service):
         yield project
 
 
-# Copied the fixture above in order to change the scope
-# Frees us from side affects from other tests in the same class
 @pytest.fixture(scope="function")
 def project_function(test_dir, project_init_service):
     with project_directory(test_dir, project_init_service) as project:
         yield project
+
+
+@pytest.fixture(scope="class")
+def project_files(test_dir, compatible_copy_tree):
+    project_init_service = ProjectInitService("a_multifile_meltano_project_core")
+    project = project_init_service.init(add_discovery=False)
+    logging.debug(f"Created new project at {project.root}")
+
+    current_dir = Path(__file__).parent
+    multifile_project_root = current_dir.joinpath("multifile_project/")
+
+    os.remove(project.meltanofile)
+    compatible_copy_tree(multifile_project_root, project.root)
+    # cd into the new project root
+    os.chdir(project.root)
+
+    try:
+        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        logging.debug(f"Cleaned project at {project.root}")
 
 
 @pytest.fixture(scope="class")
