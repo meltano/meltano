@@ -172,14 +172,6 @@ show_lint_eslint: ${MELTANO_WEBAPP}/node_modules ## Run eslint & display output
 lint: lint_python lint_eslint ## Run linters & automatically apply fixes where possible
 show_lint: show_lint_python show_lint_eslint ## Run linters & display output
 
-# Makefile Related Tasks
-# ======================
-#
-# - `make explain` will bring up a web server with this makefile annotated.
-explain: ## Bring up a web server with this Makefile annotated
-	docker stop explain || echo 'booting server'
-	${DOCKER_RUN} --name explain_makefile -p 8081:8081 node ./scripts/explain_Makefile.sh
-
 # Release
 # =====================
 # Note:
