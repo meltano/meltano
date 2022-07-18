@@ -821,7 +821,7 @@ jobs:
     tasks:
       - tap-gitlab hide-gitlab-secrets target-postgres
       - dbt-postgres:run
-	  - custom-utility-plugin
+      - custom-utility-plugin
 ```
 
 While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the
