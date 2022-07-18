@@ -797,6 +797,7 @@ class TestPluginSettingsService:
 
     def test_extra_object(
         self,
+        active_environment,
         subject,
         monkeypatch,
         env_var,
@@ -836,25 +837,61 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
-        subject.set("_vars", {"other": "from_meltano_yml"})
+        subject.set(
+            "_vars",
+            {"other": "from_meltano_yml"},
+            store=SettingValueStore.MELTANO_YML,
+        )
 
         assert subject.get_with_source("_vars") == (
             {"var": "from_default", "other": "from_meltano_yml"},
             SettingValueStore.MELTANO_YML,
         )
 
-        monkeypatch.setenv(env_var(subject, "_vars.var"), "from_env")
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars.var"), "from_env")
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env", "other": "from_meltano_yml"},
+                SettingValueStore.ENV,
+            )
 
+        with monkeypatch.context() as patch:
+            patch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
+            assert subject.get_with_source("_vars") == (
+                {"var": "from_env"},
+                SettingValueStore.ENV,
+            )
+
+        subject.set(
+            "_vars",
+            {"dev_setting": "from_dev_env"},
+            store=SettingValueStore.MELTANO_ENV,
+        )
         assert subject.get_with_source("_vars") == (
-            {"var": "from_env", "other": "from_meltano_yml"},
-            SettingValueStore.ENV,
+            {
+                "var": "from_default",
+                "other": "from_meltano_yml",
+                "dev_setting": "from_dev_env",
+            },
+            SettingValueStore.MELTANO_ENV,
         )
 
-        monkeypatch.setenv(env_var(subject, "_vars"), '{"var": "from_env"}')
+        subject.project.active_environment = None
 
-        assert subject.get_with_source("_vars") == (
-            {"var": "from_env"},
-            SettingValueStore.ENV,
+        inherited = project_add_service.add(
+            PluginType.TRANSFORMS,
+            "tap-mock-transform--inherited",
+            inherit_from=transform.name,
+        )
+        inherited_subject = plugin_settings_service_factory(inherited)
+        inherited_subject.set("_vars", {"new": "from_inheriting"})
+
+        assert inherited_subject.get_with_source("_vars") == (
+            {
+                "other": "from_meltano_yml",
+                "new": "from_inheriting",
+            },
+            SettingValueStore.MELTANO_YML,
         )
 
     def test_find_setting_raises_with_conflicting(

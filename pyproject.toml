@@ -54,6 +54,7 @@ python-dotenv = "^0.20.0"
 python-gitlab = "^3.5.0"
 pyyaml = "^5.3.1"
 requests = "^2.23.0"
+"ruamel.yaml" = "^0.17.21"
 smtpapi = "^0.4.1"
 snowplow-tracker = "^0.10.0"
 sqlalchemy = "^1.3.19"
@@ -117,12 +118,11 @@ show_missing = true
 skip_covered = true
 precision = 2
 exclude_lines = [
-    "nocov",
     "if TYPE_CHECKING:",
 ]
 
 [tool.commitizen]
-name = "cz_conventional_commits"
+name = "cz_customize"
 version = "2.2.0"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
@@ -132,6 +132,25 @@ version_files = [
     'src/webapp/package.json:^  "version":',
     'docs/package.json:^  "version":',
 ]
+
+[tool.commitizen.customize]
+commit_parser = '^(?P<change_type>feat|fix|refactor|perf|break|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?'
+change_type_order = [
+  "BREAKING CHANGES",
+  "✨ New",
+  "🐛 Fixes",
+  "⚙️ Under the Hood",
+  "⚡ Performance Improvements",
+  "📚 Documentation Improvements",
+]
+
+[tool.commitizen.customize.change_type_map]
+break = "BREAKING CHANGES"
+feat = "✨ New"
+fix = "🐛 Fixes"
+refactor = "⚙️ Under the Hood"
+docs = "📚 Documentation Improvements"
+perf = "⚡ Performance Improvements"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

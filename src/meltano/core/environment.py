@@ -15,7 +15,7 @@ from meltano.core.utils import NotFound
 TEnv = TypeVar("TEnv")
 
 
-class NoActiveEnvironment(Exception):
+class NoActiveEnvironment(Exception):  # noqa: N818
     """Exception raised when invocation has no active environment."""
 
 
@@ -92,7 +92,7 @@ class EnvironmentPluginConfig(PluginRef):
         Returns:
             List of orphan settings.
         """
-        return SettingDefinition.from_missing(existing, self.config)
+        return SettingDefinition.from_missing(existing, self.config_with_extras)
 
 
 class EnvironmentConfig(Canonical):
