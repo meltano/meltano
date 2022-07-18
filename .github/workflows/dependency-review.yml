@@ -1,4 +1,4 @@
-name: 'Dependency Review'
+name: Dependency Review
 
 on:
   pull_request: {}
@@ -17,14 +17,14 @@ jobs:
   dependency-review:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v3
+      - name: Checkout the repository
+        uses: actions/checkout@v3.0.2
 
-      - name: 'GitHub Dependency Review'
+      - name: GitHub dependency vulnerability check
         uses: actions/dependency-review-action@v2
 
-      - name: 'Run FOSSA Scan'
+      - name: FOSSA dependency license check
         run: |
           curl --no-progress-meter -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/v${FOSSA_CLI_VERSION}/install-latest.sh | bash
-          fossa analyze --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }}
-          fossa test --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }}
+          fossa analyze --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }} --revision ${{ github.sha }}
+          fossa test --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }} --revision ${{ github.sha }}
