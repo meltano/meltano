@@ -34,6 +34,11 @@ jobs:
           fossa test --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }} --revision ${{ github.sha }}
 
           TEST_FAILED=$?
+          echo 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv'
+          cat fossa_analyze.log
+          echo '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+          grep --version
+          sed --version
           FOSSA_REPORT_LINK="$(grep -A 1 -E '\[ INFO\] +View FOSSA Report:' fossa_analyze.log | tail -n 1 | sed -e 's/^\[ INFO\]\s*//')"
           echo "[FOSSA detected $([ $TEST_FAILED -ne 0 ] && echo -n '' || echo 'no ')issues](${FOSSA_REPORT_LINK})" >> $GITHUB_STEP_SUMMARY
           exit $TEST_FAILED
