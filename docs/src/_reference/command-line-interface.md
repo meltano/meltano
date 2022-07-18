@@ -771,7 +771,7 @@ Note that such a sequence is only valid if it is one of:
 
 1. An extractor followed directly by a loader. E.g. `tap-gitlab target-postgres`
 1. An extractor followed by one or more mappers and then a loader. E.g. `tap-gitlab hide-gitlab-secrets target-postgres`
-1. A plugin command invocation. E.g. `dbt-postgres:run`
+1. A plugin invocation, with optional command. E.g. `dbt-postgres:run` or `custom_utility_plugin`
 1. Any sequence of the above. E.g. `tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run tap-zendesk target-csv`
 
 If a job has only one task, that task can be supplied as a single quoted argument:
@@ -781,7 +781,7 @@ If a job has only one task, that task can be supplied as a single quoted argumen
 meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
 
 # A more complex task
-meltano job add tap-gitlab-to-target-postgres-processed --tasks "tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run"
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run custom-utility-plugin"
 ```
 
 This would add the following to your `meltano.yml`:
@@ -793,7 +793,7 @@ jobs:
       - tap-gitlab target-postgres
   - name: tap-gitlab-to-target-postgres-processed
     tasks:
-      - tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run
+      - tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run custom-utility-plugin
 ```
 
 When an Airflow DAG is generated for a job, each task in the job definition will become a single task in the generated DAG.
@@ -810,7 +810,7 @@ supplied to the `meltano job add` command as an array in YAML format.
 For instance the `tap-gitlab-to-target-postgres-processed` job in the above example could also be created as:
 
 ```bash
-meltano job add tap-gitlab-to-target-postgres-processed --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt-postgres:run]"
+meltano job add tap-gitlab-to-target-postgres-processed-multiple-tasks --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt-postgres:run, custom-utility-plugin]"
 ```
 
 This would add the following to your `meltano.yml`:
@@ -821,15 +821,17 @@ jobs:
     tasks:
       - tap-gitlab hide-gitlab-secrets target-postgres
       - dbt-postgres:run
+	  - custom-utility-plugin
 ```
 
 While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the
 same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting
-of a single task while scheduling the latter will result in a generated DAG consisting of two tasks:
+of a single task while scheduling the latter will result in a generated DAG consisting of three tasks:
 
 ```
 task 1: "meltano run tap-gitlab hide-gitlab-secrets target-postgres"
 task 2: "meltano run dbt-postgres:run" , depends on task 1
+task 3: "meltano run custom-utility-plugin", depends on task 2
 ```
 
 ### Examples
