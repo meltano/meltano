@@ -133,6 +133,7 @@ per-file-ignores =
         D101
         D102
         D103
+        D104
         # String does contain unindexed parameters
         P103
         # Allow underscored number name pattern (e.g. tap_covid_19)
@@ -173,7 +174,6 @@ per-file-ignores =
         WPS425
         # Found too long name
         WPS118
-
     !tests/*:
         T
     scripts/*:
@@ -228,7 +228,7 @@ per-file-ignores =
         WPS229
         # Found too many expressions: 27 > 9
         WPS213
-    **/__init__.py:
+    src/**/__init__.py:
         # Allow for using __init__.py to promote imports to the module namespace
         F401
     src/meltano/__init__.py:
