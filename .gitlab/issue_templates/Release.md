@@ -34,10 +34,10 @@ Rotating `assignee`, on the morning of the release:
     1. In response to new tag creation, these steps are performed automatically in Gitlab pipelines:
         1. Abort if tag `vX.Y.Z` does not match output from `poetry version --short`
         2. Test _everything_.
-        3. Publish to PyPi <!-- Meltano-only: and Docker -->.
+        3. Publish to PyPI <!-- Meltano-only: and Docker -->.
     2. Validate publish once the pipeline finishes. (While the process is running, you can continue with next steps, such as changelog grooming.)
         1. [ ] Check this box when the tag's [pipeline](https://gitlab.com/meltano/meltano/-/pipelines) has completed (eta 40-60 minutes).
-        2. [ ] Check this box when [PyPi publish](https://pypi.org/project/meltano/#history) is confirmed.
+        2. [ ] Check this box when [PyPI publish](https://pypi.org/project/meltano/#history) is confirmed.
         <!-- Meltano-only: 5. [ ] Check this box when [Docker publish]() is confirmed. -->
 3. Groom the changelog:
     1. [ ] Compare the [Changelog](https://gitlab.com/meltano/meltano/-/blob/master/CHANGELOG.md) against the `main` branch [commit history](https://gitlab.com/meltano/meltano/-/commits/master) and add any significant user-impacting updates (excluding docs and website updates, for instance).

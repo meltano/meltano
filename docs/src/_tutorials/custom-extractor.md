@@ -153,16 +153,16 @@ sharing it with the world! We often find that community
 members who benefit from your tap also may contribute back their own improvements in
 the form of pull requests.
 
-### Publish to PyPi
+### Publish to PyPI
 
 If you've built your tap using the SDK, you can take advantage of the streamlined
 [`poetry publish`](https://python-poetry.org/docs/cli/#publish) command to publish
-your tap directly to PyPi.
+your tap directly to PyPI.
 
-1. Create an account with [PyPi](https://pypi.org).
-2. Create a PyPi API token for use in automated publishing. (Optional but recommended.)
+1. Create an account with [PyPI](https://pypi.org).
+2. Create a PyPI API token for use in automated publishing. (Optional but recommended.)
 3. Run `poetry --build publish` from within your repo to build and push your latest version
-   to the PyPi servers.
+   to the PyPI servers.
 
 ### Test a `pip` install
 
@@ -190,7 +190,7 @@ If you have gotten this far... _**Congrats!** You are now a proud Singer tap dev
 
 ### Make it discoverable
 
-Once you have your tap published to PyPi, consider
+Once you have your tap published to PyPI, consider
 [making it discoverable](/contribute/plugins#making-a-custom-plugin-discoverable)
 for other users of Meltano.
 
