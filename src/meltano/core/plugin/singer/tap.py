@@ -423,7 +423,9 @@ class SingerTap(SingerPlugin):
                     else:
                         invoke_futures.append(
                             asyncio.ensure_future(
-                                _stream_redirect(handle.stderr, stderr_buff)
+                                _stream_redirect(
+                                    handle.stderr, stderr_buff, write_str=True
+                                )
                             )
                         )
                     done, _ = await asyncio.wait(
