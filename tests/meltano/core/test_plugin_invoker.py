@@ -1,3 +1,4 @@
+import os
 import platform
 from pathlib import Path
 
@@ -178,17 +179,18 @@ class TestPluginInvoker:
         assert "PYTHONPATH" not in env
 
     def test_cwd(self, alternate_cwd_plugin_invoker):
-        root = alternate_cwd_plugin_invoker.project.root
-        assert alternate_cwd_plugin_invoker.cwd() == root / "path"
-        assert alternate_cwd_plugin_invoker.cwd(command="relative") == root / "path2"
-        assert alternate_cwd_plugin_invoker.cwd(command="absolute") == Path("/root")
+        sys_root = os.path.abspath(os.sep)
+        proj_root = alternate_cwd_plugin_invoker.project.root
+        assert alternate_cwd_plugin_invoker.cwd() == proj_root / "path"
+        assert alternate_cwd_plugin_invoker.cwd(command="relative") == proj_root / "path2"
+        assert alternate_cwd_plugin_invoker.cwd(command="absolute") == sys_root / Path("root")
         assert (
             alternate_cwd_plugin_invoker.cwd(command="expansion")
-            == root / "project" / "test"
+            == proj_root / "project" / "test"
         )
         assert (
             alternate_cwd_plugin_invoker.cwd(
                 command="expansion", env={"UTILITY_CWD__CONFIG_PROJECT_DIR": "project2"}
             )
-            == root / "project2" / "test"
+            == proj_root / "project2" / "test"
         )
