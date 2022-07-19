@@ -20,7 +20,8 @@ class DbtInvoker(PluginInvoker):
         self, command: Optional[str] = None, env: Optional[dict] = None
     ) -> Optional[Path]:
         return (
-            super().workdir(command=command, env=env) or self.plugin_config["project_dir"]
+            super().workdir(command=command, env=env)
+            or self.plugin_config["project_dir"]
         )
 
 

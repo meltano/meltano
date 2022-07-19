@@ -182,15 +182,21 @@ class TestPluginInvoker:
         sys_root = os.path.abspath(os.sep)
         proj_root = alternate_workdir_plugin_invoker.project.root
         assert alternate_workdir_plugin_invoker.workdir() == proj_root / "path"
-        assert alternate_workdir_plugin_invoker.workdir(command="relative") == proj_root / "path2"
-        assert alternate_workdir_plugin_invoker.workdir(command="absolute") == sys_root / Path("root")
+        assert (
+            alternate_workdir_plugin_invoker.workdir(command="relative")
+            == proj_root / "path2"
+        )
+        assert alternate_workdir_plugin_invoker.workdir(
+            command="absolute"
+        ) == sys_root / Path("root")
         assert (
             alternate_workdir_plugin_invoker.workdir(command="expansion")
             == proj_root / "project" / "test"
         )
         assert (
             alternate_workdir_plugin_invoker.workdir(
-                command="expansion", env={"UTILITY_WORKDIR__CONFIG_PROJECT_DIR": "project2"}
+                command="expansion",
+                env={"UTILITY_WORKDIR__CONFIG_PROJECT_DIR": "project2"},
             )
             == proj_root / "project2" / "test"
         )
