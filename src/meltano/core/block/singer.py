@@ -94,9 +94,6 @@ class InvokerBase:  # noqa: WPS230, WPS214
         Raises:
             RunnerError: If the plugin process can not start.
         """
-        if self.command is None:
-            raise RunnerError("No command to run")
-
         try:
             self.process_handle = await self.invoker.invoke_async(
                 *args,
