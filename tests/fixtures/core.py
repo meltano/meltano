@@ -202,11 +202,11 @@ def discovery():  # noqa: WPS213
 
     discovery[PluginType.UTILITIES].append(
         {
-            "name": "utility-cwd",
-            "namespace": "utility_cwd",
-            "pip_url": "utility-cwd",
-            "executable": "utility-cwd",
-            "cwd": "path",
+            "name": "utility-workdir",
+            "namespace": "utility_workdir",
+            "pip_url": "utility-workdir",
+            "executable": "utility-workdir",
+            "workdir": "path",
             "settings": [
                 {
                     "name": "project_dir",
@@ -219,15 +219,15 @@ def discovery():  # noqa: WPS213
             "commands": {
                 "relative": {
                     "args": "-v",
-                    "cwd": "path2",
+                    "workdir": "path2",
                 },
                 "absolute": {
                     "args": "-v",
-                    "cwd": "/root",
+                    "workdir": "/root",
                 },
                 "expansion": {
                     "args": "-v",
-                    "cwd": "$UTILITY_CWD__CONFIG_PROJECT_DIR/test",
+                    "workdir": "$UTILITY_WORKDIR__CONFIG_PROJECT_DIR/test",
                 },
             },
         }
@@ -425,9 +425,9 @@ def utility(project_add_service):
 
 
 @pytest.fixture(scope="class")
-def alternate_cwd_plugin(project_add_service: ProjectAddService):
+def alternate_workdir_plugin(project_add_service: ProjectAddService):
     try:
-        return project_add_service.add(PluginType.UTILITIES, "utility-cwd")
+        return project_add_service.add(PluginType.UTILITIES, "utility-workdir")
     except PluginAlreadyAddedException as err:
         return err.plugin
 

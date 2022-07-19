@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 
 
 class DbtInvoker(PluginInvoker):
-    def cwd(
+    def workdir(
         self, command: Optional[str] = None, env: Optional[dict] = None
     ) -> Optional[Path]:
         return (
-            super().cwd(command=command, env=env) or self.plugin_config["project_dir"]
+            super().workdir(command=command, env=env) or self.plugin_config["project_dir"]
         )
 
 

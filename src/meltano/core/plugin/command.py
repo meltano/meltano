@@ -35,7 +35,7 @@ class Command(Canonical):
         description: Optional[str] = None,
         executable: Optional[str] = None,
         container_spec: Optional[dict] = None,
-        cwd: Optional[str] = None,
+        workdir: Optional[str] = None,
     ):
         """Initialize a Command.
 
@@ -44,13 +44,13 @@ class Command(Canonical):
             description: Command description.
             executable: Optional command executable.
             container_spec: Container specification for this command.
-            cwd: Change the working directory for execution.
+            workdir: Change the working directory for execution.
         """
         super().__init__(
             args=args,
             description=description,
             executable=executable,
-            cwd=cwd,
+            workdir=workdir,
         )
         if container_spec is not None:
             self.container_spec = ContainerSpec(**container_spec)

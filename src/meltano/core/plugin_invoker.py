@@ -342,7 +342,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def cwd(
+    def workdir(
         self, command: Optional[str] = None, env: Optional[dict] = None
     ) -> Optional[Path]:
         """Resolve the working directory for invocation.
@@ -355,16 +355,16 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             env: Environment variables to use for expansion.
 
         Returns:
-            A Path to use for the working directory, if cwd is defined.
+            A Path to use for the working directory, if workdir is defined.
         """
         env = env or self.env()
-        base_cwd = self.plugin.cwd
+        base_workdir = self.plugin.workdir
         if command:
-            base_cwd = self.find_command(command).cwd or base_cwd
-        if not base_cwd:
+            base_workdir = self.find_command(command).workdir or base_workdir
+        if not base_workdir:
             return None
 
-        path = self.project.root_dir() / Path(expand_env_vars(base_cwd, env))
+        path = self.project.root_dir() / Path(expand_env_vars(base_workdir, env))
         return path.resolve()
 
     def popen_options(self) -> dict[str, Any]:  # noqa: N802
@@ -391,7 +391,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         async with self.plugin.trigger_hooks("invoke", self, args):
             popen_env = {**self.env(), **env}
-            cwd = self.cwd(command=command, env=popen_env)
+            cwd = self.workdir(command=command, env=popen_env)
             popen_options = {
                 "cwd": cwd,
                 **self.popen_options(),
@@ -401,7 +401,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             logging.debug(f"Invoking: {popen_args}")
             logging.debug(f"Env: {popen_env}")
             if cwd:
-                logging.debug(f"CWD: {cwd}")
+                logging.debug(f"Working directory: {cwd}")
 
             try:
                 yield (popen_args, popen_options, popen_env)

@@ -12,7 +12,7 @@ class TestCommand:
                 "args": "foo",
                 "description": "foo desc",
                 "executable": "foo",
-                "cwd": "path",
+                "workdir": "path",
             },
             "bar": {"args": "bar"},
             "baz": "baz",
@@ -30,19 +30,19 @@ class TestCommand:
         assert serialized["foo"].args == "foo"
         assert serialized["foo"].description == "foo desc"
         assert serialized["foo"].executable == "foo"
-        assert serialized["foo"].cwd == "path"
+        assert serialized["foo"].workdir == "path"
         assert serialized["bar"].args == "bar"
         assert serialized["bar"].description is None
         assert serialized["bar"].executable is None
-        assert serialized["bar"].cwd is None
+        assert serialized["bar"].workdir is None
         assert serialized["baz"].args == "baz"
         assert serialized["baz"].description is None
         assert serialized["baz"].executable is None
-        assert serialized["baz"].cwd is None
+        assert serialized["baz"].workdir is None
         assert serialized["test"].args == "--test"
         assert serialized["test"].description == "Run tests"
         assert serialized["test"].executable is None
-        assert serialized["test"].cwd is None
+        assert serialized["test"].workdir is None
 
     def test_deserialize(self, commands):
         serialized = Command.parse_all(commands)

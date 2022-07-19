@@ -24,10 +24,10 @@ class TestPluginInvoker:
             yield subject
 
     @pytest.fixture
-    async def alternate_cwd_plugin_invoker(
-        self, alternate_cwd_plugin, session, plugin_invoker_factory
+    async def alternate_workdir_plugin_invoker(
+        self, alternate_workdir_plugin, session, plugin_invoker_factory
     ):
-        subject = plugin_invoker_factory(alternate_cwd_plugin)
+        subject = plugin_invoker_factory(alternate_workdir_plugin)
         async with subject.prepared(session):
             yield subject
 
@@ -178,19 +178,19 @@ class TestPluginInvoker:
         assert "VIRTUAL_ENV" not in env
         assert "PYTHONPATH" not in env
 
-    def test_cwd(self, alternate_cwd_plugin_invoker):
+    def test_workdir(self, alternate_workdir_plugin_invoker):
         sys_root = os.path.abspath(os.sep)
-        proj_root = alternate_cwd_plugin_invoker.project.root
-        assert alternate_cwd_plugin_invoker.cwd() == proj_root / "path"
-        assert alternate_cwd_plugin_invoker.cwd(command="relative") == proj_root / "path2"
-        assert alternate_cwd_plugin_invoker.cwd(command="absolute") == sys_root / Path("root")
+        proj_root = alternate_workdir_plugin_invoker.project.root
+        assert alternate_workdir_plugin_invoker.workdir() == proj_root / "path"
+        assert alternate_workdir_plugin_invoker.workdir(command="relative") == proj_root / "path2"
+        assert alternate_workdir_plugin_invoker.workdir(command="absolute") == sys_root / Path("root")
         assert (
-            alternate_cwd_plugin_invoker.cwd(command="expansion")
+            alternate_workdir_plugin_invoker.workdir(command="expansion")
             == proj_root / "project" / "test"
         )
         assert (
-            alternate_cwd_plugin_invoker.cwd(
-                command="expansion", env={"UTILITY_CWD__CONFIG_PROJECT_DIR": "project2"}
+            alternate_workdir_plugin_invoker.workdir(
+                command="expansion", env={"UTILITY_WORKDIR__CONFIG_PROJECT_DIR": "project2"}
             )
             == proj_root / "project2" / "test"
         )
