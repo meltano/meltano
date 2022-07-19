@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#3419](https://github.com/meltano/meltano/issues/3419) Change default `meltano config` behavior to --no-environment.
 
+- [#6188](https://github.com/meltano/meltano/issues/6188) Allow `meltano run` to run without provided subcommand
+
 ### Fixes
 
 ### Breaks
