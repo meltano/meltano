@@ -9,7 +9,7 @@ import shutil
 import sys
 from asyncio.streams import StreamReader
 from hashlib import sha1
-from io import BytesIO
+from io import StringIO
 from pathlib import Path
 from typing import Tuple
 
@@ -38,23 +38,24 @@ logger = structlog.getLogger(__name__)
 
 
 async def _stream_redirect(
-    stream: asyncio.StreamReader, file_like_obj, write_str=False
+    stream: asyncio.StreamReader, *file_like_objs, write_str=False
 ):
     """Redirect stream to a file like obj.
 
     Args:
         stream: the stream to redirect
-        file_like_obj: the object to redirect the stream to
+        file_like_objs: the objects to redirect the stream to
         write_str: if True, stream is written as str
     """
     encoding = sys.getdefaultencoding()
     while not stream.at_eof():
         data = await stream.readline()
-        file_like_obj.write(data.decode(encoding) if write_str else data)
+        for file_like_obj in file_like_objs:
+            file_like_obj.write(data.decode(encoding) if write_str else data)
 
 
 def _debug_logging_handler(
-    name: str, plugin_invoker: PluginInvoker, stderr: StreamReader
+    name: str, plugin_invoker: PluginInvoker, stderr: StreamReader, *other_dsts
 ) -> asyncio.Task:
     """Route debug log lines to stderr or an OutputLogger if one is present in our invocation context.
 
@@ -62,20 +63,23 @@ def _debug_logging_handler(
         name: name of the plugin
         plugin_invoker: the PluginInvoker to route log lines for
         stderr: stderr StreamReader to route to
+        other_dsts: other destinations that the stream should be routed too along with logging output
 
     Returns:
         asyncio.Task which performs the routing of log lines
     """
     if not plugin_invoker.context or not plugin_invoker.context.base_output_logger:
         return asyncio.ensure_future(
-            _stream_redirect(stderr, sys.stderr, write_str=True)
+            _stream_redirect(stderr, *(sys.stderr, *other_dsts), write_str=True)
         )
 
     out = plugin_invoker.context.base_output_logger.out(
         name, logger.bind(type="discovery", stdio="stderr")
     )
     with out.line_writer() as outerr:
-        return asyncio.ensure_future(_stream_redirect(stderr, outerr, write_str=True))
+        return asyncio.ensure_future(
+            _stream_redirect(stderr, *(outerr, *other_dsts), write_str=True)
+        )
 
 
 def config_metadata_rules(config):
@@ -393,7 +397,7 @@ class SingerTap(SingerPlugin):
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
             )
-        with BytesIO(b"") as stderr_buff:
+        with StringIO("") as stderr_buff:
             try:
                 with catalog_path.open(mode="wb") as catalog:
                     handle = await plugin_invoker.invoke_async(
@@ -402,13 +406,26 @@ class SingerTap(SingerPlugin):
                         stderr=asyncio.subprocess.PIPE,
                         universal_newlines=False,
                     )
+
                     invoke_futures = [
                         asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
-                        asyncio.ensure_future(
-                            _stream_redirect(handle.stderr, stderr_buff)
-                        ),
                         asyncio.ensure_future(handle.wait()),
                     ]
+                    if logger.isEnabledFor(logging.DEBUG) and handle.stderr:
+                        invoke_futures.append(
+                            _debug_logging_handler(
+                                self.name,
+                                plugin_invoker,
+                                handle.stderr,
+                                stderr_buff,
+                            )
+                        )
+                    else:
+                        invoke_futures.append(
+                            asyncio.ensure_future(
+                                _stream_redirect(handle.stderr, stderr_buff)
+                            )
+                        )
                     done, _ = await asyncio.wait(
                         invoke_futures,
                         return_when=asyncio.ALL_COMPLETED,
