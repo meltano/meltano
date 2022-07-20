@@ -49,6 +49,7 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
     ```bash
     pipx install meltano
     ```
+
     If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
     
     ```bash
