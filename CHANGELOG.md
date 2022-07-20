@@ -3,22 +3,36 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
+## v2.3.0 (2022-07-20)
 
----
+### ✨ New
 
-### New
+- meltano now surfaces full stderr output for catalog discovery failures. (#6432)
+- Resolve #3419 "Change default meltano config behavior to --no-environment" (#6327)
+- Preserve comments and flow style in `meltano.yml` (#6308)
+- Resolve #6207 "Add env as first-class attribute of MeltanoFile and ProjectPlugin classes (not an extra)" (#6267)
 
-### Changes
+### 🐛 Fixes
 
-- [#3419](https://github.com/meltano/meltano/issues/3419) Change default `meltano config` behavior to --no-environment.
-- [#6150](https://github.com/meltano/meltano/issues/6150) Print full stderr for catalog discovery failures.
+- Allow `meltano run` to run without providing subcommand (#6431)
+- **core**: Extras of kind `object` not honored in inherited plugins (#6404)
+- Extras of kind `object` not honored in environments (#6376)
+- Swap add_related for add_required in api v1 plugins (#6355)
+- Do not attempt to lock inherited plugins when using `meltano lock` (#6368)
+- clarify job/task relation to airflow (#6358)
+- Emit `RuntimeWarning` if a setting uses the default value (#6350)
+- typo in `meltano-basics` example link (#6357)
+- removed run preview references (#6351)
 
-- [#6188](https://github.com/meltano/meltano/issues/6188) Allow `meltano run` to run without provided subcommand
+### ⚙️ Under the Hood
 
-### Fixes
+- update to automatically fire start AND end events (#6341)
 
-### Breaks
+### 📚 Documentation Improvements
+
+- Document overriding capabilities and extending settings (#6411)
+- Windows installation old gitlab link (#6420)
+- Fix typo etl -> elt (#6367)
 
 ## 2.2.0 - (2022-07-01)
 
