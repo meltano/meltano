@@ -70,7 +70,9 @@ def _debug_logging_handler(
     """
     if not plugin_invoker.context or not plugin_invoker.context.base_output_logger:
         return asyncio.ensure_future(
-            _stream_redirect(stderr, *(sys.stderr, *other_dsts), write_str=True)
+            _stream_redirect(
+                stderr, *(sys.stderr, *other_dsts), write_str=True  # noqa: WPS517
+            )
         )
 
     out = plugin_invoker.context.base_output_logger.out(
@@ -78,7 +80,9 @@ def _debug_logging_handler(
     )
     with out.line_writer() as outerr:
         return asyncio.ensure_future(
-            _stream_redirect(stderr, *(outerr, *other_dsts), write_str=True)
+            _stream_redirect(
+                stderr, *(outerr, *other_dsts), write_str=True  # noqa: WPS517
+            )
         )
 
 
