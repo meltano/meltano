@@ -48,6 +48,9 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
 
     ```bash
     pipx install meltano
+    
+    #If you have multiple versions of Python installed, you can use a specific one with the --python arugment
+    #  pipx install meltano --python [path to desired Python exe]
     ```
 
 1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
@@ -133,6 +136,7 @@ As part of creating your Meltano project, we automatically added your first [env
 1. Activate your environment for your shell session:
 
     ```bash
+    #For Windows (PowerShell): $env:MELTANO_ENVIRONMENT="dev"
     export MELTANO_ENVIRONMENT=dev
     ```
 
