@@ -6,6 +6,10 @@
 # Default owners
 * @pandemicsyn @edgarrmondragon
 
+# CI
+.github/actions/ @WillDaSilva
+.github/workflows/ @WillDaSilva
+
 # Discovery (End-of-Life)
 /src/meltano/core/bundle/discovery.yml @aaronsteers
 
