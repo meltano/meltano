@@ -203,6 +203,73 @@ Command line arguments for the command.
 
 Friendly description of the command.
 
+### `commands.<command_name>.container_spec`
+
+The container specification to use for the command.
+
+Example:
+
+```yaml
+- name: dbt
+  pip_url: dbt-core~=1.0.1 dbt-postgres~=1.0.1
+  commands:
+    compile:
+      args: compile
+      container_spec:
+        command: compile
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+        - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+    docs-generate:
+      args: docs generate
+      container_spec:
+        command: docs generate
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+         - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+    docs-serve:
+      args: docs serve
+      container_spec:
+        command: docs serve --no-browser
+        image: ghcr.io/dbt-labs/dbt-postgres:latest
+        env:
+          DBT_PROFILES_DIR: /usr/app/profile/
+        volumes:
+        - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+        ports:
+          "8080": "8080/tcp"
+```
+
+Use this with [`meltano invoke`](/reference/command-line-interface#containerized-commands) to run commands in a container.
+
+#### `commands.<command_name>.container_spec.image`
+
+The Docker image to use for the command.
+
+#### `commands.<command_name>.container_spec.command`
+
+The command to run in the container.
+
+#### `commands.<command_name>.container_spec.entrypoint`
+
+The container entrypoint to use for the command.
+
+#### `commands.<command_name>.container_spec.ports`
+
+Mapping of host ports to container ports.
+
+#### `commands.<command_name>.container_spec.volumes`
+
+An array of host volumes to mount in the container.
+
+#### `commands.<command_name>.container_spec.env`
+
+A mapping of environment variables to set in the container.
+
 ## `settings`
 
 Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties.
