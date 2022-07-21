@@ -16,7 +16,7 @@ GitHub makes it easy to contribute changes without requiring you to leave your b
 
 Discoverable plugin definitions in Meltano Hub have the a very similar format as [custom plugin definition](/concepts/project#custom-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), so a copy-paste is usually sufficient.
 
-The format and further requirements are laid out in more detail in the [Meltano Hub plugin definition syntax](/contribute/plugin-definition-syntax) document.
+The format and further requirements are laid out in more detail in the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) document.
 
 ### Adopting a plugin
 
