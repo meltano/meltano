@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#3419](https://github.com/meltano/meltano/issues/3419) Change default `meltano config` behavior to --no-environment.
+- [#6150](https://github.com/meltano/meltano/issues/6150) Print full stderr for catalog discovery failures.
+
+- [#6188](https://github.com/meltano/meltano/issues/6188) Allow `meltano run` to run without provided subcommand
 
 ### Fixes
 
@@ -690,7 +693,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `sqlfluff` utility for linting SQL transforms
 - [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
-- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPi)
+- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPI)
 - [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift`
 
 ### Changes
@@ -2640,7 +2643,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 ### Fixes
 
-- Patch technicality due to PyPi limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
+- Patch technicality due to PyPI limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
 
 ## 1.0.0 - (2019-10-07)
 
