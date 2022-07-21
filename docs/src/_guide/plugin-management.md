@@ -427,9 +427,9 @@ To pin the latest version:
     pip_url: git+https://github.com/adswerve/target-bigquery.git@3df97b951b7eebdfa331a1ff570f1fe3487d632f
     ```
 
-## Installing plugins from a custom Python Package Index (PyPi)
+## Installing plugins from a custom Python Package Index (PyPI)
 
-If you need to fetch packages from a custom Python Package Index (PyPi), you can set the `PIP_INDEX_URL` environment variable to your custom URL before running `meltano install`.
+If you need to fetch packages from a custom Python Package Index (PyPI), you can set the `PIP_INDEX_URL` environment variable to your custom URL before running `meltano install`.
 
 In a `Dockerfile`, this would look like:
 
