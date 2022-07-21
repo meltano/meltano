@@ -2,7 +2,7 @@
 title: Meltano 2.0 Migration Guide
 description: Migrate existing "v1" projects to the latest version of Meltano
 layout: doc
-weight: 4
+weight: 20
 ---
 
 _Note: This document is still a work in progress. Expect further changes, coming soon._
@@ -1070,22 +1070,23 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
   </tr>
 </table>
 
-
 ## CLI and API Changes
 
 #### Use `--state-id` instead of `--job_id`
+
 In 2.0, many references to "Job ID" in our code and docs were changed to the more accurate name of "State ID".
 
 If you are explicitly providing a `--job_id` option to any scripted or otherwise automated CLI workflows, these commands should be updated to use the `--state-id` option instead.
 
-
 #### Schedule list format changes
+
 If you have custom orchestrator integrations based on the `meltano schedule list` command, you will need to make adjustments to handle a new output format.
 
 With the addition of support for scheduled jobs in 2.0, the schema output of `meltano schedule list --format=json` has changed.
 It now includes a top level field `schedules` and two nested array fields `job` and `elt` which hold and describe their respective schedules.
 
 ex:
+
 ```json
 {
   "schedules": {
