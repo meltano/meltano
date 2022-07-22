@@ -134,7 +134,10 @@ class Project(Versioned):  # noqa: WPS214
 
         # create a symlink to our current binary
         try:
-            executable = Path(os.path.dirname(sys.executable), "meltano")
+            if os.name == "nt":
+                executable = Path(os.path.dirname(sys.executable), "meltano.exe")
+            else:
+                executable = Path(os.path.dirname(sys.executable), "meltano")
             if executable.is_file():
                 project.run_dir().joinpath("bin").symlink_to(executable)
         except FileExistsError:
