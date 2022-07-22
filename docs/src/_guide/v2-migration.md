@@ -2,6 +2,8 @@
 title: Meltano 2.0 Migration Guide
 description: Migrate existing "v1" projects to the latest version of Meltano
 layout: doc
+redirect_from:
+  - /reference/v2-migration/
 weight: 20
 ---
 
