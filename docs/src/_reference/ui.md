@@ -1,5 +1,5 @@
 ---
-title: GUI
+title: Meltano UI
 description: Learn how to manage and monitor your plugins and pipelines using Meltano UI
 layout: doc
 redirect_from:
