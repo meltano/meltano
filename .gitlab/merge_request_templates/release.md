@@ -7,7 +7,7 @@
 
 - [ ] Wait for tag pipeline to succeed: https://gitlab.com/meltano/meltano/-/pipelines
   - [ ] Replace the pipeline link with a link to the publish job. Go to the commit's pipelines tab and select the one that has the publish stage.
-  - [ ] Check to confirm successful publish to [PyPi](https://pypi.org/project/meltano/) and [DockerHub](https://hub.docker.com/r/meltano/meltano)_
+  - [ ] Check to confirm successful publish to [PyPI](https://pypi.org/project/meltano/) and [DockerHub](https://hub.docker.com/r/meltano/meltano)_
 
 -----------------------------------
 

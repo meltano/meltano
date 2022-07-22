@@ -5,6 +5,10 @@ on:
   workflow_dispatch:
     inputs: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   FOSSA_CLI_VERSION: '3.3.9'
 
