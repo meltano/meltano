@@ -7,8 +7,8 @@
 * @pandemicsyn @edgarrmondragon
 
 # CI
-.github/actions/ @WillDaSilva
-.github/workflows/ @WillDaSilva
+.github/actions/ @WillDaSilva @meltano/engineering
+.github/workflows/ @WillDaSilva @meltano/engineering
 
 # Discovery (End-of-Life)
 /src/meltano/core/bundle/discovery.yml @aaronsteers
