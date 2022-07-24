@@ -2152,7 +2152,7 @@ repl = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "f7554f858b527123bcf0608b66b916ec263429045ec97c43cc7430d276ac03da"
+content-hash = "c0169a1bce5d4664ed66ad3f45a906db03d90c25d3a0c13ef97067b72b7fab00"
 
 [metadata.files]
 aiodocker = [
