@@ -5,8 +5,8 @@ import subprocess
 
 def build():
     # Build static web app
-    subprocess.run(["yarn", "install", "--immutable"], cwd="src/webapp")
-    subprocess.run(["yarn", "build"], cwd="src/webapp")
+    subprocess.run(["yarn", "install", "--immutable"], cwd="src/webapp")  # noqa: S607
+    subprocess.run(["yarn", "build"], cwd="src/webapp")  # noqa: S607
 
     # Copy static files
     os.makedirs("src/meltano/api/templates", exist_ok=True)
@@ -19,7 +19,7 @@ def build():
         "src/meltano/api/templates/embed.html",
     )
 
-    for dst in {"css", "js"}:
+    for dst in ("css", "js"):
         shutil.rmtree(f"src/meltano/api/static/{dst}", ignore_errors=True)
         shutil.copytree(
             f"src/webapp/dist/static/{dst}",

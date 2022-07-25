@@ -69,7 +69,7 @@ class MeltanoFile(Canonical):
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         for plugin_type, raw_plugins in plugins.items():
-            if plugin_type == PluginType.MAPPERS:  # noqa: WPS441 - false positive
+            if plugin_type == PluginType.MAPPERS:
                 for mapper in raw_plugins:
                     plugin_type_plugins[PluginType.MAPPERS].append(
                         ProjectPlugin(PluginType.MAPPERS, **mapper)

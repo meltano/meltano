@@ -109,8 +109,6 @@ class VenvService:
 
         This will try to use an existing virtual environment if one exists unless commanded
         to `clean`.
-
-        :raises: SubprocessError: if any of the commands fail.
         """
         pip_urls = [pip_url for arg in pip_urls for pip_url in arg.split(" ")]
 
@@ -160,11 +158,7 @@ class VenvService:
             logger.debug("No old virtual environment to remove")
 
     async def create(self):
-        """
-        Create a new virtual environment.
-
-        :raises: SubprocessError: if the command fails.
-        """
+        """Create a new virtual environment."""
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")
         try:
             return await exec_async(
@@ -180,11 +174,7 @@ class VenvService:
             )
 
     async def upgrade_pip(self):
-        """
-        Upgrade the `pip` package to the latest version in the virtual environment.
-
-        :raises: SubprocessError: if the command fails.
-        """
+        """Upgrade the `pip` package to the latest version in the virtual environment."""
         logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")
 
         try:

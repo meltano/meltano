@@ -75,9 +75,7 @@ class SingerTarget(SingerPlugin):
     ]
 
     def exec_args(self, plugin_invoker):
-        args = ["--config", plugin_invoker.files["config"]]
-
-        return args
+        return ["--config", plugin_invoker.files["config"]]
 
     @property
     def config_files(self):

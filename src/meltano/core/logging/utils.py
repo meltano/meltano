@@ -14,9 +14,9 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 try:
-    from typing import Protocol  # noqa:  WPS433
+    from typing import Protocol  # noqa: WPS433
 except ImportError:
-    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
+    from typing_extensions import Protocol  # noqa: WPS433
 
 
 LEVELS = {  # noqa: WPS407

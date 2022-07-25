@@ -377,7 +377,7 @@ class SingerTap(SingerPlugin):
             with catalog_path.open("r") as catalog_file:
                 catalog = json.load(catalog_file)
                 Draft4Validator.check_schema(catalog)
-        except Exception as err:  # noqa: WPS440
+        except Exception as err:
             catalog_path.unlink()
             raise PluginExecutionError(
                 f"Catalog discovery failed: invalid catalog: {err}"
@@ -549,7 +549,7 @@ class SingerTap(SingerPlugin):
             raise PluginExecutionError(
                 "Applying catalog rules failed: catalog file is missing."
             ) from err
-        except Exception as err:  # noqa: WPS440
+        except Exception as err:
             catalog_path.unlink()
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is invalid: {err}"

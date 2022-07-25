@@ -29,8 +29,7 @@ class TransformAddService:
 
     def add_to_packages(self, plugin: ProjectPlugin):
         if not os.path.exists(self.packages_file):
-            with open(self.packages_file, "w"):
-                pass
+            self.packages_file.touch()
 
         package_yaml = yaml.safe_load(self.packages_file.open()) or {"packages": []}
 

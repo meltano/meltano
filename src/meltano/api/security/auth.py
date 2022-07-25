@@ -68,7 +68,7 @@ def passes_authentication_checks():
     settings_service = ProjectSettingsService(project)
 
     if not settings_service.get("ui.authentication"):
-        logging.debug(f"Authentication not required because it's disabled")
+        logging.debug("Authentication not required because it's disabled")
         return True
 
     if current_user.is_authenticated:
@@ -79,7 +79,7 @@ def passes_authentication_checks():
         # The `@roles_required("admin")` and `@block_if_readonly` checks
         # will take care of enforcing authentication as appropriate
         logging.debug(
-            f"Authentication not required because anonymous users have read-only access"
+            "Authentication not required because anonymous users have read-only access"
         )
         return True
 

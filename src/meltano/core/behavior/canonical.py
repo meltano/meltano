@@ -87,7 +87,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
 
         if isinstance(target, dict):
             results = {}
-            for key, val in target.items():  # noqa: WPS440
+            for key, val in target.items():
                 if isinstance(val, Canonical):
                     results[key] = val.canonical()
                 else:

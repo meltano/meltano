@@ -34,7 +34,7 @@ class UIAvailableWorker(threading.Thread):
                     if self.open_browser:
                         webbrowser.open(url)
                     self._terminate = True
-            except:
+            except Exception:
                 pass
 
             time.sleep(2)
