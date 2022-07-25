@@ -181,7 +181,7 @@ requires:
 
 ## `commands`
 
-The commands that are available for this plugin.
+The [commands](/concepts/project#plugin-commands) that are available for this plugin.
 
 Example:
 
