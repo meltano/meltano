@@ -7,11 +7,12 @@ on:
         description: "Version bump type"
         required: true
         type: choice
-        default: PATCH
+        default: auto
         options:
-        - PATCH
-        - MINOR
-        - MAJOR
+        - auto
+        - patch
+        - minor
+        - major
       prerelease:
         description: "Increase to this prerelease version"
         required: false
@@ -38,34 +39,38 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v4.0.0
+      uses: actions/setup-python@v4.1.0
       with:
         python-version: "3.10"
         architecture: x64
 
     - name: Bump version
       id: cz-bump
-      # TODO: https://github.com/commitizen-tools/commitizen-action/pull/38
-      uses: edgarrmondragon/commitizen-action@feat-add-increment-option
+      uses: commitizen-tools/commitizen-action@0.14.1
       with:
-        increment: ${{ github.event.inputs.bump }}
+        increment: ${{ github.event.inputs.bump != 'auto' && github.event.inputs.bump || '' }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
         commit: "false"
         push: "false"
-        changelog: "false"
+        changelog: "true"
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        # changelog_increment_filename: _changelog_fragment.md
+        changelog_increment_filename: _changelog_fragment.md
 
     - env:
         PIP_CONSTRAINT: .github/workflows/constraints.txt
       run: |
         pipx install changelog-cli
 
-    - name: Prepare Changelog
-      if: always() && (github.event.inputs.prerelease == 'none')
-      run: |
-        bump_lowercase=$(echo "${{ github.event.inputs.bump }}" | tr '[:upper:]' '[:lower:]')
-        changelog release --$bump_lowercase --yes
+    - name: Draft Release
+      id: draft-release
+      uses: softprops/action-gh-release@v1
+      with:
+        draft: true
+        body_path: _changelog_fragment.md
+        tag_name: v${{ steps.cz-bump.outputs.version }}
+        prerelease: ${{ github.event.inputs.prerelease != 'none' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v4

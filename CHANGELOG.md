@@ -3,21 +3,39 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.3.0 (2022-07-20)
 
+### ✨ New
 
-## Unreleased
----
+- [#6150](https://github.com/meltano/meltano/issues/6150) meltano now surfaces full stderr output for catalog discovery failures
+- [#3419](https://github.com/meltano/meltano/issues/3419) Change default meltano config behavior to --no-environment
+- [#2133](https://github.com/meltano/meltano/issues/2133) Preserve comments and flow style in `meltano.yml`
+- [#6207](https://github.com/meltano/meltano/issues/6207) Add env as first-class attribute of MeltanoFile and ProjectPlugin classes (not an extra)
 
-### New
+### 🐛 Fixes
 
-### Changes
+- [#6188](https://github.com/meltano/meltano/issues/6188) Allow `meltano run` to run without providing subcommand
+- [#6380](https://github.com/meltano/meltano/issues/6380) **core**: Extras of kind `object` not honored in inherited plugins
+- [#3322](https://github.com/meltano/meltano/issues/3322) Extras of kind `object` not honored in environments
+- [#6301](https://github.com/meltano/meltano/issues/6301) Swap add_related for add_required in api v1 plugins
+- [#6359](https://github.com/meltano/meltano/issues/6359) Do not attempt to lock inherited plugins when using `meltano lock`
+- [#6136](https://github.com/meltano/meltano/issues/6136) clarify job/task relation to airflow
+- [#6234](https://github.com/meltano/meltano/issues/6234) Emit `RuntimeWarning` if a setting uses the default value
+- [#6357](https://github.com/meltano/meltano/issues/6357) typo in `meltano-basics` example link
+- [#6354](https://github.com/meltano/meltano/issues/6354) removed run preview references
 
-### Fixes
+### ⚙️ Under the Hood
 
-### Breaks
+- [#6324](https://github.com/meltano/meltano/issues/6324) update to automatically fire start AND end events
 
+### 📚 Documentation Improvements
+
+- [#6283](https://github.com/meltano/meltano/issues/6283) Document overriding capabilities and extending settings
+- [#6420](https://github.com/meltano/meltano/issues/6420) Windows installation old gitlab link
+- [#6367](https://github.com/meltano/meltano/issues/6367) Fix typo etl -> elt
 
 ## 2.2.0 - (2022-07-01)
+
 ---
 
 ### New
@@ -37,8 +55,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
 
-
 ## 2.1.0 - (2022-06-17)
+
 ---
 
 ### New
@@ -51,6 +69,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6114](https://github.com/meltano/meltano/pull/6114) - Add meltano lock.
 
 ### Changes
+
 - [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions.
 
 ### Fixes
@@ -58,6 +77,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all <jobId> with <stateId> to fix pipeline running bug.
 
 ## 2.0.3 - (2022-06-15)
+
 ---
 
 ### Changes
@@ -65,6 +85,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6186](https://github.com/meltano/meltano/pull/6186) Improve CLI startup performance
 
 ## 2.0.2 - (2022-06-14)
+
 ---
 
 ### Fixes
@@ -80,6 +101,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6149](https://github.com/meltano/meltano/pull/6149),[#6142](https://github.com/meltano/meltano/pull/6142) Add anonymized telemetry handling for exceptions.
 
 ## 2.0.1 - (2022-06-09)
+
 ---
 
 ### Fixes
@@ -87,6 +109,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6143](https://github.com/meltano/meltano/issues/6143) Resolve issue where Meltano UI would not start.
 
 ## 2.0.0 - (2022-06-08)
+
 ---
 
 _**Meltano 2.0** is a major update with multiple new features and some breaking changes. See our [2.0 Migration Guide](https://docs.meltano.com/reference/v2-migration) for more information._
@@ -99,6 +122,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 - [#3348](https://github.com/meltano/meltano/issues/3348) Add [`env_var_strict_mode`](https://docs.meltano.com/reference/settings#ffenv_var_strict_mode) feature flag to raise an exception if unset environment variables are referenced in settings.
 - [#6060](https://github.com/meltano/meltano/pull/6060) Generate lockfiles when running `meltano add` to install new plugins (now enabled by default).
 - [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies using `requires:`, replaces implicitly "related" plugins.
+- [#6033](https://github.com/meltano/meltano/pull/6033) Let plugin in `meltano.yml` override capabilities and extend settings of parent/lockfile.
 
 ### Changes
 
@@ -121,8 +145,8 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 - Improved [telemetry](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry) coverage across the product.
 
-
 ## 1.105.0 - (2022-05-19)
+
 ---
 
 ### New
@@ -140,7 +164,6 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 - [#3483](https://gitlab.com/meltano/meltano/-/issues/3483) Fixes a bug where pipx installed meltano can not find executable(.exe) meltano dependency packages. _Thanks **[Dan Norman](https://gitlab.com/BuzzCutNorman)**!_
 - [#3500](https://gitlab.com/meltano/meltano/-/issues/3500) Fixes bug where lock file was added but not used.
-
 
 ## 1.104.0 - (2022-05-13)
 
@@ -684,7 +707,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `sqlfluff` utility for linting SQL transforms
 - [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
-- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPi)
+- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPI)
 - [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift`
 
 ### Changes
@@ -2634,7 +2657,7 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 ### Fixes
 
-- Patch technicality due to PyPi limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
+- Patch technicality due to PyPI limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
 
 ## 1.0.0 - (2019-10-07)
 
