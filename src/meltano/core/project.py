@@ -237,12 +237,12 @@ class Project(Versioned):  # noqa: WPS214
         with open(self.meltanofile) as melt_ff:
             meltano_ff: dict = configure_yaml().load(melt_ff)
 
-        uvicron_enabled = (
+        uvicorn_enabled = (
             meltano_ff.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}")
             or False
         )
 
-        if uvicron_enabled:
+        if uvicorn_enabled:
             with self._meltano_rw_lock.write_lock():
                 return MeltanoFile.parse(self.project_files.load())
         else:
