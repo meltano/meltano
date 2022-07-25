@@ -137,7 +137,7 @@ next_steps: |
   1. Start Scheduler or execute Airflow commands directly using the instructions in [the Meltano docs](https://docs.meltano.com/guide/orchestration#starting-the-airflow-scheduler).
 ```
 
-## `usage``
+## `usage`
 
 Free text describing how to use the plugin, in Markdown format.
 
