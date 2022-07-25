@@ -7,11 +7,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### 🐛 Fixes
 
-- **deps**: Pin werkzeug to <2.2.0 (#6470)
+- [#6469](https://github.com/meltano/meltano/issues/6469) **deps**: Pin werkzeug to <2.2.0
 
 ### 📚 Documentation Improvements
 
-- move 'v2 migration guide' under 'guides' (#6465)
+- [#6465](https://github.com/meltano/meltano/pull/6465) Move 'v2 migration guide' under 'guides'
 
 ## v2.3.0 (2022-07-20)
 
