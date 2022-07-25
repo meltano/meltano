@@ -288,10 +288,6 @@ settings:
   env: AIRFLOW__CORE__PLUGINS_FOLDER
 ```
 
-### Protected settings
-
-Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI.
-
 ### `settings[*].name`
 
 Required. The name of the setting.
