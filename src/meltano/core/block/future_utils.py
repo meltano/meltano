@@ -20,11 +20,12 @@ def all_done(tasks: List[Task], done: Set[Task]) -> bool:
 def first_failed_future(exception_future: Task, done: Set[Task]) -> Optional[Task]:
     """Check if a future is in a set of completed futures and return the first failed (if any).
 
-    Args:
+    Parameters:
         exception_future: The future you want to check and who's futures should be returned if an exception was raised.
         done: The set of completed futures you want to search.
+
     Returns:
-        Futures that failed
+        The first future that failed.
     """
     if exception_future in done:
         futures_done, _ = exception_future.result()

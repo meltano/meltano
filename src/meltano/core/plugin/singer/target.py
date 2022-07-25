@@ -91,7 +91,7 @@ class SingerTarget(SingerPlugin):
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 
-        Args:
+        Parameters:
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
         """
@@ -109,9 +109,10 @@ class SingerTarget(SingerPlugin):
         This leverages calling back to PluginInvokers.add_output_handler to attach an additional
         output handler (the BookmarkWriter) to handle persisting state messages.
 
-        Args:
-            plugin_invoker: The invocation handler who's add_out_handler method will be called to attach the bookmark writer
-            as an additional output handler.
+        Parameters:
+            plugin_invoker: The invocation handler who's add_out_handler method
+                will be called to attach the bookmark writer as an additional
+                output handler.
         """
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job or not elt_context.session:

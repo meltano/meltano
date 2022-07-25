@@ -6,7 +6,7 @@ import re
 from collections import OrderedDict
 from enum import Enum, auto
 from functools import singledispatch
-from typing import Any, Dict, Iterable, NamedTuple, Type, TypeVar
+from typing import Any, Dict, Iterable, NamedTuple, TypeVar
 
 from meltano.core.behavior.visitor import visit_with
 
