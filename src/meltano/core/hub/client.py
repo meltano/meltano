@@ -32,7 +32,7 @@ class HubPluginTypeNotFound(Exception):
     def __init__(self, plugin_type: PluginType):
         """Create a new HubPluginVariantNotFound.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugin.
         """
         self.plugin_type = plugin_type
@@ -60,7 +60,7 @@ class HubPluginVariantNotFound(Exception):
     ):
         """Create a new HubPluginVariantNotFound.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugin.
             plugin: The indexed plugin.
             variant_name: The name of the variant that was not found.
@@ -89,7 +89,7 @@ class MeltanoHubService(PluginRepository):
     def __init__(self, project: Project) -> None:
         """Initialize the service.
 
-        Args:
+        Parameters:
             project: The Meltano project.
         """
         self.project = project
@@ -121,7 +121,7 @@ class MeltanoHubService(PluginRepository):
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
 
         Returns:
@@ -137,7 +137,7 @@ class MeltanoHubService(PluginRepository):
     ) -> str:
         """Return the resource endpoint for the given plugin.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
@@ -159,7 +159,7 @@ class MeltanoHubService(PluginRepository):
     ) -> PluginDefinition:
         """Find a locked plugin definition.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
@@ -212,7 +212,7 @@ class MeltanoHubService(PluginRepository):
     ) -> BasePlugin:
         """Get the base plugin for a project plugin.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant: The plugin variant.
@@ -231,7 +231,7 @@ class MeltanoHubService(PluginRepository):
     def get_plugins_of_type(self, plugin_type: PluginType) -> dict[str, IndexedPlugin]:
         """Get all plugins of a given type.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
 
         Returns:

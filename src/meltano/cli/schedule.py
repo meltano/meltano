@@ -281,7 +281,7 @@ def _update_job_schedule(
 ) -> Schedule:
     """Update an existing job schedule.
 
-    Args:
+    Parameters:
         candidate: The schedule to update.
         job: The name of the job to run.
         interval: The interval of the schedule.
@@ -312,7 +312,7 @@ def _update_elt_schedule(
 ) -> Schedule:
     """Update an elt schedule.
 
-    Args:
+    Parameters:
         candidate: The schedule to update.
         extractor: The name of the extractor to use.
         loader: The name of the loader to use.

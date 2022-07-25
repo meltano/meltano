@@ -60,7 +60,7 @@ class StateComparator(Comparator):
     def __eq__(self, other):
         """Enable SQLAlchemy to directly compare Job.state values with State.
 
-        Args:
+        Parameters:
             other: the State enum to compare to
 
         Returns:
@@ -110,7 +110,7 @@ class Job(SystemModel):  # noqa: WPS214
     def __init__(self, **kwargs):
         """Construct a Job.
 
-        Args:
+        Parameters:
             kwargs: keyword args to override defaults and pass to super
         """
         kwargs["_state"] = kwargs.pop("state", State.IDLE).name
@@ -131,7 +131,7 @@ class Job(SystemModel):  # noqa: WPS214
     def _(self, value):
         """Set the _state value for this Job from a State enum.
 
-        Args:
+        Parameters:
             value: the State enum to use.
         """
         self._state = str(value)
@@ -204,7 +204,7 @@ class Job(SystemModel):  # noqa: WPS214
     def can_transit(self, state: State) -> bool:
         """Return whether this job can transit into the given state.
 
-        Args:
+        Parameters:
             state: the state to check against
 
         Returns:
@@ -218,7 +218,7 @@ class Job(SystemModel):  # noqa: WPS214
     def transit(self, state: State) -> (State, State):
         """Transition this job into the given state.
 
-        Args:
+        Parameters:
             state: the state to transition this job to
 
         Returns:
@@ -245,7 +245,7 @@ class Job(SystemModel):  # noqa: WPS214
 
         Transitions state to RUNNING and SUCCESS/FAIL as appropriate and records heartbeat every second.
 
-        Args:
+        Parameters:
             session: the session to use for writing to the db
 
         Raises:
@@ -278,7 +278,7 @@ class Job(SystemModel):  # noqa: WPS214
     def fail(self, error=None):
         """Mark the job as having failed.
 
-        Args:
+        Parameters:
             error: the error to associate with the job's failure
         """
         self.ended_at = datetime.utcnow()
@@ -320,7 +320,7 @@ class Job(SystemModel):  # noqa: WPS214
     def save(self, session):
         """Save the job in the db.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
 
         Returns:
@@ -338,7 +338,7 @@ class Job(SystemModel):  # noqa: WPS214
     async def _heartbeater(self, session):
         """Heartbeat to the db every second.
 
-        Args:
+        Parameters:
             session: the session to use for writing to the db
         """
         while True:  # noqa: WPS457
@@ -351,7 +351,7 @@ class Job(SystemModel):  # noqa: WPS214
     async def _heartbeating(self, session):
         """Provide a context for heartbeating jobs.
 
-        Args:
+        Parameters:
             session: the session to use for writing to the db
         """  # noqa: DAR301
         heartbeat_future = asyncio.ensure_future(self._heartbeater(session))

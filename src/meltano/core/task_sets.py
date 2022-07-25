@@ -36,7 +36,7 @@ class InvalidTasksError(Exception):
     def __init__(self, name: str, message: str):
         """Initialize a InvalidTasksError.
 
-        Args:
+        Parameters:
             name: Name of the TaskSet that was invalid.
             message: The message describing the error.
         """
@@ -61,7 +61,7 @@ class TaskSets(NameEq, Canonical):
     def __init__(self, name: str, tasks: list[str] | list[list[str]]):
         """Initialize a TaskSets.
 
-        Args:
+        Parameters:
             name: The name of the job.
             tasks: The tasks that associated with this job.
         """
@@ -73,7 +73,7 @@ class TaskSets(NameEq, Canonical):
     def _as_args(self, preserve_top_level: bool = False) -> list[str] | list[list[str]]:
         """Convert the job's tasks into invocable representations, suitable for passing as a cli args or block names.
 
-        Args:
+        Parameters:
             preserve_top_level: Whether to preserve the defined top level task list to allow for fine-grained executions.
 
         Returns:
@@ -120,7 +120,7 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
 
     The resulting object is validated against the TASKS_JSON_SCHEMA.
 
-    Args:
+    Parameters:
         name: The name of the job.
         yaml_str: The yaml string.
 

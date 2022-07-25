@@ -39,7 +39,7 @@ class CatalogRule:
     def match(self, tap_stream_id: str, breadcrumb: list[str] | None = None) -> bool:
         """Evaluate if rule matches a stream or breadcrumb.
 
-        Args:
+        Parameters:
             tap_stream_id: Singer stream identifier.
             breadcrumb: JSON property breadcrumb.
 
@@ -107,7 +107,7 @@ class SelectPattern(NamedTuple):
     def parse(cls, pattern: str):
         """Parse a SelectPattern instance from a string pattern.
 
-        Args:
+        Parameters:
             pattern: Stream or property selection pattern.
 
         Returns:
@@ -142,7 +142,7 @@ class SelectPattern(NamedTuple):
 def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select` patterns.
 
-    Args:
+    Parameters:
         patterns: Iterable of `select` string patterns.
 
     Returns:
@@ -187,7 +187,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
 def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select_filter` patterns.
 
-    Args:
+    Parameters:
         patterns: Iterable of `select_filter` string patterns.
 
     Returns:
@@ -224,7 +224,7 @@ def path_property(path: str) -> str:
     As we traverse the catalog tree, we build a materialized path
     to keep track of the parent nodes.
 
-    Args:
+    Parameters:
         path: String representing a property path in the JSON schema.
 
     Returns:
@@ -242,7 +242,7 @@ def path_property(path: str) -> str:
 def property_breadcrumb(props: list[str]) -> list[str]:
     """Create breadcrumb from properties path list.
 
-    Args:
+    Parameters:
         props: List of strings representing a property breadcrumb in the JSON object.
 
     Returns:
@@ -566,7 +566,7 @@ class ListSelectedExecutor(CatalogExecutor):
     def node_selection(node: Node) -> SelectionType:
         """Get selection type from metadata entry.
 
-        Args:
+        Parameters:
             node: Catalog metadata dictionary.
 
         Returns:
