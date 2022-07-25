@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.3.1 (2022-07-25)
+
+### 🐛 Fixes
+
+- **deps**: Pin werkzeug to <2.2.0 (#6470)
+
+### 📚 Documentation Improvements
+
+- move 'v2 migration guide' under 'guides' (#6465)
+
 ## v2.3.0 (2022-07-20)
 
 ### ✨ New
