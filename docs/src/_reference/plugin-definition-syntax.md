@@ -154,7 +154,7 @@ usage: |
 
 ## `keywords`
 
-Array of keywords associated with the plugin, for search and classification purposes.
+Array of arbitrary keywords associated with the plugin, for search and classification purposes.
 
 ```yaml
 keywords:
