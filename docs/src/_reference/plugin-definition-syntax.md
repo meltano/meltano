@@ -78,10 +78,10 @@ pip_url: apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/ap
 
 ## `maintenance_status`
 
-The maintenance status of the plugin.
+The maintenance status of the plugin. See the [JSON schema](https://github.com/meltano/hub/blob/main/schemas/plugin_definitions/hub_metadata.schema.json) for the most up-to-date list of maintenance statuses.
 
 ```yaml
-maintenance_status: active
+maintenance_status: active  # allowed values: active, beta, development, inactive, deprecated, unknown
 ```
 
 ## `domain_url`
