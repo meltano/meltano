@@ -175,9 +175,13 @@ requires:
     variant: meltano
 ```
 
-### `requires.<plugin_type>.name`
+### `requires.<plugin_type>[*].name`
 
-### `requires.<plugin_type>.variant`
+See the full in the [`requires` section](#requires) above.
+
+### `requires.<plugin_type>[*].variant`
+
+See the full in the [`requires` section](#requires) above.
 
 ## `commands`
 
