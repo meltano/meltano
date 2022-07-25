@@ -80,7 +80,7 @@ Now that you've installed Meltano and its requirements, you can continue setting
 ## Windows
 
 Please note that Windows is not fully supported yet so some features like the UI, and the ELT command may not work yet.
-See the [Meltano on Windows](https://gitlab.com/groups/meltano/-/epics/115) Epic for more information.
+See the GitHub [Windows Label](https://github.com/meltano/meltano/labels/Windows) for more information.
 
 If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about).
 You may also try [installing Meltano on Docker](#installing-on-docker).
@@ -153,7 +153,7 @@ We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Do
 
 To get the latest version of Meltano, pull the `latest` tag. Images for specific versions of Meltano are tagged `v<X.Y.Z>`, e.g. `v1.55.0`.
 
-By default, these images come with a version of Python chosen for a balance of stability and compatibility, currently Python 3.8.
+By default, these images come with a version of Python chosen for a balance of stability and compatibility, currently Python 3.9.
 If you'd like to use a different version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.7` and `v1.54.0-python3.7`.
 
 ```bash

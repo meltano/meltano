@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-from contextlib import contextmanager
 from typing import Any
 from urllib.request import urlopen
 
@@ -13,18 +12,6 @@ import backoff
 import pytest
 
 from meltano.core.project_settings_service import ProjectSettingsService
-
-
-@contextmanager
-def env(**environment) -> None:
-    """Temporarily update environment variables."""
-    original = dict(os.environ)
-    os.environ.update(environment)
-    try:
-        yield
-    finally:
-        os.environ.clear()
-        os.environ.update(original)
 
 
 class SnowplowMicro:
@@ -77,7 +64,7 @@ def snowplow_session(request) -> SnowplowMicro | None:
     try:
         # Getting the `docker_services` fixture essentially causes `docker-compose up` to be run
         request.getfixturevalue("docker_services")
-    except Exception:
+    except Exception:  # pragma: no cover
         yield None
     else:
         args = ("docker", "port", f"pytest{os.getpid()}_snowplow_1")
@@ -86,7 +73,7 @@ def snowplow_session(request) -> SnowplowMicro | None:
         collector_endpoint = f"http://{address_and_port}"
         try:  # noqa: WPS505
             yield SnowplowMicro(collector_endpoint)
-        except Exception:
+        except Exception:  # pragma: no cover
             yield None
 
 
@@ -102,7 +89,7 @@ def snowplow_optional(
     Yields:
         A freshly reset `SnowplowMicro` instance, or `None` if it could not be created.
     """
-    if snowplow_session is None:
+    if snowplow_session is None:  # pragma: no cover
         yield None
     else:
         if isinstance(ProjectSettingsService.config_override, dict):
@@ -132,6 +119,6 @@ def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     Yields:
         A freshly reset `SnowplowMicro` instance.
     """
-    if snowplow_optional is None:
+    if snowplow_optional is None:  # pragma: no cover
         pytest.skip("Unable to start Snowplow Micro")
     yield snowplow_optional

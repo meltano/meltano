@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import tempfile
 from pathlib import Path
 
@@ -24,7 +25,9 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
-from .utils import CliError, InstrumentedCmd, InstrumentedGroup
+from .utils import CliError, InstrumentedGroup, PartialInstrumentedCmd
+
+logger = logging.getLogger(__name__)
 
 
 def get_label(metadata) -> str:
@@ -37,10 +40,11 @@ def get_label(metadata) -> str:
         string describing the source of the variable's value
     """
     source = metadata["source"]
-    if "env_var" in metadata:
+    try:
         return f"from the {metadata['env_var']} variable in {source.label}"
-    else:
+    except KeyError:
         return f"from {source.label}"
+
 
 @cli.group(
     cls=InstrumentedGroup,
@@ -77,9 +81,15 @@ def config(  # noqa: WPS231
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
     except ValueError:
-        tracker.track_command_event(CliEvent.started)
         tracker.track_command_event(CliEvent.aborted)
         raise
+
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"The default environment ({project.active_environment.name}) will be ignored for `meltano config`. "
+            + "To configure a specific Environment, please use option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
 
     plugins_service = ProjectPluginsService(project)
 
@@ -91,7 +101,6 @@ def config(  # noqa: WPS231
         if plugin_name == "meltano":
             plugin = None
         else:
-            tracker.track_command_event(CliEvent.started)
             tracker.track_command_event(CliEvent.aborted)
             raise
 
@@ -145,7 +154,7 @@ def config(  # noqa: WPS231
 
 
 @config.command(
-    cls=InstrumentedCmd,
+    cls=PartialInstrumentedCmd,
     name="list",
     short_help=(
         "List all settings for the specified plugin with their names, environment variables, and current values."
@@ -234,7 +243,7 @@ def list_settings(ctx, extras: bool):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd)
+@config.command(cls=PartialInstrumentedCmd)
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
@@ -265,7 +274,7 @@ def reset(ctx, store):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd, name="set")
+@config.command(cls=PartialInstrumentedCmd, name="set")
 @click.argument("setting_name", nargs=-1, required=True)
 @click.argument("value")
 @click.option(
@@ -315,7 +324,7 @@ def set_(ctx, setting_name, value, store):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd, name="test")
+@config.command(cls=PartialInstrumentedCmd, name="test")
 @click.pass_context
 def test(ctx):
     """Test the configuration of a plugin."""
@@ -346,7 +355,7 @@ def test(ctx):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command(cls=InstrumentedCmd)
+@config.command(cls=PartialInstrumentedCmd)
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",

@@ -33,8 +33,10 @@ jobs:
         - python-version: "3.7"
           is-default-python: false
         - python-version: "3.8"
-          is-default-python: true  # will be used in 'latest' images
+          is-default-python: false
         - python-version: "3.9"
+          is-default-python: true  # will be used in 'latest' images
+        - python-version: "3.10"
           is-default-python: false
 
     steps:
@@ -78,7 +80,7 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        username: meltano
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # e.g. meltano/meltano:SHA-73d02a3b693bbf38270bf23e4cc31e69cb2837ad

@@ -8,9 +8,9 @@ Accepted
 
 ## Context
 
-Version 1 of the Meltano API is a bit inconsistent both in API design and implementation.  Critically, it lacks full feature parity with the CLI, and there are features and patterns that are not completely implemented, have little support knowledge, or are generally features we'd prefer to deprecate (dashboards, models, etc.). 
+Version 1 of the Meltano API is a bit inconsistent both in API design and implementation.  Critically, it lacks full feature parity with the CLI, and there are features and patterns that are not completely implemented, have little support knowledge, or are generally features we'd prefer to deprecate (dashboards, models, etc.).
 
-Lastly, the API is implemented using Gunicorn + Flask, which while time tested has some issues. Gunicorn lacks Windows support, Flask is a WSGI app with no first class asyncio support. 
+Lastly, the API is implemented using Gunicorn + Flask, which while time tested has some issues. Gunicorn lacks Windows support, Flask is a WSGI app with no first class asyncio support.
 
 The goals of a v2 API and ultimately the requirements for a future framework would be to:
 
@@ -23,7 +23,7 @@ The goals of a v2 API and ultimately the requirements for a future framework wou
 - Ability to achieve CLI parity if desired, again, requiring no special sauce.
 - Relatively future-proof. Adding new endpoints and features should be straightforward and not break the API design. Only a major reorganization of the collections/resources of the API should require a v3.
 
-With those topics in mind, we investigated what technology we might build on for v2 of the API and how to bring the rest API to parity with the meltano CLI. The result of this investigation was [#3302](https://gitlab.com/meltano/meltano/-/issues/3302) which among a few topics also includes an investigation and evaluation of a Python GRPC based v2 implementation, and a FastAPI based implementation. 
+With those topics in mind, we investigated what technology we might build on for v2 of the API and how to bring the rest API to parity with the meltano CLI. The result of this investigation was [#3302](https://gitlab.com/meltano/meltano/-/issues/3302) which among a few topics also includes an investigation and evaluation of a Python GRPC based v2 implementation, and a FastAPI based implementation.
 
 ## Decision
 

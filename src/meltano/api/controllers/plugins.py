@@ -58,8 +58,8 @@ def _handle(ex):
     return (jsonify({"error": True, "code": str(ex)}), 502)
 
 
-@pluginsBP.route("/all", methods=["GET"])  # noqa: WPS125
-def all():
+@pluginsBP.route("/all", methods=["GET"])
+def all():  # noqa: WPS125
     """Plugins found by the PluginDiscoveryService.
 
     Returns:
@@ -147,12 +147,7 @@ def install_batch():  # noqa: WPS210
     )
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
-    related_plugins = add_service.add_related(plugin)
-
-    # We will install the plugins in reverse order, since dependencies
-    # are listed after their dependents in `related_plugins`, but should
-    # be installed first.
-    related_plugins.reverse()
+    required_plugins = add_service.add_required(plugin)
 
     # This was added to assist api_worker threads
     try:
@@ -163,14 +158,14 @@ def install_batch():  # noqa: WPS210
 
     install_service = PluginInstallService(project, plugins_service=plugins_service)
     install_results = install_service.install_plugins(
-        related_plugins, reason=PluginInstallReason.ADD
+        required_plugins, reason=PluginInstallReason.ADD
     )
 
     for result in install_results:
         if not result.successful:
             raise PluginInstallError(result.message)
 
-    return jsonify([plugin.canonical() for plugin in related_plugins])
+    return jsonify([plugin.canonical() for plugin in required_plugins])
 
 
 @pluginsBP.route("/install", methods=["POST"])

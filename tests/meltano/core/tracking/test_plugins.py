@@ -54,3 +54,12 @@ class TestPluginsTrackingContext:
         # verify that passing a None object results in an empty plugin context.
         plugin_ctx = PluginsTrackingContext([(None, None)])
         assert plugin_ctx.data.get("plugins") == [{}]
+
+        # verify that passing a plugin with no parent does not result in an error.
+        # most likely this is a plugin that is not installed and is being removed or somehow referenced.
+        tap.parent = None
+        plugin_ctx = PluginsTrackingContext([(tap, None)])
+        assert len(plugin_ctx.data.get("plugins")) == 1
+        plugin_with_no_parent = plugin_ctx.data.get("plugins")[0]
+        assert plugin_with_no_parent.get("name_hash") == hash_sha256(tap.name)
+        assert not plugin_with_no_parent.get("parent_name_hash")

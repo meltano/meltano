@@ -258,17 +258,17 @@ class TestTracker:
         platform.system() == "Windows",
         reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
     )
-    def test_send_anonymous_usage_stats(self, project: Project):
+    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch):
         clear_telemetry_settings(project)
 
-        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "True"
+        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
         assert Tracker(project).send_anonymous_usage_stats is True
 
         # Ensure the env var takes priority
         ProjectSettingsService(project).set("send_anonymous_usage_stats", False)
         assert Tracker(project).send_anonymous_usage_stats is True
 
-        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "False"
+        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
         assert Tracker(project).send_anonymous_usage_stats is False
 
         # Ensure the env var takes priority
