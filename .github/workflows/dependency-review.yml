@@ -1,7 +1,7 @@
 name: Dependency Review
 
 on:
-  pull_request: {}
+  pull_request_target: {}
   workflow_dispatch:
     inputs: {}
 
@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FOSSA_CLI_VERSION: '3.3.9'
+  FOSSA_CLI_INSTALLER_VERSION: '3.3.10'
 
 permissions:
   contents: read
@@ -23,11 +23,14 @@ jobs:
         uses: actions/checkout@v3.0.2
 
       - name: GitHub dependency vulnerability check
-        uses: actions/dependency-review-action@v2
+        if: ${{ github.event_name == 'pull_request_target' }}
+        # Use this fork until https://github.com/actions/dependency-review-action/pull/165 is merged
+        uses: WillDaSilva/dependency-review-action@main
 
       - name: FOSSA dependency license check
         run: |
-          curl --no-progress-meter -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/v${FOSSA_CLI_VERSION}/install-latest.sh | bash
+          # `$FOSSA_CLI_INSTALLER_VERSION` only controls the version of the installer used - the latest version of `fossa-cli` will always be used.
+          curl --no-progress-meter -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/v${FOSSA_CLI_INSTALLER_VERSION}/install-latest.sh | bash
 
           echo '## FOSSA dependency license check' >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
