@@ -18,9 +18,9 @@ class TestCliUpgrade:
         assert_cli_runner(result)
 
         assert (
-            "The `meltano` package could not be upgraded automatically" in result.output
+            "The `meltano` package could not be upgraded automatically" in result.stdout
         )
-        assert "run `meltano upgrade --skip-package`" in result.output
+        assert "run `meltano upgrade --skip-package`" in result.stdout
 
         with mock.patch(
             "meltano.cli.upgrade.UpgradeService._upgrade_package"
@@ -31,14 +31,14 @@ class TestCliUpgrade:
             assert_cli_runner(result)
 
             assert (
-                "Meltano and your Meltano project have been upgraded!" in result.output
+                "Meltano and your Meltano project have been upgraded!" in result.stdout
             )
 
     def test_upgrade_skip_package(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
         assert_cli_runner(result)
 
-        assert "Your Meltano project has been upgraded!" in result.output
+        assert "Your Meltano project has been upgraded!" in result.stdout
 
     def test_upgrade_package(self, project, cli_runner):
         if platform.system() == "Windows":
@@ -49,9 +49,9 @@ class TestCliUpgrade:
         assert_cli_runner(result)
 
         assert (
-            "The `meltano` package could not be upgraded automatically" in result.output
+            "The `meltano` package could not be upgraded automatically" in result.stdout
         )
-        assert "run `meltano upgrade --skip-package`" not in result.output
+        assert "run `meltano upgrade --skip-package`" not in result.stdout
 
     def test_upgrade_files(
         self, session, project, cli_runner, config_service, meltano_hub_service
@@ -63,7 +63,7 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Nothing to update" in result.output
+        assert "Nothing to update" in result.stdout
 
         with mock.patch(
             "meltano.core.project_plugins_service.MeltanoHubService",
@@ -79,8 +79,8 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Updating 'airflow' files in project..." in result.output
-        assert "Nothing to update" in result.output
+        assert "Updating 'airflow' files in project..." in result.stdout
+        assert "Nothing to update" in result.stdout
         assert file_path.read_text() == file_content
 
         # Update file if changed
@@ -91,14 +91,14 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Updated orchestrate/dags/meltano.py" in result.output
+        assert "Updated orchestrate/dags/meltano.py" in result.stdout
         assert file_path.read_text() == file_content
 
         # Don't update file if unchanged
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Nothing to update" in result.output
+        assert "Nothing to update" in result.stdout
         assert file_path.read_text() == file_content
 
         # Don't update file if automatic updating is disabled
@@ -122,7 +122,7 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Nothing to update" in result.output
+        assert "Nothing to update" in result.stdout
         assert file_path.read_text() != file_content
 
         # Update file if automatic updating is re-enabled
@@ -143,7 +143,7 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         assert_cli_runner(result)
 
-        assert "Updated orchestrate/dags/meltano.py" in result.output
+        assert "Updated orchestrate/dags/meltano.py" in result.stdout
 
     def test_upgrade_database(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])

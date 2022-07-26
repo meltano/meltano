@@ -128,7 +128,7 @@ class Job(SystemModel):  # noqa: WPS214
         return State[self._state]
 
     @state.setter
-    def _(self, value):
+    def state(self, value):
         """Set the _state value for this Job from a State enum.
 
         Parameters:
@@ -137,7 +137,7 @@ class Job(SystemModel):  # noqa: WPS214
         self._state = str(value)
 
     @state.comparator
-    def _(cls):  # noqa: N805
+    def state(cls):  # noqa: N805
         """Use this comparison to compare Job.state to State.
 
         See:
