@@ -62,6 +62,7 @@ jobs:
     - name: Install Dependencies
       run: |
         poetry env use "${{ matrix.python-version }}"
+        poetry debug
         poetry install
 
     - name: Start Postgres Container
