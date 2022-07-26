@@ -61,11 +61,11 @@ runs:
 
     - name: Provide a link to results
       shell: bash
+      continue-on-error: true
       run: |
         echo "View scan results at:"
         echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${GITHUB_REF}"
-        # Uncomment the following line once we want to start blocking Docker publish workflows due to detected vulnerabilities:
-        # python ./.github/actions/docker-build-scan-push/check_sarif.py --severity-cutoff 4.0 ${{ steps.anchore-scan.outputs.sarif }}
+        python ./.github/actions/docker-build-scan-push/check_sarif.py --severity-cutoff 4.0 ${{ steps.anchore-scan.outputs.sarif }}
 
     - name: Login to Docker Hub
       uses: docker/login-action@v2
