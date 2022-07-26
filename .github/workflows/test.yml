@@ -67,11 +67,10 @@ jobs:
         pip install pip
         pip --version
 
-    - name: Install Dependencies
+    - name: Configure Poetry
       run: |
         poetry env use "${{ matrix.python-version }}"
         poetry debug
-        poetry install
 
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql')
