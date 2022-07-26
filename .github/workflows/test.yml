@@ -39,13 +39,6 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.0.2
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
-
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4.1.0
       with:
@@ -53,6 +46,11 @@ jobs:
         architecture: x64
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
+
+    - name: Install Poetry
+      run: |
+        curl -sL https://install.python-poetry.org | python - -y --version "1.1"
+        poetry --version
 
     - name: Upgrade pip
       env:
