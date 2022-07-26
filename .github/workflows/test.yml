@@ -34,6 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYTEST_MARKERS: not concurrent
+      FORCE_COLOR: 1
 
     steps:
     - name: Check out the repository
