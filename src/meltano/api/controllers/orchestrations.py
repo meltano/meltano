@@ -439,13 +439,13 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
         project, plugin, plugins_service=plugins_service, show_hidden=False
     )
 
-    config = request.get_json().get("config", {})
-    valid_config = {
-        name: value
-        for name, value in config.items()
-        if validate_plugin_config(plugin, name, value, project, settings)
-    }
-    settings.config_override = PluginSettingsService.unredact(valid_config)
+    settings.config_override = PluginSettingsService.unredact(
+        {
+            name: value
+            for name, value in request.get_json().get("config", {}).items()
+            if validate_plugin_config(plugin, name, value, project, settings)
+        }
+    )
 
     async def test_extractor():
         invoker = invoker_factory(
@@ -456,7 +456,7 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
         )
         async with invoker.prepared(db.session):
             plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
-            success, _detail = await plugin_test_service.validate()
+            success, _ = await plugin_test_service.validate()
             return success
 
     # This was added to assist api_worker threads
@@ -467,8 +467,7 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
-    success = loop.run_until_complete(test_extractor())
-    return jsonify({"is_success": success}), 200
+    return jsonify({"is_success": loop.run_until_complete(test_extractor())}), 200
 
 
 @orchestrations_bp.route("/pipeline-schedules", methods=["GET"])

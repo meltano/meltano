@@ -54,56 +54,51 @@ def click_run_async(func):
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
-def compose(*fs):
-    """
-    Create a function composition.
-    :type *fs: ``iterable`` of 1-argument ``callable``s
-    :param *fs: Iterable of 1-argument functions to compose, functions will be
-        applied from last to first, in other words ``compose(f, g)(x) ==
-        f(g(x))``.
-    :return: I{callable} taking 1 argument.
+def compose(*fs: Callable[[Any], Any]):
+    """Create a composition of unary functions.
+
+    Parameters:
+        fs: Unary functions to compose.
+
+    Examples:
+        ```python
+        compose(f, g)(x) == f(g(x))
+        ```
+
+    Return:
+        The composition of the provided unary functions, which itself is a unary function.
     """
     return functools.reduce(lambda f, g: lambda x: f(g(x)), compact(fs), lambda x: x)
 
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
 def slugify(s):
-    """
-    Simplifies ugly strings into something URL-friendly.
+    """Normalize strings into something URL-friendly.
+
     >>> slugify("[Some] _ Article's Title--")
     'some-articles-title'
     """
-
-    # "[Some] _ Article's Title--"
-    # "[some] _ article's title--"
+    # "[Some] _ Article's Title--" -> "[some] _ article's title--"
     s = s.lower()
 
-    # "[some] _ article's_title--"
-    # "[some]___article's_title__"
-    for c in [" ", "-", ".", "/"]:
+    # "[some] _ article's_title--" -> "[some]___article's_title__"
+    for c in " -./":
         s = s.replace(c, "_")
 
-    # "[some]___article's_title__"
-    # "some___articles_title__"
+    # "[some]___article's_title__" -> "some___articles_title__"
     s = re.sub(r"\W", "", s)
 
-    # "some___articles_title__"
-    # "some   articles title  "
+    # "some___articles_title__" -> "some   articles title  "
     s = s.replace("_", " ")
 
-    # "some   articles title  "
-    # "some articles title "
+    # "some   articles title  " -> "some articles title "
     s = re.sub(r"\s+", " ", s)
 
-    # "some articles title "
-    # "some articles title"
+    # "some articles title " -> "some articles title"
     s = s.strip()
 
-    # "some articles title"
-    # "some-articles-title"
-    s = s.replace(" ", "-")
-
-    return s
+    # "some articles title" -> "some-articles-title"
+    return s.replace(" ", "-")
 
 
 def get_basic_auth(user, token):
@@ -111,50 +106,63 @@ def get_basic_auth(user, token):
 
 
 def pop_all(keys, d: dict):
-    return dict(map(lambda k: (k, d.pop(k)), keys))
+    return {k: d.pop(k) for k in keys}
 
 
 def get_all(keys, d: dict, default=None):
-    return dict(map(lambda k: (k, d.get(k, default)), keys))
+    return {k: d.get(k, default) for k in keys}
 
 
 # Taken from https://stackoverflow.com/a/20666342
-def merge(source, destination):
+def merge(src, dest):
+    """Merge both given dictionaries together at depth, modifying `dest` in-place.
+
+    Parameters:
+        src: A dictionary to merge into `dest`.
+        dest: The dictionary that will be updated with the keys and values from
+            `src` at depth.
+
+    Examples:
+        >>> a = { 'first' : { 'all_rows' : { 'pass' : 'dog', 'number' : '1' } } }
+        >>> b = { 'first' : { 'all_rows' : { 'fail' : 'cat', 'number' : '5' } } }
+        >>> merge(b, a) == { 'first' : { 'all_rows' : { 'pass' : 'dog', 'fail' : 'cat', 'number' : '5' } } }
+        True
+
+    Returns:
+        The `dest` dictionary with the keys and values from `src` merged in.
     """
-    >>> a = { 'first' : { 'all_rows' : { 'pass' : 'dog', 'number' : '1' } } }
-    >>> b = { 'first' : { 'all_rows' : { 'fail' : 'cat', 'number' : '5' } } }
-    >>> merge(b, a) == { 'first' : { 'all_rows' : { 'pass' : 'dog', 'fail' : 'cat', 'number' : '5' } } }
-    True
-    """
-    for key, value in source.items():
+    for key, value in src.items():
         if isinstance(value, dict):
             # get node or create one
-            node = destination.setdefault(key, {})
+            node = dest.setdefault(key, {})
             merge(value, node)
         else:
-            destination[key] = value
+            dest[key] = value
 
-    return destination
+    return dest
 
 
-def nest(d: dict, path: str, value={}, maxsplit=-1, force=False):
-    """
-    Create a hierarchical dictionary path and return the leaf dict.
+def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
+    """Create a hierarchical dictionary path and return the leaf dict.
 
-    >>> d = dict()
-    >>> test = nest(d, "foo.bar.test")
-    >>> test
-    {}
-    >>> d
-    {'foo': {'bar': {'test': {}}}}
-    >>> test["a"] = 1
-    >>> d
-    {'foo': {'bar': {'test': {'a': 1}}}}
-    >>> alist = nest(d, "foo.bar.list", value=[])
-    >>> alist.append("works")
-    >>> d
-    {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
-    """
+    Examples:
+        >>> d = dict()
+        >>> test = nest(d, "foo.bar.test")
+        >>> test
+        {}
+        >>> d
+        {'foo': {'bar': {'test': {}}}}
+        >>> test["a"] = 1
+        >>> d
+        {'foo': {'bar': {'test': {'a': 1}}}}
+        >>> alist = nest(d, "foo.bar.list", value=[])
+        >>> alist.append("works")
+        >>> d
+        {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
+    """  # noqa: P102
+    if value is None:
+        value = {}
+
     if isinstance(path, str):
         path = path.split(".", maxsplit=maxsplit)
 
@@ -168,10 +176,10 @@ def nest(d: dict, path: str, value={}, maxsplit=-1, force=False):
 
         cursor = cursor[key]
 
-    if not tail in cursor or (type(cursor[tail]) is not type(value) and force):
-        # We need to copy the value to make sure
-        # the `value` parameter is not mutated.
-        cursor[tail] = deepcopy(value)
+    if tail not in cursor or (
+        type(cursor[tail]) is not type(value) and force  # noqa: WPS516
+    ):
+        cursor[tail] = value
 
     return cursor[tail]
 
@@ -189,13 +197,15 @@ def to_env_var(*xs):
 
 
 def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
-    """Wrapper arround `flatten_dict.flatten` that adds `dot` and `env_var` reducers."""
+    """Flatten a dictionary with `dot` and `env_var` reducers.
+
+    Wrapper arround `flatten_dict.flatten`.
+    """
 
     def dot_reducer(*xs):
         if xs[0] is None:
             return xs[1]
-        else:
-            return ".".join(xs)
+        return ".".join(xs)
 
     if reducer == "dot":
         reducer = dot_reducer
@@ -223,8 +233,7 @@ def noop(*_args, **_kwargs):
 
 
 def map_dict(f: Callable, d: Dict):
-    for k, v in d.items():
-        yield k, f(v)
+    yield from ((k, f(v)) for k, v in d.items())
 
 
 def truthy(val: str) -> bool:
@@ -232,7 +241,7 @@ def truthy(val: str) -> bool:
 
 
 def coerce_datetime(d: Union[date, datetime]) -> Optional[datetime]:
-    """Adds a `time` component to `d` if such a component is missing."""
+    """Add a `time` component to `d` if it is missing."""
     if d is None:
         return None
 
@@ -247,15 +256,15 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
         return None
 
     isoformats = [
-        "%Y-%m-%dT%H:%M:%SZ",
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d",
+        "%Y-%m-%dT%H:%M:%SZ",  # noqa: WPS323
+        "%Y-%m-%dT%H:%M:%S",  # noqa: WPS323
+        "%Y-%m-%d %H:%M:%S",  # noqa: WPS323
+        "%Y-%m-%d",  # noqa: WPS323
     ]
 
-    for format in isoformats:
+    for format_string in isoformats:
         try:
-            return coerce_datetime(datetime.strptime(d, format))
+            return coerce_datetime(datetime.strptime(d, format_string))
         except ValueError:
             pass
 
@@ -296,11 +305,11 @@ def makedirs(func):
         # if there is an extension, only create the base dir
         _, ext = os.path.splitext(path)
         if ext:
-            dir = os.path.dirname(path)
+            directory = os.path.dirname(path)
         else:
-            dir = path
+            directory = path
 
-        os.makedirs(dir, exist_ok=True)
+        os.makedirs(directory, exist_ok=True)
         return path
 
     return decorate
@@ -350,8 +359,9 @@ class EnvironmentVariableNotSetError(Exception):
 
     def __init__(self, env_var: str):
         """Initialize the error.
+
         Parameters:
-            env_var: the unset environment variable name
+            env_var: The unset environment variable name.
         """
         super().__init__(env_var)
         self.env_var = env_var
@@ -391,9 +401,8 @@ def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
         except KeyError as e:
             if raise_if_missing:
                 raise EnvironmentVariableNotSetError(e.args[0])
-            else:
-                logger.debug(f"Variable '${var}' is missing from the environment.")
-                return None
+            logger.debug(f"Variable '${var}' is missing from the environment.")
+            return None
 
     fullmatch = re.fullmatch(var_matcher, raw_value)
     if fullmatch:

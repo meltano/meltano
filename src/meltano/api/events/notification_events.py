@@ -55,7 +55,7 @@ class NotificationEvents:
             "docs": plugin.docs,
         }
 
-    def handle_pipeline_completed(self, schedule, success: bool = None):
+    def handle_pipeline_completed(self, schedule, success: bool = None):  # noqa: WPS210
         """Handle the `Manual Run` pipeline email notification."""
         if success is None:
             raise ValueError("'success' must be set.")

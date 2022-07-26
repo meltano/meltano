@@ -48,10 +48,7 @@ class ResourcePermission(Permission):
             if self.in_scope(need, scopes):
                 return False
 
-        if all(needs_scoped):
-            return True
-
-        return False
+        return all(needs_scoped)
 
 
 def permission_for(permission_type, context):
@@ -128,21 +125,15 @@ def block_if_readonly(f):
 
 
 def unauthorized_callback():
-    """
-    Meltano is mainly an API, so let's return plain 403 (Forbidden)
-    instead of redirecting anywhere.
-    """
-
+    """Return a 403 (Forbidden) error instead of redirecting."""
     return "You do not have the required permissions.", 403
 
 
 def _identity_loaded_hook(sender, identity):
-    """
-    Meltano uses a resource permission scheme.
-    This hook will add the specific Permission
-    to the current identity.
-    """
+    """Add the specific permission to the current identity.
 
+    Note that Meltano uses a resource permission scheme.
+    """
     # something weird is going on here when testing
     # SQLAlchemy complains about the roles not being
     # in a session.
@@ -151,16 +142,13 @@ def _identity_loaded_hook(sender, identity):
 
     # each permission is a Need(permission_type, context),
     # i.e. ("view", "finance.*", "design")
-    for perm in (perm for role in current_user.roles for perm in role.permissions):
-        perm = Need(perm.type, perm.context)
-
-        identity.provides.add(perm)
+    for role in current_user.roles:
+        for perm in role.permissions:
+            identity.provides.add(Need(perm.type, perm.context))
 
 
 def _user_logged_in_hook(sender, user):
-    """
-    Update the audit columns for the User
-    """
+    """Update the audit columns for the user."""
     user.last_login_at = datetime.utcnow()
     user.last_activity_at = datetime.utcnow()
     user.login_count += 1

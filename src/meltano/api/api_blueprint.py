@@ -12,7 +12,7 @@ VERSION = 1
 
 class APIBlueprint(Blueprint):
     @property
-    def api_version():
+    def api_version(self):
         return f"v{VERSION}"
 
     @classmethod
@@ -29,7 +29,7 @@ class APIBlueprint(Blueprint):
             self.before_request(self.__class__.auth_filter)
 
     @block_if_api_auth_required
-    def auth_filter():
+    def auth_filter(self):
         logging.debug(f"Authenticated as {current_user}")
 
         current_user.last_activity_at = datetime.utcnow()

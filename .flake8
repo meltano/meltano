@@ -52,6 +52,8 @@ ignore =
     WPS110
     # Allow upper-case constants in Enum subclasses
     WPS115
+    # Allow many module members
+    WPS202
     # Allow "too many"
     WPS211
     # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
@@ -62,6 +64,8 @@ ignore =
     WPS305
     # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration
     WPS306
+    # Allow inconsistent returns - permitted because of too many false positives
+    WPS324
     # Allow assignment expressions (walrus operator :=)
     WPS332
     # Allow 'incorrect' order of methods in a class
@@ -117,14 +121,9 @@ exclude =
     .venv
     venv
     *.md
+    .tox
     src/webapp/node_modules/
-    src/meltano/api/events/notification_events.py
-    src/meltano/core/logging/job_logging_service.py
-    src/meltano/core/job/stale_job_failer.py
-    src/meltano/core/utils/__init__.py
     src/meltano/migrations/
-    src/meltano/api/
-    tests/meltano/core/runner/test_runner.py
 inline_quotes = double
 max_line_length = 88
 show_source = true
@@ -177,8 +176,6 @@ per-file-ignores =
         WPS437
         # Found module with too many imports
         WPS201
-        # Found too many module members
-        WPS202
         # Found boolean non-keyword argument
         WPS425
         # Found too long name
@@ -203,8 +200,6 @@ per-file-ignores =
         WPS213
         # Allow many decorators, since `click` uses them to define the CLI
         WPS216
-        # Allow many module members
-        WPS202
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
@@ -227,9 +222,6 @@ per-file-ignores =
     src/meltano/core/job/job.py:
         # Class attributes can be used as instance attributes in sqlalchemy.declarative model
         WPS601
-    src/meltano/core/plugin/singer/catalog.py:
-        # Found too many module members: 20 > 7
-        WPS202
     src/meltano/core/project_files.py:
         # Dict manipulation requires lots of string constant references
         WPS226
@@ -257,8 +249,6 @@ per-file-ignores =
     src/meltano/core/logging/utils.py:
         # Found wrong module name
         WPS100
-        # Found to many module members (8 > 7)
-        WPS202
     src/meltano/core/cli_messages.py:
         # Special exceptions for cli magic
         WPS114
@@ -271,9 +261,5 @@ per-file-ignores =
         # Lots of docstrings document **kwargs
     RST213
     src/meltano/core/settings_store.py:
-        WPS202
         # Found overused expression: allow settings store implementations to all return vars with the same names
         WPS204
-    src/meltano/api/controllers/orchestrations.py:
-        # Found too many module members: 23 > 7
-        WPS202

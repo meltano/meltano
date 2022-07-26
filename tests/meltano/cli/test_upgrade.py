@@ -61,6 +61,7 @@ class TestCliUpgrade:
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
             )
         result = cli_runner.invoke(cli, ["upgrade", "files"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         assert "Nothing to update" in result.stdout
@@ -70,6 +71,7 @@ class TestCliUpgrade:
             return_value=meltano_hub_service,
         ):
             result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+            output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         # Don't update file if unchanged
@@ -77,10 +79,11 @@ class TestCliUpgrade:
         file_content = file_path.read_text()
 
         result = cli_runner.invoke(cli, ["upgrade", "files"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
-        assert "Updating 'airflow' files in project..." in result.stdout
-        assert "Nothing to update" in result.stdout
+        assert "Updating 'airflow' files in project..." in output
+        assert "Nothing to update" in output
         assert file_path.read_text() == file_content
 
         # Update file if changed
@@ -89,16 +92,18 @@ class TestCliUpgrade:
         # The behavior being tested assumes that the file is not locked.
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         result = cli_runner.invoke(cli, ["upgrade", "files"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
-        assert "Updated orchestrate/dags/meltano.py" in result.stdout
+        assert "Updated orchestrate/dags/meltano.py" in output
         assert file_path.read_text() == file_content
 
         # Don't update file if unchanged
         result = cli_runner.invoke(cli, ["upgrade", "files"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
-        assert "Nothing to update" in result.stdout
+        assert "Nothing to update" in output
         assert file_path.read_text() == file_content
 
         # Don't update file if automatic updating is disabled
@@ -115,14 +120,16 @@ class TestCliUpgrade:
                 "false",
             ],
         )
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         file_path.write_text("Overwritten!")
 
         result = cli_runner.invoke(cli, ["upgrade", "files"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
-        assert "Nothing to update" in result.stdout
+        assert "Nothing to update" in output
         assert file_path.read_text() != file_content
 
         # Update file if automatic updating is re-enabled
@@ -138,12 +145,13 @@ class TestCliUpgrade:
                 "orchestrate/dags/meltano.py",
             ],
         )
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         result = cli_runner.invoke(cli, ["upgrade", "files"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
-
-        assert "Updated orchestrate/dags/meltano.py" in result.stdout
+        assert "Updated orchestrate/dags/meltano.py" in output
 
     def test_upgrade_database(self, project, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])

@@ -39,7 +39,7 @@ class FreeUser:
 
     @property
     def username(self):
-        return
+        return None
 
     @property
     def is_authenticated(self):
@@ -58,7 +58,7 @@ class FreeUser:
         return self.get_id()
 
     def get_id(self):
-        return
+        return None
 
     @property
     def roles(self):
@@ -66,10 +66,10 @@ class FreeUser:
 
     @roles.setter
     def roles(self, _):
-        pass
+        return None
 
     def get_auth_token(self):
-        return
+        return None
 
 
 def create_dev_user():
