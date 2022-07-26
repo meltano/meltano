@@ -41,21 +41,6 @@ def delete():
     return jsonify(settings)
 
 
-@settings_bp.route("/connections/<name>/test")
-def test(name):
-    current_settings = Settings.query.first().settings
-    connections = current_settings["connections"]
-    try:
-        found_connection = next(
-            connection for connection in connections if connection["name"] == name
-        )
-    # this is a really broad exception catch, this will swallow sneaky errors
-    except Exception:
-        found_connection = {}
-
-    return jsonify(found_connection)
-
-
 class Canonical(fields.Raw):
     def __init__(self, scopes=None, **kwargs):
         super().__init__(**kwargs)
