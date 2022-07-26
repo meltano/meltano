@@ -1,8 +1,9 @@
 """Base Error classes."""
+from __future__ import annotations
+
 from asyncio.streams import StreamReader
 from asyncio.subprocess import Process
 from enum import Enum
-from typing import Optional, Union
 
 
 class ExitCode(int, Enum):
@@ -32,15 +33,15 @@ class AsyncSubprocessError(Exception):
         self,
         message: str,
         process: Process,
-        stderr: Optional[str] = None,
+        stderr: str | None = None,
     ):
         """Initialize AsyncSubprocessError."""
         self.process = process
-        self._stderr: Union[str, StreamReader, None] = stderr or process.stderr
+        self._stderr: str | StreamReader | None = stderr or process.stderr
         super().__init__(message)
 
     @property
-    async def stderr(self) -> Optional[str]:
+    async def stderr(self) -> str | None:
         """Return the output of the process to stderr."""
         if not self._stderr:
             return None

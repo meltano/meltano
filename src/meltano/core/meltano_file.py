@@ -53,10 +53,10 @@ class MeltanoFile(Canonical):
         )
 
     def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
-        """Parse the meltano.yml file and return it as `ProjectPlugin` instances.
+        """Parse the `meltano.yml` file and return it as `ProjectPlugin` instances.
 
         Parameters:
-            plugins: Dict of plugin configurations.
+            plugins: Dictionary of plugin configurations.
 
         Returns:
             New ProjectPlugin instances.

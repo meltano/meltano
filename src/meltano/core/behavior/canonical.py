@@ -1,9 +1,11 @@
 """Meltano Canonical object behavior."""
 
+from __future__ import annotations
+
 import copy
 import json
 from os import PathLike
-from typing import Any, Type, TypeVar, Union
+from typing import Any, TypeVar
 
 import yaml
 from ruamel.yaml import Representer
@@ -47,8 +49,8 @@ class Canonical:  # noqa: WPS214 (too many methods)
 
     @classmethod
     def as_canonical(
-        cls: Type[T], target: Any
-    ) -> Union[dict, list, CommentedMap, CommentedSeq, Any]:
+        cls: type[T], target: Any
+    ) -> dict | list | CommentedMap | CommentedSeq | Any:
         """Return a canonical representation of the given instance.
 
         Parameters:
@@ -96,7 +98,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
 
         return copy.deepcopy(target)
 
-    def canonical(self) -> Union[dict, list, CommentedMap, CommentedSeq, Any]:
+    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | Any:
         """Return a canonical representation of the current instance.
 
         Returns:
@@ -117,7 +119,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         return self.__class__(**{**self.canonical(), **kwargs})
 
     @classmethod
-    def parse(cls: Type[T], obj: Any) -> T:
+    def parse(cls: type[T], obj: Any) -> T:
         """Parse a 'Canonical' object from a dictionary or return the instance.
 
         Parameters:
@@ -323,7 +325,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         )
 
     @classmethod
-    def parse_json_file(cls: Type[T], path: PathLike) -> T:
+    def parse_json_file(cls: type[T], path: PathLike) -> T:
         """Parse a plugin definition from a JSON file.
 
         Parameters:
