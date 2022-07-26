@@ -42,7 +42,15 @@ def tests(session: Session) -> None:
     )
 
     try:
-        session.run("coverage", "run", "--parallel", "-m", "pytest", *session.posargs)
+        session.run(
+            "coverage",
+            "run",
+            "--parallel",
+            "-m",
+            "pytest",
+            *session.posargs,
+            env={"NOX_CURRENT_SESSION": "tests"},
+        )
     finally:
         if session.interactive:
             session.notify("coverage", posargs=[])
