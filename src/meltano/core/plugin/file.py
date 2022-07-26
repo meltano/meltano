@@ -84,7 +84,9 @@ class FilePlugin(BasePlugin):
             if not project.root_dir(relative_path).exists():
                 return relative_path
 
-            logger.info(f"File {relative_path} already exists, keeping both versions")
+            logger.info(
+                f"File {str(relative_path)!r} already exists, keeping both versions"
+            )
             return relative_path.with_name(
                 f"{relative_path.stem} ({self.name}){relative_path.suffix}"
             )

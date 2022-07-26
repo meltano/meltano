@@ -13,26 +13,25 @@ SEED_USERS = [
         "username": "rob",
         "email": "rob@meltano.com",
         "password": "meltano",
-        "confirmed_at": date(2000, 1, 1),
+        "confirmed_at": date(2000, 1, 1),  # noqa: WPS432
         "_roles": {"regular"},
     },
     {
         "username": "alice",
         "email": "alice@meltano.com",
         "password": "meltano",
-        "confirmed_at": date(2000, 1, 1),
+        "confirmed_at": date(2000, 1, 1),  # noqa: WPS432
         "_roles": {"admin"},
     },
 ]
 
 
 class FreeUser:
-    """
-    FreeUser is free to do everything and has no limits.
+    """A user that is free to do everything without limits.
 
-    Even though this class overrides `flask_security`'s AnonymousUser
-    it doens't inherit from AnonymousUser to bypass some type check
-    regarding the loading of the identity.
+    Even though this class overrides `flask_security`'s `AnonymousUser` it
+    doesn't inherit from `AnonymousUser` to bypass some type check regarding
+    the loading of the identity.
     """
 
     def has_role(*args):
@@ -40,7 +39,7 @@ class FreeUser:
 
     @property
     def username(self):
-        return None
+        return
 
     @property
     def is_authenticated(self):
@@ -59,7 +58,7 @@ class FreeUser:
         return self.get_id()
 
     def get_id(self):
-        return None
+        return
 
     @property
     def roles(self):
@@ -70,7 +69,7 @@ class FreeUser:
         pass
 
     def get_auth_token(self):
-        return None
+        return
 
 
 def create_dev_user():

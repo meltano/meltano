@@ -33,25 +33,16 @@ class NotificationEvents:
         PipelineSignals.completed.connect(self.handle_pipeline_completed, ANY)
 
     def pipeline_data_source(self, schedule) -> str:
-        """
-        Returns the Data Source name for a Pipeline
-        """
-
-        plugin = self.plugins_service.find_plugin(
+        """Return the Data Source name for a Pipeline."""
+        return self.plugins_service.find_plugin(
             schedule.extractor, plugin_type=PluginType.EXTRACTORS
-        )
-
-        return plugin.label
+        ).label
 
     def pipeline_urls(self, schedule) -> str:
-        """
-        Return external URLs to different point of interests for a Pipeline.
-        """
-
+        """Return external URLs to different point of interests for a Pipeline."""
         plugin = self.plugins_service.find_plugin(
             schedule.extractor, plugin_type=PluginType.EXTRACTORS
         )
-
         return {
             "log": url_for(
                 "root.default", path=f"data/schedule/{schedule.name}", _external=True
@@ -65,16 +56,14 @@ class NotificationEvents:
         }
 
     def handle_pipeline_completed(self, schedule, success: bool = None):
-        """
-        Handles the `Manual Run` pipeline email notification
-        """
+        """Handle the `Manual Run` pipeline email notification."""
         if success is None:
             raise ValueError("'success' must be set.")
 
         state_id = schedule.name
         data_source = self.pipeline_data_source(schedule)
 
-        status_subject_template = {
+        subject, template = {
             SUCCESS: (
                 f"Your {data_source} data is ready!",
                 "email/pipeline_manual_run/success.html",
@@ -83,8 +72,7 @@ class NotificationEvents:
                 f"Your {data_source} extraction has failed!",
                 "email/pipeline_manual_run/failure.html",
             ),
-        }
-        subject, template = status_subject_template[success]
+        }[success]
         html = render_template(
             template, data_source=data_source, urls=self.pipeline_urls(schedule)
         )
