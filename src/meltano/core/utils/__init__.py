@@ -11,6 +11,7 @@ import os
 import re
 import traceback
 from collections import OrderedDict
+from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
 from typing import Any, Callable, Iterable, TypeVar
@@ -180,7 +181,9 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
     if tail not in cursor or (
         type(cursor[tail]) is not type(value) and force  # noqa: WPS516
     ):
-        cursor[tail] = value
+        # We need to copy the value to make sure
+        # the `value` parameter is not mutated.
+        cursor[tail] = deepcopy(value)
 
     return cursor[tail]
 
