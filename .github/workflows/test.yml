@@ -48,17 +48,11 @@ jobs:
         cache-dependency-path: 'poetry.lock'
 
     - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
-        curl -sL https://install.python-poetry.org | python - -y --version "1.1.14"
-
-    - name: Update PATH
-      if: ${{ matrix.os != 'windows-2022' }}
-      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Update Path for Windows
-      if: ${{ matrix.os == 'windows-2022' }}
-      run: |
-        echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+        pipx install poetry
+        poetry --version
 
     - name: Upgrade pip
       env:
