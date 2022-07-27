@@ -1085,6 +1085,24 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 1
             assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
 
+        # test mapper/mapping name collision detection
+        args = ["run", tap.name, "mapper-mock", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock2, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            with pytest.raises(
+                Exception,
+                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-mock",
+            ):
+                result = cli_runner.invoke(cli, args, catch_exceptions=False)
+                assert result.exit_code == 1
+
         # create duplicate mapping name - should also fail
         project_add_service.add(
             PluginType.MAPPERS,
