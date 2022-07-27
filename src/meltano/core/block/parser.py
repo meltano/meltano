@@ -99,7 +99,6 @@ class BlockParser:  # noqa: D101
         for idx, name in enumerate(blocks):
 
             try:
-                self.log.debug('BlockParser name.split(":")')
                 parsed_name, command_name = name.split(":")
             except ValueError:
                 parsed_name = name
@@ -174,7 +173,6 @@ class BlockParser:  # noqa: D101
         cur = offset
         while cur < len(self._plugins):
             plugin = self._plugins[cur]
-            self.log.debug("BlockParser find_blocks()")
             elb, idx = self._find_next_elb_set(cur)
             if elb:
                 self.log.debug("found ExtractLoadBlocks set", offset=cur)
