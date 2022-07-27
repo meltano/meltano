@@ -80,7 +80,6 @@ class BlockParser:  # noqa: D101
             ClickException: If a block name is not found.
         """
         self.log = log
-        self.log.debug("BlockParser __init__")
         self.project = project
 
         self._full_refresh = full_refresh
@@ -94,9 +93,7 @@ class BlockParser:  # noqa: D101
         self._mappings_ref: Dict[int, str] = {}
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
-        self.log.debug(
-            "BlockParser blocks = self._expand_jobs(blocks, task_sets_service"
-        )
+
         blocks = self._expand_jobs(blocks, task_sets_service)
 
         for idx, name in enumerate(blocks):
@@ -108,9 +105,6 @@ class BlockParser:  # noqa: D101
                 parsed_name = name
                 command_name = None
 
-            self.log.debug(
-                f"BlackParser self._find_plugin_or_mapping(parsed_name): {parsed_name}"
-            )
             plugin = self._find_plugin_or_mapping(parsed_name)
             if plugin is None:
                 raise click.ClickException(f"Block {name} not found")
@@ -215,16 +209,12 @@ class BlockParser:  # noqa: D101
         Raises:
             ClickException: If mapping name returns multiple matches.
         """
-        self.log.debug(f"BlockParser self._plugins_service.find_plugin(name): {name}")
         try:
             return self._plugins_service.find_plugin(name)
         except PluginNotFoundError:
             pass
 
         mapper = None
-        self.log.debug(
-            f"BlockParser self._plugins_service.find_plugins_by_mapping_name(name): {name}"
-        )
         try:
             mapper = self._plugins_service.find_plugins_by_mapping_name(name)
         except PluginNotFoundError:
@@ -237,7 +227,6 @@ class BlockParser:  # noqa: D101
             raise click.ClickException(
                 f"Ambiguous mapping name {name}, found multiple matches."
             )
-        self.log.debug("BlackParser _find_plugin_or_mapping return mapper or none")
         return mapper[0] if mapper else None
 
     def _find_next_elb_set(  # noqa: WPS231, WPS213
