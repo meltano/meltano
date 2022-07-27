@@ -22,7 +22,7 @@ Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`,
 
 To lint your Python code, run `poetry run flake8` from the root of the project. If you only want to lint the files that have changed (and have been staged in git), you can run `pre-commit`. The `pre-commit` check will be run in CI on all PRs. Some lint issues, particularly around documentation, are pre-existing. Over time we are working to address these issues. If your PR is failing the `pre-commit` check because of pre-existing lint issues, feel free to leave them unaddressed.
 
-MyPy is currently only executed as part of the build pipeline in order to avoid overwhelming developers with the complete list of violations. This allows for incremental and iterative improvement without requiring a concerted effort to fix all errors at once.
+[MyPy is currently not executed in CI](https://github.com/meltano/meltano/issues/6491). It currently raises many issues when run. We intend to address them over time.
 
 Javascript:
 - [ESLint](https://eslint.org/docs/rules/)
