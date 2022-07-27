@@ -7,19 +7,26 @@ This script is run automatically by Poetry when building a wheel.
 It can also be run manually for the purpose of UI development.
 """
 
+from __future__ import annotations
+
 import os
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Any
 
-root_dir = Path(__file__).parent.parent.resolve()
+root_dir = Path(__file__).parent.resolve()
 webapp_dir = root_dir / "src" / "webapp"
 dist_dir = webapp_dir / "dist"
 api_dir = root_dir / "src" / "meltano" / "api"
 
 
-def build():
-    """Build & bundle the Meltano UI - executed automatically by Poetry when building the wheel."""
+def build(setup_kwargs: dict[str, Any]) -> None:
+    """Build & bundle the Meltano UI - executed automatically by Poetry when building the wheel.
+
+    Parameters:
+        setup_kwargs: The `setuptools.setup` config.
+    """
     # Operate from the root of the project
     os.chdir(root_dir)
 

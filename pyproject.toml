@@ -21,7 +21,7 @@ include = [
   "src/meltano/api/templates/webapp.html",
   "src/meltano/core/tracking/.release_marker",
 ]
-build = "scripts/build.py"
+build = "build.py"
 
 [tool.poetry.dependencies]
 aiodocker = "^0.21.0"
