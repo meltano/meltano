@@ -139,10 +139,14 @@ As part of creating your Meltano project, we automatically added your first [env
 1. Activate your environment for your shell session:
 
     ```bash
-    #For Windows (PowerShell): $env:MELTANO_ENVIRONMENT="dev"
-    export MELTANO_ENVIRONMENT=dev
+        export MELTANO_ENVIRONMENT=dev
     ```
-
+    or for Windows PowerShell:
+    
+    ```powershell
+        $env:MELTANO_ENVIRONMENT="dev"
+    ```
+    
     Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
 
 1. [optional] Add a new environment:
