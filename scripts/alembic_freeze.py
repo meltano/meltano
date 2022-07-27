@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Script to freeze the Meltano database - executed by the Makefile."""
+"""Script to freeze the Meltano database - executed by GitHub CI."""
 
 from alembic.script import ScriptDirectory
 
