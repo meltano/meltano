@@ -56,7 +56,11 @@ jobs:
 
     - name: Build distribution
       run: |
-        make sdist_public
+        poetry run scripts/alembic_freeze.py
+        bash scripts/bundle_ui.sh
+        # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
+        touch src/meltano/core/tracking/.release_marker
+        poetry build
 
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
