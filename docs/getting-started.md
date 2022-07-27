@@ -139,7 +139,7 @@ As part of creating your Meltano project, we automatically added your first [env
 1. Activate your environment for your shell session:
 
     ```bash
-        export MELTANO_ENVIRONMENT=dev
+    export MELTANO_ENVIRONMENT=dev
     ```
     or for Windows PowerShell:
     
