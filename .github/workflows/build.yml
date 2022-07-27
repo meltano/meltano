@@ -51,15 +51,13 @@ jobs:
 
     - name: Release Marker
       if: ${{ github.event.release }}
-      run: |
-        touch src/meltano/core/tracking/.release_marker
+      # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
+      run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
       run: |
         poetry run scripts/alembic_freeze.py
         bash scripts/bundle_ui.sh
-        # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
-        touch src/meltano/core/tracking/.release_marker
         poetry build
 
     # This is for temporary testing purposes only,
