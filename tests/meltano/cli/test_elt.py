@@ -1,5 +1,6 @@
 import asyncio
 import json
+import platform
 from typing import List, Optional
 
 import pytest
@@ -76,7 +77,7 @@ def assert_lines(output, *lines):
 
 
 def exception_logged(result_output: str, exc: Exception) -> bool:
-    """Small utility to search click result output for a specific excpetion .
+    """Small utility to search click result output for a specific exception.
 
     Args:
         result_output: The click result output string to search.
@@ -217,6 +218,38 @@ def dbt_process(process_mock_factory, dbt):
     return dbt
 
 
+class TestWindowsELT:
+    @pytest.mark.skipif(
+        platform.system() != "Windows",
+        reason="Test is only for Windows",
+    )
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_elt_windows(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        tap,
+        target,
+    ):
+        args = ["elt", tap.name, target.name]
+        result = cli_runner.invoke(cli, args)
+        assert result.exit_code == 1
+        # Didn't use exception_logged() as result.stderr doensn't contain the error for some reason
+        assert (
+            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
+            in str(result.exception)
+        )
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="ELT is not supported on Windows",
+)
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(LegacyTracker, "track_event", return_value=None)
@@ -847,7 +880,7 @@ class TestCliEltScratchpadOne:
         state_id = "already_running"
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
-        existing_job = Job(job_id=state_id, state=State.RUNNING)
+        existing_job = Job(job_name=state_id, state=State.RUNNING)
         existing_job.save(session)
 
         with mock.patch(
@@ -1006,6 +1039,10 @@ class TestCliEltScratchpadOne:
             )
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="ELT is not supported on Windows",
+)
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(LegacyTracker, "track_event", return_value=None)
@@ -1173,6 +1210,10 @@ class TestCliEltScratchpadTwo:
             )
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="ELT is not supported on Windows",
+)
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(LegacyTracker, "track_event", return_value=None)

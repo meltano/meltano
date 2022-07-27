@@ -1,3 +1,4 @@
+import platform
 import sys
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
@@ -41,6 +42,10 @@ class TestSuperset:
     async def test_hooks(  # noqa:  WPS210
         self, subject, project, session, plugin_invoker_factory, monkeypatch
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         run_dir = project.run_dir("superset")
         config_path = run_dir.joinpath("superset_config.py")
 

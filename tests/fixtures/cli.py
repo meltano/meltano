@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -25,8 +24,9 @@ class MeltanoCliRunner(CliRunner):
 
     def invoke(self, *args, **kwargs) -> Any:
         results = super().invoke(*args, **kwargs)
-        if self.snowplow:
-            assert self.snowplow.all()["bad"] == 0
+        if self.snowplow:  # pragma: no cover
+            assert self.snowplow.all()["bad"] == 0  # pragma: no cover
+            assert not self.snowplow.bad()  # pragma: no cover
         return results
 
 
@@ -60,5 +60,4 @@ def project_files_cli(test_dir, compatible_copy_tree):
     finally:
         Project.deactivate()
         os.chdir(test_dir)
-        shutil.rmtree(project.root)
         logging.debug(f"Cleaned project at {project.root}")

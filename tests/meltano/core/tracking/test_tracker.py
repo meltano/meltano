@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import subprocess
 import uuid
 from contextlib import contextmanager
@@ -12,6 +13,9 @@ import pytest
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking.contexts.environment import EnvironmentContext
+from meltano.core.tracking.contexts.exception import ExceptionContext
+from meltano.core.tracking.contexts.project import ProjectContext
 from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
 
@@ -89,6 +93,10 @@ class TestTracker:
             != analytics_json_post["send_anonymous_usage_stats"]
         )
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_restore_project_id_from_analytics_json(self, project: Project):
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
@@ -107,6 +115,10 @@ class TestTracker:
 
         assert original_project_id == restored_project_id
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
         clear_telemetry_settings(project)
         setting_service = ProjectSettingsService(project)
@@ -146,6 +158,10 @@ class TestTracker:
             Tracker(project)
             check_analytics_json(project)
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     @pytest.mark.parametrize(
         "analytics_json_content",
         [
@@ -173,6 +189,10 @@ class TestTracker:
 
             check_analytics_json(project)
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_restore_project_id_and_telemetry_state_change(self, project: Project):
         """
         Test that `project_id` is restored from `analytics.json`, and a telemetry state
@@ -209,6 +229,10 @@ class TestTracker:
             finally:
                 ProjectSettingsService.config_override = original_config_override
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     @pytest.mark.parametrize(
         "snowplow_endpoints,send_stats,expected",
         (
@@ -230,17 +254,21 @@ class TestTracker:
         setting_service.set("send_anonymous_usage_stats", send_stats)
         assert Tracker(project).can_track() is expected
 
-    def test_send_anonymous_usage_stats(self, project: Project):
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
+    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch):
         clear_telemetry_settings(project)
 
-        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "True"
+        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
         assert Tracker(project).send_anonymous_usage_stats is True
 
         # Ensure the env var takes priority
         ProjectSettingsService(project).set("send_anonymous_usage_stats", False)
         assert Tracker(project).send_anonymous_usage_stats is True
 
-        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "False"
+        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
         assert Tracker(project).send_anonymous_usage_stats is False
 
         # Ensure the env var takes priority
@@ -255,10 +283,18 @@ class TestTracker:
         ProjectSettingsService(project).set("send_anonymous_usage_stats", True)
         assert Tracker(project).send_anonymous_usage_stats is True
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_default_send_anonymous_usage_stats(self, project: Project):
         clear_telemetry_settings(project)
         assert Tracker(project).send_anonymous_usage_stats
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
+    )
     def test_exit_event_is_fired(self, project: Project, snowplow: SnowplowMicro):
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
 
@@ -284,10 +320,12 @@ class TestTracker:
                 # Can't put asserts in here because this method is executed
                 # withing a try-except block that catches all exceptions.
                 nonlocal passed
+                expected_contexts = [EnvironmentContext, ProjectContext]
                 if send_anonymous_usage_stats:
-                    passed = contexts is not None
-                else:
-                    passed = contexts is None
+                    expected_contexts.append(ExceptionContext)
+                passed = len(set(contexts)) == len(expected_contexts) and all(
+                    isinstance(ctx, tuple(expected_contexts)) for ctx in contexts
+                )
 
         tracker.snowplow_tracker = MockSnowplowTracker()
 

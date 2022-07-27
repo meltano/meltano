@@ -1,4 +1,5 @@
 import asyncio
+import platform
 import signal
 import uuid
 from datetime import datetime, timedelta
@@ -16,7 +17,9 @@ from meltano.core.job.job import (
 
 class TestJob:
     def sample_job(self, payload=None):
-        return Job(job_id="meltano:sample-elt", state=State.IDLE, payload=payload or {})
+        return Job(
+            job_name="meltano:sample-elt", state=State.IDLE, payload=payload or {}
+        )
 
     def test_save(self, session):
         subject = self.sample_job().save(session)
@@ -27,7 +30,7 @@ class TestJob:
         for key in range(0, 10):
             session.add(self.sample_job({"key": key}))
 
-        subjects = session.query(Job).filter_by(job_id="meltano:sample-elt")
+        subjects = session.query(Job).filter_by(job_name="meltano:sample-elt")
 
         assert len(subjects.all()) == 10
         session.rollback()
@@ -89,11 +92,15 @@ class TestJob:
 
     @pytest.mark.asyncio
     async def test_run_interrupted(self, session):
-        subject = self.sample_job({"original_state": 1}).save(session)
 
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+            )
+        subject = self.sample_job({"original_state": 1}).save(session)
         with pytest.raises(KeyboardInterrupt):
             async with subject.run(session):
-                psutil.Process().send_signal(signal.SIGINT)
+                send_signal(signal.SIGINT)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -102,11 +109,16 @@ class TestJob:
 
     @pytest.mark.asyncio
     async def test_run_terminated(self, session):
+
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+            )
         subject = self.sample_job({"original_state": 1}).save(session)
 
         with pytest.raises(SystemExit):
             async with subject.run(session):
-                psutil.Process().terminate()
+                send_signal(signal.SIGTERM)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -177,3 +189,15 @@ class TestJob:
         assert job.fail_stale()
         assert job.has_error()
         assert "5 minutes" in job.payload["error"]
+
+
+def send_signal(signal: int):
+    if platform.system() == "Windows":
+        # Replace once Python 3.7 has been dropped see https://github.com/meltano/meltano/issues/6223
+        import ctypes
+
+        ucrtbase = ctypes.CDLL("ucrtbase")
+        c_raise = ucrtbase["raise"]
+        c_raise(signal)
+    else:
+        psutil.Process().send_signal(signal)

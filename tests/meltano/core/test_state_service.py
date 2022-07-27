@@ -1,4 +1,5 @@
 import json
+import platform
 
 import pytest
 
@@ -39,26 +40,31 @@ class TestStateService:
         assert state_service.get_state(mock_state_id) == payloads.mock_state_payloads[0]
 
     def test_set_state(self, job_history_session, jobs, payloads, state_service):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         for job in jobs:
             for state in payloads.mock_state_payloads:
-                state_service.set_state(job.job_id, json.dumps(state))
-                assert state_service.get_state(job.job_id) == state
+                state_service.set_state(job.job_name, json.dumps(state))
+                assert state_service.get_state(job.job_name) == state
 
     def test_clear_state(self, job_history_session, jobs, payloads, state_service):
         for job in jobs:
-            state_service.clear_state(job.job_id)
-            assert state_service.get_state(job.job_id) == payloads.mock_empty_payload
+            state_service.clear_state(job.job_name)
+            assert state_service.get_state(job.job_name) == payloads.mock_empty_payload
 
     def test_merge_state(self, job_history_session, jobs, state_service):
         job_pairs = []
         for idx in range(0, len(jobs) - 1, 2):
             job_pairs.append((jobs[idx], jobs[idx + 1]))
         for (job_src, job_dst) in job_pairs:
-            state_src = state_service.get_state(job_src.job_id)
-            state_dst = state_service.get_state(job_dst.job_id)
+            state_src = state_service.get_state(job_src.job_name)
+            state_dst = state_service.get_state(job_dst.job_name)
             merged_dst = merge(state_src, state_dst)
-            state_service.merge_state(job_src.job_id, job_dst.job_id)
-            assert merged_dst == state_service.get_state(job_dst.job_id)
+            state_service.merge_state(job_src.job_name, job_dst.job_name)
+            assert merged_dst == state_service.get_state(job_dst.job_name)
 
     def test_copy(self, state_ids, state_service):
         state_id_pairs = []

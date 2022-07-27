@@ -243,6 +243,7 @@ class Variant(NameEq, Canonical):
         settings: list | None = None,
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
+        env: dict[str, str] | None = None,
         **extras,
     ):
         """Create a new Variant.
@@ -260,6 +261,7 @@ class Variant(NameEq, Canonical):
             settings: The settings of the variant.
             commands: The commands of the variant.
             requires: Other plugins this plugin depends on.
+            env: Environment variables to inject into plugins runtime context.
             extras: Additional keyword arguments.
         """
         super().__init__(
@@ -275,6 +277,7 @@ class Variant(NameEq, Canonical):
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
+            env=env or {},
             extras=extras,
         )
 
@@ -446,6 +449,7 @@ class PluginDefinition(PluginRef):
             settings=plugin.settings,
             commands=plugin.commands,
             requires=plugin.requires,
+            env=plugin.env,
             **plugin.extras,
         )
 
@@ -717,6 +721,7 @@ class StandalonePlugin(Canonical):
         settings: list | None = None,
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
+        env: dict[str, str] | None = None,
         **extras,
     ):
         """Create a locked plugin.
@@ -736,6 +741,7 @@ class StandalonePlugin(Canonical):
             settings: The settings of the plugin.
             commands: The commands of the plugin.
             requires: Other plugins this plugin depends on.
+            env: Environment variables to inject into plugins runtime context.
             extras: Additional attributes to set on the plugin.
         """
         super().__init__(
@@ -753,6 +759,7 @@ class StandalonePlugin(Canonical):
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
+            env=env or {},
             extras=extras,
         )
 
@@ -786,5 +793,6 @@ class StandalonePlugin(Canonical):
             settings=variant.settings,
             commands=variant.commands,
             requires=variant.requires,
+            env=variant.env,
             **{**plugin_def.extras, **variant.extras},
         )

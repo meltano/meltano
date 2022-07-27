@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import tempfile
 from pathlib import Path
 
@@ -20,15 +21,35 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking import CliContext, CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
-from .utils import CliError
+from .utils import CliError, InstrumentedGroup, PartialInstrumentedCmd
+
+logger = logging.getLogger(__name__)
+
+
+def get_label(metadata) -> str:
+    """Get the label for an environment variable's source.
+
+    Args:
+        metadata: the metadata for the variable
+
+    Returns:
+        string describing the source of the variable's value
+    """
+    source = metadata["source"]
+    try:
+        return f"from the {metadata['env_var']} variable in {source.label}"
+    except KeyError:
+        return f"from {source.label}"
 
 
 @cli.group(
-    invoke_without_command=True, short_help="Display Meltano or plugin configuration."
+    cls=InstrumentedGroup,
+    invoke_without_command=True,
+    short_help="Display Meltano or plugin configuration.",
 )
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
@@ -56,23 +77,19 @@ def config(  # noqa: WPS231
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
     """
-    tracker = Tracker(project)
-    tracker.add_contexts(
-        CliContext.from_command_and_kwargs(
-            "config",
-            ctx.invoked_subcommand or None,
-            plugin_type=plugin_type,
-            format=format,
-            extras=extras,
-        )
-    )
-
+    tracker = ctx.obj["tracker"]
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
     except ValueError:
-        tracker.track_command_event(CliEvent.started)
         tracker.track_command_event(CliEvent.aborted)
         raise
+
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"The default environment ({project.active_environment.name}) will be ignored for `meltano config`. "
+            + "To configure a specific Environment, please use option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
 
     plugins_service = ProjectPluginsService(project)
 
@@ -84,13 +101,12 @@ def config(  # noqa: WPS231
         if plugin_name == "meltano":
             plugin = None
         else:
-            tracker.track_command_event(CliEvent.started)
             tracker.track_command_event(CliEvent.aborted)
             raise
 
     if plugin:
         tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
-    tracker.track_command_event(CliEvent.started)
+    tracker.track_command_event(CliEvent.inflight)
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -135,11 +151,11 @@ def config(  # noqa: WPS231
         raise
     finally:
         session.close()
-    ctx.obj["tracker"] = tracker
 
 
 @config.command(
-    "list",
+    cls=PartialInstrumentedCmd,
+    name="list",
     short_help=(
         "List all settings for the specified plugin with their names, environment variables, and current values."
     ),
@@ -201,7 +217,7 @@ def list_settings(ctx, extras: bool):
         elif source is SettingValueStore.INHERITED:
             label = f"inherited from '{settings.plugin.parent.name}'"
         else:
-            label = f"from {source.label}"
+            label = f"{get_label(config_metadata)}"
 
         current_value = click.style(f"{value!r}", fg="green")
         click.echo(f" current value: {current_value}", nl=False)
@@ -227,7 +243,7 @@ def list_settings(ctx, extras: bool):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command()
+@config.command(cls=PartialInstrumentedCmd)
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
@@ -258,7 +274,7 @@ def reset(ctx, store):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command("set")
+@config.command(cls=PartialInstrumentedCmd, name="set")
 @click.argument("setting_name", nargs=-1, required=True)
 @click.argument("value")
 @click.option(
@@ -297,16 +313,18 @@ def set_(ctx, setting_name, value, store):
         fg="green",
     )
 
-    current_value, source = settings.get_with_source(name, session=session)
+    current_value, metadata = settings.get_with_metadata(name, session=session)
+    source = metadata["source"]
     if source != store:
+        message = f"Current value is still: {current_value!r} {get_label(metadata)}"
         click.secho(
-            f"Current value is still: {current_value!r} (from {source.label})",
+            message,
             fg="yellow",
         )
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command("test")
+@config.command(cls=PartialInstrumentedCmd, name="test")
 @click.pass_context
 def test(ctx):
     """Test the configuration of a plugin."""
@@ -337,7 +355,7 @@ def test(ctx):
     tracker.track_command_event(CliEvent.completed)
 
 
-@config.command()
+@config.command(cls=PartialInstrumentedCmd)
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",
@@ -372,7 +390,7 @@ def unset(ctx, setting_name, store):
     current_value, source = settings.get_with_source(name, session=session)
     if source is not SettingValueStore.DEFAULT:
         click.secho(
-            f"Current value is now: {current_value!r} (from {source.label})",
+            f"Current value is now: {current_value!r} ({get_label(metadata)})",
             fg="yellow",
         )
     tracker.track_command_event(CliEvent.completed)

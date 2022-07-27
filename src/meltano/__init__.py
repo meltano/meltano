@@ -2,4 +2,4 @@
 
 
 # Managed by bumpversion
-__version__ = "2.1.0"
+__version__ = "2.3.0"

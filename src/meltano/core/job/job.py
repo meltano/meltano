@@ -94,10 +94,10 @@ class Job(SystemModel):  # noqa: WPS214
     state == State.STATE_EDIT.
     """
 
-    __tablename__ = "job"
+    __tablename__ = "runs"
 
     id = Column(types.Integer, primary_key=True)
-    job_id = Column(types.String)
+    job_name = Column(types.String)
     run_id = Column(GUID, nullable=False, default=uuid.uuid4)
     _state = Column(name="state", type_=types.String)
     started_at = Column(types.DateTime)
@@ -315,7 +315,7 @@ class Job(SystemModel):  # noqa: WPS214
         Returns:
             a string representation of the job
         """
-        return f"<Job(id='{self.id}', job_id='{self.job_id}', state='{self.state}', started_at='{self.started_at}', ended_at='{self.ended_at}')>"
+        return f"<Job(id='{self.id}', job_name='{self.job_name}', state='{self.state}', started_at='{self.started_at}', ended_at='{self.ended_at}')>"
 
     def save(self, session):
         """Save the job in the db.

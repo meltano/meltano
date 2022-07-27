@@ -2,7 +2,6 @@ import datetime
 import itertools
 import logging
 import os
-import shutil
 from collections import defaultdict, namedtuple
 from copy import deepcopy
 from pathlib import Path
@@ -38,8 +37,6 @@ from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleSe
 from meltano.core.state_service import StateService
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
-
-PROJECT_NAME = "a_meltano_project"
 
 
 @pytest.fixture(scope="class")
@@ -238,8 +235,8 @@ def locked_definition_service(project):
 
 
 @pytest.fixture(scope="class")
-def project_init_service():
-    return ProjectInitService(PROJECT_NAME)
+def project_init_service(request):
+    return ProjectInitService(f"project_{request.node.name}")
 
 
 @pytest.fixture(scope="class")
@@ -455,10 +452,6 @@ def job_logging_service(project):
 
 @pytest.fixture(scope="class")
 def project(test_dir, project_init_service):
-    # Clean up whatever might be left behind. Nothing should be left, but some fixtures
-    # occasionally do not clean up after themselves properly.
-    shutil.rmtree(test_dir / PROJECT_NAME, ignore_errors=True)
-
     project = project_init_service.init(add_discovery=True)
     logging.debug(f"Created new project at {project.root}")
 
@@ -476,7 +469,6 @@ def project(test_dir, project_init_service):
     finally:
         Project.deactivate()
         os.chdir(test_dir)
-        shutil.rmtree(project.root)
         logging.debug(f"Cleaned project at {project.root}")
 
 
@@ -499,7 +491,6 @@ def project_files(test_dir, compatible_copy_tree):
     finally:
         Project.deactivate()
         os.chdir(test_dir)
-        shutil.rmtree(project.root)
         logging.debug(f"Cleaned project at {project.root}")
 
 
@@ -613,21 +604,21 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
         state_ids.single_incomplete_state_id: [
             Job(
-                job_id=state_ids.single_incomplete_state_id,
+                job_name=state_ids.single_incomplete_state_id,
                 **job_args.incomplete_job_args,
                 payload=payloads.mock_state_payloads[0],
             )
         ],
         state_ids.single_complete_state_id: [
             Job(
-                job_id=state_ids.single_complete_state_id,
+                job_name=state_ids.single_complete_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ],
         state_ids.multiple_incompletes_state_id: [
             Job(
-                job_id=state_ids.multiple_incompletes_state_id,
+                job_name=state_ids.multiple_incompletes_state_id,
                 **job_args.incomplete_job_args,
                 payload=payload,
             )
@@ -635,7 +626,7 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.multiple_completes_state_id: [
             Job(
-                job_id=state_ids.multiple_completes_state_id,
+                job_name=state_ids.multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )
@@ -643,14 +634,14 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.single_complete_then_multiple_incompletes_state_id: [
             Job(
-                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
+                job_name=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ]
         + [
             Job(
-                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
+                job_name=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payload,
                 **job_args.incomplete_job_args,
             )
@@ -658,14 +649,14 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.single_incomplete_then_multiple_completes_state_id: [
             Job(
-                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
+                job_name=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.incomplete_job_args,
             )
         ]
         + [
             Job(
-                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
+                job_name=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )

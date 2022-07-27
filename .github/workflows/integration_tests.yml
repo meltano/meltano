@@ -1,0 +1,72 @@
+name: Integration Tests
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    strategy:
+      matrix:
+        include:
+        - { integration_test: "meltano-basics", needs_postgres: false }
+        - { integration_test: "meltano-run", needs_postgres: true }
+        - { integration_test: "meltano-objects", needs_postgres: false }
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install poetry
+        poetry --version
+
+    - name: Setup Python 3.8
+      uses: actions/setup-python@v4.1.0
+      with:
+        python-version: 3.8
+        architecture: x64
+        cache: 'poetry'
+
+    - name: Upgrade pip
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pip install pip
+        pip --version
+
+    - name: Install Dependencies
+      run: |
+        poetry env use "3.8"
+        poetry install
+
+    - name: Start Postgres Container
+      if: always() && (matrix.needs_postgres == true)
+      run: >
+        docker run -d
+        -p "5432:5432"
+        -e "POSTGRES_PASSWORD=postgres"
+        -e "POSTGRES_DB=warehouse"
+        --name postgres
+        --health-cmd "pg_isready -d postgres -U postgres"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        postgres:11
+
+    - name: Run integration tests
+      run: |
+        poetry env use "3.8"
+        poetry run bash integration/validate.sh ${{ matrix.integration_test }}
