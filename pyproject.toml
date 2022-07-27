@@ -14,13 +14,14 @@ classifiers = [
 include = [
   # Explicitly include non-Python files and gitignored files:
   "LICENSE",
-  "*.m5o",
+  "scripts/build.py",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
   "src/meltano/api/templates/embed.html",
   "src/meltano/api/templates/webapp.html",
   "src/meltano/core/tracking/.release_marker",
 ]
+build = "scripts/build.py"
 
 [tool.poetry.dependencies]
 aiodocker = "^0.21.0"
