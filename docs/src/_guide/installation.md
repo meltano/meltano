@@ -149,7 +149,7 @@ Now that you've installed Meltano and its requirements, you can continue setting
 
 ### Using Pre-built Docker Images
 
-We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Docker image on DockerHub, which comes with Python and Meltano pre-installed.
+We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Docker image on Docker Hub, which comes with Python and Meltano pre-installed.
 
 To get the latest version of Meltano, pull the `latest` tag. Images for specific versions of Meltano are tagged `v<X.Y.Z>`, e.g. `v1.55.0`.
 
