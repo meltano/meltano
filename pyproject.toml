@@ -14,7 +14,6 @@ classifiers = [
 include = [
   # Explicitly include non-Python files and gitignored files:
   "LICENSE",
-  "scripts/build.py",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
   "src/meltano/api/templates/embed.html",
