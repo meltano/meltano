@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class hook:  # noqa: N801
-    """
-    This decorator marks a function as a __hook__.
-    It will be found by the Hookable metaclass and
-    registered to be triggered accordingly.
+    """This decorator marks a function as a `__hook__`.
+
+    It will be found by the `Hookable` metaclass and registered to be triggered
+    accordingly.
     """
 
     def __init__(self, hook_name, can_fail=False):
@@ -28,8 +28,8 @@ class hook:  # noqa: N801
 
 
 class Hookable(type):
-    """
-    Metaclass that registers @hook functions into __hooks__
+    """Metaclass that registers hook-decorated functions into `__hooks__`.
+
     Hooks are registered in declaration order.
     """
 
@@ -54,10 +54,10 @@ class Hookable(type):
 
 
 class HookObject(metaclass=Hookable):
-    """
-    Hook base class that handles the triggering of hooks.
-    Hooks are triggered in reverse MRO order, which means
-    derived classes hooks are called after their base class.
+    """Hook base class that handles the triggering of hooks.
+
+    Hooks are triggered in reverse MRO order, which means derived classes hooks
+    are called after their base class.
     """
 
     @asynccontextmanager
