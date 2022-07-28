@@ -296,7 +296,10 @@ class BlockParser:  # noqa: D101
                 # pass to the parent mapper plugin.  We also want to fail if the user names them
                 # the same to stop errors due to ambiguous commands.
                 if plugin.name == self._mappings_ref.get(next_block):
-                    self.log.warning("mapper plugin name used")
+                    self.log.warning(
+                        "Found unexpected mapper plugin name. ",
+                        plugin_name=plugin.name,
+                    )
                     raise BlockSetValidationError(
                         f"Expected unique mappings name not the mapper plugin name: {plugin.name}."
                     )
