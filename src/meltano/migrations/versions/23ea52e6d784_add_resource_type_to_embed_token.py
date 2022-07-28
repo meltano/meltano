@@ -23,10 +23,12 @@ Session = sa.orm.sessionmaker()
 
 
 def upgrade():
-    dialect_name = get_dialect_name(op)
+    dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
 
-    op.add_column("embed_tokens", sa.Column("resource_type", sa.String(max_string_length)))
+    op.add_column(
+        "embed_tokens", sa.Column("resource_type", sa.String(max_string_length))
+    )
 
     metadata = sa.MetaData(bind=op.get_bind())
     Embed_Tokens = sa.Table("embed_tokens", metadata, autoload=True)

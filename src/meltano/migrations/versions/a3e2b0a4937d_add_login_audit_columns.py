@@ -21,7 +21,7 @@ depends_on = None
 
 
 def upgrade():
-    dialect_name = get_dialect_name(op)
+    dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
 
     op.add_column("user", sa.Column("last_login_at", datetime_type, nullable=True))

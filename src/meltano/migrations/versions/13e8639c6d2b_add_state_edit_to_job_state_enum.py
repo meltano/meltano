@@ -35,9 +35,9 @@ class State(Enum):
 
 
 def upgrade():
-    dialect_name = get_dialect_name(op)
+    dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
-    
+
     conn = op.get_bind()
     # In sqlite, the field is already a varchar.
     # "ALTER COLUMN" statements are also not supported.

@@ -21,7 +21,7 @@ depends_on = None
 
 
 def upgrade():
-    dialect_name = get_dialect_name(op)
+    dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
 
     op.add_column("job", sa.Column("trigger", sa.String(max_string_length)))

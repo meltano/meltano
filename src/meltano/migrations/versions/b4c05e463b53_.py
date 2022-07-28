@@ -36,7 +36,7 @@ class State(Enum):
 
 
 def upgrade():
-    dialect_name = get_dialect_name(op)
+    dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)
 
@@ -47,7 +47,9 @@ def upgrade():
         sa.Column("state", sa.Enum(State, name="job_state")),
         sa.Column("started_at", datetime_type),
         sa.Column("ended_at", datetime_type),
-        sa.Column("payload", MutableDict.as_mutable(JSONEncodedDict(max_string_length))),
+        sa.Column(
+            "payload", MutableDict.as_mutable(JSONEncodedDict(max_string_length))
+        ),
         sa.Column("payload_flags", IntFlag, default=0),
     )
 

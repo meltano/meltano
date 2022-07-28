@@ -4,29 +4,53 @@ import os
 
 import pytest
 import sqlalchemy as sa
-from sqlalchemy import create_engine, text
+from sqlalchemy import DDL, create_engine
 from sqlalchemy.engine import URL
 
 
 def recreate_database(engine, db_name):
-    """
-    Drop & Create a new database. We need to use the master connection to do this.
+    """Drop & Create a new database.
+
+    We need to use the master connection to do this.
+
+    Args:
+        engine: The master connection.
+        db_name: The name of the database to create.
     """
     with contextlib.suppress(sa.exc.ProgrammingError):
-        engine.execute(text(f"""
-            USE master
-            IF EXISTS(select * from sys.databases where name='{db_name}')
-            DROP DATABASE {db_name}
-        """))
+        # DROP DATABASE IF EXISTS is not supported by SQL Server 2016 and up
+        engine.execute(
+            DDL(
+                "DROP DATABASE IF EXISTS %(db_name)s",  # noqa: WPS323
+                {"db_name": db_name},
+            )
+        )
 
     with contextlib.suppress(sa.exc.ProgrammingError):
-        engine.execute(text(f"CREATE DATABASE {db_name}"))
+        engine.execute(
+            DDL(
+                "CREATE DATABASE %(db_name)s",  # noqa: WPS323
+                {"db_name": db_name},
+            )
+        )
 
-def create_connection_url(host: str, port: int, user: str, password: str, database: str) -> URL:
+
+def create_connection_url(
+    host: str, port: int, user: str, password: str, database: str
+) -> URL:
+    """Create a MSSQL connection URL for the given parameters.
+
+    Args:
+        host: The hostname.
+        port: The port.
+        user: The username.
+        password: The password.
+        database: The database name.
+
+    Returns:
+        The connection URL.
     """
-    Create a MSSQL connection URL for the given parameters.
-    """
-    connection_url = sa.engine.URL.create(
+    return sa.engine.URL.create(
         "mssql+pymssql",
         username=user,
         password=password,
@@ -35,7 +59,6 @@ def create_connection_url(host: str, port: int, user: str, password: str, databa
         database=database,
     )
 
-    return connection_url
 
 @pytest.fixture(scope="session")
 def engine_uri():
@@ -63,4 +86,4 @@ def pg_stats(request, session):
     from meltano.core.job import Job
 
     jobs = session.query(Job).all()
-    print(f"{request.node.name} created {len(jobs)} Job.")
+    logging.info("%s created %d Job.", request.node.name, len(jobs))  # noqa: WPS323
