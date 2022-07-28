@@ -30,17 +30,19 @@ async def get_futures(urls: Iterator[str], timeout=None, headers=None):
 def fetch_urls(
     urls: list, headers: dict = None, timeout: aiohttp.ClientTimeout = None
 ) -> Iterator[str]:
-    """
-    Asynchronously fetch multiple urls and return Iterator object that contains all of the responses
-    Example usage:
-    urls = ['https://httpbin.org/get', 'https://google.com', 'https://gitlab.com/meltano/']
-    for result in fetch_urls(urls):
-        print(result)
+    """Asynchronously fetch multiple urls and return `Iterator` object that contains all of the responses.
 
-    :param headers: dict of headers to be passed with the request
-    :param timeout: timeout object to be passed to the aiohttp lib
-    :param urls: Iterator of url strings
-    :return: Generator of response texts
+    Examples:
+        ```python
+        urls = ['https://httpbin.org/get', 'https://google.com', 'https://gitlab.com/meltano/']
+        for result in fetch_urls(urls):
+            print(result)
+        ```
+
+    Parameters:
+        headers: Dictionary of headers to be passed with the request.
+        timeout: Timeout object to be passed to the aiohttp lib.
+        urls: Iterator of url strings.
     """
     try:
         loop = asyncio.get_event_loop()
@@ -49,10 +51,9 @@ def fetch_urls(
         asyncio.set_event_loop(asyncio.new_event_loop())
         loop = asyncio.get_event_loop()
 
-    futures = get_futures(urls=urls, headers=headers, timeout=timeout)
-    future = asyncio.ensure_future(futures)
-    responses = loop.run_until_complete(future)
-    yield from responses
+    yield from loop.run_until_complete(
+        asyncio.ensure_future(get_futures(urls=urls, headers=headers, timeout=timeout))
+    )
 
 
 SQLALCHEMY_COL_TYPE_NAME_MAP = {
@@ -73,9 +74,7 @@ SQLALCHEMY_COL_TYPE_NAME_MAP = {
 def get_sqlalchemy_col(
     column_name: str, column_type_name: str, primary_key_col_name: str
 ) -> sqlalchemy.Column:
-    """
-    Helper method that returns the sqlalchemy Column object to be used for Table def.
-    """
+    """Return the sqlalchemy `Column` object to be used for `Table` definition."""
     col = sqlalchemy.Column(
         column_name,
         SQLALCHEMY_COL_TYPE_NAME_MAP.get(column_type_name, sqlalchemy.String),
