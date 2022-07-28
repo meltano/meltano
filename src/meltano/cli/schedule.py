@@ -172,10 +172,10 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     }
 
 
-@schedule.command(
+@schedule.command(  # noqa: WPS125
     cls=PartialInstrumentedCmd, short_help="List available schedules."
-)  # noqa: WPS441
-@click.option("--format", type=click.Choice(["json", "text"]), default="text")
+)
+@click.option("--format", type=click.Choice(("json", "text")), default="text")
 @click.pass_context
 def list(ctx, format):  # noqa: WPS125
     """List available schedules."""

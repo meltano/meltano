@@ -24,7 +24,10 @@ from .utils import (
 )
 
 
-@cli.command(cls=PartialInstrumentedCmd, short_help="Add a plugin to your project.")
+@cli.command(  # noqa: WPS238
+    cls=PartialInstrumentedCmd,
+    short_help="Add a plugin to your project.",
+)
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
 @click.option(
@@ -54,7 +57,7 @@ from .utils import (
 )
 @pass_project()
 @click.pass_context
-def add(  # noqa: WPS238
+def add(
     ctx,
     project: Project,
     plugin_type: str,
