@@ -7,10 +7,7 @@ from .auth import ResourcePermission
 
 
 class ResourceFilter:
-    """
-    Responsible for filtering API responses for a certain
-    set of permissions.
-    """
+    """Filters API responses for a certain set of permissions."""
 
     def __init__(self):
         self._needs = []
@@ -60,4 +57,4 @@ class TopicFilter(NameFilterMixin, ResourceFilter):
 
 
 class DesignFilter(NameFilterMixin, ResourceFilter):
-    pass
+    pass  # noqa: WPS604
