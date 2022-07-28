@@ -33,7 +33,9 @@ def tests(session: Session) -> None:
     """
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
 
-    if backend_db == "mssql":
+    if backend_db == "mysql":
+        session.install(".[mysql]")
+    elif backend_db == "mssql":
         session.install(".[mssql]")
     else:
         session.install(".")

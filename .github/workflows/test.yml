@@ -16,23 +16,27 @@ jobs:
     strategy:
       matrix:
         include:
-        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: sqlite }
-        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: sqlite }
-        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: sqlite }
-        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: sqlite }
+        # - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: sqlite }
+        # - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: sqlite }
+        # - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: sqlite }
+        # - { python-version: "3.10", os: "ubuntu-latest",  backend-db: sqlite }
         - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: postgresql }
         - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: postgresql }
         - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: postgresql }
         - { python-version: "3.10", os: "ubuntu-latest",  backend-db: postgresql }
-        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: mssql }
-        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: mssql }
-        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: mssql }
-        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: mssql }
+        # - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: mssql }
+        # - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: mssql }
+        # - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: mssql }
+        # - { python-version: "3.10", os: "ubuntu-latest",  backend-db: mssql }
+        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: mysql }
+        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: mysql }
+        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: mysql }
+        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: mysql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         # Windows tests for Python 3.7 and 3.10 are temporarily disabled - see https://github.com/meltano/meltano/issues/6479
         # - { python-version: "3.7",  os: "windows-2022",   backend-db: sqlite }
-        - { python-version: "3.8",  os: "windows-2022",   backend-db: sqlite }
-        - { python-version: "3.9",  os: "windows-2022",   backend-db: sqlite }
+        # - { python-version: "3.8",  os: "windows-2022",   backend-db: sqlite }
+        # - { python-version: "3.9",  os: "windows-2022",   backend-db: sqlite }
         # - { python-version: "3.10", os: "windows-2022",   backend-db: sqlite }
       fail-fast: false
 
@@ -100,6 +104,26 @@ jobs:
         --health-retries 5
         mcr.microsoft.com/mssql/server:2019-latest
 
+    - name: Start MYSQL Container
+      if: always() && (matrix.backend-db == 'mysql')
+      run: >
+        docker run -d
+        -p "3306:3306"
+        -e "MYSQL_ROOT_PASSWORD=mysql"
+        --name mysql
+        --health-cmd "mysqladmin ping -h 127.0.0.1 -u root --password=mysql"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        mysql
+        --default-authentication-plugin=mysql_native_password
+        --collation_server=utf8_general_ci
+        --character_set_server=utf8
+
+    - name: Wait for MYSQL Container
+      if: always() && (matrix.backend-db == 'mysql')
+      run: sleep 15
+
     - name: Check running containers
       run: |
         docker ps -a
@@ -130,6 +154,12 @@ jobs:
         MSSQL_PASSWORD: Meltan0admin
         MSSQL_DB: pytest_warehouse
 
+        # MySQL backend
+        MYSQL_ADDRESS: localhost
+        MYSQL_PORT: 3306
+        MYSQL_USER: root
+        MYSQL_PASSWORD: mysql
+        MYSQL_DB: pytest_warehouse
       run: |
         nox -rs tests --python=${{ matrix.python-version }} -- -m "${{ env.PYTEST_MARKERS }}"
 
