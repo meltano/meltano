@@ -1,9 +1,10 @@
-"""SingerBlock wraps singer plugins to implement the IOBlock interface."""
+"""`SingerBlock` wraps singer plugins to implement the `IOBlock` interface."""
+
+from __future__ import annotations
 
 import asyncio
 from asyncio.subprocess import Process
 from contextlib import suppress
-from typing import Dict, Optional, Tuple
 
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.utils import SubprocessOutputWriter
@@ -37,7 +38,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         project: Project,
         plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
-        command: Optional[str],
+        command: str | None,
     ):
         """Configure and return a wrapped plugin invoker extendable for use as an IOBlock or PluginCommandBlock.
 
@@ -56,18 +57,18 @@ class InvokerBase:  # noqa: WPS230, WPS214
         )
 
         self.invoker: PluginInvoker = plugin_invoker
-        self._command: Optional[str] = command
+        self._command: str | None = command
 
         self.outputs = []
         self.err_outputs = []
 
-        self.process_handle: Optional[Process] = None
-        self._process_future: Optional[asyncio.Task] = None
-        self._stdout_future: Optional[asyncio.Task] = None
-        self._stderr_future: Optional[asyncio.Task] = None
+        self.process_handle: Process | None = None
+        self._process_future: asyncio.Task | None = None
+        self._stdout_future: asyncio.Task | None = None
+        self._stderr_future: asyncio.Task | None = None
 
     @property
-    def command(self) -> Optional[str]:
+    def command(self) -> str | None:
         """Command is the specific plugin command to use when invoking the plugin (if any).
 
         Returns:
@@ -169,7 +170,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
             )
         return self._stderr_future
 
-    def proxy_io(self) -> Tuple[asyncio.Task, asyncio.Task]:
+    def proxy_io(self) -> tuple[asyncio.Task, asyncio.Task]:
         """Start proxying stdout AND stderr to the respectively linked destinations.
 
         Returns:
@@ -196,7 +197,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         return self._process_future
 
     @property
-    def stdin(self) -> Optional[asyncio.StreamWriter]:
+    def stdin(self) -> asyncio.StreamWriter | None:
         """Return stdin of the underlying process.
 
         Returns:
@@ -273,11 +274,11 @@ class SingerBlock(InvokerBase, IOBlock):
 
     def __init__(
         self,
-        block_ctx: Dict,
+        block_ctx: dict,
         project: Project,
         plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
-        plugin_args: Tuple[str],
+        plugin_args: tuple[str],
     ):
         """Configure and return a Singer plugin wrapped as an IOBlock.
 
