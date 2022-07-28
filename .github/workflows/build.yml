@@ -57,7 +57,6 @@ jobs:
     - name: Build distribution
       run: |
         poetry run scripts/alembic_freeze.py
-        bash scripts/bundle_ui.sh
         poetry build
 
     # This is for temporary testing purposes only,
