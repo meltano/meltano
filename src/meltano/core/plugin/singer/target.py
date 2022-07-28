@@ -75,9 +75,7 @@ class SingerTarget(SingerPlugin):
     ]
 
     def exec_args(self, plugin_invoker):
-        args = ["--config", plugin_invoker.files["config"]]
-
-        return args
+        return ["--config", plugin_invoker.files["config"]]
 
     @property
     def config_files(self):
@@ -112,8 +110,9 @@ class SingerTarget(SingerPlugin):
         output handler (the BookmarkWriter) to handle persisting state messages.
 
         Parameters:
-            plugin_invoker: The invocation handler who's add_out_handler method will be called to attach the bookmark writer
-            as an additional output handler.
+            plugin_invoker: The invocation handler who's add_out_handler method
+                will be called to attach the bookmark writer as an additional
+                output handler.
         """
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job or not elt_context.session:
