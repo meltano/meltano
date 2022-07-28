@@ -35,7 +35,7 @@ class ValidationOutcome(str, Enum):
     def from_exit_code(cls, exit_code: int):
         """Create validation outcome from an exit code.
 
-        Args:
+        Parameters:
             exit_code: Exit code of this of this outcome.
 
         Returns:
@@ -54,7 +54,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     ) -> None:
         """Create a validators runner for a plugin.
 
-        Args:
+        Parameters:
             invoker: PluginInvoker to be used with this ValidationsRunner.
             tests_selection: Dict of selected tests.
         """
@@ -73,7 +73,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     def select_test(self, name: str) -> None:
         """Mark a single test as selected.
 
-        Args:
+        Parameters:
             name: Test (command) name.
 
         Raises:
@@ -94,7 +94,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     async def run_all(self, session: sessionmaker) -> Dict[str, int]:
         """Run all validators defined in a plugin.
 
-        Args:
+        Parameters:
             session: A SQLAlchemy ORM session.
 
         Returns:
@@ -118,7 +118,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     ) -> Dict[str, T]:
         """Collect all tests for CLI invocation.
 
-        Args:
+        Parameters:
             project: A Meltano project object.
             select_all: Flag to select all validations by default.
 
@@ -143,7 +143,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     async def run_test(self, name: str):
         """Run a test command.
 
-        Args:
+        Parameters:
             name: Test name.
         """
         raise NotImplementedError

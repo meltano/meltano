@@ -56,7 +56,7 @@ class Superset(BasePlugin):
     async def before_configure(self, invoker: SupersetInvoker, session):  # noqa: WPS217
         """Write plugin configuration to superset_config.py.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
             session: metadata database session
 
@@ -107,7 +107,7 @@ class Superset(BasePlugin):
     async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: List[str]):
         """Create or upgrade metadata database.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
             exec_args: the args being passed
 
@@ -134,7 +134,7 @@ class Superset(BasePlugin):
     async def init_hook(self, invoker: PluginInvoker, exec_args: List[str]):
         """Create default roles and permissions.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
             exec_args: the args being passed
 
@@ -160,7 +160,7 @@ class Superset(BasePlugin):
     async def before_cleanup(self, invoker: PluginInvoker):
         """Delete the config file.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
         """
         config_file = invoker.files["config"]

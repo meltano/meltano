@@ -162,7 +162,7 @@ class EventMatcher:
     def event_matches(self, event: str) -> bool:
         """Search result output for an event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:
@@ -176,7 +176,7 @@ class EventMatcher:
     def find_by_event(self, event: str) -> Optional[List[dict]]:
         """Return the first matching event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:

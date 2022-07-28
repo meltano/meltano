@@ -21,7 +21,7 @@ class PluginRemoveService:
     def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         """Construct a PluginRemoveService instance.
 
-        Args:
+        Parameters:
             project: The Meltano project.
             plugins_service: The project plugins service.
         """
@@ -41,7 +41,7 @@ class PluginRemoveService:
         1. The total number of removed plugins
         2. The total number of plugins attempted
 
-        Args:
+        Parameters:
             plugins: The plugins to remove.
             plugin_status_cb: A callback to call for each plugin.
             removal_manager_status_cb: A callback to call for each removal manager.
@@ -77,7 +77,7 @@ class PluginRemoveService:
         Removes from `meltano.yml`, its installation in `.meltano`, and its settings in
         the Meltano system database.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
 
         Returns:

@@ -30,7 +30,7 @@ class MutuallyExclusiveOptionsError(Exception):
     def __init__(self, *options: str) -> None:
         """Instantiate the error.
 
-        Args:
+        Parameters:
             options: the mutually exclusive options that were incorrectly provided.
         """
         super().__init__(*options)

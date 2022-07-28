@@ -62,7 +62,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
     ):
         """Configure and return a wrapped plugin invoker.
 
-        Args:
+        Parameters:
             name: the name of the plugin/command.
             log: the OutputLogger instance to proxy output too.
             block_ctx: the block context.
@@ -152,7 +152,7 @@ def plugin_command_invoker(
     """
     Make an InvokerCommand from a plugin.
 
-    Args:
+    Parameters:
         plugin: Plugin to make command from.
         project: Project to use.
         command: the command to invoke on the plugin i.e. `run` in dbt run.

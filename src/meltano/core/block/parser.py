@@ -19,7 +19,7 @@ from .singer import CONSUMERS, SingerBlock
 def is_command_block(plugin: ProjectPlugin) -> bool:
     """Check if a plugin is a command block.
 
-    Args:
+    Parameters:
         plugin: Plugin to check.
 
     Returns:
@@ -37,7 +37,7 @@ def validate_block_sets(
 ) -> bool:
     """Perform validation of all blocks in a list that implement the BlockSet interface.
 
-    Args:
+    Parameters:
         log: Logger to use in the event of a validation error.
         blocks: A list of blocks.
 
@@ -68,7 +68,7 @@ class BlockParser:  # noqa: D101
         """
         Parse a meltano run command invocation into a list of blocks.
 
-        Args:
+        Parameters:
             log: Logger to use.
             project: Project to use.
             blocks: List of block names to parse.
@@ -135,7 +135,7 @@ class BlockParser:  # noqa: D101
             Given a job named "somejob" which consists of a single task of "tap target":
             ["somejob", "dbt:run"] -> ["tap", "target", "dbt:run"]
 
-        Args:
+        Parameters:
             blocks: List of block names to parse.
             task_sets: TaskSetsService to use.
 
@@ -161,7 +161,7 @@ class BlockParser:  # noqa: D101
         """
         Find all blocks in the invocation.
 
-        Args:
+        Parameters:
             offset: Offset to start from.
 
         Yields:
@@ -198,7 +198,7 @@ class BlockParser:  # noqa: D101
     def _find_plugin_or_mapping(self, name: str) -> Optional[ProjectPlugin]:
         """Find a plugin by name OR by mapping name.
 
-        Args:
+        Parameters:
             name: Name of the plugin or mapping.
 
         Returns:
@@ -234,7 +234,7 @@ class BlockParser:  # noqa: D101
         """
         Search a list of project plugins trying to find an extract ExtractLoad block set.
 
-        Args:
+        Parameters:
             offset: Optional starting offset for search.
 
         Returns:

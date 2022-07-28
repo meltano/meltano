@@ -24,7 +24,7 @@ class CyclicInheritanceError(Exception):
     def __init__(self, plugin: ProjectPlugin, ancestor: ProjectPlugin):
         """Initialize cyclic inheritance error.
 
-        Args:
+        Parameters:
             plugin: A ProjectPlugin
             ancestor: The given ProjectPlugins' ancestor.
         """
@@ -75,7 +75,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
     ):
         """ProjectPlugin.
 
-        Args:
+        Parameters:
             plugin_type: PluginType instance.
             name: Plugin name.
             inherit_from: Name of plugin to inherit from.
@@ -267,7 +267,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
     def env_prefixes(self, for_writing=False) -> list[str]:
         """Return environment variable prefixes.
 
-        Args:
+        Parameters:
             for_writing: Include parent prefix (used when writing to env vars)
 
         Returns:
@@ -407,7 +407,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
     ) -> dict[PluginType, list[PluginRequirement]]:
         """Return the requirements for this plugin.
 
-        Args:
+        Parameters:
             plugin_types: The plugin types to include.
 
         Returns:
