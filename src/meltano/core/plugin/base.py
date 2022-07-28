@@ -346,7 +346,7 @@ class PluginDefinition(PluginRef):
                 # nested in the plugin definition
                 for variant_k, variant_v in value[0]:
                     if variant_k == "name":
-                        variant_k = "variant"  # noqa: WPS440
+                        variant_k = "variant"
 
                     yield (variant_k, variant_v)
             else:
