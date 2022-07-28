@@ -1,3 +1,5 @@
+import structlog
+
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -8,6 +10,8 @@ from meltano.core.plugin_install_service import (
 )
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.venv_service import VirtualEnv
+
+logger = structlog.getLogger(__name__)
 
 
 class FilePlugin(BasePlugin):
@@ -39,11 +43,11 @@ class FilePlugin(BasePlugin):
 
     def update_file_header(self, relative_path):
         return "\n".join(
-            [
+            (
                 f"# This file is managed by the '{self.name}' {self.type.descriptor} and updated automatically when `meltano upgrade` is run.",
                 f"# To prevent any manual changes from being overwritten, remove the {self.type.descriptor} from `meltano.yml` or disable automatic updates:",
                 f"#     meltano config --plugin-type={self.type} {self.name} set _update {relative_path} false",
-            ]
+            )
         )
 
     def project_file_contents(self, project, paths_to_update):
@@ -80,7 +84,9 @@ class FilePlugin(BasePlugin):
             if not project.root_dir(relative_path).exists():
                 return relative_path
 
-            print(f"File {relative_path} already exists, keeping both versions")
+            logger.info(
+                f"File {str(relative_path)!r} already exists, keeping both versions"
+            )
             return relative_path.with_name(
                 f"{relative_path.stem} ({self.name}){relative_path.suffix}"
             )
@@ -101,11 +107,21 @@ class FilePlugin(BasePlugin):
             if str(relative_path) in paths_to_update
         }
 
-    def create_files(self, project, paths_to_update=[]):
-        return self.write_files(project, self.files_to_create(project, paths_to_update))
+    def create_files(self, project, paths_to_update=None):
+        return self.write_files(
+            project,
+            self.files_to_create(
+                project, [] if paths_to_update is None else paths_to_update
+            ),
+        )
 
-    def update_files(self, project, paths_to_update=[]):
-        return self.write_files(project, self.files_to_update(project, paths_to_update))
+    def update_files(self, project, paths_to_update=None):
+        return self.write_files(
+            project,
+            self.files_to_update(
+                project, [] if paths_to_update is None else paths_to_update
+            ),
+        )
 
     @hook("after_install")
     async def after_install(
@@ -127,21 +143,21 @@ class FilePlugin(BasePlugin):
         ]
 
         if reason is PluginInstallReason.ADD:
-            print(f"Adding '{plugin.name}' files to project...")
+            logger.info(f"Adding '{plugin.name}' files to project...")
 
             for path in self.create_files(project, paths_to_update):
-                print(f"Created {path}")
+                logger.info(f"Created {path}")
         elif reason is PluginInstallReason.UPGRADE:
-            print(f"Updating '{plugin.name}' files in project...")
+            logger.info(f"Updating '{plugin.name}' files in project...")
 
             updated_paths = self.update_files(project, paths_to_update)
             if not updated_paths:
-                print("Nothing to update")
+                logger.info("Nothing to update")
                 return
 
             for path in updated_paths:
-                print(f"Updated {path}")
+                logger.info(f"Updated {path}")
         else:
-            print(
+            logger.info(
                 f"Run `meltano upgrade files` to update your project's '{plugin.name}' files."
             )
