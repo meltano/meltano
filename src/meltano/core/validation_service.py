@@ -1,8 +1,10 @@
 """Class for invoking plugin validations."""
 
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import Dict, Type, TypeVar
+from typing import TypeVar
 
 from sqlalchemy.orm.session import sessionmaker
 
@@ -50,7 +52,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     def __init__(
         self,
         invoker: PluginInvoker,
-        tests_selection: Dict[str, bool],
+        tests_selection: dict[str, bool],
     ) -> None:
         """Create a validators runner for a plugin.
 
@@ -91,7 +93,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         for name in self.tests_selection.keys():
             self.tests_selection[name] = True
 
-    async def run_all(self, session: sessionmaker) -> Dict[str, int]:
+    async def run_all(self, session: sessionmaker) -> dict[str, int]:
         """Run all validators defined in a plugin.
 
         Parameters:
@@ -112,10 +114,10 @@ class ValidationsRunner(metaclass=ABCMeta):
 
     @classmethod
     def collect(
-        cls: Type[T],
+        cls: type[T],
         project: Project,
         select_all: bool = True,
-    ) -> Dict[str, T]:
+    ) -> dict[str, T]:
         """Collect all tests for CLI invocation.
 
         Parameters:
