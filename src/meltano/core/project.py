@@ -231,9 +231,23 @@ class Project(Versioned):  # noqa: WPS214
             the current meltano config
         """
         from .meltano_file import MeltanoFile
+        from .settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
+        from .yaml import configure_yaml
 
-        with self._meltano_rw_lock.read_lock():
-            return MeltanoFile.parse(self.project_files.load())
+        with open(self.meltanofile) as melt_ff:
+            meltano_ff: dict = configure_yaml().load(melt_ff)
+
+        uvicorn_enabled = (
+            meltano_ff.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}")
+            or False
+        )
+
+        if uvicorn_enabled:
+            with self._meltano_rw_lock.write_lock():
+                return MeltanoFile.parse(self.project_files.load())
+        else:
+            with self._meltano_rw_lock.read_lock():
+                return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
     def meltano_update(self):
@@ -329,6 +343,10 @@ class Project(Versioned):  # noqa: WPS214
             name: Name of the environment.
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
+
+    def deactivate_environment(self) -> None:
+        """Deactivate the currently active environment."""
+        self.active_environment = None
 
     @contextmanager
     def dotenv_update(self):

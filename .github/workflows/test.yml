@@ -7,6 +7,10 @@ on:
   workflow_dispatch:
     inputs: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     strategy:
@@ -43,7 +47,7 @@ jobs:
         poetry --version
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4.0.0
+      uses: actions/setup-python@v4.1.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
@@ -112,7 +116,7 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v4.0.0
+      uses: actions/setup-python@v4.1.0
       with:
         python-version: '3.9'
         cache: 'poetry'

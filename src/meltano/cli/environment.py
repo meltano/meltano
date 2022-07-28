@@ -8,7 +8,7 @@ from meltano.core.project import Project
 from meltano.core.tracking import CliEvent
 
 from . import cli
-from .utils import InstrumentedCmd, InstrumentedGroup
+from .utils import InstrumentedGroup, PartialInstrumentedCmd
 
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 
@@ -25,7 +25,7 @@ def meltano_environment(project: Project, ctx: click.Context):
     ctx.obj[ENVIRONMENT_SERVICE_KEY] = EnvironmentService(project)
 
 
-@meltano_environment.command(cls=InstrumentedCmd)
+@meltano_environment.command(cls=PartialInstrumentedCmd)
 @click.argument("name")
 @click.pass_context
 def add(ctx: click.Context, name: str):
@@ -41,7 +41,7 @@ def add(ctx: click.Context, name: str):
     tracker.track_command_event(CliEvent.completed)
 
 
-@meltano_environment.command(cls=InstrumentedCmd)
+@meltano_environment.command(cls=PartialInstrumentedCmd)
 @click.argument("name")
 @click.pass_context
 def remove(ctx: click.Context, name: str):
@@ -57,7 +57,7 @@ def remove(ctx: click.Context, name: str):
     tracker.track_command_event(CliEvent.completed)
 
 
-@meltano_environment.command(cls=InstrumentedCmd, name="list")
+@meltano_environment.command(cls=PartialInstrumentedCmd, name="list")
 @click.pass_context
 def list_environments(ctx: click.Context):
     """List available environments."""

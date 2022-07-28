@@ -44,6 +44,28 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 [`meltano config <plugin> set`](/reference/command-line-interface#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
+### Overriding discoverable plugin properties
+
+Starting with Meltano [`2.0`](/reference/v2-migration), you can override the properties of discoverable plugins, such as their [`capabilities`](/contribute/plugins#how-to-test-a-tap) and `settings_group_validation`, and extend their default [`settings`](/reference/settings):
+
+```yaml
+plugins:
+  extractors:
+  - name: tap-example
+    variant: meltanolabs
+    capabilities:  # This will override the capabilities declared in the lockfile
+    - state
+    - discover
+    - catalog
+    settings:  # These will be appended to the settings declared in the lockfile
+    - name: my-new-setting
+      kind: object
+      value:
+        key: value
+```
+
+All overrides replace the values stored in the [lockfile](/concepts/plugins#lock-artifacts), except for `settings`, which extend the base definitions. If there is a collision on name, then the setting is taken from the override definition in `meltano.yml` and used at runtime, while the token setting definition in the lockfile is discarded.
+
 ## Environment variables
 
 When you run an executable on your system, [environment variables](https://en.wikipedia.org/wiki/Environment_variable)
@@ -52,6 +74,50 @@ can be used to pass along arbitrary key-value data to the new process.
 Meltano [reads settings from environment variables](#configuring-settings) when you run the [`meltano` command](/reference/command-line-interface),
 and populates them when it [evaluates plugin configuration](#expansion-in-setting-values)
 and [invokes plugin executables](#accessing-from-plugins).
+Meltano also supports specifying environment variables under the `env:` keys of `meltano.yml`, a Meltano Environment, or on the Plugin.
+
+### Specifying environment variables
+
+In addition to the terminal environment and the `.env ` file, Meltano supports the specification of environment variables at the following configuration levels:
+
+```yaml
+env:
+  # root level env
+  MY_ENV_VAR: top_level_env_var
+plugins:
+  extractors:
+  - name: tap-google-analytics
+    variant: meltano
+    env:
+      # root level plugin env
+      MY_ENV_VAR: plugin_level_env_var
+environments:
+- name: dev
+  env:
+    # environment level env
+    MY_ENV_VAR: environment_level_env_var
+  config:
+    plugins:
+      extractors:
+        - name: tap-google-analytics
+          variant: meltano
+          env:
+            # environment level plugin env
+            MY_ENV_VAR: environment_level_plugin_env_var
+```
+
+Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context):
+
+```yaml
+- environment level plugin env # highest
+- environment level env
+- root level plugin env
+- root level env
+- .env file
+- terminal env # lowest
+```
+
+This allows you to override environment variables per plugin and per environment, as needed for your use case.
 
 ### Configuring settings
 
@@ -85,7 +151,7 @@ For example, the following defines a `my_custom_username` setting with aliases `
 
 ```yaml
 # meltano.yml
-...
+---
 plugins:
   extractors:
   - name: my-custom-tap
@@ -108,6 +174,7 @@ So given the custom extractor defined above, the `my_custom_tap_username` settin
 But if more than one of these variables is set in the terminal environment, then an exception will be raised--even if all the relevant environment variables have the same value.
 
 The configuration setting could also be set via the [`meltano config set`](/reference/command-line-interface#config) by setting either the canonical name or any of its aliases. Again using the custom extractor defined above as an example, the `my_custom_tap_username` could be set by any of the following commands:
+
 ```bash
 # The canonical name
 meltano config my-custom-tap set my_custom_tap_username some_value
@@ -201,9 +268,9 @@ Within a [Meltano environment](/concepts/environments) environment variables can
 
 ```yml
 environments:
-  - name: dev
-    env:
-      AN_ENVIRONMENT_VARIABLE: dev
+- name: dev
+  env:
+    AN_ENVIRONMENT_VARIABLE: dev
 ```
 
 Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
@@ -221,7 +288,7 @@ plugins:
     variant: meltano
     config:
       key_file_location: client_secrets.json
-      start_date: '2020-10-01T00:00:00Z'
+      start_date: "2020-10-01T00:00:00Z"
   - name: tap-ga--view-foo
     inherit_from: tap-google-analytics
     config:
@@ -231,7 +298,7 @@ plugins:
     inherit_from: tap-google-analytics
     config:
       # `key_file_location` is inherited
-      start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
+      start_date: "2020-12-01T00:00:00Z" # `start_date` is overridden
       view_id: 789012
 ```
 
@@ -248,18 +315,18 @@ they can [directly inherit](/guide/plugin-management#explicit-inheritance) from 
 ```yml
 plugins:
   extractors:
-    - name: tap-postgres--billing
-      inherit_from: tap-postgres
-      config:
-        host: one.postgres.example.com
-        user: billing_user
-        dbname: billing_db
-    - name: tap-postgres--events
-      inherit_from: tap-postgres
-      config:
-        host: two.postgres.example.com
-        user: events_user
-        dbname: events_db
+  - name: tap-postgres--billing
+    inherit_from: tap-postgres
+    config:
+      host: one.postgres.example.com
+      user: billing_user
+      dbname: billing_db
+  - name: tap-postgres--events
+    inherit_from: tap-postgres
+    config:
+      host: two.postgres.example.com
+      user: events_user
+      dbname: events_db
 ```
 
 To configure `tap-postgres`'s `password` setting, you would typically set the `TAP_POSTGRES_PASSWORD` [environment variable](#configuring-settings),

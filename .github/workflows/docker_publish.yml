@@ -1,15 +1,13 @@
 name: Docker Publish
 
-# This workflow will publish all public docker images to DockerHub
-# Use the `dry-run=FALSE` input variable to debug the workflow without pushing
-# images.
+# This workflow will build and publish all public Docker images to Docker Hub.
+# Set the input `dry-run` to `false` to skip pushing images to Docker Hub.
 
 # For now, only run manually
 on:
   workflow_dispatch:
     inputs:
       dry-run:
-        # True to only push SHA label
         description: "Dry run (skip push step)"
         type: boolean
         required: true
@@ -23,36 +21,38 @@ jobs:
       COMMIT_SHA: ${{ github.sha }}
       # Boolean values don't actually work so cast to 'true' and 'false'
       # https://github.com/actions/runner/issues/1483
-      DRY_RUN_STR: ${{format('{0}', github.event.inputs.dry-run)}}
+      DRY_RUN_STR: ${{ format('{0}', github.event.inputs.dry-run) || 'true' }}
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
-        # TODO: uncomment when basic functionality is working
         - python-version: "3.7"
           is-default-python: false
         - python-version: "3.8"
-          is-default-python: true  # will be used in 'latest' images
+          is-default-python: false
         - python-version: "3.9"
+          is-default-python: true # will be used in 'latest' images
+        - python-version: "3.10"
           is-default-python: false
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: Get Meltano Version
+    - name: Get Meltano version
       id: get-meltano-version
       run: |
         pipx install poetry
         poetry version
         poetry version --short
         echo "::set-output name=release-version::$(poetry version --short)"
+
     - name: Print job inputs summary
       run: |
         echo "DRY_RUN=${{ env.DRY_RUN_STR }}"
         echo "PYTHON_VERSION=${{ matrix.python-version }}"
         echo "RELEASE_VERSION=${{ steps.get-meltano-version.outputs.release-version }}"
-        echo "COMMIT_SHA=${{ env.COMMIT_SHA }}"
+        echo "COMMIT_SHA=${{ github.sha }}"
         echo "DEBUG INFO: DRY_RUN is truthy=${{ env.DRY_RUN_STR == 'true' }}"
         echo "DEBUG INFO: DRY_RUN is falsey=${{ env.DRY_RUN_STR == 'false' }}"
 
@@ -62,6 +62,7 @@ jobs:
       run: |
         echo "DRY_RUN=${{ github.event.inputs.dry-run }}"
         echo "NOTE: This job is a dry run and will not publish any images."
+
     - name: Print publish message (if applicable)
       if: ${{ env.DRY_RUN_STR == 'false' }}
       run: |
@@ -69,58 +70,32 @@ jobs:
         echo "NOTE: This job is planning to publish the docker images."
         echo "⚠️ If this is not intended, please cancel this job."
 
-    # Per: https://github.com/marketplace/actions/build-and-push-docker-images
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+    - name: Assemble image tags
+      id: assemble-tags
+      run: |
+        [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
+        echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
+        echo "meltano/meltano:latest-python${{ matrix.python-version }}" >> tags
+        [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:latest" >> tags
+        [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        TAGS=$(cat tags)
+        TAGS="${TAGS//'%'/'%25'}"
+        TAGS="${TAGS//$'\n'/'%0A'}"
+        TAGS="${TAGS//$'\r'/'%0D'}"
 
-    # e.g. meltano/meltano:SHA-73d02a3b693bbf38270bf23e4cc31e69cb2837ad
-    - name: Build and push images with SHA label 'meltano/meltano:SHA-${{ env.COMMIT_SHA }}'
-      if: ${{ matrix.is-default-python }}
-      uses: docker/build-push-action@v3
-      with:
-        context: "{{defaultContext}}:docker/publish"
-        push: true
-        tags: |
-          meltano/meltano:SHA-${{ env.COMMIT_SHA }}
-        build-args: |
-          PYTHON_VERSION=${{ matrix.python-version }}
-          MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+        echo "If this is not a dry run, the image will be published with the following tags:"
+        cat tags
+        echo "::set-output name=tags::$TAGS"
 
-    # e.g. meltano/meltano:v2.0.0-python:3.8
-    # e.g. meltano/meltano:latest-python:3.8
-    - name: Build and push images with suffix '-python${{ matrix.python-version }}'
-      uses: docker/build-push-action@v3
+    - name: Build, scan, then conditionally push the Docker image for a given Python version
+      uses: ./.github/actions/docker-build-scan-push
       with:
-        context: "{{defaultContext}}:docker/publish"
         push: ${{ env.DRY_RUN_STR == 'false' }}
-        tags: |
-          meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}
-          meltano/meltano:latest-python${{ matrix.python-version }}
+        tags: ${{ steps.assemble-tags.output }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
-
-    # e.g. meltano/meltano:v2.0.0
-    #      meltano/meltano:latest
-    #      meltano/meltano:latest-python:3.8
-    - name: Build and push default Python versions (if ${{ matrix.python-version }}' is default)
-      if: ${{ matrix.is-default-python }}
-      uses: docker/build-push-action@v3
-      with:
-        context: "{{defaultContext}}:docker/publish"
-        push: ${{ env.DRY_RUN_STR == 'false' }}
-        tags: |
-          meltano/meltano:latest
-          meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}
-          meltano/meltano:latest-python${{ matrix.python-version }}
-        build-args: |
-          PYTHON_VERSION=${{ matrix.python-version }}
-          MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+        dockerhub-username: meltano
+        dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+        python-version: ${{ matrix.python-version }}

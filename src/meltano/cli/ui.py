@@ -6,10 +6,8 @@ import secrets
 import signal
 
 import click
-from click_default_group import DefaultGroup
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
@@ -17,7 +15,7 @@ from meltano.core.project_settings_service import (
 
 from . import cli
 from .params import pass_project
-from .utils import CliError
+from .utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +73,7 @@ def start_workers(workers):
 
 
 @cli.group(
-    cls=DefaultGroup,
+    cls=InstrumentedDefaultGroup,
     default="start",
     default_if_no_args=True,
     short_help="Start the Meltano UI webserver.",
@@ -91,7 +89,7 @@ def ui(ctx, project):
     ctx.obj["project"] = project
 
 
-@ui.command(short_help="Start the Meltano UI webserver.")
+@ui.command(cls=InstrumentedCmd, short_help="Start the Meltano UI webserver.")
 @click.option("--reload", is_flag=True, default=False)
 @click.option("--bind", help="The hostname (or IP address) to bind on")
 @click.option("--bind-port", help="Port to run webserver on", type=int)
@@ -104,8 +102,8 @@ def start(ctx, reload, bind, bind_port):
         ProjectSettingsService.config_override["ui.bind_port"] = bind_port
 
     project = ctx.obj["project"]
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_ui()
+    legacy_tracker = ctx.obj["legacy_tracker"]
+    legacy_tracker.track_meltano_ui()
 
     ensure_secure_setup(project)
 
@@ -125,7 +123,9 @@ def start(ctx, reload, bind, bind_port):
     logger.info("All workers started.")
 
 
-@ui.command(short_help="Generate and store server name and secrets.")
+@ui.command(
+    cls=InstrumentedCmd, short_help="Generate and store server name and secrets."
+)
 @click.argument("server_name")
 @click.option(
     "--bits",

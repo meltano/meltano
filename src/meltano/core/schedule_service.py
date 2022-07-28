@@ -5,9 +5,11 @@ import subprocess
 from datetime import date, datetime
 from typing import Dict, List, Optional
 
+from meltano.core.setting_definition import SettingMissingError
+
 from .meltano_invoker import MeltanoInvoker
 from .plugin import PluginType
-from .plugin.settings_service import PluginSettingsService, SettingMissingError
+from .plugin.settings_service import PluginSettingsService
 from .plugin_discovery_service import PluginNotFoundError
 from .project import Project
 from .project_plugins_service import ProjectPluginsService

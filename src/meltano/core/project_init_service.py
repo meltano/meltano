@@ -48,9 +48,10 @@ class ProjectInitService:
         click.echo(f" {self.project_name}")
 
         self.project = Project(self.project_name)
-        self.settings_service = ProjectSettingsService(self.project)
 
         self.create_files(add_discovery=add_discovery)
+
+        self.settings_service = ProjectSettingsService(self.project)
         self.set_send_anonymous_usage_stats()
         if activate:
             Project.activate(self.project)

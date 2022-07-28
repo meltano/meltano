@@ -17,7 +17,7 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 
 from . import CliError, cli
 from .params import pass_project
-from .utils import InstrumentedCmd, InstrumentedGroup
+from .utils import InstrumentedGroup, PartialInstrumentedCmd
 
 logger = structlog.getLogger(__name__)
 
@@ -122,7 +122,7 @@ def job(project, ctx):
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
 
-@job.command(cls=InstrumentedCmd, name="list", short_help="List job(s).")
+@job.command(cls=PartialInstrumentedCmd, name="list", short_help="List job(s).")
 @click.option(
     "--format",
     "list_format",
@@ -141,7 +141,9 @@ def list_jobs(ctx, list_format: str, job_name: str):
         _list_all_jobs(task_sets_service, list_format, ctx)
 
 
-@job.command(cls=InstrumentedCmd, name="add", short_help="Add a new job with tasks.")
+@job.command(
+    cls=PartialInstrumentedCmd, name="add", short_help="Add a new job with tasks."
+)
 @click.argument(
     "job_name",
     required=True,
@@ -199,7 +201,7 @@ def add(ctx, job_name: str, raw_tasks: str):
 
 
 @job.command(
-    cls=InstrumentedCmd, name="set", short_help="Update an existing jobs tasks"
+    cls=PartialInstrumentedCmd, name="set", short_help="Update an existing jobs tasks"
 )
 @click.argument(
     "job_name",
@@ -255,7 +257,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     tracker.track_command_event(CliEvent.completed)
 
 
-@job.command(cls=InstrumentedCmd, name="remove", short_help="Remove a job.")
+@job.command(cls=PartialInstrumentedCmd, name="remove", short_help="Remove a job.")
 @click.argument("job_name", required=True)
 @click.pass_context
 def remove(ctx, job_name: str):  # noqa: WPS442

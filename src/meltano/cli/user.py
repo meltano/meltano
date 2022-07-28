@@ -6,9 +6,14 @@ from meltano.api.app import create_app
 
 from . import cli
 from .params import pass_project
+from .utils import InstrumentedCmd, InstrumentedGroup
 
 
-@cli.group(invoke_without_command=True, short_help="Manage Meltano user accounts.")
+@cli.group(
+    cls=InstrumentedGroup,
+    invoke_without_command=True,
+    short_help="Manage Meltano user accounts.",
+)
 @pass_project(migrate=True)
 @click.pass_context
 def user(ctx, project):
@@ -22,7 +27,7 @@ def user(ctx, project):
     ctx.obj["project"] = project
 
 
-@user.command(short_help="Create a Meltano user account.")
+@user.command(cls=InstrumentedCmd, short_help="Create a Meltano user account.")
 @click.argument("username")
 @click.argument("password")
 @click.option(
