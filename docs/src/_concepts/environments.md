@@ -100,6 +100,9 @@ If you have an environment that you'd like to use by default without having to p
 default_environment: <ENV>
 ```
 
+Note that the default environment does not apply to the [`meltano config`](/reference/command-line-interface#using-config-with-environments) command.
+Default environments are intended for execution related work and not configuration.
+
 ## Example
 
 When activating an environment, you will observe different configurations are injected by Meltano
