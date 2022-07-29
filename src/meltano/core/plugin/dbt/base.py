@@ -1,6 +1,7 @@
 """Defines DBT-specific plugins."""
 import logging
 from pathlib import Path
+from typing import Optional
 
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import BasePlugin, PluginType
@@ -15,8 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 class DbtInvoker(PluginInvoker):
-    def Popen_options(self):
-        return {**super().Popen_options(), "cwd": self.plugin_config["project_dir"]}
+    def workdir(
+        self, command: Optional[str] = None, env: Optional[dict] = None
+    ) -> Optional[Path]:
+        return (
+            super().workdir(command=command, env=env)
+            or self.plugin_config["project_dir"]
+        )
 
 
 class DbtPlugin(BasePlugin):

@@ -9,12 +9,13 @@ import os
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any, Generator, Optional
 
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
 from meltano.core.logging.utils import SubprocessOutputWriter
+from meltano.core.utils import expand_env_vars
 
 from .error import Error
 from .plugin import PluginRef
@@ -281,7 +282,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Args:
             args: Optional plugin args.
             command: Plugin command name.
-            env: Environment variables
+            env: Environment variables.
 
         Returns:
             List of plugin invocation arguments.
@@ -341,7 +342,32 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def Popen_options(self) -> dict[str, Any]:  # noqa: N802
+    def workdir(
+        self, command: Optional[str] = None, env: Optional[dict] = None
+    ) -> Optional[Path]:
+        """Resolve the working directory for invocation.
+
+        Expands environment variables, and resolves paths relative to
+        the project root into absolute paths.
+
+        Args:
+            command: Command name.
+            env: Environment variables to use for expansion.
+
+        Returns:
+            A Path to use for the working directory, if workdir is defined.
+        """
+        env = env or self.env()
+        base_workdir = self.plugin.workdir
+        if command:
+            base_workdir = self.find_command(command).workdir or base_workdir
+        if not base_workdir:
+            return None
+
+        path = self.project.root_dir() / Path(expand_env_vars(base_workdir, env))
+        return path.resolve()
+
+    def popen_options(self) -> dict[str, Any]:  # noqa: N802
         """Get options for subprocess.Popen.
 
         Returns:
@@ -364,11 +390,18 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             raise InvokerNotPreparedError()
 
         async with self.plugin.trigger_hooks("invoke", self, args):
-            popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
+            cwd = self.workdir(command=command, env=popen_env)
+            popen_options = {
+                "cwd": cwd,
+                **self.popen_options(),
+                **kwargs,
+            }
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")
             logging.debug(f"Env: {popen_env}")
+            if cwd:
+                logging.debug(f"Working directory: {cwd}")
 
             try:
                 yield (popen_args, popen_options, popen_env)

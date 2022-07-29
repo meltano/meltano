@@ -1,4 +1,6 @@
+import os
 import platform
+from pathlib import Path
 
 import dotenv
 import pytest
@@ -18,6 +20,14 @@ class TestPluginInvoker:
     @pytest.fixture
     async def nonpip_plugin_invoker(self, nonpip_tap, session, plugin_invoker_factory):
         subject = plugin_invoker_factory(nonpip_tap)
+        async with subject.prepared(session):
+            yield subject
+
+    @pytest.fixture
+    async def alternate_workdir_plugin_invoker(
+        self, alternate_workdir_plugin, session, plugin_invoker_factory
+    ):
+        subject = plugin_invoker_factory(alternate_workdir_plugin)
         async with subject.prepared(session):
             yield subject
 
@@ -167,3 +177,26 @@ class TestPluginInvoker:
 
         assert "VIRTUAL_ENV" not in env
         assert "PYTHONPATH" not in env
+
+    def test_workdir(self, alternate_workdir_plugin_invoker):
+        sys_root = os.path.abspath(os.sep)
+        proj_root = alternate_workdir_plugin_invoker.project.root
+        assert alternate_workdir_plugin_invoker.workdir() == proj_root / "path"
+        assert (
+            alternate_workdir_plugin_invoker.workdir(command="relative")
+            == proj_root / "path2"
+        )
+        assert alternate_workdir_plugin_invoker.workdir(
+            command="absolute"
+        ) == sys_root / Path("root")
+        assert (
+            alternate_workdir_plugin_invoker.workdir(command="expansion")
+            == proj_root / "project" / "test"
+        )
+        assert (
+            alternate_workdir_plugin_invoker.workdir(
+                command="expansion",
+                env={"UTILITY_WORKDIR__CONFIG_PROJECT_DIR": "project2"},
+            )
+            == proj_root / "project2" / "test"
+        )

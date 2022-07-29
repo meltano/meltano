@@ -200,6 +200,39 @@ def discovery():  # noqa: WPS213
         }
     )
 
+    discovery[PluginType.UTILITIES].append(
+        {
+            "name": "utility-workdir",
+            "namespace": "utility_workdir",
+            "pip_url": "utility-workdir",
+            "executable": "utility-workdir",
+            "workdir": "path",
+            "settings": [
+                {
+                    "name": "project_dir",
+                    "env": "PROJECT_DIR",
+                }
+            ],
+            "config": {
+                "project_dir": "project",
+            },
+            "commands": {
+                "relative": {
+                    "args": "-v",
+                    "workdir": "path2",
+                },
+                "absolute": {
+                    "args": "-v",
+                    "workdir": "/root",
+                },
+                "expansion": {
+                    "args": "-v",
+                    "workdir": "$UTILITY_WORKDIR__CONFIG_PROJECT_DIR/test",
+                },
+            },
+        }
+    )
+
     discovery[PluginType.MAPPERS].append(
         {
             "name": "mapper-mock",
@@ -387,6 +420,14 @@ def transformer(project_add_service: ProjectAddService):
 def utility(project_add_service):
     try:
         return project_add_service.add(PluginType.UTILITIES, "utility-mock")
+    except PluginAlreadyAddedException as err:
+        return err.plugin
+
+
+@pytest.fixture(scope="class")
+def alternate_workdir_plugin(project_add_service: ProjectAddService):
+    try:
+        return project_add_service.add(PluginType.UTILITIES, "utility-workdir")
     except PluginAlreadyAddedException as err:
         return err.plugin
 
