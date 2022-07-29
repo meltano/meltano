@@ -11,7 +11,6 @@ class EnvVarResolutionExpectation(NamedTuple):
     expected_env_values: dict
     meltanofile_updates: dict = {}
     terminal_env: dict = {}
-    xfail: bool = False
 
 
 def _meltanofile_update_dict(
@@ -111,8 +110,6 @@ def _meltanofile_update_dict(
 
 _terminal_env_var = {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"}
 
-# Test cases with xfail=True should be resolved to pass
-# as part of this issue: https://github.com/meltano/meltano/issues/5982
 _env_var_resolution_expectations = {
     # Check that envs at each level override terminal
     "00 Terminal environment": EnvVarResolutionExpectation(
@@ -164,7 +161,6 @@ _env_var_resolution_expectations = {
             environment_level_plugin_env=True,
         ),
     ),
-    # Original xfail'ing tests, as per comment above
     "10 Top-level plugin setting (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"},
         _meltanofile_update_dict(top_level_plugin_setting=True),
@@ -244,10 +240,6 @@ class TestEnvVarResolution:
         for key, val in env_var_resolution_expectation.terminal_env.items():
             monkeypatch.setenv(key, val)
 
-        if env_var_resolution_expectation.xfail:
-            pytest.xfail(
-                "This expected environment variable resolution behavior is currently failing."
-            )
         args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():
             args.append("--print-var")
