@@ -1,16 +1,24 @@
 import logging
 import warnings
+from typing import Generator
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(monkeypatch, engine_uri: str) -> None:
+def engine_uri_env(engine_uri: str) -> Generator:
     """Use the correct meltano database URI for these tests."""
-    monkeypatch.setenv["MELTANO_DATABASE_URI"] = engine_uri
+    # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
+    monkeypatch = MonkeyPatch()
+    monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
+    try:
+        yield
+    finally:
+        monkeypatch.undo()
 
 
 @pytest.fixture(scope="class", autouse=True)
