@@ -1,7 +1,5 @@
 import logging
-import os
 import warnings
-from typing import Generator
 
 import pytest
 from sqlalchemy import MetaData, create_engine
@@ -10,17 +8,9 @@ from sqlalchemy.orm import close_all_sessions, sessionmaker
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri: str) -> None:
+def engine_uri_env(monkeypatch, engine_uri: str) -> None:
     """Use the correct meltano database URI for these tests."""
-    os.environ["MELTANO_DATABASE_URI"] = engine_uri
-
-
-@pytest.fixture
-def un_engine_uri(monkeypatch) -> Generator:
-    """When we want to test functionality that doesn't use the current DB URI."""
-    with monkeypatch.context() as m:
-        m.delenv("MELTANO_DATABASE_URI")
-        yield
+    monkeypatch.setenv["MELTANO_DATABASE_URI"] = engine_uri
 
 
 @pytest.fixture(scope="class", autouse=True)

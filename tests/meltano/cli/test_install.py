@@ -250,9 +250,17 @@ class TestCliInstall:
 # un_engine_uri forces us to create a new project, we must do this before the
 # project fixture creates the project
 def test_new_folder_should_autocreate_on_install(
-    un_engine_uri, project_function, cli_runner
+    monkeypatch, project_function, cli_runner
 ):
-    # We had a case defined https://github.com/meltano/meltano/issues/6383 that caused the meltano db to not be recreated
+    """Be sure .meltano auto creates a db on install by default.
+
+    We had a case https://github.com/meltano/meltano/issues/6383
+    that caused the meltano db to not be recreated.
+    """
+    # Session fixture engine_uri_env auto sets this up, for this test we need to
+    # turn that functionality off
+    monkeypatch.delenv("MELTANO_DATABASE_URI")
+
     shutil.rmtree(".meltano")
     result = cli_runner.invoke(cli, ["install"])
     assert result
