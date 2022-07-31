@@ -21,6 +21,12 @@ def engine_uri_env(engine_uri: str) -> Generator:
         monkeypatch.undo()
 
 
+@pytest.fixture()
+def un_engine_uri(monkeypatch):
+    """When we want to test functionality that doesn't use the current DB URI."""
+    monkeypatch.delenv("MELTANO_DATABASE_URI")
+
+
 @pytest.fixture(scope="class", autouse=True)
 def vacuum_db(engine_sessionmaker):
     try:
