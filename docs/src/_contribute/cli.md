@@ -5,7 +5,7 @@ layout: doc
 weight: 10
 ---
 
-This section of the guide provides guidance on how to work with the Meltano CLI, which serves as primary UX of Meltano
+This section of the guide provides guidance on how to work with the Meltano CLI, which serves as the primary UI of Meltano
 and is built with the [Python package: click](https://click.palletsprojects.com/en/8.1.x/).
 
 ## Getting Set Up
@@ -29,7 +29,7 @@ defined as follows for use in `meltano`.
 
 - Group is a group of commands that are related to a specific area of the CLI, typically a specific meltano feature.
   For example, the `meltano schedule` feature-group contains commands related to managing Meltano schedules.
-- command/sub_command are used to perform a specific tasks or used to group a set of command around a specific feature
+- command/sub_command are used to perform specific tasks or used to group a set of command around a specific feature
   or task. Sub-commands take the form of parameters, but require additional arguments or options themselves.
 - Arguments are positional parameters that are passed to a command. Arguments do not require additional options or
   arguments - otherwise they would be considered a sub-command.
@@ -56,7 +56,7 @@ For example `--help` and `-h`, `--tasks` and `-t`, `--force` and `-f`.
 
 1. Organize in a command group around a feature below the top level where possible.
 2. Coalesce commands that operate on the same resource of a feature as a group of sub-commands.
-3. Use transitive verbs like `delete`, `set`, `list`, `get` as sub-commands perform work within a group where appropriate.
+3. Use transitive verbs like `delete`, `set`, `list`, `get` as sub-commands to perform work within a group where appropriate.
 
 ```
 meltano <feature-group> add <something>
@@ -77,7 +77,7 @@ meltano --environment=production
 ### Global vs argument level flag casing
 
 When creating global flags, default to upper case letters for short options, and lower case letter for argument level
-options. Unless a common industry convention alrady exists to use the lower case variation.
+options. Unless a common industry convention already exists to use the lower case variation.
 
 Defaulting global short flags to upper case letters can help prevent ambiguity should a collision between a global flag
 and an argument level option occur. e.g.
