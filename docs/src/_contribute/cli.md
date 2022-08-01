@@ -219,7 +219,7 @@ meltano install [] [PLUGIN_NAME] ...
 Prefer the term "deprecated" over "obsolete". Commands that are deprecated should be marked as such in help text and
 in the meltano documentation. Deprecated commands should also explicitly emit a notice when they are used indicating
 their deprecation. Where appropriate the notice and help text should indicate the replacement command, or link to
-further information.
+further information. If known, you should also document in what version you expect a command to be fully removed.
 
 Prefer the term "preview" over "beta". Commands that enable a preview feature should be marked as such in help text and
-in the meltano documentation.
+in the meltano documentation. Where possible if not in the help output, then at least in the documentation, you should also document when the command is expected to graduate from preview status, and what if any short comings, defects, or missing functionality it currently has. 
