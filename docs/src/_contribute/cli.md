@@ -5,7 +5,8 @@ layout: doc
 weight: 10
 ---
 
-This section of the guide provides guidance on how to work with the Meltano CLI, which serves as primary UX of Meltano and is built with the [Python package: click](https://click.palletsprojects.com/en/8.1.x/).
+This section of the guide provides guidance on how to work with the Meltano CLI, which serves as primary UX of Meltano
+and is built with the [Python package: click](https://click.palletsprojects.com/en/8.1.x/).
 
 ## Getting Set Up
 
@@ -14,12 +15,12 @@ See the prerequisite section for instructions on how to set up a development env
 ## CLI Design Guidelines
 
 The `meltano` CLI is the primary interface for interacting with Meltano. It's often the first introduction to meltano
-that a users when browsing the docs or experimenting with the CLI. As such, we aim to provide a clear and consistent interface that is easy to use.
-This guide aims to codify the design guidelines for the CLI so that contributors can easily update or extend
-the CLI with new features, commands, options, and enhancements.
+that a users experiences when browsing the docs or experimenting with the CLI. As such, we aim to provide a clear and
+consistent interface that is easy to use. This guide aims to codify the design guidelines for the CLI so that
+contributors can easily update or extend the CLI with new features, commands, options, and enhancements.
 
-This document is somewhat aspirational, and portions of the CLI may violate the design and style guidelines, but we aim to
-update the CLI overtime to ensure that it is as consistent as possible.
+This document is somewhat aspirational and a work in progress. Portions of the CLI may violate the design and style
+guidelines, but we aim to update the CLI overtime to ensure that it is as consistent as possible.
 
 ### Consistent definition of Groups, Commands, Sub-commands, Arguments, and Options
 
@@ -27,9 +28,9 @@ Groups, Commands, Sub-commands, Arguments, Options, and Flags often have slightl
 defined as follows for use in `meltano`.
 
 - Group is a group of commands that are related to a specific area of the CLI, typically a specific meltano feature.
-  For example, the `meltano schedule` feature group contains commands related to managing Meltano schedules.
+  For example, the `meltano schedule` feature-group contains commands related to managing Meltano schedules.
 - command/sub_command are used to perform a specific tasks or used to group a set of command around a specific feature
-  or task. Sub-commands often take the form of parameters, but require additional arguments or options.
+  or task. Sub-commands take the form of parameters, but require additional arguments or options themselves.
 - Arguments are positional parameters that are passed to a command. Arguments do not require additional options or
   arguments - otherwise they would be considered a sub-command.
 - Options (switch, option flags, or flags) are options that alter the behavior (e.g. `--dry-run/--verbose`) or named
@@ -79,7 +80,7 @@ When creating global flags, use upper case letters for short options, and lower 
 This can further help prevent ambiguity should a collision between a global flag and an argument level option occur. e.g.
 
 ```
-meltano -L/--log-level <level> some-command -l/--last-thing
+meltano -L/--log-level LEVEL SOME_COMMAND -l/--last-thing
 ```
 
 The caveat to this is *common* and *expected* global short options. For example `-h` and `--help`.
@@ -111,13 +112,98 @@ In the future we may add support for other formats (e.g. `yaml`).
 
 ### Expected help and usage
 
+Feature groups should have fully documented help and usage, that contains at least basic invocation examples. And link
+to the CLI documentation for that specific feature group for more details.
+
+```
+Usage: meltano job [OPTIONS] COMMAND [ARGS]...
+
+  Manage jobs.
+
+  Example usage:
+
+      # This help
+      meltano job --help
+      # List all jobs in JSON format
+      meltano job list --format json
+      # List a named job
+      meltano job list [JOB_NAME]
+
+      # Create a new job with a single task representing a single run command.
+      meltano job add NAME --tasks 'tap mapper target command:arg1'
+
+      # Create a new job with multiple tasks each representing a run command.
+      # The list of tasks must be yaml formatted and consist of a list of strings, list of string lists, or mix of both.
+      meltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
+      meltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
+
+      # Remove a named job
+      meltano job remove NAME
+
+ Read more at https://docs.meltano.com/reference/command-line-interface#jobs
+
+Options:
+  --database-uri TEXT  System database URI.
+  --help               Show this message and exit.
+
+Commands:
+  add     Add a new job with tasks.
+  list    List job(s).
+  remove  Remove a job.
+  set     Update an existing jobs tasks
+```
+
 ### Help style guidelines
+
+#### Required items
+
+For required items such as commands and arguments, use text without brackets or braces. In the following examples, all
+words and arguments are required:
+
+```
+meltano run JOB_NAME
+meltano invoke PLUGIN_NAME
+meltano schedule list
+meltano schedule remove SCHEDULE_NAME
+```
+
+#### Optional items
+
+Use square brackets around an optional items. If there's more than one optional item, enclose each item in
+its own set of square brackets. In the following example the `--log-level` and `--dump` are optional, while PLUGIN_NAME
+is required:
+
+```
+meltano [--log-level=LEVEL] invoke [--dump=config] PLUGIN_NAME
+```
+
+Note that today you may also see some use of greater/less than signs to indicate that an option is optional, but this should
+be avoided and should be replaced with square brackets when possible.
+
+#### Mutually exclusive items
+
+Use curly braces (`{}`) to indicate that the user must choose one—and only one—of the items inside the braces. Use
+PIPES (`|`) to separate the items:
+
+```
+meltano schedule {list|remove}
+```
+
+#### Repeating items
+
+Use three trailing dots and no spaces (`...`) to indicate that the user can specify multiple values for the items:
+
+```
+meltano run BLOCKS ...
+meltano install [] [PLUGIN_NAME] ...
+```
 
 ### Phrasing guidelines for command Deprecation and Preview commands
 
 Prefer the term "deprecated" over "obsolete". Commands that are deprecated should be marked as such in help text and
-in the meltano documentation. Deprecated commands should also explicitly emit a notice when they are used indicating their deprecation.
-Where appropriate the notice and help text should indicate the replacement command, or link to further information.
+in the meltano documentation. Deprecated commands should also explicitly emit a notice when they are used indicating
+their deprecation. Where appropriate the notice and help text should indicate the replacement command, or link to
+further information.
 
 Prefer the term "preview" over "beta". Commands that enable a preview feature should be marked as such in help text and
 in the meltano documentation.
