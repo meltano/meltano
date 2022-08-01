@@ -50,13 +50,6 @@ jobs:
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
-
     - name: Upgrade pip
       env:
         PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
@@ -64,9 +57,18 @@ jobs:
         pip install pip
         pip --version
 
-    - name: Configure Poetry
+    - name: Install pipx
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
-        poetry env use "${{ matrix.python-version }}"
+        python -m pip install pipx
+        pipx --version
+
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install poetry
         poetry debug
 
     - name: Start Postgres Container

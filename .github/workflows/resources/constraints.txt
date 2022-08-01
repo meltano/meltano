@@ -1,3 +1,4 @@
 pip==22.2.1
 poetry==1.1.14
 virtualenv==20.16.2
+pipx==1.1.0
