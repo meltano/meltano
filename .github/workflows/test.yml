@@ -26,10 +26,10 @@ jobs:
         - { python-version: "3.10", os: "ubuntu-latest",  backend-db: postgresql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         # Windows tests for Python 3.7 and 3.10 are temporarily disabled - see https://github.com/meltano/meltano/issues/6479
-        # - { python-version: "3.7",  os: "windows-2022",   backend-db: sqlite }
+        - { python-version: "3.7",  os: "windows-2022",   backend-db: sqlite }
         - { python-version: "3.8",  os: "windows-2022",   backend-db: sqlite }
         - { python-version: "3.9",  os: "windows-2022",   backend-db: sqlite }
-        # - { python-version: "3.10", os: "windows-2022",   backend-db: sqlite }
+        - { python-version: "3.10", os: "windows-2022",   backend-db: sqlite }
       fail-fast: false
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
