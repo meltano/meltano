@@ -1,3 +1,6 @@
+#We use && for all multi-line runs because Windows won't fail in all scenarios
+#See https://github.com/meltano/meltano/issues/6540 for more information
+
 name: Tests
 
 on:
@@ -53,21 +56,21 @@ jobs:
     - name: Install Poetry
       env:
         PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
+      run: >
         pipx install poetry
-        poetry --version
+        && poetry --version
 
     - name: Upgrade pip
       env:
         PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
+      run: >
         pip install pip
-        pip --version
+        && pip --version
 
     - name: Configure Poetry
-      run: |
+      run: >
         poetry env use "${{ matrix.python-version }}"
-        poetry debug
+        && poetry debug
 
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql')
@@ -83,15 +86,14 @@ jobs:
         postgres:11
 
     - name: Check running containers
-      run: |
-        docker ps -a
+      run: docker ps -a
 
     - name: Install Nox
       env:
         PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
+      run: >
         pipx install nox
-        pipx inject nox nox-poetry
+        && pipx inject nox nox-poetry
 
     - name: Run pytest
       env:
@@ -104,7 +106,7 @@ jobs:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres
         POSTGRES_DB: pytest_warehouse
-      run: |
+      run: >
         nox -rs tests --python=${{ matrix.python-version }} -- -m "${{ env.PYTEST_MARKERS }}"
 
     - name: Upload coverage data
