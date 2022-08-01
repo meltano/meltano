@@ -130,17 +130,28 @@ class Project(Versioned):  # noqa: WPS214
         Raises:
             OSError: if project cannot be activated due to unsupported OS
         """
+        import ctypes
+
         project.ensure_compatible()
 
         # create a symlink to our current binary
         try:
+            # check if running on Windows
             if os.name == "nt":
                 executable = Path(os.path.dirname(sys.executable), "meltano.exe")
-                if executable.is_file():
-                    os.link(executable, project.run_dir().joinpath("bin"))
+                # See if the user is part of the at leas the local administrator group
+                is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+                # Only users who have amdin privilages are able to create symlinks
+                if is_admin:
+                    if executable.is_file():
+                        project.run_dir().joinpath("bin").symlink_to(executable)
+                    else:
+                        logger.debug(
+                            f"Could not create symlink: meltano.exe not present in:\n{str(Path(os.path.dirname(sys.executable)))}"
+                        )
                 else:
                     logger.debug(
-                        f"Could not create symlink: meltano.exe not present in:\n{str(Path(os.path.dirname(sys.executable)))}"
+                        "Could not create symlink: The creation of a symlink requires administrator previlages"
                     )
             else:
                 executable = Path(os.path.dirname(sys.executable), "meltano")
