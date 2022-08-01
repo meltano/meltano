@@ -136,10 +136,16 @@ class Project(Versioned):  # noqa: WPS214
         try:
             if os.name == "nt":
                 executable = Path(os.path.dirname(sys.executable), "meltano.exe")
+                if executable.is_file():
+                    os.link(executable, project.run_dir().joinpath("bin"))
+                else:
+                    logger.debug(
+                        f"Could not create symlink: meltano.exe not present in:\n{str(Path(os.path.dirname(sys.executable)))}"
+                    )
             else:
                 executable = Path(os.path.dirname(sys.executable), "meltano")
-            if executable.is_file():
-                project.run_dir().joinpath("bin").symlink_to(executable)
+                if executable.is_file():
+                    project.run_dir().joinpath("bin").symlink_to(executable)
         except FileExistsError:
             pass
         except OSError as error:
