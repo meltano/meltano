@@ -9,10 +9,11 @@ from abc import ABCMeta, abstractmethod
 from typing import Iterable
 
 import requests
-import yaml
+from ruamel.yaml import YAMLError
 
 import meltano
 from meltano.core import bundle
+from meltano.core.yaml import configure_yaml
 from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.project import Project
 
@@ -24,6 +25,9 @@ from .plugin.factory import base_plugin_factory
 from .plugin.project_plugin import ProjectPlugin
 from .project_settings_service import ProjectSettingsService
 from .utils import NotFound, find_named
+
+
+yaml = configure_yaml()
 
 
 class DiscoveryInvalidError(Exception):
@@ -346,7 +350,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             DiscoveryInvalidError: If the discovery file is invalid.
         """
         try:
-            discovery_yaml = yaml.safe_load(discovery_file)
+            discovery_yaml = yaml.load(discovery_file)
 
             self._discovery_version = DiscoveryFile.file_version(discovery_yaml)
             self.ensure_compatible()
@@ -357,7 +361,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
                 self.cache_discovery()
 
             return self._discovery
-        except (yaml.YAMLError, Exception) as err:
+        except (YAMLError, Exception) as err:
             raise DiscoveryInvalidError(str(err))
 
     def cache_discovery(self):
@@ -366,8 +370,6 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             yaml.dump(
                 self._discovery,
                 cached_discovery,
-                default_flow_style=False,
-                sort_keys=False,
             )
 
     @property
