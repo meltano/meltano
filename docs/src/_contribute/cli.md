@@ -36,12 +36,12 @@ defined as follows for use in `meltano`.
 - Options (switch, option flags, or flags) are options that alter the behavior (e.g. `--dry-run/--verbose`) or named
   input options (e.g. `--tasks=`). They come in two forms. A long form: `--option-name`, and a short form: `-o`.
 
-Given a command like `meltano job set <job_name> --tasks=[<task>...]`:
+Given a command like `meltano job set JOB_NAME --tasks=[<task>...]`:
 
 - `meltano` is the global click command group for Meltano. This is the main entry point to the CLI. When we refer to global options this is the level we refer to.
 - `job` is the click command group for the `job` command. This is the main command group for the `job` command. This is typically the top level for a Meltano feature.
 - `set` is a `sub-command` of the `job` command.
-- `<job_name>` is an `argument` of the `set` sub-command.
+- `JOB_NAME` is an `argument` of the `set` sub-command.
 - `--tasks` is named `option` of the `set` sub-command.
 
 For a technical explanation of how commands and groups work see https://click.palletsprojects.com/en/8.0.x/commands/
@@ -66,7 +66,7 @@ meltano <feature-group> get <something>
 
 ### Abbreviations
 
-For excessively long options, especially in cases where not short flag is provided or a commonly used abbreviation is present
+For excessively long options, especially in cases where no short flag is provided or a commonly used abbreviation is exists,
 you should allow the use of the abbreviation as a documented alias:
 
 ```
@@ -76,11 +76,14 @@ meltano --environment=production
 
 ### Global vs argument level flag casing
 
-When creating global flags, use upper case letters for short options, and lower case letter for argument level options.
-This can further help prevent ambiguity should a collision between a global flag and an argument level option occur. e.g.
+When creating global flags, default to upper case letters for short options, and lower case letter for argument level
+options. Unless a common industry convention alrady exists to use the lower case variation.
+
+Defaulting global short flags to upper case letters can help prevent ambiguity should a collision between a global flag
+and an argument level option occur. e.g.
 
 ```
-meltano -L/--log-level LEVEL SOME_COMMAND -l/--last-thing
+meltano [-L/--log-level LEVEL] SOME_COMMAND [-l/--last-thing]
 ```
 
 The caveat to this is *common* and *expected* global short options. For example `-h` and `--help`.
@@ -88,14 +91,30 @@ The caveat to this is *common* and *expected* global short options. For example 
 ### Reusing short options
 
 You may need to reuse a short option, but you should limit this to a single meaning per command group.
-Hypothetical example:
+Hypothetical example where reusing a short option is acceptable:
 
 ```
-# ok to reuse short flag
-
-meltano test -t run-specific-test
-meltano invoke somejob -t invoke-some-TASK
+# ok to reuse short flag, because each application has a distinct meaning in two different top level feature group commands
+meltano somecommand -t run-specific-test
+meltano othercommand somejob -t invoke-some-TASK
 ```
+
+An example a short flag should not be reused:
+
+```
+# ambiguous use that should be avoided
+meltano somecommand run SOME_TASK [-t/--test SOME_TEST]
+meltano somecommand set [-t/--task SOME_TASK]
+```
+
+In this scenario you have three options.
+
+1. Choose a sensible alternate when its unlikely to cause confusion with OTHER options e.g. `-k/--task` and `-t/--test`.
+2. Dropping the use of the short flag of the option you feel will be used less frequently.
+3. Upper case the lesser used of the two short flags and lower case the more commonly used.
+
+During scenarios like this you may want to consider taking a look at common unix utilities like `grep` to see if they
+have a similar arguments or flag abbreviations you can draw inspiration from.
 
 ### Expected output formats
 
@@ -176,9 +195,6 @@ is required:
 ```
 meltano [--log-level=LEVEL] invoke [--dump=config] PLUGIN_NAME
 ```
-
-Note that today you may also see some use of greater/less than signs to indicate that an option is optional, but this should
-be avoided and should be replaced with square brackets when possible.
 
 #### Mutually exclusive items
 
