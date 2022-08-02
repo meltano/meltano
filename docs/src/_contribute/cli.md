@@ -214,6 +214,26 @@ meltano run BLOCKS ...
 meltano install [] [PLUGIN_NAME] ...
 ```
 
+### Placeholders and angle brackets
+
+When writing help output its often useful to provide examples that utilize place holders. In complex cases where you're trying illustrate how a user might use feature, its often useful to use actual tap/target/mapping names to illustrate intent. But most commonly, especially for simple examples use common terms e.g. `TAP` rather than `extractor` or `tap-something`. 
+
+We also have significant historic use of angle brackets as place holders for user input in our documentation (and also help out). Which often looks like:
+
+```
+meltano elt <tap> <target>
+```
+
+In the context of something like a more conversational guide or other online docs this does help indicate that we expect the user to supply this input. However, our current use in help output is often ambigous when it comes to indicating whether this is a required item or optional item. So moving forward if you use this form in CLI help out you should still follow the documented conventions for indicating whether something is required:
+
+```
+# TAP and TARGET are upper case since they are required inputs
+meltano run <TAP> <TARGET>
+
+# MAPPER1 is wrapped in [] since its optional and a series
+meltano <TAP> [MAPPER1 ...] <TARGET>
+```
+
 ### Phrasing guidelines for command Deprecation and Preview commands
 
 Prefer the term "deprecated" over "obsolete". Commands that are deprecated should be marked as such in help text and
