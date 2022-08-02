@@ -1,6 +1,6 @@
 ARG PYTHON_VERSION
 
-FROM python:${PYTHON_VERSION}-slim as build
+FROM python:${PYTHON_VERSION}-slim
 
 ARG MELTANO_VERSION
 
