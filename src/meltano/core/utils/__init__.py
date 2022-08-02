@@ -362,7 +362,12 @@ class EnvironmentVariableNotSetError(Exception):
 
 
 def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
-    if not isinstance(raw_value, str):
+    if isinstance(raw_value, dict):
+        return {
+            key: expand_env_vars(val, env, raise_if_missing)
+            for key, val in raw_value.items()
+        }
+    elif not isinstance(raw_value, str):
         return raw_value
 
     # find viable substitutions

@@ -1,6 +1,6 @@
 import pytest  # noqa: F401
 
-from meltano.core.utils import flatten, nest, pop_at_path, set_at_path
+from meltano.core.utils import expand_env_vars, flatten, nest, pop_at_path, set_at_path
 
 
 def test_nest():
@@ -77,3 +77,35 @@ def test_flatten():
     expected_flat = {"_update.orchestrate/dags/meltano.py": False}
     result = flatten(example_config, "dot")
     assert result == expected_flat
+
+
+def test_expand_env_vars():
+    assert (
+        expand_env_vars("${ENV_VAR}_suffix", {"ENV_VAR": "substituted"})
+        == "substituted_suffix"
+    )
+
+
+def test_expand_env_vars_nested():
+    input_dict = {
+        "some_key": 12,
+        "some_var": "${ENV_VAR_1}",
+        "nested": {
+            "${THIS_DOES_NOT_EXPAND}": "another_val",
+            "another_layer": {"nested_var": "${ENV_VAR_2}"},
+        },
+        "another_top_level_var": "${ENV_VAR_2}",
+    }
+    env = {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"}
+
+    expected_output = {
+        "some_key": 12,
+        "some_var": "substituted_1",
+        "nested": {
+            "${THIS_DOES_NOT_EXPAND}": "another_val",
+            "another_layer": {"nested_var": "substituted_2"},
+        },
+        "another_top_level_var": "substituted_2",
+    }
+
+    assert expand_env_vars(input_dict, env) == expected_output
