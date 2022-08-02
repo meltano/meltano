@@ -739,7 +739,7 @@ Flask = "*"
 
 [[package]]
 name = "flask-login"
-version = "0.6.2"
+version = "0.6.1"
 description = "User authentication and session management for Flask."
 category = "main"
 optional = false
@@ -2014,7 +2014,7 @@ repl = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "e1445d5797fa9f1e9b1cb1374b52e51b54836789c1d2cae607edde31b7433895"
+content-hash = "0cc23d80d613d242064eabeebc9d53df66af8502bca686113dd955f78ee0c0f5"
 
 [metadata.files]
 aiodocker = [
@@ -2494,8 +2494,8 @@ flask-executor = [
     {file = "Flask_Executor-0.10.0-py3-none-any.whl", hash = "sha256:074885fc6d04764c86ab7f070818ea87dd08ee54767a216a8e7a00c39550bea2"},
 ]
 flask-login = [
-    {file = "Flask-Login-0.6.2.tar.gz", hash = "sha256:c0a7baa9fdc448cdd3dd6f0939df72eec5177b2f7abe6cb82fc934d29caac9c3"},
-    {file = "Flask_Login-0.6.2-py3-none-any.whl", hash = "sha256:1ef79843f5eddd0f143c2cd994c1b05ac83c0401dc6234c143495af9a939613f"},
+    {file = "Flask-Login-0.6.1.tar.gz", hash = "sha256:1306d474a270a036d6fd14f45640c4d77355e4f1c67ca4331b372d3448997b8c"},
+    {file = "Flask_Login-0.6.1-py3-none-any.whl", hash = "sha256:b9a4287a2d0067a7a482a23e40075e0d670f371974633fe890222dece4e02a74"},
 ]
 flask-mail = [
     {file = "Flask-Mail-0.9.1.tar.gz", hash = "sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"},
