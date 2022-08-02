@@ -1,21 +1,12 @@
+from __future__ import annotations
+
 import fnmatch
 import logging
 import re
 from collections import OrderedDict
 from enum import Enum, auto
 from functools import singledispatch
-from typing import (  # noqa: WPS235
-    Any,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Set,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Dict, Iterable, NamedTuple, TypeVar
 
 from meltano.core.behavior.visitor import visit_with
 
@@ -26,8 +17,8 @@ T = TypeVar("T", bound="CatalogRule")
 class CatalogRule:
     def __init__(
         self,
-        tap_stream_id: Union[str, List[str]],
-        breadcrumb: Optional[List[str]] = None,
+        tap_stream_id: str | list[str],
+        breadcrumb: list[str] | None = None,
         negated: bool = False,
     ):
         """Create a catalog rule for a stream and property."""
@@ -37,15 +28,15 @@ class CatalogRule:
 
     @classmethod
     def matching(
-        cls: Type[T],
-        rules: List[T],
+        cls: type[T],
+        rules: list[T],
         tap_stream_id: str,
-        breadcrumb: Optional[List[str]] = None,
+        breadcrumb: list[str] | None = None,
     ):
         """Filter rules that match a given breadcrumb."""
         return [rule for rule in rules if rule.match(tap_stream_id, breadcrumb)]
 
-    def match(self, tap_stream_id: str, breadcrumb: Optional[List[str]] = None) -> bool:
+    def match(self, tap_stream_id: str, breadcrumb: list[str] | None = None) -> bool:
         """Evaluate if rule matches a stream or breadcrumb.
 
         Args:
@@ -79,8 +70,8 @@ class CatalogRule:
 class MetadataRule(CatalogRule):
     def __init__(
         self,
-        tap_stream_id: Union[str, List[str]],
-        breadcrumb: Optional[List[str]],
+        tap_stream_id: str | list[str],
+        breadcrumb: list[str] | None,
         key: str,
         value: bool,
         negated: bool = False,
@@ -94,8 +85,8 @@ class MetadataRule(CatalogRule):
 class SchemaRule(CatalogRule):
     def __init__(
         self,
-        tap_stream_id: Union[str, List[str]],
-        breadcrumb: Optional[List[str]],
+        tap_stream_id: str | list[str],
+        breadcrumb: list[str] | None,
         payload: dict,
         negated: bool = False,
     ):
@@ -108,7 +99,7 @@ class SelectPattern(NamedTuple):
     """A pattern for selecting streams and properties."""
 
     stream_pattern: str
-    property_pattern: Optional[str]
+    property_pattern: str | None
     negated: bool
     raw: str
 
@@ -148,7 +139,7 @@ class SelectPattern(NamedTuple):
         )
 
 
-def select_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
+def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select` patterns.
 
     Args:
@@ -193,7 +184,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
     return include_rules + exclude_rules
 
 
-def select_filter_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
+def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select_filter` patterns.
 
     Args:
@@ -248,7 +239,7 @@ def path_property(path: str) -> str:
     return ".".join(components)
 
 
-def property_breadcrumb(props: List[str]) -> List[str]:
+def property_breadcrumb(props: list[str]) -> list[str]:
     """Create breadcrumb from properties path list.
 
     Args:
@@ -373,13 +364,13 @@ class CatalogExecutor:
 
 
 class MetadataExecutor(CatalogExecutor):
-    def __init__(self, rules: List[MetadataRule]):
+    def __init__(self, rules: list[MetadataRule]):
         self._stream = None
         self._rules = rules
 
-    def ensure_metadata(self, breadcrumb: List[str]):
+    def ensure_metadata(self, breadcrumb: list[str]):
         """Handle missing metadata entries."""
-        metadata_list: List[dict] = self._stream["metadata"]
+        metadata_list: list[dict] = self._stream["metadata"]
         match = next(
             (
                 metadata
@@ -458,18 +449,18 @@ class MetadataExecutor(CatalogExecutor):
 
 
 class SelectExecutor(MetadataExecutor):
-    def __init__(self, patterns: List[str]):
+    def __init__(self, patterns: list[str]):
         super().__init__(select_metadata_rules(patterns))
 
 
 class SchemaExecutor(CatalogExecutor):
-    def __init__(self, rules: List[SchemaRule]):
+    def __init__(self, rules: list[SchemaRule]):
         self._stream = None
         self._rules = rules
 
-    def ensure_property(self, breadcrumb: List[str]):  # noqa: WPS231
+    def ensure_property(self, breadcrumb: list[str]):  # noqa: WPS231
         """Create nodes for the breadcrumb and schema extra that matches."""
-        next_node: Dict[str, Any] = self._stream["schema"]
+        next_node: dict[str, Any] = self._stream["schema"]
 
         for idx, key in enumerate(breadcrumb):
             # If the key contains shell-style wildcards,
@@ -523,7 +514,7 @@ class SchemaExecutor(CatalogExecutor):
 class ListExecutor(CatalogExecutor):
     def __init__(self):
         # properties per stream
-        self.properties: Dict[str, Set[str]] = OrderedDict()
+        self.properties: dict[str, set[str]] = OrderedDict()
 
         super().__init__()
 
@@ -550,8 +541,8 @@ class SelectedNode(NamedTuple):
 
 class ListSelectedExecutor(CatalogExecutor):
     def __init__(self):
-        self.streams: Set[SelectedNode] = set()
-        self.properties: Dict[str, Set[SelectedNode]] = OrderedDict()
+        self.streams: set[SelectedNode] = set()
+        self.properties: dict[str, set[SelectedNode]] = OrderedDict()
         super().__init__()
 
     @property
@@ -581,12 +572,12 @@ class ListSelectedExecutor(CatalogExecutor):
             A proper `SelectionType` given the inclusion and selection metadata.
         """
         try:
-            metadata: Dict[str, Any] = node["metadata"]
+            metadata: dict[str, Any] = node["metadata"]
         except KeyError:
             return SelectionType.EXCLUDED
 
         inclusion: str = metadata.get("inclusion")
-        selected: Optional[bool] = metadata.get("selected")
+        selected: bool | None = metadata.get("selected")
         selected_by_default: bool = metadata.get("selected-by-default", False)
 
         if inclusion == "automatic":

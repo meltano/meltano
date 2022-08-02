@@ -1,6 +1,8 @@
 """Stored command arguments for plugins."""
+from __future__ import annotations
+
 import shlex
-from typing import Dict, Optional, Type, TypeVar
+from typing import TypeVar
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.container.container_spec import ContainerSpec
@@ -32,9 +34,9 @@ class Command(Canonical):
     def __init__(
         self,
         args: str,
-        description: Optional[str] = None,
-        executable: Optional[str] = None,
-        container_spec: Optional[dict] = None,
+        description: str | None = None,
+        executable: str | None = None,
+        container_spec: dict | None = None,
     ):
         """Initialize a Command.
 
@@ -121,7 +123,7 @@ class Command(Canonical):
         return super().parse(obj)
 
     @classmethod
-    def parse_all(cls: Type[TCommand], obj: Optional[dict]) -> Dict[str, TCommand]:
+    def parse_all(cls: type[TCommand], obj: dict | None) -> dict[str, TCommand]:
         """Deserialize commands data into a dict of Commands.
 
         Args:

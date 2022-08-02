@@ -2,10 +2,11 @@
 
 This module contains the SingerTarget class as well as a supporting BookmarkWriter class.
 """
+from __future__ import annotations
+
 import json
 import logging
 from datetime import datetime
-from typing import List
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
@@ -89,7 +90,7 @@ class SingerTarget(SingerPlugin):
 
     @hook("before_invoke")
     async def setup_bookmark_writer_hook(
-        self, plugin_invoker: PluginInvoker, exec_args: List[str]
+        self, plugin_invoker: PluginInvoker, exec_args: list[str]
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 

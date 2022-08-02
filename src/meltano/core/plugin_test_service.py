@@ -1,9 +1,10 @@
 """Defines PluginTestService."""
+from __future__ import annotations
+
 import asyncio
 import json
 import logging
 from abc import ABC, abstractmethod
-from typing import Union
 
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotSupportedError
@@ -36,14 +37,14 @@ class PluginTestService(ABC):
         self.plugin_invoker = plugin_invoker
 
     @abstractmethod
-    def validate(self) -> Union[bool, str]:
+    def validate(self) -> bool | str:
         """Abstract method to validate plugin configuration."""
 
 
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self) -> Union[bool, str]:
+    async def validate(self) -> bool | str:
         """Validate extractor configuration."""
         process = None
 

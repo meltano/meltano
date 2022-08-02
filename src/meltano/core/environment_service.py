@@ -1,6 +1,6 @@
 """Manager for Meltano project Environments."""
 
-from typing import List
+from __future__ import annotations
 
 from meltano.core.environment import Environment
 from meltano.core.project import Project
@@ -65,7 +65,7 @@ class EnvironmentService:
 
         return environment
 
-    def list_environments(self) -> List[Environment]:
+    def list_environments(self) -> list[Environment]:
         """Enumerate existing Environments.
 
         Returns:

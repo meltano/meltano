@@ -1,5 +1,7 @@
 """Defines JobFinder (will be renamed to StateFinder)."""
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 from .job import HEARTBEAT_VALID_MINUTES, HEARTBEATLESS_JOB_VALID_HOURS, Job, State

@@ -1,5 +1,7 @@
 """Defines helpers for the core codebase."""
 
+from __future__ import annotations
+
 import asyncio
 import functools
 import hashlib
@@ -12,7 +14,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Optional, TypeVar, Union
+from typing import Any, Callable, Iterable, TypeVar
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
@@ -188,7 +190,7 @@ def to_env_var(*xs):
     return "_".join(xs)
 
 
-def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
+def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
     """Wrapper arround `flatten_dict.flatten` that adds `dot` and `env_var` reducers."""
 
     def dot_reducer(*xs):
@@ -209,7 +211,7 @@ def compact(xs: Iterable) -> Iterable:
     return (x for x in xs if x is not None)
 
 
-def file_has_data(file: Union[Path, str]):
+def file_has_data(file: Path | str):
     file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
 
@@ -222,7 +224,7 @@ def noop(*_args, **_kwargs):
     pass
 
 
-def map_dict(f: Callable, d: Dict):
+def map_dict(f: Callable, d: dict):
     for k, v in d.items():
         yield k, f(v)
 
@@ -231,7 +233,7 @@ def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 
 
-def coerce_datetime(d: Union[date, datetime]) -> Optional[datetime]:
+def coerce_datetime(d: date | datetime) -> datetime | None:
     """Adds a `time` component to `d` if such a component is missing."""
     if d is None:
         return None
@@ -242,7 +244,7 @@ def coerce_datetime(d: Union[date, datetime]) -> Optional[datetime]:
     return datetime.combine(d, time())
 
 
-def iso8601_datetime(d: str) -> Optional[datetime]:
+def iso8601_datetime(d: str) -> datetime | None:
     if d is None:
         return None
 
@@ -361,7 +363,7 @@ class EnvironmentVariableNotSetError(Exception):
         return f"{self.env_var} referenced but not set."
 
 
-def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
+def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
     if not isinstance(raw_value, str):
         return raw_value
 

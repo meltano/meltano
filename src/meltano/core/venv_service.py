@@ -1,4 +1,6 @@
 """Manage Python virtual environments."""
+from __future__ import annotations
+
 import asyncio
 import hashlib
 import logging
@@ -10,7 +12,6 @@ import sys
 from asyncio.subprocess import Process
 from collections import namedtuple
 from pathlib import Path
-from typing import List, Optional
 
 from .error import AsyncSubprocessError
 from .project import Project
@@ -81,7 +82,7 @@ async def exec_async(*args, **kwargs) -> Process:
     return run
 
 
-def fingerprint(pip_urls: List[str]):
+def fingerprint(pip_urls: list[str]):
     """Return a unique string for the given pip urls."""
     key = " ".join(sorted(pip_urls))
     return hashlib.sha256(bytes(key, "utf-8")).hexdigest()
@@ -128,7 +129,7 @@ class VenvService:
             await self._upgrade_install(pip_urls)
         self.write_fingerprint(pip_urls)
 
-    def requires_clean_install(self, pip_urls: List[str]) -> bool:
+    def requires_clean_install(self, pip_urls: list[str]) -> bool:
         """Return `True` if the virtual environment doesn't exist or can't be reused."""
         meltano_pth_path = self.venv.site_packages_dir.joinpath("meltano_venv.pth")
         if meltano_pth_path.exists():
@@ -195,14 +196,14 @@ class VenvService:
                 "Failed to upgrade pip to the latest version.", err.process
             )
 
-    def read_fingerprint(self) -> Optional[str]:
+    def read_fingerprint(self) -> str | None:
         """Return the fingerprint of the existing virtual environment, if any."""
         if not self.plugin_fingerprint_path.exists():
             return None
         with open(self.plugin_fingerprint_path) as fingerprint_file:
             return fingerprint_file.read()
 
-    def write_fingerprint(self, pip_urls: List[str]):
+    def write_fingerprint(self, pip_urls: list[str]):
         """Save the fingerprint for this installation."""
         with open(self.plugin_fingerprint_path, "wt") as fingerprint_file:
             fingerprint_file.write(fingerprint(pip_urls))
@@ -211,7 +212,7 @@ class VenvService:
         """Return the absolute path for the given binary in the virtual environment."""
         return self.venv.bin_dir.joinpath(executable)
 
-    async def _clean_install(self, pip_urls: List[str]):
+    async def _clean_install(self, pip_urls: list[str]):
         self.clean()
         await self.create()
         await self.upgrade_pip()
@@ -221,7 +222,7 @@ class VenvService:
         )
         await self._pip_install(*pip_urls)
 
-    async def _upgrade_install(self, pip_urls: List[str]):
+    async def _upgrade_install(self, pip_urls: list[str]):
         logger.debug(
             f"Upgrading '{' '.join(pip_urls)}' in existing virtual environment for '{self.namespace}/{self.name}'"  # noqa: WPS221
         )

@@ -1,5 +1,7 @@
 """Validates yaml files against their schemas."""
 
+from __future__ import annotations
+
 import json
 import os
 import pathlib

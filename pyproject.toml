@@ -98,8 +98,19 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 88
-src_paths = ["src/", "tests/"]
-skip_glob = ["*.md", "*.vue", "*.js"]
+src_paths = [
+  "src/",
+  "tests/",
+]
+skip_glob = [
+  "*.md",
+  "*.vue",
+  "*.js",
+  "src/meltano/migrations/versions/*",
+]
+add_imports = [
+    "from __future__ import annotations",
+]
 
 [tool.coverage.run]
 concurrency = [ "multiprocessing" ]

@@ -1,4 +1,6 @@
 """Flask app for Meltano UI."""
+from __future__ import annotations
+
 import importlib
 import logging
 from urllib.parse import urlsplit
