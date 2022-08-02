@@ -238,6 +238,7 @@ jobs:
 ```
 
 You can learn more about how tasks are defined and run in the [`meltano job` documentation](/reference/command-line-interface#job).
+
 ### Schedules
 
 Your project's pipeline schedules,
@@ -284,7 +285,7 @@ To learn more about pipeline schedules and orchestration, refer to the [Orchestr
 
 As your project grows, and your `meltano.yml` with it, you may wish to break your config into multiple `.yml` files and to store those subfiles in various places in your Project folder hierachy.
 
-This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](https://en.wikipedia.org/wiki/Glob_(programming))) to the `include_paths` key of your `meltano.yml`:
+This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](<https://en.wikipedia.org/wiki/Glob_(programming)>)) to the `include_paths` key of your `meltano.yml`:
 
 ```yaml
 include_paths:
@@ -352,6 +353,7 @@ Meltano's CLI utilizes the following tables:
 - `user` table: Users for [Meltano UI](/reference/ui) created using [`meltano user add`](/reference/command-line-interface#user).
 
 The remaining tables in the database are used exclusively by Meltano UI, mostly for authentication and authorization purposes:
+
 - `role`
 - `role_permissions`
 - `oauth`
