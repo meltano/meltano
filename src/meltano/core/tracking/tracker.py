@@ -85,13 +85,16 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def __init__(
         self,
         project: Project,
-        request_timeout: float | tuple[float, float] | None = None,
+        request_timeout: float | tuple[float, float] | None = 3.5,
     ):
         """Initialize a tracker for the Meltano project.
 
         Args:
             project: The Meltano project.
-            request_timeout: Timeout for the HTTP requests. Can be set either as single float value which applies to both `connect` AND `read` timeout, or as tuple with two float values which specify the `connect` and `read` timeouts separately.
+            request_timeout: Timeout for the HTTP requests. Can be set either
+                as single float value which applies to both `connect` and
+                `read` timeout, or as tuple with two float values which specify
+                the `connect` and `read` timeouts separately.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
