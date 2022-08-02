@@ -103,7 +103,10 @@ src_paths = ["src/", "tests/"]
 skip_glob = ["*.md", "*.vue", "*.js"]
 
 [tool.coverage.run]
-concurrency = [ "multiprocessing" ]
+concurrency = [
+  "multiprocessing",
+  "thread",
+]
 parallel = true
 branch = true
 
