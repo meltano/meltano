@@ -8,6 +8,11 @@ Create Date: 2022-06-29 14:28:51.673195
 import sqlalchemy as sa
 from alembic import op
 
+from meltano.migrations.utils.dialect_typing import (
+    get_dialect_name,
+    max_string_length_for_dialect,
+)
+
 # revision identifiers, used by Alembic.
 revision = "5b43800443d1"
 down_revision = "13e8639c6d2b"
@@ -16,10 +21,26 @@ depends_on = None
 
 
 def upgrade():
-    op.alter_column("job", "job_id", new_column_name="job_name")
+    dialect_name = get_dialect_name()
+    max_string_length = max_string_length_for_dialect(dialect_name)
+
+    op.alter_column(
+        "job",
+        "job_id",
+        new_column_name="job_name",
+        existing_type=sa.types.String(max_string_length),
+    )
     op.rename_table("job", "runs")
 
 
 def downgrade():
+    dialect_name = get_dialect_name()
+    max_string_length = max_string_length_for_dialect(dialect_name)
+
     op.rename_table("runs", "job")
-    op.alter_column("job", "job_name", new_column_name="job_id")
+    op.alter_column(
+        "job",
+        "job_name",
+        new_column_name="job_id",
+        existing_type=sa.types.String(max_string_length),
+    )
