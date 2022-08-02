@@ -402,3 +402,24 @@ class TestTracker:
         server_thread.join()
 
         assert timeout_occured is timeout_should_occur
+
+    def test_project_context_send_anonymous_usage_stats_source(self, project: Project):
+        clear_telemetry_settings(project)
+
+        settings_service = ProjectSettingsService(project)
+
+        def get_source():
+            return ProjectContext(project, uuid.uuid4()).to_json()["data"][
+                "send_anonymous_usage_stats_source"
+            ]
+
+        assert get_source() == "default"
+
+        settings_service.set(
+            "send_anonymous_usage_stats",
+            not settings_service.get("send_anonymous_usage_stats"),
+        )
+        assert get_source() == "meltano_yml"
+
+        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "True"
+        assert get_source() == "env"
