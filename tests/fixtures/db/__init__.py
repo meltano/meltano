@@ -23,7 +23,11 @@ def engine_uri_env(engine_uri: str) -> Generator:
 
 @pytest.fixture()
 def un_engine_uri(monkeypatch):
-    """When we want to test functionality that doesn't use the current DB URI."""
+    """When we want to test functionality that doesn't use the current DB URI.
+
+    Note that this fixture must run before the project fixture as
+    src/meltano/core/db.py _engines has the engine cached.
+    """
     monkeypatch.delenv("MELTANO_DATABASE_URI")
 
 
