@@ -35,7 +35,7 @@ runs:
       uses: docker/build-push-action@v3
       with:
         load: true
-        context: "{{defaultContext}}:docker/publish"
+        context: "{{defaultContext}}:docker/meltano"
         tags: ${{ inputs.tags }}
         build-args: ${{ inputs.build-args }}
 
