@@ -1208,6 +1208,10 @@ class AutoStoreManager(SettingsStoreManager):
         # any remaining config routed to meltano environment
         if self.ensure_supported(store=SettingValueStore.MELTANO_ENV):
             return SettingValueStore.MELTANO_ENV
+        # fall back to root `meltano.yml`
+        # this is required for Meltano settings, which cannot be stored in an Environment
+        if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
+            return SettingValueStore.MELTANO_YML
         # fall back to dotenv
         elif self.ensure_supported(store=SettingValueStore.DOTENV):
             return SettingValueStore.DOTENV
