@@ -42,7 +42,7 @@ async def _stream_redirect(
 ):
     """Redirect stream to a file like obj.
 
-    Args:
+    Parameters:
         stream: the stream to redirect
         file_like_objs: the objects to redirect the stream to
         write_str: if True, stream is written as str
@@ -59,7 +59,7 @@ def _debug_logging_handler(
 ) -> asyncio.Task:
     """Route debug log lines to stderr or an OutputLogger if one is present in our invocation context.
 
-    Args:
+    Parameters:
         name: name of the plugin
         plugin_invoker: the PluginInvoker to route log lines for
         stderr: stderr StreamReader to route to
@@ -89,7 +89,7 @@ def _debug_logging_handler(
 def config_metadata_rules(config):
     """Get metadata rules from config.
 
-    Args:
+    Parameters:
         config: configuration dict
 
     Returns:
@@ -121,7 +121,7 @@ def config_metadata_rules(config):
 def config_schema_rules(config):
     """Get schema rules from config.
 
-    Args:
+    Parameters:
         config: configuration dict
 
     Returns:
@@ -167,7 +167,7 @@ class SingerTap(SingerPlugin):
     def exec_args(self, plugin_invoker):
         """Return the arguments list with the complete runtime paths.
 
-        Args:
+        Parameters:
             plugin_invoker: the plugin invoker running
 
         Returns:
@@ -220,7 +220,7 @@ class SingerTap(SingerPlugin):
     ):
         """Look up state before being invoked if in sync mode.
 
-        Args:
+        Parameters:
             plugin_invoker: the plugin invoker running
             exec_args: the args being passed to the tap
 
@@ -241,7 +241,7 @@ class SingerTap(SingerPlugin):
     ):
         """Look up state, cleaning up and refreshing as needed.
 
-        Args:
+        Parameters:
             plugin_invoker: the plugin invoker running
 
         Returns:
@@ -307,7 +307,7 @@ class SingerTap(SingerPlugin):
     ):
         """Discover Singer catalog before invoking tap if in sync mode.
 
-        Args:
+        Parameters:
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
 
@@ -326,7 +326,7 @@ class SingerTap(SingerPlugin):
     async def discover_catalog(self, plugin_invoker: PluginInvoker):  # noqa: WPS231
         """Perform catalog discovery.
 
-        Args:
+        Parameters:
             plugin_invoker: The invocation handler of the plugin instance.
 
         Returns:
@@ -388,7 +388,7 @@ class SingerTap(SingerPlugin):
     ):  # noqa: DAR401
         """Run tap in discovery mode and store the result.
 
-        Args:
+        Parameters:
             plugin_invoker: The invocation handler of the plugin instance.
             catalog_path: Where discovery output should be written.
 
@@ -460,7 +460,7 @@ class SingerTap(SingerPlugin):
     ):
         """Apply catalog rules before invoke if in sync mode.
 
-        Args:
+        Parameters:
             plugin_invoker: the plugin invoker running
             exec_args: the argumnets to pass to the tap
 
@@ -483,7 +483,7 @@ class SingerTap(SingerPlugin):
     ):
         """Apply Singer catalog and schema rules to discovered catalog.
 
-        Args:
+        Parameters:
             plugin_invoker: the plugin invoker running
             exec_args: the argumnets to pass to the tap
 
@@ -558,7 +558,7 @@ class SingerTap(SingerPlugin):
     def catalog_cache_key(self, plugin_invoker):
         """Get a cache key for the catalog.
 
-        Args:
+        Parameters:
             plugin_invoker: the plugin invoker running
 
         Returns:

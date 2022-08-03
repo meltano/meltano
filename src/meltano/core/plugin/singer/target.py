@@ -23,7 +23,7 @@ class BookmarkWriter:
     def __init__(self, job: Job, session: object, payload_flag: int = Payload.STATE):
         """Bookmark writer with a writelines implementation to support ingesting and persisting state messages.
 
-        Args:
+        Parameters:
             job: meltano elt job associated with this invocation and who's state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: a valid payload flag, one of Payload.STATE or Payload.INCOMPLETE_STATE.
@@ -35,7 +35,7 @@ class BookmarkWriter:
     def writeline(self, line: str):
         """Persist a state entry.
 
-        Args:
+        Parameters:
             line: raw json state line to decode/store
         """
         if self.job is None:
@@ -93,7 +93,7 @@ class SingerTarget(SingerPlugin):
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 
-        Args:
+        Parameters:
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
         """
@@ -111,7 +111,7 @@ class SingerTarget(SingerPlugin):
         This leverages calling back to PluginInvokers.add_output_handler to attach an additional
         output handler (the BookmarkWriter) to handle persisting state messages.
 
-        Args:
+        Parameters:
             plugin_invoker: The invocation handler who's add_out_handler method will be called to attach the bookmark writer
             as an additional output handler.
         """

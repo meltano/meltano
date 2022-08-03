@@ -30,7 +30,7 @@ def _list_single_job(
 ) -> None:
     """List a single job.
 
-    Args:
+    Parameters:
         project: The project to use.
         task_sets_service: The task sets service to use.
         list_format: The format to use.
@@ -62,7 +62,7 @@ def _list_all_jobs(
 ) -> None:
     """List all jobs.
 
-    Args:
+    Parameters:
         project: The project to use.
         task_sets_service: The task sets service to use.
         list_format: The format to use.
@@ -278,7 +278,7 @@ def remove(ctx, job_name: str):  # noqa: WPS442
 def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) -> bool:
     """Validate the job's tasks by attempting to parse them into valid Blocks and using the Block's validation logic.
 
-    Args:
+    Parameters:
         project: Project to use.
         task_set: TaskSets to validate.
 

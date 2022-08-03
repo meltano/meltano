@@ -40,7 +40,7 @@ class CliContext(SelfDescribingJson):
     ):
         """Initialize a CLI context.
 
-        Args:
+        Parameters:
             command: The command name e.g. `schedule` or `list`.
             parent_command_hint: The upstream parent command e.g. `cli`, `schedule`.
             options: A dict of options keys and sanitized values.
@@ -58,7 +58,7 @@ class CliContext(SelfDescribingJson):
     def from_click_context(cls, ctx: click.Context) -> CliContext:
         """Initialize a CLI context.
 
-        Args:
+        Parameters:
             ctx: The click.Context to derive our tracking context from.
 
         Returns:

@@ -53,7 +53,7 @@ class IOBlock(metaclass=ABCMeta):
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst.
 
-        Args:
+        Parameters:
             dst: SubprocessOutputWriter
 
         Raises:
@@ -65,7 +65,7 @@ class IOBlock(metaclass=ABCMeta):
     def stderr_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stderr_link to instruct block to link/write stderr content to dst.
 
-        Args:
+        Parameters:
             dst: SubprocessOutputWriter
 
         Raises:
@@ -88,7 +88,7 @@ class IOBlock(metaclass=ABCMeta):
     async def stop(self, kill: bool = True) -> None:
         """Stop a block.
 
-        Args:
+        Parameters:
             kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
 
         Raises:
@@ -127,7 +127,7 @@ class IOBlock(metaclass=ABCMeta):
     async def pre(self, context: object) -> None:
         """Execute pre-start tasks.
 
-        Args:
+        Parameters:
             context: invocation context to use for this execution.
         """
 

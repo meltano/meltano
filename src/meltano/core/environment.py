@@ -32,7 +32,7 @@ class EnvironmentPluginConfig(PluginRef):
     ):
         """Create a new plugin configuration object.
 
-        Args:
+        Parameters:
             plugin_type: Extractor, loader, etc.
             name: Name of the plugin.
             config: Plugin configuration.
@@ -66,7 +66,7 @@ class EnvironmentPluginConfig(PluginRef):
     def config_with_extras(self, new_config_with_extras: dict[str, Any]):
         """Set plugin configuration values from the Meltano environment.
 
-        Args:
+        Parameters:
             new_config_with_extras: New plugin configuration with extra values.
         """
         self.config.clear()
@@ -86,7 +86,7 @@ class EnvironmentPluginConfig(PluginRef):
         Orphan settings are `config` entries that do not have a
         matching parent entry within `settings`.
 
-        Args:
+        Parameters:
             existing: Existing settings.
 
         Returns:
@@ -101,7 +101,7 @@ class EnvironmentConfig(Canonical):
     def __init__(self, plugins: dict[str, list[dict]] = None, **extras):
         """Create a new environment configuration.
 
-        Args:
+        Parameters:
             plugins: Mapping of plugin types to arrays of plugin configurations.
             extras: Environment extras.
         """
@@ -114,7 +114,7 @@ class EnvironmentConfig(Canonical):
     ) -> dict[PluginType, list[EnvironmentPluginConfig]]:
         """Create plugin configurations from raw dictionary.
 
-        Args:
+        Parameters:
             plugins: Plugin configurations.
 
         Returns:
@@ -142,7 +142,7 @@ class Environment(NameEq, Canonical):
     ) -> None:
         """Create a new environment object.
 
-        Args:
+        Parameters:
             name: Environment name. Must be unique.
             config: Dictionary with environment configuration.
             env: Optional override environment values.
@@ -157,7 +157,7 @@ class Environment(NameEq, Canonical):
     def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
         """Lookup an environment by name from an iterable.
 
-        Args:
+        Parameters:
             objects: Iterable of objects to search.
             name: Environment name.
 
@@ -179,7 +179,7 @@ class Environment(NameEq, Canonical):
     ) -> EnvironmentPluginConfig:
         """Get configuration for a plugin in this environment.
 
-        Args:
+        Parameters:
             plugin_type: Extractor, loader, etc.
             name: Plugin name.
 

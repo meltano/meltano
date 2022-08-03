@@ -30,7 +30,7 @@ class ProjectSettingsService(SettingsService):
     def __init__(self, *args, config_service: ConfigService = None, **kwargs):
         """Instantiate ProjectSettingsService instance.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to the superclass.
             config_service: Project configuration service instance.
             kwargs: Keyword arguments to pass to the superclass.
@@ -154,7 +154,7 @@ class ProjectSettingsService(SettingsService):
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
 
-        Args:
+        Parameters:
             config: Updated config.
         """
         self.config_service.update_config(config)
@@ -162,7 +162,7 @@ class ProjectSettingsService(SettingsService):
     def update_meltano_environment_config(self, config: dict):
         """Update environment configuration in `meltano.yml`.
 
-        Args:
+        Parameters:
             config: Updated environment config.
         """
         self.config_service.update_environment_config(config)
@@ -170,7 +170,7 @@ class ProjectSettingsService(SettingsService):
     def process_config(self, config) -> dict:
         """Process configuration dictionary for presentation in `meltano config meltano`.
 
-        Args:
+        Parameters:
             config: Config to process.
 
         Returns:
@@ -181,7 +181,7 @@ class ProjectSettingsService(SettingsService):
     def get_with_metadata(self, name: str, *args, **kwargs):
         """Return setting value with metadata.
 
-        Args:
+        Parameters:
             name: Name of setting to get.
             args: Positional arguments to pass to the superclass method.
             kwargs: Keyword arguments to pass to the superclass method.
@@ -203,7 +203,7 @@ class ProjectSettingsService(SettingsService):
     def get_from_ui_cfg(self, name: str):
         """Return setting value from UI config.
 
-        Args:
+        Parameters:
             name: Name of setting to get.
 
         Returns:

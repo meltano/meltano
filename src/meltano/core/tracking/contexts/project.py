@@ -36,7 +36,7 @@ class ProjectContext(SelfDescribingJson):
     def __init__(self, project: Project, client_id: uuid.UUID):
         """Initialize a meltano tracking "project" context.
 
-        Args:
+        Parameters:
             project: The Meltano project.
             client_id: The client ID from `analytics.json`.
         """

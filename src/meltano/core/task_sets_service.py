@@ -15,7 +15,7 @@ class JobAlreadyExistsError(Exception):
     def __init__(self, name: str):
         """Initialize a JobAlreadyExistsError.
 
-        Args:
+        Parameters:
             name: Name of the TaskSet (aka job) that already exists.
         """
         self.name = name
@@ -27,7 +27,7 @@ class JobNotFoundError(Exception):
     def __init__(self, name: str):
         """Initialize a JobNotFoundError.
 
-        Args:
+        Parameters:
             name: Name of the TaskSet (aka job) that wasn't found.
         """
         self.name = name
@@ -40,7 +40,7 @@ class TaskSetsService:
     def __init__(self, project: Project):
         """Initialize a TaskSetsService.
 
-        Args:
+        Parameters:
             project: The active project.
         """
         self.project = project
@@ -48,7 +48,7 @@ class TaskSetsService:
     def add(self, task_sets: TaskSets) -> None:
         """Add a TaskSet to the project.
 
-        Args:
+        Parameters:
             task_sets: The TaskSets to add.
 
         Raises:
@@ -64,7 +64,7 @@ class TaskSetsService:
     def remove(self, name: str) -> TaskSets:
         """Remove a TaskSet from the project.
 
-        Args:
+        Parameters:
             name: The name of the TaskSet to remove.
 
         Returns:
@@ -84,7 +84,7 @@ class TaskSetsService:
     def update(self, task_sets: TaskSets) -> None:
         """Update a tasks.
 
-        Args:
+        Parameters:
             task_sets: The TaskSets to update.
 
         Raises:
@@ -101,7 +101,7 @@ class TaskSetsService:
     def get(self, name: str) -> TaskSets:
         """Get a TaskSet by name.
 
-        Args:
+        Parameters:
             name: The name of the TaskSet.
 
         Returns:
@@ -126,7 +126,7 @@ class TaskSetsService:
     def exists(self, name: str) -> bool:
         """Check if a TaskSet with the given name exists.
 
-        Args:
+        Parameters:
             name: The name of the TaskSet.
 
         Returns:

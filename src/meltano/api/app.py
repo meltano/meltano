@@ -28,7 +28,7 @@ logger = logging.getLogger("meltano.api")
 def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     """Create flask app for the current project.
 
-    Args:
+    Parameters:
         config: app configuration
 
     Returns:
