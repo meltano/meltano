@@ -37,7 +37,7 @@ MULTI_FILE_KEYS = {
 def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
     """Deep merge a list of child dicts with a given parent.
 
-    Parameters:
+    Args:
         parent: The parent dict.
         children: The child dicts.
 
@@ -69,7 +69,7 @@ class ProjectFiles:  # noqa: WPS214
     def __init__(self, root: Path, meltano_file_path: Path) -> None:
         """Instantiate ProjectFiles interface from project root and meltano.yml path.
 
-        Parameters:
+        Args:
             root: The project root path.
             meltano_file_path: The path to the meltano.yml file.
         """
@@ -121,7 +121,7 @@ class ProjectFiles:  # noqa: WPS214
         Note: `.update()` will write blank entities for those no longer in use
         (i.e. contained config on load, but not on save).
 
-        Parameters:
+        Args:
             meltano_config: The new config to update with.
 
         Returns:
@@ -144,7 +144,7 @@ class ProjectFiles:  # noqa: WPS214
     def _is_valid_include_path(self, file_path: Path) -> None:
         """Determine if given path is a valid `include_paths` file.
 
-        Parameters:
+        Args:
             file_path: The path to check.
 
         Raises:
@@ -158,7 +158,7 @@ class ProjectFiles:  # noqa: WPS214
 
         Not including `meltano.yml` (even if it is matched by a pattern).
 
-        Parameters:
+        Args:
             include_path_patterns: List of glob pattern strings.
 
         Returns:
@@ -186,7 +186,7 @@ class ProjectFiles:  # noqa: WPS214
     def _add_to_index(self, key: tuple, include_path: Path) -> None:
         """Add a new key:path to the `_plugin_file_map`.
 
-        Parameters:
+        Args:
             key: The key to add.
             include_path: The path to add.
 
@@ -211,7 +211,7 @@ class ProjectFiles:  # noqa: WPS214
         This allows us to know exactly which plugin is configured where when we come to
         update plugins.
 
-        Parameters:
+        Args:
             include_file_path: The path to the included file.
             include_file_contents: The contents of the included file.
         """
@@ -315,7 +315,7 @@ class ProjectFiles:  # noqa: WPS214
     def _restore_file_key_order(self, file_dicts: dict[str, CommentedMap]):
         """Restore the order of the keys in the meltano project files.
 
-        Parameters:
+        Args:
             file_dicts: The dictionary mapping included files to their contents.
 
         Returns:
@@ -350,7 +350,7 @@ class ProjectFiles:  # noqa: WPS214
         For every file, use the top-level entries (e.g. "plugins") to copy the comments
         from the original config.
 
-        Parameters:
+        Args:
             file_dicts: The dictionary mapping included files to their contents.
         """
         for file, file_dict in file_dicts.items():

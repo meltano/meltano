@@ -30,7 +30,7 @@ class StateService:
     def __init__(self, session: object = None):
         """Create a StateService object.
 
-        Parameters:
+        Args:
             session: the session to use for interacting with the db
         """
         self.session = session
@@ -38,7 +38,7 @@ class StateService:
     def list_state(self, state_id_pattern: Optional[str] = None) -> Dict[str, Dict]:
         """List all state found in the db.
 
-        Parameters:
+        Args:
             state_id_pattern: An optional glob-style pattern of state_ids to search for
 
         Returns:
@@ -55,7 +55,7 @@ class StateService:
     def _get_or_create_job(self, job: Union[Job, str]) -> Job:
         """If Job is passed, return it. If state_id is passed, create new and return.
 
-        Parameters:
+        Args:
             job: either an existing Job to modify state for, or a state_id
 
         Raises:
@@ -77,7 +77,7 @@ class StateService:
     def validate_state(state: Dict[str, Any]):
         """Check that the given state str is valid.
 
-        Parameters:
+        Args:
             state: the state to validate
 
         Raises:
@@ -97,7 +97,7 @@ class StateService:
     ):
         """Add state for the given Job.
 
-        Parameters:
+        Args:
             job: either an existing Job or a state_id that future runs may look up state for.
             new_state: the state to add for the given job.
             payload_flags: the payload_flags to set for the job
@@ -117,7 +117,7 @@ class StateService:
     def get_state(self, state_id: str) -> Dict:
         """Get state for the given state_id.
 
-        Parameters:
+        Args:
             state_id: The state_id to get state for
 
         Returns:
@@ -155,7 +155,7 @@ class StateService:
     def set_state(self, state_id: str, new_state: Optional[str], validate: bool = True):
         """Set the state for the state_id.
 
-        Parameters:
+        Args:
             state_id: the state_id to set state for
             new_state: the state to update to
             validate: whether or not to validate the supplied state.
@@ -170,7 +170,7 @@ class StateService:
     def clear_state(self, state_id, save: bool = True):
         """Clear the state for the state_id.
 
-        Parameters:
+        Args:
             state_id: the state_id to clear state for
             save: whether or not to immediately save the state
         """
@@ -179,7 +179,7 @@ class StateService:
     def merge_state(self, state_id_src: str, state_id_dst: str):
         """Merge state from state_id_src into state_id_dst.
 
-        Parameters:
+        Args:
             state_id_src: the state_id to get state from
             state_id_dst: the state_id_to merge state onto
         """
@@ -190,7 +190,7 @@ class StateService:
     def copy_state(self, state_id_src: str, state_id_dst: str):
         """Copy state from Job state_id_src onto Job state_id_dst.
 
-        Parameters:
+        Args:
             state_id_src: the state_id to get state from
             state_id_dst: the state_id_to copy state onto
         """
@@ -201,7 +201,7 @@ class StateService:
     def move_state(self, state_id_src: str, state_id_dst: str):
         """Move state from Job state_id_src to Job state_id_dst.
 
-        Parameters:
+        Args:
             state_id_src: the state_id to get state from and clear
             state_id_dst: the state_id_to move state onto
         """

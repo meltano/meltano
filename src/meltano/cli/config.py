@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 def get_label(metadata) -> str:
     """Get the label for an environment variable's source.
 
-    Parameters:
+    Args:
         metadata: the metadata for the variable
 
     Returns:

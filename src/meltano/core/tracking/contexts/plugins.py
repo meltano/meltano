@@ -49,7 +49,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     def __init__(self, plugins: list(tuple[ProjectPlugin, str])):
         """Initialize a meltano tracking plugin context.
 
-        Parameters:
+        Args:
             plugins: The Meltano plugins and the requested command.
         """
         tracking_context = []
@@ -64,7 +64,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     def append_plugin_context(self, plugin: ProjectPlugin, cmd: str):
         """Append a plugin context to the tracking context.
 
-        Parameters:
+        Args:
             plugin: The Meltano plugin.
             cmd: The command that was executed.
         """

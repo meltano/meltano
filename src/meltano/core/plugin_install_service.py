@@ -55,7 +55,7 @@ class PluginInstallState:
     ):
         """Initialize PluginInstallState instance.
 
-        Parameters:
+        Args:
             plugin: Plugin related to this install state.
             reason: Reason for plugin install.
             status: Status of plugin install.
@@ -114,7 +114,7 @@ class PluginInstallState:
 def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     """Installer Factory.
 
-    Parameters:
+    Args:
         project: Meltano Project.
         plugin: Plugin to be installed.
         args: Positional arguments to instantiate installer with.
@@ -135,7 +135,7 @@ def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
 def with_semaphore(func):
     """Gate access to the method using its class's semaphore.
 
-    Parameters:
+    Args:
         func: Function to wrap.
 
     Returns:
@@ -163,7 +163,7 @@ class PluginInstallService:
     ):
         """Initialize new PluginInstallService instance.
 
-        Parameters:
+        Args:
             project: Meltano Project.
             plugins_service: Project plugins service to use.
             status_cb: Status call-back function.
@@ -194,7 +194,7 @@ class PluginInstallService:
         problematic if `clean` is set as one async `clean` operation causes the other
         install to fail.
 
-        Parameters:
+        Args:
             plugins: An iterable containing plugins to dedupe.
             reason: Plugins install reason.
 
@@ -230,7 +230,7 @@ class PluginInstallService:
 
         Blocks until all plugins are installed.
 
-        Parameters:
+        Args:
             reason: Plugin install reason.
 
         Returns:
@@ -248,7 +248,7 @@ class PluginInstallService:
 
         Blocks until all plugins are installed.
 
-        Parameters:
+        Args:
             plugins: ProjectPlugin instances to install.
             reason: Plugin install reason.
 
@@ -270,7 +270,7 @@ class PluginInstallService:
     ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
 
-        Parameters:
+        Args:
             plugins: ProjectPlugin instances to install.
             reason: Plugin install reason.
 
@@ -291,7 +291,7 @@ class PluginInstallService:
 
         Blocks until the plugin is installed.
 
-        Parameters:
+        Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
 
@@ -313,7 +313,7 @@ class PluginInstallService:
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
-        Parameters:
+        Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
 
@@ -390,7 +390,7 @@ class PluginInstallService:
         Mappings are PluginType.MAPPERS with extra attribute of `_mapping` which will indicate
         that this instance of the plugin is actually a mapping - and should not be installed.
 
-        Parameters:
+        Args:
             plugin: ProjectPlugin to evaluate.
 
         Returns:
@@ -410,7 +410,7 @@ class PipPluginInstaller:
     ):
         """Initialize PipPluginInstaller instance.
 
-        Parameters:
+        Args:
             project: Meltano Project.
             plugin: ProjectPlugin to install.
             venv_service: VenvService instance to use when installing.
@@ -425,7 +425,7 @@ class PipPluginInstaller:
     async def install(self, reason, clean):
         """Install the plugin into the virtual environment using pip.
 
-        Parameters:
+        Args:
             reason: Install reason.
             clean: Flag to clean install.
 

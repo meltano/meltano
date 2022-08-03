@@ -27,7 +27,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __init__(self, *args: Any, **attrs: Any):
         """Initialize the current instance with the given attributes.
 
-        Parameters:
+        Args:
             args: Arguments to initialize with.
             attrs: Keyword arguments to initialize with.
         """
@@ -51,7 +51,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     ) -> Union[dict, list, CommentedMap, CommentedSeq, Any]:
         """Return a canonical representation of the given instance.
 
-        Parameters:
+        Args:
             target: Instance to convert.
 
         Returns:
@@ -107,7 +107,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def with_attrs(self: T, *args: Any, **kwargs: Any) -> T:
         """Return a new instance with the given attributes set.
 
-        Parameters:
+        Args:
             args: Attribute names to set.
             kwargs: Keyword arguments to set.
 
@@ -120,7 +120,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def parse(cls: Type[T], obj: Any) -> T:
         """Parse a 'Canonical' object from a dictionary or return the instance.
 
-        Parameters:
+        Args:
             obj: Dictionary or instance to parse.
 
         Returns:
@@ -151,7 +151,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def is_attr_set(self, attr):
         """Return whether specified attribute has a non-default/fallback value set.
 
-        Parameters:
+        Args:
             attr: Attribute to check.
 
         Returns:
@@ -162,7 +162,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __getattr__(self, attr: str) -> Any:
         """Return the value of the given attribute.
 
-        Parameters:
+        Args:
             attr: Attribute to return.
 
         Returns:
@@ -196,7 +196,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __setattr__(self, attr: str, value: Any):
         """Set the given attribute to the given value.
 
-        Parameters:
+        Args:
             attr: Attribute to set.
             value: Value to set.
         """
@@ -208,7 +208,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __getitem__(self, attr: str) -> Any:
         """Return the value of the given attribute.
 
-        Parameters:
+        Args:
             attr: Attribute to return.
 
         Returns:
@@ -219,7 +219,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __setitem__(self, attr: str, value: Any) -> None:
         """Set the given attribute to the given value.
 
-        Parameters:
+        Args:
             attr: Attribute to set.
             value: Value to set.
 
@@ -267,7 +267,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __contains__(self, obj: Any):
         """Return whether the current instance contains the given object.
 
-        Parameters:
+        Args:
             obj: Object to check.
 
         Returns:
@@ -278,7 +278,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def update(self, *others: Any, **kwargs: Any) -> None:
         """Update the current instance with the given others.
 
-        Parameters:
+        Args:
             others: Other instances to update with.
             kwargs: Keyword arguments to update with.
         """
@@ -295,7 +295,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def yaml(cls, dumper: yaml.BaseDumper, obj: Any) -> yaml.MappingNode:
         """YAML serializer for Canonical objects.
 
-        Parameters:
+        Args:
             dumper: The YAML dumper.
             obj: The Canonical object to serialize.
 
@@ -310,7 +310,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def to_yaml(cls, representer: Representer, obj: Any):
         """YAML serializer for Canonical objects.
 
-        Parameters:
+        Args:
             representer: The YAML representer.
             obj: The Canonical object to serialize.
 
@@ -326,7 +326,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def parse_json_file(cls: Type[T], path: PathLike) -> T:
         """Parse a plugin definition from a JSON file.
 
-        Parameters:
+        Args:
             path: The path to the JSON file.
 
         Returns:

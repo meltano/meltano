@@ -26,7 +26,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 def plugin_def_json(plugin_def):
     """Convert plugin defenition to json.
 
-    Parameters:
+    Args:
         plugin_def: Plugin definition
 
     Returns:

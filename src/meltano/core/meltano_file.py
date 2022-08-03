@@ -30,7 +30,7 @@ class MeltanoFile(Canonical):
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
 
-        Parameters:
+        Args:
             version: The meltano.yml version, currently always 1.
             default_environment: The default environment to use for commands in this project.
             plugins: Plugin configuration for this project.
@@ -55,7 +55,7 @@ class MeltanoFile(Canonical):
     def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
         """Parse the meltano.yml file and return it as `ProjectPlugin` instances.
 
-        Parameters:
+        Args:
             plugins: Dict of plugin configurations.
 
         Returns:
@@ -87,7 +87,7 @@ class MeltanoFile(Canonical):
     def load_schedules(self, schedules: list[dict]) -> list[Schedule]:
         """Parse the meltano.yml file and return it as Schedule instances.
 
-        Parameters:
+        Args:
             schedules: List of schedule configurations.
 
         Returns:
@@ -99,7 +99,7 @@ class MeltanoFile(Canonical):
     def load_environments(environments: Iterable[dict]) -> list[Environment]:
         """Parse `Environment` objects from python objects.
 
-        Parameters:
+        Args:
             environments: Sequence of environment dictionaries.
 
         Returns:
@@ -111,7 +111,7 @@ class MeltanoFile(Canonical):
     def load_job_tasks(jobs: Iterable[dict]) -> list[TaskSets]:
         """Parse `TaskSets` objects from python objects.
 
-        Parameters:
+        Args:
             jobs: Sequence of job dictionaries.
 
         Returns:
@@ -123,7 +123,7 @@ class MeltanoFile(Canonical):
     def get_plugins_for_mappings(mapper_config: dict) -> list[ProjectPlugin]:
         """Mapper plugins are a special case. They are not a single plugin, but actually a list of plugins generated from the mapping config defined within the mapper config.
 
-        Parameters:
+        Args:
             mapper_config: The dict representation of a mapper config found in in meltano.yml.
 
         Returns:

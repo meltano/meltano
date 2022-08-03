@@ -124,7 +124,7 @@ class MockAdapter(BaseAdapter):
     def __init__(self, api_url: str, discovery: dict) -> None:
         """Create a mock HTTP adapter for the Hub.
 
-        Parameters:
+        Args:
             api_url: The base URL of the Hub.
             discovery: A parsed discovery.yml file.
         """

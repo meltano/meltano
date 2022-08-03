@@ -14,7 +14,7 @@ class EnvironmentAlreadyExistsError(Exception):
     def __init__(self, environment: Environment):
         """Create a new exception.
 
-        Parameters:
+        Args:
             environment: An Environment object.
         """
         self.environment = environment
@@ -27,7 +27,7 @@ class EnvironmentService:
     def __init__(self, project: Project):
         """Create a new EnvironmentService for a Meltano Project.
 
-        Parameters:
+        Args:
             A Meltano Project.
         """
         self.project = project
@@ -35,7 +35,7 @@ class EnvironmentService:
     def add(self, name) -> Environment:
         """Create a new Environment in `meltano.yml`.
 
-        Parameters:
+        Args:
             name: Name for new Environment.
 
         Returns:
@@ -46,7 +46,7 @@ class EnvironmentService:
     def add_environment(self, environment: Environment):
         """Add an Environment object to `meltano.yml`.
 
-        Parameters:
+        Args:
             environment: An instance of meltano.core.environment.Environment to add.
 
         Raises:
@@ -76,7 +76,7 @@ class EnvironmentService:
     def remove(self, name: str) -> str:
         """Remove an Environment by name.
 
-        Parameters:
+        Args:
             name: Name of the Environment that should be removed.
 
         Returns:
