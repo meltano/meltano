@@ -293,11 +293,25 @@ class BlockParser:  # noqa: D101
                     mapping=self._mappings_ref.get(next_block),
                     idx=next_block,
                 )
-                blocks.append(
-                    builder.make_block(
-                        plugin,
+                # Checks to see if the mapper plugin name is the same as the mappings name
+                # If they both match then a validation error is raised because the
+                # meltano run command needs the mappings name to obtain the settings to
+                # pass to the parent mapper plugin.  We also want to fail if the user names them
+                # the same to stop errors due to ambiguous commands.
+                if plugin.name == self._mappings_ref.get(next_block):
+                    self.log.warning(
+                        "Found unexpected mapper plugin name. ",
+                        plugin_name=plugin.name,
                     )
-                )
+                    raise BlockSetValidationError(
+                        f"Expected unique mappings name not the mapper plugin name: {plugin.name}."
+                    )
+                else:
+                    blocks.append(
+                        builder.make_block(
+                            plugin,
+                        )
+                    )
             elif plugin.type == PluginType.LOADERS:
                 self.log.debug("blocks", offset=offset, idx=next_block)
                 blocks.append(builder.make_block(plugin))
