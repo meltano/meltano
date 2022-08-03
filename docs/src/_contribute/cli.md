@@ -56,13 +56,21 @@ For example `--help` and `-h`, `--tasks` and `-t`, `--force` and `-f`.
 
 1. Organize in a command group around a feature below the top level where possible.
 2. Coalesce commands that operate on the same resource of a feature as a group of sub-commands.
-3. Use transitive verbs like `delete`, `set`, `list`, `get` as sub-commands to perform work within a group where appropriate.
+3. Use transitive verbs like `remove`, `set`, `list`, `get` as sub-commands to perform work within a group where appropriate.
 
 ```
 meltano <feature-group> add <something>
 meltano <feature-group> delete <something>
 meltano <feature-group> get <something>
 ```
+
+#### Standardized verbs
+
+- Use `add` and `remove` to create or remove a construct like "schedule" or "job"
+- Use `set` to override or update a construct after creation as in `meltano jobs JOB_NAME set`
+- Use `get`, `set`, `list`, `clear` for operating on variable like artifacts like "state" and "secrets"
+- Use `list` to enumerate items as in `meltano job list`
+- Use `describe` to show details about an item
 
 ### Abbreviations
 
