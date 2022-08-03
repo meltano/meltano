@@ -228,7 +228,7 @@ In the context of something like a more conversational guide or other online doc
 
 ```
 # TAP and TARGET are upper case since they are required inputs
-meltano run <TAP> <TARGET>
+meltano run <TAP_NAME> <TARGET_NAME>
 
 # MAPPER1 is wrapped in [] since its optional and a series
 meltano <TAP> [MAPPER1 ...] <TARGET>
