@@ -265,7 +265,7 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
 def find_named(xs: Iterable[dict], name: str, obj_type: type = None) -> dict:
     """Find an object by its 'name' key.
 
-    Args:
+    Parameters:
         xs: Some iterable of objects against which that name should be matched.
         name: Used to match against the input objects.
         obj_type: Object type used for generating the exception message.
@@ -350,7 +350,7 @@ class EnvironmentVariableNotSetError(Exception):
 
     def __init__(self, env_var: str):
         """Initialize the error.
-        Args:
+        Parameters:
             env_var: the unset environment variable name
         """
         super().__init__(env_var)
@@ -425,7 +425,7 @@ def human_size(num, suffix="B"):
 def hash_sha256(value: str) -> str:
     """Get the sha256 hash of a string.
 
-    Args:
+    Parameters:
         value: the string value to hash.
 
     Returns:
@@ -442,7 +442,7 @@ def hash_sha256(value: str) -> str:
 def format_exception(exception: BaseException) -> str:
     """Get the exception with its traceback in the standard format it would have been printed with.
 
-    Args:
+    Parameters:
         The exception value to be turned into a string.
 
     Returns:
@@ -459,7 +459,7 @@ def safe_hasattr(obj: Any, name: str) -> bool:
 
     This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
 
-    Args:
+    Parameters:
         obj: The object to check.
         name: The name of the attribute to check.
 

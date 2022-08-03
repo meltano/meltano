@@ -78,7 +78,7 @@ class EnvironmentContext(SelfDescribingJson):
     def get_process_timestamp(process: psutil.Process) -> str:
         """Obtain the creation time of a process as a ISO 8601 timestamp.
 
-        Args:
+        Parameters:
             process: The process to obtain the creation time from.
 
         Returns:

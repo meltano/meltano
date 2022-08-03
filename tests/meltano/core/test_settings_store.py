@@ -24,7 +24,7 @@ class DummySettingsService(SettingsService):
     def __init__(self, *args, **kwargs):
         """Instantiate new DummySettingsService instance.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to the superclass.
             kwargs: Keyword arguments to pass to the superclass.
         """

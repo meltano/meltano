@@ -25,7 +25,7 @@ class VariantNotFoundError(Exception):
     def __init__(self, plugin: PluginDefinition, variant_name: str):
         """Create a new VariantNotFoundError.
 
-        Args:
+        Parameters:
             plugin: The plugin definition.
             variant_name: The name of the variant that was not found.
         """
@@ -123,7 +123,7 @@ class PluginType(YAMLEnum):
     def value_exists(cls, value: str) -> bool:
         """Check if a plugin type exists.
 
-        Args:
+        Parameters:
             value: The plugin type to check.
 
         Returns:
@@ -146,7 +146,7 @@ class PluginType(YAMLEnum):
     def from_cli_argument(cls, value: str) -> PluginType:
         """Get the plugin type from a CLI argument.
 
-        Args:
+        Parameters:
             value: The CLI argument.
 
         Returns:
@@ -168,7 +168,7 @@ class PluginRef(Canonical):
     def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):
         """Create a new PluginRef.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugin.
             name: The name of the plugin.
             kwargs: Additional keyword arguments.
@@ -193,7 +193,7 @@ class PluginRef(Canonical):
     def __eq__(self, other: PluginRef) -> bool:
         """Compare two plugin references.
 
-        Args:
+        Parameters:
             other: The other plugin reference.
 
         Returns:
@@ -212,7 +212,7 @@ class PluginRef(Canonical):
     def set_presentation_attrs(self, extras):
         """Set the presentation attributes of the plugin reference.
 
-        Args:
+        Parameters:
             extras: The presentation attributes.
         """
         self.update(
@@ -248,7 +248,7 @@ class Variant(NameEq, Canonical):
     ):
         """Create a new Variant.
 
-        Args:
+        Parameters:
             name: The name of the variant.
             original: Whether the variant is the original one.
             deprecated: Whether the variant is deprecated.
@@ -296,7 +296,7 @@ class PluginDefinition(PluginRef):
     ):
         """Create a new PluginDefinition.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugin.
             name: The name of the plugin.
             namespace: The namespace of the plugin.
@@ -355,7 +355,7 @@ class PluginDefinition(PluginRef):
     def get_variant(self, variant_name: str) -> Variant:
         """Get the variant with the given name.
 
-        Args:
+        Parameters:
             variant_name: The name of the variant.
 
         Returns:
@@ -372,7 +372,7 @@ class PluginDefinition(PluginRef):
     def find_variant(self, variant_or_name: str | Variant = None):
         """Find the variant with the given name or variant.
 
-        Args:
+        Parameters:
             variant_or_name: The variant or name of the variant.
 
         Returns:
@@ -395,7 +395,7 @@ class PluginDefinition(PluginRef):
     def variant_label(self, variant):
         """Return label for specified variant.
 
-        Args:
+        Parameters:
             variant: The variant.
 
         Returns:
@@ -427,7 +427,7 @@ class PluginDefinition(PluginRef):
     ) -> PluginDefinition:
         """Create a new PluginDefinition from a StandalonePlugin.
 
-        Args:
+        Parameters:
             plugin: The plugin.
 
         Returns:
@@ -462,7 +462,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
     def __init__(self, plugin_def: PluginDefinition, variant: Variant):
         """Create a new BasePlugin.
 
-        Args:
+        Parameters:
             plugin_def: The plugin definition.
             variant: The variant.
         """
@@ -474,7 +474,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
     def __eq__(self, other: BasePlugin):
         """Compare two plugins.
 
-        Args:
+        Parameters:
             other: The other plugin.
 
         Returns:
@@ -504,7 +504,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
     def __getattr__(self, attr: str):
         """Get the value of the setting.
 
-        Args:
+        Parameters:
             attr: The name of the setting.
 
         Returns:
@@ -612,7 +612,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
     def env_prefixes(self, for_writing=False) -> list[str]:
         """Return environment variable prefixes to use for settings.
 
-        Args:
+        Parameters:
             for_writing: Whether to return environment variable prefixes for writing.
 
         Returns:
@@ -655,7 +655,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
     def exec_args(self, files: dict):
         """Return the arguments to pass to the plugin runner.
 
-        Args:
+        Parameters:
             files: The files to pass to the plugin runner.
 
         Returns:
@@ -684,7 +684,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
     def process_config(self, config):
         """Process the config for this plugin.
 
-        Args:
+        Parameters:
             config: The config to process.
 
         Returns:
@@ -726,7 +726,7 @@ class StandalonePlugin(Canonical):
     ):
         """Create a locked plugin.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             name: The name of the plugin.
             namespace: The namespace of the plugin.
@@ -771,7 +771,7 @@ class StandalonePlugin(Canonical):
     ):
         """Create a locked plugin from a variant and plugin definition.
 
-        Args:
+        Parameters:
             variant: The variant to create the plugin from.
             plugin_def: The plugin definition to create the plugin from.
 
