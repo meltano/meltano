@@ -110,7 +110,7 @@ class SingerTarget(SingerPlugin):
         output handler (the BookmarkWriter) to handle persisting state messages.
 
         Parameters:
-            plugin_invoker: The invocation handler who's add_out_handler method
+            plugin_invoker: The invocation handler whose `add_out_handler` method
                 will be called to attach the bookmark writer as an additional
                 output handler.
         """
