@@ -2,12 +2,14 @@ import os
 from pathlib import Path
 from typing import Optional
 
-import yaml
-
 from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
+from meltano.core.yaml import configure_yaml
+
+
+yaml = configure_yaml()
 
 
 class TransformAddService:
@@ -32,7 +34,7 @@ class TransformAddService:
             with open(self.packages_file, "w"):
                 pass
 
-        package_yaml = yaml.safe_load(self.packages_file.open()) or {"packages": []}
+        package_yaml = yaml.load(self.packages_file.open()) or {"packages": []}
 
         git_repo = plugin.pip_url
         if not git_repo:
@@ -55,7 +57,7 @@ class TransformAddService:
         package_yaml["packages"].append(package_ref)
 
         with open(self.packages_file, "w") as f:
-            f.write(yaml.dump(package_yaml, default_flow_style=False, sort_keys=False))
+            yaml.dump(package_yaml, f)
 
     def update_dbt_project(self, plugin: ProjectPlugin):
         """Set transform package variables in `dbt_project.yml`.
@@ -69,7 +71,7 @@ class TransformAddService:
         package_name = settings_service.get("_package_name")
         package_vars = settings_service.get("_vars")
 
-        dbt_project_yaml = yaml.safe_load(self.dbt_project_file.open())
+        dbt_project_yaml = yaml.load(self.dbt_project_file.open())
 
         model_def = {}
 
@@ -87,6 +89,4 @@ class TransformAddService:
         dbt_project_yaml["models"][package_name] = model_def
 
         with open(self.dbt_project_file, "w") as f:
-            f.write(
-                yaml.dump(dbt_project_yaml, default_flow_style=False, sort_keys=False)
-            )
+            yaml.dump(dbt_project_yaml, f)
