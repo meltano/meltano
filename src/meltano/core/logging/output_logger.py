@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
@@ -9,7 +11,6 @@ from contextlib import (
     redirect_stdout,
     suppress,
 )
-from typing import Optional
 
 import structlog
 
@@ -26,8 +27,8 @@ class OutputLogger:
         self.outs = {}
 
     def out(
-        self, name: str, logger=None, write_level: Optional[int] = logging.INFO
-    ) -> "Out":
+        self, name: str, logger=None, write_level: int | None = logging.INFO
+    ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
 
         Args:

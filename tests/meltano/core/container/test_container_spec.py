@@ -1,5 +1,7 @@
 """Test container commands."""
 
+from __future__ import annotations
+
 import platform
 from collections import defaultdict
 

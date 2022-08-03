@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from meltano.core.meltano_file import MeltanoFile
 
 

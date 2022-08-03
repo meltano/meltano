@@ -1,5 +1,7 @@
 """Defines PluginLocationRemoveStatus, PluginLocationRemoveManager, DbRemoveManager, MeltanoYmlRemoveManager and InstallationRemoveManager."""
 
+from __future__ import annotations
+
 import shutil
 from abc import ABC, abstractmethod
 from enum import Enum

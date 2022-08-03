@@ -1,7 +1,8 @@
 """A "CommandBlock" pattern supporting Meltano plugin's command like `dbt:run`, `dbt:docs` or `dbt:test`."""
+from __future__ import annotations
+
 import asyncio
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List, Optional, Tuple
 
 import structlog
 
@@ -36,7 +37,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def command(self) -> Optional[str]:
+    def command(self) -> str | None:
         """Command is the specific plugin command to use when invoking the plugin (if any)."""
         raise NotImplementedError
 
@@ -53,12 +54,12 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         self,
         name: str,
         log: SubprocessOutputWriter,
-        block_ctx: Dict,
+        block_ctx: dict,
         project: Project,
         plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
-        command: Optional[str],
-        command_args: Tuple[str],
+        command: str | None,
+        command_args: tuple[str],
     ):
         """Configure and return a wrapped plugin invoker.
 
@@ -94,7 +95,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         return self._name
 
     @property
-    def command(self) -> Optional[str]:
+    def command(self) -> str | None:
         """Command is the specific plugin command to use when invoking the plugin.
 
         Returns:
@@ -103,7 +104,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         return self._command
 
     @property
-    def command_args(self) -> Optional[str]:
+    def command_args(self) -> str | None:
         """Command args are the specific plugin command args to use when invoking the plugin (if any).
 
         Returns:
@@ -145,8 +146,8 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
 def plugin_command_invoker(
     plugin: ProjectPlugin,
     project: Project,
-    command: Optional[str],
-    command_args: Optional[List[str]] = None,
+    command: str | None,
+    command_args: list[str] | None = None,
     run_dir: str = None,
 ) -> InvokerCommand:
     """

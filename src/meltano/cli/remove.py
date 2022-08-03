@@ -1,4 +1,6 @@
 """Defines `meltano remove` command."""
+from __future__ import annotations
+
 import click
 
 from meltano.core.plugin import PluginType

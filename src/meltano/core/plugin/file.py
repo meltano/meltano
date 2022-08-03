@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin

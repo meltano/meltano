@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from flask_login import user_logged_in
 from flask_principal import identity_loaded
 

@@ -1,5 +1,7 @@
 """API Plugin Management Blue Print."""
 
+from __future__ import annotations
+
 import asyncio
 import logging
 

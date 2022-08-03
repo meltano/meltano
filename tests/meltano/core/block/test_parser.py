@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from meltano.core.block.parser import is_command_block
 
 

@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class PayloadBuilder:
     def __init__(self, source_name: str, **kwargs):
         self._name = source_name

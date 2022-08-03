@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from werkzeug.utils import secure_filename
 
 from .errors import InvalidFileNameError

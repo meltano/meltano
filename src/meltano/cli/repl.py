@@ -1,5 +1,7 @@
 """The Meltano REPL."""
 
+from __future__ import annotations
+
 import click
 
 from meltano.cli.cli import cli

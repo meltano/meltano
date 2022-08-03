@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from flask import appcontext_pushed, g  # noqa: WPS347
 from flask_principal import Identity, Need

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import mock
 
 from asserts import assert_cli_runner

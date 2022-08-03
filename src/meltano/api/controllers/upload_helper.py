@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from os import SEEK_END
 from os.path import join
 

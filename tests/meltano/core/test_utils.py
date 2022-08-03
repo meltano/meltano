@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest  # noqa: F401
 
 from meltano.core.utils import flatten, nest, pop_at_path, set_at_path

@@ -2,6 +2,8 @@
 
 This module contains the SingerTap class as well as a supporting methods.
 """
+from __future__ import annotations
+
 import asyncio
 import json
 import logging
@@ -11,7 +13,6 @@ from asyncio.streams import StreamReader
 from hashlib import sha1
 from io import StringIO
 from pathlib import Path
-from typing import Tuple
 
 import structlog
 from jsonschema import Draft4Validator
@@ -216,7 +217,7 @@ class SingerTap(SingerPlugin):
     async def look_up_state_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: Tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),
     ):
         """Look up state before being invoked if in sync mode.
 
@@ -303,7 +304,7 @@ class SingerTap(SingerPlugin):
     async def discover_catalog_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: Tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),
     ):
         """Discover Singer catalog before invoking tap if in sync mode.
 
@@ -456,7 +457,7 @@ class SingerTap(SingerPlugin):
 
     @hook("before_invoke")
     async def apply_catalog_rules_hook(
-        self, plugin_invoker: PluginInvoker, exec_args: Tuple[str, ...] = ()
+        self, plugin_invoker: PluginInvoker, exec_args: tuple[str, ...] = ()
     ):
         """Apply catalog rules before invoke if in sync mode.
 
@@ -479,7 +480,7 @@ class SingerTap(SingerPlugin):
     def apply_catalog_rules(  # noqa: WPS213,WPS231
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: Tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),
     ):
         """Apply Singer catalog and schema rules to discovered catalog.
 

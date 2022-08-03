@@ -1,4 +1,6 @@
 """New Project Initialization CLI."""
+from __future__ import annotations
+
 import logging
 
 import click

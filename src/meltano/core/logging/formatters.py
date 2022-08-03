@@ -1,6 +1,8 @@
 """Various utils and formatters for log rendering control."""
 
-from typing import Optional, Sequence
+from __future__ import annotations
+
+from typing import Sequence
 
 import structlog
 from structlog.types import Processor
@@ -37,7 +39,7 @@ def console_log_formatter(colors: bool = False) -> None:
 
 def key_value_formatter(
     sort_keys: bool = False,
-    key_order: Optional[Sequence[str]] = None,
+    key_order: Sequence[str] | None = None,
     drop_missing: bool = False,
 ) -> None:
     """Create a logging formatter that renders lines in key=value format."""

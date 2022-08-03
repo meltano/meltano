@@ -1,5 +1,7 @@
 """OAuth providers."""
 
+from __future__ import annotations
+
 from authlib.integrations.flask_client import OAuth as OAuthClient
 from flask import Blueprint, Flask, render_template, url_for
 

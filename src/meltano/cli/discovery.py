@@ -1,5 +1,7 @@
 """Discoverable Plugins CLI."""
 
+from __future__ import annotations
+
 import click
 
 from meltano.core.hub import MeltanoHubService

@@ -1,5 +1,7 @@
 """Schema creation CLI."""
 
+from __future__ import annotations
+
 import click
 
 from meltano.core.db import DB, project_engine

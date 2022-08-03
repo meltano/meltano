@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging  # noqa: D100
 import sys
 from typing import NoReturn

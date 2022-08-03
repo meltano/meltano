@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sqlalchemy.types as types
 from sqlalchemy import Column
 

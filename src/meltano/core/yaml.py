@@ -1,5 +1,7 @@
 """YAML instance."""
 
+from __future__ import annotations
+
 from ruamel.yaml import YAML
 
 from meltano.core.behavior.canonical import Canonical

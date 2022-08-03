@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import platform
-from typing import List, Optional
 
 import pytest
 import structlog
@@ -23,11 +24,11 @@ from meltano.core.runner.singer import SingerRunner
 class LogEntry:
     def __init__(
         self,
-        name: Optional[str] = None,
-        cmd_type: Optional[str] = None,
-        event: Optional[str] = None,
-        level: Optional[str] = None,
-        stdio: Optional[str] = None,
+        name: str | None = None,
+        cmd_type: str | None = None,
+        event: str | None = None,
+        level: str | None = None,
+        stdio: str | None = None,
     ):
         """Logentries is a simple support class for checking whether a log entry is in a list of dicts.
 
@@ -44,7 +45,7 @@ class LogEntry:
         self.level = level
         self.stdio = stdio
 
-    def matches(self, lines: List[dict]) -> bool:
+    def matches(self, lines: list[dict]) -> bool:
         """Find a matching log line in the provided list of log lines.
 
         It's important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
@@ -86,7 +87,7 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
     Returns:
         bool: Whether or not the exception was found
     """
-    seen_lines: List[dict] = []
+    seen_lines: list[dict] = []
     for line in result_output.splitlines():
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
@@ -98,8 +99,8 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
     return False
 
 
-def assert_log_lines(result_output: str, expected: List[LogEntry]):
-    seen_lines: List[dict] = []
+def assert_log_lines(result_output: str, expected: list[LogEntry]):
+    seen_lines: list[dict] = []
     for line in result_output.splitlines():
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
