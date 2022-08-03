@@ -216,7 +216,7 @@ meltano install [] [PLUGIN_NAME] ...
 
 ### Placeholders and angle brackets
 
-When writing help output its often useful to provide examples that utilize place holders. In complex cases where you're trying illustrate how a user might use feature, its often useful to use actual tap/target/mapping names to illustrate intent. But most commonly, especially for simple examples use common terms e.g. `TAP` rather than `extractor` or `tap-something`. 
+When writing help output its often useful to provide examples that utilize place holders. In complex cases where you're trying illustrate how a user might use feature, its often useful to use actual tap/target/mapping names to illustrate intent. But most commonly, especially for simple examples use common terms e.g. `TAP` rather than `extractor` or `tap-something`.
 
 We also have significant historic use of angle brackets as place holders for user input in our documentation (and also help out). Which often looks like:
 
@@ -242,4 +242,6 @@ their deprecation. Where appropriate the notice and help text should indicate th
 further information. If known, you should also document in what version you expect a command to be fully removed.
 
 Prefer the term "preview" over "beta". Commands that enable a preview feature should be marked as such in help text and
-in the meltano documentation. Where possible if not in the help output, then at least in the documentation, you should also document when the command is expected to graduate from preview status, and what if any short comings, defects, or missing functionality it currently has. 
+in the meltano documentation. Where possible if not in the help output, then at least in the documentation, you should also
+document when the command is expected to graduate from preview status, and what if any short comings, defects, or missing
+functionality it currently has.
