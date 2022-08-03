@@ -96,3 +96,52 @@ class TestCliConfig:
             str(result.exception)
             == "Testing of the Meltano project configuration is not supported"
         )
+
+
+class TestCliConfigSet:
+    def test_environments_order_of_precedence(
+        self, project, cli_runner, tap, project_plugins_service
+    ):
+        with mock.patch(
+            "meltano.cli.config.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            # set base config in `meltano.yml`
+            result = cli_runner.invoke(
+                cli,
+                ["--no-environment", "config", "tap-mock", "set", "test", "base-mock"],
+            )
+            assert_cli_runner(result)
+            base_tap_config = next(
+                (
+                    tap
+                    for tap in project.meltano["plugins"]["extractors"]
+                    if tap["name"] == "tap-mock"
+                ),
+                {},
+            )
+            assert base_tap_config["config"]["test"] == "base-mock"
+
+            # set dev environment config in `meltano.yml`
+            result = cli_runner.invoke(
+                cli,
+                ["--environment=dev", "config", "tap-mock", "set", "test", "dev-mock"],
+            )
+            assert_cli_runner(result)
+            dev_env = next(
+                (
+                    env
+                    for env in project.meltano["environments"]
+                    if env["name"] == "dev"
+                ),
+                {},
+            )
+            tap_config = next(
+                (
+                    tap
+                    for tap in dev_env["config"]["plugins"]["extractors"]
+                    if tap["name"] == "tap-mock"
+                ),
+                {},
+            )
+            assert tap_config["config"]["test"] == "dev-mock"
