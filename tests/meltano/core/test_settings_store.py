@@ -154,70 +154,44 @@ class TestAutoStoreManager:
         environment,
         monkeypatch,
     ):
-        def auto_store(source):
-            return subject.auto_store(setting_name, source)
-
-        # Not writable
-        assert auto_store(Store.CONFIG_OVERRIDE) == preferred_store
-        assert auto_store(Store.ENV) == Store.DOTENV
-        assert auto_store(Store.DEFAULT) == preferred_store
-
-        # Writable
-        assert auto_store(Store.DOTENV) == Store.DOTENV
-        assert auto_store(Store.MELTANO_YML) == Store.MELTANO_YML
-        assert auto_store(Store.DB) == Store.DB
+        assert subject.auto_store(setting_name) == preferred_store
 
         # Meltano environment is selected only when there's an active environment
-        assert auto_store(Store.MELTANO_ENV) == preferred_store
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "active_environment", environment)
-            assert auto_store(Store.MELTANO_ENV) == Store.MELTANO_ENV
-
-        # Fall back when writable store is not supported
-        with unsupported(Store.DB):
-            assert auto_store(Store.DB) == preferred_store
+            if preferred_store == Store.MELTANO_YML:
+                assert subject.auto_store(setting_name) == Store.MELTANO_ENV
 
         with unsupported(Store.DOTENV):
             # Sensitive settings won't fall back on `meltano.yml`
-            if preferred_store == Store.DOTENV:
-                assert auto_store(Store.DOTENV) == Store.DB
+            if setting_name == "password":
+                assert subject.auto_store(setting_name) == Store.DB
             else:
-                assert auto_store(Store.DOTENV) == Store.MELTANO_YML
-                assert auto_store(Store.MELTANO_ENV) == Store.MELTANO_YML
+                assert subject.auto_store(setting_name) == Store.MELTANO_YML
                 with monkeypatch.context() as mpc:
                     mpc.setattr(project, "active_environment", environment)
-                    assert auto_store(Store.DOTENV) == Store.MELTANO_ENV
+                    assert subject.auto_store(setting_name) == Store.MELTANO_ENV
 
         with unsupported(Store.MELTANO_YML):
-            assert auto_store(Store.MELTANO_YML) == Store.DOTENV
-            assert auto_store(Store.MELTANO_ENV) == Store.DOTENV
-            with monkeypatch.context() as mpc:
-                mpc.setattr(project, "active_environment", environment)
-                assert auto_store(Store.MELTANO_ENV) == Store.DOTENV
+            # fall back on dotenv
+            if preferred_store == Store.MELTANO_YML:
+                assert subject.auto_store(setting_name) == Store.DOTENV
+                with monkeypatch.context() as mpc:
+                    mpc.setattr(project, "active_environment", environment)
+                    assert subject.auto_store(setting_name) == Store.DOTENV
 
         with unsupported(Store.DOTENV), unsupported(Store.MELTANO_YML):
-            assert auto_store(Store.DOTENV) == Store.DB
-            assert auto_store(Store.MELTANO_YML) == Store.DB
-            assert auto_store(Store.MELTANO_ENV) == Store.DB
+            assert subject.auto_store(setting_name) == Store.DB
             with monkeypatch.context() as mpc:
                 mpc.setattr(project, "active_environment", environment)
-                assert auto_store(Store.MELTANO_ENV) == Store.DB
+                assert subject.auto_store(setting_name) == Store.DB
 
             with unsupported(Store.DB):
-                assert auto_store(Store.DOTENV) is None
-                assert auto_store(Store.MELTANO_YML) is None
-                assert auto_store(Store.DB) is None
-                assert auto_store(Store.MELTANO_ENV) is None
+                assert subject.auto_store(setting_name) is None
 
         monkeypatch.setattr(project, "readonly", True)
 
-        assert auto_store(Store.CONFIG_OVERRIDE) == Store.DB
-        assert auto_store(Store.ENV) == Store.DB
-        assert auto_store(Store.DOTENV) == Store.DB
-        assert auto_store(Store.MELTANO_YML) == Store.DB
-        assert auto_store(Store.DB) == Store.DB
-        assert auto_store(Store.DEFAULT) == Store.DB
-        assert auto_store(Store.MELTANO_ENV) == Store.DB
+        assert subject.auto_store(setting_name) == Store.DB
 
     def test_get(  # noqa: WPS213
         self,
@@ -247,7 +221,7 @@ class TestAutoStoreManager:
         value, metadata = subject.get("regular")
         assert value == "from_db"
         assert metadata["source"] == Store.DB
-        assert metadata["auto_store"] == Store.DB
+        assert metadata["auto_store"] == Store.MELTANO_YML
         assert metadata["overwritable"] is True
 
         set_value_store("from_meltano_yml", Store.MELTANO_YML)
@@ -270,15 +244,15 @@ class TestAutoStoreManager:
         value, metadata = subject.get("regular")
         assert value == "from_dotenv"
         assert metadata["source"] == Store.DOTENV
-        assert metadata["auto_store"] == Store.DOTENV
-        assert metadata["overwritable"] is True
+        assert metadata["auto_store"] == Store.MELTANO_YML
+        assert metadata["overwritable"] is False
 
         setting_def = subject.find_setting("regular")
         monkeypatch.setenv(dummy_settings_service.setting_env(setting_def), "from_env")
         value, metadata = subject.get("regular")
         assert value == "from_env"
         assert metadata["source"] == Store.ENV
-        assert metadata["auto_store"] == Store.DOTENV
+        assert metadata["auto_store"] == Store.MELTANO_YML
         assert metadata["overwritable"] is False
 
         monkeypatch.setitem(
@@ -330,13 +304,8 @@ class TestAutoStoreManager:
             Store.DB.manager, "set", side_effect=StoreNotSupportedError
         ):
             metadata = set_value("from_db")
-            assert metadata["store"] == Store.DB
-            assert_value_source("from_db", Store.DB)
-
-        # Uses current store
-        metadata = set_value("from_db_new")
-        assert metadata["store"] == Store.DB
-        assert_value_source("from_db_new", Store.DB)
+            assert metadata["store"] == Store.MELTANO_YML
+            assert_value_source("from_db", Store.MELTANO_YML)
 
         # Falls back on `meltano.yml` when current source is not writable
         with unsupported(Store.DB):
@@ -361,37 +330,25 @@ class TestAutoStoreManager:
         assert metadata["store"] == Store.MELTANO_YML
         assert_value_source("from_meltano_yml", Store.MELTANO_YML)
 
-        # Uses current store
-        metadata = set_value("from_meltano_yml_new")
-        assert metadata["store"] == Store.MELTANO_YML
-        assert_value_source("from_meltano_yml_new", Store.MELTANO_YML)
-
         with unsupported(Store.MELTANO_YML):
             # Falls back on `.env` when current store is not supported
             metadata = set_value("from_dotenv")
             assert metadata["store"] == Store.DOTENV
             assert_value_source("from_dotenv", Store.DOTENV)
 
-        # Uses current store
-        metadata = set_value("from_dotenv_new")
-        assert metadata["store"] == Store.DOTENV
-        assert_value_source("from_dotenv_new", Store.DOTENV)
-
         # Falls back on `meltano.yml` when `.env` is not supported
         with unsupported(Store.DOTENV):
             metadata = set_value("from_meltano_yml")
             assert metadata["store"] == Store.MELTANO_YML
-
             # Even though `.env` can't be overwritten
-            assert_value_source("from_dotenv_new", Store.DOTENV)
+            assert_value_source("from_dotenv", Store.DOTENV)
 
         # Falls back on system database when neither `.env` or `meltano.yml` are supported
         with unsupported(Store.DOTENV), unsupported(Store.MELTANO_YML):
             metadata = set_value("from_db")
             assert metadata["store"] == Store.DB
-
             # Even though `.env` can't be overwritten
-            assert_value_source("from_dotenv_new", Store.DOTENV)
+            assert_value_source("from_dotenv", Store.DOTENV)
 
         # Fails if no stores are supported
         with unsupported(Store.DOTENV), unsupported(Store.MELTANO_YML), unsupported(
@@ -400,7 +357,7 @@ class TestAutoStoreManager:
             with pytest.raises(StoreNotSupportedError):
                 set_value("nowhere")
 
-            assert_value_source("from_dotenv_new", Store.DOTENV)
+            assert_value_source("from_dotenv", Store.DOTENV)
 
         # Falls back on system database when project is readonly
         monkeypatch.setattr(project, "readonly", True)
@@ -408,7 +365,7 @@ class TestAutoStoreManager:
         assert metadata["store"] == Store.DB
 
         # Even though `.env` can't be overwritten
-        assert_value_source("from_dotenv_new", Store.DOTENV)
+        assert_value_source("from_dotenv", Store.DOTENV)
 
     def test_unset(  # noqa: WPS213
         self,
