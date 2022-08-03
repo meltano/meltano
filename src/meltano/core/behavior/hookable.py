@@ -65,7 +65,7 @@ class HookObject(metaclass=Hookable):
         """
         Trigger all registered before and after functions for a given hook - yielding to the caller in between.
 
-        Parameters:
+        Args:
             hook_name: The hook who's registered functions that should be triggered
 
         Yields: None

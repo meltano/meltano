@@ -41,7 +41,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     ):
         """Configure and return a wrapped plugin invoker extendable for use as an IOBlock or PluginCommandBlock.
 
-        Parameters:
+        Args:
             block_ctx: context that should be used for this instance to do things like obtaining project settings.
             project: that should be used to obtain the ProjectSettingsService.
             plugins_service: that configured plugins service.
@@ -87,7 +87,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     async def start(self, *args, **kwargs):
         """Invoke the process asynchronously.
 
-        Parameters:
+        Args:
             args: arguments to pass to the process invoker.
             kwargs: keyword arguments to pass to the process invoker.
 
@@ -108,7 +108,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     async def stop(self, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.
 
-        Parameters:
+        Args:
             kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:
@@ -216,7 +216,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst.
 
-        Parameters:
+        Args:
             dst:  The destination stdout output should be written too.
 
         Raises:
@@ -230,7 +230,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     def stderr_link(self, dst: SubprocessOutputWriter):
         """Use stderr_link to instruct block to link/write stderr content to dst.
 
-        Parameters:
+        Args:
             dst:  The destination stderr output should be written too.
 
         Raises:
@@ -244,7 +244,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     async def pre(self, context) -> None:
         """Pre triggers preparation of the underlying plugin.
 
-        Parameters:
+        Args:
             context: The context with which to update the invoker
         """
         self.invoker.context = context
@@ -281,7 +281,7 @@ class SingerBlock(InvokerBase, IOBlock):
     ):
         """Configure and return a Singer plugin wrapped as an IOBlock.
 
-        Parameters:
+        Args:
             block_ctx: the block context.
             project:  the project to use to obtain project settings.
             plugins_service: the plugins service.
@@ -354,7 +354,7 @@ class SingerBlock(InvokerBase, IOBlock):
     async def stop(self, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.
 
-        Parameters:
+        Args:
             kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:

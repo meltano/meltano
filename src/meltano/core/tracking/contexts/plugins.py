@@ -49,7 +49,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     def __init__(self, plugins: list(tuple[ProjectPlugin, str | None])):
         """Initialize a meltano tracking plugin context.
 
-        Parameters:
+        Args:
             plugins: The Meltano plugins and the requested command.
         """
         super().__init__(

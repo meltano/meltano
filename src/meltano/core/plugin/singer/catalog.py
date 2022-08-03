@@ -48,7 +48,7 @@ class CatalogRule:
     def match(self, tap_stream_id: str, breadcrumb: Optional[List[str]] = None) -> bool:
         """Evaluate if rule matches a stream or breadcrumb.
 
-        Parameters:
+        Args:
             tap_stream_id: Singer stream identifier.
             breadcrumb: JSON property breadcrumb.
 
@@ -116,7 +116,7 @@ class SelectPattern(NamedTuple):
     def parse(cls, pattern: str):
         """Parse a SelectPattern instance from a string pattern.
 
-        Parameters:
+        Args:
             pattern: Stream or property selection pattern.
 
         Returns:
@@ -151,7 +151,7 @@ class SelectPattern(NamedTuple):
 def select_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
     """Create metadata rules from `select` patterns.
 
-    Parameters:
+    Args:
         patterns: Iterable of `select` string patterns.
 
     Returns:
@@ -196,7 +196,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
 def select_filter_metadata_rules(patterns: Iterable[str]) -> List[MetadataRule]:
     """Create metadata rules from `select_filter` patterns.
 
-    Parameters:
+    Args:
         patterns: Iterable of `select_filter` string patterns.
 
     Returns:
@@ -233,7 +233,7 @@ def path_property(path: str) -> str:
     As we traverse the catalog tree, we build a materialized path
     to keep track of the parent nodes.
 
-    Parameters:
+    Args:
         path: String representing a property path in the JSON schema.
 
     Returns:
@@ -251,7 +251,7 @@ def path_property(path: str) -> str:
 def property_breadcrumb(props: List[str]) -> List[str]:
     """Create breadcrumb from properties path list.
 
-    Parameters:
+    Args:
         props: List of strings representing a property breadcrumb in the JSON object.
 
     Returns:
@@ -574,7 +574,7 @@ class ListSelectedExecutor(CatalogExecutor):
     def node_selection(node: Node) -> SelectionType:
         """Get selection type from metadata entry.
 
-        Parameters:
+        Args:
             node: Catalog metadata dictionary.
 
         Returns:

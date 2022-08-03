@@ -37,7 +37,7 @@ class ProjectAddService:
     ):
         """Create a new Project Add Service.
 
-        Parameters:
+        Args:
             project: The project to add plugins to.
             plugins_service: The project plugins service.
         """
@@ -53,7 +53,7 @@ class ProjectAddService:
     ) -> ProjectPlugin:
         """Add a new plugin to the project.
 
-        Parameters:
+        Args:
             plugin_type: The type of the plugin to add.
             plugin_name (str): The name of the plugin to add.
             lock: Whether to generate a lockfile for the plugin.
@@ -89,7 +89,7 @@ class ProjectAddService:
     def add_plugin(self, plugin: ProjectPlugin):
         """Add a plugin to the project.
 
-        Parameters:
+        Args:
             plugin: The plugin to add.
 
         Returns:
@@ -104,7 +104,7 @@ class ProjectAddService:
     ):
         """Add all required plugins to the project.
 
-        Parameters:
+        Args:
             plugin: The plugin to get requirements from.
             lock: Whether to generate a lockfile for the plugin.
 

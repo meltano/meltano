@@ -24,7 +24,7 @@ class ScheduleAlreadyExistsError(Exception):
     def __init__(self, schedule: Schedule):
         """Initialize the exception.
 
-        Parameters:
+        Args:
             schedule: The schedule that already exists.
         """
         self.schedule = schedule
@@ -36,7 +36,7 @@ class ScheduleDoesNotExistError(Exception):
     def __init__(self, name: str):
         """Initialize the exception.
 
-        Parameters:
+        Args:
             name: The name of the schedule that does not exist.
 
         """
@@ -49,7 +49,7 @@ class ScheduleNotFoundError(Exception):
     def __init__(self, namespace: str):
         """Initialize the exception.
 
-        Parameters:
+        Args:
             namespace: The namespace that had no associated schedules.
         """
         self.namespace = namespace
@@ -61,7 +61,7 @@ class ScheduleService:
     def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
         """Initialize a ScheduleService for a project to manage a projects schedules.
 
-        Parameters:
+        Args:
             project: The project whos schedules you wish to interact with.
             plugins_service: The project plugins service.
         """
@@ -82,7 +82,7 @@ class ScheduleService:
     ) -> Schedule:
         """Add a scheduled legacy elt task.
 
-        Parameters:
+        Args:
             session: The active sqlalchemy session.
             name: The name of the schedule.
             extractor:  The name of the extractor.
@@ -107,7 +107,7 @@ class ScheduleService:
     def add(self, name: str, job: str, interval: str, **env) -> Schedule:
         """Add a scheduled job.
 
-        Parameters:
+        Args:
             name: The name of the schedule.
             job: The name of the job.
             interval: The interval of the job.
@@ -123,7 +123,7 @@ class ScheduleService:
     def remove(self, name) -> str:
         """Remove a schedule from the project.
 
-        Parameters:
+        Args:
             name: The name of the schedule.
 
         Returns:
@@ -134,7 +134,7 @@ class ScheduleService:
     def default_start_date(self, session, extractor: str) -> datetime:
         """Obtain the default start date for an elt schedule.
 
-        Parameters:
+        Args:
             session: The session to use.
             extractor: The extractor to get the start_date from.
 
@@ -166,7 +166,7 @@ class ScheduleService:
     def add_schedule(self, schedule: Schedule) -> Schedule:
         """Add a schedule to the project.
 
-        Parameters:
+        Args:
             schedule: The schedule to add.
 
         Returns:
@@ -187,7 +187,7 @@ class ScheduleService:
     def remove_schedule(self, name: str) -> str:
         """Remove a schedule.
 
-        Parameters:
+        Args:
             name: The name of the schedule.
 
         Returns:
@@ -211,7 +211,7 @@ class ScheduleService:
     def update_schedule(self, schedule: Schedule):
         """Update a schedule.
 
-        Parameters:
+        Args:
             schedule: The schedule to update.
 
         Raises:
@@ -230,7 +230,7 @@ class ScheduleService:
         Example:
             `tap_carbon` would yield the first schedule that runs for the `tap-carbon` extractor.
 
-        Parameters:
+        Args:
             namespace: The plugin namespace to search.
 
         Returns:
@@ -263,7 +263,7 @@ class ScheduleService:
     def find_schedule(self, name) -> Schedule:
         """Find a schedule by name.
 
-        Parameters:
+        Args:
             name: the name of the schedule to find
 
         Returns:
@@ -282,7 +282,7 @@ class ScheduleService:
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 
-        Parameters:
+        Args:
             schedule: The schedule whos elt task or named job to run.
             args: The arguments to pass to the elt task or named job.
             env: The environment to run the elt task or named job in.
