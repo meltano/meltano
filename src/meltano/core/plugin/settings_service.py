@@ -56,13 +56,18 @@ class PluginSettingsService(SettingsService):
         ) as strict_env_var_mode:
 
             # Expand root env w/ os.environ
-            # TODO: dotenv
             expanded_project_env = expand_env_vars(
                 project_settings_service.env,
                 os.environ,
                 raise_if_missing=strict_env_var_mode,
             )
-
+            expanded_project_env.update(
+                expand_env_vars(
+                    self.project.dotenv_env,
+                    os.environ,
+                    raise_if_missing=strict_env_var_mode,
+                )
+            )
             # Expand active env w/ expanded root env
             expanded_active_env = (
                 expand_env_vars(

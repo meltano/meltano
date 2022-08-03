@@ -109,25 +109,3 @@ def test_expand_env_vars_nested():
     }
 
     assert expand_env_vars(input_dict, env) == expected_output
-
-
-def test_expand_env_vars_expanded_only():
-    input_dict = {
-        "some_key": 12,
-        "some_var": "${ENV_VAR_1}",
-        "nested": {
-            "${THIS_DOES_NOT_EXPAND}": "another_val",
-            "another_layer": {"nested_var": "${ENV_VAR_2}"},
-        },
-        "another_top_level_var": "${ENV_VAR_2}",
-    }
-
-    expected_output = {
-        "some_var": "substituted_1",
-        "nested": {
-            "another_layer": {"nested_var": "substituted_2"},
-        },
-        "another_top_level_var": "substituted_2",
-    }
-
-    assert expand_env_vars(input_dict, env, expanded_only=True) == expected_output

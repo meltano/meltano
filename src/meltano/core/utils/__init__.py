@@ -361,16 +361,12 @@ class EnvironmentVariableNotSetError(Exception):
         return f"{self.env_var} referenced but not set."
 
 
-def expand_env_vars(
-    raw_value, env: Dict, raise_if_missing: bool = False, expanded_only: bool = False
-):
+def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
     if isinstance(raw_value, dict):
-        expanded_dict = {}
-        for key, val in raw_value.items():
-            expanded_val = expand_env_vars(val, env, raise_if_missing)
-            if expanded_val:
-                expanded_dict[key] = expanded_val
-        return expanded_dict
+        return {
+            key: expand_env_vars(val, env, raise_if_missing)
+            for key, val in raw_value.items()
+        }
     elif not isinstance(raw_value, str):
         return raw_value
 
@@ -386,9 +382,6 @@ def expand_env_vars(
         """,
         re.VERBOSE,
     )
-
-    if expanded_only and not var_matcher.match(raw_value):
-        return None
 
     def subst(match) -> str:
         try:
