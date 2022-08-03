@@ -57,20 +57,17 @@ class PluginSettingsService(SettingsService):
 
             # Expand root env w/ os.environ
             # TODO: dotenv
-            expanded_env = os.environ
-            expanded_env.update(
-                expand_env_vars(
-                    self.project.meltano.env,
-                    expanded_env,
-                    raise_if_missing=strict_env_var_mode,
-                )
+            expanded_project_env = expand_env_vars(
+                project_settings_service.env,
+                os.environ,
+                raise_if_missing=strict_env_var_mode,
             )
 
             # Expand active env w/ expanded root env
-            expanded_env.update(
+            expanded_active_env = (
                 expand_env_vars(
                     self.project.active_environment.env,
-                    expanded_env,
+                    expanded_project_env,
                     raise_if_missing=strict_env_var_mode,
                 )
                 if self.project.active_environment
@@ -78,19 +75,17 @@ class PluginSettingsService(SettingsService):
             )
 
             # Expand root plugin env w/ expanded active env
-            expanded_env.update(
-                expand_env_vars(
-                    self.plugin.env,
-                    expanded_env,
-                    raise_if_missing=strict_env_var_mode,
-                )
+            expanded_root_plugin_env = expand_env_vars(
+                self.plugin.env,
+                expanded_active_env,
+                raise_if_missing=strict_env_var_mode,
             )
 
             # Expand active env plugin env w/ expanded root plugin env
-            expanded_env.update(
+            expanded_active_env_plugin_env = (
                 expand_env_vars(
                     self.environment_plugin_config.env,
-                    expanded_env,
+                    expanded_root_plugin_env,
                     raise_if_missing=strict_env_var_mode,
                 )
                 if self.environment_plugin_config
@@ -98,12 +93,13 @@ class PluginSettingsService(SettingsService):
             )
 
         self.env_override = {
-            **project_settings_service.env,  # project level environment variables
+            **expanded_project_env,  # project level environment variables
             **project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
             **self.env_override,  # plugin level overrides, passed in as **kwargs and set to self.env_overrides by super().__init__ above
             **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
-            **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition,
-            **expanded_env,
+            **expanded_root_plugin_env,  # env vars stored under the `env:` key of the plugin definition,
+            **expanded_active_env,  # env vars under `env:` key of active environment
+            **expanded_active_env_plugin_env,  # env vars under `env` key of active environment plugin definition
         }
 
     @property

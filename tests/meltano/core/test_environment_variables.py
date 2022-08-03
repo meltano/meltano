@@ -339,5 +339,6 @@ def test_environment_variable_inheritance_meltano_env_only(
             "test-environment-inheritance",
         ],
     )
+    breakpoint()
     assert_cli_runner(result)
     assert result.stdout.strip() == "STACKED=12"
