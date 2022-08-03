@@ -176,10 +176,9 @@ class TestProjectSettingsService:
     ):
         # make sure that meltano setting values are written to the root of `meltano.yml`
         # even if there is an active environment
-        with monkeypatch.context() as mpc:
-            mpc.setattr(subject.project, "active_environment", environment)
-            assert subject.project.active_environment == environment
-            subject.set("database_max_retries", 10000)
-            value, source = subject.get_with_source("database_max_retries")
-            assert source == SettingValueStore.MELTANO_YML
-            assert value == 10000
+        monkeypatch.setattr(subject.project, "active_environment", environment)
+        assert subject.project.active_environment == environment
+        subject.set("database_max_retries", 10000)
+        value, source = subject.get_with_source("database_max_retries")
+        assert source == SettingValueStore.MELTANO_YML
+        assert value == 10000
