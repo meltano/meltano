@@ -743,7 +743,7 @@
           ]
         }
       ],
-      "description": "https://www.meltano.com/docs/orchestration.html#orchestration",
+      "description": "https://docs.meltano.com/guide/orchestration",
       "additionalProperties": false,
       "properties": {
         "name": {

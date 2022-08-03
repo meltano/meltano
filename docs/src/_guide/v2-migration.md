@@ -59,7 +59,7 @@ meltano remove files dbt
 ```
 
 Removing a file bundle _does not_ remove any files from your `transform/` directory.
-Manually remove `transform/profiles.yml` to complete clean-up (as adapter-specific installs come with their own `profiles.yml` in `transform/profiles/<adapter name>/profiles.yml`).
+Manually remove `transform/profile/profiles.yml` to complete clean-up (as adapter-specific installs come with their own `profiles.yml` in `transform/profiles/<adapter name>/profiles.yml`).
 
 ## Removed
 
