@@ -1139,17 +1139,32 @@ class AutoStoreManager(SettingsStoreManager):
         stores.remove(SettingValueStore.AUTO)
         return stores
 
+    def ensure_supported(self, store, method="set"):
+        """Return if a given store is supported for the given method.
+
+        Args:
+            store: The store to check.
+            method: The method to check for the given store.
+
+        Returns:
+            True if store supports method.
+        """
+        try:
+            manager = self.manager_for(store)
+            manager.ensure_supported(method)
+            return True
+        except StoreNotSupportedError:
+            return False
+
     def auto_store(  # noqa: WPS231 # Too complex
         self,
         name: str,
-        source: SettingValueStore,
         setting_def: SettingDefinition | None = None,
     ) -> SettingValueStore | None:
         """Get first valid writable SettingValueStore instance for a Setting.
 
         Args:
             name: Setting name.
-            source: Default SettingValueStore.
             setting_def: SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
 
         Returns:
@@ -1157,39 +1172,48 @@ class AutoStoreManager(SettingsStoreManager):
         """
         setting_def = setting_def or self.find_setting(name)
 
-        store: SettingValueStore = source
+        # only the system database is available in readonly mode
+        if self.project.readonly:
+            if self.ensure_supported(store=SettingValueStore.DB):
+                return SettingValueStore.DB
+            return None
 
-        prefer_dotenv = (
-            setting_def and (setting_def.is_redacted or setting_def.env_specific)
-        ) or source is SettingValueStore.ENV
+        # value is a secret
+        if setting_def and setting_def.is_redacted:
+            if self.ensure_supported(store=SettingValueStore.DOTENV):
+                return SettingValueStore.DOTENV
+            elif self.ensure_supported(store=SettingValueStore.DB):
+                return SettingValueStore.DB
+            # ensure secrets don't leak into other stores
+            return None
 
-        tried = set()
-        while True:
-            try:
-                manager = self.manager_for(store)
-                manager.ensure_supported(method="set")
-                return store
-            except StoreNotSupportedError:
-                tried.add(store)
+        # value is env-specific
+        if setting_def and setting_def.env_specific:
+            if self.ensure_supported(store=SettingValueStore.DOTENV):
+                return SettingValueStore.DOTENV
 
-                if SettingValueStore.MELTANO_ENV not in tried and not prefer_dotenv:
-                    store = SettingValueStore.MELTANO_ENV
-                    continue
+        # no active meltano environment
+        if not self.project.active_environment:
+            # return root `meltano.yml`
+            if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
+                return SettingValueStore.MELTANO_YML
+            # fall back to dotenv
+            elif self.ensure_supported(store=SettingValueStore.DOTENV):
+                return SettingValueStore.DOTENV
+            # fall back to meltano system db
+            elif self.ensure_supported(store=SettingValueStore.DB):
+                return SettingValueStore.DB
+            return None
 
-                if SettingValueStore.MELTANO_YML not in tried and not prefer_dotenv:
-                    store = SettingValueStore.MELTANO_YML
-                    continue
-
-                if SettingValueStore.DOTENV not in tried:
-                    store = SettingValueStore.DOTENV
-                    continue
-
-                if SettingValueStore.DB not in tried:
-                    store = SettingValueStore.DB
-                    continue
-
-                break
-
+        # any remaining config routed to meltano environment
+        if self.ensure_supported(store=SettingValueStore.MELTANO_ENV):
+            return SettingValueStore.MELTANO_ENV
+        # fall back to dotenv
+        elif self.ensure_supported(store=SettingValueStore.DOTENV):
+            return SettingValueStore.DOTENV
+        # fall back to meltano system db
+        elif self.ensure_supported(store=SettingValueStore.DB):
+            return SettingValueStore.DB
         return None
 
     def get(
@@ -1229,7 +1253,7 @@ class AutoStoreManager(SettingsStoreManager):
 
         metadata["source"] = found_source
 
-        auto_store = self.auto_store(name, found_source, setting_def=setting_def)
+        auto_store = self.auto_store(name, setting_def=setting_def)
         if auto_store:
             metadata["auto_store"] = auto_store
             metadata["overwritable"] = auto_store.can_overwrite(found_source)
@@ -1254,7 +1278,6 @@ class AutoStoreManager(SettingsStoreManager):
         setting_def = setting_def or self.find_setting(name)
 
         current_value, metadata = self.get(name, setting_def=setting_def)
-        source = metadata["source"]
 
         if setting_def:
             if value == setting_def.value:
@@ -1262,7 +1285,8 @@ class AutoStoreManager(SettingsStoreManager):
                 self.unset(name, path, setting_def=setting_def)
                 return {"store": SettingValueStore.DEFAULT}
 
-        store = self.auto_store(name, source, setting_def=setting_def)
+        store = self.auto_store(name, setting_def=setting_def)
+        logger.debug(f"AutoStoreManager returned store '{store}'")
         if store is None:
             raise StoreNotSupportedError("No storage method available")
 

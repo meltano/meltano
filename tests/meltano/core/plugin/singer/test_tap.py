@@ -782,8 +782,7 @@ class TestSingerTap:
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
         ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
             await subject.run_discovery(invoker, catalog_path)
-
-            assert stream_mock.call_count == 1
+            assert stream_mock.call_count == 2
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
@@ -791,9 +790,7 @@ class TestSingerTap:
             "meltano.core.plugin.singer.tap._stream_redirect"
         ) as stream_mock2:
             await subject.run_discovery(invoker, catalog_path)
-
             assert stream_mock2.call_count == 2
-            assert stream_mock2.call_args[1]["write_str"] is True
 
         # ensure stderr is redirected to devnull if we don't need it
         discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")
@@ -807,10 +804,8 @@ class TestSingerTap:
             await subject.run_discovery(invoker, catalog_path)
 
             assert stream_mock3.call_count == 2
-            assert stream_mock3.call_args[1]["write_str"] is True
-
             call_kwargs = invoker.invoke_async.call_args_list[0][1]
-            assert call_kwargs.get("stderr") is subprocess.DEVNULL
+            assert call_kwargs.get("stderr") is subprocess.PIPE
 
         discovery_logger.setLevel(original_level)
 
@@ -868,12 +863,6 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         assert sys.getdefaultencoding() == "utf-8"
-
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
-        ), mock.patch("sys.getdefaultencoding", return_value="ascii"):
-            with pytest.raises(UnicodeDecodeError):
-                await subject.run_discovery(invoker, catalog_path)
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True

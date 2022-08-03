@@ -1,11 +1,16 @@
-# Dependency Review Action
-#
-# This Action will scan dependency manifest files that change as part of a Pull Request, surfacing known-vulnerable versions of the packages declared or updated in the PR. Once installed, if the workflow run is marked as required, PRs introducing known-vulnerable packages will be blocked from merging.
-#
-# Source repository: https://github.com/actions/dependency-review-action
-# Public documentation: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
-name: 'Dependency Review'
-on: [pull_request]
+name: Dependency Review
+
+on:
+  pull_request_target: {}
+  workflow_dispatch:
+    inputs: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  FOSSA_CLI_VERSION: '3.3.11'
 
 permissions:
   contents: read
@@ -14,7 +19,25 @@ jobs:
   dependency-review:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v3
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v2
+      - name: Checkout the repository
+        uses: actions/checkout@v3.0.2
+
+      - name: GitHub dependency vulnerability check
+        if: ${{ github.event_name == 'pull_request_target' }}
+        # Use this fork until https://github.com/actions/dependency-review-action/pull/165 is merged
+        uses: WillDaSilva/dependency-review-action@main
+
+      - name: FOSSA dependency license check
+        run: |
+          curl --no-progress-meter -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash -s -- "v$FOSSA_CLI_VERSION"
+
+          echo '## FOSSA dependency license check' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+
+          fossa analyze --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }} --revision ${{ github.sha }} |& tee fossa_analyze.log
+          fossa test --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }} --revision ${{ github.sha }}
+
+          TEST_FAILED=$?
+          FOSSA_REPORT_LINK="$(grep -A 1 '[ INFO] View FOSSA Report:' fossa_analyze.log | tail -n 1 | sed -e 's/^\[ INFO\]\s*//')"
+          echo "[FOSSA detected $([ $TEST_FAILED -ne 0 ] && echo -n '' || echo 'no ')issues](${FOSSA_REPORT_LINK})" >> $GITHUB_STEP_SUMMARY
+          exit $TEST_FAILED
