@@ -238,6 +238,7 @@ jobs:
 ```
 
 You can learn more about how tasks are defined and run in the [`meltano job` documentation](/reference/command-line-interface#job).
+
 ### Schedules
 
 Your project's pipeline schedules,
@@ -284,7 +285,7 @@ To learn more about pipeline schedules and orchestration, refer to the [Orchestr
 
 As your project grows, and your `meltano.yml` with it, you may wish to break your config into multiple `.yml` files and to store those subfiles in various places in your Project folder hierachy.
 
-This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](https://en.wikipedia.org/wiki/Glob_(programming))) to the `include_paths` key of your `meltano.yml`:
+This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](<https://en.wikipedia.org/wiki/Glob_(programming)>)) to the `include_paths` key of your `meltano.yml`:
 
 ```yaml
 include_paths:
@@ -343,8 +344,18 @@ Like all files stored in the `.meltano` directory, the system database is also e
 
 You can choose to use a different system database backend or configuration using the [`database_uri` setting](/reference/settings#database-uri).
 
-While you would usually not want to modify the system database directly, knowing what's in there can aid in debugging:
+While you would usually not want to modify the system database directly, knowing what's in there can aid in debugging.
 
-- `job` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
+Meltano's CLI utilizes the following tables:
+
+- `runs` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
 - `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
 - `user` table: Users for [Meltano UI](/reference/ui) created using [`meltano user add`](/reference/command-line-interface#user).
+
+The remaining tables in the database are used exclusively by Meltano UI, mostly for authentication and authorization purposes:
+
+- `role`
+- `role_permissions`
+- `oauth`
+- `embed_tokens`
+- `subscriptions`
