@@ -1,9 +1,8 @@
-"""SingerMapper and supporting classes.
+"""`SingerMapper` and supporting classes."""
 
-This module contains the SingerMapper class as well as a supporting methods.
-"""
+from __future__ import annotations
+
 import json
-from typing import Optional
 
 import structlog
 
@@ -61,7 +60,7 @@ class SingerMapper(SingerPlugin):
         )
 
     @staticmethod
-    def _get_mapping_config(extra_config: dict) -> Optional[dict]:
+    def _get_mapping_config(extra_config: dict) -> dict | None:
         for mapping in extra_config.get("_mappings", []):
             if mapping.get("name") == extra_config.get("_mapping_name"):
                 return mapping["config"]
