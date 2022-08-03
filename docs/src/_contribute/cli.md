@@ -221,7 +221,7 @@ When writing help output its often useful to provide examples that utilize place
 We also have significant historic use of angle brackets as place holders for user input in our documentation (and also help out). Which often looks like:
 
 ```
-meltano elt <tap> <target>
+meltano elt <tap_name> <target_name>
 ```
 
 In the context of something like a more conversational guide or other online docs this does help indicate that we expect the user to supply this input. However, our current use in help output is often ambigous when it comes to indicating whether this is a required item or optional item. So moving forward if you use this form in CLI help out you should still follow the documented conventions for indicating whether something is required:
