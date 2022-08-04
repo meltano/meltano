@@ -86,14 +86,14 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
 
     # 3) Register the controllers
 
-    from .controllers.orchestrations import orchestrationsBP
-    from .controllers.plugins import pluginsBP
+    from .controllers.orchestrations import orchestrations_bp
+    from .controllers.plugins import plugins_bp
     from .controllers.root import api_root, root
-    from .controllers.settings import settingsBP
+    from .controllers.settings import settings_bp
 
-    app.register_blueprint(settingsBP)
-    app.register_blueprint(orchestrationsBP)
-    app.register_blueprint(pluginsBP)
+    app.register_blueprint(settings_bp)
+    app.register_blueprint(orchestrations_bp)
+    app.register_blueprint(plugins_bp)
     app.register_blueprint(root)
     app.register_blueprint(api_root)
 
