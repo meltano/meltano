@@ -3,7 +3,6 @@ name: Docker Publish
 # This workflow will build and publish all public Docker images to the configured registry.
 # Set the input `dry-run` to `false` to skip pushing images to the registry.
 
-# For now, only run manually
 on:
   workflow_dispatch:
     inputs:
@@ -81,7 +80,7 @@ jobs:
       id: assemble-tags
       run: |
         # To save space, only publish the `latest` tag for each images to the GitHub registry
-        if [[ "${{ inputs.registry }}" != "ghcr.io" ]]; then
+        if [[ "${{ github.event.inputs.registry }}" != "ghcr.io" ]]; then
           echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
           [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
           [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
@@ -101,11 +100,11 @@ jobs:
     - name: Set registry username and password
       id: user-and-pass
       run: |
-        if [[ "${{ inputs.registry }}" == "ghcr.io" ]]; then
+        if [[ "${{ github.event.inputs.registry }}" == "ghcr.io" ]]; then
           echo "::set-output name=username::${{ github.actor }}"
           echo "::set-output name=password::${{ secrets.GITHUB_TOKEN }}"
         fi
-        if [[ "${{ inputs.registry }}" == "docker.io" ]]; then
+        if [[ "${{ github.event.inputs.registry }}" == "docker.io" ]]; then
           echo "::set-output name=username::meltano"
           echo "::set-output name=password::${{ secrets.DOCKERHUB_TOKEN }}"
         fi
@@ -118,7 +117,7 @@ jobs:
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
-        registry: ${{ inputs.registry }}
+        registry: ${{ github.event.inputs.registry }}
         username: ${{ steps.user-and-pass.outputs.username }}
         password: ${{ steps.user-and-pass.outputs.password }}
         python-version: ${{ matrix.python-version }}
