@@ -27,7 +27,7 @@ class EnvVar:
     def __init__(self, definition: str):
         """Instantiate new EnvVar.
 
-        Parameters:
+        Args:
             definition: Env var definition.
         """
         key = definition
@@ -53,7 +53,7 @@ class EnvVar:
     def get(self, env) -> str:
         """Get env value.
 
-        Parameters:
+        Args:
             env: Env to get value for.
 
         Returns:
@@ -70,7 +70,7 @@ class SettingMissingError(Error):
     def __init__(self, name: str):
         """Instantiate SettingMissingError.
 
-        Parameters:
+        Args:
             name: Name of missing setting.
         """
         super().__init__(f"Cannot find setting {name}")
@@ -91,7 +91,7 @@ class YAMLEnum(str, Enum):
     def yaml_representer(dumper, obj) -> str:
         """Represent as yaml.
 
-        Parameters:
+        Args:
             dumper: YAML dumper.
             obj: Object to dump.
 
@@ -104,7 +104,7 @@ class YAMLEnum(str, Enum):
     def to_yaml(cls, representer: Representer, node: Any):
         """Represent as yaml.
 
-        Parameters:
+        Args:
             representer: YAML representer.
             node: Object to dump.
 
@@ -117,7 +117,7 @@ class YAMLEnum(str, Enum):
     def from_yaml(cls, constructor, node):
         """Construct from yaml.
 
-        Parameters:
+        Args:
             constructor: Class constructor.
             node: YAML node.
 
@@ -171,7 +171,7 @@ class SettingDefinition(NameEq, Canonical):
     ):
         """Instantiate new SettingDefinition.
 
-        Parameters:
+        Args:
             name: Setting name.
             aliases: Setting alias names.
             env: Setting target environment variable.
@@ -234,7 +234,7 @@ class SettingDefinition(NameEq, Canonical):
     def from_missing(cls, defs: list[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
 
-        Parameters:
+        Args:
             defs: Know setting definitions.
             config: Config dict.
             kwargs: Keyword arguments to pass to new SettingDefinition instances.
@@ -263,7 +263,7 @@ class SettingDefinition(NameEq, Canonical):
     ):
         """Create SettingDefinition instance from key-value pair.
 
-        Parameters:
+        Args:
             key: Key.
             value: Value.
             custom: Custom setting flag.
@@ -328,7 +328,7 @@ class SettingDefinition(NameEq, Canonical):
     ) -> list[EnvVar]:
         """Return environment variables with the provided prefixes.
 
-        Parameters:
+        Args:
             prefixes: Env var prefixes to prepend.
             include_custom: Include custom env vars from `env_aliases`.
             for_writing: Include target env var from `env`.
@@ -356,7 +356,7 @@ class SettingDefinition(NameEq, Canonical):
     def cast_value(self, value: Any) -> Any:
         """Cast given value.
 
-        Parameters:
+        Args:
             value: Value to cast.
 
         Returns:
@@ -392,7 +392,7 @@ class SettingDefinition(NameEq, Canonical):
     def post_process_value(self, value: Any) -> Any:
         """Post-process given value.
 
-        Parameters:
+        Args:
             value: Value to post-process.
 
         Returns:
@@ -410,7 +410,7 @@ class SettingDefinition(NameEq, Canonical):
     def stringify_value(self, value: Any) -> str:
         """Return value in string form.
 
-        Parameters:
+        Args:
             value: Value to stringify
 
         Returns:

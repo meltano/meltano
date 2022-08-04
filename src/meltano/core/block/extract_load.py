@@ -53,7 +53,7 @@ class ELBContext:  # noqa: WPS230
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
 
-        Parameters:
+        Args:
             project: The project to use.
             plugins_service: The plugins service to use.
             session: The session to use.
@@ -103,7 +103,7 @@ class ELBContextBuilder:
     ):
         """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
 
-        Parameters:
+        Args:
             project: the meltano project for the context.
             plugins_service: the plugins service for the context.
             job: the job for this ELT run.
@@ -126,7 +126,7 @@ class ELBContextBuilder:
     def with_job(self, job: Job):
         """Set the associated job for the context.
 
-        Parameters:
+        Args:
             job: the initial job for the context.
 
         Returns:
@@ -138,7 +138,7 @@ class ELBContextBuilder:
     def with_full_refresh(self, full_refresh: bool):
         """Set whether this is a full refresh.
 
-        Parameters:
+        Args:
             full_refresh : whether this is a full refresh.
 
         Returns:
@@ -153,7 +153,7 @@ class ELBContextBuilder:
         By default we typically attempt to track state. This allows avoiding state management.
 
 
-        Parameters:
+        Args:
             no_state_update: whether this run should update state.
 
         Returns:
@@ -165,7 +165,7 @@ class ELBContextBuilder:
     def with_force(self, force: bool):
         """Set whether the execution of the job should be forced if it is stale.
 
-        Parameters:
+        Args:
             force: Whether to force the execution of the job if it is stale.
 
         Returns:
@@ -181,7 +181,7 @@ class ELBContextBuilder:
     ) -> SingerBlock:
         """Create a new `SingerBlock` object, from a plugin.
 
-        Parameters:
+        Args:
             plugin: The plugin to be executed.
             plugin_args: The arguments to be passed to the plugin.
 
@@ -208,7 +208,7 @@ class ELBContextBuilder:
     ) -> PluginContext:
         """Create context object for a plugin.
 
-        Parameters:
+        Args:
             plugin: The plugin to create the context for.
             env: Environment override dictionary.
 
@@ -232,7 +232,7 @@ class ELBContextBuilder:
     ) -> PluginInvoker:
         """Create an invoker for a plugin from a PluginContext.
 
-        Parameters:
+        Args:
             plugin_context: The plugin context to pass to the invoker_factory.
 
         Returns:
@@ -285,7 +285,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
-        Parameters:
+        Args:
             context: the elt context to use for this elt run.
             blocks: the IOBlocks that should be used for this elt run.
         """
@@ -357,7 +357,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     def upstream_complete(self, index: int) -> bool:
         """Return whether blocks upstream from a given block index are already done.
 
-        Parameters:
+        Args:
             index: The index of the block to check upstream from.
 
         Returns:
@@ -373,7 +373,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     async def upstream_stop(self, index) -> None:
         """Stop all blocks upstream of a given index.
 
-        Parameters:
+        Args:
             index: The index of the block to stop upstream from.
         """
         for block in reversed(self.blocks[:index]):
@@ -384,7 +384,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     ) -> set[asyncio.Task]:
         """Wait on all process futures in the block set.
 
-        Parameters:
+        Args:
             output_exception_future: additional future to wait on for output exceptions.
             subset: the subset of blocks to wait on.
 
@@ -470,7 +470,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Not actually implemented yet.
 
-        Parameters:
+        Args:
             graceful: Whether or not the BlockSet should try to gracefully quit.
 
         Raises:
@@ -606,7 +606,7 @@ class ELBExecutionManager:
     def __init__(self, elb: ExtractLoadBlocks) -> None:
         """Initialize the ELBExecutionManager which will handle the actual runtime management of the block set.
 
-        Parameters:
+        Args:
             elb: The ExtractLoadBlocks to manage.
         """
         self.elb = elb
@@ -653,7 +653,7 @@ class ELBExecutionManager:
     ) -> tuple[int, int] | None:
         """Wait for the current head block to complete or for an error to occur.
 
-        Parameters:
+        Args:
             current_head: The current head block
 
         Returns:
@@ -748,7 +748,7 @@ class ELBExecutionManager:
     async def _stop_all_blocks(self, idx: int = 0) -> None:
         """Close stdin and stop all blocks inclusive of index.
 
-        Parameters:
+        Args:
             idx: starting index of the block's to stop.
         """
         for block in self.elb.blocks[idx:]:
@@ -761,7 +761,7 @@ def _check_exit_codes(  # noqa: WPS238
 ) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
 
-    Parameters:
+    Args:
         producer_code: exit code of the producer (tap)
         consumer_code: exit code of the consumer (target)
         intermediate_codes: exit codes of the intermediate blocks (mappers)
@@ -793,7 +793,7 @@ def _check_exit_codes(  # noqa: WPS238
 def generate_state_id(project: Project, consumer: IOBlock, producer: IOBlock) -> str:
     """Generate a state id based on a project active environment and consumer and producer names.
 
-    Parameters:
+    Args:
         project: Project to retrieve active environment from.
         consumer: Consumer block.
         producer: Producer block.

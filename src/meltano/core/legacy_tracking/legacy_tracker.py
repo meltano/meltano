@@ -33,7 +33,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ):
         """Create a new Google Analytics tracker.
 
-        Parameters:
+        Args:
             project: Meltano project.
             tracking_id: Unique identifier for tracking.
             request_timeout: For GA requests.
@@ -62,7 +62,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def event(self, category: str, action: str) -> dict[str, Any]:
         """Construct a GA event with all the required parameters.
 
-        Parameters:
+        Args:
             category: The category of the event.
             action: The action of the event.
 
@@ -84,7 +84,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def track_event(self, category: str, action: str, debug: bool = False) -> None:
         """Send a struct event to Snowplow.
 
-        Parameters:
+        Args:
             category: GA event category.
             action: GA event action.
             debug: If True, send the event to the debug endpoint.
@@ -94,7 +94,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
         """Track the initialization of a Meltano project.
 
-        Parameters:
+        Args:
             project_name: The name of the project.
             debug: Whether to send the event to the debug endpoint.
         """
@@ -107,7 +107,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ) -> None:
         """Track a plugin add event.
 
-        Parameters:
+        Args:
             plugin_type: The type of the plugin.
             plugin_name: The name of the plugin.
             debug: Whether to send the event to the debug endpoint.
@@ -121,7 +121,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def track_meltano_discover(self, plugin_type: str, debug: bool = False) -> None:
         """Track the discovery of a plugin type.
 
-        Parameters:
+        Args:
             plugin_type: The type of plugin that was discovered.
             debug: Whether to send the event to the debug endpoint.
         """
@@ -136,7 +136,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ) -> None:
         """Track a meltano elt command.
 
-        Parameters:
+        Args:
             extractor: The extractor name.
             loader: The loader name.
             transform: The transform name.
@@ -151,7 +151,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def track_meltano_install(self, debug: bool = False) -> None:
         """Track the installation of plugins.
 
-        Parameters:
+        Args:
             debug: Whether to send the event to the debug endpoint.
         """
         self.track_event(
@@ -163,7 +163,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ) -> None:
         """Track a meltano invoke event.
 
-        Parameters:
+        Args:
             plugin_name: The name of the plugin invoked.
             plugin_args: The arguments passed to the plugin.
             debug: Whether to send the event to the debug endpoint.
@@ -179,7 +179,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ) -> None:
         """Track a schedule event.
 
-        Parameters:
+        Args:
             action: The type of action taken on the schedule (e.g. add, run, list)
             schedule: The schedule to track.
             debug: Whether to send the event to the debug endpoint.
@@ -221,7 +221,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ) -> None:
         """Track the selection of entities and attributes.
 
-        Parameters:
+        Args:
             extractor: The extractor name.
             entities_filter: The entities filter.
             attributes_filter: The attributes filter.
@@ -242,7 +242,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def track_meltano_state(self, subcommand: str, state_id: str | None = None):
         """Track the management of Singer State.
 
-        Parameters:
+        Args:
             subcommand: The subcommand being run (e.g. 'set' or 'clear')
             state_id: The state_id for which state is being managed
         """
@@ -255,7 +255,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def track_meltano_ui(self, debug: bool = False) -> None:
         """Track the UI start-up.
 
-        Parameters:
+        Args:
             debug: Whether to send the event to the debug endpoint.
         """
         action = "meltano ui"
@@ -269,7 +269,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ) -> None:
         """Track invocations of `meltano test`.
 
-        Parameters:
+        Args:
             plugin_tests: A tuple of plugin names and test names.
             debug: Whether to send the event to the debug endpoint.
             flags: A dictionary of CLI flags.
@@ -291,7 +291,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     def track_meltano_run(self, blocks: list[str], debug: bool = False) -> None:
         """Track invocations of `meltano run`.
 
-        Parameters:
+        Args:
             blocks: The blocks to track.
             debug: Whether to print debug information.
         """
@@ -307,7 +307,7 @@ class LegacyTracker:  # noqa: WPS214, WPS230
     ) -> None:
         """Track a job event.
 
-        Parameters:
+        Args:
             action: The type of action taken on the job (e.g. add, run, list)
             job_name: The job to track.
             debug: Whether to send the event to the debug endpoint.

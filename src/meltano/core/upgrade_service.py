@@ -28,7 +28,7 @@ class AutomaticPackageUpgradeError(Exception):
     def __init__(self, reason: str, instructions: str):
         """Initialize the `AutomaticPackageUpgradeError`.
 
-        Parameters:
+        Args:
             reason: The reason the exception occured.
             instructions: Instructions for how to manually resolve the exception.
         """
@@ -42,7 +42,7 @@ class UpgradeService:
     def __init__(self, engine: Engine, project: Project):
         """Initialize the Meltano upgrade service.
 
-        Parameters:
+        Args:
             engine: The SQLAlchemy engine to be used for the upgrade.
             project: The Meltano project.
         """
@@ -105,7 +105,7 @@ class UpgradeService:
     def upgrade_package(self, pip_url: str | None = None, force: bool = False) -> bool:
         """Upgrade the Meltano package.
 
-        Parameters:
+        Args:
             pip_url: The pip URL to use when upgrading the Meltano package.
             force: Whether editable installations from source should be overwritten.
 
@@ -162,7 +162,7 @@ class UpgradeService:
     def upgrade(self, skip_package: bool = False, **kwargs):
         """Upgrade Meltano.
 
-        Parameters:
+        Args:
             skip_package: Whether the Meltano package should be upgraded.
             kwargs: Keyword arguments for `UpgradeService.upgrade_package`.
         """

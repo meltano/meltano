@@ -34,7 +34,7 @@ class MigrationService:
     def __init__(self, engine: Engine) -> None:
         """Initialize the migration service.
 
-        Parameters:
+        Args:
             engine: The sqlalchemy engine to use for the migration and checks.
         """
         self.engine = engine
@@ -44,7 +44,7 @@ class MigrationService:
     ) -> None:
         """Ensure that a migration of the system database is actually needed.
 
-        Parameters:
+        Args:
             script: The alembic script directory.
             context: The migration context.
             target_revision: The desired target revision.
@@ -63,7 +63,7 @@ class MigrationService:
     ) -> None:
         """Upgrade to the latest revision.
 
-        Parameters:
+        Args:
             silent: If true, don't print anything.
 
         Raises:
@@ -116,7 +116,7 @@ class MigrationService:
     def seed(self, project: Project) -> None:
         """Seed the database with the default roles and permissions.
 
-        Parameters:
+        Args:
             project: The project to seed the database for.
         """
         _, session_maker = project_engine(project)
@@ -130,7 +130,7 @@ class MigrationService:
     def _create_user_role(self, session: Session) -> None:
         """Actually perform the database seeding creating users/roles.
 
-        Parameters:
+        Args:
             session: The session to use.
         """
         if not session.query(Role).filter_by(name="admin").first():
