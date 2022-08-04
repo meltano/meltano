@@ -1,5 +1,7 @@
 """Check if the provided SARIF file has any violations at or above some severity level."""
 
+from __future__ import annotations
+
 import argparse
 import json
 

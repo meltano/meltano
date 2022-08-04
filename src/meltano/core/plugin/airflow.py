@@ -1,4 +1,6 @@
 """Plugin glue code for Airflow."""
+from __future__ import annotations
+
 import configparser
 import logging
 import os

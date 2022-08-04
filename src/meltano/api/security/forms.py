@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from flask import url_for
 from flask_security.forms import ConfirmRegisterForm, LoginForm, RegisterForm
 from flask_security.utils import _datastore, get_message  # noqa: WPS450

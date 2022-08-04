@@ -1,4 +1,5 @@
 """Base Error classes."""
+
 from __future__ import annotations
 
 from asyncio.streams import StreamReader

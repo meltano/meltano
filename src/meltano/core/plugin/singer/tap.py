@@ -1,4 +1,4 @@
-"""`SingerTap` and supporting classes."""
+"""This module contains the SingerTap class as well as a supporting methods."""
 
 from __future__ import annotations
 

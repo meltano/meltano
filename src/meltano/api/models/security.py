@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from flask_security import RoleMixin, UserMixin
 
 from . import db

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from secrets import token_hex
 
 from meltano.api.config import ProjectSettings as APIProjectSettings

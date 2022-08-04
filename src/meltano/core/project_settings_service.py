@@ -1,7 +1,8 @@
 """Project Settings Service."""
 
+from __future__ import annotations
+
 import json
-from typing import List
 
 import structlog
 from dotenv import dotenv_values
@@ -125,7 +126,7 @@ class ProjectSettingsService(SettingsService):
         return "meltano"
 
     @property
-    def setting_definitions(self) -> List[SettingDefinition]:
+    def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings.
 
         Returns:

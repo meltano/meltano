@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class RunnerError(Exception):
     def __init__(self, message, exitcodes=None):
         super().__init__(message)

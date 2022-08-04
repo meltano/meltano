@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from meltano.api.headers import JSON_SCHEME_HEADER, VERSION_HEADER

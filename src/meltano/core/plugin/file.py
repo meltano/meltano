@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import structlog
 
 from meltano.core.behavior.hookable import hook

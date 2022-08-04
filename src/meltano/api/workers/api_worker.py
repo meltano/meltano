@@ -1,4 +1,6 @@
 """Starts WSGI Webserver that will run the API App for a Meltano Project."""
+from __future__ import annotations
+
 import logging
 import platform
 import threading
