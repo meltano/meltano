@@ -26,13 +26,13 @@ from .schema import IndexedPlugin, VariantRef
 logger = get_logger(__name__)
 
 
-class HubPluginTypeNotFound(Exception):
+class HubPluginTypeNotFoundError(Exception):
     """Raised when a Hub plugin type is not found."""
 
     def __init__(self, plugin_type: PluginType):
         """Create a new HubPluginVariantNotFound.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugin.
         """
         self.plugin_type = plugin_type
@@ -49,7 +49,7 @@ class HubPluginTypeNotFound(Exception):
         )
 
 
-class HubPluginVariantNotFound(Exception):
+class HubPluginVariantNotFoundError(Exception):
     """Raised when a Hub plugin variant is not found."""
 
     def __init__(
@@ -60,7 +60,7 @@ class HubPluginVariantNotFound(Exception):
     ):
         """Create a new HubPluginVariantNotFound.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugin.
             plugin: The indexed plugin.
             variant_name: The name of the variant that was not found.
@@ -89,7 +89,7 @@ class MeltanoHubService(PluginRepository):
     def __init__(self, project: Project) -> None:
         """Initialize the service.
 
-        Args:
+        Parameters:
             project: The Meltano project.
         """
         self.project = project
@@ -121,7 +121,7 @@ class MeltanoHubService(PluginRepository):
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
 
         Returns:
@@ -137,7 +137,7 @@ class MeltanoHubService(PluginRepository):
     ) -> str:
         """Return the resource endpoint for the given plugin.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
@@ -159,7 +159,7 @@ class MeltanoHubService(PluginRepository):
     ) -> PluginDefinition:
         """Find a locked plugin definition.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
@@ -169,7 +169,7 @@ class MeltanoHubService(PluginRepository):
 
         Raises:
             PluginNotFoundError: If the plugin definition could not be found.
-            HubPluginVariantNotFound: If the plugin variant could not be found.
+            HubPluginVariantNotFoundError: If the plugin variant could not be found.
         """
         plugins = self.get_plugins_of_type(plugin_type)
 
@@ -180,13 +180,16 @@ class MeltanoHubService(PluginRepository):
                 PluginRef(plugin_type, plugin_name)
             ) from plugins_key_err
 
-        if variant_name is None or variant_name == Variant.DEFAULT_NAME:
+        if variant_name is None or variant_name in {
+            Variant.DEFAULT_NAME,
+            Variant.ORIGINAL_NAME,
+        }:
             variant_name = plugin.default_variant
 
         try:
             url = plugin.variants[variant_name].ref
         except KeyError as variant_key_err:
-            raise HubPluginVariantNotFound(
+            raise HubPluginVariantNotFoundError(
                 plugin_type, plugin, variant_name
             ) from variant_key_err
 
@@ -212,7 +215,7 @@ class MeltanoHubService(PluginRepository):
     ) -> BasePlugin:
         """Get the base plugin for a project plugin.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant: The plugin variant.
@@ -231,14 +234,14 @@ class MeltanoHubService(PluginRepository):
     def get_plugins_of_type(self, plugin_type: PluginType) -> dict[str, IndexedPlugin]:
         """Get all plugins of a given type.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
 
         Returns:
             The plugin definitions.
 
         Raises:
-            HubPluginTypeNotFound: If the plugin type is not supported.
+            HubPluginTypeNotFoundError: If the plugin type is not supported.
         """
         if not plugin_type.discoverable:
             return {}
@@ -254,7 +257,7 @@ class MeltanoHubService(PluginRepository):
                 status_code=err.response.status_code,
                 error=err,
             )
-            raise HubPluginTypeNotFound(plugin_type) from err
+            raise HubPluginTypeNotFoundError(plugin_type) from err
 
         plugins: dict[str, dict[str, Any]] = response.json()
         return {

@@ -1,4 +1,6 @@
 """Plugin glue code for Airflow."""
+from __future__ import annotations
+
 import configparser
 import logging
 import os
@@ -50,7 +52,7 @@ class Airflow(BasePlugin):
     def process_config(self, flat_config):
         """Unflatten the config.
 
-        Args:
+        Parameters:
             flat_config: the flat config
 
         Returns:
@@ -65,7 +67,7 @@ class Airflow(BasePlugin):
     def update_config_file(invoker: AirflowInvoker) -> None:
         """Update airflow.cfg with plugin configuration.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
         """
         airflow_cfg_path = invoker.files["config"]
@@ -92,17 +94,17 @@ class Airflow(BasePlugin):
     async def setup_env(self, *args, **kwargs):
         """Configure the env to make airflow installable without GPL deps.
 
-        Args:
+        Parameters:
             args: Arbitrary args
             kwargs: Arbitrary kwargs
         """
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    @hook("before_configure")
-    async def before_configure(self, invoker: AirflowInvoker, session):  # noqa: WPS217
+    @hook("before_configure")  # noqa: WPS217
+    async def before_configure(self, invoker: AirflowInvoker, session):
         """Generate config file and keep metadata database up-to-date.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
             session: metadata database session
 
@@ -169,7 +171,7 @@ class Airflow(BasePlugin):
     async def before_cleanup(self, invoker: PluginInvoker):
         """Delete the config file.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
         """
         config_file = invoker.files["config"]

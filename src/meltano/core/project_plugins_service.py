@@ -1,8 +1,10 @@
-"""Project Plugin Service."""
+"""Project plugin service."""
+
+from __future__ import annotations
 
 import enum
 from contextlib import contextmanager
-from typing import Generator, List, Optional, Tuple
+from typing import Generator
 
 import structlog
 
@@ -38,7 +40,7 @@ class PluginAlreadyAddedException(Exception):
     def __init__(self, plugin: PluginRef):
         """Create a new Plugin Already Added Exception.
 
-        Args:
+        Parameters:
             plugin: The plugin that was already added.
         """
         self.plugin = plugin
@@ -60,7 +62,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     ):
         """Create a new Project Plugins Service.
 
-        Args:
+        Parameters:
             project: The Meltano project.
             config_service: The Meltano Config Service.
             lock_service: The Meltano Plugin Lock Service.
@@ -127,7 +129,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def add_to_file(self, plugin: ProjectPlugin):
         """Add plugin to `meltano.yml`.
 
-        Args:
+        Parameters:
             plugin: The plugin to add.
 
         Raises:
@@ -156,7 +158,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def remove_from_file(self, plugin: ProjectPlugin):
         """Remove plugin from `meltano.yml`.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
 
         Returns:
@@ -173,7 +175,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def has_plugin(self, plugin_name: str) -> bool:
         """Check if plugin exists for the given name.
 
-        Args:
+        Parameters:
             plugin_name: The name of the plugin to check for.
 
         Returns:
@@ -188,14 +190,14 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def find_plugin(
         self,
         plugin_name: str,
-        plugin_type: Optional[PluginType] = None,
+        plugin_type: PluginType | None = None,
         invokable=None,
         configurable=None,
     ) -> ProjectPlugin:
         """
         Find a plugin.
 
-        Args:
+        Parameters:
             plugin_name: The name of the plugin to find.
             plugin_type: Optionally the type of plugin.
             invokable: Optionally limit the search to invokable plugins.
@@ -246,7 +248,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         For example, PluginType.EXTRACTORS and namespace tap_custom
         will return the extractor for the tap-custom plugin.
 
-        Args:
+        Parameters:
             plugin_type: The type of plugin to find.
             namespace: The namespace of the plugin.
 
@@ -265,10 +267,10 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
 
-    def find_plugins_by_mapping_name(self, mapping_name: str) -> List[ProjectPlugin]:
+    def find_plugins_by_mapping_name(self, mapping_name: str) -> list[ProjectPlugin]:
         """Search for plugins with the specified mapping name present in  their mappings config.
 
-        Args:
+        Parameters:
             mapping_name: The name of the mapping to find.
 
         Returns:
@@ -277,7 +279,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Raises:
             PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
         """
-        found: List[ProjectPlugin] = []
+        found: list[ProjectPlugin] = []
         for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPERS):
             if plugin.extra_config.get("_mapping_name") == mapping_name:
                 found.append(plugin)
@@ -288,7 +290,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         """Get a plugin using its PluginRef.
 
-        Args:
+        Parameters:
             plugin_ref: The plugin reference to use.
 
         Returns:
@@ -310,10 +312,10 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
     def get_plugins_of_type(
         self, plugin_type: PluginType, ensure_parent=True
-    ) -> List[ProjectPlugin]:
+    ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugins to return.
             ensure_parent: If True, ensure that plugin has a parent plugin set.
 
@@ -331,7 +333,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def plugins_by_type(self, ensure_parent=True):
         """Return plugins grouped by type.
 
-        Args:
+        Parameters:
             ensure_parent: If True, ensure that plugin has a parent plugin set.
 
         Returns:
@@ -347,7 +349,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def plugins(self, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:
         """Return all plugins.
 
-        Args:
+        Parameters:
             ensure_parent: If True, ensure that plugin has a parent plugin set.
 
         Yields:
@@ -362,7 +364,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def update_plugin(self, plugin: ProjectPlugin):
         """Update a plugin.
 
-        Args:
+        Parameters:
             plugin: The plugin to update.
 
         Returns:
@@ -383,7 +385,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def update_environment_plugin(self, plugin: EnvironmentPluginConfig):
         """Update a plugin configuration inside a Meltano environment.
 
-        Args:
+        Parameters:
             plugin: The plugin configuration to update.
         """
         with self.config_service.update_active_environment() as environment:
@@ -408,7 +410,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def _get_parent_from_discovery(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Get the parent plugin from discovery.yml.
 
-        Args:
+        Parameters:
             plugin: The plugin to get the parent of.
 
         Returns:
@@ -428,7 +430,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Get the parent plugin from the hub.
 
-        Args:
+        Parameters:
             plugin: The plugin to get the parent of.
 
         Returns:
@@ -448,10 +450,10 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def find_parent(
         self,
         plugin: ProjectPlugin,
-    ) -> Tuple[ProjectPlugin, DefinitionSource]:
+    ) -> tuple[ProjectPlugin, DefinitionSource]:
         """Find the parent plugin of a plugin.
 
-        Args:
+        Parameters:
             plugin: The plugin to find the parent of.
 
         Returns:
@@ -509,10 +511,10 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if error:
             raise error
 
-    def get_parent(self, plugin: ProjectPlugin) -> Optional[ProjectPlugin]:
+    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin | None:
         """Get plugin's parent plugin.
 
-        Args:
+        Parameters:
             plugin: The plugin to get the parent of.
 
         Returns:
@@ -531,7 +533,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Ensure that plugin has a parent set.
 
-        Args:
+        Parameters:
             plugin: To set the parent of if necessary.
 
         Returns:
@@ -562,7 +564,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def use_preferred_source(self, source: DefinitionSource) -> None:
         """Prefer a source of definition.
 
-        Args:
+        Parameters:
             source: The source to prefer.
 
         Yields:

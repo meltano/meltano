@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import asyncio
 import json
-from typing import List, Optional
 
 import pytest
 import structlog
@@ -148,8 +149,8 @@ def dbt_process(process_mock_factory, dbt):
 class EventMatcher:
     def __init__(self, result_output: str):
         """Build a matcher for the result output of a command."""
-        self.seen_events: List[dict] = []
-        self.seen_raw: List[str] = []
+        self.seen_events: list[dict] = []
+        self.seen_raw: list[str] = []
 
         for line in result_output.splitlines():
             try:
@@ -162,7 +163,7 @@ class EventMatcher:
     def event_matches(self, event: str) -> bool:
         """Search result output for an event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:
@@ -173,10 +174,10 @@ class EventMatcher:
             if matches:
                 return True
 
-    def find_by_event(self, event: str) -> Optional[List[dict]]:
+    def find_by_event(self, event: str) -> list[dict] | None:
         """Return the first matching event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:
@@ -1084,6 +1085,64 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 1
             assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
+
+        # test mapper/mapping name collision detection - mapper plugin name no mappings
+        project_add_service.add(
+            PluginType.MAPPERS, "mapper-collision-01", inherit_from=mapper.name
+        )
+        args = ["run", tap.name, "mapper-collision-01", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock2, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            with pytest.raises(
+                Exception,
+                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-01",
+            ):
+                result = cli_runner.invoke(cli, args, catch_exceptions=False)
+                assert result.exit_code == 1
+
+        # test mapper/mapping name collision detection - mappings name same a mapper plugin name
+        project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-collision-02",
+            inherit_from=mapper.name,
+            mappings=[
+                {
+                    "name": "mapper-collision-02",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email1",
+                                "tap_stream_name": "commits1",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                }
+            ],
+        )
+        args = ["run", tap.name, "mapper-collision-02", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock2, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            with pytest.raises(
+                Exception,
+                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-02",
+            ):
+                result = cli_runner.invoke(cli, args, catch_exceptions=False)
+                assert result.exit_code == 1
 
         # create duplicate mapping name - should also fail
         project_add_service.add(

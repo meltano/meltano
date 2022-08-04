@@ -4,10 +4,12 @@
 'payload' field. This is not to be confused with the Job's 'state' field,
 which refers to a given job run's status, e.g. 'RUNNING' or 'FAILED'.
 """
+from __future__ import annotations
+
 import datetime
 import json
 from collections import defaultdict
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 import structlog
 
@@ -30,15 +32,15 @@ class StateService:
     def __init__(self, session: object = None):
         """Create a StateService object.
 
-        Args:
+        Parameters:
             session: the session to use for interacting with the db
         """
         self.session = session
 
-    def list_state(self, state_id_pattern: Optional[str] = None) -> Dict[str, Dict]:
+    def list_state(self, state_id_pattern: str | None = None) -> dict[str, dict]:
         """List all state found in the db.
 
-        Args:
+        Parameters:
             state_id_pattern: An optional glob-style pattern of state_ids to search for
 
         Returns:
@@ -52,10 +54,10 @@ class StateService:
             states[state_id] = self.get_state(state_id)
         return states
 
-    def _get_or_create_job(self, job: Union[Job, str]) -> Job:
+    def _get_or_create_job(self, job: Job | str) -> Job:
         """If Job is passed, return it. If state_id is passed, create new and return.
 
-        Args:
+        Parameters:
             job: either an existing Job to modify state for, or a state_id
 
         Raises:
@@ -74,10 +76,10 @@ class StateService:
         raise TypeError("job must be of type Job or of type str")
 
     @staticmethod
-    def validate_state(state: Dict[str, Any]):
+    def validate_state(state: dict[str, Any]):
         """Check that the given state str is valid.
 
-        Args:
+        Parameters:
             state: the state to validate
 
         Raises:
@@ -90,14 +92,14 @@ class StateService:
 
     def add_state(
         self,
-        job: Union[Job, str],
-        new_state: Optional[str],
+        job: Job | str,
+        new_state: str | None,
         payload_flags: Payload = Payload.STATE,
         validate=True,
     ):
         """Add state for the given Job.
 
-        Args:
+        Parameters:
             job: either an existing Job or a state_id that future runs may look up state for.
             new_state: the state to add for the given job.
             payload_flags: the payload_flags to set for the job
@@ -114,10 +116,10 @@ class StateService:
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
 
-    def get_state(self, state_id: str) -> Dict:
+    def get_state(self, state_id: str) -> dict:
         """Get state for the given state_id.
 
-        Args:
+        Parameters:
             state_id: The state_id to get state for
 
         Returns:
@@ -152,10 +154,10 @@ class StateService:
 
         return state
 
-    def set_state(self, state_id: str, new_state: Optional[str], validate: bool = True):
+    def set_state(self, state_id: str, new_state: str | None, validate: bool = True):
         """Set the state for the state_id.
 
-        Args:
+        Parameters:
             state_id: the state_id to set state for
             new_state: the state to update to
             validate: whether or not to validate the supplied state.
@@ -170,7 +172,7 @@ class StateService:
     def clear_state(self, state_id, save: bool = True):
         """Clear the state for the state_id.
 
-        Args:
+        Parameters:
             state_id: the state_id to clear state for
             save: whether or not to immediately save the state
         """
@@ -179,7 +181,7 @@ class StateService:
     def merge_state(self, state_id_src: str, state_id_dst: str):
         """Merge state from state_id_src into state_id_dst.
 
-        Args:
+        Parameters:
             state_id_src: the state_id to get state from
             state_id_dst: the state_id_to merge state onto
         """
@@ -190,7 +192,7 @@ class StateService:
     def copy_state(self, state_id_src: str, state_id_dst: str):
         """Copy state from Job state_id_src onto Job state_id_dst.
 
-        Args:
+        Parameters:
             state_id_src: the state_id to get state from
             state_id_dst: the state_id_to copy state onto
         """
@@ -201,7 +203,7 @@ class StateService:
     def move_state(self, state_id_src: str, state_id_dst: str):
         """Move state from Job state_id_src to Job state_id_dst.
 
-        Args:
+        Parameters:
             state_id_src: the state_id to get state from and clear
             state_id_dst: the state_id_to move state onto
         """

@@ -1,10 +1,11 @@
 """State management in CLI."""
+from __future__ import annotations
+
 import json
 import re
 from datetime import datetime as dt
 from functools import partial, reduce, wraps
 from operator import xor
-from typing import Optional
 
 import click
 import structlog
@@ -30,7 +31,7 @@ class MutuallyExclusiveOptionsError(Exception):
     def __init__(self, *options: str) -> None:
         """Instantiate the error.
 
-        Args:
+        Parameters:
             options: the mutually exclusive options that were incorrectly provided.
         """
         super().__init__(*options)
@@ -66,9 +67,7 @@ prompt_for_confirmation = partial(
 )
 
 
-def state_service_from_state_id(
-    project: Project, state_id: str
-) -> Optional[StateService]:
+def state_service_from_state_id(project: Project, state_id: str) -> StateService | None:
     """Instantiate by parsing a state_id."""
     state_id_re = re.compile(r"^(?P<env>.+)\:(?P<tap>.+)-to-(?P<target>.+)$")
     match = state_id_re.match(state_id)
@@ -116,7 +115,7 @@ def meltano_state(project: Project, ctx: click.Context):
 @click.pass_context
 @pass_project()
 def list_state(
-    project: Project, ctx: click.Context, pattern: Optional[str]
+    project: Project, ctx: click.Context, pattern: str | None
 ):  # noqa: WPS125
     """List all state_ids for this project.
 
@@ -217,9 +216,9 @@ def merge_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: Optional[str],
-    input_file: Optional[click.Path],
-    from_state_id: Optional[str],
+    state: str | None,
+    input_file: click.Path | None,
+    from_state_id: str | None,
 ):
     """Add bookmarks to existing state."""
     state_service = (
@@ -260,8 +259,8 @@ def set_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: Optional[str],
-    input_file: Optional[click.Path],
+    state: str | None,
+    input_file: click.Path | None,
     force: bool,
 ):
     """Set state."""

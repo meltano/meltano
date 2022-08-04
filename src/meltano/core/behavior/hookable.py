@@ -4,6 +4,8 @@ Hookable class and supporting functions, classes, and decorators.
 This module contains the Hookable class which allows for implementation of a classic before/after hook pattern. Allowing
 you to register functions to be called before or after given trigger.
 """
+from __future__ import annotations
+
 import logging
 from collections import OrderedDict
 from contextlib import asynccontextmanager
@@ -12,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class hook:  # noqa: N801
-    """
-    This decorator marks a function as a __hook__.
-    It will be found by the Hookable metaclass and
-    registered to be triggered accordingly.
+    """This decorator marks a function as a `__hook__`.
+
+    It will be found by the `Hookable` metaclass and registered to be triggered
+    accordingly.
     """
 
     def __init__(self, hook_name, can_fail=False):
@@ -28,8 +30,8 @@ class hook:  # noqa: N801
 
 
 class Hookable(type):
-    """
-    Metaclass that registers @hook functions into __hooks__
+    """Metaclass that registers hook-decorated functions into `__hooks__`.
+
     Hooks are registered in declaration order.
     """
 
@@ -54,10 +56,10 @@ class Hookable(type):
 
 
 class HookObject(metaclass=Hookable):
-    """
-    Hook base class that handles the triggering of hooks.
-    Hooks are triggered in reverse MRO order, which means
-    derived classes hooks are called after their base class.
+    """Hook base class that handles the triggering of hooks.
+
+    Hooks are triggered in reverse MRO order, which means derived classes hooks
+    are called after their base class.
     """
 
     @asynccontextmanager
@@ -65,7 +67,7 @@ class HookObject(metaclass=Hookable):
         """
         Trigger all registered before and after functions for a given hook - yielding to the caller in between.
 
-        Args:
+        Parameters:
             hook_name: The hook who's registered functions that should be triggered
 
         Yields: None

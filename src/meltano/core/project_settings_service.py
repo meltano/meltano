@@ -1,7 +1,8 @@
 """Project Settings Service."""
 
+from __future__ import annotations
+
 import json
-from typing import List
 
 import structlog
 from dotenv import dotenv_values
@@ -26,11 +27,12 @@ class ProjectSettingsService(SettingsService):
     """Project Settings Service."""
 
     config_override = {}
+    supports_environments = False
 
     def __init__(self, *args, config_service: ConfigService = None, **kwargs):
         """Instantiate ProjectSettingsService instance.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to the superclass.
             config_service: Project configuration service instance.
             kwargs: Keyword arguments to pass to the superclass.
@@ -66,15 +68,6 @@ class ProjectSettingsService(SettingsService):
 
         If it is not present, it will be restored from `analytics.json` if possible.
         """
-        if self.project.active_environment and "project_id" in self.environment_config:
-            # `project_id` is only valid at the top-level of the config, so we move it up there.
-            env_config = self.environment_config.copy()
-            self.update_meltano_yml_config(
-                # Potentially overwrite it with the existing top-level `project_id`
-                {"project_id": env_config.pop("project_id"), **self.meltano_yml_config}
-            )
-            self.update_meltano_environment_config(env_config)
-
         try:
             project_id = self.get("project_id")
         except OSError:
@@ -125,7 +118,7 @@ class ProjectSettingsService(SettingsService):
         return "meltano"
 
     @property
-    def setting_definitions(self) -> List[SettingDefinition]:
+    def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings.
 
         Returns:
@@ -142,35 +135,18 @@ class ProjectSettingsService(SettingsService):
         """
         return self.config_service.current_config
 
-    @property
-    def environment_config(self):
-        """Return current environment configuration in `meltano.yml`.
-
-        Returns:
-            Current environment configuration in `meltano.yml`
-        """
-        return self.config_service.current_environment_config
-
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
 
-        Args:
+        Parameters:
             config: Updated config.
         """
         self.config_service.update_config(config)
 
-    def update_meltano_environment_config(self, config: dict):
-        """Update environment configuration in `meltano.yml`.
-
-        Args:
-            config: Updated environment config.
-        """
-        self.config_service.update_environment_config(config)
-
     def process_config(self, config) -> dict:
         """Process configuration dictionary for presentation in `meltano config meltano`.
 
-        Args:
+        Parameters:
             config: Config to process.
 
         Returns:
@@ -181,7 +157,7 @@ class ProjectSettingsService(SettingsService):
     def get_with_metadata(self, name: str, *args, **kwargs):
         """Return setting value with metadata.
 
-        Args:
+        Parameters:
             name: Name of setting to get.
             args: Positional arguments to pass to the superclass method.
             kwargs: Keyword arguments to pass to the superclass method.
@@ -203,7 +179,7 @@ class ProjectSettingsService(SettingsService):
     def get_from_ui_cfg(self, name: str):
         """Return setting value from UI config.
 
-        Args:
+        Parameters:
             name: Name of setting to get.
 
         Returns:

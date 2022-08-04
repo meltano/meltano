@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
@@ -9,7 +11,6 @@ from contextlib import (
     redirect_stdout,
     suppress,
 )
-from typing import Optional
 
 import structlog
 
@@ -26,11 +27,11 @@ class OutputLogger:
         self.outs = {}
 
     def out(
-        self, name: str, logger=None, write_level: Optional[int] = logging.INFO
-    ) -> "Out":
+        self, name: str, logger=None, write_level: int | None = logging.INFO
+    ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
 
-        Args:
+        Parameters:
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
             write_level: log level passed to underlying logger.log calls.
@@ -89,7 +90,7 @@ class Out:  # noqa: WPS230
     ):
         """Log anything written in a stream.
 
-        Args:
+        Parameters:
             output_logger: the OutputLogger to use.
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.

@@ -1,6 +1,6 @@
 """Manager for Meltano project Environments."""
 
-from typing import List
+from __future__ import annotations
 
 from meltano.core.environment import Environment
 from meltano.core.project import Project
@@ -14,7 +14,7 @@ class EnvironmentAlreadyExistsError(Exception):
     def __init__(self, environment: Environment):
         """Create a new exception.
 
-        Args:
+        Parameters:
             environment: An Environment object.
         """
         self.environment = environment
@@ -27,7 +27,7 @@ class EnvironmentService:
     def __init__(self, project: Project):
         """Create a new EnvironmentService for a Meltano Project.
 
-        Args:
+        Parameters:
             A Meltano Project.
         """
         self.project = project
@@ -35,7 +35,7 @@ class EnvironmentService:
     def add(self, name) -> Environment:
         """Create a new Environment in `meltano.yml`.
 
-        Args:
+        Parameters:
             name: Name for new Environment.
 
         Returns:
@@ -46,7 +46,7 @@ class EnvironmentService:
     def add_environment(self, environment: Environment):
         """Add an Environment object to `meltano.yml`.
 
-        Args:
+        Parameters:
             environment: An instance of meltano.core.environment.Environment to add.
 
         Raises:
@@ -65,7 +65,7 @@ class EnvironmentService:
 
         return environment
 
-    def list_environments(self) -> List[Environment]:
+    def list_environments(self) -> list[Environment]:
         """Enumerate existing Environments.
 
         Returns:
@@ -76,7 +76,7 @@ class EnvironmentService:
     def remove(self, name: str) -> str:
         """Remove an Environment by name.
 
-        Args:
+        Parameters:
             name: Name of the Environment that should be removed.
 
         Returns:

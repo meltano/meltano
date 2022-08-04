@@ -2,10 +2,11 @@
 
 This module contains the SingerTarget class as well as a supporting BookmarkWriter class.
 """
+from __future__ import annotations
+
 import json
 import logging
 from datetime import datetime
-from typing import List
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
@@ -23,7 +24,7 @@ class BookmarkWriter:
     def __init__(self, job: Job, session: object, payload_flag: int = Payload.STATE):
         """Bookmark writer with a writelines implementation to support ingesting and persisting state messages.
 
-        Args:
+        Parameters:
             job: meltano elt job associated with this invocation and who's state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: a valid payload flag, one of Payload.STATE or Payload.INCOMPLETE_STATE.
@@ -35,7 +36,7 @@ class BookmarkWriter:
     def writeline(self, line: str):
         """Persist a state entry.
 
-        Args:
+        Parameters:
             line: raw json state line to decode/store
         """
         if self.job is None:
@@ -75,9 +76,7 @@ class SingerTarget(SingerPlugin):
     ]
 
     def exec_args(self, plugin_invoker):
-        args = ["--config", plugin_invoker.files["config"]]
-
-        return args
+        return ["--config", plugin_invoker.files["config"]]
 
     @property
     def config_files(self):
@@ -89,11 +88,11 @@ class SingerTarget(SingerPlugin):
 
     @hook("before_invoke")
     async def setup_bookmark_writer_hook(
-        self, plugin_invoker: PluginInvoker, exec_args: List[str]
+        self, plugin_invoker: PluginInvoker, exec_args: list[str]
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 
-        Args:
+        Parameters:
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
         """
@@ -111,9 +110,10 @@ class SingerTarget(SingerPlugin):
         This leverages calling back to PluginInvokers.add_output_handler to attach an additional
         output handler (the BookmarkWriter) to handle persisting state messages.
 
-        Args:
-            plugin_invoker: The invocation handler who's add_out_handler method will be called to attach the bookmark writer
-            as an additional output handler.
+        Parameters:
+            plugin_invoker: The invocation handler whose `add_out_handler` method
+                will be called to attach the bookmark writer as an additional
+                output handler.
         """
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job or not elt_context.session:

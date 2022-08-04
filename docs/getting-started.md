@@ -8,9 +8,8 @@ weight: 1
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
-<div class="notification is-warning">
-    <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
-    <p>To get a sense of the Meltano experience in just a few minutes, watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a> that takes you through <a href="/guide/integration">data integration (EL)</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres loader</a>.</p>
+<div class="notification is-success">
+    <p><strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!</p>
 </div>
 
 ## Install Meltano
@@ -48,6 +47,12 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
 
     ```bash
     pipx install meltano
+    ```
+
+    If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
+
+    ```bash
+    pipx install meltano --python <path to desired Python executable>
     ```
 
 1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
@@ -134,6 +139,11 @@ As part of creating your Meltano project, we automatically added your first [env
 
     ```bash
     export MELTANO_ENVIRONMENT=dev
+    ```
+    or for Windows PowerShell:
+
+    ```powershell
+    $env:MELTANO_ENVIRONMENT="dev"
     ```
 
     Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
