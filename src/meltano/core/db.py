@@ -19,8 +19,7 @@ _engines = {}
 
 
 def project_engine(project, default=False) -> tuple(Engine, sessionmaker):
-    """Creates and register a SQLAlchemy engine for a Meltano project instance."""
-
+    """Create and register a SQLAlchemy engine for a Meltano project instance."""
     existing_engine = _engines.get(project)
     if existing_engine:
         return existing_engine
@@ -88,12 +87,7 @@ def init_sqlite_hook(engine):
 class DB:
     @classmethod
     def ensure_schema_exists(cls, engine, schema_name, grant_roles=()):
-        """
-        Make sure that the given schema_name exists in the database. If not, create it.
-
-        :param db_conn: psycopg2 database connection
-        :param schema_name: database schema
-        """
+        """Ensure the given schema_name exists in the database."""
         schema_identifier = schema_name
         group_identifiers = ",".join(grant_roles)
 
