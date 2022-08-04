@@ -119,7 +119,7 @@ class Job(SystemModel):  # noqa: WPS214
         super().__init__(**kwargs)
 
     @hybrid_property
-    def state(self) -> State:  # noqa: WPS440
+    def state(self) -> State:
         """Get the job state as a State enum.
 
         Returns:
@@ -127,7 +127,7 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return State[self._state]
 
-    @state.setter  # noqa: WPS440
+    @state.setter
     def state(self, value):
         """Set the _state value for this Job from a State enum.
 
@@ -136,7 +136,7 @@ class Job(SystemModel):  # noqa: WPS214
         """
         self._state = str(value)
 
-    @state.comparator  # noqa: WPS440
+    @state.comparator
     def state(cls):  # noqa: N805
         """Use this comparison to compare Job.state to State.
 
