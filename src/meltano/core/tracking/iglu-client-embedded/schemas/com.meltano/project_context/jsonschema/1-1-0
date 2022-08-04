@@ -1,0 +1,80 @@
+{
+    "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a Snowplow context describing a Meltano project",
+    "self": {
+        "vendor": "com.meltano",
+        "name": "project_context",
+        "format": "jsonschema",
+        "version": "1-1-0"
+    },
+    "type": "object",
+    "properties": {
+        "context_uuid": {
+            "description": "A UUID that uniquely identifies an instance of this context",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "project_uuid": {
+            "description": "A UUID that uniquely identifies the Meltano project",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "project_uuid_source": {
+            "description": "How the 'project_id' was obtained/derived - either explicitly set, derived by hashing a non-UUID project ID, or randomly generated",
+            "type": "string",
+            "enum": [
+                "explicit",
+                "derived",
+                "random"
+            ]
+        },
+        "client_uuid": {
+            "description": "A UUID that uniquely identifies the client",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "minLength": 36,
+            "maxLength": 36
+        },
+        "environment_name_hash": {
+            "description": "The hash of the active environment for the Meltano project",
+            "type": [
+                "string",
+                "null"
+            ],
+            "maxLength": 256
+        },
+        "send_anonymous_usage_stats": {
+            "description": "Whether anonymous telemetry should be shared with Meltano.",
+            "type": "boolean"
+        },
+        "send_anonymous_usage_stats_source": {
+            "description": "How `send_anonymous_usage_stats` was configured.",
+            "type": "string",
+            "enum": [
+                "auto",
+                "config_override",
+                "db",
+                "default",
+                "dotenv",
+                "env",
+                "inherited",
+                "meltano_env",
+                "meltano_yml"
+            ]
+        }
+    },
+    "required": [
+        "context_uuid",
+        "project_uuid",
+        "project_uuid_source",
+        "client_uuid",
+        "environment_name_hash",
+        "send_anonymous_usage_stats",
+        "send_anonymous_usage_stats_source"
+    ],
+    "additionalProperties": false
+}

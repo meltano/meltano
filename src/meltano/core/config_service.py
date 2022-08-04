@@ -1,4 +1,6 @@
 """Service to manage meltano.yml."""
+from __future__ import annotations
+
 import logging
 import os
 from contextlib import contextmanager
@@ -19,7 +21,7 @@ class ConfigService:
     def __init__(self, project: Project, use_cache=True):
         """Create a new project configuration service.
 
-        Args:
+        Parameters:
             project: the project to configure.
             use_cache: whether to use the cache or not.
         """

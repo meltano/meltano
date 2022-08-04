@@ -1,9 +1,10 @@
-"""SingerBlock wraps singer plugins to implement the IOBlock interface."""
+"""`SingerBlock` wraps singer plugins to implement the `IOBlock` interface."""
+
+from __future__ import annotations
 
 import asyncio
 from asyncio.subprocess import Process
 from contextlib import suppress
-from typing import Dict, Optional, Tuple
 
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.utils import SubprocessOutputWriter
@@ -37,11 +38,11 @@ class InvokerBase:  # noqa: WPS230, WPS214
         project: Project,
         plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
-        command: Optional[str],
+        command: str | None,
     ):
         """Configure and return a wrapped plugin invoker extendable for use as an IOBlock or PluginCommandBlock.
 
-        Args:
+        Parameters:
             block_ctx: context that should be used for this instance to do things like obtaining project settings.
             project: that should be used to obtain the ProjectSettingsService.
             plugins_service: that configured plugins service.
@@ -56,18 +57,18 @@ class InvokerBase:  # noqa: WPS230, WPS214
         )
 
         self.invoker: PluginInvoker = plugin_invoker
-        self._command: Optional[str] = command
+        self._command: str | None = command
 
         self.outputs = []
         self.err_outputs = []
 
-        self.process_handle: Optional[Process] = None
-        self._process_future: Optional[asyncio.Task] = None
-        self._stdout_future: Optional[asyncio.Task] = None
-        self._stderr_future: Optional[asyncio.Task] = None
+        self.process_handle: Process | None = None
+        self._process_future: asyncio.Task | None = None
+        self._stdout_future: asyncio.Task | None = None
+        self._stderr_future: asyncio.Task | None = None
 
     @property
-    def command(self) -> Optional[str]:
+    def command(self) -> str | None:
         """Command is the specific plugin command to use when invoking the plugin (if any).
 
         Returns:
@@ -87,7 +88,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     async def start(self, *args, **kwargs):
         """Invoke the process asynchronously.
 
-        Args:
+        Parameters:
             args: arguments to pass to the process invoker.
             kwargs: keyword arguments to pass to the process invoker.
 
@@ -108,7 +109,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     async def stop(self, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.
 
-        Args:
+        Parameters:
             kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:
@@ -169,7 +170,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
             )
         return self._stderr_future
 
-    def proxy_io(self) -> Tuple[asyncio.Task, asyncio.Task]:
+    def proxy_io(self) -> tuple[asyncio.Task, asyncio.Task]:
         """Start proxying stdout AND stderr to the respectively linked destinations.
 
         Returns:
@@ -196,7 +197,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         return self._process_future
 
     @property
-    def stdin(self) -> Optional[asyncio.StreamWriter]:
+    def stdin(self) -> asyncio.StreamWriter | None:
         """Return stdin of the underlying process.
 
         Returns:
@@ -216,7 +217,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst.
 
-        Args:
+        Parameters:
             dst:  The destination stdout output should be written too.
 
         Raises:
@@ -230,7 +231,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     def stderr_link(self, dst: SubprocessOutputWriter):
         """Use stderr_link to instruct block to link/write stderr content to dst.
 
-        Args:
+        Parameters:
             dst:  The destination stderr output should be written too.
 
         Raises:
@@ -244,7 +245,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
     async def pre(self, context) -> None:
         """Pre triggers preparation of the underlying plugin.
 
-        Args:
+        Parameters:
             context: The context with which to update the invoker
         """
         self.invoker.context = context
@@ -273,15 +274,15 @@ class SingerBlock(InvokerBase, IOBlock):
 
     def __init__(
         self,
-        block_ctx: Dict,
+        block_ctx: dict,
         project: Project,
         plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
-        plugin_args: Tuple[str],
+        plugin_args: tuple[str],
     ):
         """Configure and return a Singer plugin wrapped as an IOBlock.
 
-        Args:
+        Parameters:
             block_ctx: the block context.
             project:  the project to use to obtain project settings.
             plugins_service: the plugins service.
@@ -354,7 +355,7 @@ class SingerBlock(InvokerBase, IOBlock):
     async def stop(self, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.
 
-        Args:
+        Parameters:
             kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:

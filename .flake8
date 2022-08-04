@@ -43,6 +43,8 @@ ignore =
     W503
     # Allow for long lines since we delegate to Black for enforcement
     E501
+    # Allow custom exceptions whose name ends with "Exception"
+    N818
     # Allow format strings with unindex parameters (because the pyupgrade pre-commit hook enforces their usage)
     P101
     # wemake-python-styleguide
@@ -50,14 +52,20 @@ ignore =
     WPS110
     # Allow upper-case constants in Enum subclasses
     WPS115
+    # Allow many module members
+    WPS202
     # Allow "too many"
     WPS211
+    # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
+    WPS212
     # Allow local folder imports (import .module)
     WPS300
     # Allow f-strings
     WPS305
     # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration
     WPS306
+    # Allow inconsistent returns - permitted because of too many false positives
+    WPS324
     # Allow assignment expressions (walrus operator :=)
     WPS332
     # Allow 'incorrect' order of methods in a class
@@ -72,14 +80,18 @@ ignore =
     WPS420
     # Allow nested classes
     WPS431
+    # Allow block variable overlap, e.g. multiple for-loops that use the same name for their loop variables
+    WPS440
+    # Allow control variables to be used after their block, because this rule has too many false-positives
+    WPS441
     # Import name collisions - disabled because it raises many false positives
     WPS458
     # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
     WPS600
     # Allow using @staticmethod
     WPS602
-    # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
-    WPS212
+    # Allow "unpythonic" getters and setters
+    WPS615
     # Various WPS refactor heavy warnings to ignore that currently have a poor risk/reward tradeoff.
     WPS100
     WPS111
@@ -105,17 +117,15 @@ ignore =
     WPS501
     # Allow Exceptions to have suffix 'Exception' rather than 'Error'
     N818
+    WPS507
 
 exclude =
     .venv
     venv
     *.md
+    .tox
     src/webapp/node_modules/
-    src/meltano/api/events/notification_events.py
-    src/meltano/core/logging/job_logging_service.py
-    src/meltano/core/job/stale_job_failer.py
-    src/meltano/core/utils/__init__.py
-    tests/meltano/core/runner/test_runner.py
+    src/meltano/migrations/
 inline_quotes = double
 max_line_length = 88
 show_source = true
@@ -166,12 +176,8 @@ per-file-ignores =
         WPS436
         # Allow protected attribute usage in test methods
         WPS437
-        # Found block variables overlap (false positive)
-        WPS440
         # Found module with too many imports
         WPS201
-        # Found too many module members
-        WPS202
         # Found boolean non-keyword argument
         WPS425
         # Found too long name
@@ -196,8 +202,6 @@ per-file-ignores =
         WPS213
         # Allow many decorators, since `click` uses them to define the CLI
         WPS216
-        # Allow many module members
-        WPS202
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
@@ -233,6 +237,9 @@ per-file-ignores =
     src/**/__init__.py:
         # Allow for using __init__.py to promote imports to the module namespace
         F401
+    tests/**/__init__.py:
+        # Allow for using __init__.py to promote imports to the module namespace
+        F401
     src/meltano/__init__.py:
         # Found `__init__.py` module with logic
         WPS412
@@ -244,8 +251,6 @@ per-file-ignores =
     src/meltano/core/logging/utils.py:
         # Found wrong module name
         WPS100
-        # Found to many module members (8 > 7)
-        WPS202
     src/meltano/core/cli_messages.py:
         # Special exceptions for cli magic
         WPS114
@@ -258,9 +263,5 @@ per-file-ignores =
         # Lots of docstrings document **kwargs
     RST213
     src/meltano/core/settings_store.py:
-        WPS202
         # Found overused expression: allow settings store implementations to all return vars with the same names
         WPS204
-    src/meltano/api/controllers/orchestrations.py:
-        # Found too many module members: 23 > 7
-        WPS202

@@ -1,4 +1,6 @@
 """Defines StaleJobFailer."""
+from __future__ import annotations
+
 import logging
 
 from .finder import JobFinder

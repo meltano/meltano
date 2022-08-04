@@ -1,9 +1,11 @@
 """Meltano Canonical object behavior."""
 
+from __future__ import annotations
+
 import copy
 import json
 from os import PathLike
-from typing import Any, Type, TypeVar, Union
+from typing import Any, TypeVar
 
 import yaml
 from ruamel.yaml import Representer
@@ -27,7 +29,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __init__(self, *args: Any, **attrs: Any):
         """Initialize the current instance with the given attributes.
 
-        Args:
+        Parameters:
             args: Arguments to initialize with.
             attrs: Keyword arguments to initialize with.
         """
@@ -47,11 +49,11 @@ class Canonical:  # noqa: WPS214 (too many methods)
 
     @classmethod
     def as_canonical(
-        cls: Type[T], target: Any
-    ) -> Union[dict, list, CommentedMap, CommentedSeq, Any]:
+        cls: type[T], target: Any
+    ) -> dict | list | CommentedMap | CommentedSeq | Any:
         """Return a canonical representation of the given instance.
 
-        Args:
+        Parameters:
             target: Instance to convert.
 
         Returns:
@@ -87,7 +89,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
 
         if isinstance(target, dict):
             results = {}
-            for key, val in target.items():  # noqa: WPS440
+            for key, val in target.items():
                 if isinstance(val, Canonical):
                     results[key] = val.canonical()
                 else:
@@ -96,7 +98,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
 
         return copy.deepcopy(target)
 
-    def canonical(self) -> Union[dict, list, CommentedMap, CommentedSeq, Any]:
+    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | Any:
         """Return a canonical representation of the current instance.
 
         Returns:
@@ -107,7 +109,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def with_attrs(self: T, *args: Any, **kwargs: Any) -> T:
         """Return a new instance with the given attributes set.
 
-        Args:
+        Parameters:
             args: Attribute names to set.
             kwargs: Keyword arguments to set.
 
@@ -117,10 +119,10 @@ class Canonical:  # noqa: WPS214 (too many methods)
         return self.__class__(**{**self.canonical(), **kwargs})
 
     @classmethod
-    def parse(cls: Type[T], obj: Any) -> T:
+    def parse(cls: type[T], obj: Any) -> T:
         """Parse a 'Canonical' object from a dictionary or return the instance.
 
-        Args:
+        Parameters:
             obj: Dictionary or instance to parse.
 
         Returns:
@@ -151,7 +153,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def is_attr_set(self, attr):
         """Return whether specified attribute has a non-default/fallback value set.
 
-        Args:
+        Parameters:
             attr: Attribute to check.
 
         Returns:
@@ -162,7 +164,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __getattr__(self, attr: str) -> Any:
         """Return the value of the given attribute.
 
-        Args:
+        Parameters:
             attr: Attribute to return.
 
         Returns:
@@ -196,7 +198,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __setattr__(self, attr: str, value: Any):
         """Set the given attribute to the given value.
 
-        Args:
+        Parameters:
             attr: Attribute to set.
             value: Value to set.
         """
@@ -208,7 +210,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __getitem__(self, attr: str) -> Any:
         """Return the value of the given attribute.
 
-        Args:
+        Parameters:
             attr: Attribute to return.
 
         Returns:
@@ -219,7 +221,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __setitem__(self, attr: str, value: Any) -> None:
         """Set the given attribute to the given value.
 
-        Args:
+        Parameters:
             attr: Attribute to set.
             value: Value to set.
 
@@ -267,7 +269,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def __contains__(self, obj: Any):
         """Return whether the current instance contains the given object.
 
-        Args:
+        Parameters:
             obj: Object to check.
 
         Returns:
@@ -278,7 +280,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def update(self, *others: Any, **kwargs: Any) -> None:
         """Update the current instance with the given others.
 
-        Args:
+        Parameters:
             others: Other instances to update with.
             kwargs: Keyword arguments to update with.
         """
@@ -295,7 +297,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def yaml(cls, dumper: yaml.BaseDumper, obj: Any) -> yaml.MappingNode:
         """YAML serializer for Canonical objects.
 
-        Args:
+        Parameters:
             dumper: The YAML dumper.
             obj: The Canonical object to serialize.
 
@@ -310,7 +312,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
     def to_yaml(cls, representer: Representer, obj: Any):
         """YAML serializer for Canonical objects.
 
-        Args:
+        Parameters:
             representer: The YAML representer.
             obj: The Canonical object to serialize.
 
@@ -323,10 +325,10 @@ class Canonical:  # noqa: WPS214 (too many methods)
         )
 
     @classmethod
-    def parse_json_file(cls: Type[T], path: PathLike) -> T:
+    def parse_json_file(cls: type[T], path: PathLike) -> T:
         """Parse a plugin definition from a JSON file.
 
-        Args:
+        Parameters:
             path: The path to the JSON file.
 
         Returns:

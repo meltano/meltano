@@ -36,15 +36,16 @@ class ProjectContext(SelfDescribingJson):
     def __init__(self, project: Project, client_id: uuid.UUID):
         """Initialize a meltano tracking "project" context.
 
-        Args:
+        Parameters:
             project: The Meltano project.
             client_id: The client ID from `analytics.json`.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
-        self.send_anonymous_usage_stats = self.settings_service.get(
-            "send_anonymous_usage_stats", True
-        )
+        (
+            send_anonymous_usage_stats,
+            send_anonymous_usage_stats_metadata,
+        ) = self.settings_service.get_with_metadata("send_anonymous_usage_stats")
 
         super().__init__(
             ProjectContextSchema.url,
@@ -57,6 +58,10 @@ class ProjectContext(SelfDescribingJson):
                     hash_sha256(self.project.active_environment.name)
                     if self.project.active_environment
                     else None
+                ),
+                "send_anonymous_usage_stats": send_anonymous_usage_stats,
+                "send_anonymous_usage_stats_source": (
+                    send_anonymous_usage_stats_metadata["source"].value
                 ),
             },
         )

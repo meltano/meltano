@@ -1,23 +1,25 @@
+from __future__ import annotations
+
 import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Union
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class PluginConfigService:
-    """
-    Manage the plugin configuration files. Each plugin can expose a
-    set of files that should be stubbed using environment variables.
+    """Manage the plugin configuration files.
+
+    Each plugin can expose a set of files that should be stubbed using
+    environment variables.
     """
 
     def __init__(
         self,
         plugin: ProjectPlugin,
-        config_dir: Union[str, Path],
-        run_dir: Union[str, Path],
+        config_dir: str | Path,
+        run_dir: str | Path,
     ):
         self.plugin = plugin
         self.config_dir = Path(config_dir)

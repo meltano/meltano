@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import asyncio
 import json
-from typing import List, Optional
 
 import pytest
 import structlog
@@ -148,8 +149,8 @@ def dbt_process(process_mock_factory, dbt):
 class EventMatcher:
     def __init__(self, result_output: str):
         """Build a matcher for the result output of a command."""
-        self.seen_events: List[dict] = []
-        self.seen_raw: List[str] = []
+        self.seen_events: list[dict] = []
+        self.seen_raw: list[str] = []
 
         for line in result_output.splitlines():
             try:
@@ -162,7 +163,7 @@ class EventMatcher:
     def event_matches(self, event: str) -> bool:
         """Search result output for an event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:
@@ -173,10 +174,10 @@ class EventMatcher:
             if matches:
                 return True
 
-    def find_by_event(self, event: str) -> Optional[List[dict]]:
+    def find_by_event(self, event: str) -> list[dict] | None:
         """Return the first matching event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:

@@ -1,7 +1,8 @@
 """Plugin glue code for Superset."""
+from __future__ import annotations
+
 import logging
 import subprocess
-from typing import List
 
 import structlog
 
@@ -56,7 +57,7 @@ class Superset(BasePlugin):
     async def before_configure(self, invoker: SupersetInvoker, session):  # noqa: WPS217
         """Write plugin configuration to superset_config.py.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
             session: metadata database session
 
@@ -104,10 +105,10 @@ class Superset(BasePlugin):
         logging.debug(f"Created configuration at {config_path}")
 
     @hook("before_invoke")
-    async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: List[str]):
+    async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: list[str]):
         """Create or upgrade metadata database.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
             exec_args: the args being passed
 
@@ -131,10 +132,10 @@ class Superset(BasePlugin):
         logging.debug("Completed `superset db upgrade`")
 
     @hook("before_invoke")
-    async def init_hook(self, invoker: PluginInvoker, exec_args: List[str]):
+    async def init_hook(self, invoker: PluginInvoker, exec_args: list[str]):
         """Create default roles and permissions.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
             exec_args: the args being passed
 
@@ -160,7 +161,7 @@ class Superset(BasePlugin):
     async def before_cleanup(self, invoker: PluginInvoker):
         """Delete the config file.
 
-        Args:
+        Parameters:
             invoker: the active PluginInvoker
         """
         config_file = invoker.files["config"]

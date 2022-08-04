@@ -34,7 +34,7 @@ class ConflictingSettingValueException(Exception):  # noqa: N818
     def __init__(self, setting_names):
         """Instantiate the error.
 
-        Args:
+        Parameters:
             setting_names: the name/aliases where conflicting values are set
 
         """
@@ -56,7 +56,7 @@ class MultipleEnvVarsSetException(Exception):  # noqa: N818
     def __init__(self, names):
         """Instantiate the error.
 
-        Args:
+        Parameters:
             names: the name/aliases where conflicting values are set
         """
         self.names = names
@@ -154,7 +154,7 @@ class SettingValueStore(str, Enum):
     def overrides(self, source: SettingValueStore) -> bool:
         """Check if given source overrides this instance.
 
-        Args:
+        Parameters:
             source: SettingValueStore to compare against.
 
         Returns:
@@ -166,7 +166,7 @@ class SettingValueStore(str, Enum):
     def can_overwrite(self, source: SettingValueStore) -> bool:
         """Check if source can overwrite.
 
-        Args:
+        Parameters:
             source: SettingValueStore instance to check.
 
         Returns:
@@ -184,7 +184,7 @@ class SettingsStoreManager(ABC):
     def __init__(self, settings_service: SettingsService, **kwargs):
         """Initialise settings store manager.
 
-        Args:
+        Parameters:
             settings_service: SettingsService instance.
             kwargs: Keyword arguments.
         """
@@ -195,7 +195,7 @@ class SettingsStoreManager(ABC):
     def get(self, name: str, setting_def: SettingDefinition | None = None) -> None:
         """Abstract get method.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: SettingDefinition instance.
         """
@@ -209,7 +209,7 @@ class SettingsStoreManager(ABC):
     ) -> None:
         """Unimplemented set method.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Setting path.
             value: New value to set.
@@ -228,7 +228,7 @@ class SettingsStoreManager(ABC):
     ) -> None:
         """Unimplemented unset method.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Setting path.
             setting_def: SettingDefinition instance.
@@ -249,7 +249,7 @@ class SettingsStoreManager(ABC):
     def ensure_supported(self, method: str = "get") -> None:
         """Ensure passed method is supported.
 
-        Args:
+        Parameters:
             method: Method to check if supported.
 
         Raises:
@@ -261,7 +261,7 @@ class SettingsStoreManager(ABC):
     def log(self, message: str) -> None:
         """Log method.
 
-        Args:
+        Parameters:
             message: message to log.
         """
         self.settings_service.log(message)
@@ -277,7 +277,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: Unused. Included to match parent class method signature.
 
@@ -305,7 +305,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
-        Args:
+        Parameters:
             name: Unused. Included to match parent class method signature.
             setting_def: SettingDefinition instance.
 
@@ -344,7 +344,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
     def setting_env_vars(self, *args, **kwargs) -> dict:
         """Return setting environment variables.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to setting_service setting_env_vars method.
             kwargs: Keyword arguments to pass to setting_service setting_env_vars method.
 
@@ -371,7 +371,7 @@ class EnvStoreManager(BaseEnvStoreManager):
     def get(self, *args, **kwargs):
         """Get value by name from the .env file.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to parent method.
             kwargs: Keyword arguments to pass to parent method.
 
@@ -396,7 +396,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     def __init__(self, *args, **kwargs):
         """Initialise a .env file store manager instance.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to parent class.
             kwargs: Keyword arguments to pass to parent class.
         """
@@ -406,7 +406,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     def ensure_supported(self, method: str = "get") -> None:
         """Ensure named method is supported and project is not read-only and the passed method is supported.
 
-        Args:
+        Parameters:
             method: Setting method (get, set, etc.)
 
         Raises:
@@ -429,7 +429,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     def get(self, *args, **kwargs) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to parent method.
             kwargs: Keyword arguments to pass to parent method.
 
@@ -447,7 +447,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     def set(self, name: str, path: list[str], value, setting_def=None):
         """Set value by name in the .env file.
 
-        Args:
+        Parameters:
             name: Unused. Included to match parent class method signature.
             path: Unused. Included to match parent class method signature.
             value: New value to set.
@@ -487,7 +487,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     ) -> dict:
         """Unset value by SettingDefinition in the .env file.
 
-        Args:
+        Parameters:
             name: Unused. Included to match parent class method signature.
             path: Unused. Included to match parent class method signature.
             setting_def: SettingDefinition instance.
@@ -554,7 +554,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
     def __init__(self, *args, **kwargs):
         """Initialise MeltanoYmlStoreManager instance.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to parent class.
             kwargs: Keyword arguments to pass to parent class.
         """
@@ -564,7 +564,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
     def ensure_supported(self, method: str = "get") -> None:
         """Ensure named method is supported and project is not read-only and an environment is active.
 
-        Args:
+        Parameters:
             method: Setting method (get, set, etc.)
 
         Raises:
@@ -578,7 +578,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: SettingDefinition.
 
@@ -620,7 +620,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
     ) -> dict:
         """Set value by name in the Meltano YAML File.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Setting path.
             value: New value to set.
@@ -666,7 +666,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
     ) -> dict:
         """Unset value by name in the Meltano YAML file.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Setting path.
             setting_def: SettingDefinition instance.
@@ -748,7 +748,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     def __init__(self, *args, **kwargs):
         """Initialise MeltanoEnvStoreManager instance.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to parent class.
             kwargs: Keyword arguments to pass to parent class.
         """
@@ -769,7 +769,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     def ensure_supported(self, method: str = "get"):
         """Ensure project is not read-only and an environment is active.
 
-        Args:
+        Parameters:
             method: Setting method (get, set, etc.)
 
         Raises:
@@ -819,7 +819,7 @@ class DbStoreManager(SettingsStoreManager):
     ):
         """Initialise DbStoreManager.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to parent class.
             bulk:  Flag to determine whether parent metadata is returned alongside child.
             session: SQLAlchemy Session to use when querying the system database.
@@ -834,7 +834,7 @@ class DbStoreManager(SettingsStoreManager):
     def ensure_supported(self, method: str = "get") -> None:
         """Return True if passed method is supported by this store.
 
-        Args:
+        Parameters:
             method: Unused. Included to match parent class method signature.
 
         Raises:
@@ -848,7 +848,7 @@ class DbStoreManager(SettingsStoreManager):
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: Unused. Included to match parent class method signature.
 
@@ -880,7 +880,7 @@ class DbStoreManager(SettingsStoreManager):
     ) -> dict:
         """Set value by name in the system database.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Unused. Included to match parent class method signature.
             value: New value to set.
@@ -908,7 +908,7 @@ class DbStoreManager(SettingsStoreManager):
     ) -> dict:
         """Unset value by name in the system database store.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Unused. Included to match parent class method signature.
             setting_def: Unused. Included to match parent class method signature.
@@ -976,7 +976,7 @@ class InheritedStoreManager(SettingsStoreManager):
     ):
         """Initialize inherited store manager.
 
-        Args:
+        Parameters:
             settings_service: SettingsService instance.
             args: Positional arguments to pass to parent class.
             bulk: Flag to determine whether parent metadata is returned alongside child.
@@ -992,7 +992,7 @@ class InheritedStoreManager(SettingsStoreManager):
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: SettingDefinition.
 
@@ -1043,7 +1043,7 @@ class InheritedStoreManager(SettingsStoreManager):
     def get_with_metadata(self, name: str) -> tuple[str, dict]:
         """Return inherited config and metadata for the named setting.
 
-        Args:
+        Parameters:
             name: Setting name.
 
         Returns:
@@ -1066,7 +1066,7 @@ class DefaultStoreManager(SettingsStoreManager):
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: SettingDefinition.
 
@@ -1094,7 +1094,7 @@ class AutoStoreManager(SettingsStoreManager):
     def __init__(self, *args, cache: bool = True, **kwargs):
         """Initialise AutoStoreManager.
 
-        Args:
+        Parameters:
             args: Positional arguments to pass to parent class.
             cache: Cache store manager instances for fast retrieval.
             kwargs: Keyword arguments to pass to parent class.
@@ -1107,7 +1107,7 @@ class AutoStoreManager(SettingsStoreManager):
     def manager_for(self, store: SettingValueStore) -> SettingsStoreManager:
         """Get setting store manager for this a value store.
 
-        Args:
+        Parameters:
             store: A setting value store.
 
         Returns:
@@ -1163,7 +1163,7 @@ class AutoStoreManager(SettingsStoreManager):
     ) -> SettingValueStore | None:
         """Get first valid writable SettingValueStore instance for a Setting.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
 
@@ -1225,7 +1225,7 @@ class AutoStoreManager(SettingsStoreManager):
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
-        Args:
+        Parameters:
             name: Setting name.
             setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
             kwargs: Additional keword arguments to pass to `manager.get()`
@@ -1267,7 +1267,7 @@ class AutoStoreManager(SettingsStoreManager):
     def set(self, name: str, path: list[str], value, setting_def=None) -> dict:
         """Set a Setting by name, path and (optionally) SettingDefinition.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Setting path.
             value: New Setting value.
@@ -1317,7 +1317,7 @@ class AutoStoreManager(SettingsStoreManager):
     ) -> dict:
         """Unset value, by name, path and SettingDefinition, in all stores.
 
-        Args:
+        Parameters:
             name: Setting name.
             path: Setting path.
             setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
@@ -1371,7 +1371,7 @@ class AutoStoreManager(SettingsStoreManager):
     def find_setting(self, name: str) -> SettingDefinition | None:
         """Find a setting by name.
 
-        Args:
+        Parameters:
             name: Name of the Setting to find.
 
         Returns:

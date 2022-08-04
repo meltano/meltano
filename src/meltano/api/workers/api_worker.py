@@ -1,4 +1,6 @@
 """Starts WSGI Webserver that will run the API App for a Meltano Project."""
+from __future__ import annotations
+
 import logging
 import platform
 import threading
@@ -16,7 +18,7 @@ class APIWorker(threading.Thread):
     def __init__(self, project: Project, reload=False):
         """Initialize the API Worker class with the project config.
 
-        Args:
+        Parameters:
             project: Project class.
             reload: Boolean.
         """

@@ -1,6 +1,7 @@
 """Meltano schedule definition."""
+from __future__ import annotations
+
 import datetime
-from typing import List
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -33,7 +34,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
     ):
         """Initialize a Schedule.
 
-        Args:
+        Parameters:
             name: The name of the schedule.
             extractor: The name of the extractor.
             loader: The name of the loader.
@@ -85,7 +86,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         return not self.job
 
     @property
-    def elt_args(self) -> List[str]:
+    def elt_args(self) -> list[str]:
         """Return the list of arguments to pass to the elt command, if the schedule is an elt schedule.
 
         Returns:
@@ -106,7 +107,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
     def last_successful_run(self, session) -> StateJob:
         """Return the last successful run for this schedule.
 
-        Args:
+        Parameters:
             session: The database session.
 
         Returns:

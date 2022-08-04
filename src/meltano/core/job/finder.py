@@ -1,5 +1,7 @@
 """Defines JobFinder (will be renamed to StateFinder)."""
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 from .job import HEARTBEAT_VALID_MINUTES, HEARTBEATLESS_JOB_VALID_HOURS, Job, State
@@ -11,7 +13,7 @@ class JobFinder:
     def __init__(self, state_id: str):
         """Initialize the JobFinder.
 
-        Args:
+        Parameters:
             state_id: the state_id to build queries for.
         """
         self.state_id = state_id
@@ -19,7 +21,7 @@ class JobFinder:
     def latest(self, session):
         """Get the latest state for this instance's state ID.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
 
         Returns:
@@ -35,7 +37,7 @@ class JobFinder:
     def successful(self, session):
         """Get all successful jobs for this instance's state ID.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
 
         Returns:
@@ -43,28 +45,28 @@ class JobFinder:
         """
         return session.query(Job).filter(
             (Job.job_name == self.state_id)  # noqa: WPS465
-            & (Job.state == State.SUCCESS)
+            & (Job.state == State.SUCCESS)  # noqa: WPS465
             & Job.ended_at.isnot(None)
         )
 
     def running(self, session):
         """Find states in the running state.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
 
         Returns:
             All runnings states for state_id.
         """
         return session.query(Job).filter(
-            (Job.job_name == self.state_id)
-            & (Job.state == State.RUNNING)  # noqa: WPS465
+            (Job.job_name == self.state_id)  # noqa: WPS465
+            & (Job.state == State.RUNNING)
         )
 
     def latest_success(self, session):
         """Get the latest successful state for this instance's state ID.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
 
         Returns:
@@ -75,7 +77,7 @@ class JobFinder:
     def latest_running(self, session):
         """Find the most recent state in the running state, if any.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
 
         Returns:
@@ -86,7 +88,7 @@ class JobFinder:
     def with_payload(self, session, flags=0, since=None, state=None):
         """Get all states for this instance's state ID matching the given args.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
             flags: only return states with these flags
             since: only return states which ended after this time
@@ -99,8 +101,8 @@ class JobFinder:
             session.query(Job)
             .filter(
                 (Job.job_name == self.state_id)  # noqa: WPS465
-                & (Job.payload_flags != 0)
-                & (Job.payload_flags.op("&")(flags) == flags)
+                & (Job.payload_flags != 0)  # noqa: WPS465
+                & (Job.payload_flags.op("&")(flags) == flags)  # noqa: WPS465
                 & Job.ended_at.isnot(None)
             )
             .order_by(Job.ended_at.asc())
@@ -115,7 +117,7 @@ class JobFinder:
     def latest_with_payload(self, session, **kwargs):
         """Return the latest state matching the given kwargs.
 
-        Args:
+        Parameters:
             session: the session to use to query the db
             kwargs: keyword args to pass to with_payload
 
@@ -133,7 +135,7 @@ class JobFinder:
     def all_stale(cls, session):
         """Return all stale states.
 
-        Args:
+        Parameters:
             session: the session to use to query the db
 
         Returns:
@@ -160,7 +162,7 @@ class JobFinder:
     def stale(self, session):
         """Return stale states with the instance's state ID.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
 
         Returns:
@@ -171,7 +173,7 @@ class JobFinder:
     def get_all(self, session: object, since=None):
         """Return all state with the instance's state ID.
 
-        Args:
+        Parameters:
             session: the session to use in querying the db
             since: only return state which ended after this datetime
 

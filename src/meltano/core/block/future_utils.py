@@ -1,15 +1,16 @@
 """Various small utilities for working with futures."""
 
+from __future__ import annotations
+
 import asyncio
 import logging
 from asyncio import Task
-from typing import List, Optional, Set
 
 from meltano.core.runner import RunnerError
 from meltano.core.utils import human_size
 
 
-def all_done(tasks: List[Task], done: Set[Task]) -> bool:
+def all_done(tasks: list[Task], done: set[Task]) -> bool:
     """Iterate through a task list checking if ALL tasks are in the done set."""
     for idx in tasks:
         if idx not in done:
@@ -17,14 +18,15 @@ def all_done(tasks: List[Task], done: Set[Task]) -> bool:
     return True
 
 
-def first_failed_future(exception_future: Task, done: Set[Task]) -> Optional[Task]:
+def first_failed_future(exception_future: Task, done: set[Task]) -> Task | None:
     """Check if a future is in a set of completed futures and return the first failed (if any).
 
-    Args:
+    Parameters:
         exception_future: The future you want to check and who's futures should be returned if an exception was raised.
         done: The set of completed futures you want to search.
+
     Returns:
-        Futures that failed
+        The first future that failed.
     """
     if exception_future in done:
         futures_done, _ = exception_future.result()

@@ -172,10 +172,10 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     }
 
 
-@schedule.command(
+@schedule.command(  # noqa: WPS125
     cls=PartialInstrumentedCmd, short_help="List available schedules."
-)  # noqa: WPS441
-@click.option("--format", type=click.Choice(["json", "text"]), default="text")
+)
+@click.option("--format", type=click.Choice(("json", "text")), default="text")
 @click.pass_context
 def list(ctx, format):  # noqa: WPS125
     """List available schedules."""
@@ -281,7 +281,7 @@ def _update_job_schedule(
 ) -> Schedule:
     """Update an existing job schedule.
 
-    Args:
+    Parameters:
         candidate: The schedule to update.
         job: The name of the job to run.
         interval: The interval of the schedule.
@@ -312,7 +312,7 @@ def _update_elt_schedule(
 ) -> Schedule:
     """Update an elt schedule.
 
-    Args:
+    Parameters:
         candidate: The schedule to update.
         extractor: The name of the extractor to use.
         loader: The name of the loader to use.
