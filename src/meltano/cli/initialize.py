@@ -5,7 +5,6 @@ import logging
 
 import click
 
-from meltano.core.error import SubprocessError
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -49,20 +48,17 @@ def init(ctx, project_name, no_usage_stats):
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
 
     init_service = ProjectInitService(project_name)
-    try:  # noqa: WPS229
-        project = init_service.init()
-        init_service.echo_instructions()
 
-        # since the project didn't exist, tracking was not initialized in cli.py
-        # but now that we've created a project we can set up telemetry and fire events.
-        tracker = Tracker(project)
-        tracker.add_contexts(CliContext.from_click_context(ctx))
-        tracker.track_command_event(CliEvent.started)
-        ctx.obj["tracker"] = tracker
-        ctx.obj["legacy_tracker"] = LegacyTracker(
-            project, context_overrides=ctx.obj["tracker"].contexts
-        )
-        ctx.obj["legacy_tracker"].track_meltano_init(project_name=project_name)
-    except SubprocessError as err:
-        logger.error(err.stderr)
-        raise
+    project = init_service.init()
+    init_service.echo_instructions()
+
+    # since the project didn't exist, tracking was not initialized in cli.py
+    # but now that we've created a project we can set up telemetry and fire events.
+    tracker = Tracker(project)
+    tracker.add_contexts(CliContext.from_click_context(ctx))
+    tracker.track_command_event(CliEvent.started)
+    ctx.obj["tracker"] = tracker
+    ctx.obj["legacy_tracker"] = LegacyTracker(
+        project, context_overrides=ctx.obj["tracker"].contexts
+    )
+    ctx.obj["legacy_tracker"].track_meltano_init(project_name=project_name)

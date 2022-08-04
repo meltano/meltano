@@ -6,8 +6,8 @@ import secrets
 from flask import Flask, render_template, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-import meltano.oauth.config
 from meltano.core.project import Project
+from meltano.oauth import config as oauth_config
 
 
 def create_app():
@@ -18,7 +18,7 @@ def create_app():
     )
 
     app.config.from_object("meltano.oauth.config")
-    app.config.from_mapping(**meltano.oauth.config.ProjectSettings(project).as_dict())
+    app.config.from_mapping(**oauth_config.ProjectSettings(project).as_dict())
 
     @app.errorhandler(Exception)
     def _handle(e):
@@ -45,7 +45,8 @@ def create_app():
 
     @app.route("/sample")
     def sample():
-        return render_template("token.html", token=secrets.token_hex(128))
+        secret_token_size = 128
+        return render_template("token.html", token=secrets.token_hex(secret_token_size))
 
     @app.route("/error")
     def error():

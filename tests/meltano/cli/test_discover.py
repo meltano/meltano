@@ -32,14 +32,14 @@ class TestCliDiscover:
             request_count = 1 if plugin_type.discoverable else 0
             assert hub_request_counter[f"/{plugin_type}/index"] == request_count
 
-        assert "Extractors" in result.output
-        assert "tap-gitlab" in result.output
-        assert "tap-mock" in result.output
-        assert "tap-mock, variants: meltano (default), singer-io" in result.output
+        assert "Extractors" in result.stdout
+        assert "tap-gitlab" in result.stdout
+        assert "tap-mock" in result.stdout
+        assert "tap-mock, variants: meltano (default), singer-io" in result.stdout
 
-        assert "Loaders" in result.output
-        assert "target-jsonl" in result.output
-        assert "target-mock" in result.output
+        assert "Loaders" in result.stdout
+        assert "target-jsonl" in result.stdout
+        assert "target-mock" in result.stdout
 
     def test_discover_extractors(
         self,
@@ -60,8 +60,8 @@ class TestCliDiscover:
         assert hub_request_counter["/extractors/index"] == 1
         assert hub_request_counter["/loaders/index"] == 0
 
-        assert "Extractors" in result.output
-        assert "tap-gitlab" in result.output
-        assert "tap-mock" in result.output
+        assert "Extractors" in result.stdout
+        assert "tap-gitlab" in result.stdout
+        assert "tap-mock" in result.stdout
 
-        assert "Loaders" not in result.output
+        assert "Loaders" not in result.stdout

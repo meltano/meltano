@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from meltano.api.headers import *
+from meltano.api.headers import JSON_SCHEME_HEADER, VERSION_HEADER
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import truthy
@@ -29,7 +29,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # Flask-Security
 # -----------------
 
-SECURITY_PASSWORD_HASH = "bcrypt"
+SECURITY_PASSWORD_HASH = "bcrypt"  # noqa: S105
 SECURITY_REGISTERABLE = False
 SECURITY_CHANGEABLE = True
 SECURITY_RECOVERABLE = False

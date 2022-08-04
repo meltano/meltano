@@ -1,7 +1,5 @@
-"""SingerMapper and supporting classes.
+"""This module contains the SingerMapper class as well as a supporting methods."""
 
-This module contains the SingerMapper class as well as a supporting methods.
-"""
 from __future__ import annotations
 
 import json

@@ -5,7 +5,11 @@ from flask_principal import identity_loaded
 
 from meltano.core.project_settings_service import ProjectSettingsService
 
-from .auth import _identity_loaded_hook, _user_logged_in_hook, unauthorized_callback
+from .auth import (  # noqa: WPS450
+    _identity_loaded_hook,
+    _user_logged_in_hook,
+    unauthorized_callback,
+)
 
 
 def setup_security(app, project):
@@ -24,13 +28,9 @@ def setup_security(app, project):
 
     settings_service = ProjectSettingsService(project)
     if not settings_service.get("ui.authentication"):
-        # the FreeUser is free to do everything and has all
-        # roles and permissions automatically.
         options["anonymous_user"] = FreeUser
-    else:
-        # Use Flask's built-in AnonymousUser which is not deemed to be authenticated
-        # and has no roles
-        pass
+    # Else: use Flask's built-in AnonymousUser, which is not deemed to be
+    # authenticated and has no roles.
 
     from flask_security import Security
 

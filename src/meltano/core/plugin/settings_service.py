@@ -26,7 +26,7 @@ class PluginSettingsService(SettingsService):
     ):
         """Create a new plugin settings manager.
 
-        Args:
+        Parameters:
             project: The Meltano project.
             plugin: The Meltano plugin.
             args: Positional arguments to pass to the superclass.
@@ -105,7 +105,7 @@ class PluginSettingsService(SettingsService):
     def setting_env_vars(self, setting_def: SettingDefinition, for_writing=False):
         """Get environment variables for a setting.
 
-        Args:
+        Parameters:
             setting_def: The setting definition.
             for_writing: Whether to get environment variables for writing.
 
@@ -167,7 +167,7 @@ class PluginSettingsService(SettingsService):
     def update_meltano_yml_config(self, config_with_extras):
         """Update configuration in `meltano.yml`.
 
-        Args:
+        Parameters:
             config_with_extras: Configuration to update.
         """
         self.plugin.config_with_extras = config_with_extras
@@ -176,7 +176,7 @@ class PluginSettingsService(SettingsService):
     def update_meltano_environment_config(self, config_with_extras: dict[str, Any]):
         """Update environment configuration in `meltano.yml`.
 
-        Args:
+        Parameters:
             config_with_extras: Configuration to update.
         """
         self.environment_plugin_config.config_with_extras = config_with_extras
@@ -205,7 +205,7 @@ class PluginSettingsService(SettingsService):
     def process_config(self, config):
         """Process configuration dictionary to be passed to plugin.
 
-        Args:
+        Parameters:
             config: Configuration dictionary to process.
 
         Returns:

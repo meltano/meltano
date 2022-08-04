@@ -16,7 +16,7 @@ from meltano.core.utils import hash_sha256, safe_hasattr
 logger = get_logger(__name__)
 
 
-def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
+def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
     if not plugin or not safe_hasattr(plugin, "info"):
         # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?), or where passed None.
         # this event will be routed to the "bad" bucket on the snowplow side. That makes it detectable on our end,
@@ -46,29 +46,19 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
 class PluginsTrackingContext(SelfDescribingJson):
     """Tracking context for the Meltano plugins."""
 
-    def __init__(self, plugins: list(tuple[ProjectPlugin, str])):
+    def __init__(self, plugins: list(tuple[ProjectPlugin, str | None])):
         """Initialize a meltano tracking plugin context.
 
-        Args:
+        Parameters:
             plugins: The Meltano plugins and the requested command.
         """
-        tracking_context = []
-        for plugin, cmd in plugins:
-            tracking_context.append(_from_plugin(plugin, cmd))
-
         super().__init__(
             PluginsContextSchema.url,
-            {"context_uuid": str(uuid.uuid4()), "plugins": tracking_context},
+            {
+                "context_uuid": str(uuid.uuid4()),
+                "plugins": [_from_plugin(plugin, cmd) for plugin, cmd in plugins],
+            },
         )
-
-    def append_plugin_context(self, plugin: ProjectPlugin, cmd: str):
-        """Append a plugin context to the tracking context.
-
-        Args:
-            plugin: The Meltano plugin.
-            cmd: The command that was executed.
-        """
-        self["plugins"].append({_from_plugin(plugin, cmd)})
 
     @classmethod
     def from_elt_context(cls, elt_context: ELTContext) -> PluginsTrackingContext:

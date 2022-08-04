@@ -9,7 +9,7 @@ from . import BasePlugin, PluginDefinition, PluginType, Variant
 def lazy_import(module: str, classname: str):
     """Lazily import a class.
 
-    Args:
+    Parameters:
         module: the module to import from
         classname: the class to import
 
@@ -43,7 +43,7 @@ def base_plugin_factory(
 ) -> BasePlugin:
     """Return a plugin based on the given PluginDefinition and variant.
 
-    Args:
+    Parameters:
         plugin_def: the PluginDefinition of the plugin to create.
         variant_or_name: the variant or name of the plugin to create.
 

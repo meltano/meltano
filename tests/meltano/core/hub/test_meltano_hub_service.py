@@ -5,8 +5,8 @@ from collections import Counter
 import pytest
 
 from meltano.core.hub import MeltanoHubService
-from meltano.core.hub.client import HubPluginVariantNotFound
-from meltano.core.plugin.base import PluginType
+from meltano.core.hub.client import HubPluginVariantNotFoundError
+from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 
 
@@ -43,6 +43,22 @@ class TestMeltanoHubService:
         assert hub_request_counter["/extractors/index"] == 1
         assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
 
+    def test_find_definition_original_variant(
+        self,
+        subject: MeltanoHubService,
+        hub_request_counter: Counter,
+    ):
+        definition = subject.find_definition(
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant_name=Variant.ORIGINAL_NAME,
+        )
+        assert definition.name == "tap-mock"
+        assert definition.variants[0].name == "meltano"
+
+        assert hub_request_counter["/extractors/index"] == 1
+        assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
+
     def test_definition_not_found(
         self,
         subject: MeltanoHubService,
@@ -59,7 +75,7 @@ class TestMeltanoHubService:
         subject: MeltanoHubService,
         hub_request_counter: Counter,
     ):
-        with pytest.raises(HubPluginVariantNotFound):
+        with pytest.raises(HubPluginVariantNotFoundError):
             subject.find_definition(PluginType.EXTRACTORS, "tap-mock", "not-found")
 
         assert hub_request_counter["/extractors/index"] == 1

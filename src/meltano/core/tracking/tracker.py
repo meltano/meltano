@@ -59,7 +59,7 @@ class BlockEvents(Enum):
 def check_url(url: str) -> bool:
     """Check if the given URL is valid.
 
-    Args:
+    Parameters:
         url: The URL to check.
 
     Returns:
@@ -89,7 +89,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     ):
         """Initialize a tracker for the Meltano project.
 
-        Args:
+        Parameters:
             project: The Meltano project.
             request_timeout: Timeout for the HTTP requests. Can be set either
                 as single float value which applies to both `connect` and
@@ -159,7 +159,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     ) -> None:
         """Check prior values against current ones, and send a change event if needed.
 
-        Args:
+        Parameters:
             stored_telemetry_settings: the prior analytics settings
         """
         if (
@@ -210,7 +210,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def add_contexts(self, *extra_contexts):
         """Permanently add additional Snowplow contexts to the `Tracker`.
 
-        Args:
+        Parameters:
             extra_contexts: The additional contexts to add to the `Tracker`.
         """
         self._contexts = (*self._contexts, *extra_contexts)
@@ -219,7 +219,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def with_contexts(self, *extra_contexts) -> Tracker:
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
-        Args:
+        Parameters:
             extra_contexts: The additional contexts to add to the `Tracker`.
 
         Yields:
@@ -245,7 +245,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         Note: This is a legacy method that will be removed in a future version, once LegacyTracker is no longer used.
 
-        Args:
+        Parameters:
             category: The category of the event.
             action: The event actions.
         """
@@ -271,7 +271,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
         """Fire an unstructured tracking event.
 
-        Args:
+        Parameters:
             event_json: The SelfDescribingJson event to track. See the Snowplow documentation for more information.
         """
         if not self.can_track():
@@ -287,7 +287,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def track_command_event(self, event: CliEvent) -> None:
         """Fire generic command tracking event.
 
-        Args:
+        Parameters:
             event: An member from `meltano.core.tracking.CliEvent`
         """
         self.track_unstruct_event(
@@ -302,7 +302,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     ) -> None:
         """Fire a telemetry state change event.
 
-        Args:
+        Parameters:
             setting_name: the name of the setting that is changing
             from_value: the old value
             to_value: the new value
@@ -406,7 +406,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def _uuid_from_str(self, from_val: Any | None, warn: bool) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
 
-        Args:
+        Parameters:
             from_val: The string.
             warn: True to warn on conversion failure.
 
@@ -438,7 +438,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def track_block_event(self, block_type: str, event: BlockEvents) -> None:
         """Fire generic block tracking event.
 
-        Args:
+        Parameters:
             block_type: The block type.
             event: The event string (e.g. "initialize", "started", etc)
         """

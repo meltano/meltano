@@ -31,7 +31,7 @@ logger = get_logger(__name__)
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     """Instantiate a plugin invoker from a project plugin.
 
-    Args:
+    Parameters:
         project: Meltano project.
         plugin: Plugin instance.
         args: Invoker constructor positional arguments.
@@ -58,7 +58,7 @@ class ExecutableNotFoundError(InvokerError):
     def __init__(self, plugin: PluginRef, executable: str):
         """Initialize ExecutableNotFoundError.
 
-        Args:
+        Parameters:
             plugin: Meltano plugin reference.
             executable: Plugin command executable.
         """
@@ -83,7 +83,7 @@ class UnknownCommandError(InvokerError):
     def __init__(self, plugin: PluginRef, command):
         """Initialize UnknownCommandError.
 
-        Args:
+        Parameters:
             plugin: Meltano plugin reference.
             command: Plugin command name.
         """
@@ -137,7 +137,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     ):
         """Create a new plugin invoker.
 
-        Args:
+        Parameters:
             project: Meltano Project.
             plugin: Meltano Plugin.
             context: Invocation context.
@@ -208,7 +208,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def prepare(self, session):
         """Prepare plugin config.
 
-        Args:
+        Parameters:
             session: Database session.
         """
         self.plugin_config = self.settings_service.as_dict(
@@ -240,7 +240,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def prepared(self, session):
         """Context manager that prepares plugin config.
 
-        Args:
+        Parameters:
             session: Database session.
 
         Yields:
@@ -257,7 +257,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         Uses the plugin executable if none is specified.
 
-        Args:
+        Parameters:
             executable: Optional executable string.
 
         Returns:
@@ -278,7 +278,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable.
 
-        Args:
+        Parameters:
             args: Optional plugin args.
             command: Plugin command name.
             env: Environment variables
@@ -301,7 +301,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def find_command(self, name):
         """Find a Command by name.
 
-        Args:
+        Parameters:
             name: Command name.
 
         Returns:
@@ -380,7 +380,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def invoke_async(self, *args, **kwargs):
         """Invoke a command.
 
-        Args:
+        Parameters:
             args: Positional arguments.
             kwargs: Keyword arguments.
 
@@ -401,7 +401,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def invoke_docker(self, plugin_command: str, *args, **kwargs) -> int:
         """Invoke a containerized command.
 
-        Args:
+        Parameters:
             plugin_command: Plugin command name.
             args: Command line invocation arguments.
             kwargs: Command line invocation keyword arguments.
@@ -433,7 +433,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def dump(self, file_id: str) -> str:
         """Dump a plugin file by id.
 
-        Args:
+        Parameters:
             file_id: Dump this file identifier.
 
         Returns:
@@ -455,7 +455,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.
 
-        Args:
+        Parameters:
             src: stdio source you'd like to subscribe, likely either 'stdout' or 'stderr'
             handler: either a StreamWriter or an object matching the utils.SubprocessOutputWriter proto
         """

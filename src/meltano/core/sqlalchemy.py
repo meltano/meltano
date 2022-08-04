@@ -10,8 +10,8 @@ from sqlalchemy.types import CHAR, INTEGER, VARCHAR, TypeDecorator
 class JSONEncodedDict(TypeDecorator):
     """Represents an immutable structure as a json-encoded string.
 
-    Usage::
-        JSONEncodedDict(255)
+    Usage:
+        JSONEncodedDict(VARCHAR_LENGTH)
     """
 
     impl = VARCHAR
@@ -53,25 +53,21 @@ class GUID(TypeDecorator):
     def load_dialect_impl(self, dialect):
         if dialect.name == "postgresql":
             return dialect.type_descriptor(UUID())
-        else:
-            return dialect.type_descriptor(CHAR(32))
+        type_descriptor_length = 32
+        return dialect.type_descriptor(CHAR(type_descriptor_length))
 
     def process_bind_param(self, value, dialect):
         if value is None:
             return value
         elif dialect.name == "postgresql":
             return str(value)
-        else:
-            if not isinstance(value, uuid.UUID):
-                return "%.32x" % uuid.UUID(value).int
-            else:
-                # hexstring
-                return "%.32x" % value.int
+        if not isinstance(value, uuid.UUID):
+            value = uuid.UUID(value)
+        return value.hex
 
     def process_result_value(self, value, dialect):
         if value is None:
             return value
-        else:
-            if not isinstance(value, uuid.UUID):
-                value = uuid.UUID(value)
-            return value
+        if not isinstance(value, uuid.UUID):
+            value = uuid.UUID(value)
+        return value

@@ -14,7 +14,7 @@ VERSION = 1
 
 class APIBlueprint(Blueprint):
     @property
-    def api_version():
+    def api_version(self):
         return f"v{VERSION}"
 
     @classmethod

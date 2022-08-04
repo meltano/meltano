@@ -32,7 +32,7 @@ class LogEntry:
     ):
         """Logentries is a simple support class for checking whether a log entry is in a list of dicts.
 
-        Args:
+        Parameters:
             name: contents of the name field field to search for (or None if it should not be set)
             cmd_type: contents of the cmd_type field to search for (or None if it should not be set)
             event: str prefix of the event field to search for (or None if it should not be set)
@@ -51,7 +51,7 @@ class LogEntry:
         It's important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
         This is because quite a few log lines have dynamic suffix segments.
 
-        Args:
+        Parameters:
             lines: the log lines to check against
 
         Returns:
@@ -80,7 +80,7 @@ def assert_lines(output, *lines):
 def exception_logged(result_output: str, exc: Exception) -> bool:
     """Small utility to search click result output for a specific exception.
 
-    Args:
+    Parameters:
         result_output: The click result output string to search.
         exc: The exception to search for.
 

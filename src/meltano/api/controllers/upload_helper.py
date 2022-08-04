@@ -7,7 +7,7 @@ from meltano.core.project import Project
 
 from .utils import enforce_secure_filename
 
-MAX_FILE_SIZE = 4_194_304  # 4MB max
+MAX_FILE_SIZE = 4194304  # 4MB max
 ALLOWED_EXTENSIONS = {"json"}
 
 
@@ -50,4 +50,4 @@ class UploadHelper:
         file.seek(0, SEEK_END)
         file_size = file.tell()
         file.seek(0)  # Return to 0 so subsequent write occurs from beginning of file
-        return file_size > 0 and file_size <= MAX_FILE_SIZE
+        return 0 < file_size <= MAX_FILE_SIZE

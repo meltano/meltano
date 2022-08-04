@@ -40,7 +40,7 @@ def upgrade(ctx, project):
     ctx.obj["upgrade_service"] = upgrade_service
 
 
-@upgrade.command(
+@upgrade.command(  # noqa: WPS125
     cls=InstrumentedCmd,
     short_help="Upgrade Meltano and your entire project to the latest version.",
 )
@@ -61,7 +61,7 @@ def upgrade(ctx, project):
     help="Skip updating the Meltano package.",
 )
 @click.pass_context
-def all(ctx, pip_url, force, skip_package):  # noqa: WPS125
+def all(ctx, pip_url, force, skip_package):
     """
     Upgrade Meltano and your entire project to the latest version.
 

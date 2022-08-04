@@ -44,36 +44,40 @@ class PayloadBuilder:
         return self
 
     def legacy_column_filter(self, source_name, name, expression, value):
-        filter = {
-            "source_name": source_name,
-            "name": name,
-            "expression": expression,
-            "value": value,
-        }
-        self._column_filters.append(filter)
+        self._column_filters.append(
+            {
+                "source_name": source_name,
+                "name": name,
+                "expression": expression,
+                "value": value,
+            }
+        )
 
         return self
 
     def column_filter(self, key, expression, value):
-        filter = {"key": key, "expression": expression, "value": value}
-        self._column_filters.append(filter)
+        self._column_filters.append(
+            {"key": key, "expression": expression, "value": value}
+        )
 
         return self
 
     def legacy_aggregate_filter(self, source_name, name, expression, value):
-        filter = {
-            "source_name": source_name,
-            "name": name,
-            "expression": expression,
-            "value": value,
-        }
-        self._aggregate_filters.append(filter)
+        self._aggregate_filters.append(
+            {
+                "source_name": source_name,
+                "name": name,
+                "expression": expression,
+                "value": value,
+            }
+        )
 
         return self
 
     def aggregate_filter(self, key, expression, value):
-        filter = {"key": key, "expression": expression, "value": value}
-        self._aggregate_filters.append(filter)
+        self._aggregate_filters.append(
+            {"key": key, "expression": expression, "value": value}
+        )
 
         return self
 

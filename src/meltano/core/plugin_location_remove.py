@@ -32,7 +32,7 @@ class PluginLocationRemoveManager(ABC):
     def __init__(self, plugin: ProjectPlugin, location):
         """Construct a PluginLocationRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             location: The location to remove the plugin from.
         """
@@ -80,7 +80,7 @@ class DbRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project):
         """Construct a DbRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """
@@ -113,7 +113,7 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project: Project):
         """Construct a MeltanoYmlRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """
@@ -141,7 +141,7 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project: Project):
         """Construct a LockedDefinitionRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """
@@ -177,7 +177,7 @@ class InstallationRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project: Project):
         """Construct a InstallationRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """

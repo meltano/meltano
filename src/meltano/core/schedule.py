@@ -34,7 +34,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
     ):
         """Initialize a Schedule.
 
-        Args:
+        Parameters:
             name: The name of the schedule.
             extractor: The name of the extractor.
             loader: The name of the loader.
@@ -107,7 +107,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
     def last_successful_run(self, session) -> StateJob:
         """Return the last successful run for this schedule.
 
-        Args:
+        Parameters:
             session: The database session.
 
         Returns:

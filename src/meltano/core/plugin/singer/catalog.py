@@ -39,7 +39,7 @@ class CatalogRule:
     def match(self, tap_stream_id: str, breadcrumb: list[str] | None = None) -> bool:
         """Evaluate if rule matches a stream or breadcrumb.
 
-        Args:
+        Parameters:
             tap_stream_id: Singer stream identifier.
             breadcrumb: JSON property breadcrumb.
 
@@ -107,7 +107,7 @@ class SelectPattern(NamedTuple):
     def parse(cls, pattern: str):
         """Parse a SelectPattern instance from a string pattern.
 
-        Args:
+        Parameters:
             pattern: Stream or property selection pattern.
 
         Returns:
@@ -142,7 +142,7 @@ class SelectPattern(NamedTuple):
 def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select` patterns.
 
-    Args:
+    Parameters:
         patterns: Iterable of `select` string patterns.
 
     Returns:
@@ -187,7 +187,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
 def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select_filter` patterns.
 
-    Args:
+    Parameters:
         patterns: Iterable of `select_filter` string patterns.
 
     Returns:
@@ -224,7 +224,7 @@ def path_property(path: str) -> str:
     As we traverse the catalog tree, we build a materialized path
     to keep track of the parent nodes.
 
-    Args:
+    Parameters:
         path: String representing a property path in the JSON schema.
 
     Returns:
@@ -242,7 +242,7 @@ def path_property(path: str) -> str:
 def property_breadcrumb(props: list[str]) -> list[str]:
     """Create breadcrumb from properties path list.
 
-    Args:
+    Parameters:
         props: List of strings representing a property breadcrumb in the JSON object.
 
     Returns:
@@ -311,7 +311,7 @@ def _(node: dict, executor, path=""):
         executor(node_type, node, path)
 
     for child_path, child_node in node.items():
-        if node_type is CatalogNode.PROPERTY and child_path in ["anyOf", "type"]:
+        if node_type is CatalogNode.PROPERTY and child_path in {"anyOf", "type"}:
             continue
 
         # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
@@ -402,7 +402,7 @@ class MetadataExecutor(CatalogExecutor):
         self._stream = node
         tap_stream_id = self._stream["tap_stream_id"]
 
-        if not "metadata" in node:
+        if "metadata" not in node:
             node["metadata"] = []
 
         self.ensure_metadata([])
@@ -439,7 +439,7 @@ class MetadataExecutor(CatalogExecutor):
         # Unsupported fields cannot be selected
         if (
             key == "selected"
-            and value == True
+            and value is True
             and node.get("inclusion") == "unsupported"
         ):
             return
@@ -478,7 +478,7 @@ class SchemaExecutor(CatalogExecutor):
                 break
 
             # If a property node for this breadcrumb doesn't exist yet, create it.
-            if not key in next_node:
+            if key not in next_node:
                 next_node[key] = {}
 
             next_node = next_node[key]
@@ -488,7 +488,7 @@ class SchemaExecutor(CatalogExecutor):
         self._stream = node
         tap_stream_id: str = self._stream["tap_stream_id"]
 
-        if not "schema" in node:
+        if "schema" not in node:
             node["schema"] = {"type": "object"}
 
         for rule in SchemaRule.matching(self._rules, tap_stream_id):
@@ -549,23 +549,24 @@ class ListSelectedExecutor(CatalogExecutor):
     def selected_properties(self):
         """Get selected streams and properties."""
         # we don't want to mutate the visitor result
-        selected = self.properties.copy()
+        selected_properties = self.properties.copy()
 
         # remove all non-selected streams
-        for stream in (name for name, selected in self.streams if not selected):
-            del selected[stream]
+        for name, selected in self.streams:
+            if not selected:
+                del selected_properties[name]
 
         # remove all non-selected properties
-        for stream, props in selected.items():
-            selected[stream] = {name for name, selected in props if selected}
+        for stream, props in selected_properties.items():
+            selected_properties[stream] = {name for name, selected in props if selected}
 
-        return selected
+        return selected_properties
 
     @staticmethod
     def node_selection(node: Node) -> SelectionType:
         """Get selection type from metadata entry.
 
-        Args:
+        Parameters:
             node: Catalog metadata dictionary.
 
         Returns:

@@ -28,7 +28,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 def plugin_def_json(plugin_def):
     """Convert plugin defenition to json.
 
-    Args:
+    Parameters:
         plugin_def: Plugin definition
 
     Returns:
@@ -52,16 +52,16 @@ def plugin_def_json(plugin_def):
     }
 
 
-pluginsBP = APIBlueprint("plugins", __name__)  # noqa: N816
+plugins_bp = APIBlueprint("plugins", __name__)  # noqa: N816
 
 
-@pluginsBP.errorhandler(PluginInstallError)
+@plugins_bp.errorhandler(PluginInstallError)
 def _handle(ex):
     return (jsonify({"error": True, "code": str(ex)}), 502)
 
 
-@pluginsBP.route("/all", methods=["GET"])
-def all():  # noqa: WPS125
+@plugins_bp.route("/all", methods=["GET"])  # noqa: WPS125
+def all():
     """Plugins found by the PluginDiscoveryService.
 
     Returns:
@@ -78,7 +78,7 @@ def all():  # noqa: WPS125
     return jsonify(all_plugins)
 
 
-@pluginsBP.route("/installed", methods=["GET"])
+@plugins_bp.route("/installed", methods=["GET"])
 def installed():
     """All plugins installed in the project.
 
@@ -109,7 +109,7 @@ def installed():
     return jsonify(installed_plugins)
 
 
-@pluginsBP.route("/add", methods=["POST"])
+@plugins_bp.route("/add", methods=["POST"])
 @block_if_readonly
 def add():
     """Add Plugin the the project file.
@@ -129,7 +129,7 @@ def add():
     return jsonify(plugin.canonical())
 
 
-@pluginsBP.route("/install/batch", methods=["POST"])
+@plugins_bp.route("/install/batch", methods=["POST"])
 @block_if_readonly
 def install_batch():  # noqa: WPS210
     """Install multiple plugins at once.
@@ -170,7 +170,7 @@ def install_batch():  # noqa: WPS210
     return jsonify([plugin.canonical() for plugin in required_plugins])
 
 
-@pluginsBP.route("/install", methods=["POST"])
+@plugins_bp.route("/install", methods=["POST"])
 @block_if_readonly
 def install():
     """Install a plugin.

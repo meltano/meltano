@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import sqlalchemy.types as types
-from sqlalchemy import Column
+from sqlalchemy import Column, types
 
 from .models import SystemModel
 

@@ -178,6 +178,7 @@ class TestCliAdd:
         shutil.rmtree("plugins/files", ignore_errors=True)
 
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         # Plugin has been added to meltano.yml
@@ -190,7 +191,7 @@ class TestCliAdd:
         assert update_config["orchestrate/dags/meltano.py"] is True
 
         # File has been created
-        assert "Created orchestrate/dags/meltano.py" in result.output
+        assert "Created orchestrate/dags/meltano.py" in output
 
         file_path = project.root_dir("orchestrate/dags/meltano.py")
         assert file_path.is_file()
@@ -204,6 +205,7 @@ class TestCliAdd:
         self, project, cli_runner, project_plugins_service
     ):
         result = cli_runner.invoke(cli, ["add", "files", "docker-compose"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         # Plugin has not been added to meltano.yml
@@ -211,7 +213,7 @@ class TestCliAdd:
             project_plugins_service.find_plugin("docker-compose", PluginType.FILES)
 
         # File has been created
-        assert "Created docker-compose.yml" in result.output
+        assert "Created docker-compose.yml" in output
 
         file_path = project.root_dir("docker-compose.yml")
         assert file_path.is_file()
@@ -230,13 +232,14 @@ class TestCliAdd:
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
         result = cli_runner.invoke(cli, ["add", "files", "dbt"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         assert (
-            "File transform/dbt_project.yml already exists, keeping both versions"
-            in result.output
+            "File 'transform/dbt_project.yml' already exists, keeping both versions"
+            in output
         )
-        assert "Created transform/dbt_project (dbt).yml" in result.output
+        assert "Created transform/dbt_project (dbt).yml" in output
         assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
 
     def test_add_missing(self, project, cli_runner, project_plugins_service):
@@ -252,11 +255,12 @@ class TestCliAdd:
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
     def test_add_fails(self, project, cli_runner, project_plugins_service):
-        res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+        result = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+        output = result.stdout + result.stderr
 
-        assert res.exit_code == 1, res.stdout
-        assert "Failed to install plugin 'tap-mock'" in res.stdout
-        assert res.stderr
+        assert result.exit_code == 1, result.stdout
+        assert "Failed to install plugin 'tap-mock'" in output
+        assert result.stderr
 
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):

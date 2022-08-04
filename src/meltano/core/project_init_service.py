@@ -22,7 +22,7 @@ class ProjectInitService:
     def __init__(self, project_name):
         """Create a new ProjectInitService instance.
 
-        Args:
+        Parameters:
             project_name: The name of the project to create
         """
         self.project_name = project_name.lower()
@@ -30,7 +30,7 @@ class ProjectInitService:
     def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
         """Initialise Meltano Project.
 
-        Args:
+        Parameters:
             activate: Activate newly created project
             add_discovery: Add discovery.yml file to created project
 
@@ -72,7 +72,7 @@ class ProjectInitService:
     def create_files(self, add_discovery=False):
         """Create project files.
 
-        Args:
+        Parameters:
             add_discovery: Add discovery.yml file to created project
         """
         click.secho("Creating project files...", fg="blue")
@@ -150,7 +150,7 @@ class ProjectInitService:
     def join_with_project_base(self, filename):
         """Join Path to Project base.
 
-        Args:
+        Parameters:
             filename: File name to join with project base
 
         Returns:

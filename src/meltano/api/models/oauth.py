@@ -4,15 +4,17 @@ from datetime import datetime
 
 from . import db
 
+DEFAULT_VARCHAR_LENGTH = 255
+
 
 class OAuth(db.Model):
     __tablename__ = "oauth"
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    provider_id = db.Column(db.String(255))
+    provider_id = db.Column(db.String(DEFAULT_VARCHAR_LENGTH))
     provider_user_id = db.Column(db.Integer)
-    access_token = db.Column(db.String(255))
+    access_token = db.Column(db.String(DEFAULT_VARCHAR_LENGTH))
     created_at = db.Column(db.DateTime())
     id_token = db.Column(db.String())
 

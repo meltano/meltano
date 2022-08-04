@@ -9,7 +9,6 @@ from contextlib import suppress
 from meltano.core.elt_context import ELTContext
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.singer import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import human_size
@@ -36,7 +35,7 @@ class SingerRunner(Runner):
                 process.kill()
                 logging.error(f"{process} was killed.")
 
-    async def invoke(  # noqa: WPS217, WPS210, WPS213, WPS231
+    async def invoke(  # noqa: WPS210, WPS213, WPS217, WPS231, WPS238
         self,
         tap: PluginInvoker,
         target: PluginInvoker,

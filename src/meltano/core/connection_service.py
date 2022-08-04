@@ -6,7 +6,7 @@ from .elt_context import ELTContext
 
 
 class DialectNotSupportedError(Exception):
-    pass
+    """Exception for when a dialect is not supported."""
 
 
 class ConnectionService:
@@ -18,7 +18,7 @@ class ConnectionService:
         return self.context.loader.get_config("_dialect")
 
     def analyze_params(self):
-        if self.dialect not in ("postgres", "snowflake"):
+        if self.dialect not in {"postgres", "snowflake"}:
             return {}
 
         if self.context.transformer:
@@ -32,11 +32,15 @@ class ConnectionService:
         params = self.analyze_params()
         return self.dialect_engine_uri(params)
 
-    def dialect_engine_uri(self, params={}):
+    def dialect_engine_uri(self, params=None):
+        params = {} if params is None else params
+
         # this part knows probably too much about the setting definition
         # for a plugin, but we have to do this if we want to infer connections
         # from the loader
-        db_suffix = lambda s: str(Path(s).with_suffix(".db"))
+
+        def db_suffix(s):
+            return str(Path(s).with_suffix(".db"))
 
         dialect_templates = {
             "postgres": lambda params: "postgresql://{user}:{password}@{host}:{port}/{dbname}".format(
@@ -51,10 +55,8 @@ class ConnectionService:
         }
 
         try:
-            url = dialect_templates[self.dialect](
+            return dialect_templates[self.dialect](
                 {**self.context.loader.config_dict(), **params}
             )
-
-            return url
         except KeyError:
             raise DialectNotSupportedError(self.dialect)

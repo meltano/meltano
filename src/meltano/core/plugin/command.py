@@ -1,4 +1,5 @@
 """Stored command arguments for plugins."""
+
 from __future__ import annotations
 
 import shlex
@@ -18,7 +19,7 @@ class UndefinedEnvVarError(Error):
     def __init__(self, command_name, var):
         """Initialize UndefinedEnvVarError.
 
-        Args:
+        Parameters:
             command_name: Plugin command name.
             var: Environment variable name.
         """
@@ -40,7 +41,7 @@ class Command(Canonical):
     ):
         """Initialize a Command.
 
-        Args:
+        Parameters:
             args: Command arguments.
             description: Command description.
             executable: Optional command executable.
@@ -59,7 +60,7 @@ class Command(Canonical):
     def expanded_args(self, name, env):
         """Replace any env var arguments with their values.
 
-        Args:
+        Parameters:
             name: Command name.
             env: Mapping of environment variables to expand the command.
 
@@ -91,7 +92,7 @@ class Command(Canonical):
     def as_canonical(cls, target):
         """Serialize the target command.
 
-        Args:
+        Parameters:
             target: Target object type.
 
         Returns:
@@ -109,7 +110,7 @@ class Command(Canonical):
     def parse(cls, obj):
         """Deserialize data into a Command.
 
-        Args:
+        Parameters:
             obj: Raw Python object.
 
         Returns:
@@ -126,7 +127,7 @@ class Command(Canonical):
     def parse_all(cls: type[TCommand], obj: dict | None) -> dict[str, TCommand]:
         """Deserialize commands data into a dict of Commands.
 
-        Args:
+        Parameters:
             obj: Raw Python object.
 
         Returns:
