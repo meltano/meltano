@@ -1,8 +1,8 @@
 """Settings manager for Meltano plugins."""
+
 from __future__ import annotations
 
-import os
-from typing import Any, Dict, List
+from typing import Any
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
@@ -52,61 +52,37 @@ class PluginSettingsService(SettingsService):
             self.project, config_service=self.plugins_service.config_service
         )
 
-        with self.feature_flag(
-            FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
-        ) as strict_env_var_mode:
-
-            # Expand root env w/ os.environ
-            expanded_project_env = expand_env_vars(
-                project_settings_service.env,
-                os.environ,
-                raise_if_missing=strict_env_var_mode,
-            )
-            expanded_project_env.update(
-                expand_env_vars(
-                    self.project.dotenv_env,
-                    os.environ,
-                    raise_if_missing=strict_env_var_mode,
-                )
-            )
-            # Expand active env w/ expanded root env
-            expanded_active_env = (
-                expand_env_vars(
-                    self.project.active_environment.env,
-                    expanded_project_env,
-                    raise_if_missing=strict_env_var_mode,
-                )
-                if self.project.active_environment
-                else {}
-            )
-
-            # Expand root plugin env w/ expanded active env
-            expanded_root_plugin_env = expand_env_vars(
-                self.plugin.env,
-                expanded_active_env,
-                raise_if_missing=strict_env_var_mode,
-            )
-
-            # Expand active env plugin env w/ expanded root plugin env
-            expanded_active_env_plugin_env = (
-                expand_env_vars(
-                    self.environment_plugin_config.env,
-                    expanded_root_plugin_env,
-                    raise_if_missing=strict_env_var_mode,
-                )
-                if self.environment_plugin_config
-                else {}
-            )
-
         self.env_override = {
-            **expanded_project_env,  # project level environment variables
+            **project_settings_service.env,  # project level environment variables
             **project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
             **self.env_override,  # plugin level overrides, passed in as **kwargs and set to self.env_overrides by super().__init__ above
             **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
-            **expanded_root_plugin_env,  # env vars stored under the `env:` key of the plugin definition,
-            **expanded_active_env,  # env vars under `env:` key of active environment
-            **expanded_active_env_plugin_env,  # env vars under `env` key of active environment plugin definition
+            **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition
         }
+
+        environment_env = {}
+        if self.project.active_environment:
+            with self.feature_flag(
+                FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+            ) as strict_env_var_mode:
+                environment_env = {
+                    var: expand_env_vars(
+                        value,
+                        self.env_override,
+                        raise_if_missing=strict_env_var_mode,
+                    )
+                    for var, value in self.project.active_environment.env.items()
+                }
+            self.env_override.update(
+                environment_env
+            )  # active Meltano Environment top level `env:` key
+
+        environment_plugin_env = (
+            self.environment_plugin_config.env if self.environment_plugin_config else {}
+        )
+        self.env_override.update(
+            environment_plugin_env
+        )  # env vars stored under the `env:` key of the plugin definition of the active meltano Environment
 
     @property
     def label(self):
