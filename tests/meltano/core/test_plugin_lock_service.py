@@ -104,4 +104,4 @@ class TestPluginLockService:
         with pytest.raises(LockfileAlreadyExistsError) as exc_info:
             subject.save(plugin)
 
-        assert exc_info.value.plugin == plugin  # noqa: WPS441
+        assert exc_info.value.plugin == plugin
