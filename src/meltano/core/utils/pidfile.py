@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import logging
 from pathlib import Path
-from typing import Union
 
 import psutil
 
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class PIDFile:
-    def __init__(self, path: Union[str, Path]):
+    def __init__(self, path: str | Path):
         self.path = Path(path)
         self._pid = None
 
