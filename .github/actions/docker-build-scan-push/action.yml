@@ -1,5 +1,5 @@
 name: 'build-scan-push'
-description: 'Build a Docker image, scan it, then push it to Docker Hub'
+description: 'Build a Docker image, scan it, then push it to a container registry'
 
 inputs:
   tags:
@@ -8,14 +8,17 @@ inputs:
   build-args:
     description: 'The Docker build args'
     required: true
+  registry:
+    description: "Where to upload the images"
+    required: true
   push:
-    description: 'Whether to push the built image to Docker Hub'
+    description: 'Whether to push the built image to the registry'
     required: true
-  dockerhub-username:
-    description: 'The Docker Hub username to use when pushing the image'
+  username:
+    description: 'The username to use when pushing the image'
     required: true
-  dockerhub-password:
-    description: 'The Docker Hub password to use when pushing the image'
+  password:
+    description: 'The password to use when pushing the image'
     required: true
   python-version:
     description: 'The Python version installed on the image'
@@ -67,13 +70,14 @@ runs:
         echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${GITHUB_REF}"
         python ./.github/actions/docker-build-scan-push/check_sarif.py --severity-cutoff 4.0 ${{ steps.anchore-scan.outputs.sarif }}
 
-    - name: Login to Docker Hub
+    - name: Login to the registry
       uses: docker/login-action@v2
       with:
-        username: ${{ inputs.dockerhub-username }}
-        password: ${{ inputs.dockerhub-password }}
+        registry: ${{ inputs.registry }}
+        username: ${{ inputs.username }}
+        password: ${{ inputs.password }}
 
-    - name: Push the scanned image to Docker Hub
+    - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
       shell: bash
       run: docker image push --all-tags meltano/meltano
