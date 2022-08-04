@@ -31,7 +31,7 @@ class OutputLogger:
     ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
 
-        Parameters:
+        Args:
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
             write_level: log level passed to underlying logger.log calls.
@@ -90,7 +90,7 @@ class Out:  # noqa: WPS230
     ):
         """Log anything written in a stream.
 
-        Parameters:
+        Args:
             output_logger: the OutputLogger to use.
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.

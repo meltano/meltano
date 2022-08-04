@@ -21,7 +21,7 @@ class LockfileAlreadyExistsError(Exception):
     def __init__(self, message: str, path: Path, plugin: PluginRef):
         """Create a new LockfileAlreadyExistsError.
 
-        Parameters:
+        Args:
             message: The error message.
             path: The path to the existing lockfile.
             plugin: The plugin that was locked.
@@ -37,7 +37,7 @@ class PluginLock:
     def __init__(self, project: Project, plugin: ProjectPlugin) -> None:
         """Create a new PluginLock.
 
-        Parameters:
+        Args:
             project: The project.
             plugin: The plugin to lock.
         """
@@ -85,7 +85,7 @@ class PluginLockService:
     def __init__(self, project: Project):
         """Create a new Plugin Lockfile Service.
 
-        Parameters:
+        Args:
             project: The Meltano project.
         """
         self.project = project
@@ -98,7 +98,7 @@ class PluginLockService:
     ):
         """Save the plugin lockfile.
 
-        Parameters:
+        Args:
             plugin: The plugin definition to save.
             exists_ok: Whether raise an exception if the lockfile already exists.
 

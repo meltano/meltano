@@ -18,7 +18,7 @@ class MailService:
     def __init__(self, project: Project):
         """Initialize the MailService.
 
-        Parameters:
+        Args:
             project: The project to use the MailService when referencing the project settings or project id.
         """
         self.project = project
@@ -35,7 +35,7 @@ class MailService:
         Currently, the unsubscribe group is based on the event type, and only the SubscriptionEventType.PIPELINE_MANUAL_RUN
         even type is actually supported.
 
-        Parameters:
+        Args:
             subscription: The subscription to get the unsubscribe group for.
 
         Returns:
@@ -49,7 +49,7 @@ class MailService:
     def create_message(self, subscription: Subscription, **kwargs) -> Message:
         """Create a message for the given subscription.
 
-        Parameters:
+        Args:
             subscription: The subscription to create the message for.
             kwargs: Additional arguments to pass to the message constructor.
 

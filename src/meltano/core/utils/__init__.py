@@ -59,7 +59,7 @@ def click_run_async(func):
 def compose(*fs: Callable[[Any], Any]):
     """Create a composition of unary functions.
 
-    Parameters:
+    Args:
         fs: Unary functions to compose.
 
     Examples:
@@ -119,7 +119,7 @@ def get_all(keys, d: dict, default=None):
 def merge(src, dest):
     """Merge both given dictionaries together at depth, modifying `dest` in-place.
 
-    Parameters:
+    Args:
         src: A dictionary to merge into `dest`.
         dest: The dictionary that will be updated with the keys and values from
             `src` at depth.
@@ -278,7 +278,7 @@ def iso8601_datetime(d: str) -> datetime | None:
 def find_named(xs: Iterable[dict], name: str, obj_type: type = None) -> dict:
     """Find an object by its 'name' key.
 
-    Parameters:
+    Args:
         xs: Some iterable of objects against which that name should be matched.
         name: Used to match against the input objects.
         obj_type: Object type used for generating the exception message.
@@ -364,7 +364,7 @@ class EnvironmentVariableNotSetError(Exception):
     def __init__(self, env_var: str):
         """Initialize the error.
 
-        Parameters:
+        Args:
             env_var: The unset environment variable name.
         """
         super().__init__(env_var)
@@ -438,7 +438,7 @@ def human_size(num, suffix="B"):
 def hash_sha256(value: str) -> str:
     """Get the sha256 hash of a string.
 
-    Parameters:
+    Args:
         value: the string value to hash.
 
     Returns:
@@ -455,7 +455,7 @@ def hash_sha256(value: str) -> str:
 def format_exception(exception: BaseException) -> str:
     """Get the exception with its traceback in the standard format it would have been printed with.
 
-    Parameters:
+    Args:
         The exception value to be turned into a string.
 
     Returns:
@@ -472,7 +472,7 @@ def safe_hasattr(obj: Any, name: str) -> bool:
 
     This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
 
-    Parameters:
+    Args:
         obj: The object to check.
         name: The name of the attribute to check.
 

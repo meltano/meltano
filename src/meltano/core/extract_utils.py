@@ -39,7 +39,7 @@ def fetch_urls(
             print(result)
         ```
 
-    Parameters:
+    Args:
         headers: Dictionary of headers to be passed with the request.
         timeout: Timeout object to be passed to the aiohttp lib.
         urls: Iterator of url strings.

@@ -21,7 +21,7 @@ class ConfigService:
     def __init__(self, project: Project, use_cache=True):
         """Create a new project configuration service.
 
-        Parameters:
+        Args:
             project: the project to configure.
             use_cache: whether to use the cache or not.
         """
@@ -105,7 +105,7 @@ class ConfigService:
     def update_config(self, config):
         """Update top-level Meltano configuration.
 
-        Parameters:
+        Args:
             config: configuration dict
         """
         with self.update_meltano_yml() as meltano_yml:
