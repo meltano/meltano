@@ -1,7 +1,9 @@
-"""The actual IOBlock interface is one of the lower level blocks for use with various BlockSet implementations."""
+"""The actual `IOBlock` interface is one of the lower level blocks for use with various `BlockSet` implementations."""
+
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from asyncio import StreamWriter, Task
-from typing import Optional, Tuple
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 
@@ -15,7 +17,7 @@ class IOBlock(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def stdin(self) -> Optional[StreamWriter]:
+    def stdin(self) -> StreamWriter | None:
         """If a block requires input, return the StreamWriter that should be used for writes.
 
         Returns:
@@ -113,7 +115,7 @@ class IOBlock(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def proxy_io(self) -> Tuple[Task, Task]:
+    def proxy_io(self) -> tuple[Task, Task]:
         """Start proxying stdout AND stderr to the linked destinations.
 
         Returns:

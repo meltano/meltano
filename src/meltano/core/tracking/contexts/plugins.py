@@ -64,7 +64,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     def from_elt_context(cls, elt_context: ELTContext) -> PluginsTrackingContext:
         """Create a PluginsTrackingContext from an ELTContext.
 
-        Parameters:
+        Args:
             elt_context: The ELTContext to use.
 
         Returns:
@@ -82,7 +82,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     def from_block(cls, blk: BlockSet | PluginCommandBlock) -> PluginsTrackingContext:
         """Create a PluginsTrackingContext from a BlockSet or PluginCommandBlock.
 
-        Parameters:
+        Args:
             blk: The block to create the context for.
 
         Raises:
@@ -109,7 +109,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     ) -> PluginsTrackingContext:
         """Create a PluginsTrackingContext from a list of BlockSets or PluginCommandBlocks.
 
-        Parameters:
+        Args:
             parsed_blocks: The blocks to create the context from.
 
         Returns:

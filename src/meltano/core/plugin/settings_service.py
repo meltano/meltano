@@ -1,4 +1,5 @@
 """Settings manager for Meltano plugins."""
+from __future__ import annotations
 
 import os
 from typing import Any, Dict, List
@@ -152,7 +153,7 @@ class PluginSettingsService(SettingsService):
         return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
-    def setting_definitions(self) -> List[SettingDefinition]:
+    def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings.
 
         Returns:
@@ -196,7 +197,7 @@ class PluginSettingsService(SettingsService):
         self.plugin.config_with_extras = config_with_extras
         self.plugins_service.update_plugin(self.plugin)
 
-    def update_meltano_environment_config(self, config_with_extras: Dict[str, Any]):
+    def update_meltano_environment_config(self, config_with_extras: dict[str, Any]):
         """Update environment configuration in `meltano.yml`.
 
         Args:

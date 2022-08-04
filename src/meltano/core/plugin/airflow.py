@@ -1,4 +1,6 @@
 """Plugin glue code for Airflow."""
+from __future__ import annotations
+
 import configparser
 import logging
 import os
@@ -98,8 +100,8 @@ class Airflow(BasePlugin):
         """
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    @hook("before_configure")
-    async def before_configure(self, invoker: AirflowInvoker, session):  # noqa: WPS217
+    @hook("before_configure")  # noqa: WPS217
+    async def before_configure(self, invoker: AirflowInvoker, session):
         """Generate config file and keep metadata database up-to-date.
 
         Args:
