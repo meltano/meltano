@@ -111,24 +111,6 @@ class ConfigService:
         with self.update_meltano_yml() as meltano_yml:
             meltano_yml.extras = config
 
-    @property
-    def current_environment_config(self):
-        """Return the current environment configuration.
-
-        Returns:
-            The current environment configuration.
-        """
-        return self.project.active_environment.config.extras
-
-    def update_environment_config(self, config):
-        """Update configuration in an environment.
-
-        Parameters:
-            config: configuration dict
-        """
-        with self.update_active_environment() as environment:
-            environment.config.extras = config
-
     def make_meltano_secret_dir(self):
         """Create the secret directory."""
         os.makedirs(self.project.meltano_dir(), exist_ok=True)

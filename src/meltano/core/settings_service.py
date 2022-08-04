@@ -52,7 +52,7 @@ class FeatureFlags(Enum):
         return f"{FEATURE_FLAG_PREFIX}.{self.value}"
 
 
-class FeatureNotAllowedException(Exception):  # noqa: N818
+class FeatureNotAllowedException(Exception):
     """Occurs when a disallowed code path is run."""
 
     def __init__(self, feature):
@@ -77,6 +77,7 @@ class SettingsService(ABC):  # noqa: WPS214
     """Abstract base class for managing settings."""
 
     LOGGING = False
+    supports_environments = True
 
     def __init__(
         self,
@@ -149,22 +150,9 @@ class SettingsService(ABC):  # noqa: WPS214
     def meltano_yml_config(self) -> dict:
         """Return current configuration in `meltano.yml`."""
 
-    @property
-    @abstractmethod
-    def environment_config(self) -> dict:
-        """Return current configuration in `meltano.yml`."""
-
     @abstractmethod
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
-
-        Parameters:
-            config: updated config
-        """
-
-    @abstractmethod
-    def update_meltano_environment_config(self, config: dict):
-        """Update environment configuration in `meltano.yml`.
 
         Parameters:
             config: updated config
