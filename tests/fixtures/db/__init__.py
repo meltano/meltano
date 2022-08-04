@@ -1,21 +1,34 @@
 import logging
 import warnings
+from typing import Generator
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
+from _pytest.monkeypatch import MonkeyPatch
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri):
+def engine_uri_env(engine_uri: str) -> Generator:
+    """Use the correct meltano database URI for these tests."""
+    # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
     monkeypatch = MonkeyPatch()
     monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
     try:
         yield
     finally:
         monkeypatch.undo()
+
+
+@pytest.fixture()
+def un_engine_uri(monkeypatch):
+    """When we want to test functionality that doesn't use the current DB URI.
+
+    Note that this fixture must run before the project fixture as
+    src/meltano/core/db.py _engines has the engine cached.
+    """
+    monkeypatch.delenv("MELTANO_DATABASE_URI")
 
 
 @pytest.fixture(scope="class", autouse=True)
