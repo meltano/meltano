@@ -5,6 +5,7 @@ import itertools
 import logging
 import os
 from collections import defaultdict, namedtuple
+from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
 
@@ -452,8 +453,8 @@ def job_logging_service(project):
     return JobLoggingService(project)
 
 
-@pytest.fixture(scope="class")
-def project(test_dir, project_init_service):
+@contextmanager
+def project_directory(test_dir, project_init_service):
     project = project_init_service.init(add_discovery=True)
     logging.debug(f"Created new project at {project.root}")
 
@@ -472,6 +473,18 @@ def project(test_dir, project_init_service):
         Project.deactivate()
         os.chdir(test_dir)
         logging.debug(f"Cleaned project at {project.root}")
+
+
+@pytest.fixture(scope="class")
+def project(test_dir, project_init_service):
+    with project_directory(test_dir, project_init_service) as project:
+        yield project
+
+
+@pytest.fixture(scope="function")
+def project_function(test_dir, project_init_service):
+    with project_directory(test_dir, project_init_service) as project:
+        yield project
 
 
 @pytest.fixture(scope="class")
