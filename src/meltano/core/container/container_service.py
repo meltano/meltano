@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 def stop_container(container: DockerContainer):
     """Stop a Docker container.
 
-    Parameters:
+    Args:
         container: Running container.
     """
     logger.info("Stopping container", container_id=container.id)
@@ -40,7 +40,7 @@ class ContainerService:
     ) -> dict:
         """Run a Docker container.
 
-        Parameters:
+        Args:
             spec: Command container spec.
             name: Container name.
             env: Environment mapping for the container run.

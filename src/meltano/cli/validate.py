@@ -48,7 +48,7 @@ class CommandLineRunner(ValidationsRunner):
     async def run_test(self, name: str) -> int:
         """Run a test command.
 
-        Parameters:
+        Args:
             name: Test command name to invoke.
 
         Returns:

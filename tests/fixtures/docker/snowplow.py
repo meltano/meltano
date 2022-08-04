@@ -20,7 +20,7 @@ class SnowplowMicro:
     def __init__(self, collector_endpoint: str):
         """Initialize the `SnowplowMicro` instance.
 
-        Parameters:
+        Args:
             collector_endpoint: The HTTP URL to the Snowplow Micro service.
         """
         self.collector_endpoint = collector_endpoint

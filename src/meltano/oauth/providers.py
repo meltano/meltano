@@ -11,7 +11,7 @@ OAuth = OAuthClient()
 def facebook(app: Flask) -> None:
     """Register OAuth for Facebook.
 
-    Parameters:
+    Args:
         app: The Flask app for which the OAuth blueprint will be registered.
     """
     OAuth.register(  # noqa: S106
@@ -41,7 +41,7 @@ def facebook(app: Flask) -> None:
 def google_adwords(app: Flask) -> None:
     """Register OAuth for Google AdWords.
 
-    Parameters:
+    Args:
         app: The Flask app for which the OAuth blueprint will be registered.
     """
     OAuth.register(  # noqa: S106
