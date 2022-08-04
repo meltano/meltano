@@ -1,4 +1,6 @@
 """Service to manage meltano.yml."""
+from __future__ import annotations
+
 import logging
 import os
 from contextlib import contextmanager
@@ -19,7 +21,7 @@ class ConfigService:
     def __init__(self, project: Project, use_cache=True):
         """Create a new project configuration service.
 
-        Args:
+        Parameters:
             project: the project to configure.
             use_cache: whether to use the cache or not.
         """
@@ -37,7 +39,7 @@ class ConfigService:
             The project settings.
         """
         if self._settings is None:
-            with bundle.find("settings.yml").open() as settings_yaml:
+            with open(bundle.root / "settings.yml") as settings_yaml:
                 settings = yaml.safe_load(settings_yaml)
             self._settings = list(map(SettingDefinition.parse, settings["settings"]))
 
@@ -109,24 +111,15 @@ class ConfigService:
         with self.update_meltano_yml() as meltano_yml:
             meltano_yml.extras = config
 
-    @property
-    def current_environment_config(self):
-        """Return the current environment configuration.
-
-        Returns:
-            The current environment configuration.
-        """
-        return self.project.active_environment.config.extras
-
-    def update_environment_config(self, config):
-        """Update configuration in an environment.
-
-        Parameters:
-            config: configuration dict
-        """
-        with self.update_active_environment() as environment:
-            environment.config.extras = config
-
     def make_meltano_secret_dir(self):
         """Create the secret directory."""
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
+
+    @property
+    def env(self):
+        """Return the top-level env vars from meltano.yml.
+
+        Returns:
+            A dictionary of (unexpanded) environment variables.
+        """
+        return self.current_meltano_yml.env

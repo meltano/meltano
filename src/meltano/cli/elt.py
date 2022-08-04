@@ -1,30 +1,33 @@
 """Defines `meltano elt` command."""
+from __future__ import annotations
 
 import datetime
 import logging
-from contextlib import contextmanager
+import platform
+from contextlib import asynccontextmanager, nullcontext
 
 import click
-from async_generator import asynccontextmanager
+import structlog
 from structlog import stdlib as structlog_stdlib
 
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import StaleJobFailer
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
+from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import click_run_async
 
 from . import cli
 from .params import pass_project
-from .utils import CliError
+from .utils import CliError, PartialInstrumentedCmd
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -36,10 +39,13 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.command(short_help="Run an ELT pipeline to Extract, Load, and Transform data.")
+@cli.command(
+    cls=PartialInstrumentedCmd,
+    short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
+)
 @click.argument("extractor")
 @click.argument("loader")
-@click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
+@click.option("--transform", type=click.Choice(["skip", "only", "run"]))
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
     "--full-refresh",
@@ -76,22 +82,24 @@ logger = structlog_stdlib.get_logger(__name__)
     help="Force a new run even when a pipeline with the same state ID is already running.",
     is_flag=True,
 )
+@click.pass_context
 @pass_project(migrate=True)
 @click_run_async
 async def elt(
-    project,
-    extractor,
-    loader,
-    transform,
-    dry,
-    full_refresh,
-    select,
-    exclude,
-    catalog,
-    state,
-    dump,
-    state_id,
-    force,
+    project: Project,
+    ctx: click.Context,
+    extractor: str,
+    loader: str,
+    transform: str,
+    dry: bool,
+    full_refresh: bool,
+    select: list[str],
+    exclude: list[str],
+    catalog: str,
+    state: str,
+    dump: str,
+    state_id: str,
+    force: bool,
 ):
     """
     Run an ELT pipeline to Extract, Load, and Transform data.
@@ -103,13 +111,25 @@ async def elt(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    if platform.system() == "Windows":
+        raise CliError(
+            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
+        )
+
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
+
+    # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
+    # if transform is None we still need manually default to skip after firing the tracking event above.
+    if not transform:
+        transform = "skip"
+
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
-        job_id=state_id
+        job_name=state_id
         or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
     )
-
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
@@ -132,12 +152,17 @@ async def elt(
         if dump:
             await dump_file(context_builder, dump)
         else:
-            await _run_job(project, job, session, context_builder, force=force)
+            await _run_job(tracker, project, job, session, context_builder, force=force)
+    except Exception as err:
+        tracker.track_command_event(CliEvent.failed)
+        raise err
     finally:
         session.close()
 
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
+    tracker.track_command_event(CliEvent.completed)
+    legacy_tracker.track_meltano_elt(
+        extractor=extractor, loader=loader, transform=transform
+    )
 
 
 def _elt_context_builder(
@@ -195,27 +220,27 @@ async def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err
 
 
-async def _run_job(project, job, session, context_builder, force=False):
-    StaleJobFailer(job.job_id).fail_stale_jobs(session)
+async def _run_job(tracker, project, job, session, context_builder, force=False):
+    StaleJobFailer(job.job_name).fail_stale_jobs(session)
 
     if not force:
-        existing = JobFinder(job.job_id).latest_running(session)
+        existing = JobFinder(job.job_name).latest_running(session)
         if existing:
             raise CliError(
-                f"Another '{job.job_id}' pipeline is already running which started at {existing.started_at}. "
+                f"Another '{job.job_name}' pipeline is already running which started at {existing.started_at}. "
                 + "To ignore this check use the '--force' option."
             )
 
     async with job.run(session):
         job_logging_service = JobLoggingService(project)
-        log_file = job_logging_service.generate_log_name(job.job_id, job.run_id)
+        log_file = job_logging_service.generate_log_name(job.job_name, job.run_id)
 
         output_logger = OutputLogger(log_file)
         context_builder.set_base_output_logger(output_logger)
 
-        log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_id)
+        log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_name)
 
-        await _run_elt(log, context_builder, output_logger)
+        await _run_elt(tracker, log, context_builder, output_logger)
 
 
 @asynccontextmanager
@@ -237,10 +262,17 @@ async def _redirect_output(log, output_logger):
                 raise
 
 
-async def _run_elt(log, context_builder, output_logger):
+async def _run_elt(
+    tracker: Tracker,
+    log: structlog.BoundLogger,
+    context_builder: ELTContextBuilder,
+    output_logger: OutputLogger,
+):
     async with _redirect_output(log, output_logger):
         try:
             elt_context = context_builder.context()
+            tracker.add_contexts(PluginsTrackingContext.from_elt_context(elt_context))
+            tracker.track_command_event(CliEvent.inflight)
 
             if elt_context.only_transform:
                 log.info("Extract & load skipped.")
@@ -267,23 +299,19 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_name,
         stdio="stderr",
     )
 
     extractor_log = output_logger.out(extractor, stderr_log.bind(cmd_type="extractor"))
     loader_log = output_logger.out(loader, stderr_log.bind(cmd_type="loader"))
 
-    @contextmanager
-    def nullcontext():
-        yield None
-
     extractor_out_writer_ctxmgr = nullcontext
     loader_out_writer_ctxmgr = nullcontext
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(
             run_id=str(elt_context.job.run_id),
-            state_id=elt_context.job.job_id,
+            state_id=elt_context.job.job_name,
             stdio="stdout",
         )
         extractor_out = output_logger.out(
@@ -335,7 +363,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
 
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_id,
+        state_id=elt_context.job.job_name,
         stdio="stderr",
         cmd_type="transformer",
     )

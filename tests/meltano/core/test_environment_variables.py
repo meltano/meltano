@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import platform
 from typing import NamedTuple
 
 import pytest
@@ -10,13 +13,15 @@ class EnvVarResolutionExpectation(NamedTuple):
     expected_env_values: dict
     meltanofile_updates: dict = {}
     terminal_env: dict = {}
-    xfail: bool = False
 
 
 def _meltanofile_update_dict(
     top_level_plugin_setting=True,
     top_level_plugin_config=False,
+    top_level_env=False,
+    top_level_plugin_env=False,
     environment_level_env=False,
+    environment_level_plugin_env=False,
     environment_level_plugin_config=False,
     environment_level_plugin_config_indirected=False,
 ):
@@ -26,6 +31,7 @@ def _meltanofile_update_dict(
         "name": "from",
         "kind": "string",
     }
+    env = {}
     environment = {"name": "dev"}
     utility = {
         "name": plugin_name,
@@ -37,6 +43,12 @@ def _meltanofile_update_dict(
         setting.update({"value": "top_level_plugin_setting"})
     if top_level_plugin_config:
         utility.update({"config": {"from": "top_level_plugin_config"}})
+    if top_level_env:
+        env.update({"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_env"})
+    if top_level_plugin_env:
+        utility.update(
+            {"env": {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_env"}}
+        )
     if environment_level_plugin_config:
         environment.update(
             {
@@ -54,7 +66,24 @@ def _meltanofile_update_dict(
         )
     if environment_level_env:
         environment.update(
-            {"env": {"TEST_ENV_RESOLUTION_FROM": "environment_level_env"}}
+            {"env": {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"}}
+        )
+    if environment_level_plugin_env:
+        environment.update(
+            {
+                "config": {
+                    "plugins": {
+                        "utilities": [
+                            {
+                                "name": plugin_name,
+                                "env": {
+                                    "TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env"
+                                },
+                            }
+                        ]
+                    }
+                }
+            }
         )
     if environment_level_plugin_config_indirected:
         environment.update(
@@ -70,92 +99,110 @@ def _meltanofile_update_dict(
                     }
                 },
                 "env": {
-                    "INDIRECTED_ENV_VAR": "environment_level_plugin_config_indrected"
+                    "INDIRECTED_ENV_VAR": "environment_level_plugin_config_indirected"
                 },
             }
         )
-    return {"plugins": {"utilities": [utility]}, "environments": [environment]}
+    return {
+        "plugins": {"utilities": [utility]},
+        "environments": [environment],
+        "env": env,
+    }
 
 
 _terminal_env_var = {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"}
 
-# Test cases with xfail=True should be resolved to pass
-# as part of this issue: https://github.com/meltano/meltano/issues/5982
 _env_var_resolution_expectations = {
-    "Terminal environment": EnvVarResolutionExpectation(
+    # Check that envs at each level override terminal
+    "00 Terminal environment": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"},
         _meltanofile_update_dict(),
         _terminal_env_var,
-        xfail=True,
     ),
-    "Environment-level env (with terminal context)": EnvVarResolutionExpectation(
+    "01 Top-level env (with terminal context)": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_env"},
+        _meltanofile_update_dict(top_level_env=True),
+        _terminal_env_var,
+    ),
+    "02 Top-level plugin env (with terminal context)": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_env"},
+        _meltanofile_update_dict(top_level_plugin_env=True),
+        _terminal_env_var,
+    ),
+    "03 Environment-level env (with terminal context)": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(environment_level_env=True),
         _terminal_env_var,
-        xfail=True,
     ),
-    "Top-level plugin setting (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},
-        _meltanofile_update_dict(
-            environment_level_env=True, top_level_plugin_setting=True
-        ),
+    "04 Environment-level plugin env (with terminal context)": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env"},
+        _meltanofile_update_dict(environment_level_plugin_env=True),
         _terminal_env_var,
-        xfail=True,
     ),
-    "Set in top-level plugin config (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_config"},
-        _meltanofile_update_dict(
-            environment_level_env=True,
-            top_level_plugin_setting=True,
-            top_level_plugin_config=True,
-        ),
-        _terminal_env_var,
-        xfail=True,
+    # Now check the order of precedence between each level
+    "06 Top-level env": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_env"},
+        _meltanofile_update_dict(top_level_env=True),
     ),
-    "Environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config"},
-        _meltanofile_update_dict(
-            environment_level_env=True,
-            top_level_plugin_setting=True,
-            top_level_plugin_config=True,
-            environment_level_plugin_config=True,
-        ),
-        _terminal_env_var,
-        xfail=True,
+    "07 Top-level plugin env (with terminal context)": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_env"},
+        _meltanofile_update_dict(top_level_env=True, top_level_plugin_env=True),
     ),
-    "Set in indirected environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config_indrected"},
-        _meltanofile_update_dict(
-            environment_level_env=True,
-            top_level_plugin_setting=True,
-            top_level_plugin_config=True,
-            environment_level_plugin_config=True,
-            environment_level_plugin_config_indirected=True,
-        ),
-        _terminal_env_var,
-        xfail=True,
-    ),
-    "Environment-level env": EnvVarResolutionExpectation(
+    "08 Environment-level env": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
-        _meltanofile_update_dict(environment_level_env=True),
-        xfail=True,
+        _meltanofile_update_dict(
+            top_level_env=True, top_level_plugin_env=True, environment_level_env=True
+        ),
     ),
-    "Top-level plugin setting": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},
+    "09 Environment-level Plugin env": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env"},
+        _meltanofile_update_dict(
+            top_level_env=True,
+            top_level_plugin_env=True,
+            environment_level_env=True,
+            environment_level_plugin_env=True,
+        ),
+    ),
+    "10 Top-level plugin setting (with terminal context)": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"},
+        _meltanofile_update_dict(top_level_plugin_setting=True),
+        _terminal_env_var,
+    ),
+    "11 Top-level plugin config (with terminal context)": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
+        _meltanofile_update_dict(
+            environment_level_env=True,
+            top_level_plugin_setting=True,
+            top_level_plugin_config=True,
+        ),
+        _terminal_env_var,
+    ),
+    "12 Environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
+        _meltanofile_update_dict(
+            environment_level_env=True,
+            top_level_plugin_setting=True,
+            top_level_plugin_config=True,
+            environment_level_plugin_config=True,
+        ),
+        _terminal_env_var,
+    ),
+    "13 Top-level plugin setting": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True, top_level_plugin_setting=True
         ),
     ),
-    "Set in top-level plugin config": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_config"},
+    "14 Set in top-level plugin config": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
             top_level_plugin_config=True,
         ),
     ),
-    "Environment-level plugin config": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config"},
+    "15 Environment-level plugin config": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
@@ -163,8 +210,8 @@ _env_var_resolution_expectations = {
             environment_level_plugin_config=True,
         ),
     ),
-    "Set in indirected environment-level plugin config": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config_indrected"},
+    "16 Set in indirected environment-level plugin config": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config_indirected"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
@@ -184,6 +231,10 @@ class TestEnvVarResolution:
     def test_env_var_resolution(
         self, scenario, env_var_resolution_expectation, cli_runner, project, monkeypatch
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
 
         with project.meltano_update() as meltanofile:
             meltanofile.update(env_var_resolution_expectation.meltanofile_updates)
@@ -191,10 +242,6 @@ class TestEnvVarResolution:
         for key, val in env_var_resolution_expectation.terminal_env.items():
             monkeypatch.setenv(key, val)
 
-        if env_var_resolution_expectation.xfail:
-            pytest.xfail(
-                "This expected environment variable resolution behavior is currently failing."
-            )
         args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():
             args.append("--print-var")

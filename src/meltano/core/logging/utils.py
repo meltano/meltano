@@ -1,10 +1,12 @@
 """Various utilities for configuring logging in a meltano project."""
+
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
 from contextlib import suppress
 from logging import config as logging_config
-from typing import Dict, Optional
 
 import structlog
 import yaml
@@ -14,9 +16,9 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 try:
-    from typing import Protocol  # noqa:  WPS433
+    from typing import Protocol  # noqa: WPS433
 except ImportError:
-    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
+    from typing_extensions import Protocol  # noqa: WPS433
 
 
 LEVELS = {  # noqa: WPS407
@@ -30,10 +32,10 @@ DEFAULT_LEVEL = "info"
 FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323
 
 
-def parse_log_level(log_level: Dict[str, int]) -> int:
+def parse_log_level(log_level: dict[str, int]) -> int:
     """Parse a level descriptor into an logging level.
 
-    Args:
+    Parameters:
         log_level: level descriptor.
 
     Returns:
@@ -42,10 +44,10 @@ def parse_log_level(log_level: Dict[str, int]) -> int:
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
 
 
-def read_config(config_file: Optional[str] = None) -> dict:
+def read_config(config_file: str | None = None) -> dict:
     """Read a logging config yaml from disk.
 
-    Args:
+    Parameters:
         config_file: path to the config file to read.
 
     Returns:
@@ -61,7 +63,7 @@ def read_config(config_file: Optional[str] = None) -> dict:
 def default_config(log_level: str) -> dict:
     """Generate a default logging config.
 
-    Args:
+    Parameters:
         log_level: set log levels to provided level.
 
     Returns:
@@ -100,6 +102,11 @@ def default_config(log_level: str) -> dict:
                 "level": logging.INFO,
                 "propagate": False,
             },
+            "asyncio": {
+                "handlers": ["console"],
+                "level": logging.INFO,
+                "propagate": False,
+            },
         },
     }
 
@@ -107,7 +114,7 @@ def default_config(log_level: str) -> dict:
 def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> None:
     """Configure logging for a meltano project.
 
-    Args:
+    Parameters:
         project: the meltano project
         log_level: set log levels to provided level.
     """
@@ -151,7 +158,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
     of any potential logging.yaml sourced configs. Note that if a logging.yaml config without a 'console' handler
     is used, this will not override the log level.
 
-    Args:
+    Parameters:
         log_level: set log levels to provided level.
     """
     root_logger = logging.getLogger()
@@ -167,10 +174,9 @@ class SubprocessOutputWriter(Protocol):
     def writelines(self, lines: str):
         """Any type with a writelines method accepting a string could be used as an output writer.
 
-        Args:
+        Parameters:
             lines: string to write
         """
-        pass
 
 
 async def _write_line_writer(writer, line):
@@ -191,7 +197,7 @@ async def _write_line_writer(writer, line):
 
 
 async def capture_subprocess_output(
-    reader: Optional[asyncio.StreamReader], *line_writers: SubprocessOutputWriter
+    reader: asyncio.StreamReader | None, *line_writers: SubprocessOutputWriter
 ) -> None:
     """Capture in real time the output stream of a suprocess that is run async.
 
@@ -202,7 +208,7 @@ async def capture_subprocess_output(
     This async function should be run with await asyncio.wait() while waiting
     for the subprocess to end.
 
-    Args:
+    Parameters:
         reader: asyncio.StreamReader object that is the output stream of the subprocess.
         line_writers: any object thats a StreamWriter or has a writelines method accepting a string.
     """

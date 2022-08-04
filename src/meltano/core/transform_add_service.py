@@ -1,13 +1,10 @@
-import json
-import logging
+from __future__ import annotations
+
 import os
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
-from .db import project_engine
-from .plugin import PluginType
 from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
@@ -33,8 +30,7 @@ class TransformAddService:
 
     def add_to_packages(self, plugin: ProjectPlugin):
         if not os.path.exists(self.packages_file):
-            with open(self.packages_file, "w"):
-                pass
+            self.packages_file.touch()
 
         package_yaml = yaml.safe_load(self.packages_file.open()) or {"packages": []}
 
@@ -42,7 +38,7 @@ class TransformAddService:
         if not git_repo:
             raise ValueError(f"Missing pip_url for transform plugin '{plugin.name}'")
 
-        revision: Optional[str] = None
+        revision: str | None = None
         if len(git_repo.split("@")) == 2:
             git_repo, revision = git_repo.split("@")
         for package in package_yaml["packages"]:

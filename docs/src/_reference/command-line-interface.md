@@ -15,12 +15,12 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 Specifically, it will:
 
-1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/),
-2. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors:`,
-3. Store the plugin definition in the `./plugins` directory (see [Lock Artifacts](/concepts/plugins#lock-artifacts)),
+1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
+2. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors`
+3. Store the plugin definition in the `./plugins` directory (see [Lock Artifacts](/concepts/plugins#lock-artifacts))
 4. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
-   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`, and
-   2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`.
+   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
+   2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
 
@@ -211,6 +211,10 @@ If you have multiple [Meltano Environments](/concepts/environments) you can spec
 ```bash
 meltano --environment=<ENVIRONMENT> config <plugin>
 ```
+
+<br>
+> Note: Unlike other commands like [`meltano run`](#run) and [`meltano invoke`](#invoke), the `meltano config` command ignores any configured [default environment](/concepts/environments#default-environment).
+> This is to make it easier to configure plugins' base configuration before adding environment-specific overrides.
 
 ### How to use: Plugin extras
 
@@ -431,7 +435,8 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 - [`invoke`](#using-invoke-with-environments)
 - [`select`](#using-select-with-environments)
 
-If there is a value provided for `default_environment` in your `meltano.yml` these commands will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided. If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
+If there is a value provided for `default_environment` in your `meltano.yml`, then these commands, with the exception of [`config`](#using-config-with-environments), will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided.
+If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
 
 ### Examples
 
@@ -624,6 +629,30 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> <PLUGIN_NAME>
 meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_ENVIRONMENT_VARIABLE_2> <PLUGIN_NAME>
 ```
 
+## `lock`
+
+`meltano lock` creates lock files for [non-custom](/concepts/plugins#custom-plugins) plugins in the project.
+
+### How to use
+
+```bash
+# Lock all plugins
+meltano lock --all
+
+# Lock all plugins of a certain type
+meltano lock --all --plugin-type=<type>
+
+# Lock specific plugins
+meltano lock <name> <name_two>
+
+# Lock specific plugins and disambiguate by type
+meltano lock <name> <name_two> --plugin-type=<type>
+
+# Use --update in combination with any of the above to update the lock file
+# with the latest definition from MeltanoHub
+meltano lock --all --update
+```
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
@@ -674,9 +703,9 @@ In addition to explicitly specifying plugin names you can also execute one or mo
 
 ```bash
 meltano run tap-gitlab target-postgres
-meltano run tap-gitlab target-postgres dbt:clean dbt:test dbt:run
+meltano run tap-gitlab target-postgres dbt-postgres:clean dbt-postgres:test dbt-postgres:run
 meltano run tap-gitlab target-postgres tap-salesforce target-mysql
-meltano run tap-gitlab target-postgres dbt:run tap-postgres target-bigquery
+meltano run tap-gitlab target-postgres dbt-postgres:run tap-postgres target-bigquery
 meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
 meltano run tap-gitlab one-mapping another-mapping target-postgres
 meltano run tap-gitlab target-postgres simple-job
@@ -721,17 +750,23 @@ Note that if no environment is active, `meltano run` _does not_ generate a state
 
 ## `job`
 
-Use the `job` command to define one more related tasks. A job can contain a single task, or many tasks. Today all tasks
-are run sequentially. You can run a specified job by passing the job name as an argument to `meltano run`.
+Use the `job` command to define one or more sequences of tasks. A job can contain a single task or many tasks.
+As of today all tasks are run sequentially.
+You can run a specified job by passing the job name as an argument to [`meltano run`](#run).
+You can also schedule jobs using [`meltano schedule`](#schedule).
 
 ### How to use
 
 ```bash
-
 # Add a job with a single task representing a run command
 meltano job add <job_name> --tasks "<tap_name> <mapping_name> <target_name> <command>"
 
-# Add a new job with multiple tasks by passing arrays in yaml format, where each item representing a run command.
+# Add a new job with multiple tasks by passing arrays in yaml format, where each item represents a run command.
+# This will generate one task per array element:
+# task 1: <tap_name> <target_name>
+# task 2: <command>
+# task 3: <tap2_name> <target2_name>
+# etc.
 meltano job add <job_name> --tasks "[<tap_name> <target_name>, <command>, <tap2_name> <target2_name>, ...]"
 
 # Update an existing job with new tasks
@@ -750,13 +785,85 @@ meltano job list <job_name> --format=json
 meltano job remove <job_name>
 ```
 
+##### Tasks
+
+A task should be of the same format as arguments supplied to [the `meltano run` command](#run), which can be any valid sequence of plugins (e.g. extractors, mappers, loaders, utilities, etc.) and [plugin commands](/concepts/project#plugin-commands).
+Note that such a sequence is only valid if it is one of:
+
+1. An extractor followed directly by a loader. E.g. `tap-gitlab target-postgres`
+1. An extractor followed by one or more mappers and then a loader. E.g. `tap-gitlab hide-gitlab-secrets target-postgres`
+1. A plugin invocation, with optional command. E.g. `dbt-postgres:run` or `custom_utility_plugin`
+1. Any sequence of the above. E.g. `tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run tap-zendesk target-csv`
+
+If a job has only one task, that task can be supplied as a single quoted argument:
+
+```bash
+# A task with a single extractor and loader
+meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
+
+# A more complex task
+meltano job add tap-gitlab-to-target-postgres-processed --tasks "tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run custom-utility-plugin"
+```
+
+This would add the following to your `meltano.yml`:
+
+```yaml
+jobs:
+  - name: tap-gitlab-to-target-postgres
+    tasks:
+      - tap-gitlab target-postgres
+  - name: tap-gitlab-to-target-postgres-processed
+    tasks:
+      - tap-gitlab hide-gitlab-secrets target-postgres dbt-postgres:run custom-utility-plugin
+```
+
+When an Airflow DAG is generated for a job, each task in the job definition will become a single task in the generated DAG.
+So while it is certainly possible to define all your jobs using only one task each, there are many scenarios in which it
+would be useful or even necessary to split your job into multiple tasks. For instance, job steps which must always run,
+fail, and be retried as a group should always be a part of the same task. And long-running job steps should likely be
+grouped into a separate task from shorter-running downstream steps so that those downstream steps can be rerun on their
+own.
+
+Meltano does support this by allowing a job to consist of multiple tasks. Each individual task must itself be a valid
+sequence of extractors, mappers, loaders, and plugin commands. When multiple tasks are defined in a job, they must be
+supplied to the `meltano job add` command as an array in YAML format.
+
+For instance the `tap-gitlab-to-target-postgres-processed` job in the above example could also be created as:
+
+```bash
+meltano job add tap-gitlab-to-target-postgres-processed-multiple-tasks --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt-postgres:run, custom-utility-plugin]"
+```
+
+This would add the following to your `meltano.yml`:
+
+```yaml
+jobs:
+  - name: tap-gitlab-to-target-postgres-processed-multiple-tasks
+    tasks:
+      - tap-gitlab hide-gitlab-secrets target-postgres
+      - dbt-postgres:run
+      - custom-utility-plugin
+```
+
+While `tap-gitlab-to-target-postgres-processed` and `tap-gitlab-to-target-postgres-processed-multiple-tasks` will run the
+same steps of the pipeline in the same order, [scheduling](#schedule) the former will result in a generated DAG consisting
+of a single task while scheduling the latter will result in a generated DAG consisting of three tasks:
+
+```
+task 1: "meltano run tap-gitlab hide-gitlab-secrets target-postgres"
+task 2: "meltano run dbt-postgres:run" , depends on task 1
+task 3: "meltano run custom-utility-plugin", depends on task 2
+```
+
 ### Examples
 
 ```bash
-# Add a new job named "simple-demo" that contains two tasks
-# Task 1: tap-gitlab hide-gitlab-secrets target-mysql
-# Task 2: tap-gitlab target-csv
-meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-mysql dbt:run, tap-gitlab target-csv]"
+# Add a new job named "simple-demo" that contains three tasks
+# Task 1: tap-gitlab hide-gitlab-secrets target-postgres
+# Task 2: dbt-postgres:run
+# Task 3: tap-gitlab target-csv
+meltano job add simple-demo --tasks "[tap-gitlab hide-gitlab-secrets target-postgres, dbt-postgres:run, tap-gitlab target-csv]"
+
 # list the job named "simple-demo"
 meltano job list simple-demo --format=json
 # run the job named "simple-demo" using meltano run
@@ -1032,12 +1139,12 @@ meltano state list --pattern '*tap-gitlab*'
 Merge new state onto existing state for a state ID.
 
 <div class="notification is-info">
-	<p><strong>Not seeing merged state in the system database?</strong></p>
-	<p>Merged state is computed at <em>execution</em> time.
-	The <samp>merge</samp> command merely
-	adds a new <samp>payload</samp> to the database which is merged together with
-	existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
-	</p>
+  <p><strong>Not seeing merged state in the system database?</strong></p>
+  <p>Merged state is computed at <em>execution</em> time.
+  The <samp>merge</samp> command merely
+  adds a new <samp>payload</samp> to the database which is merged together with
+  existing payloads the next time state is read via <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
+  </p>
 </div>
 
 #### How to use
@@ -1076,6 +1183,42 @@ meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.jso
 
 # Provide state via existing state.
 meltano state merge dev:tap-gitlab-to-target-jsonl --from-state-id prod:tap-gitlab-to-target-jsonl
+```
+
+### copy
+
+Copy state from one state ID to another
+
+#### How to use
+
+```bash
+# Copy state from one state ID to another
+meltano state copy <src_state_id> <dst_state_id>
+```
+
+#### Examples
+
+```bash
+# Use prod state to update dev environemnt
+meltano state copy prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
+```
+
+### move
+
+Move state from one state ID to another, equivalent to a rename
+
+#### How to use
+
+```bash
+# Move state from one ID to another
+meltano state move <src_state_id> <dst_state_id>
+```
+
+#### Examples
+
+```bash
+# Use previous state with a new tap variant, clearing the original
+meltano state move original-tap-postgres-to-target-jsonl variant-tap-postgres-to-target-jsonl
 ```
 
 ### set

@@ -43,7 +43,7 @@ appropriate `Dockerfile` and `.dockerignore` files to your project by adding the
 docker --version
 
 # Add Docker files to your project
-meltano add files docker
+meltano add files files-docker
 
 # Build Docker image containing
 # Meltano, your project, and all of its plugins
@@ -87,7 +87,7 @@ you can add the appropriate `docker-compose.prod.yml` file to your project by ad
 docker-compose --version
 
 # Add Docker Compose files to your project
-meltano add files docker-compose
+meltano add files files-docker-compose
 
 # Start the `meltano-ui` and `meltano-system-db` services in the background
 docker-compose -f docker-compose.prod.yml up -d
@@ -113,7 +113,7 @@ files to your project by adding the
 # GitLab CI/CD and Container Registry enabled
 
 # Add GitLab CI/CD files to your project
-meltano add files gitlab-ci
+meltano add files files-gitlab-ci
 
 # Initialize Git repository, if you haven't already
 git init

@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 import json
-from typing import List, Optional
 
 import pytest
 import structlog
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
@@ -62,9 +63,9 @@ def process_mock_factory():
     def _factory(name):
         process_mock = mock.Mock()
         process_mock.name = name
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
-        process_mock.stdin.wait_closed = CoroutineMock(return_value=True)
+        process_mock.stdin.wait_closed = AsyncMock(return_value=True)
         return process_mock
 
     return _factory
@@ -74,11 +75,9 @@ def process_mock_factory():
 def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
-    tap.stdout.readline = CoroutineMock(
-        side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
-    )
+    tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
     tap.stderr.at_eof.side_effect = (False, False, False, True)
-    tap.stderr.readline = CoroutineMock(
+    tap.stderr.readline = AsyncMock(
         side_effect=(b"tap starting\n", b"tap running\n", b"tap done\n")
     )
     return tap
@@ -96,11 +95,11 @@ def target_process(process_mock_factory, target):
     target.wait.side_effect = wait_mock
 
     target.stdout.at_eof.side_effect = (False, False, False, True)
-    target.stdout.readline = CoroutineMock(
+    target.stdout.readline = AsyncMock(
         side_effect=(b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
     )
     target.stderr.at_eof.side_effect = (False, False, False, True)
-    target.stderr.readline = CoroutineMock(
+    target.stderr.readline = AsyncMock(
         side_effect=(b"target starting\n", b"target running\n", b"target done\n")
     )
     return target
@@ -118,11 +117,11 @@ def mapper_process(process_mock_factory, mapper):
     mapper.wait.side_effect = wait_mock
 
     mapper.stdout.at_eof.side_effect = (False, False, False, True)
-    mapper.stdout.readline = CoroutineMock(
+    mapper.stdout.readline = AsyncMock(
         side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
     )
     mapper.stderr.at_eof.side_effect = (False, False, False, True)
-    mapper.stderr.readline = CoroutineMock(
+    mapper.stderr.readline = AsyncMock(
         side_effect=(b"mapper starting\n", b"mapper running\n", b"mapper done\n")
     )
     return mapper
@@ -139,9 +138,9 @@ def dbt_process(process_mock_factory, dbt):
     dbt.wait.side_effect = wait_mock
 
     dbt.stdout.at_eof.side_effect = (False, True)
-    dbt.stdout.readline = CoroutineMock(side_effect=(b"Testoutput"))
+    dbt.stdout.readline = AsyncMock(side_effect=(b"Testoutput"))
     dbt.stderr.at_eof.side_effect = (False, False, False, True)
-    dbt.stderr.readline = CoroutineMock(
+    dbt.stderr.readline = AsyncMock(
         side_effect=(b"dbt starting\n", b"dbt running\n", b"dbt done\n")
     )
     return dbt
@@ -150,8 +149,8 @@ def dbt_process(process_mock_factory, dbt):
 class EventMatcher:
     def __init__(self, result_output: str):
         """Build a matcher for the result output of a command."""
-        self.seen_events: List[dict] = []
-        self.seen_raw: List[str] = []
+        self.seen_events: list[dict] = []
+        self.seen_raw: list[str] = []
 
         for line in result_output.splitlines():
             try:
@@ -164,7 +163,7 @@ class EventMatcher:
     def event_matches(self, event: str) -> bool:
         """Search result output for an event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:
@@ -175,10 +174,10 @@ class EventMatcher:
             if matches:
                 return True
 
-    def find_by_event(self, event: str) -> Optional[List[dict]]:
+    def find_by_event(self, event: str) -> list[dict] | None:
         """Return the first matching event, that matches the given event.
 
-        Args:
+        Parameters:
             event: the event to search for.
 
         Returns:
@@ -219,9 +218,7 @@ class TestCliRunScratchpadOne:
         args = ["run", tap.name]
 
         # exit cleanly when everything is fine
-        create_subprocess_exec = CoroutineMock(
-            side_effect=(tap_process, target_process)
-        )
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
         # check that the various ELB validation checks actually run and fail as expected
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
@@ -315,7 +312,7 @@ class TestCliRunScratchpadOne:
         job_logging_service,
     ):
         # exit cleanly when everything is fine
-        create_subprocess_exec = CoroutineMock(
+        create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
 
@@ -346,7 +343,7 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0].get("success")
 
         # Verify that a vanilla command plugin (dbt:run) run works
-        invoke_async = CoroutineMock(side_effect=(dbt_process,))  # dbt run
+        invoke_async = AsyncMock(side_effect=(dbt_process,))  # dbt run
         args = ["run", "dbt:run"]
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -391,7 +388,7 @@ class TestCliRunScratchpadOne:
         job_logging_service,
     ):
         # Verify that requesting the same command plugin multiple time with different args works
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(
                 dbt_process,
                 dbt_process,
@@ -456,7 +453,7 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process, dbt_process)
         )
         args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
@@ -540,9 +537,7 @@ class TestCliRunScratchpadOne:
             b"dbt failure\n",
         )
 
-        invoke_async = CoroutineMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -623,9 +618,7 @@ class TestCliRunScratchpadOne:
             b"tap failure\n",
         )
 
-        invoke_async = CoroutineMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -714,8 +707,8 @@ class TestCliRunScratchpadOne:
         # capture_subprocess_output writer will return and close the pipe when either BrokenPipeError or ConnectionResetError is enccountered
         # it does not itself reraise the exception - so you shouldn't expect to see these.
         target_process.stdin.write.side_effect = BrokenPipeError
-        target_process.stdin.drain = CoroutineMock(side_effect=ConnectionResetError)
-        target_process.stdin.wait_closed = CoroutineMock(return_value=True)
+        target_process.stdin.drain = AsyncMock(side_effect=ConnectionResetError)
+        target_process.stdin.wait_closed = AsyncMock(return_value=True)
 
         # Have `target_process.wait` take 1s to make sure the `stdin.write`/`drain` exceptions can be raised
         async def target_wait_mock():
@@ -732,9 +725,7 @@ class TestCliRunScratchpadOne:
             b"target failure\n",
         )
 
-        invoke_async = CoroutineMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -821,9 +812,7 @@ class TestCliRunScratchpadOne:
             b"target failure\n",
         )
 
-        invoke_async = CoroutineMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -918,9 +907,7 @@ class TestCliRunScratchpadOne:
             b"target failure\n",
         )
 
-        invoke_async = CoroutineMock(
-            side_effect=(tap_process, target_process, dbt_process)
-        )
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process, dbt_process))
 
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
@@ -1019,7 +1006,7 @@ class TestCliRunScratchpadOne:
 
         tap_process.wait.side_effect = wait_mock
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ), mock.patch(
@@ -1079,7 +1066,7 @@ class TestCliRunScratchpadOne:
         project_add_service,
     ):
         # exit cleanly when everything is fine
-        create_subprocess_exec = CoroutineMock(
+        create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
 
@@ -1098,6 +1085,64 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 1
             assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
+
+        # test mapper/mapping name collision detection - mapper plugin name no mappings
+        project_add_service.add(
+            PluginType.MAPPERS, "mapper-collision-01", inherit_from=mapper.name
+        )
+        args = ["run", tap.name, "mapper-collision-01", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock2, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            with pytest.raises(
+                Exception,
+                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-01",
+            ):
+                result = cli_runner.invoke(cli, args, catch_exceptions=False)
+                assert result.exit_code == 1
+
+        # test mapper/mapping name collision detection - mappings name same a mapper plugin name
+        project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-collision-02",
+            inherit_from=mapper.name,
+            mappings=[
+                {
+                    "name": "mapper-collision-02",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email1",
+                                "tap_stream_name": "commits1",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                }
+            ],
+        )
+        args = ["run", tap.name, "mapper-collision-02", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock2, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            with pytest.raises(
+                Exception,
+                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-02",
+            ):
+                result = cli_runner.invoke(cli, args, catch_exceptions=False)
+                assert result.exit_code == 1
 
         # create duplicate mapping name - should also fail
         project_add_service.add(
@@ -1191,7 +1236,7 @@ class TestCliRunScratchpadOne:
             b"mapper failure\n",
         )
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process, dbt_process)
         )
 
@@ -1268,7 +1313,7 @@ class TestCliRunScratchpadOne:
         job_logging_service,
     ):
         # exit cleanly when everything is fine
-        create_subprocess_exec = CoroutineMock(
+        create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process)
         )
 

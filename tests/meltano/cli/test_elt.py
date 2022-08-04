@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import asyncio
 import json
-from typing import List, Optional
+import platform
 
 import pytest
 import structlog
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import CliError, cli
@@ -22,15 +24,15 @@ from meltano.core.runner.singer import SingerRunner
 class LogEntry:
     def __init__(
         self,
-        name: Optional[str] = None,
-        cmd_type: Optional[str] = None,
-        event: Optional[str] = None,
-        level: Optional[str] = None,
-        stdio: Optional[str] = None,
+        name: str | None = None,
+        cmd_type: str | None = None,
+        event: str | None = None,
+        level: str | None = None,
+        stdio: str | None = None,
     ):
         """Logentries is a simple support class for checking whether a log entry is in a list of dicts.
 
-        Args:
+        Parameters:
             name: contents of the name field field to search for (or None if it should not be set)
             cmd_type: contents of the cmd_type field to search for (or None if it should not be set)
             event: str prefix of the event field to search for (or None if it should not be set)
@@ -43,13 +45,13 @@ class LogEntry:
         self.level = level
         self.stdio = stdio
 
-    def matches(self, lines: List[dict]) -> bool:
+    def matches(self, lines: list[dict]) -> bool:
         """Find a matching log line in the provided list of log lines.
 
         It's important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
         This is because quite a few log lines have dynamic suffix segments.
 
-        Args:
+        Parameters:
             lines: the log lines to check against
 
         Returns:
@@ -76,16 +78,16 @@ def assert_lines(output, *lines):
 
 
 def exception_logged(result_output: str, exc: Exception) -> bool:
-    """Small utility to search click result output for a specific excpetion .
+    """Small utility to search click result output for a specific exception.
 
-    Args:
+    Parameters:
         result_output: The click result output string to search.
         exc: The exception to search for.
 
     Returns:
         bool: Whether or not the exception was found
     """
-    seen_lines: List[dict] = []
+    seen_lines: list[dict] = []
     for line in result_output.splitlines():
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
@@ -97,8 +99,8 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
     return False
 
 
-def assert_log_lines(result_output: str, expected: List[LogEntry]):
-    seen_lines: List[dict] = []
+def assert_log_lines(result_output: str, expected: list[LogEntry]):
+    seen_lines: list[dict] = []
     for line in result_output.splitlines():
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
@@ -156,9 +158,9 @@ def process_mock_factory():
     def _factory(name):
         process_mock = mock.Mock()
         process_mock.name = name
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
-        process_mock.stdin.wait_closed = CoroutineMock(return_value=True)
+        process_mock.stdin.wait_closed = AsyncMock(return_value=True)
         return process_mock
 
     return _factory
@@ -168,11 +170,9 @@ def process_mock_factory():
 def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
-    tap.stdout.readline = CoroutineMock(
-        side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n")
-    )
+    tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
     tap.stderr.at_eof.side_effect = (False, False, False, True)
-    tap.stderr.readline = CoroutineMock(
+    tap.stderr.readline = AsyncMock(
         side_effect=(b"Starting\n", b"Running\n", b"Done\n")
     )
     return tap
@@ -190,11 +190,11 @@ def target_process(process_mock_factory, target):
     target.wait.side_effect = wait_mock
 
     target.stdout.at_eof.side_effect = (False, False, False, True)
-    target.stdout.readline = CoroutineMock(
+    target.stdout.readline = AsyncMock(
         side_effect=(b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
     )
     target.stderr.at_eof.side_effect = (False, False, False, True)
-    target.stderr.readline = CoroutineMock(
+    target.stderr.readline = AsyncMock(
         side_effect=(b"Starting\n", b"Running\n", b"Done\n")
     )
     return target
@@ -213,12 +213,44 @@ def dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
     dbt.stdout.at_eof.side_effect = (True,)
     dbt.stderr.at_eof.side_effect = (False, False, False, True)
-    dbt.stderr.readline = CoroutineMock(
+    dbt.stderr.readline = AsyncMock(
         side_effect=(b"Starting\n", b"Running\n", b"Done\n")
     )
     return dbt
 
 
+class TestWindowsELT:
+    @pytest.mark.skipif(
+        platform.system() != "Windows",
+        reason="Test is only for Windows",
+    )
+    @pytest.mark.backend("sqlite")
+    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_elt_windows(
+        self,
+        google_tracker,
+        default_config,
+        cli_runner,
+        tap,
+        target,
+    ):
+        args = ["elt", tap.name, target.name]
+        result = cli_runner.invoke(cli, args)
+        assert result.exit_code == 1
+        # Didn't use exception_logged() as result.stderr doensn't contain the error for some reason
+        assert (
+            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
+            in str(result.exception)
+        )
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="ELT is not supported on Windows",
+)
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(LegacyTracker, "track_event", return_value=None)
@@ -245,9 +277,7 @@ class TestCliEltScratchpadOne:
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
         # exit cleanly when everything is fine
-        create_subprocess_exec = CoroutineMock(
-            side_effect=(tap_process, target_process)
-        )
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -335,9 +365,7 @@ class TestCliEltScratchpadOne:
 
         job_logging_service.delete_all_logs(state_id)
 
-        create_subprocess_exec = CoroutineMock(
-            side_effect=(tap_process, target_process)
-        )
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ), mock.patch(
@@ -453,7 +481,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -523,8 +551,8 @@ class TestCliEltScratchpadOne:
         # Writing to target stdin will fail because (we'll pretend) it has already died
         target_process.stdin = mock.Mock(spec=asyncio.StreamWriter)
         target_process.stdin.write.side_effect = BrokenPipeError
-        target_process.stdin.drain = CoroutineMock(side_effect=ConnectionResetError)
-        target_process.stdin.wait_closed = CoroutineMock(return_value=True)
+        target_process.stdin.drain = AsyncMock(side_effect=ConnectionResetError)
+        target_process.stdin.wait_closed = AsyncMock(return_value=True)
 
         # Have `target_process.wait` take 1s to make sure the `stdin.write`/`drain` exceptions can be raised
         async def target_wait_mock():
@@ -539,7 +567,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -605,7 +633,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -679,7 +707,7 @@ class TestCliEltScratchpadOne:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -762,7 +790,7 @@ class TestCliEltScratchpadOne:
 
         tap_process.wait.side_effect = wait_mock
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -825,7 +853,7 @@ class TestCliEltScratchpadOne:
 
         tap_process.wait.side_effect = wait_mock
 
-        invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
         ) as invoke_async, mock.patch(
@@ -853,7 +881,7 @@ class TestCliEltScratchpadOne:
         state_id = "already_running"
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
-        existing_job = Job(job_id=state_id, state=State.RUNNING)
+        existing_job = Job(job_name=state_id, state=State.RUNNING)
         existing_job.save(session)
 
         with mock.patch(
@@ -1012,6 +1040,10 @@ class TestCliEltScratchpadOne:
             )
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="ELT is not supported on Windows",
+)
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(LegacyTracker, "track_event", return_value=None)
@@ -1036,7 +1068,7 @@ class TestCliEltScratchpadTwo:
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(
                 tap_process,
                 target_process,
@@ -1123,7 +1155,7 @@ class TestCliEltScratchpadTwo:
             b"Failure\n",
         )
 
-        invoke_async = CoroutineMock(
+        invoke_async = AsyncMock(
             side_effect=(
                 tap_process,
                 target_process,
@@ -1179,6 +1211,10 @@ class TestCliEltScratchpadTwo:
             )
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="ELT is not supported on Windows",
+)
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
     @mock.patch.object(LegacyTracker, "track_event", return_value=None)
@@ -1205,7 +1241,7 @@ class TestCliEltScratchpadThree:
             "meltano.core.transform_add_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch.object(
-            DbtRunner, "run", new=CoroutineMock()
+            DbtRunner, "run", new=AsyncMock()
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -1245,7 +1281,7 @@ class TestCliEltScratchpadThree:
             "meltano.core.transform_add_service.ProjectPluginsService",
             return_value=project_plugins_service,
         ), mock.patch.object(
-            DbtRunner, "run", new=CoroutineMock()
+            DbtRunner, "run", new=AsyncMock()
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)

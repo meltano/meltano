@@ -1,4 +1,6 @@
 """Defines MeltanoInvoker."""
+from __future__ import annotations
+
 import os
 import subprocess
 import sys
@@ -18,7 +20,7 @@ class MeltanoInvoker:
 
         Parameters:
             project: Project class
-            settings_service: ProjectSettingService Class blank
+            settings_service: ProjectSettingsService Class blank
         """
         self.project = project
         self.settings_service = settings_service or ProjectSettingsService(project)
@@ -36,7 +38,7 @@ class MeltanoInvoker:
         Returns:
             A CompletedProcess class object from subprocess.run().
         """
-        return subprocess.run(  # noqa: S603
+        return subprocess.run(
             [self._executable_path(command), *args],
             **kwargs,
             env=self._executable_env(env),

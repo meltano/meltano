@@ -1,12 +1,11 @@
+from __future__ import annotations
+
 import json
 import logging
-import os
 from uuid import uuid4
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.db import project_engine
 from meltano.core.plugin import BasePlugin
-from meltano.core.project import Project
 from meltano.core.utils import nest_object
 
 

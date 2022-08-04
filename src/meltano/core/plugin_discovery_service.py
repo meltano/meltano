@@ -45,7 +45,7 @@ class DiscoveryFile(Canonical):
     def __init__(self, version=1, **plugins):
         """Create a new DiscoveryFile.
 
-        Args:
+        Parameters:
             version: The version of the discovery file.
             plugins: The plugins to add to the discovery file.
         """
@@ -68,7 +68,7 @@ class DiscoveryFile(Canonical):
     def file_version(cls, attrs):
         """Return version of discovery file represented by attrs dictionary.
 
-        Args:
+        Parameters:
             attrs: The attributes of the discovery file.
 
         Returns:
@@ -89,7 +89,7 @@ class PluginRepository(metaclass=ABCMeta):
     ) -> PluginDefinition:
         """Find a plugin definition.
 
-        Args:
+        Parameters:
             plugin_type: The type of plugin to find.
             plugin_name: The name of the plugin to find.
             kwargs: Additional arguments to pass to the finder.
@@ -104,7 +104,7 @@ class PluginRepository(metaclass=ABCMeta):
     ) -> BasePlugin:
         """Get the base plugin for a project plugin.
 
-        Args:
+        Parameters:
             plugin_type: The type of plugin to get the base plugin for.
             plugin_name: The name of the plugin to get the base plugin for.
             variant: The variant of the plugin to get the base plugin for.
@@ -126,7 +126,7 @@ class PluginRepository(metaclass=ABCMeta):
     ) -> BasePlugin:
         """Get the base plugin for a project plugin.
 
-        Args:
+        Parameters:
             project_plugin: The project plugin to get the base plugin for.
             kwargs: Additional arguments to pass to the finder.
 
@@ -152,7 +152,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
     def __init__(self, project, discovery: dict | None = None):
         """Create a new PluginDiscoveryService.
 
-        Args:
+        Parameters:
             project: The project to discover plugins for.
             discovery: The discovery file to use.
         """
@@ -327,7 +327,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The discovery file.
         """
-        with bundle.find("discovery.yml").open() as bundled_discovery:
+        with open(bundle.root / "discovery.yml") as bundled_discovery:
             discovery = self.load_discovery(bundled_discovery, cache=True)
 
         return discovery
@@ -335,7 +335,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
     def load_discovery(self, discovery_file, cache=False) -> DiscoveryFile:
         """Load the `discovery.yml` manifest.
 
-        Args:
+        Parameters:
             discovery_file: The file to load.
             cache: Whether to cache the manifest.
 
@@ -382,7 +382,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
     def get_plugins_of_type(self, plugin_type):
         """Return the plugins of the given type.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
 
         Returns:
@@ -418,7 +418,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
     ) -> PluginDefinition:
         """Find a plugin definition by type and name.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
 
@@ -438,7 +438,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
     ) -> PluginDefinition:
         """Find a plugin definition by type and namespace.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             namespace: The plugin namespace.
 
@@ -464,7 +464,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
     ):
         """Find related plugin references.
 
-        Args:
+        Parameters:
             target_plugin: The target plugin.
             plugin_types: Types of related plugins to add.
 
@@ -496,7 +496,7 @@ class LockedDefinitionService(PluginRepository):
     def __init__(self, project: Project) -> None:
         """Initialize the service.
 
-        Args:
+        Parameters:
             project: The Meltano project.
         """
         self.project = project
@@ -509,7 +509,7 @@ class LockedDefinitionService(PluginRepository):
     ) -> PluginDefinition:
         """Find a locked plugin definition.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
@@ -535,7 +535,7 @@ class LockedDefinitionService(PluginRepository):
     ) -> BasePlugin:
         """Get the base plugin for a project plugin.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant: The plugin variant.

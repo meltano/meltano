@@ -10,7 +10,6 @@ from typing import Any, Mapping
 
 import pytest
 import requests
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436 (protected module)
 from requests.adapters import BaseAdapter
 
 from meltano.core.hub.client import MeltanoHubService
@@ -26,6 +25,7 @@ pytest_plugins = [
     "fixtures.core",
     "fixtures.api",
     "fixtures.cli",
+    "fixtures.docker",
 ]
 
 if PYTEST_BACKEND == "sqlite":
@@ -34,8 +34,6 @@ elif PYTEST_BACKEND == "postgresql":
     pytest_plugins.append("fixtures.db.postgresql")
 else:
     raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")
-
-BACKEND = ["sqlite", "postgresql"]
 
 
 def pytest_runtest_setup(item):
@@ -56,16 +54,6 @@ def concurrency():
         "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),
         "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),  # noqa: WPS432
     }
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_env():
-    monkeypatch = MonkeyPatch()
-    monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
-
-    yield
-
-    monkeypatch.undo()
 
 
 class MockAdapter(BaseAdapter):
@@ -136,7 +124,7 @@ class MockAdapter(BaseAdapter):
     def __init__(self, api_url: str, discovery: dict) -> None:
         """Create a mock HTTP adapter for the Hub.
 
-        Args:
+        Parameters:
             api_url: The base URL of the Hub.
             discovery: A parsed discovery.yml file.
         """
@@ -176,6 +164,12 @@ def meltano_hub_service(project, discovery):
     hub = MeltanoHubService(project)
     hub.session.mount(hub.hub_api_url, MockAdapter(hub.hub_api_url, discovery))
     return hub
+
+
+@pytest.fixture(scope="class")
+def hub_endpoints(meltano_hub_service):
+    adapter = meltano_hub_service.session.adapters[meltano_hub_service.hub_api_url]
+    return adapter._mapping
 
 
 @pytest.fixture(scope="function")

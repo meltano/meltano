@@ -1,5 +1,7 @@
 """Defines PluginLocationRemoveStatus, PluginLocationRemoveManager, DbRemoveManager, MeltanoYmlRemoveManager and InstallationRemoveManager."""
 
+from __future__ import annotations
+
 import shutil
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -30,7 +32,7 @@ class PluginLocationRemoveManager(ABC):
     def __init__(self, plugin: ProjectPlugin, location):
         """Construct a PluginLocationRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             location: The location to remove the plugin from.
         """
@@ -43,7 +45,6 @@ class PluginLocationRemoveManager(ABC):
     @abstractmethod
     def remove(self):
         """Abstract remove method."""
-        pass
 
     @property
     def plugin_removed(self) -> bool:
@@ -79,7 +80,7 @@ class DbRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project):
         """Construct a DbRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """
@@ -112,7 +113,7 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project: Project):
         """Construct a MeltanoYmlRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """
@@ -140,7 +141,7 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project: Project):
         """Construct a LockedDefinitionRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """
@@ -176,7 +177,7 @@ class InstallationRemoveManager(PluginLocationRemoveManager):
     def __init__(self, plugin, project: Project):
         """Construct a InstallationRemoveManager instance.
 
-        Args:
+        Parameters:
             plugin: The plugin to remove.
             project: The Meltano project.
         """

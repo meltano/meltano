@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import json
-import logging
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
@@ -10,7 +11,6 @@ from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project_plugins_service import ProjectPluginsService
 
-from .db import project_engine
 from .project import Project
 
 
@@ -60,7 +60,9 @@ class SelectService:
             catalog = await self.load_catalog(session)
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                f"Could not find catalog. Verify that the tap supports discovery mode and advertises the `discover` capability as well as either `catalog` or `properties`"
+                "Could not find catalog. Verify that the tap supports discovery "
+                + "mode and advertises the `discover` capability as well as either "
+                + "`catalog` or `properties`"
             ) from err
 
         list_all = ListSelectedExecutor()

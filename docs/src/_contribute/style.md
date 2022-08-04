@@ -21,7 +21,7 @@ Python:
 Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code,
 and `wemake-python-styleguide` is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
 
-MyPy is currently only executed as part of the build pipeline in order to avoid overwhelming developers with the complete list of violations. This allows for incremental and iterative improvement without requiring a concerted effort to fix all errors at once.
+[MyPy is currently not executed in CI](https://github.com/meltano/meltano/issues/6491). It currently raises many issues when run. We intend to address them over time.
 
 Javascript:
 - [ESLint](https://eslint.org/docs/rules/)
@@ -86,24 +86,23 @@ from meltano.core.settings_service import EXPERIMENTAL
 
 class ExistingClass:
 
-	def __init__(self):
-		self.project = Project.find()
-		self.settings_service = ProjectSettingsService(self.project)
+    def __init__(self):
+        self.project = Project.find()
+        self.settings_service = ProjectSettingsService(self.project)
 
-	# If this method is called elsewhere in the code and experimental features are
-	# not allowed, it will throw an error:
-	def experimental_method(self):
-		with self.settings_service.feature_flag(EXPERIMENTAL):
-			print("Doing experimental behavior...")
+    # If this method is called elsewhere in the code and experimental features are
+    # not allowed, it will throw an error:
+    def experimental_method(self):
+        with self.settings_service.feature_flag(EXPERIMENTAL):
+            print("Doing experimental behavior...")
 
-	# If this method is called elsewhere, its behavior will vary based on whether
-	# the feature flag is set in the project
-	# The same pattern can be used to deprecate existing behavior
-	def existing_method_with_new_behavior(self):
-		with self.settings_service.feature_flag("new_behavior") as new_behavior:
-			if new_behavior:
-				print("Doing the new behavior...")
-			else:
-				print("Doing the existing behavior...")
-
+    # If this method is called elsewhere, its behavior will vary based on whether
+    # the feature flag is set in the project
+    # The same pattern can be used to deprecate existing behavior
+    def existing_method_with_new_behavior(self):
+        with self.settings_service.feature_flag("new_behavior") as new_behavior:
+            if new_behavior:
+                print("Doing the new behavior...")
+            else:
+                print("Doing the existing behavior...")
 ```

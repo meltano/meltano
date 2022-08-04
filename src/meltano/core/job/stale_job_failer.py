@@ -1,4 +1,6 @@
 """Defines StaleJobFailer."""
+from __future__ import annotations
+
 import logging
 
 from .finder import JobFinder
@@ -31,7 +33,7 @@ class StaleJobFailer:
         job.save(session)
 
         # No need to mention state ID if they're all going to be the same.
-        with_state_id = "" if self.state_id else f" with state ID '{job.job_id}'"
+        with_state_id = "" if self.state_id else f" with state ID '{job.job_name}'"
 
         error = job.payload["error"]
         logger.info(

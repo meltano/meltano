@@ -1,26 +1,20 @@
+from __future__ import annotations
+
 import logging
-import subprocess
 from functools import wraps
-from urllib.parse import urlsplit
+
+import requests
+from flask import Blueprint, current_app
+from flask import g as global_app_ctx
+from flask import jsonify, redirect, render_template, request
+from flask_login import current_user
+from flask_security import roles_required
+from jinja2 import TemplateNotFound
 
 import meltano
-import requests
-from flask import (
-    Blueprint,
-    current_app,
-    g,
-    jsonify,
-    make_response,
-    redirect,
-    render_template,
-    request,
-)
-from flask_login import current_user
-from flask_security import logout_user, roles_required
-from jinja2 import TemplateNotFound
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import block_if_readonly, passes_authentication_checks
-from meltano.core.project import Project, ProjectReadonly
+from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import truthy
 
@@ -43,7 +37,7 @@ def redirect_to_login_if_auth_required(f):
 @root.route("/-/embed/<token>")
 def embed(token):
     try:
-        return render_template("embed.html", jsContext=g.jsContext)
+        return render_template("embed.html", jsContext=global_app_ctx.jsContext)
     except TemplateNotFound:
         return "Please run `make bundle` from src/webapp of the Meltano project."
 
@@ -56,7 +50,7 @@ def embed(token):
 @redirect_to_login_if_auth_required
 def default(path):
     try:
-        return render_template("webapp.html", jsContext=g.jsContext)
+        return render_template("webapp.html", jsContext=global_app_ctx.jsContext)
     except TemplateNotFound:
         return "Please run `make bundle` from src/webapp of the Meltano project."
 
@@ -70,7 +64,7 @@ def bootstrap():
 @root.route("/echo", methods=["POST"])
 def echo():
     payload = request.get_json()
-    print(payload)
+    print(payload)  # noqa: WPS421
     return jsonify(payload)
 
 

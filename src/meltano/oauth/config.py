@@ -1,10 +1,12 @@
-import os
+from __future__ import annotations
+
 from secrets import token_hex
 
 from meltano.api.config import ProjectSettings as APIProjectSettings
 
 # session are used internally to verify the tokens
-SECRET_KEY = token_hex(64)
+SECRET_KEY_SIZE = 64
+SECRET_KEY = token_hex(SECRET_KEY_SIZE)
 
 
 class ProjectSettings(APIProjectSettings):

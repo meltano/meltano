@@ -1,12 +1,12 @@
-import os
-import shutil
+from __future__ import annotations
+
+import platform
 import threading
 import time
 from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
 
 import pytest
-import yaml
 
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.project import PROJECT_ROOT_ENV, Project, ProjectNotFound
@@ -28,7 +28,10 @@ def update(payload):
 
 
 class IndefiniteThread(threading.Thread):
+    """Never ending thread."""
+
     def __init__(self):
+        """Set stop event."""
         super().__init__()
         self._stop_event = threading.Event()
 
@@ -41,7 +44,10 @@ class IndefiniteThread(threading.Thread):
 
 
 class ProjectReader(IndefiniteThread):
+    """Project using a never ending thread."""
+
     def __init__(self, project):
+        """Set the project."""
         self.project = project
         super().__init__()
 
@@ -52,7 +58,7 @@ class ProjectReader(IndefiniteThread):
 
 class TestProject:
     @pytest.mark.usefixtures("deactivate_project")
-    def test_find(self, project, mkdtemp, monkeypatch):
+    def test_find(self, project, tmp_path, monkeypatch):
         # defaults to the cwd
         found = Project.find(activate=False)
         assert found == project
@@ -77,11 +83,7 @@ class TestProject:
 
         # and it fails if there isn't a meltano.yml
         with pytest.raises(ProjectNotFound):
-            try:
-                empty_dir = mkdtemp("meltano_empty_project")
-                Project.find(empty_dir)
-            finally:
-                shutil.rmtree(empty_dir)
+            Project.find(tmp_path)
 
     def test_activate(self, project):
         Project.deactivate()
@@ -95,11 +97,15 @@ class TestProject:
     def test_find_threadsafe(self, project, concurrency):
         workers = ThreadPool(concurrency["threads"])
         projects = workers.map(Project.find, range(concurrency["cases"]))
-
-        assert all(map(lambda x: x is project, projects))
+        assert all(x is project for x in projects)
 
     @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
+
         payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]
 
         reader = ProjectReader(project)
@@ -112,8 +118,22 @@ class TestProject:
         reader.join()
 
         meltano = project.meltano
-        for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
+        unpacked_items = (item for payload in payloads for item in payload.items())
+        for key, val in unpacked_items:
             assert meltano.extras[key] == val
+
+    def test_preserve_comments(self, project: Project):
+        original_contents = project.meltanofile.read_text()
+
+        new_contents = f"# Please don't delete me :)\n{original_contents}"
+        project.meltanofile.write_text(new_contents)
+
+        with project.meltano_update() as meltano:
+            meltano.extras["a_new_key"] = "New Key"
+
+        contents = project.meltanofile.read_text()
+        assert contents.startswith("# Please don't delete me :)\n")
+        assert "a_new_key: New Key" in contents
 
 
 class TestIncompatibleProject:

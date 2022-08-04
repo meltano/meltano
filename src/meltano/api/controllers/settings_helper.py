@@ -1,7 +1,6 @@
+from __future__ import annotations
+
 import json
-import os
-from os.path import join
-from pathlib import Path
 
 from meltano.core.project import Project
 

@@ -1,18 +1,20 @@
 """Validation command."""
 
+from __future__ import annotations
+
+import asyncio
 import shutil
 import sys
-from typing import Dict, Iterable, Tuple
+from typing import Iterable
 
 import click
 import structlog
 from sqlalchemy.orm.session import sessionmaker
 
-from meltano.cli.utils import propagate_stop_signals
+from meltano.cli.utils import InstrumentedCmd, propagate_stop_signals
 from meltano.core.db import project_engine
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
-from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
 from . import cli
@@ -46,7 +48,7 @@ class CommandLineRunner(ValidationsRunner):
     async def run_test(self, name: str) -> int:
         """Run a test command.
 
-        Args:
+        Parameters:
             name: Test command name to invoke.
 
         Returns:
@@ -59,7 +61,7 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.command(short_help="Run validations using plugins' tests.")
+@cli.command(cls=InstrumentedCmd, short_help="Run validations using plugins' tests.")
 @click.option(
     "--all",
     "all_tests",
@@ -76,7 +78,7 @@ class CommandLineRunner(ValidationsRunner):
 def test(
     project: Project,
     all_tests: bool,
-    plugin_tests: Tuple[str] = (),
+    plugin_tests: tuple[str] = (),
 ):
     """
     Run validations using plugins' tests.
@@ -99,7 +101,7 @@ def test(
         else:
             collected[plugin_name].select_all()
 
-    exit_codes = run_async(_run_plugin_tests(session, collected.values()))
+    exit_codes = asyncio.run(_run_plugin_tests(session, collected.values()))
 
     tracker = LegacyTracker(project)
     tracker.track_meltano_test(
@@ -114,11 +116,11 @@ def test(
 async def _run_plugin_tests(
     session: sessionmaker,
     runners: Iterable[ValidationsRunner],
-) -> Dict[str, Dict[str, int]]:
+) -> dict[str, dict[str, int]]:
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}
 
 
-def _report_and_exit(results: Dict[str, Dict[str, int]]):
+def _report_and_exit(results: dict[str, dict[str, int]]):
     exit_code = 0
     failed_count = 0
     passed_count = 0

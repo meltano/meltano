@@ -1,10 +1,11 @@
 """Defines DBT-specific plugins."""
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 
-from meltano.core.behavior.hookable import hook
 from meltano.core.error import PluginInstallError
-from meltano.core.plugin import BasePlugin, PluginRef, PluginType
+from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class DbtInvoker(PluginInvoker):
-    def Popen_options(self):
+    def Popen_options(self):  # noqa: N802
         return {**super().Popen_options(), "cwd": self.plugin_config["project_dir"]}
 
 
@@ -64,7 +65,7 @@ class DbtTransformPluginInstaller:
         except FileNotFoundError as err:
             relative_path = Path(err.filename).relative_to(self.project.root)
             raise PluginInstallError(
-                f"File {relative_path}' could not be found. Run `meltano add files dbt` to set up a dbt project."
+                f"File {relative_path}' could not be found. Run `meltano add files files-dbt` to set up a dbt project."
             )
 
 

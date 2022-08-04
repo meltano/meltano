@@ -76,9 +76,9 @@ const getters = {
     return state.pipelines.filter(pipeline => pipeline.isRunning)
   },
 
-  getRunningPipelineJobIds(state) {
+  getRunningPipelinestateIds(state) {
     return state.pipelinePollers.map(
-      pipelinePoller => pipelinePoller.getMetadata().jobId
+      pipelinePoller => pipelinePoller.getMetadata().stateId
     )
   },
 
@@ -138,8 +138,8 @@ const actions = {
     })
   },
 
-  getJobLog(_, jobId) {
-    return orchestrationsApi.getJobLog({ jobId })
+  getJobLog(_, stateId) {
+    return orchestrationsApi.getJobLog({ stateId })
   },
 
   getLoaderConfiguration({ commit, dispatch }, loader) {
@@ -177,19 +177,21 @@ const actions = {
 
   getPolledPipelineJobStatus({ commit, getters, state }) {
     return orchestrationsApi
-      .getPolledPipelineJobStatus({ jobIds: getters.getRunningPipelineJobIds })
+      .getPolledPipelineJobStatus({
+        stateIds: getters.getRunningPipelinestateIds
+      })
       .then(response => {
         response.data.jobs.forEach(jobStatus => {
           const targetPoller = state.pipelinePollers.find(
             pipelinePoller =>
-              pipelinePoller.getMetadata().jobId === jobStatus.jobId
+              pipelinePoller.getMetadata().stateId === jobStatus.stateId
           )
           if (jobStatus.isComplete) {
             commit('removePipelinePoller', targetPoller)
           }
 
           const targetPipeline = state.pipelines.find(
-            pipeline => pipeline.name === jobStatus.jobId
+            pipeline => pipeline.name === jobStatus.stateId
           )
 
           commit('setPipelineStatus', {
@@ -215,14 +217,14 @@ const actions = {
   rehydratePollers({ dispatch, getters, state }) {
     // Handle page refresh condition resulting in jobs running but no pollers
     const pollersUponQueued = getters.getRunningPipelines.map(pipeline => {
-      const jobId = pipeline.name
+      const stateId = pipeline.name
       const isMissingPoller =
         state.pipelinePollers.find(
-          pipelinePoller => pipelinePoller.getMetadata().jobId === jobId
+          pipelinePoller => pipelinePoller.getMetadata().stateId === stateId
         ) === undefined
 
       if (isMissingPoller) {
-        return dispatch('queuePipelinePoller', { jobId })
+        return dispatch('queuePipelinePoller', { stateId })
       }
     })
 

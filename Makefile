@@ -9,6 +9,11 @@
 # - `make clean` deletes all the build artifacts
 # - `make docker_images` builds all the docker images including the production
 #   image
+#
+# To build and publish:
+#
+# > make sdist-public
+# > poetry publish --build
 
 ifdef DOCKER_REGISTRY
 base_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/base
@@ -25,12 +30,17 @@ DCRN=${DCR} --no-deps
 
 MELTANO_WEBAPP = src/webapp
 MELTANO_API = src/meltano/api
+MELTANO_RELEASE_MARKER_FILE = ./src/meltano/core/tracking/.release_marker
 
-.PHONY: build test clean docker_images release
+.PHONY: build test clean docker_images release help
+.DEFAULT_GOAL := help
 
-build: ui api
+help: ## Display this help text
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
-test:
+build: ui api ## Build the Meltano UI and API
+
+test: ## Run the tests
 	${DCRN} api poetry run pytest tests/
 
 # pip related
@@ -39,11 +49,14 @@ TO_CLEAN  = ./build ./dist
 TO_CLEAN += ./${MELTANO_API}/static/js
 TO_CLEAN += ./${MELTANO_API}/static/css
 TO_CLEAN += ./${MELTANO_WEBAPP}/dist
+# release marker
+TO_CLEAN += ${MELTANO_RELEASE_MARKER_FILE}
 
-clean:
+
+clean: ## Delete build artifacts
 	rm -rf ${TO_CLEAN}
 
-docker_images: base_image prod_image
+docker_images: base_image prod_image ## Build the Meltano Docker images
 
 # Docker Image Related
 # ====================
@@ -54,15 +67,15 @@ docker_images: base_image prod_image
 
 .PHONY: base_image prod_image
 
-base_image:
+base_image: ## Build the Meltano base image
 	docker build \
 		--file docker/base/Dockerfile \
 		-t $(base_image_tag) \
 		.
 
-prod_image: base_image ui
+prod_image: base_image ui ## Build the Meltano prod image
 	docker build \
-		--file docker/prod/Dockerfile \
+		--file docker/main/Dockerfile \
 		-t $(prod_image_tag) \
 		--build-arg BASE_IMAGE=$(base_image_tag) \
 		.
@@ -74,7 +87,7 @@ prod_image: base_image ui
 
 .PHONY: api
 
-api: prod_image ${MELTANO_API}/node_modules
+api: prod_image ${MELTANO_API}/node_modules ## Build the Meltano API
 
 ${MELTANO_API}/node_modules:
 	${DCRN} -w /meltano/${MELTANO_API} api yarn
@@ -85,22 +98,33 @@ ${MELTANO_API}/node_modules:
 # - `make lock` pins dependency versions. We use Poetry to generate
 #   a lockfile.
 
-lock:
+lock: ## Update Poetry lock file
 	poetry lock
 
-bundle: clean ui
+bundle: clean ui ## Clean build artifacts, then build & bundle the UI
 	mkdir -p src/meltano/api/templates && \
 	cp src/webapp/dist/index.html src/meltano/api/templates/webapp.html && \
 	cp src/webapp/dist/index-embed.html src/meltano/api/templates/embed.html && \
 	cp -r src/webapp/dist/static/. src/meltano/api/static
 
-freeze_db:
+freeze_db: ## Freeze the Meltano database to support DB migration during upgrades
 	poetry run scripts/alembic_freeze.py
 
-sdist: freeze_db bundle
-	poetry build -f sdist
+# sdist:
+# Build the source distribution
+# Note: plese use `sdist-public` for the actual release build
+sdist: freeze_db bundle ## Build the Meltano sdist for development
+	poetry build
 
-docker_sdist: base_image
+# sdist_public:
+# Same as sdist, except add release marker before poetry build
+# The release marker differentiates installations 'in the wild' versus inernal dev builds and tests
+sdist_public: freeze_db bundle ## Build the Meltano sdist for release
+	touch src/meltano/core/tracking/.release_marker
+	poetry build
+	echo "Builds complete. You can now publish to PyPI using 'poetry publish'."
+
+docker_sdist: base_image ## Build an image off of the base image that includes the Meltano sdist
 	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
 	bash -c "make sdist" && \
 	bash -c "chmod 777 dist/*"
@@ -113,36 +137,12 @@ docker_sdist: base_image
 
 .PHONY: ui
 
-ui:
+ui: ## Build the Meltano UI
 	cd src/webapp && yarn && yarn build
 
 ${MELTANO_WEBAPP}/node_modules: ${MELTANO_WEBAPP}/yarn.lock
 	cd ${MELTANO_WEBAPP} && yarn install --frozen-lockfile
 
-
-# Docs Related Tasks
-# ==================
-#
-
-.PHONY: makefile_docs docs_image docs_shell
-
-docs_image: base_image
-	docker build \
-		--file docker/docs/Dockerfile \
-		-t meltano/docs_build \
-		.
-
-docs_shell: docs_image
-	${DOCKER_RUN} -w /app/docs meltano/docs_build bash
-
-docs/build: docs_image docs/source
-	${DOCKER_RUN} -w /app/docs meltano/docs_build make html
-
-docs/serve: docs/build
-	${DOCKER_RUN} \
-		-w /app/docs \
-		-p 8080:8081 \
-		meltano/docs_build sphinx-serve -b build
 
 # Lint Related Tasks
 # ==================
@@ -156,34 +156,28 @@ JSON_YML_VALIDATE = poetry run python src/meltano/core/utils/validate_json_schem
 
 args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
-lint_python:
+lint_python: ## Run Python linters & automatically apply fixes where possible
 	${JSON_YML_VALIDATE}
 	${TOX_RUN} fix -- $(call args)
 
-lint_eslint: ${MELTANO_WEBAPP}/node_modules
+lint_eslint: ${MELTANO_WEBAPP}/node_modules ## Run eslint & automatically apply fixes where possible
 	${ESLINT_RUN} --fix
 
-show_lint_python:
+show_lint_python: ## Run Python linters & display output
 	${TOX_RUN} lint -- $(call args)
 
-show_lint_eslint: ${MELTANO_WEBAPP}/node_modules
+show_lint_eslint: ${MELTANO_WEBAPP}/node_modules ## Run eslint & display output
 	${ESLINT_RUN}
 
-lint: lint_python lint_eslint
-show_lint: show_lint_python show_lint_eslint
-
-# Makefile Related Tasks
-# ======================
-#
-# - `make explain_makefile` will bring up a web server with this makefile annotated.
-explain_makefile:
-	docker stop explain_makefile || echo 'booting server'
-	${DOCKER_RUN} --name explain_makefile -p 8081:8081 node ./Makefile_explain.sh
+lint: lint_python lint_eslint ## Run linters & automatically apply fixes where possible
+show_lint: show_lint_python show_lint_eslint ## Run linters & display output
 
 # Release
 # =====================
-
-release:
+# Note:
+# - this code is old and may be stale.
+# - process currently runs in CI
+release: ## Execute the automated steps of the deprecated release process
 	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
 	yes | poetry run changelog release --$(type)
 	git add CHANGELOG.md

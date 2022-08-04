@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import os
 import shutil
 import sys
-import tempfile
 from distutils import dir_util
 from functools import partial
 from pathlib import Path
@@ -24,29 +25,15 @@ def compatible_copy_tree():
     return _compatible_copy_tree
 
 
-@pytest.fixture(scope="function")
-def mkdtemp(request):
-    def _mkdtemp(*args, **kwargs):
-        path = Path(tempfile.mkdtemp())
-        cleanup = partial(shutil.rmtree, path, ignore_errors=True)
-
-        request.addfinalizer(cleanup)
-        return path
-
-    return _mkdtemp
-
-
 @pytest.fixture(scope="session")
-def test_dir(tmp_path_factory):
+def test_dir(tmp_path_factory) -> Path:
+    tmp_path = tmp_path_factory.mktemp("meltano_root")
     cwd = os.getcwd()
-    test_dir = tmp_path_factory.mktemp("meltano_root")
-
-    try:  # noqa: WPS229
-        os.chdir(test_dir)
-        yield test_dir
+    try:
+        os.chdir(tmp_path)
+        yield tmp_path
     finally:
         os.chdir(cwd)
-        shutil.rmtree(test_dir)
 
 
 @pytest.fixture
@@ -62,17 +49,15 @@ def pushd(request):
 
 
 @pytest.mark.meta
-def test_pushd(mkdtemp, pushd):
-    temp = mkdtemp()
+def test_pushd(tmp_path, pushd):
+    os.makedirs(tmp_path / "a")
+    os.makedirs(tmp_path / "a" / "b")
 
-    os.makedirs(temp.joinpath("a"))
-    os.makedirs(temp.joinpath("a/b"))
-
-    pushd(temp / "a")
-    assert os.getcwd() == str(temp.joinpath("a"))
+    pushd(tmp_path / "a")
+    assert os.getcwd() == str(tmp_path / "a")
 
     popd = pushd("b")
-    assert os.getcwd() == str(temp.joinpath("a/b"))
+    assert os.getcwd() == str(tmp_path / "a" / "b")
 
     popd()
-    assert os.getcwd() == str(temp.joinpath("a"))
+    assert os.getcwd() == str(tmp_path / "a")

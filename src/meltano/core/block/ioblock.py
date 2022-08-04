@@ -1,7 +1,9 @@
-"""The actual IOBlock interface is one of the lower level blocks for use with various BlockSet implementations."""
+"""The actual `IOBlock` interface is one of the lower level blocks for use with various `BlockSet` implementations."""
+
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from asyncio import StreamWriter, Task
-from typing import Optional, Tuple
 
 from meltano.core.logging.utils import SubprocessOutputWriter
 
@@ -15,7 +17,7 @@ class IOBlock(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def stdin(self) -> Optional[StreamWriter]:
+    def stdin(self) -> StreamWriter | None:
         """If a block requires input, return the StreamWriter that should be used for writes.
 
         Returns:
@@ -53,7 +55,7 @@ class IOBlock(metaclass=ABCMeta):
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst.
 
-        Args:
+        Parameters:
             dst: SubprocessOutputWriter
 
         Raises:
@@ -65,7 +67,7 @@ class IOBlock(metaclass=ABCMeta):
     def stderr_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stderr_link to instruct block to link/write stderr content to dst.
 
-        Args:
+        Parameters:
             dst: SubprocessOutputWriter
 
         Raises:
@@ -88,7 +90,7 @@ class IOBlock(metaclass=ABCMeta):
     async def stop(self, kill: bool = True) -> None:
         """Stop a block.
 
-        Args:
+        Parameters:
             kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
 
         Raises:
@@ -113,7 +115,7 @@ class IOBlock(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def proxy_io(self) -> Tuple[Task, Task]:
+    def proxy_io(self) -> tuple[Task, Task]:
         """Start proxying stdout AND stderr to the linked destinations.
 
         Returns:
@@ -127,17 +129,14 @@ class IOBlock(metaclass=ABCMeta):
     async def pre(self, context: object) -> None:
         """Execute pre-start tasks.
 
-        Args:
+        Parameters:
             context: invocation context to use for this execution.
         """
-        pass
 
     @abstractmethod
     async def post(self) -> None:
         """Execute post-stop tasks."""
-        pass
 
     @abstractmethod
     async def close_stdin(self) -> None:
         """Close the underlying stdin if the block is a consumer."""
-        pass

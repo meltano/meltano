@@ -1,4 +1,4 @@
-import re
+from __future__ import annotations
 
 from werkzeug.utils import secure_filename
 

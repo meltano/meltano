@@ -1,16 +1,20 @@
+from __future__ import annotations
+
 from collections import Counter
-from unittest import mock
+
+import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
+from meltano.core.project import Project
 
 
 class TestCliDiscover:
     def test_discover(
         self,
-        project,
+        project: Project,
         cli_runner,
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,
@@ -28,18 +32,18 @@ class TestCliDiscover:
             request_count = 1 if plugin_type.discoverable else 0
             assert hub_request_counter[f"/{plugin_type}/index"] == request_count
 
-        assert "Extractors" in result.output
-        assert "tap-gitlab" in result.output
-        assert "tap-mock" in result.output
-        assert "tap-mock, variants: meltano (default), singer-io" in result.output
+        assert "Extractors" in result.stdout
+        assert "tap-gitlab" in result.stdout
+        assert "tap-mock" in result.stdout
+        assert "tap-mock, variants: meltano (default), singer-io" in result.stdout
 
-        assert "Loaders" in result.output
-        assert "target-jsonl" in result.output
-        assert "target-mock" in result.output
+        assert "Loaders" in result.stdout
+        assert "target-jsonl" in result.stdout
+        assert "target-mock" in result.stdout
 
     def test_discover_extractors(
         self,
-        project,
+        project: Project,
         cli_runner,
         meltano_hub_service: MeltanoHubService,
         hub_request_counter: Counter,
@@ -56,8 +60,8 @@ class TestCliDiscover:
         assert hub_request_counter["/extractors/index"] == 1
         assert hub_request_counter["/loaders/index"] == 0
 
-        assert "Extractors" in result.output
-        assert "tap-gitlab" in result.output
-        assert "tap-mock" in result.output
+        assert "Extractors" in result.stdout
+        assert "tap-gitlab" in result.stdout
+        assert "tap-mock" in result.stdout
 
-        assert "Loaders" not in result.output
+        assert "Loaders" not in result.stdout

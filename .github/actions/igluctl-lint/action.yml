@@ -1,0 +1,12 @@
+name: 'igluctl-lint'
+description: 'Run igluctl lint'
+inputs:
+  path_to_schemas:
+    description: 'Path to the schemas for igluctl to lint'
+    required: true
+    default: './'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.path_to_schemas }}

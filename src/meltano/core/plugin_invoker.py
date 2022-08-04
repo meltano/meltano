@@ -1,14 +1,16 @@
 """Plugin invoker class."""
 
+from __future__ import annotations
+
 import asyncio
 import enum
 import logging
 import os
 import uuid
+from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional, Union
+from typing import Any, Generator
 
-from async_generator import asynccontextmanager
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
@@ -29,7 +31,7 @@ logger = get_logger(__name__)
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     """Instantiate a plugin invoker from a project plugin.
 
-    Args:
+    Parameters:
         project: Meltano project.
         plugin: Plugin instance.
         args: Invoker constructor positional arguments.
@@ -56,7 +58,7 @@ class ExecutableNotFoundError(InvokerError):
     def __init__(self, plugin: PluginRef, executable: str):
         """Initialize ExecutableNotFoundError.
 
-        Args:
+        Parameters:
             plugin: Meltano plugin reference.
             executable: Plugin command executable.
         """
@@ -81,7 +83,7 @@ class UnknownCommandError(InvokerError):
     def __init__(self, plugin: PluginRef, command):
         """Initialize UnknownCommandError.
 
-        Args:
+        Parameters:
             plugin: Meltano plugin reference.
             command: Plugin command name.
         """
@@ -124,35 +126,35 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self,
         project: Project,
         plugin: ProjectPlugin,
-        context: Optional[object] = None,
-        output_handlers: Optional[dict] = None,
-        run_dir=None,
-        config_dir=None,
-        venv_service: VenvService = None,
-        plugins_service: ProjectPluginsService = None,
-        plugin_config_service: PluginConfigService = None,
-        plugin_settings_service: PluginSettingsService = None,
+        context: Any | None = None,
+        output_handlers: dict | None = None,
+        run_dir: Path | None = None,
+        config_dir: Path | None = None,
+        venv_service: VenvService | None = None,
+        plugins_service: ProjectPluginsService | None = None,
+        plugin_config_service: PluginConfigService | None = None,
+        plugin_settings_service: PluginSettingsService | None = None,
     ):
         """Create a new plugin invoker.
 
-        Args:
+        Parameters:
             project: Meltano Project.
             plugin: Meltano Plugin.
-            context: Invocation context. Defaults to None.
-            output_handlers: Logging and output handlers. Defaults to None.
-            run_dir: Execution directory. Defaults to None.
-            config_dir: Configuration files directory. Defaults to None.
-            venv_service: Virtual Environment manager. Defaults to None.
-            plugins_service: Plugin manager. Defaults to None.
-            plugin_config_service: Plugin Configuration manager. Defaults to None.
-            plugin_settings_service: Plugin Settings manager. Defaults to None.
+            context: Invocation context.
+            output_handlers: Logging and output handlers.
+            run_dir: Execution directory.
+            config_dir: Configuration files directory.
+            venv_service: Virtual Environment manager.
+            plugins_service: Plugin manager.
+            plugin_config_service: Plugin Configuration manager.
+            plugin_settings_service: Plugin Settings manager.
         """
         self.project = project
         self.plugin = plugin
         self.context = context
         self.output_handlers = output_handlers
 
-        self.venv_service: Optional[VenvService] = None
+        self.venv_service: VenvService | None = None
         if plugin.pip_url or venv_service:
             self.venv_service = venv_service or VenvService(
                 project,
@@ -190,7 +192,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         return frozenset(self.plugin.capabilities)
 
     @property
-    def files(self) -> Dict[str, Path]:
+    def files(self) -> dict[str, Path]:
         """Get all config and output files of the plugin.
 
         Returns:
@@ -206,7 +208,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def prepare(self, session):
         """Prepare plugin config.
 
-        Args:
+        Parameters:
             session: Database session.
         """
         self.plugin_config = self.settings_service.as_dict(
@@ -238,7 +240,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def prepared(self, session):
         """Context manager that prepares plugin config.
 
-        Args:
+        Parameters:
             session: Database session.
 
         Yields:
@@ -250,12 +252,12 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         finally:
             await self.cleanup()
 
-    def exec_path(self, executable: Optional[str] = None) -> Union[str, Path]:
+    def exec_path(self, executable: str | None = None) -> str | Path:
         """Return the absolute path to the executable.
 
         Uses the plugin executable if none is specified.
 
-        Args:
+        Parameters:
             executable: Optional executable string.
 
         Returns:
@@ -276,7 +278,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable.
 
-        Args:
+        Parameters:
             args: Optional plugin args.
             command: Plugin command name.
             env: Environment variables
@@ -299,7 +301,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def find_command(self, name):
         """Find a Command by name.
 
-        Args:
+        Parameters:
             name: Command name.
 
         Returns:
@@ -339,7 +341,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def Popen_options(self) -> Dict[str, Any]:  # noqa: N802
+    def Popen_options(self) -> dict[str, Any]:  # noqa: N802
         """Get options for subprocess.Popen.
 
         Returns:
@@ -352,10 +354,10 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self,
         *args: str,
         require_preparation: bool = True,
-        env: Optional[Dict[str, Any]] = None,
-        command: Optional[str] = None,
+        env: dict[str, Any] | None = None,
+        command: str | None = None,
         **kwargs,
-    ) -> Generator[List[str], Dict[str, Any], Dict[str, Any]]:  # noqa: WPS221
+    ) -> Generator[list[str], dict[str, Any], dict[str, Any]]:  # noqa: WPS221
         env = env or {}
 
         if require_preparation and not self._prepared:
@@ -378,7 +380,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def invoke_async(self, *args, **kwargs):
         """Invoke a command.
 
-        Args:
+        Parameters:
             args: Positional arguments.
             kwargs: Keyword arguments.
 
@@ -399,7 +401,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def invoke_docker(self, plugin_command: str, *args, **kwargs) -> int:
         """Invoke a containerized command.
 
-        Args:
+        Parameters:
             plugin_command: Plugin command name.
             args: Command line invocation arguments.
             kwargs: Command line invocation keyword arguments.
@@ -431,7 +433,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def dump(self, file_id: str) -> str:
         """Dump a plugin file by id.
 
-        Args:
+        Parameters:
             file_id: Dump this file identifier.
 
         Returns:
@@ -453,7 +455,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.
 
-        Args:
+        Parameters:
             src: stdio source you'd like to subscribe, likely either 'stdout' or 'stderr'
             handler: either a StreamWriter or an object matching the utils.SubprocessOutputWriter proto
         """

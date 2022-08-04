@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 import os
-import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from click.testing import CliRunner
@@ -10,14 +12,33 @@ from meltano.core.project import Project
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
 
+if TYPE_CHECKING:
+    from fixtures.docker import SnowplowMicro
 
-@pytest.fixture()
-def cli_runner(pushd):
-    # this will make sure we are back at `cwd`
-    # after this test is finished
-    pushd(os.getcwd())
 
-    yield CliRunner(mix_stderr=False)
+class MeltanoCliRunner(CliRunner):
+    def __init__(self, *args, snowplow: SnowplowMicro | None = None, **kwargs):
+        """Initialize the `MeltanoCliRunner`."""
+        self.snowplow = snowplow
+        super().__init__(*args, **kwargs)
+
+    def invoke(self, *args, **kwargs) -> Any:
+        results = super().invoke(*args, **kwargs)
+        if self.snowplow:  # pragma: no cover
+            assert self.snowplow.all()["bad"] == 0  # pragma: no cover
+            assert not self.snowplow.bad()  # pragma: no cover
+        return results
+
+
+@pytest.fixture
+def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
+    pushd(os.getcwd())  # Ensure we return to the CWD after the test
+    root_logger = logging.getLogger()
+    log_level = root_logger.level
+    try:
+        yield MeltanoCliRunner(mix_stderr=False, snowplow=snowplow_optional)
+    finally:
+        root_logger.setLevel(log_level)
 
 
 @pytest.fixture(scope="class")
@@ -34,10 +55,9 @@ def project_files_cli(test_dir, compatible_copy_tree):
     # cd into the new project root
     os.chdir(project.root)
 
-    yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-
-    # clean-up
-    Project.deactivate()
-    os.chdir(test_dir)
-    shutil.rmtree(project.root)
-    logging.debug(f"Cleaned project at {project.root}")
+    try:
+        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        logging.debug(f"Cleaned project at {project.root}")

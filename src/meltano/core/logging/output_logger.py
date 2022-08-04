@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
 import sys
-from contextlib import contextmanager, redirect_stderr, redirect_stdout, suppress
-from typing import Optional
+from contextlib import (
+    asynccontextmanager,
+    contextmanager,
+    redirect_stderr,
+    redirect_stdout,
+    suppress,
+)
 
 import structlog
-from async_generator import asynccontextmanager
 
 from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from .utils import capture_subprocess_output
@@ -21,11 +27,11 @@ class OutputLogger:
         self.outs = {}
 
     def out(
-        self, name: str, logger=None, write_level: Optional[int] = logging.INFO
-    ) -> "Out":
+        self, name: str, logger=None, write_level: int | None = logging.INFO
+    ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
 
-        Args:
+        Parameters:
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
             write_level: log level passed to underlying logger.log calls.
@@ -84,7 +90,7 @@ class Out:  # noqa: WPS230
     ):
         """Log anything written in a stream.
 
-        Args:
+        Parameters:
             output_logger: the OutputLogger to use.
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
@@ -123,9 +129,14 @@ class Out:  # noqa: WPS230
         """Redirect log entries to a temporarily added file handler."""
         logger = logging.getLogger()
         logger.addHandler(self.redirect_log_handler)
+        ignored_errors = (
+            KeyboardInterrupt,
+            asyncio.CancelledError,
+            *ignore_errors,
+        )
         try:
             yield
-        except (KeyboardInterrupt, asyncio.CancelledError, *ignore_errors):
+        except ignored_errors:  # noqa: WPS329
             raise
         except Exception as err:
             logger.error(str(err), exc_info=True)
@@ -174,8 +185,6 @@ class Out:  # noqa: WPS230
         read_protocol = asyncio.StreamReaderProtocol(reader)
 
         loop = asyncio.get_event_loop()
-        read_transport, _ = await loop.connect_read_pipe(
-            lambda: read_protocol, os.fdopen(read_fd)
-        )
+        await loop.connect_read_pipe(lambda: read_protocol, os.fdopen(read_fd))
 
         await capture_subprocess_output(reader, self)

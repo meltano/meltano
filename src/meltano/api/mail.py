@@ -1,5 +1,6 @@
-"""Basic MailService that sends notifications via the sendgrid API."""
-from typing import Optional
+"""Basic `MailService` that sends notifications via the sendgrid API."""
+
+from __future__ import annotations
 
 from flask_mail import Mail, Message
 from smtpapi import SMTPAPIHeader
@@ -17,7 +18,7 @@ class MailService:
     def __init__(self, project: Project):
         """Initialize the MailService.
 
-        Args:
+        Parameters:
             project: The project to use the MailService when referencing the project settings or project id.
         """
         self.project = project
@@ -28,13 +29,13 @@ class MailService:
             "mail.sendgrid_unsubscribe_group_id"
         )
 
-    def get_unsubscribe_group(self, subscription: Subscription) -> Optional[int]:
+    def get_unsubscribe_group(self, subscription: Subscription) -> int | None:
         """Get the unsubscribe group for the given subscription.
 
         Currently, the unsubscribe group is based on the event type, and only the SubscriptionEventType.PIPELINE_MANUAL_RUN
         even type is actually supported.
 
-        Args:
+        Parameters:
             subscription: The subscription to get the unsubscribe group for.
 
         Returns:
@@ -48,7 +49,7 @@ class MailService:
     def create_message(self, subscription: Subscription, **kwargs) -> Message:
         """Create a message for the given subscription.
 
-        Args:
+        Parameters:
             subscription: The subscription to create the message for.
             kwargs: Additional arguments to pass to the message constructor.
 
@@ -70,5 +71,5 @@ class MailService:
         return Message(
             recipients=[subscription.recipient],
             extra_headers={"X-SMTPAPI": headers.json_string()},
-            **kwargs
+            **kwargs,
         )

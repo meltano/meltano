@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import contextlib
-import logging
 import os
 
 import pytest
@@ -8,9 +9,7 @@ from sqlalchemy import create_engine, text
 
 
 def recreate_database(engine, db_name):
-    """
-    Drop & Create a new database, PostgreSQL only.
-    """
+    """Drop & Create a new database, PostgreSQL only."""
     with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
         engine.execute(text(f"DROP DATABASE {db_name}"))
 
@@ -32,13 +31,3 @@ def engine_uri():
     recreate_database(engine, database)
 
     return f"postgresql://{user}:{password}@{host}:{port}/{database}"
-
-
-@pytest.fixture()
-def pg_stats(request, session):
-    yield
-
-    from meltano.core.job import Job
-
-    jobs = session.query(Job).all()
-    print(f"{request.node.name} created {len(jobs)} Job.")

@@ -3,7 +3,38 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.3.0 (2022-07-20)
 
+### ✨ New
+
+- [#6150](https://github.com/meltano/meltano/issues/6150) meltano now surfaces full stderr output for catalog discovery failures
+- [#3419](https://github.com/meltano/meltano/issues/3419) Change default meltano config behavior to --no-environment
+- [#2133](https://github.com/meltano/meltano/issues/2133) Preserve comments and flow style in `meltano.yml`
+- [#6207](https://github.com/meltano/meltano/issues/6207) Add env as first-class attribute of MeltanoFile and ProjectPlugin classes (not an extra)
+
+### 🐛 Fixes
+
+- [#6188](https://github.com/meltano/meltano/issues/6188) Allow `meltano run` to run without providing subcommand
+- [#6380](https://github.com/meltano/meltano/issues/6380) **core**: Extras of kind `object` not honored in inherited plugins
+- [#3322](https://github.com/meltano/meltano/issues/3322) Extras of kind `object` not honored in environments
+- [#6301](https://github.com/meltano/meltano/issues/6301) Swap add_related for add_required in api v1 plugins
+- [#6359](https://github.com/meltano/meltano/issues/6359) Do not attempt to lock inherited plugins when using `meltano lock`
+- [#6136](https://github.com/meltano/meltano/issues/6136) clarify job/task relation to airflow
+- [#6234](https://github.com/meltano/meltano/issues/6234) Emit `RuntimeWarning` if a setting uses the default value
+- [#6357](https://github.com/meltano/meltano/issues/6357) typo in `meltano-basics` example link
+- [#6354](https://github.com/meltano/meltano/issues/6354) removed run preview references
+
+### ⚙️ Under the Hood
+
+- [#6324](https://github.com/meltano/meltano/issues/6324) update to automatically fire start AND end events
+
+### 📚 Documentation Improvements
+
+- [#6283](https://github.com/meltano/meltano/issues/6283) Document overriding capabilities and extending settings
+- [#6420](https://github.com/meltano/meltano/issues/6420) Windows installation old gitlab link
+- [#6367](https://github.com/meltano/meltano/issues/6367) Fix typo etl -> elt
+
+## 2.2.0 - (2022-07-01)
 
 ## Unreleased
 
@@ -12,64 +43,131 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#3227](https://gitlab.com/meltano/meltano/-/issues/3227) Add interactive mode to `meltano config` command.
+- [#2830](https://github.com/meltano/meltano/issues/2830) Add support for Python 3.10.
+- [#3452](https://gitlab.com/meltano/meltano/-/issues/3452) Add `copy` and `move` commands to `meltano state`
 
 ### Changes
 
+- [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) We now recommend pipx over manually created virtual environments.
+- [#3450](https://gitlab.com/meltano/meltano/-/issues/3450) Added installation instructions for Windows.
+- [#3367](https://gitlab.com/meltano/meltano/-/issues/3367) Windows now covered in CI for some basic cases.
+- [#3135](https://github.com/meltano/meltano/issues/3135) Formalize settings alias behavior and disallow conflicting values between setting name and aliases.
+- [#2035](https://github.com/meltano/meltano/issues/2035) Rename `job` table and `job_id` column in backend db.
+
 ### Fixes
 
-### Breaks
+- [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
 
-
-## 2.0.0 - (2022-06-08)
-
-- [#3348](https://github.com/meltano/meltano/issues/3348) Add feature flag for raising exceptions when unset environment variables are referenced in settings.
+## 2.1.0 - (2022-06-17)
 
 ---
 
 ### New
 
-- [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
-
-- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX
+- [#5961](https://github.com/meltano/meltano/issues/5961) - Add `meltano lock` command to create or update plugin lock artifacts.
+- [#6199](https://github.com/meltano/meltano/pull/6199/) - Restore project_id from analytics.json & improve analytics.json handling.
+- [#6203](https://github.com/meltano/meltano/pull/6203) - Fire exit event exactly once & include detailed exception context.
+- [#6141](https://github.com/meltano/meltano/pull/6141) - Add tracking for job command.
+- [#6137](https://github.com/meltano/meltano/pull/6137) - Add telemetry for meltano config.
+- [#6114](https://github.com/meltano/meltano/pull/6114) - Add meltano lock.
 
 ### Changes
-- [#3173](https://gitlab.com/meltano/meltano/-/issues/3173) Add tests and clarify docs for environment variable resolution.
 
-- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Fully remove option for Explore/Dashboard UI in 2.0
+- [#3473](https://gitlab.com/meltano/meltano/-/issues/3473) - Python Virtual Environments advanced concept added to docs by splitting it out from the Installation instructions.
 
-- [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies replaces  implicitly "related" plugins
+### Fixes
+
+- [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all <jobId> with <stateId> to fix pipeline running bug.
+
+## 2.0.3 - (2022-06-15)
+
+---
+
+### Changes
+
+- [#6186](https://github.com/meltano/meltano/pull/6186) Improve CLI startup performance
+
+## 2.0.2 - (2022-06-14)
+
+---
+
+### Fixes
+
+- [#6174](https://github.com/meltano/meltano/issues/6174) Fix issue where loading schedules could cause Meltano UI to crash.
+
+### Docs
+
+- [#6184](https://github.com/meltano/meltano/pull/6184) Bugfix in getting-started guide installation instructions - _Thanks, **[Martin Morset (@dingobar)](https://github.com/dingobar)**!_
+
+### Misc
+
+- [#6149](https://github.com/meltano/meltano/pull/6149),[#6142](https://github.com/meltano/meltano/pull/6142) Add anonymized telemetry handling for exceptions.
+
+## 2.0.1 - (2022-06-09)
+
+---
+
+### Fixes
+
+- [#6143](https://github.com/meltano/meltano/issues/6143) Resolve issue where Meltano UI would not start.
+
+## 2.0.0 - (2022-06-08)
+
+---
+
+_**Meltano 2.0** is a major update with multiple new features and some breaking changes. See our [2.0 Migration Guide](https://docs.meltano.com/reference/v2-migration) for more information._
+
+### New
+
+- [#3283](https://github.com/meltano/meltano/issues/3208) Support `meltano add` directly from Hub.
+- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Add job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
+- [#5923](https://github.com/meltano/meltano/pull/5923) Add support for jobs to schedules and improves general schedule cli UX.
+- [#3348](https://github.com/meltano/meltano/issues/3348) Add [`env_var_strict_mode`](https://docs.meltano.com/reference/settings#ffenv_var_strict_mode) feature flag to raise an exception if unset environment variables are referenced in settings.
+- [#6060](https://github.com/meltano/meltano/pull/6060) Generate lockfiles when running `meltano add` to install new plugins (now enabled by default).
+- [#3355](https://github.com/meltano/meltano/pull/3355) New paradigm of explicit plugin dependencies using `requires:`, replaces implicitly "related" plugins.
+- [#6033](https://github.com/meltano/meltano/pull/6033) Let plugin in `meltano.yml` override capabilities and extend settings of parent/lockfile.
+
+### Changes
+
+- [#5957](https://github.com/meltano/meltano/pull/5957) Remove the auto-add functionality that applied to transform plugins and plugins with matching `namespace`.
+- [#6043](https://github.com/meltano/meltano/pull/6034) Let Meltano settings be stored under environments.
+
+### Breaks
+
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for the legacy "Dashboards" and "Explore" UX in Meltano UI.
+- [#3427](https://gitlab.com/meltano/meltano/-/issues/3427) Drop support for legacy `model` and `dashboard` plugin types.
+- [#3048](https://github.com/meltano/meltano/issues/3048) Drop support for `env_aliases` feature and remove its references in `discovery.yml`.
+- [#5957](https://github.com/meltano/meltano/pull/5957) Drop support for the `--include-related` CLI flag.
 
 ### Fixes
 
 - [#5979](https://github.com/meltano/meltano/issues/5979) Fixes `meltano remove` bug where lock files were not removed if they include a variant in the file name.
+- [#6015](https://github.com/meltano/meltano/issues/6015) Fixes a bug where `meltano config meltano set` would not always set a value.
+
+### Under the Hood
 
 ## 1.102.0 - (2022-04-28)
+- Improved [telemetry](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry) coverage across the product.
 
 ## 1.105.0 - (2022-05-19)
+
 ---
 
 ### New
 
 - [#3298](https://gitlab.com/meltano/meltano/-/issues/3298) Add adapter-specific dbt plugins for Redshift, Postgres, and BigQuery.
-
-- [#2924](https://gitlab.com/meltano/meltano/-/issues/2924) Initial meltano job support via new `meltano job` command and support for referencing jobs in `meltano run` commands.
-
 - [#3482](https://gitlab.com/meltano/meltano/-/issues/3482) Expand project-set environment variables in Environment-level `env:`.
 
 ### Changes
 
 - [#3174](https://gitlab.com/meltano/meltano/-/issues/3174) - We now recommend [pipx](https://pypa.github.io/pipx/) over manually created virtual environments.
-
 - [#3484](https://gitlab.com/meltano/meltano/-/issues/3484) Use `SettingsService.feature_flag` convention for lockfiles.
-
 - [#3447](https://gitlab.com/meltano/meltano/-/issues/3447) Make setting-level `env:` declaration a one-way injection into the plugin execution context.
 
 ### Fixes
 
 - [#3483](https://gitlab.com/meltano/meltano/-/issues/3483) Fixes a bug where pipx installed meltano can not find executable(.exe) meltano dependency packages. _Thanks **[Dan Norman](https://gitlab.com/BuzzCutNorman)**!_
-
 - [#3500](https://gitlab.com/meltano/meltano/-/issues/3500) Fixes bug where lock file was added but not used.
-
 
 ## 1.104.0 - (2022-05-13)
 
@@ -615,7 +713,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for shortcut commands to `invoke`
 - [#2560](https://gitlab.com/meltano/meltano/-/issues/2560) Add support for `sqlfluff` utility for linting SQL transforms
 - [#2613](https://gitlab.com/meltano/meltano/-/issues/2613) Add `mashey` variant of `tap-slack`
-- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPi)
+- [#2689](https://gitlab.com/meltano/meltano/-/issues/2689) Add documentation for using a custom Python Package Index (PyPI)
 - [#2426](https://gitlab.com/meltano/meltano/-/issues/2426) Add `transferwise` variant of `target-redshift`
 
 ### Changes
@@ -2565,7 +2663,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- Patch technicality due to PyPi limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
+- Patch technicality due to PyPI limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
 
 ## 1.0.0 - (2019-10-07)
 

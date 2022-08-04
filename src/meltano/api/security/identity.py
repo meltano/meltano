@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from datetime import date
 
-from flask_security import AnonymousUser, SQLAlchemyUserDatastore
+from flask_security import SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
-from meltano.api.models.security import Role, RolePermissions, User, db
+
+from meltano.api.models.security import Role, User, db
 
 users = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -12,26 +15,25 @@ SEED_USERS = [
         "username": "rob",
         "email": "rob@meltano.com",
         "password": "meltano",
-        "confirmed_at": date(2000, 1, 1),
+        "confirmed_at": date(2000, 1, 1),  # noqa: WPS432
         "_roles": {"regular"},
     },
     {
         "username": "alice",
         "email": "alice@meltano.com",
         "password": "meltano",
-        "confirmed_at": date(2000, 1, 1),
+        "confirmed_at": date(2000, 1, 1),  # noqa: WPS432
         "_roles": {"admin"},
     },
 ]
 
 
 class FreeUser:
-    """
-    FreeUser is free to do everything and has no limits.
+    """A user that is free to do everything without limits.
 
-    Even though this class overrides `flask_security`'s AnonymousUser
-    it doens't inherit from AnonymousUser to bypass some type check
-    regarding the loading of the identity.
+    Even though this class overrides `flask_security`'s `AnonymousUser` it
+    doesn't inherit from `AnonymousUser` to bypass some type check regarding
+    the loading of the identity.
     """
 
     def has_role(*args):
@@ -66,7 +68,7 @@ class FreeUser:
 
     @roles.setter
     def roles(self, _):
-        pass
+        return None
 
     def get_auth_token(self):
         return None

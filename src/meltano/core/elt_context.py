@@ -1,4 +1,5 @@
 """ELT Context."""
+
 from __future__ import annotations
 
 from collections import namedtuple
@@ -24,7 +25,7 @@ class PluginContext(
     def __getattr__(self, attr: str) -> Any:
         """Get plugin attribute.
 
-        Args:
+        Parameters:
             attr: Attribute name.
 
         Returns:
@@ -35,7 +36,7 @@ class PluginContext(
     def get_config(self, name: str, **kwargs: Any) -> Any:
         """Get plugin config by name.
 
-        Args:
+        Parameters:
             name: Setting name to retrieve config for.
             kwargs: Keyword arguments to pass to SettingService.
 
@@ -47,7 +48,7 @@ class PluginContext(
     def config_dict(self, **kwargs) -> dict:
         """Get plugins config dict.
 
-        Args:
+        Parameters:
             kwargs: Keyword arguments to pass to SettingService.
 
         Returns:
@@ -58,7 +59,7 @@ class PluginContext(
     def config_env(self, **kwargs) -> dict[str, str]:
         """Get plugins config environment.
 
-        Args:
+        Parameters:
             kwargs: Keyword arguments to pass to SettingService.
 
         Returns:
@@ -99,7 +100,7 @@ class ELTContext:  # noqa: WPS230
     ):
         """Initialise ELT Context instance.
 
-        Args:
+        Parameters:
             project: Meltano Project instance.
             job: Job instance.
             session: SQLAlchemy Session instance.
@@ -143,12 +144,12 @@ class ELTContext:  # noqa: WPS230
             The job dir, if a Job is provided, else None.
         """
         if self.job:
-            return self.project.job_dir(self.job.job_id, str(self.job.run_id))
+            return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
     def invoker_for(self, plugin_type: PluginType) -> PluginInvoker:
         """Get invoker for given plugin type.
 
-        Args:
+        Parameters:
             plugin_type: Plugin type to get invoker for.
 
         Returns:
@@ -205,7 +206,7 @@ class ELTContextBuilder:  # noqa: WPS214
     ):
         """Instantiate new ELTContextBuilder.
 
-        Args:
+        Parameters:
             project: A Meltano Project instance.
             plugins_service: A PluginsService instance.
         """
@@ -231,7 +232,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_session(self, session: Session) -> ELTContextBuilder:
         """Include session when building context.
 
-        Args:
+        Parameters:
             session: A SQLAlchemy session.
 
         Returns:
@@ -243,7 +244,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_job(self, job: Job) -> ELTContextBuilder:
         """Include job when building context.
 
-        Args:
+        Parameters:
             job: Job instance.
 
         Returns:
@@ -255,7 +256,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_extractor(self, extractor_name: str) -> ELTContextBuilder:
         """Include extractor when building context.
 
-        Args:
+        Parameters:
             extractor_name: Extractor name.
 
         Returns:
@@ -267,7 +268,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_loader(self, loader_name: str) -> ELTContextBuilder:
         """Include loader when building context.
 
-        Args:
+        Parameters:
             loader_name: Loader name.
 
         Returns:
@@ -279,7 +280,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_transform(self, transform: str) -> ELTContextBuilder:
         """Include transform when building context.
 
-        Args:
+        Parameters:
             transform: Choice of "skip", "only" or "run".
 
         Returns:
@@ -296,7 +297,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_transformer(self, transformer_name: str) -> ELTContextBuilder:
         """Include transformer when building context.
 
-        Args:
+        Parameters:
             transformer_name: Name of transformer.
 
         Returns:
@@ -308,7 +309,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_only_transform(self, only_transform: bool) -> ELTContextBuilder:
         """Include only transform flag when building context.
 
-        Args:
+        Parameters:
             only_transform: Flag. Only run transform.
 
         Returns:
@@ -320,7 +321,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_dry_run(self, dry_run: bool) -> ELTContextBuilder:
         """Include dry run flag when building context.
 
-        Args:
+        Parameters:
             dry_run: Flag. Do not actually run.
 
         Returns:
@@ -332,7 +333,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_full_refresh(self, full_refresh: bool) -> ELTContextBuilder:
         """Include full refresh flag when building context.
 
-        Args:
+        Parameters:
             full_refresh: Flag. Perform a full refresh (ignore state left behind by any previous runs).
 
         Returns:
@@ -344,7 +345,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_select_filter(self, select_filter: list[str]) -> ELTContextBuilder:
         """Include select filters when building context.
 
-        Args:
+        Parameters:
             select_filter: A list of select filter strings.
 
         Returns:
@@ -356,7 +357,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_catalog(self, catalog: str) -> ELTContextBuilder:
         """Include catalog file path when building context.
 
-        Args:
+        Parameters:
             catalog: Path to singer catalog file.
 
         Returns:
@@ -368,7 +369,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def with_state(self, state: str) -> ELTContextBuilder:
         """Include state file path when building context.
 
-        Args:
+        Parameters:
             state: Path to a singer state file.
 
         Returns:
@@ -380,7 +381,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def set_base_output_logger(self, base_output_logger: OutputLogger):  # noqa: WPS615
         """Set the base output logger for use in this ELTContext.
 
-        Args:
+        Parameters:
             base_output_logger: The OutputLogger to use.
         """
         self._base_output_logger = base_output_logger
@@ -388,15 +389,15 @@ class ELTContextBuilder:  # noqa: WPS214
     def plugin_context(
         self,
         plugin_ref: PluginRef,
-        env: dict = None,
-        config: dict = None,
+        env: dict | None = None,
+        config: dict | None = None,
     ) -> PluginContext:
         """Create context object for a plugin.
 
-        Args:
+        Parameters:
             plugin_ref: Plugin reference object.
-            env: Environment override dictionary. Defaults to None.
-            config: Plugin configuration override dictionary. Defaults to None.
+            env: Environment override dictionary.
+            config: Plugin configuration override dictionary.
 
         Returns:
             A new `PluginContext` object.

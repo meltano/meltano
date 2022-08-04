@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import datetime
 import itertools
 import logging
 import os
-import shutil
-from collections import namedtuple
+from collections import defaultdict, namedtuple
+from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
 
@@ -39,12 +41,10 @@ from meltano.core.state_service import StateService
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
-PROJECT_NAME = "a_meltano_project"
-
 
 @pytest.fixture(scope="class")
 def discovery():  # noqa: WPS213
-    with bundle.find("discovery.yml").open() as base:
+    with open(bundle.root / "discovery.yml") as base:
         discovery = yaml.safe_load(base)
 
     discovery[PluginType.EXTRACTORS].append(
@@ -238,8 +238,8 @@ def locked_definition_service(project):
 
 
 @pytest.fixture(scope="class")
-def project_init_service():
-    return ProjectInitService(PROJECT_NAME)
+def project_init_service(request):
+    return ProjectInitService(f"project_{request.node.name}")
 
 
 @pytest.fixture(scope="class")
@@ -435,11 +435,12 @@ def job_schedule(project, tap, target, schedule_service):
 @pytest.fixture(scope="function")
 def environment_service(project):
     service = EnvironmentService(project)
-    yield service
-
-    # Cleanup: remove any added Environments
-    for environment in service.list_environments():
-        service.remove(environment.name)
+    try:
+        yield service
+    finally:
+        # Remove any added Environments
+        for environment in service.list_environments():
+            service.remove(environment.name)
 
 
 @pytest.fixture(scope="class")
@@ -452,8 +453,8 @@ def job_logging_service(project):
     return JobLoggingService(project)
 
 
-@pytest.fixture(scope="class")
-def project(test_dir, project_init_service):
+@contextmanager
+def project_directory(test_dir, project_init_service):
     project = project_init_service.init(add_discovery=True)
     logging.debug(f"Created new project at {project.root}")
 
@@ -466,13 +467,24 @@ def project(test_dir, project_init_service):
     # cd into the new project root
     os.chdir(project.root)
 
-    yield project
+    try:
+        yield project
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        logging.debug(f"Cleaned project at {project.root}")
 
-    # clean-up
-    Project.deactivate()
-    os.chdir(test_dir)
-    shutil.rmtree(project.root)
-    logging.debug(f"Cleaned project at {project.root}")
+
+@pytest.fixture(scope="class")
+def project(test_dir, project_init_service):
+    with project_directory(test_dir, project_init_service) as project:
+        yield project
+
+
+@pytest.fixture(scope="function")
+def project_function(test_dir, project_init_service):
+    with project_directory(test_dir, project_init_service) as project:
+        yield project
 
 
 @pytest.fixture(scope="class")
@@ -489,13 +501,12 @@ def project_files(test_dir, compatible_copy_tree):
     # cd into the new project root
     os.chdir(project.root)
 
-    yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-
-    # clean-up
-    Project.deactivate()
-    os.chdir(test_dir)
-    shutil.rmtree(project.root)
-    logging.debug(f"Cleaned project at {project.root}")
+    try:
+        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+    finally:
+        Project.deactivate()
+        os.chdir(test_dir)
+        logging.debug(f"Cleaned project at {project.root}")
 
 
 @pytest.fixture(scope="class")
@@ -608,21 +619,21 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
         state_ids.single_incomplete_state_id: [
             Job(
-                job_id=state_ids.single_incomplete_state_id,
+                job_name=state_ids.single_incomplete_state_id,
                 **job_args.incomplete_job_args,
                 payload=payloads.mock_state_payloads[0],
             )
         ],
         state_ids.single_complete_state_id: [
             Job(
-                job_id=state_ids.single_complete_state_id,
+                job_name=state_ids.single_complete_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ],
         state_ids.multiple_incompletes_state_id: [
             Job(
-                job_id=state_ids.multiple_incompletes_state_id,
+                job_name=state_ids.multiple_incompletes_state_id,
                 **job_args.incomplete_job_args,
                 payload=payload,
             )
@@ -630,7 +641,7 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.multiple_completes_state_id: [
             Job(
-                job_id=state_ids.multiple_completes_state_id,
+                job_name=state_ids.multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )
@@ -638,14 +649,14 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.single_complete_then_multiple_incompletes_state_id: [
             Job(
-                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
+                job_name=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
             )
         ]
         + [
             Job(
-                job_id=state_ids.single_complete_then_multiple_incompletes_state_id,
+                job_name=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payload,
                 **job_args.incomplete_job_args,
             )
@@ -653,14 +664,14 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
         ],
         state_ids.single_incomplete_then_multiple_completes_state_id: [
             Job(
-                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
+                job_name=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.incomplete_job_args,
             )
         ]
         + [
             Job(
-                job_id=state_ids.single_incomplete_then_multiple_completes_state_id,
+                job_name=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payload,
                 **job_args.complete_job_args,
             )
@@ -693,42 +704,39 @@ def state_ids_with_expected_states(  # noqa: WPS210
 
     for state_id, job_list in state_ids_with_jobs.items():
         expectations[state_id] = {}
-
-        complete_jobs = []
-        incomplete_jobs = []
-        dummy_jobs = []
+        jobs = defaultdict(list)
         # Get latest complete non-dummy job.
         for job in job_list:
             if job.state == State.STATE_EDIT:
-                dummy_jobs.append(job)
+                jobs["dummy"].append(job)
             elif job.payload_flags == Payload.STATE:
-                complete_jobs.append(job)
+                jobs["complete"].append(job)
             elif job.payload_flags == Payload.INCOMPLETE_STATE:
-                incomplete_jobs.append(job)
-        latest_complete_job = None
-        if complete_jobs:
-            latest_complete_job = max(complete_jobs, key=lambda _job: _job.ended_at)
-        # Get all incomplete jobs since latest complete non-dummy job.
-        latest_incomplete_job = None
-        if incomplete_jobs:
-            latest_incomplete_job = max(incomplete_jobs, key=lambda _job: _job.ended_at)
-        if latest_complete_job:
+                jobs["incomplete"].append(job)
+        latest_job = {
+            kind: (
+                max(jobs[kind], key=lambda _job: _job.ended_at) if jobs[kind] else None
+            )
+            for kind in ("complete", "incomplete")
+        }
+        if latest_job["complete"]:
             expectations[state_id] = merge(
-                expectations[state_id], latest_complete_job.payload
+                expectations[state_id], latest_job["complete"].payload
             )
 
-        for job in incomplete_jobs:
-            if (not latest_complete_job) or (
-                job.ended_at > latest_complete_job.ended_at
+        for job in jobs["incomplete"]:
+            if (not latest_job["complete"]) or (
+                job.ended_at > latest_job["complete"].ended_at
             ):
                 expectations[state_id] = merge(expectations[state_id], job.payload)
         # Get all dummy jobs since latest non-dummy job.
-        for job in dummy_jobs:
+        for job in jobs["dummy"]:
             if (
-                not latest_complete_job or (job.ended_at > latest_complete_job.ended_at)
+                not latest_job["complete"]
+                or (job.ended_at > latest_job["complete"].ended_at)
             ) and (
-                (not latest_incomplete_job)
-                or (job.ended_at > latest_incomplete_job.ended_at)
+                (not latest_job["incomplete"])
+                or (job.ended_at > latest_job["incomplete"].ended_at)
             ):
                 expectations[state_id] = merge(expectations[state_id], job.payload)
     return [
@@ -755,5 +763,7 @@ def project_with_environment(project: Project) -> Project:
     project.active_environment.env[
         "ENVIRONMENT_ENV_VAR"
     ] = "${MELTANO_PROJECT_ROOT}/file.txt"
-    yield project
-    project.active_environment = None
+    try:
+        yield project
+    finally:
+        project.active_environment = None

@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import pytest
 from flask import url_for
+
 from meltano.api.models.security import Role, db
-from meltano.api.security import users
+from meltano.api.security.identity import users
 from meltano.core.project_settings_service import ProjectSettingsService
 
 
@@ -68,7 +71,7 @@ class TestRoles:
     )
     def test_delete_role(self, user, status_code, api, app, impersonate):
         with app.test_request_context():
-            fake_role = users.find_or_create_role(name="pytest")
+            users.find_or_create_role(name="pytest")
 
             # save the new role
             db.session.commit()

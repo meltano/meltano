@@ -7,6 +7,8 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Any
 
+from ruamel.yaml import Representer
+
 from . import utils
 from .behavior import NameEq
 from .behavior.canonical import Canonical
@@ -25,7 +27,7 @@ class EnvVar:
     def __init__(self, definition: str):
         """Instantiate new EnvVar.
 
-        Args:
+        Parameters:
             definition: Env var definition.
         """
         key = definition
@@ -51,7 +53,7 @@ class EnvVar:
     def get(self, env) -> str:
         """Get env value.
 
-        Args:
+        Parameters:
             env: Env to get value for.
 
         Returns:
@@ -68,7 +70,7 @@ class SettingMissingError(Error):
     def __init__(self, name: str):
         """Instantiate SettingMissingError.
 
-        Args:
+        Parameters:
             name: Name of missing setting.
         """
         super().__init__(f"Cannot find setting {name}")
@@ -89,7 +91,7 @@ class YAMLEnum(str, Enum):
     def yaml_representer(dumper, obj) -> str:
         """Represent as yaml.
 
-        Args:
+        Parameters:
             dumper: YAML dumper.
             obj: Object to dump.
 
@@ -97,6 +99,32 @@ class YAMLEnum(str, Enum):
             Object in yaml string form.
         """
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
+
+    @classmethod
+    def to_yaml(cls, representer: Representer, node: Any):
+        """Represent as yaml.
+
+        Parameters:
+            representer: YAML representer.
+            node: Object to dump.
+
+        Returns:
+            Object in yaml string form.
+        """
+        return representer.represent_scalar("tag:yaml.org,2002:str", str(node))
+
+    @classmethod
+    def from_yaml(cls, constructor, node):
+        """Construct from yaml.
+
+        Parameters:
+            constructor: Class constructor.
+            node: YAML node.
+
+        Returns:
+            Object from yaml node.
+        """
+        return cls(node.value)
 
 
 class SettingKind(YAMLEnum):
@@ -143,7 +171,7 @@ class SettingDefinition(NameEq, Canonical):
     ):
         """Instantiate new SettingDefinition.
 
-        Args:
+        Parameters:
             name: Setting name.
             aliases: Setting alias names.
             env: Setting target environment variable.
@@ -194,11 +222,19 @@ class SettingDefinition(NameEq, Canonical):
 
         self._verbatim.add("value")
 
+    def __repr__(self) -> str:
+        """Return string representation.
+
+        Returns:
+            String representation of this setting.
+        """
+        return f"<SettingDefinition {self.name} ({self.kind})>"
+
     @classmethod
     def from_missing(cls, defs: list[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
 
-        Args:
+        Parameters:
             defs: Know setting definitions.
             config: Config dict.
             kwargs: Keyword arguments to pass to new SettingDefinition instances.
@@ -227,7 +263,7 @@ class SettingDefinition(NameEq, Canonical):
     ):
         """Create SettingDefinition instance from key-value pair.
 
-        Args:
+        Parameters:
             key: Key.
             value: Value.
             custom: Custom setting flag.
@@ -292,7 +328,7 @@ class SettingDefinition(NameEq, Canonical):
     ) -> list[EnvVar]:
         """Return environment variables with the provided prefixes.
 
-        Args:
+        Parameters:
             prefixes: Env var prefixes to prepend.
             include_custom: Include custom env vars from `env_aliases`.
             for_writing: Include target env var from `env`.
@@ -320,7 +356,7 @@ class SettingDefinition(NameEq, Canonical):
     def cast_value(self, value: Any) -> Any:
         """Cast given value.
 
-        Args:
+        Parameters:
             value: Value to cast.
 
         Returns:
@@ -356,7 +392,7 @@ class SettingDefinition(NameEq, Canonical):
     def post_process_value(self, value: Any) -> Any:
         """Post-process given value.
 
-        Args:
+        Parameters:
             value: Value to post-process.
 
         Returns:
@@ -374,7 +410,7 @@ class SettingDefinition(NameEq, Canonical):
     def stringify_value(self, value: Any) -> str:
         """Return value in string form.
 
-        Args:
+        Parameters:
             value: Value to stringify
 
         Returns:

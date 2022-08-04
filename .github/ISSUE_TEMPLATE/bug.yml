@@ -1,0 +1,71 @@
+name: Bug Report
+description: File a bug report
+title: "bug: <title>"
+labels: ["kind/Bug", "valuestream/Meltano"]
+assignees:
+  - meltano/engineering
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: meltano_version
+    attributes:
+      label: Meltano Version
+      description: Version of Meltano you are using
+      placeholder: "2.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: python_version
+    attributes:
+      label: Python Version
+      description: Version of Python you are using
+      options:
+        - "3.6 (deprecated)"
+        - "3.7"
+        - "3.8"
+        - "3.9"
+        - "3.10"
+        - "NA"
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Bug scope
+      description: Functionality this bug affects
+      options:
+        - API
+        - CLI (options, error messages, logging, etc.)
+        - Configuration (settings parsing, validation, etc.)
+        - Web UI
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system you are using
+      placeholder: "Linux - Ubuntu 20.04"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Description
+      description: Describe what you were trying to get done
+      placeholder: Tell us what happened, what went wrong, and what you expected to happen
+    validations:
+      required: true
+  - type: textarea
+    id: failing-code
+    attributes:
+      label: Code
+      description: Paste the failing code and traceback, if applicable
+      render: python
+    validations:
+      required: false

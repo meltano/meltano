@@ -1,0 +1,28 @@
+name: Lint Snowplow Schemas
+
+on:
+  pull_request:
+    paths:
+      - 'src/meltano/core/tracking/iglu-client-embedded/**'
+  push:
+    branches: [main]
+    paths:
+      - 'src/meltano/core/tracking/iglu-client-embedded/**'
+  workflow_dispatch:
+    inputs: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  iglulint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3.0.2
+
+      - name: Iglu Schema Lint
+        uses: ./.github/actions/igluctl-lint
+        with:
+          path_to_schemas: './src/meltano/core/tracking/iglu-client-embedded/'

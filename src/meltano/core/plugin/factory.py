@@ -1,6 +1,7 @@
 """Factory for creating plugins."""
+from __future__ import annotations
+
 import importlib
-from typing import Union
 
 from . import BasePlugin, PluginDefinition, PluginType, Variant
 
@@ -8,7 +9,7 @@ from . import BasePlugin, PluginDefinition, PluginType, Variant
 def lazy_import(module: str, classname: str):
     """Lazily import a class.
 
-    Args:
+    Parameters:
         module: the module to import from
         classname: the class to import
 
@@ -38,11 +39,11 @@ base_plugin_classes = {  # noqa: WPS317
 
 
 def base_plugin_factory(
-    plugin_def: PluginDefinition, variant_or_name: Union[str, Variant]
+    plugin_def: PluginDefinition, variant_or_name: str | Variant
 ) -> BasePlugin:
     """Return a plugin based on the given PluginDefinition and variant.
 
-    Args:
+    Parameters:
         plugin_def: the PluginDefinition of the plugin to create.
         variant_or_name: the variant or name of the plugin to create.
 

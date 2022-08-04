@@ -8,11 +8,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from snowplow_tracker import SelfDescribingJson
+
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule import Schedule
-from meltano.core.tracking import Tracker
-from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking import ProjectContext, Tracker
 from meltano.core.utils import hash_sha256
 
 REQUEST_TIMEOUT = 2.0
@@ -20,21 +21,23 @@ MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/collect"
 DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect"
 
 
-class LegacyTracker:
+class LegacyTracker:  # noqa: WPS214, WPS230
     """Legacy tracker for Meltano."""
 
     def __init__(
         self,
         project: Project,
-        tracking_id: str = None,
-        request_timeout: float = None,
+        tracking_id: str | None = None,
+        request_timeout: float | None = None,
+        context_overrides: tuple[SelfDescribingJson] | None = None,
     ):
         """Create a new Google Analytics tracker.
 
-        Args:
+        Parameters:
             project: Meltano project.
-            tracking_id: Unique identifier for tracking. Defaults to None.
-            request_timeout: For GA requests. Defaults to None.
+            tracking_id: Unique identifier for tracking.
+            request_timeout: For GA requests.
+            context_overrides: A list of explicit context overrides that will be set on the underlying Tracker.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(self.project)
@@ -50,6 +53,8 @@ class LegacyTracker:
             project,
             request_timeout=self.request_timeout,
         )
+        if context_overrides:
+            self.tracker._contexts = context_overrides  # noqa: WPS437
 
         project_context = ProjectContext(project, self.tracker.client_id)
         self.project_id = project_context.project_uuid
@@ -57,7 +62,7 @@ class LegacyTracker:
     def event(self, category: str, action: str) -> dict[str, Any]:
         """Construct a GA event with all the required parameters.
 
-        Args:
+        Parameters:
             category: The category of the event.
             action: The action of the event.
 
@@ -79,7 +84,7 @@ class LegacyTracker:
     def track_event(self, category: str, action: str, debug: bool = False) -> None:
         """Send a struct event to Snowplow.
 
-        Args:
+        Parameters:
             category: GA event category.
             action: GA event action.
             debug: If True, send the event to the debug endpoint.
@@ -89,7 +94,7 @@ class LegacyTracker:
     def track_meltano_init(self, project_name: str, debug: bool = False) -> None:
         """Track the initialization of a Meltano project.
 
-        Args:
+        Parameters:
             project_name: The name of the project.
             debug: Whether to send the event to the debug endpoint.
         """
@@ -102,7 +107,7 @@ class LegacyTracker:
     ) -> None:
         """Track a plugin add event.
 
-        Args:
+        Parameters:
             plugin_type: The type of the plugin.
             plugin_name: The name of the plugin.
             debug: Whether to send the event to the debug endpoint.
@@ -116,7 +121,7 @@ class LegacyTracker:
     def track_meltano_discover(self, plugin_type: str, debug: bool = False) -> None:
         """Track the discovery of a plugin type.
 
-        Args:
+        Parameters:
             plugin_type: The type of plugin that was discovered.
             debug: Whether to send the event to the debug endpoint.
         """
@@ -131,7 +136,7 @@ class LegacyTracker:
     ) -> None:
         """Track a meltano elt command.
 
-        Args:
+        Parameters:
             extractor: The extractor name.
             loader: The loader name.
             transform: The transform name.
@@ -146,7 +151,7 @@ class LegacyTracker:
     def track_meltano_install(self, debug: bool = False) -> None:
         """Track the installation of plugins.
 
-        Args:
+        Parameters:
             debug: Whether to send the event to the debug endpoint.
         """
         self.track_event(
@@ -158,7 +163,7 @@ class LegacyTracker:
     ) -> None:
         """Track a meltano invoke event.
 
-        Args:
+        Parameters:
             plugin_name: The name of the plugin invoked.
             plugin_args: The arguments passed to the plugin.
             debug: Whether to send the event to the debug endpoint.
@@ -174,7 +179,7 @@ class LegacyTracker:
     ) -> None:
         """Track a schedule event.
 
-        Args:
+        Parameters:
             action: The type of action taken on the schedule (e.g. add, run, list)
             schedule: The schedule to track.
             debug: Whether to send the event to the debug endpoint.
@@ -216,7 +221,7 @@ class LegacyTracker:
     ) -> None:
         """Track the selection of entities and attributes.
 
-        Args:
+        Parameters:
             extractor: The extractor name.
             entities_filter: The entities filter.
             attributes_filter: The attributes filter.
@@ -237,7 +242,7 @@ class LegacyTracker:
     def track_meltano_state(self, subcommand: str, state_id: str | None = None):
         """Track the management of Singer State.
 
-        Args:
+        Parameters:
             subcommand: The subcommand being run (e.g. 'set' or 'clear')
             state_id: The state_id for which state is being managed
         """
@@ -250,7 +255,7 @@ class LegacyTracker:
     def track_meltano_ui(self, debug: bool = False) -> None:
         """Track the UI start-up.
 
-        Args:
+        Parameters:
             debug: Whether to send the event to the debug endpoint.
         """
         action = "meltano ui"
@@ -264,7 +269,7 @@ class LegacyTracker:
     ) -> None:
         """Track invocations of `meltano test`.
 
-        Args:
+        Parameters:
             plugin_tests: A tuple of plugin names and test names.
             debug: Whether to send the event to the debug endpoint.
             flags: A dictionary of CLI flags.
@@ -286,7 +291,7 @@ class LegacyTracker:
     def track_meltano_run(self, blocks: list[str], debug: bool = False) -> None:
         """Track invocations of `meltano run`.
 
-        Args:
+        Parameters:
             blocks: The blocks to track.
             debug: Whether to print debug information.
         """
@@ -302,7 +307,7 @@ class LegacyTracker:
     ) -> None:
         """Track a job event.
 
-        Args:
+        Parameters:
             action: The type of action taken on the job (e.g. add, run, list)
             job_name: The job to track.
             debug: Whether to send the event to the debug endpoint.

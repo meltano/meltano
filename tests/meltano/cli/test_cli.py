@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import shutil
 
 import pytest
@@ -16,10 +18,11 @@ class TestCli:
             activate=False, add_discovery=True
         )
 
-        yield project
-
-        Project.deactivate()
-        shutil.rmtree(project.root)
+        try:
+            yield project
+        finally:
+            Project.deactivate()
+            shutil.rmtree(project.root)
 
     @pytest.fixture()
     def deactivate_project(self):

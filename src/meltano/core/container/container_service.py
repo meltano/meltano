@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import asyncio
 import signal
+from typing import TYPE_CHECKING
 
-import aiodocker
-from aiodocker.containers import DockerContainer
 from structlog.stdlib import get_logger
 
 from .container_spec import ContainerSpec
+
+if TYPE_CHECKING:
+    from aiodocker.containers import DockerContainer
+
 
 logger = get_logger(__name__)
 
@@ -17,7 +20,7 @@ logger = get_logger(__name__)
 def stop_container(container: DockerContainer):
     """Stop a Docker container.
 
-    Args:
+    Parameters:
         container: Running container.
     """
     logger.info("Stopping container", container_id=container.id)
@@ -37,7 +40,7 @@ class ContainerService:
     ) -> dict:
         """Run a Docker container.
 
-        Args:
+        Parameters:
             spec: Command container spec.
             name: Container name.
             env: Environment mapping for the container run.
@@ -46,6 +49,8 @@ class ContainerService:
         Returns:
             Docker container information after execution.
         """
+        import aiodocker
+
         async with aiodocker.Docker() as docker:
             if pull:
                 await docker.images.pull(spec.image)

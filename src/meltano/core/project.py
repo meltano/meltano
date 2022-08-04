@@ -9,6 +9,7 @@ import sys
 import threading
 from contextlib import contextmanager
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import fasteners
 from dotenv import dotenv_values
@@ -19,9 +20,12 @@ from meltano.core.plugin.base import PluginRef
 
 from .behavior.versioned import Versioned
 from .error import Error
-from .meltano_file import MeltanoFile
 from .project_files import ProjectFiles
 from .utils import makedirs, truthy
+
+if TYPE_CHECKING:
+    from .meltano_file import MeltanoFile as MeltanoFileHint
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +41,7 @@ class ProjectNotFound(Error):
     def __init__(self, project: Project):
         """Instantiate the error.
 
-        Args:
+        Parameters:
             project: the name of the project which cannot be found
         """
         super().__init__(
@@ -81,7 +85,7 @@ class Project(Versioned):  # noqa: WPS214
     def __init__(self, root: Path | str):
         """Instantiate a Project from its root directory.
 
-        Args:
+        Parameters:
             root: the root directory for the project
         """
         self.root = Path(root).resolve()
@@ -120,7 +124,7 @@ class Project(Versioned):  # noqa: WPS214
     def activate(cls, project: Project):
         """Activate the given Project.
 
-        Args:
+        Parameters:
             project: the Project to activate
 
         Raises:
@@ -167,7 +171,7 @@ class Project(Versioned):  # noqa: WPS214
     def find(cls, project_root: Path | str = None, activate=True):
         """Find a Project.
 
-        Args:
+        Parameters:
             project_root: The path to the root directory of the project. If not supplied,
                 infer from PROJECT_ROOT_ENV or the current working directory and it's parents.
             activate: Save the found project so that future calls to `find` will
@@ -220,14 +224,30 @@ class Project(Versioned):  # noqa: WPS214
         return self._project_files
 
     @property
-    def meltano(self) -> MeltanoFile:
+    def meltano(self) -> MeltanoFileHint:
         """Return a copy of the current meltano config.
 
         Returns:
             the current meltano config
         """
-        with self._meltano_rw_lock.read_lock():
-            return MeltanoFile.parse(self.project_files.load())
+        from .meltano_file import MeltanoFile
+        from .settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
+        from .yaml import configure_yaml
+
+        with open(self.meltanofile) as melt_ff:
+            meltano_ff: dict = configure_yaml().load(melt_ff)
+
+        uvicorn_enabled = (
+            meltano_ff.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}")
+            or False
+        )
+
+        if uvicorn_enabled:
+            with self._meltano_rw_lock.write_lock():
+                return MeltanoFile.parse(self.project_files.load())
+        else:
+            with self._meltano_rw_lock.read_lock():
+                return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
     def meltano_update(self):
@@ -244,6 +264,8 @@ class Project(Versioned):  # noqa: WPS214
         """
         if self.readonly:
             raise ProjectReadonly
+
+        from .meltano_file import MeltanoFile
 
         # fmt: off
         with self._meltano_rw_lock.write_lock(), self._meltano_ip_lock:
@@ -262,7 +284,7 @@ class Project(Versioned):  # noqa: WPS214
     def root_dir(self, *joinpaths):
         """Return the root directory of this project, optionally joined with path.
 
-        Args:
+        Parameters:
             joinpaths: list of subdirs and/or file to join to project root.
 
         Returns:
@@ -317,10 +339,14 @@ class Project(Versioned):  # noqa: WPS214
     def activate_environment(self, name: str) -> None:
         """Retrieve an environment configuration.
 
-        Args:
-            name: Name of the environment. Defaults to None.
+        Parameters:
+            name: Name of the environment.
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
+
+    def deactivate_environment(self) -> None:
+        """Deactivate the currently active environment."""
+        self.active_environment = None
 
     @contextmanager
     def dotenv_update(self):
@@ -343,7 +369,7 @@ class Project(Versioned):  # noqa: WPS214
     def meltano_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `.meltano` directory.
 
-        Args:
+        Parameters:
             joinpaths: Paths to join to the `.meltano` directory.
             make_dirs: Flag to make directories if not exists.
 
@@ -356,7 +382,7 @@ class Project(Versioned):  # noqa: WPS214
     def analyze_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `analyze` directory.
 
-        Args:
+        Parameters:
             joinpaths: Paths to join to the `analyze` directory.
             make_dirs: Flag to make directories if not exists.
 
@@ -369,7 +395,7 @@ class Project(Versioned):  # noqa: WPS214
     def extract_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the project `extract` directory.
 
-        Args:
+        Parameters:
             joinpaths: Paths to join to the `extract` directory.
             make_dirs: Flag to make directories if not exists.
 
@@ -382,7 +408,7 @@ class Project(Versioned):  # noqa: WPS214
     def venvs_dir(self, *prefixes, make_dirs: bool = True):
         """Path to a `venv` directory in `.meltano`.
 
-        Args:
+        Parameters:
             prefixes: Paths to prepend to the `venv` directory in `.meltano`.
             make_dirs: Flag to make directories if not exists.
 
@@ -395,7 +421,7 @@ class Project(Versioned):  # noqa: WPS214
     def run_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the `run` directory in `.meltano`.
 
-        Args:
+        Parameters:
             joinpaths: Paths to join to the `run` directory in `.meltano`.
             make_dirs: Flag to make directories if not exists.
 
@@ -408,7 +434,7 @@ class Project(Versioned):  # noqa: WPS214
     def logs_dir(self, *joinpaths, make_dirs: bool = True):
         """Path to the `logs` directory in `.meltano`.
 
-        Args:
+        Parameters:
             joinpaths: Paths to join to the `logs` directory in `.meltano`.
             make_dirs: Flag to make directories if not exists.
 
@@ -421,7 +447,7 @@ class Project(Versioned):  # noqa: WPS214
     def job_dir(self, state_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/run`.
 
-        Args:
+        Parameters:
             state_id: State ID of `run` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano`.
             make_dirs: Flag to make directories if not exists.
@@ -437,7 +463,7 @@ class Project(Versioned):  # noqa: WPS214
     def job_logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):
         """Path to the `elt` directory in `.meltano/logs`.
 
-        Args:
+        Parameters:
             state_id: State ID of `logs` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano/logs`.
             make_dirs: Flag to make directories if not exists.
@@ -453,7 +479,7 @@ class Project(Versioned):  # noqa: WPS214
     def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):
         """Path to the plugin installation directory in `.meltano`.
 
-        Args:
+        Parameters:
             plugin: Plugin to retrieve or create directory for.
             joinpaths: Paths to join to the plugin installation directory in `.meltano`.
             make_dirs: Flag to make directories if not exists.
@@ -469,7 +495,7 @@ class Project(Versioned):  # noqa: WPS214
     def root_plugins_dir(self, *joinpaths: str, make_dirs: bool = True):
         """Path to the project `plugins` directory.
 
-        Args:
+        Parameters:
             joinpaths: Paths to join with the project `plugins` directory.
             make_dirs: If True, create the directory hierarchy if it does not exist.
 
@@ -488,7 +514,7 @@ class Project(Versioned):  # noqa: WPS214
     ):
         """Path to the project lock file.
 
-        Args:
+        Parameters:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
@@ -511,7 +537,7 @@ class Project(Versioned):  # noqa: WPS214
     def __eq__(self, other):
         """Project equivalence check.
 
-        Args:
+        Parameters:
             other: The other Project instance to check against.
 
         Returns:

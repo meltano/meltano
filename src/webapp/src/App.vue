@@ -8,7 +8,8 @@ export default {
   },
   computed: {
     isMeltanoDataInstance() {
-      return window.location.host.indexOf('meltanodata.com') > -1
+      const url = new URL(window.location.host)
+      return url.hostname.endsWith('meltanodata.com')
     }
   },
   created() {
