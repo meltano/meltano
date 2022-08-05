@@ -368,7 +368,7 @@ Meltano currently supports the following databases as backends for state and con
 * SQLite
 * MS SQL Server
 
-PostgresSQL and SQLite are supported out of the box, while the MS SQL Server requires installing Meltano with the [`mssql` extra](/guide/advanced-topics#installing-optional-components).
+PostgresSQL and SQLite are supported out of the box, while MS SQL Server requires installing Meltano with the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components).
 
 Support for other databases is planned:
 
