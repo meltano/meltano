@@ -9,9 +9,15 @@ from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects.mssql import DATETIME2
 from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.migrations import IntFlag, JSONEncodedDict
+from meltano.migrations.utils.dialect_typing import (
+    datetime_for_dialect,
+    get_dialect_name,
+    max_string_length_for_dialect,
+)
 
 # revision identifiers, used by Alembic.
 revision = "b4c05e463b53"
@@ -30,23 +36,29 @@ class State(Enum):
 
 
 def upgrade():
+    dialect_name = get_dialect_name()
+    datetime_type = datetime_for_dialect(dialect_name)
+    max_string_length = max_string_length_for_dialect(dialect_name)
+
     op.create_table(
         "job",
         sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("job_id", sa.String),
+        sa.Column("job_id", sa.String(max_string_length)),
         sa.Column("state", sa.Enum(State, name="job_state")),
-        sa.Column("started_at", sa.DateTime),
-        sa.Column("ended_at", sa.DateTime),
-        sa.Column("payload", MutableDict.as_mutable(JSONEncodedDict)),
+        sa.Column("started_at", datetime_type),
+        sa.Column("ended_at", datetime_type),
+        sa.Column(
+            "payload", MutableDict.as_mutable(JSONEncodedDict(max_string_length))
+        ),
         sa.Column("payload_flags", IntFlag, default=0),
     )
 
     op.create_table(
         "plugin_settings",
-        sa.Column("label", sa.String(), nullable=True),
+        sa.Column("label", datetime_type, nullable=True),
         sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column("namespace", sa.String(), nullable=True),
+        sa.Column("name", sa.String(255), nullable=False),
+        sa.Column("namespace", sa.String(255), nullable=True),
         sa.Column("value", sa.PickleType(), nullable=True),
         sa.Column("enabled", sa.Boolean(), nullable=True),
         sa.PrimaryKeyConstraint("name", "namespace"),
