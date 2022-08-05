@@ -72,6 +72,10 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
+### Optional Components
+
+Some components of Meltano are optional and not installed by default. See the guide on [installing optional components](/guide/advanced-topics#installing-optional-components) for more information.
+
 ### Next Steps
 
 Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
