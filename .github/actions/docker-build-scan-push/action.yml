@@ -2,6 +2,9 @@ name: 'build-scan-push'
 description: 'Build a Docker image, scan it, then push it to a container registry'
 
 inputs:
+  token:
+    description: 'A GitHub API token that can access the code scanning endpoints.'
+    required: true
   tags:
     description: 'The Docker tags for the image that will be built'
     required: true
@@ -69,7 +72,7 @@ runs:
         echo "View scan results at:"
         echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${{ github.ref }}"
         sleep 10 # Give GitHub some time to process the uploaded report
-        NUM_ISSUES="$(curl --no-progress-meter -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        NUM_ISSUES="$(curl --no-progress-meter -H "Authorization: token ${{ inputs.token }}" \
             "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=open&ref=${{ github.ref }}")"
         [ $NUM_ISSUES = '0' ] # Error if there are any alerts that are neither fixed nor dismissed
 
