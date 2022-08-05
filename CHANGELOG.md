@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.4.0 (2022-08-05)
+
+### ✨ New
+
+- add support for env var inheritance across config layers (#6563)
+- Add systemdb support for MS SQL Server (#6167)
+- **core**: Report how `send_anonymous_usage_stats` was configured (#6552)
+- Resolve #6116 "Ignore setting values when selecting store location and store=auto" (#6204)
+
+### 🐛 Fixes
+
+- Test DB Creation when meltano install is ran (#6407)
+- Lock plugins using the latest Hub definition if plugin has no variant name and no lock file exists (#6534)
+- Map original variants to the default in Hub
+- Remove broken unused method `PluginsTrackingContext.append_plugin_context` (#6557)
+- **core**: Timeout Snowplow requests (#6533)
+- **core**: Update env var tests to be in line with correct reading of spec. (#6530)
+- Validating Mapper and Mappings names and alerting if necessary (#6433)
+- **ui**: When feature flag `enable_uvicorn` is true require write lock when accessing Project.meltano attribute  (#6466)
+- **deps**: Pin werkzeug to <2.2.0 (#6470)
+
+### 📚 Documentation Improvements
+
+- Update broken doc link in `meltano.schema.json` (#6535)
+- Update for Windows and for using pipx --python version (#6456)
+- Update style doc to note that MyPy is not run in CI (#6492)
+- Document YAML syntax for Hub plugins (#6460)
+- move 'v2 migration guide' under 'guides' (#6465)
+
 ## v2.3.0 (2022-07-20)
 
 ### ✨ New
