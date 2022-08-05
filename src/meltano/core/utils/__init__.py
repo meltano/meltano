@@ -38,7 +38,12 @@ class NotFound(Exception):
     """Occurs when an element is not found."""
 
     def __init__(self, name, obj_type=None):
-        """Create a new exception."""
+        """Create a new exception.
+
+        Args:
+            name: the name of the element that is not found
+            obj_type: the type of element
+        """
         if obj_type is None:
             super().__init__(f"{name} was not found.")
         else:
@@ -46,7 +51,14 @@ class NotFound(Exception):
 
 
 def click_run_async(func):
-    """Small decorator to allow click invoked functions to leverage `asyncio.run` and be declared as async."""
+    """Small decorator to allow click invoked functions to leverage `asyncio.run` and be declared as async.
+
+    Args:
+        func: the function to run async
+
+    Returns:
+        A function which runs the given function async
+    """
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):  # noqa: WPS430
@@ -67,7 +79,7 @@ def compose(*fs: Callable[[Any], Any]):
         compose(f, g)(x) == f(g(x))
         ```
 
-    Return:
+    Returns:
         The composition of the provided unary functions, which itself is a unary function.
     """
     return functools.reduce(lambda f, g: lambda x: f(g(x)), compact(fs), lambda x: x)
@@ -76,6 +88,12 @@ def compose(*fs: Callable[[Any], Any]):
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
 def slugify(s):
     """Normalize strings into something URL-friendly.
+
+    Args:
+        s: the string to slugify
+
+    Returns:
+        The string as a slug
 
     >>> slugify("[Some] _ Article's Title--")
     'some-articles-title'
@@ -147,6 +165,16 @@ def merge(src, dest):
 def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
     """Create a hierarchical dictionary path and return the leaf dict.
 
+    Args:
+        d: the dictionary to operate on
+        path: the dot-delimited path to operate on
+        value: the value to set at the given path
+        maxsplit: maximum number of splits to split path by
+        force: if true, write an empty dict
+
+    Returns:
+        The leaf element of the dict
+
     Examples:
         >>> d = dict()
         >>> test = nest(d, "foo.bar.test")
@@ -204,6 +232,14 @@ def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Wrapper arround `flatten_dict.flatten`.
+
+    Args:
+        d: the dict to flatten
+        reducer: the reducer to flatten with
+        **kwargs: additional kwargs to pass to flatten_dict.flatten
+
+    Returns:
+        the flattened dict
     """
 
     def dot_reducer(*xs):
@@ -220,6 +256,14 @@ def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
 
 
 def compact(xs: Iterable) -> Iterable:
+    """Remove None values from an iterable.
+
+    Args:
+        xs: the iterable to operate on
+
+    Returns:
+        The iterable with Nones removed
+    """
     return (x for x in xs if x is not None)
 
 
@@ -245,7 +289,14 @@ def truthy(val: str) -> bool:
 
 
 def coerce_datetime(d: date | datetime) -> datetime | None:
-    """Add a `time` component to `d` if it is missing."""
+    """Add a `time` component to `d` if it is missing.
+
+    Args:
+        d: the date or datetime to add the time to
+
+    Returns:
+        The resulting datetime
+    """
     if d is None:
         return None
 
@@ -371,12 +422,17 @@ class EnvironmentVariableNotSetError(Exception):
         self.env_var = env_var
 
     def __str__(self) -> str:
-        """Return the error as a string."""
+        """Return the error as a string."""  # noqa: DAR201
         return f"{self.env_var} referenced but not set."
 
 
 def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
-    if not isinstance(raw_value, str):
+    if isinstance(raw_value, dict):
+        return {
+            key: expand_env_vars(val, env, raise_if_missing)
+            for key, val in raw_value.items()
+        }
+    elif not isinstance(raw_value, str):
         return raw_value
 
     # find viable substitutions
@@ -422,7 +478,15 @@ def uniques_in(original):
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
 def human_size(num, suffix="B"):
-    """Return human-readable file size."""
+    """Return human-readable file size.
+
+    Args:
+        num: the number to convert
+        suffix: the suffix to append to the resulting file size
+
+    Returns:
+        File size in human-readable format
+    """
     magnitude = int(math.floor(math.log(num, 1024)))
     val = num / math.pow(1024, magnitude)
 
@@ -456,7 +520,7 @@ def format_exception(exception: BaseException) -> str:
     """Get the exception with its traceback in the standard format it would have been printed with.
 
     Args:
-        The exception value to be turned into a string.
+        exception: The exception value to be turned into a string.
 
     Returns:
         A string that shows the exception object as it would have been printed had it been raised
