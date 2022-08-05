@@ -1,5 +1,5 @@
 name: 'build-scan-push'
-description: 'Build a Docker image, scan it, then push it to Docker Hub'
+description: 'Build a Docker image, scan it, then push it to a container registry'
 
 inputs:
   tags:
@@ -8,14 +8,17 @@ inputs:
   build-args:
     description: 'The Docker build args'
     required: true
+  registry:
+    description: "Where to upload the images"
+    required: true
   push:
-    description: 'Whether to push the built image to Docker Hub'
+    description: 'Whether to push the built image to the registry'
     required: true
-  dockerhub-username:
-    description: 'The Docker Hub username to use when pushing the image'
+  username:
+    description: 'The username to use when pushing the image'
     required: true
-  dockerhub-password:
-    description: 'The Docker Hub password to use when pushing the image'
+  password:
+    description: 'The password to use when pushing the image'
     required: true
   python-version:
     description: 'The Python version installed on the image'
@@ -35,7 +38,7 @@ runs:
       uses: docker/build-push-action@v3
       with:
         load: true
-        context: "{{defaultContext}}:docker/publish"
+        context: "{{defaultContext}}:docker/meltano"
         tags: ${{ inputs.tags }}
         build-args: ${{ inputs.build-args }}
 
@@ -70,13 +73,14 @@ runs:
             "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=open&ref=${{ github.ref }}")"
         [ $NUM_ISSUES = '0' ] # Error if there are any alerts that are neither fixed nor dismissed
 
-    - name: Login to Docker Hub
+    - name: Login to the registry
       uses: docker/login-action@v2
       with:
-        username: ${{ inputs.dockerhub-username }}
-        password: ${{ inputs.dockerhub-password }}
+        registry: ${{ inputs.registry }}
+        username: ${{ inputs.username }}
+        password: ${{ inputs.password }}
 
-    - name: Push the scanned image to Docker Hub
+    - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
       shell: bash
       run: docker image push --all-tags meltano/meltano

@@ -39,7 +39,7 @@ class ExceptionContext(SelfDescribingJson):
 def get_exception_json(ex: BaseException) -> ExceptionContextJSON:
     """Get anonymized telemetry data detailing an exception.
 
-    Parameters:
+    Args:
         ex: The exception from which data will be extracted.
 
     Returns:
@@ -60,7 +60,7 @@ def get_exception_json(ex: BaseException) -> ExceptionContextJSON:
 def get_traceback_json(tb: TracebackType) -> TracebackLevelsJSON:
     """Get anonymized telemetry data detailing a traceback.
 
-    Parameters:
+    Args:
         tb: The traceback from which data will be extracted.
 
     Returns:
@@ -83,7 +83,7 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
 
     The path is made relative to the first element in `BASE_PATHS` it can be made relative to.
 
-    Parameters:
+    Args:
         tb: The traceback from which to extract the path info.
 
     Returns:
