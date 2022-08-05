@@ -359,3 +359,19 @@ The remaining tables in the database are used exclusively by Meltano UI, mostly 
 - `oauth`
 - `embed_tokens`
 - `subscriptions`
+
+### Support for other database types
+
+Meltano currently supports the following databases as backends for state and configuration:
+
+* PostgreSQL
+* SQLite
+* MS SQL Server
+
+PostgresSQL and SQLite are supported out of the box, while the MS SQL Server requires installing Meltano with the [`mssql` extra](/guide/advanced-topics#installing-optional-components).
+
+Support for other databases is planned:
+
+* [MySQL](https://github.com/meltano/meltano/issues/6529)
+
+If you would like to see support for a specific database, please [open an issue](https://github.com/meltano/meltano/issues/new?assignees=meltano%2Fengineering&labels=kind%2FFeature%2Cvaluestream%2FMeltano&template=feature.yml&title=feature%3A+%3Ctitle%3E)
