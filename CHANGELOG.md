@@ -7,30 +7,29 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### ✨ New
 
-- add support for env var inheritance across config layers (#6563)
-- Add systemdb support for MS SQL Server (#6167)
-- **core**: Report how `send_anonymous_usage_stats` was configured (#6552)
-- Resolve #6116 "Ignore setting values when selecting store location and store=auto" (#6204)
+- [#5983](https://github.com/meltano/meltano/issues/5983) Add support for env var inheritance across config layers
+- [!6167](https://github.com/meltano/meltano/pull/6167) Add systemdb support for MS SQL Server
+- [#6494](https://github.com/meltano/meltano/issues/6494) **core**: Report how `send_anonymous_usage_stats` was configured
+- [#6116](https://github.com/meltano/meltano/issues/6116) Ignore setting values when selecting store location and `store=auto`
 
 ### 🐛 Fixes
 
-- Test DB Creation when meltano install is ran (#6407)
-- Lock plugins using the latest Hub definition if plugin has no variant name and no lock file exists (#6534)
-- Map original variants to the default in Hub
-- Remove broken unused method `PluginsTrackingContext.append_plugin_context` (#6557)
-- **core**: Timeout Snowplow requests (#6533)
-- **core**: Update env var tests to be in line with correct reading of spec. (#6530)
-- Validating Mapper and Mappings names and alerting if necessary (#6433)
-- **ui**: When feature flag `enable_uvicorn` is true require write lock when accessing Project.meltano attribute  (#6466)
-- **deps**: Pin werkzeug to <2.2.0 (#6470)
+- [#6383](https://github.com/meltano/meltano/issues/6383) Test DB Creation when meltano install is ran
+- [#6360](https://github.com/meltano/meltano/issues/6360) Lock plugins using the latest Hub definition if plugin has no variant name and no lock file exists
+- [!6557](https://github.com/meltano/meltano/pull/6557) Remove broken unused method `PluginsTrackingContext.append_plugin_context`
+- [#6532](https://github.com/meltano/meltano/issues/6532) **core**: Timeout Snowplow requests
+- [#5982](https://github.com/meltano/meltano/issues/5982) **core**: Update env var tests to be in line with correct reading of spec
+- [#6189](https://github.com/meltano/meltano/issues/6189) Validating Mapper and Mappings names and alerting if necessary
+- [#6240](https://github.com/meltano/meltano/issues/6240) **ui**: When feature flag `enable_uvicorn` is true require write lock when accessing Project.meltano attribute
+- [#6469](https://github.com/meltano/meltano/issues/6469) **deps**: Pin werkzeug to <2.2.0
 
 ### 📚 Documentation Improvements
 
-- Update broken doc link in `meltano.schema.json` (#6535)
-- Update for Windows and for using pipx --python version (#6456)
-- Update style doc to note that MyPy is not run in CI (#6492)
-- Document YAML syntax for Hub plugins (#6460)
-- move 'v2 migration guide' under 'guides' (#6465)
+- [!6535](https://github.com/meltano/meltano/pull/6535) Update broken doc link in `meltano.schema.json`
+- [!6456](https://github.com/meltano/meltano/pull/6456) Update for Windows and for using pipx --python version
+- [#6491](https://github.com/meltano/meltano/issues/6491) Update style doc to note that MyPy is not run in CI
+- [#6107](https://github.com/meltano/meltano/issues/6107) Document YAML syntax for Hub plugins
+- [!6465](https://github.com/meltano/meltano/pull/6465) Move 'v2 migration guide' under 'guides'
 
 ## v2.3.0 (2022-07-20)
 
