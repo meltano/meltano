@@ -375,7 +375,7 @@ class EnvironmentVariableNotSetError(Exception):
         return f"{self.env_var} referenced but not set."
 
 
-def expand_env_vars(raw_value, env: Dict, raise_if_missing: bool = False):
+def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
     if isinstance(raw_value, dict):
         return {
             key: expand_env_vars(val, env, raise_if_missing)
