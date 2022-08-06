@@ -113,6 +113,7 @@ jobs:
       uses: ./.github/actions/docker-build-scan-push
       with:
         push: ${{ env.DRY_RUN_STR == 'false' }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         tags: ${{ steps.assemble-tags.output }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
