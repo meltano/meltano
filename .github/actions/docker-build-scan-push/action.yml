@@ -70,7 +70,7 @@ runs:
       continue-on-error: true
       run: |
         echo "View scan results at:"
-        echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${{ github.ref }}"
+        echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${{ github.ref }}+tool:Grype"
         sleep 10 # Give GitHub some time to process the uploaded report
         NUM_ISSUES="$(curl --no-progress-meter -H "Authorization: token ${{ inputs.token }}" \
             "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=open&ref=${{ github.ref }}")"
