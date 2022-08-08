@@ -115,8 +115,7 @@ class MeltanoHubService(PluginRepository):
         Returns:
             The URL of the Hub API.
         """
-        hub_url = self.settings_service.get("hub_url")
-        return f"{hub_url}/meltano/api/v1"
+        return self.settings_service.get("hub_url")
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
