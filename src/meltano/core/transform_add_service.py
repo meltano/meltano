@@ -1,20 +1,29 @@
+"""Helper class for dbt package installation."""
+
 from __future__ import annotations
 
 import os
 from pathlib import Path
 
+from meltano.core.yaml import configure_yaml
+
 from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
-from meltano.core.yaml import configure_yaml
-
 
 yaml = configure_yaml()
 
 
 class TransformAddService:
-    def __init__(self, project: Project):
+    """Helper class for adding a dbt package to the project."""
+
+    def __init__(self, project: Project) -> None:
+        """Create a new TransformAddService.
+
+        Args:
+            project: The project to add the dbt package to.
+        """
         self.project = project
 
         self.plugins_service = ProjectPluginsService(project)
@@ -30,7 +39,15 @@ class TransformAddService:
         self.packages_file = dbt_project_path.joinpath("packages.yml")
         self.dbt_project_file = dbt_project_path.joinpath("dbt_project.yml")
 
-    def add_to_packages(self, plugin: ProjectPlugin):
+    def add_to_packages(self, plugin: ProjectPlugin) -> None:
+        """Add the plugin's package to the project's `packages.yml` file.
+
+        Args:
+            plugin: The plugin to add to the project.
+
+        Raises:
+            ValueError: If the plugin is missing the git repo URL.
+        """
         if not os.path.exists(self.packages_file):
             self.packages_file.touch()
 
@@ -59,10 +76,13 @@ class TransformAddService:
         with open(self.packages_file, "w") as f:
             yaml.dump(package_yaml, f)
 
-    def update_dbt_project(self, plugin: ProjectPlugin):
+    def update_dbt_project(self, plugin: ProjectPlugin) -> None:
         """Set transform package variables in `dbt_project.yml`.
 
         If not already present, the package name will also be added under dbt 'models'.
+
+        Args:
+            plugin: The plugin to add to the project.
         """
         settings_service = PluginSettingsService(
             self.project, plugin, plugins_service=self.plugins_service
