@@ -521,3 +521,80 @@ class TestCliAdd:
             plugin_variant = plugin_def.variants[0]
 
             assert plugin.variant == plugin_variant.name == "personal"
+
+    @pytest.mark.parametrize(
+        "plugin_type,plugin_name,default_variant,required_plugin_refs",
+        [
+            (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
+            (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
+            (PluginType.TRANSFORMS, "tap-carbon-intensity", "meltano", []),
+            (
+                PluginType.ORCHESTRATORS,
+                "airflow",
+                Variant.ORIGINAL_NAME,
+                [PluginRef(PluginType.FILES, "airflow")],
+            ),
+        ],
+        ids=[
+            "single-extractor",
+            "single-loader",
+            "transform-and-related",
+            "orchestrator-and-required",
+        ],
+    )
+    def test_add_no_install(
+        self,
+        plugin_type,
+        plugin_name,
+        default_variant,
+        required_plugin_refs,
+        project,
+        cli_runner,
+        project_plugins_service,
+    ):
+        # ensure the plugin is not present
+        with pytest.raises(PluginNotFoundError):
+            project_plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
+
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name, "--no-install"])
+
+            if plugin_type is PluginType.TRANSFORMS:
+                assert res.exit_code == 1, res.stdout
+                assert isinstance(res.exception, CliError)
+                assert "Dependencies not met:" in str(res.exception)
+            else:
+                assert res.exit_code == 0, res.stdout
+                assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
+
+                plugin = project_plugins_service.find_plugin(plugin_name, plugin_type)
+                assert plugin
+                assert plugin.variant == default_variant
+
+                # check plugin lock file is added
+                plugins_dir = project.root_dir("plugins")
+                assert plugins_dir.joinpath(f"{plugin_type}/{plugin_name}--{default_variant}.lock").exists()
+
+                for required_plugin_ref in required_plugin_refs:
+                    if (required_plugin_ref._type) == PluginType.FILES and (
+                        required_plugin_ref.name == "dbt"
+                    ):
+                        # file bundles with no managed files are added but do not appear in meltano.yml
+                        assert (
+                            f"Adding required file bundle '{required_plugin_ref.name}'"
+                            in res.stdout
+                        )
+                    else:
+                        plugin = project_plugins_service.get_plugin(required_plugin_ref)
+                        assert plugin
+
+                        assert (
+                            f"Added required {plugin.type.descriptor} '{plugin.name}'"
+                            in res.stdout
+                        )
+
+                    # check required plugin lock files are added
+                    assert list(plugins_dir.glob(f"{required_plugin_ref._type}/{required_plugin_ref.name}--*.lock"))
+
+                install_plugin_mock.assert_not_called()
