@@ -108,6 +108,9 @@ class MeltanoHubService(PluginRepository):
 
             self.session.headers["X-Project-ID"] = project_id
 
+        if self.hub_url_auth:
+            self.session.headers.update({"Authorization": self.hub_url_auth})
+
     @property
     def hub_api_url(self):
         """Return the URL of the Hub API.
@@ -116,6 +119,15 @@ class MeltanoHubService(PluginRepository):
             The URL of the Hub API.
         """
         return self.settings_service.get("hub_url")
+
+    @property
+    def hub_url_auth(self):
+        """Return the `hub_url_auth` setting.
+
+        Returns:
+            The `hub_url_auth` setting.
+        """
+        return self.settings_service.get("hub_url_auth")
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.

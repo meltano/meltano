@@ -26,6 +26,7 @@ settings:
   value: https://discovery.meltano.com/discovery.yml
 - name: hub_url
   value: https://hub.meltano.com/meltano/api/v1
+- name: hub_url_auth
 - name: discovery_url_auth
 - name: elt.buffer_size
   kind: integer
