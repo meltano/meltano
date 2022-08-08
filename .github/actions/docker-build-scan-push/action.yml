@@ -48,7 +48,10 @@ runs:
     - name: Get the ID of the image
       id: get-image-id
       shell: bash
-      run: echo "::set-output name=id::$(docker images -q meltano/meltano | head -n 1)"
+      run: |
+        docker images
+        docker images -q meltano/meltano | head -n 1
+        echo "::set-output name=id::$(docker images -q meltano/meltano | head -n 1)"
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan

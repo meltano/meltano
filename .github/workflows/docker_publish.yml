@@ -23,8 +23,6 @@ jobs:
   public_docker_build:
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: meltano/meltano
-      COMMIT_SHA: ${{ github.sha }}
       # Boolean values don't actually work so cast to 'true' and 'false'
       # https://github.com/actions/runner/issues/1483
       DRY_RUN_STR: ${{ format('{0}', github.event.inputs.dry-run) || 'true' }}
@@ -52,15 +50,6 @@ jobs:
         poetry version
         poetry version --short
         echo "::set-output name=release-version::$(poetry version --short)"
-
-    - name: Print job inputs summary
-      run: |
-        echo "DRY_RUN=${{ env.DRY_RUN_STR }}"
-        echo "PYTHON_VERSION=${{ matrix.python-version }}"
-        echo "RELEASE_VERSION=${{ steps.get-meltano-version.outputs.release-version }}"
-        echo "COMMIT_SHA=${{ github.sha }}"
-        echo "DEBUG INFO: DRY_RUN is truthy=${{ env.DRY_RUN_STR == 'true' }}"
-        echo "DEBUG INFO: DRY_RUN is falsey=${{ env.DRY_RUN_STR == 'false' }}"
 
     # These exist to show if 'dry-run' flag is set as intended and correctly parsed from inputs
     - name: Print dry-run message (if applicable)
