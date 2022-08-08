@@ -269,3 +269,7 @@ per-file-ignores =
     src/meltano/core/settings_store.py:
         # Found overused expression: allow settings store implementations to all return vars with the same names
         WPS204
+    src/meltano/core/utils/__init__.py:
+        # Many of these utility functions are descriptively
+	# name and self-documenting
+	D103

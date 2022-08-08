@@ -13,7 +13,7 @@ class JobFinder:
     def __init__(self, state_id: str):
         """Initialize the JobFinder.
 
-        Parameters:
+        Args:
             state_id: the state_id to build queries for.
         """
         self.state_id = state_id
@@ -21,7 +21,7 @@ class JobFinder:
     def latest(self, session):
         """Get the latest state for this instance's state ID.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
 
         Returns:
@@ -37,7 +37,7 @@ class JobFinder:
     def successful(self, session):
         """Get all successful jobs for this instance's state ID.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
 
         Returns:
@@ -52,7 +52,7 @@ class JobFinder:
     def running(self, session):
         """Find states in the running state.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
 
         Returns:
@@ -66,7 +66,7 @@ class JobFinder:
     def latest_success(self, session):
         """Get the latest successful state for this instance's state ID.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
 
         Returns:
@@ -77,7 +77,7 @@ class JobFinder:
     def latest_running(self, session):
         """Find the most recent state in the running state, if any.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
 
         Returns:
@@ -88,7 +88,7 @@ class JobFinder:
     def with_payload(self, session, flags=0, since=None, state=None):
         """Get all states for this instance's state ID matching the given args.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
             flags: only return states with these flags
             since: only return states which ended after this time
@@ -117,7 +117,7 @@ class JobFinder:
     def latest_with_payload(self, session, **kwargs):
         """Return the latest state matching the given kwargs.
 
-        Parameters:
+        Args:
             session: the session to use to query the db
             kwargs: keyword args to pass to with_payload
 
@@ -135,7 +135,7 @@ class JobFinder:
     def all_stale(cls, session):
         """Return all stale states.
 
-        Parameters:
+        Args:
             session: the session to use to query the db
 
         Returns:
@@ -162,7 +162,7 @@ class JobFinder:
     def stale(self, session):
         """Return stale states with the instance's state ID.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
 
         Returns:
@@ -173,7 +173,7 @@ class JobFinder:
     def get_all(self, session: object, since=None):
         """Return all state with the instance's state ID.
 
-        Parameters:
+        Args:
             session: the session to use in querying the db
             since: only return state which ended after this datetime
 

@@ -10,7 +10,7 @@ class BlockSetValidationError(Exception):
     def __init__(self, error: str, message: str = "block violates set requirements"):
         """Initialize exception for when plugin violates the BlockSet requirements.
 
-        Parameters:
+        Args:
             error: The error.
             message: The message.
         """
@@ -33,7 +33,7 @@ class BlockSet(metaclass=ABCMeta):
     async def terminate(self, graceful: bool = True):
         """Terminate a currently executing BlockSet.
 
-        Parameters:
+        Args:
             graceful: Whether the BlockSet should try to gracefully quit.
         """
         raise NotImplementedError

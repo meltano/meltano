@@ -23,6 +23,9 @@ from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
+from .project_settings_service import ProjectSettingsService
+from .settings_service import FeatureFlags
+from .utils import expand_env_vars
 from .venv_service import VenvService, VirtualEnv
 
 logger = get_logger(__name__)
@@ -31,7 +34,7 @@ logger = get_logger(__name__)
 def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     """Instantiate a plugin invoker from a project plugin.
 
-    Parameters:
+    Args:
         project: Meltano project.
         plugin: Plugin instance.
         args: Invoker constructor positional arguments.
@@ -58,7 +61,7 @@ class ExecutableNotFoundError(InvokerError):
     def __init__(self, plugin: PluginRef, executable: str):
         """Initialize ExecutableNotFoundError.
 
-        Parameters:
+        Args:
             plugin: Meltano plugin reference.
             executable: Plugin command executable.
         """
@@ -83,7 +86,7 @@ class UnknownCommandError(InvokerError):
     def __init__(self, plugin: PluginRef, command):
         """Initialize UnknownCommandError.
 
-        Parameters:
+        Args:
             plugin: Meltano plugin reference.
             command: Plugin command name.
         """
@@ -137,7 +140,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     ):
         """Create a new plugin invoker.
 
-        Parameters:
+        Args:
             project: Meltano Project.
             plugin: Meltano Plugin.
             context: Invocation context.
@@ -208,7 +211,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def prepare(self, session):
         """Prepare plugin config.
 
-        Parameters:
+        Args:
             session: Database session.
         """
         self.plugin_config = self.settings_service.as_dict(
@@ -240,7 +243,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def prepared(self, session):
         """Context manager that prepares plugin config.
 
-        Parameters:
+        Args:
             session: Database session.
 
         Yields:
@@ -257,7 +260,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         Uses the plugin executable if none is specified.
 
-        Parameters:
+        Args:
             executable: Optional executable string.
 
         Returns:
@@ -278,7 +281,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def exec_args(self, *args, command=None, env=None):
         """Materialize the arguments to be passed to the executable.
 
-        Parameters:
+        Args:
             args: Optional plugin args.
             command: Plugin command name.
             env: Environment variables
@@ -301,7 +304,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def find_command(self, name):
         """Find a Command by name.
 
-        Parameters:
+        Args:
             name: Command name.
 
         Returns:
@@ -321,10 +324,63 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Returns:
             Dictionary of environment variables.
         """
+        project_settings_service = ProjectSettingsService(
+            self.project, config_service=self.plugins_service.config_service
+        )
+        with self.settings_service.feature_flag(
+            FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+        ) as strict_env_var_mode:
+
+            # Expand root env w/ os.environ
+            expanded_project_env = expand_env_vars(
+                project_settings_service.env,
+                os.environ,
+                raise_if_missing=strict_env_var_mode,
+            )
+            expanded_project_env.update(
+                expand_env_vars(
+                    self.settings_service.project.dotenv_env,
+                    os.environ,
+                    raise_if_missing=strict_env_var_mode,
+                )
+            )
+            # Expand active env w/ expanded root env
+            expanded_active_env = (
+                expand_env_vars(
+                    self.settings_service.project.active_environment.env,
+                    expanded_project_env,
+                    raise_if_missing=strict_env_var_mode,
+                )
+                if self.settings_service.project.active_environment
+                else {}
+            )
+
+            # Expand root plugin env w/ expanded active env
+            expanded_root_plugin_env = expand_env_vars(
+                self.settings_service.plugin.env,
+                expanded_active_env,
+                raise_if_missing=strict_env_var_mode,
+            )
+
+            # Expand active env plugin env w/ expanded root plugin env
+            expanded_active_env_plugin_env = (
+                expand_env_vars(
+                    self.settings_service.environment_plugin_config.env,
+                    expanded_root_plugin_env,
+                    raise_if_missing=strict_env_var_mode,
+                )
+                if self.settings_service.environment_plugin_config
+                else {}
+            )
+
         env = {
+            **expanded_project_env,
             **self.project.dotenv_env,
             **self.settings_service.env,
             **self.plugin_config_env,
+            **expanded_root_plugin_env,
+            **expanded_active_env,
+            **expanded_active_env_plugin_env,
         }
 
         # Ensure Meltano venv is not inherited
@@ -380,7 +436,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def invoke_async(self, *args, **kwargs):
         """Invoke a command.
 
-        Parameters:
+        Args:
             args: Positional arguments.
             kwargs: Keyword arguments.
 
@@ -401,7 +457,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def invoke_docker(self, plugin_command: str, *args, **kwargs) -> int:
         """Invoke a containerized command.
 
-        Parameters:
+        Args:
             plugin_command: Plugin command name.
             args: Command line invocation arguments.
             kwargs: Command line invocation keyword arguments.
@@ -433,7 +489,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     async def dump(self, file_id: str) -> str:
         """Dump a plugin file by id.
 
-        Parameters:
+        Args:
             file_id: Dump this file identifier.
 
         Returns:
@@ -455,7 +511,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.
 
-        Parameters:
+        Args:
             src: stdio source you'd like to subscribe, likely either 'stdout' or 'stderr'
             handler: either a StreamWriter or an object matching the utils.SubprocessOutputWriter proto
         """

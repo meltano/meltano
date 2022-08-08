@@ -16,7 +16,7 @@ class PluginRequirement(NameEq, Canonical):
     def __init__(self, name: str, variant: str | None = None) -> None:
         """Create a new PluginBundleFile.
 
-        Parameters:
+        Args:
             name: The name of the plugin dependency.
             variant: The variant of the plugin dependency.
         """
@@ -26,7 +26,7 @@ class PluginRequirement(NameEq, Canonical):
     def parse_all(cls: type[TReq], obj: dict | None) -> dict[str, list[TReq]]:
         """Deserialize requirements data into a dict of PluginRequirement.
 
-        Parameters:
+        Args:
             obj: Raw Python object.
 
         Returns:

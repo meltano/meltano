@@ -35,7 +35,7 @@ FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] 
 def parse_log_level(log_level: dict[str, int]) -> int:
     """Parse a level descriptor into an logging level.
 
-    Parameters:
+    Args:
         log_level: level descriptor.
 
     Returns:
@@ -47,7 +47,7 @@ def parse_log_level(log_level: dict[str, int]) -> int:
 def read_config(config_file: str | None = None) -> dict:
     """Read a logging config yaml from disk.
 
-    Parameters:
+    Args:
         config_file: path to the config file to read.
 
     Returns:
@@ -63,7 +63,7 @@ def read_config(config_file: str | None = None) -> dict:
 def default_config(log_level: str) -> dict:
     """Generate a default logging config.
 
-    Parameters:
+    Args:
         log_level: set log levels to provided level.
 
     Returns:
@@ -114,7 +114,7 @@ def default_config(log_level: str) -> dict:
 def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> None:
     """Configure logging for a meltano project.
 
-    Parameters:
+    Args:
         project: the meltano project
         log_level: set log levels to provided level.
     """
@@ -158,7 +158,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
     of any potential logging.yaml sourced configs. Note that if a logging.yaml config without a 'console' handler
     is used, this will not override the log level.
 
-    Parameters:
+    Args:
         log_level: set log levels to provided level.
     """
     root_logger = logging.getLogger()
@@ -174,7 +174,7 @@ class SubprocessOutputWriter(Protocol):
     def writelines(self, lines: str):
         """Any type with a writelines method accepting a string could be used as an output writer.
 
-        Parameters:
+        Args:
             lines: string to write
         """
 
@@ -208,7 +208,7 @@ async def capture_subprocess_output(
     This async function should be run with await asyncio.wait() while waiting
     for the subprocess to end.
 
-    Parameters:
+    Args:
         reader: asyncio.StreamReader object that is the output stream of the subprocess.
         line_writers: any object thats a StreamWriter or has a writelines method accepting a string.
     """

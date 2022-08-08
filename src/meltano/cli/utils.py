@@ -491,7 +491,7 @@ def check_dependencies_met(
 ) -> tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
-    Parameters:
+    Args:
         plugins: List of plugins to be added.
         plugin_service: Plugin service to use when checking for dependencies.
 

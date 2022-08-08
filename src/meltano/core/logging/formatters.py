@@ -24,7 +24,7 @@ def _process_formatter(processor: Processor):
 
     It will automatically add log level and timestamp fields to any log entries not originating from structlog.
 
-    Parameters:
+    Args:
         processor: A structlog message processor such as structlog.dev.ConsoleRenderer.
     """
     return structlog.stdlib.ProcessorFormatter(

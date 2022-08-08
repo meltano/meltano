@@ -18,7 +18,7 @@ class APIWorker(threading.Thread):
     def __init__(self, project: Project, reload=False):
         """Initialize the API Worker class with the project config.
 
-        Parameters:
+        Args:
             project: Project class.
             reload: Boolean.
         """

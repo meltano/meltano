@@ -32,8 +32,12 @@ if PYTEST_BACKEND == "sqlite":
     pytest_plugins.append("fixtures.db.sqlite")
 elif PYTEST_BACKEND == "postgresql":
     pytest_plugins.append("fixtures.db.postgresql")
+elif PYTEST_BACKEND == "mssql":
+    pytest_plugins.append("fixtures.db.mssql")
 else:
     raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")
+
+BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
 def pytest_runtest_setup(item):
@@ -124,7 +128,7 @@ class MockAdapter(BaseAdapter):
     def __init__(self, api_url: str, discovery: dict) -> None:
         """Create a mock HTTP adapter for the Hub.
 
-        Parameters:
+        Args:
             api_url: The base URL of the Hub.
             discovery: A parsed discovery.yml file.
         """
