@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FOSSA_CLI_INSTALLER_VERSION: '3.3.10'
+  FOSSA_CLI_VERSION: '3.3.11'
 
 permissions:
   contents: read
@@ -29,8 +29,7 @@ jobs:
 
       - name: FOSSA dependency license check
         run: |
-          # `$FOSSA_CLI_INSTALLER_VERSION` only controls the version of the installer used - the latest version of `fossa-cli` will always be used.
-          curl --no-progress-meter -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/v${FOSSA_CLI_INSTALLER_VERSION}/install-latest.sh | bash
+          curl --no-progress-meter -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash -s -- "v$FOSSA_CLI_VERSION"
 
           echo '## FOSSA dependency license check' >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY

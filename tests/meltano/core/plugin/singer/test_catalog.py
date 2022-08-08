@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import json
 
 import pytest
 
-from meltano.core.plugin.singer.catalog import (
+from meltano.core.plugin.singer.catalog import (  # noqa: WPS235
     CatalogRule,
     ListExecutor,
     ListSelectedExecutor,
@@ -633,7 +635,7 @@ class TestLegacyCatalogSelectVisitor:
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.fixture
     def catalog(self, request):
-        return json.loads(globals()[request.param])
+        return json.loads(globals()[request.param])  # noqa: WPS421
 
     @classmethod
     def stream_is_selected(cls, stream):
@@ -808,7 +810,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 class TestMetadataExecutor:
     @pytest.fixture
     def catalog(self, request):
-        return json.loads(globals()[request.param])
+        return json.loads(globals()[request.param])  # noqa: WPS421
 
     @pytest.mark.parametrize(
         "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
@@ -853,7 +855,7 @@ class TestMetadataExecutor:
         assert stream_node["replication_key"] == "created_at"
         assert stream_metadata_node["metadata"]["replication-key"] == "created_at"
         assert (
-            created_at_property_metadata_node["metadata"]["is-replication-key"] == True
+            created_at_property_metadata_node["metadata"]["is-replication-key"] is True
         )
         assert (
             hash_property_metadata_node["metadata"]["custom-metadata"] == "custom-value"
@@ -863,7 +865,7 @@ class TestMetadataExecutor:
 class TestSchemaExecutor:
     @pytest.fixture
     def catalog(self, request):
-        return json.loads(globals()[request.param])
+        return json.loads(globals()[request.param])  # noqa: WPS421
 
     @pytest.mark.parametrize(
         "catalog",
@@ -913,7 +915,10 @@ class TestSchemaExecutor:
         }
 
         if "created_at" in properties_node:
-            assert properties_node["created_at"] == {"type": "string", "format": "date"}
+            assert properties_node["created_at"] == {  # noqa: WPS52
+                "type": "string",
+                "format": "date",
+            }
         else:
             # If no matching properties were found for a glob-like pattern,
             # no new property is created

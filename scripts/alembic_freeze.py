@@ -2,6 +2,8 @@
 
 """Script to freeze the Meltano database - executed by the Makefile."""
 
+from __future__ import annotations
+
 from alembic.script import ScriptDirectory
 
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR

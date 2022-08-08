@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import platform
@@ -225,7 +227,7 @@ class TestOutputLogger:
 
         # make sure it let the exception through
         # All code below here in this test cannot be reached
-        assert exc.value is exception  # noqa: WPS441
+        assert exc.value is exception
 
         log_content = json.loads(log.read())
 

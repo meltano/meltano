@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 from flask import Flask, url_for
@@ -48,15 +50,6 @@ class TestOrchestration:
             assert config_metadata["secure"]["source"] == "dotenv"
             assert config_metadata["secure"]["auto_store"] == "dotenv"
             assert config_metadata["secure"]["overwritable"] is True
-
-            # make sure that `boolean` cannot be overwritten
-            assert plugin_settings_service.get_with_source(
-                "boolean", session=session
-            ) == (False, SettingValueStore.ENV)
-            assert config["boolean"] is False
-            assert config_metadata["boolean"]["source"] == "env"
-            assert config_metadata["boolean"]["auto_store"] == "dotenv"
-            assert config_metadata["boolean"]["overwritable"] is False
 
             # make sure the `hidden` setting is still present
             # but hidden in the response

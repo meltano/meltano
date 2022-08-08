@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import platform
 import sys
 from importlib.util import module_from_spec, spec_from_file_location
@@ -18,7 +20,7 @@ def load_module_from_path(name: str, path: Path) -> ModuleType:
 
     Replacement for the deprecated `imp.load_source`.
 
-    Parameters:
+    Args:
         name: The name of the module as it would be in `sys.modules`.
         path: The path of the `.py` file.
 
