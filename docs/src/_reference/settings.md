@@ -254,6 +254,28 @@ meltano config meltano set hub_url http://localhost:4000
 export MELTANO_HUB_URL=http://localhost:4000
 ```
 
+### <a name="hub-url-auth"></a>`hub_url_auth`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL_AUTH`
+- Default: None
+
+The value of the `Authorization` header sent when making a request to [`hub_url`](#hub-url).
+
+No `Authorization` header is applied under the following conditions:
+
+- `hub_url_auth` is not set
+- `hub_url_auth` is set to `false`, `null` or an empty string
+
+#### How to use
+
+```bash
+meltano config meltano set hub_url_auth "Bearer $ACCESS_TOKEN"
+meltano config meltano set hub_url_auth false
+
+export MELTANO_HUB_URL_AUTH="Bearer $ACCESS_TOKEN"
+export MELTANO_HUB_URL_AUTH=false
+```
+
 ### <a name="discovery-url"></a>`discovery_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DISCOVERY_URL`
