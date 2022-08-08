@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 from meltano.core.plugin import PluginType
@@ -58,7 +60,9 @@ class SelectService:
             catalog = await self.load_catalog(session)
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                f"Could not find catalog. Verify that the tap supports discovery mode and advertises the `discover` capability as well as either `catalog` or `properties`"
+                "Could not find catalog. Verify that the tap supports discovery "
+                + "mode and advertises the `discover` capability as well as either "
+                + "`catalog` or `properties`"
             ) from err
 
         list_all = ListSelectedExecutor()

@@ -23,6 +23,9 @@ from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
+from .project_settings_service import ProjectSettingsService
+from .settings_service import FeatureFlags
+from .utils import expand_env_vars
 from .venv_service import VenvService, VirtualEnv
 
 logger = get_logger(__name__)
@@ -321,10 +324,63 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Returns:
             Dictionary of environment variables.
         """
+        project_settings_service = ProjectSettingsService(
+            self.project, config_service=self.plugins_service.config_service
+        )
+        with self.settings_service.feature_flag(
+            FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+        ) as strict_env_var_mode:
+
+            # Expand root env w/ os.environ
+            expanded_project_env = expand_env_vars(
+                project_settings_service.env,
+                os.environ,
+                raise_if_missing=strict_env_var_mode,
+            )
+            expanded_project_env.update(
+                expand_env_vars(
+                    self.settings_service.project.dotenv_env,
+                    os.environ,
+                    raise_if_missing=strict_env_var_mode,
+                )
+            )
+            # Expand active env w/ expanded root env
+            expanded_active_env = (
+                expand_env_vars(
+                    self.settings_service.project.active_environment.env,
+                    expanded_project_env,
+                    raise_if_missing=strict_env_var_mode,
+                )
+                if self.settings_service.project.active_environment
+                else {}
+            )
+
+            # Expand root plugin env w/ expanded active env
+            expanded_root_plugin_env = expand_env_vars(
+                self.settings_service.plugin.env,
+                expanded_active_env,
+                raise_if_missing=strict_env_var_mode,
+            )
+
+            # Expand active env plugin env w/ expanded root plugin env
+            expanded_active_env_plugin_env = (
+                expand_env_vars(
+                    self.settings_service.environment_plugin_config.env,
+                    expanded_root_plugin_env,
+                    raise_if_missing=strict_env_var_mode,
+                )
+                if self.settings_service.environment_plugin_config
+                else {}
+            )
+
         env = {
+            **expanded_project_env,
             **self.project.dotenv_env,
             **self.settings_service.env,
             **self.plugin_config_env,
+            **expanded_root_plugin_env,
+            **expanded_active_env,
+            **expanded_active_env_plugin_env,
         }
 
         # Ensure Meltano venv is not inherited

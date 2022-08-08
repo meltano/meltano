@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging  # noqa: D100
 import sys
 from typing import NoReturn
@@ -28,7 +30,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     def main(self, *args, **kwargs) -> NoReturn:
         """Invoke the Click CLI with Windows globbing disabled.
 
-        Parameters:
+        Args:
             args: Positional arguments for the Click group.
             kwargs: Keyword arguments for the Click group.
         """

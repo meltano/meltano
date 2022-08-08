@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from textwrap import dedent
@@ -30,7 +31,13 @@ def tests(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    session.install(".")
+    backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
+
+    if backend_db == "mssql":
+        session.install(".[mssql]")
+    else:
+        session.install(".")
+
     session.install(
         "coverage[toml]",
         "freezegun",

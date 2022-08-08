@@ -1,4 +1,6 @@
 """Defines DBT-specific plugins."""
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 
@@ -15,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class DbtInvoker(PluginInvoker):
-    def Popen_options(self):
+    def Popen_options(self):  # noqa: N802
         return {**super().Popen_options(), "cwd": self.plugin_config["project_dir"]}
 
 

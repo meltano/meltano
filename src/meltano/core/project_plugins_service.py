@@ -1,8 +1,10 @@
-"""Project Plugin Service."""
+"""Project plugin service."""
+
+from __future__ import annotations
 
 import enum
 from contextlib import contextmanager
-from typing import Generator, List, Optional, Tuple
+from typing import Generator
 
 import structlog
 
@@ -188,7 +190,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def find_plugin(
         self,
         plugin_name: str,
-        plugin_type: Optional[PluginType] = None,
+        plugin_type: PluginType | None = None,
         invokable=None,
         configurable=None,
     ) -> ProjectPlugin:
@@ -265,7 +267,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         except StopIteration as stop:
             raise PluginNotFoundError(namespace) from stop
 
-    def find_plugins_by_mapping_name(self, mapping_name: str) -> List[ProjectPlugin]:
+    def find_plugins_by_mapping_name(self, mapping_name: str) -> list[ProjectPlugin]:
         """Search for plugins with the specified mapping name present in  their mappings config.
 
         Args:
@@ -277,7 +279,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Raises:
             PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
         """
-        found: List[ProjectPlugin] = []
+        found: list[ProjectPlugin] = []
         for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPERS):
             if plugin.extra_config.get("_mapping_name") == mapping_name:
                 found.append(plugin)
@@ -310,7 +312,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
     def get_plugins_of_type(
         self, plugin_type: PluginType, ensure_parent=True
-    ) -> List[ProjectPlugin]:
+    ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
         Args:
@@ -448,7 +450,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def find_parent(
         self,
         plugin: ProjectPlugin,
-    ) -> Tuple[ProjectPlugin, DefinitionSource]:
+    ) -> tuple[ProjectPlugin, DefinitionSource]:
         """Find the parent plugin of a plugin.
 
         Args:
@@ -509,7 +511,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if error:
             raise error
 
-    def get_parent(self, plugin: ProjectPlugin) -> Optional[ProjectPlugin]:
+    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin | None:
         """Get plugin's parent plugin.
 
         Args:

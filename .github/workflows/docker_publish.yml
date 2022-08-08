@@ -1,9 +1,8 @@
 name: Docker Publish
 
-# This workflow will build and publish all public Docker images to Docker Hub.
-# Set the input `dry-run` to `false` to skip pushing images to Docker Hub.
+# This workflow will build and publish all public Docker images to the configured registry.
+# Set the input `dry-run` to `false` to skip pushing images to the registry.
 
-# For now, only run manually
 on:
   workflow_dispatch:
     inputs:
@@ -12,6 +11,13 @@ on:
         type: boolean
         required: true
         default: true
+      registry:
+        description: "Where to upload the images"
+        required: true
+        type: choice
+        options:
+          - ghcr.io
+          - docker.io
 
 jobs:
   public_docker_build:
@@ -73,11 +79,14 @@ jobs:
     - name: Assemble image tags
       id: assemble-tags
       run: |
-        [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
-        echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
+        # To save space, only publish the `latest` tag for each images to the GitHub registry
+        if [[ "${{ github.event.inputs.registry }}" != "ghcr.io" ]]; then
+          echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
+        fi
         echo "meltano/meltano:latest-python${{ matrix.python-version }}" >> tags
-        [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:latest" >> tags
-        [[ ${{ matrix.is-default-python }} == "true" ]] && echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
+        [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:latest" >> tags
 
         TAGS=$(cat tags)
         TAGS="${TAGS//'%'/'%25'}"
@@ -88,14 +97,28 @@ jobs:
         cat tags
         echo "::set-output name=tags::$TAGS"
 
+    - name: Set registry username and password
+      id: user-and-pass
+      run: |
+        if [[ "${{ github.event.inputs.registry }}" == "ghcr.io" ]]; then
+          echo "::set-output name=username::${{ github.actor }}"
+          echo "::set-output name=password::${{ secrets.GITHUB_TOKEN }}"
+        fi
+        if [[ "${{ github.event.inputs.registry }}" == "docker.io" ]]; then
+          echo "::set-output name=username::meltano"
+          echo "::set-output name=password::${{ secrets.DOCKERHUB_TOKEN }}"
+        fi
+
     - name: Build, scan, then conditionally push the Docker image for a given Python version
       uses: ./.github/actions/docker-build-scan-push
       with:
         push: ${{ env.DRY_RUN_STR == 'false' }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         tags: ${{ steps.assemble-tags.output }}
         build-args: |
           PYTHON_VERSION=${{ matrix.python-version }}
           MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
-        dockerhub-username: meltano
-        dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+        registry: ${{ github.event.inputs.registry }}
+        username: ${{ steps.user-and-pass.outputs.username }}
+        password: ${{ steps.user-and-pass.outputs.password }}
         python-version: ${{ matrix.python-version }}

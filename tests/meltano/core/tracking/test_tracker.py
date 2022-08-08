@@ -6,6 +6,9 @@ import platform
 import subprocess
 import uuid
 from contextlib import contextmanager
+from http import server as server_lib
+from threading import Thread
+from time import sleep
 from typing import TYPE_CHECKING, Any
 
 import mock
@@ -13,6 +16,7 @@ import pytest
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
 from meltano.core.tracking.contexts.project import ProjectContext
@@ -343,3 +347,79 @@ class TestTracker:
             "send_anonymous_usage_stats", False, True
         )
         assert passed
+
+    @pytest.mark.parametrize(  # noqa: WPS317
+        ("sleep_duration", "timeout_should_occur"),
+        ((1.0, False), (5.0, True)),
+        ids=("no_timeout", "timeout"),
+    )
+    def test_timeout_if_endpoint_unavailable(
+        self, project: Project, sleep_duration, timeout_should_occur
+    ):
+        """Test to ensure that the default tracker timeout is respected.
+
+        An HTTP sever is run on another thread, which handles request sent from
+        the Snowplow tracker. When `timeout_should_occur` is `False`, we check
+        that this sever is properly masqerading as a Snowplow endpoint. When
+        `timeout_should_occur` is `True`, we check that when the server takes
+        too long to respond, we timeout and continue without raising an error.
+        """
+        timeout_occured = False
+
+        class HTTPRequestHandler(server_lib.SimpleHTTPRequestHandler):
+            def do_GET(self) -> None:  # noqa: N802
+                sleep(sleep_duration)
+                self.send_response(200, "OK")
+                self.end_headers()
+
+        server = server_lib.HTTPServer(("localhost", 0), HTTPRequestHandler)
+        server_thread = Thread(
+            target=server.serve_forever, kwargs={"poll_interval": 0.1}
+        )
+        server_thread.start()
+
+        ProjectSettingsService(project).set(
+            "snowplow.collector_endpoints",
+            f'["http://localhost:{server.server_port}"]',
+        )
+
+        def emitter_failure_callback(_, failure_events: list):
+            nonlocal timeout_occured
+            # `timeout_occured` is technically a misnomer here, since there are
+            # multiple reasons for failure, but this callback doesn't let us
+            # distinguish. We can rely on the `timeout_should_occur is True`
+            # case to ensure that this callback won't be called for non-timeout
+            # reasons.
+            timeout_occured = True
+
+        tracker = Tracker(project)
+        assert len(tracker.snowplow_tracker.emitters) == 1
+        tracker.snowplow_tracker.emitters[0].on_failure = emitter_failure_callback
+
+        tracker.track_command_event(CliEvent.started)
+
+        server.shutdown()
+        server_thread.join()
+
+        assert timeout_occured is timeout_should_occur
+
+    def test_project_context_send_anonymous_usage_stats_source(self, project: Project):
+        clear_telemetry_settings(project)
+
+        settings_service = ProjectSettingsService(project)
+
+        def get_source():
+            return ProjectContext(project, uuid.uuid4()).to_json()["data"][
+                "send_anonymous_usage_stats_source"
+            ]
+
+        assert get_source() == "default"
+
+        settings_service.set(
+            "send_anonymous_usage_stats",
+            not settings_service.get("send_anonymous_usage_stats"),
+        )
+        assert get_source() == "meltano_yml"
+
+        os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "True"
+        assert get_source() == "env"

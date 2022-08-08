@@ -1,7 +1,8 @@
 """Plugin glue code for Superset."""
+from __future__ import annotations
+
 import logging
 import subprocess
-from typing import List
 
 import structlog
 
@@ -104,7 +105,7 @@ class Superset(BasePlugin):
         logging.debug(f"Created configuration at {config_path}")
 
     @hook("before_invoke")
-    async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: List[str]):
+    async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: list[str]):
         """Create or upgrade metadata database.
 
         Args:
@@ -131,7 +132,7 @@ class Superset(BasePlugin):
         logging.debug("Completed `superset db upgrade`")
 
     @hook("before_invoke")
-    async def init_hook(self, invoker: PluginInvoker, exec_args: List[str]):
+    async def init_hook(self, invoker: PluginInvoker, exec_args: list[str]):
         """Create default roles and permissions.
 
         Args:

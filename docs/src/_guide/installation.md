@@ -7,9 +7,8 @@ weight: 1
 
 If the installation instructions in the [Getting Started guide](/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
 
-<div class="notification is-warning">
-    <p><strong>Short on time, or just curious what the fuss is about?</strong></p>
-    <p>To get a sense of the Meltano experience in just a few minutes, watch the <a href="https://meltano.com/blog/speedrun-from-0-to-elt-in-90-seconds/">"from 0 to ELT in 90 seconds" speedrun</a> that takes you through <a href="/guide/integration">data integration (EL)</a> with the <a href="https://hub.meltano.com/extractors/gitlab.html">tap-gitlab extractor</a> and the <a href="https://hub.meltano.com/loaders/postgres.html">target-postgres loader</a>.</p>
+<div class="notification is-success">
+    <p><strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!</p>
 </div>
 
 # Local Installation
@@ -72,6 +71,10 @@ Once the installation completes, you can check if it was successful by running:
 ```bash
 meltano --version
 ```
+
+### Optional Components
+
+Some components of Meltano are optional and not installed by default. See the guide on [installing optional components](/guide/advanced-topics#installing-optional-components) for more information.
 
 ### Next Steps
 
