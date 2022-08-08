@@ -80,7 +80,7 @@ meltano add <type> <name> --inherit-from <existing-name>
 meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 ```
 
-By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to short-circuit this behaviour:
+By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
 ```bash
 meltano add <type> <name> --no-install
