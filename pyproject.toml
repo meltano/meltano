@@ -11,8 +11,8 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
+# Explicitly include non-Python files and gitignored files:
 include = [
-  # Explicitly include non-Python files and gitignored files:
   "LICENSE",
   "*.m5o",
   "src/meltano/api/static/css/*",
