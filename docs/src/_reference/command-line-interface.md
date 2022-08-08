@@ -20,7 +20,7 @@ Specifically, it will:
 3. Store the plugin definition in the `./plugins` directory (see [Lock Artifacts](/concepts/plugins#lock-artifacts))
 4. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
    1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
-   2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>`
+   2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
 
@@ -80,6 +80,15 @@ meltano add <type> <name> --inherit-from <existing-name>
 meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 ```
 
+By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to short-circuit this behaviour:
+
+```bash
+meltano add <type> <name> --no-install
+
+# For example:
+meltano add extractor tap-spotify --no-install
+```
+
 #### Parameters
 
 - `--custom`: Add a [custom plugin](/concepts/plugins#custom-plugins). The command will prompt you for the package's [base plugin description](/concepts/plugins#project-plugins) metadata.
@@ -89,6 +98,8 @@ meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 - `--as=<new-name>`: `meltano add <type> <name> --as=<new-name>` is equivalent to `meltano add <type> <new-name> --inherit-from=<name>`, and can be used to add a [discoverable plugin](/concepts/plugins#discoverable-plugins) to your project with a different name.
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
+
+- `--no-install`: Do not install the plugin after adding it to the project.
 
 ## `config`
 
