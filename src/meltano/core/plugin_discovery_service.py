@@ -13,19 +13,18 @@ from ruamel.yaml import YAMLError
 
 import meltano
 from meltano.core import bundle
-from meltano.core.yaml import configure_yaml
 from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.project import Project
+from meltano.core.yaml import configure_yaml
 
-from .behavior.canonical import Canonical
 from .behavior.versioned import IncompatibleVersionError, Versioned
+from .discovery_file import DiscoveryFile
 from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
 from .plugin.error import PluginNotFoundError
 from .plugin.factory import base_plugin_factory
 from .plugin.project_plugin import ProjectPlugin
 from .project_settings_service import ProjectSettingsService
 from .utils import NotFound, find_named
-
 
 yaml = configure_yaml()
 
@@ -41,44 +40,6 @@ class DiscoveryUnavailableError(Exception):
 # Increment this version number whenever the schema of discovery.yml is changed.
 # See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
 VERSION = 22
-
-
-class DiscoveryFile(Canonical):
-    """A discovery file object."""
-
-    def __init__(self, version=1, **plugins):
-        """Create a new DiscoveryFile.
-
-        Args:
-            version: The version of the discovery file.
-            plugins: The plugins to add to the discovery file.
-        """
-        super().__init__(version=int(version))
-
-        for ptype in PluginType:
-            self[ptype] = []
-
-        for plugin_type, raw_plugins in plugins.items():
-            for raw_plugin in raw_plugins:
-                plugin_def = PluginDefinition(
-                    plugin_type,
-                    raw_plugin.pop("name"),
-                    raw_plugin.pop("namespace"),
-                    **raw_plugin,
-                )
-                self[plugin_type].append(plugin_def)
-
-    @classmethod
-    def file_version(cls, attrs):
-        """Return version of discovery file represented by attrs dictionary.
-
-        Args:
-            attrs: The attributes of the discovery file.
-
-        Returns:
-            The version of the discovery file.
-        """
-        return int(attrs.get("version", 1))
 
 
 class PluginRepository(metaclass=ABCMeta):
