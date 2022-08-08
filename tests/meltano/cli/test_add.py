@@ -558,7 +558,9 @@ class TestCliAdd:
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
-            res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name, "--no-install"])
+            res = cli_runner.invoke(
+                cli, ["add", plugin_type.singular, plugin_name, "--no-install"]
+            )
 
             if plugin_type is PluginType.TRANSFORMS:
                 assert res.exit_code == 1, res.stdout
@@ -574,7 +576,9 @@ class TestCliAdd:
 
                 # check plugin lock file is added
                 plugins_dir = project.root_dir("plugins")
-                assert plugins_dir.joinpath(f"{plugin_type}/{plugin_name}--{default_variant}.lock").exists()
+                assert plugins_dir.joinpath(
+                    f"{plugin_type}/{plugin_name}--{default_variant}.lock"
+                ).exists()
 
                 for required_plugin_ref in required_plugin_refs:
                     if (required_plugin_ref._type) == PluginType.FILES and (
@@ -595,6 +599,10 @@ class TestCliAdd:
                         )
 
                     # check required plugin lock files are added
-                    assert list(plugins_dir.glob(f"{required_plugin_ref._type}/{required_plugin_ref.name}--*.lock"))
+                    assert list(
+                        plugins_dir.glob(
+                            f"{required_plugin_ref._type}/{required_plugin_ref.name}--*.lock"
+                        )
+                    )
 
                 install_plugin_mock.assert_not_called()
