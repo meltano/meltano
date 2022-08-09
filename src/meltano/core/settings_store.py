@@ -1106,7 +1106,7 @@ class AutoStoreManager(SettingsStoreManager):
     def auto_store(  # noqa: WPS231 # Too complex
         self,
         name: str,
-        source: SettingValueStore,
+        source: SettingValueStore | None = None,
         setting_def: SettingDefinition | None = None,
     ) -> SettingValueStore | None:
         """Get first valid writable SettingValueStore instance for a Setting.
@@ -1130,9 +1130,11 @@ class AutoStoreManager(SettingsStoreManager):
         tried = set()
         while True:
             try:
-                manager = self.manager_for(store)
-                manager.ensure_supported("set")
-                return store
+                if store:
+                    manager = self.manager_for(store)
+                    manager.ensure_supported("set")
+                    return store
+                raise StoreNotSupportedError("No source passed.")
             except StoreNotSupportedError:
                 tried.add(store)
 
@@ -1212,10 +1214,7 @@ class AutoStoreManager(SettingsStoreManager):
         """
         setting_def = setting_def or self.find_setting(name)
 
-        current_value, metadata = self.get(name, setting_def=setting_def)
-        source = metadata["source"]
-
-        store = self.auto_store(name, source, setting_def=setting_def)
+        store = self.auto_store(name, None, setting_def=setting_def)
         if store is None:
             raise StoreNotSupportedError("No storage method available")
 
