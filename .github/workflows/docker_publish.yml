@@ -70,12 +70,12 @@ jobs:
       run: |
         # To save space, only publish the `latest` tag for each images to the GitHub registry
         if [[ "${{ github.event.inputs.registry }}" != "ghcr.io" ]]; then
-          echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
+          echo "v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "SHA-${{ github.sha }}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
         fi
-        echo "meltano/meltano:latest-python${{ matrix.python-version }}" >> tags
-        [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:latest" >> tags
+        echo "latest-python${{ matrix.python-version }}" >> tags
+        [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "latest" >> tags
 
         TAGS=$(cat tags)
         TAGS="${TAGS//'%'/'%25'}"
@@ -103,11 +103,9 @@ jobs:
       with:
         push: ${{ env.DRY_RUN_STR == 'false' }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        tags: ${{ steps.assemble-tags.output }}
-        build-args: |
-          PYTHON_VERSION=${{ matrix.python-version }}
-          MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+        tags: ${{ steps.assemble-tags.outputs.tags }}
         registry: ${{ github.event.inputs.registry }}
         username: ${{ steps.user-and-pass.outputs.username }}
         password: ${{ steps.user-and-pass.outputs.password }}
         python-version: ${{ matrix.python-version }}
+        meltano-version: ${{ steps.get-meltano-version.outputs.release-version }}
