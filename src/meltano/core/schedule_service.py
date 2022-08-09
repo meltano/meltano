@@ -191,7 +191,11 @@ class ScheduleService:
             BadCronError: If the cron expression is invalid.
             ScheduleAlreadyExistsError: If a schedule with the same name already exists.
         """
-        if schedule.interval is not None and not croniter.is_valid(schedule.interval):
+        if (
+            schedule.interval is not None
+            and schedule.interval != "@once"
+            and not croniter.is_valid(schedule.interval)
+        ):
             raise BadCronError(schedule.interval)
 
         with self.project.meltano_update() as meltano:
