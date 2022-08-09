@@ -249,9 +249,9 @@ This manifest is primarily used by [`meltano discover`](/reference/command-line-
 #### How to use
 
 ```bash
-meltano config meltano set hub_url http://localhost:4000
+meltano config meltano set hub_url http://localhost:4000/meltano/api/v1
 
-export MELTANO_HUB_URL=http://localhost:4000
+export MELTANO_HUB_URL=http://localhost:4000/meltano/api/v1
 ```
 
 ### <a name="hub-url-auth"></a>`hub_url_auth`
