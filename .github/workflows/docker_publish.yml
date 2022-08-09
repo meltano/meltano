@@ -23,8 +23,6 @@ jobs:
   public_docker_build:
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: meltano/meltano
-      COMMIT_SHA: ${{ github.sha }}
       # Boolean values don't actually work so cast to 'true' and 'false'
       # https://github.com/actions/runner/issues/1483
       DRY_RUN_STR: ${{ format('{0}', github.event.inputs.dry-run) || 'true' }}
@@ -53,15 +51,6 @@ jobs:
         poetry version --short
         echo "::set-output name=release-version::$(poetry version --short)"
 
-    - name: Print job inputs summary
-      run: |
-        echo "DRY_RUN=${{ env.DRY_RUN_STR }}"
-        echo "PYTHON_VERSION=${{ matrix.python-version }}"
-        echo "RELEASE_VERSION=${{ steps.get-meltano-version.outputs.release-version }}"
-        echo "COMMIT_SHA=${{ github.sha }}"
-        echo "DEBUG INFO: DRY_RUN is truthy=${{ env.DRY_RUN_STR == 'true' }}"
-        echo "DEBUG INFO: DRY_RUN is falsey=${{ env.DRY_RUN_STR == 'false' }}"
-
     # These exist to show if 'dry-run' flag is set as intended and correctly parsed from inputs
     - name: Print dry-run message (if applicable)
       if: ${{ env.DRY_RUN_STR == 'true' }}
@@ -81,12 +70,12 @@ jobs:
       run: |
         # To save space, only publish the `latest` tag for each images to the GitHub registry
         if [[ "${{ github.event.inputs.registry }}" != "ghcr.io" ]]; then
-          echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:SHA-${{ github.sha }}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
+          echo "v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "SHA-${{ github.sha }}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
         fi
-        echo "meltano/meltano:latest-python${{ matrix.python-version }}" >> tags
-        [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "meltano/meltano:latest" >> tags
+        echo "latest-python${{ matrix.python-version }}" >> tags
+        [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "latest" >> tags
 
         TAGS=$(cat tags)
         TAGS="${TAGS//'%'/'%25'}"
@@ -114,11 +103,9 @@ jobs:
       with:
         push: ${{ env.DRY_RUN_STR == 'false' }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        tags: ${{ steps.assemble-tags.output }}
-        build-args: |
-          PYTHON_VERSION=${{ matrix.python-version }}
-          MELTANO_VERSION=${{ steps.get-meltano-version.outputs.release-version }}
+        tags: ${{ steps.assemble-tags.outputs.tags }}
         registry: ${{ github.event.inputs.registry }}
         username: ${{ steps.user-and-pass.outputs.username }}
         password: ${{ steps.user-and-pass.outputs.password }}
         python-version: ${{ matrix.python-version }}
+        meltano-version: ${{ steps.get-meltano-version.outputs.release-version }}
