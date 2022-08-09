@@ -16,6 +16,8 @@ from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project import Project
+from meltano.core.project_init_service import ProjectInitService
 
 
 class TestCliAdd:
@@ -26,6 +28,13 @@ class TestCliAdd:
             return_value=meltano_hub_service,
         ):
             yield
+
+    @pytest.fixture
+    def reset_project_context(
+        self, project: Project, project_init_service: ProjectInitService
+    ):
+        shutil.rmtree(".", ignore_errors=True)
+        project_init_service.create_files(project)
 
     @pytest.mark.parametrize(
         "plugin_type,plugin_name,default_variant,required_plugin_refs",
@@ -551,6 +560,7 @@ class TestCliAdd:
         project,
         cli_runner,
         project_plugins_service,
+        reset_project_context,
     ):
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
