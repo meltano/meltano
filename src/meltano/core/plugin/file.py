@@ -54,7 +54,7 @@ class FilePlugin(BasePlugin):
 
     def project_file_contents(self, project, paths_to_update):
         def with_update_header(content, relative_path):
-            if str(relative_path) in paths_to_update:
+            if any(relative_path.match(path) for path in paths_to_update):
                 content = "\n\n".join([self.update_file_header(relative_path), content])
 
             return content
@@ -106,7 +106,7 @@ class FilePlugin(BasePlugin):
             for relative_path, content in self.project_file_contents(
                 project, paths_to_update
             ).items()
-            if str(relative_path) in paths_to_update
+            if any(relative_path.match(path) for path in paths_to_update)
         }
 
     def create_files(self, project, paths_to_update=None):
