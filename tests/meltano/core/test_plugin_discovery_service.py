@@ -1,19 +1,28 @@
+from __future__ import annotations
+
+import io
 import json
 from contextlib import contextmanager
-from unittest import mock
 
+import mock
 import pytest
 import requests
 import requests_mock
-import yaml
 
 from meltano.core import bundle
 from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
+from meltano.core.plugin_discovery_service import (
+    VERSION,
+    DiscoveryFile,
+    PluginNotFoundError,
+)
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.yaml import configure_yaml
 
 HTTP_STATUS_TEAPOT = 418
+
+yaml = configure_yaml()
 
 
 @pytest.fixture(scope="class")
@@ -60,6 +69,7 @@ class TestPluginDiscoveryService:
     @pytest.fixture
     def discovery_yaml(self, subject):
         """Disable the discovery mock."""
+        yaml.register_class(DiscoveryFile)
         with subject.project.root_dir("discovery.yml").open("w") as discovery_yaml:
             yaml.dump(subject._discovery, discovery_yaml)
 
@@ -218,7 +228,10 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
     @contextmanager
     def use_remote_discovery(self, discovery_yaml, subject):
         with requests_mock.Mocker() as mocker:
-            mocker.get(subject.discovery_url, text=yaml.dump(discovery_yaml))
+            buf = io.StringIO()
+            yaml.dump(discovery_yaml, buf)
+            buf.seek(0)
+            mocker.get(subject.discovery_url, text=buf.read())
 
             yield discovery_yaml
 
@@ -283,8 +296,8 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     @pytest.fixture
     def bundled_discovery(self):
-        with bundle.find("discovery.yml").open() as bundled_discovery:
-            return yaml.safe_load(bundled_discovery)
+        with open(bundle.root / "discovery.yml") as bundled_discovery:
+            return yaml.load(bundled_discovery)
 
     def test_local_discovery(self, subject, local_discovery):
         self.assert_discovery_yaml(subject, local_discovery)
@@ -301,7 +314,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
         assert subject.cached_discovery_file.exists()
         with subject.cached_discovery_file.open() as cached_discovery:
-            cached_discovery_yaml = yaml.safe_load(cached_discovery)
+            cached_discovery_yaml = yaml.load(cached_discovery)
             assert cached_discovery_yaml["version"] == remote_discovery["version"]
 
     @mock.patch("meltano.core.plugin_discovery_service.requests.get")

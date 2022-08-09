@@ -1,5 +1,7 @@
 """A module for the UtilityPlugin type."""
 
+from __future__ import annotations
+
 from meltano.core.plugin import BasePlugin, PluginType
 
 

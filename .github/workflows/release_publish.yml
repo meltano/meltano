@@ -69,7 +69,7 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Set up Python
-      uses: actions/setup-python@v4.0.0
+      uses: actions/setup-python@v4.2.0
       with:
         python-version: 3.9
         architecture: x64
@@ -83,7 +83,7 @@ jobs:
         touch src/meltano/core/tracking/.release_marker
         poetry build
 
-    - name: Publish to PyPi
+    - name: Publish to PyPI
       # # Only run when not on a fork:
       # if: ${{ github.event.repository.name == 'meltano/meltano' }}
       run: |

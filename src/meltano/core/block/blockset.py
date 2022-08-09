@@ -1,4 +1,6 @@
 """This holds the actual BlockSet meta class as well as related components such as exceptions."""
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 
 

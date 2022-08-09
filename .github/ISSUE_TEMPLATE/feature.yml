@@ -1,0 +1,32 @@
+name: Feature request
+description: Request a new feature
+title: "feature: <title>"
+labels: ["kind/Feature", "valuestream/Meltano"]
+assignees:
+  - meltano/engineering
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to request a new feature!
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Feature scope
+      description: Functionality this new feature would impact
+      options:
+        - API
+        - CLI (options, error messages, logging, etc.)
+        - Configuration (settings parsing, validation, etc.)
+        - Web UI
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Description
+      description: Describe the feature you would like to see
+    validations:
+      required: true

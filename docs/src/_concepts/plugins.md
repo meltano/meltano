@@ -106,6 +106,12 @@ When you add a plugin to your project using `meltano add`, the [discoverable plu
 
 Later invocations of the plugin will use this file to determine the settings, installation source, etc.
 
+<div class="notification is-info">
+  <p>Note that <a href="#custom-plugins">custom</a> and <a href="#plugin-inheritance">inherited</a> plugins
+  do not get a lock file.
+  </p>
+</div>
+
 ## Types
 
 Meltano supports the following types of plugins:

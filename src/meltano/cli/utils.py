@@ -1,12 +1,14 @@
 """Defines helpers for use by the CLI."""
 
+from __future__ import annotations
+
 import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import List, Optional, Tuple
 
 import click
+from click_default_group import DefaultGroup
 
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
@@ -27,6 +29,7 @@ from meltano.core.project_add_service import (
 )
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
+from meltano.core.tracking import CliContext, CliEvent
 
 setup_logging()
 
@@ -125,7 +128,7 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
     )
 
 
-def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
+def _prompt_plugin_pip_url(plugin_name: str) -> str | None:
     click.echo()
     click.echo(
         f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
@@ -147,7 +150,7 @@ def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     return None if result == "n" else result
 
 
-def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
+def _prompt_plugin_executable(pip_url: str | None, plugin_name: str) -> str:
     derived_from = "`pip_url`"
     prompt_request = "executable name"
     if pip_url is None:
@@ -194,7 +197,9 @@ def _prompt_plugin_capabilities(plugin_type):
         click.style("(capabilities)", fg="blue"),
         type=list,
         default=[],
-        value_proc=lambda value: [word.strip() for word in value.split(",")],
+        value_proc=lambda value: [word.strip() for word in value.split(",")]
+        if value
+        else [],
     )
 
 
@@ -252,7 +257,9 @@ def _prompt_plugin_settings(plugin_type):
             default=[],
             value_proc=lambda value: [
                 setting.strip().partition(":") for setting in value.split(",")
-            ],
+            ]
+            if value
+            else [],
         )
         try:
             settings = [
@@ -383,7 +390,7 @@ def add_plugin(
 
 def add_required_plugins(
     project: Project,
-    plugins: List[ProjectPlugin],
+    plugins: list[ProjectPlugin],
     add_service: ProjectAddService,
     lock: bool = True,
 ):
@@ -480,8 +487,8 @@ def propagate_stop_signals(proc):
 
 
 def check_dependencies_met(
-    plugin_refs: List[PluginRef], plugins_service: ProjectPluginsService
-) -> Tuple[bool, str]:
+    plugin_refs: list[PluginRef], plugins_service: ProjectPluginsService
+) -> tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
     Args:
@@ -510,3 +517,61 @@ def check_dependencies_met(
     else:
         message = f"Dependencies not met: {'; '.join(messages)}"
     return passed, message
+
+
+class InstrumentedDefaultGroup(DefaultGroup):
+    """A variation of a DefaultGroup that instruments its invocation by updating the telemetry context."""
+
+    def invoke(self, ctx):
+        """Update the telemetry context and invoke the group."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+        super().invoke(ctx)  # noqa: WPS608
+
+
+class InstrumentedGroup(click.Group):
+    """A click.Group that instruments its invocation by updating the telemetry context."""
+
+    def invoke(self, ctx):
+        """Update the telemetry context and invoke the group."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+        super().invoke(ctx)  # noqa: WPS608
+
+
+class InstrumentedCmd(click.Command):
+    """A click.Command that automatically fires telemetry events when invoked.
+
+    Both starting and ending events are fired. The ending event fired is dependent on whether invocation of the command
+    resulted in an Exception.
+    """
+
+    def invoke(self, ctx):
+        """Invoke the requested command firing start and events accordingly."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            tracker = ctx.obj["tracker"]
+            tracker.add_contexts(CliContext.from_click_context(ctx))
+            tracker.track_command_event(CliEvent.started)
+            try:
+                super().invoke(ctx)  # noqa: WPS608
+            except Exception:
+                tracker.track_command_event(CliEvent.failed)
+                raise
+            tracker.track_command_event(CliEvent.completed)
+        else:
+            super().invoke(ctx)
+
+
+class PartialInstrumentedCmd(click.Command):
+    """A click.Command that automatically fires an instrumentation 'start' event, if a tracker is available."""
+
+    def invoke(self, ctx):
+        """Invoke the requested command firing only a start event."""
+        ctx.ensure_object(dict)
+        if ctx.obj.get("tracker"):
+            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+            ctx.obj["tracker"].track_command_event(CliEvent.started)
+        super().invoke(ctx)  # noqa: WPS608

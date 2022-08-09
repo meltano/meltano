@@ -1,15 +1,12 @@
+from __future__ import annotations
+
 import functools
-import os
-import urllib
-from pathlib import Path
 
 import click
-import click.globals
+from click.globals import get_current_context as get_current_click_context
+
 from meltano.core.db import project_engine
-from meltano.core.migration_service import MigrationService
-from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.utils import pop_all
 
 from .utils import CliError
 
@@ -36,19 +33,21 @@ class pass_project:  # noqa: N801
     def __call__(self, func):
         @database_uri_option
         def decorate(*args, **kwargs):
-            ctx = click.globals.get_current_context()
+            ctx = get_current_click_context()
 
             project = ctx.obj["project"]
             if not project:
                 raise CliError(
-                    f"`{ctx.command_path}` must be run inside a Meltano project."
-                    "\nUse `meltano init <project_name>` to create one."
+                    f"`{ctx.command_path}` must be run inside a Meltano project.\n"
+                    + "Use `meltano init <project_name>` to create one."
                 )
 
             # register the system database connection
             engine, _ = project_engine(project, default=True)
 
             if self.migrate:
+                from meltano.core.migration_service import MigrationService
+
                 migration_service = MigrationService(engine)
                 migration_service.upgrade(silent=True)
                 migration_service.seed(project)

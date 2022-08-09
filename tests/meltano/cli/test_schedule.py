@@ -1,5 +1,6 @@
-from unittest import mock
+from __future__ import annotations
 
+import mock
 import pytest
 
 from asserts import assert_cli_runner

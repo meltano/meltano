@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 import pytest
@@ -44,7 +46,7 @@ class TestJobFinder:
             )
 
         job = Job(
-            job_id="test_state_id",
+            job_name="test_state_id",
             state=state,
             started_at=started_at,
             last_heartbeat_at=last_heartbeat_at,
@@ -56,11 +58,11 @@ class TestJobFinder:
         assert bool(job in JobFinder.all_stale(session)) == is_stale
 
     def test_stale(self, session):
-        job = Job(job_id="test")
+        job = Job(job_name="test")
         job.start()
         job.last_heartbeat_at = datetime.utcnow() - timedelta(minutes=10)
         job.save(session)
 
-        assert job in JobFinder(state_id=job.job_id).stale(session)
+        assert job in JobFinder(state_id=job.job_name).stale(session)
 
         assert job not in JobFinder(state_id="other").stale(session)

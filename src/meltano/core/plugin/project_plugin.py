@@ -70,6 +70,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         requires: dict[PluginType, list] | None = None,
         config: dict | None = None,
         default_variant=Variant.ORIGINAL_NAME,
+        env: dict[str, str] | None = None,
         **extras,
     ):
         """ProjectPlugin.
@@ -77,18 +78,19 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         Args:
             plugin_type: PluginType instance.
             name: Plugin name.
-            inherit_from: (optional) Name of plugin to inherit from.
-            namespace: (optional) Plugin namespace.
-            variant: (optional) Plugin variant.
-            pip_url: (optional) Plugin install pip url.
-            executable: (optional) Executable name.
-            capabilities: (optional) Capabilities.
-            settings_group_validation: (optional) Settings group validation.
-            settings: (optional) Settings.
-            commands: (optional) Plugin commands.
-            requires: (optional) Plugin requirements.
-            config: (optional) Plugin configuration.
-            default_variant: (optional) Default variant for this plugin.
+            inherit_from: Name of plugin to inherit from.
+            namespace: Plugin namespace.
+            variant: Plugin variant.
+            pip_url: Plugin install pip url.
+            executable: Executable name.
+            capabilities: Capabilities.
+            settings_group_validation: Settings group validation.
+            settings: Settings.
+            commands: Plugin commands.
+            requires: Plugin requirements.
+            config: Plugin configuration.
+            default_variant: Default variant for this plugin.
+            env: Environment variables to inject into plugins runtime context.
             extras: Extra keyword arguments.
         """
         super().__init__(plugin_type, name)
@@ -141,6 +143,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self.settings = list(map(SettingDefinition.parse, settings or []))
         self.commands = Command.parse_all(commands)
         self.requires = PluginRequirement.parse_all(requires)
+        self.env = env or {}
 
         self._fallbacks.update(
             [

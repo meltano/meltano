@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import logging
@@ -6,7 +8,7 @@ import sys
 from contextlib import contextmanager
 
 import pytest
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
@@ -21,7 +23,7 @@ class TestSingerTap:
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.mark.asyncio
-    async def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
+    async def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
@@ -64,7 +66,7 @@ class TestSingerTap:
         elt_context_builder,
         monkeypatch,
     ):
-        job = Job(job_id="pytest_test_runner")
+        job = Job(job_name="pytest_test_runner")
         elt_context = (
             elt_context_builder.with_session(session)
             .with_extractor(subject.name)
@@ -76,7 +78,7 @@ class TestSingerTap:
 
         @contextmanager
         def create_job():
-            new_job = Job(job_id=job.job_id)
+            new_job = Job(job_name=job.job_name)
             new_job.start()
             yield new_job
             new_job.save(session)
@@ -702,7 +704,7 @@ class TestSingerTap:
 
         process_mock = mock.Mock()
         process_mock.name = subject.name
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
         process_mock.sterr.at_eof.side_effect = (
             True  # no output so return eof immediately
@@ -712,17 +714,15 @@ class TestSingerTap:
             False,
             True,
         )  # first check needs to be false so loop starts read, after 1 line, we'll return true
-        process_mock.stdout.readline = CoroutineMock(
-            return_value=b'{"discovered": true}\n'
-        )
+        process_mock.stdout.readline = AsyncMock(return_value=b'{"discovered": true}\n')
 
-        invoke_async = CoroutineMock(return_value=process_mock)
+        invoke_async = AsyncMock(return_value=process_mock)
         invoker = plugin_invoker_factory(subject)
         invoker.invoke_async = invoke_async
         catalog_path = invoker.files["catalog"]
 
         await subject.run_discovery(invoker, catalog_path)
-        assert invoke_async.called_with(["--discover"])
+        assert await invoke_async.called_with(["--discover"])
 
         with catalog_path.open("r") as catalog_file:
             resp = json.load(catalog_file)
@@ -740,15 +740,15 @@ class TestSingerTap:
 
         process_mock = mock.Mock()
         process_mock.name = subject.name
-        process_mock.wait = CoroutineMock(return_value=1)
+        process_mock.wait = AsyncMock(return_value=1)
         process_mock.returncode = 1
         process_mock.stderr.at_eof.side_effect = (False, True)
-        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stderr.readline = AsyncMock(return_value=b"stderr mock output")
         process_mock.stdout.at_eof.side_effect = (True, True)
-        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+        process_mock.stdout.readline = AsyncMock(return_value=b"")
 
         invoker = plugin_invoker_factory(subject)
-        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        invoker.invoke_async = AsyncMock(return_value=process_mock)
         catalog_path = invoker.files["catalog"]
 
         with pytest.raises(PluginExecutionError, match="returned 1"):
@@ -769,23 +769,22 @@ class TestSingerTap:
         process_mock = mock.Mock()
         process_mock.name = subject.name
         # we need to exit successfully to not trigger error handling
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
         process_mock.stderr.at_eof.side_effect = (False, True)
-        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stderr.readline = AsyncMock(return_value=b"stderr mock output")
         process_mock.stdout.at_eof.side_effect = (True, True)
-        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+        process_mock.stdout.readline = AsyncMock(return_value=b"")
 
         invoker = plugin_invoker_factory(subject)
-        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        invoker.invoke_async = AsyncMock(return_value=process_mock)
         catalog_path = invoker.files["catalog"]
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
         ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
             await subject.run_discovery(invoker, catalog_path)
-
-            assert stream_mock.call_count == 1
+            assert stream_mock.call_count == 2
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
@@ -793,9 +792,7 @@ class TestSingerTap:
             "meltano.core.plugin.singer.tap._stream_redirect"
         ) as stream_mock2:
             await subject.run_discovery(invoker, catalog_path)
-
             assert stream_mock2.call_count == 2
-            assert stream_mock2.call_args[1]["write_str"] is True
 
         # ensure stderr is redirected to devnull if we don't need it
         discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")
@@ -809,10 +806,8 @@ class TestSingerTap:
             await subject.run_discovery(invoker, catalog_path)
 
             assert stream_mock3.call_count == 2
-            assert stream_mock3.call_args[1]["write_str"] is True
-
             call_kwargs = invoker.invoke_async.call_args_list[0][1]
-            assert call_kwargs.get("stderr") is subprocess.DEVNULL
+            assert call_kwargs.get("stderr") is subprocess.PIPE
 
         discovery_logger.setLevel(original_level)
 
@@ -828,15 +823,15 @@ class TestSingerTap:
 
         process_mock = mock.Mock()
         process_mock.name = subject.name
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
         process_mock.stderr.at_eof.side_effect = (False, True)
-        process_mock.stderr.readline = CoroutineMock(return_value=b"stderr mock output")
+        process_mock.stderr.readline = AsyncMock(return_value=b"stderr mock output")
         process_mock.stdout.at_eof.side_effect = (False, True)
         process_mock.stdout.readline.side_effect = Exception("mock readline exception")
 
         invoker = plugin_invoker_factory(subject)
-        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        invoker.invoke_async = AsyncMock(return_value=process_mock)
         catalog_path = invoker.files["catalog"]
 
         with pytest.raises(Exception, match="mock readline exception"):
@@ -857,25 +852,19 @@ class TestSingerTap:
         process_mock = mock.Mock()
         process_mock.name = subject.name
         # we need to exit successfully to not trigger error handling
-        process_mock.wait = CoroutineMock(return_value=0)
+        process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
         process_mock.stderr.at_eof.side_effect = (False, True)
         test_string = "Hello world, Καλημέρα κόσμε, コンニチハ".encode()
-        process_mock.stderr.readline = CoroutineMock(return_value=test_string)
+        process_mock.stderr.readline = AsyncMock(return_value=test_string)
         process_mock.stdout.at_eof.side_effect = (True, True)
-        process_mock.stdout.readline = CoroutineMock(return_value=b"")
+        process_mock.stdout.readline = AsyncMock(return_value=b"")
 
         invoker = plugin_invoker_factory(subject)
-        invoker.invoke_async = CoroutineMock(return_value=process_mock)
+        invoker.invoke_async = AsyncMock(return_value=process_mock)
         catalog_path = invoker.files["catalog"]
 
         assert sys.getdefaultencoding() == "utf-8"
-
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
-        ), mock.patch("sys.getdefaultencoding", return_value="ascii"):
-            with pytest.raises(UnicodeDecodeError):
-                await subject.run_discovery(invoker, catalog_path)
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True

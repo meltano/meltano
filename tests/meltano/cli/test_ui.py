@@ -1,6 +1,6 @@
-from unittest import mock
+from __future__ import annotations
 
-import pytest
+import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli

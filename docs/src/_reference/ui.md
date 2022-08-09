@@ -1,5 +1,5 @@
 ---
-title: GUI
+title: Meltano UI
 description: Learn how to manage and monitor your plugins and pipelines using Meltano UI
 layout: doc
 redirect_from:
@@ -48,7 +48,7 @@ you can add the appropriate `docker-compose.yml` file to your project by adding 
 docker-compose --version
 
 # Add Docker Compose files to your project
-meltano add files docker-compose
+meltano add files files-docker-compose
 
 # Start the `meltano-ui` service in the background
 docker-compose up -d

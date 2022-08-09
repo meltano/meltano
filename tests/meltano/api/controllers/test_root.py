@@ -1,6 +1,5 @@
-import hashlib
+from __future__ import annotations
 
-import pytest
 from flask import url_for
 
 

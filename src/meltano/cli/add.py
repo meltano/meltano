@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import click
 
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -11,14 +10,13 @@ from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import PluginsTrackingContext, Tracker
-from meltano.core.tracking import cli as cli_tracking
-from meltano.core.tracking import cli_context_builder
+from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
 from .params import pass_project
 from .utils import (
     CliError,
+    PartialInstrumentedCmd,
     add_plugin,
     add_required_plugins,
     check_dependencies_met,
@@ -26,7 +24,10 @@ from .utils import (
 )
 
 
-@cli.command(short_help="Add a plugin to your project.")
+@cli.command(  # noqa: WPS238
+    cls=PartialInstrumentedCmd,
+    short_help="Add a plugin to your project.",
+)
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
 @click.option(
@@ -56,7 +57,7 @@ from .utils import (
 )
 @pass_project()
 @click.pass_context
-def add(  # noqa: WPS238
+def add(
     ctx,
     project: Project,
     plugin_type: str,
@@ -71,17 +72,8 @@ def add(  # noqa: WPS238
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
-    tracker = Tracker(project)
-    legacy_tracker = LegacyTracker(project, context_overrides=tracker.contexts)
-    tracker.add_contexts(
-        cli_context_builder(
-            "add",
-            None,
-            inherit_from=inherit_from,
-            variant=variant,
-            as_name=as_name,
-        )
-    )
+    tracker = ctx.obj["tracker"]
+    legacy_tracker = ctx.obj["legacy_tracker"]
 
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
@@ -100,8 +92,7 @@ def add(  # noqa: WPS238
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
         }:
-            tracker.track_command_event(cli_tracking.STARTED)
-            tracker.track_command_event(cli_tracking.ABORTED)
+            tracker.track_command_event(CliEvent.aborted)
             raise CliError(f"--custom is not supported for {plugin_type}")
 
     plugin_refs = [
@@ -111,8 +102,7 @@ def add(  # noqa: WPS238
         plugin_refs=plugin_refs, plugins_service=plugins_service
     )
     if not dependencies_met:
-        tracker.track_command_event(cli_tracking.STARTED)
-        tracker.track_command_event(cli_tracking.ABORTED)
+        tracker.track_command_event(CliEvent.aborted)
         raise CliError(f"Failed to install plugin(s): {err}")
 
     add_service = ProjectAddService(project, plugins_service=plugins_service)
@@ -136,8 +126,7 @@ def add(  # noqa: WPS238
             tracker.add_contexts(
                 PluginsTrackingContext([(plugin, None) for plugin in plugins])
             )
-            tracker.track_command_event(cli_tracking.STARTED)
-            tracker.track_command_event(cli_tracking.ABORTED)
+            tracker.track_command_event(CliEvent.aborted)
             raise
 
         legacy_tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
@@ -149,16 +138,16 @@ def add(  # noqa: WPS238
     tracker.add_contexts(
         PluginsTrackingContext([(candidate, None) for candidate in plugins])
     )
-    tracker.track_command_event(cli_tracking.STARTED)
+    tracker.track_command_event(CliEvent.inflight)
 
     success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
     if not success:
-        tracker.track_command_event(cli_tracking.FAILED)
+        tracker.track_command_event(CliEvent.failed)
         raise CliError("Failed to install plugin(s)")
 
     _print_plugins(plugins)
-    tracker.track_command_event(cli_tracking.COMPLETED)
+    tracker.track_command_event(CliEvent.completed)
 
 
 def _print_plugins(plugins):

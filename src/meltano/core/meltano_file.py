@@ -1,6 +1,8 @@
 """Module for working with meltano.yml files."""
+from __future__ import annotations
+
 import copy
-from typing import Dict, Iterable, List, Optional
+from typing import Iterable
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
@@ -18,40 +20,40 @@ class MeltanoFile(Canonical):
     def __init__(
         self,
         version: int = VERSION,
-        default_environment: Optional[str] = None,
-        plugins: Dict[str, dict] = None,
-        schedules: List[dict] = None,
-        environments: List[dict] = None,
-        jobs: List[dict] = None,
+        plugins: dict[str, dict] = None,
+        schedules: list[dict] = None,
+        environments: list[dict] = None,
+        jobs: list[dict] = None,
+        env: dict[str, str] = None,
         **extras,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
 
         Args:
             version: The meltano.yml version, currently always 1.
-            default_environment: The default environment to use for commands in this project.
             plugins: Plugin configuration for this project.
             schedules: Schedule configuration for this project.
             environments: Environment configuration for this project.
             jobs: Job configuration for this project.
+            env: Environment variables for this project.
             extras: Additional configuration for this project.
         """
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             version=version,
-            default_environment=default_environment,
             extras=extras,
             plugins=self.load_plugins(plugins or {}),
             schedules=self.load_schedules(schedules or []),
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
+            env=env or {},
         )
 
-    def load_plugins(self, plugins: Dict[str, dict]) -> Canonical:
-        """Parse the meltano.yml file and return it as `ProjectPlugin` instances.
+    def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
+        """Parse the `meltano.yml` file and return it as `ProjectPlugin` instances.
 
         Args:
-            plugins: Dict of plugin configurations.
+            plugins: Dictionary of plugin configurations.
 
         Returns:
             New ProjectPlugin instances.
@@ -64,7 +66,7 @@ class MeltanoFile(Canonical):
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         for plugin_type, raw_plugins in plugins.items():
-            if plugin_type == PluginType.MAPPERS:  # noqa: WPS441 - false positive
+            if plugin_type == PluginType.MAPPERS:
                 for mapper in raw_plugins:
                     plugin_type_plugins[PluginType.MAPPERS].append(
                         ProjectPlugin(PluginType.MAPPERS, **mapper)
@@ -79,7 +81,7 @@ class MeltanoFile(Canonical):
 
         return plugin_type_plugins
 
-    def load_schedules(self, schedules: List[dict]) -> List[Schedule]:
+    def load_schedules(self, schedules: list[dict]) -> list[Schedule]:
         """Parse the meltano.yml file and return it as Schedule instances.
 
         Args:
@@ -91,7 +93,7 @@ class MeltanoFile(Canonical):
         return list(map(Schedule.parse, schedules))
 
     @staticmethod
-    def load_environments(environments: Iterable[dict]) -> List[Environment]:
+    def load_environments(environments: Iterable[dict]) -> list[Environment]:
         """Parse `Environment` objects from python objects.
 
         Args:
@@ -103,7 +105,7 @@ class MeltanoFile(Canonical):
         return [Environment.parse(obj) for obj in environments]
 
     @staticmethod
-    def load_job_tasks(jobs: Iterable[dict]) -> List[TaskSets]:
+    def load_job_tasks(jobs: Iterable[dict]) -> list[TaskSets]:
         """Parse `TaskSets` objects from python objects.
 
         Args:
@@ -115,7 +117,7 @@ class MeltanoFile(Canonical):
         return [TaskSets.parse(obj) for obj in jobs]
 
     @staticmethod
-    def get_plugins_for_mappings(mapper_config: Dict) -> List[ProjectPlugin]:
+    def get_plugins_for_mappings(mapper_config: dict) -> list[ProjectPlugin]:
         """Mapper plugins are a special case. They are not a single plugin, but actually a list of plugins generated from the mapping config defined within the mapper config.
 
         Args:
@@ -124,7 +126,7 @@ class MeltanoFile(Canonical):
         Returns:
             A list of `ProjectPlugin` instances.
         """
-        mapping_plugins: List[ProjectPlugin] = []
+        mapping_plugins: list[ProjectPlugin] = []
         for mapping in mapper_config.get("mappings", []):
             raw_mapping_plugin = copy.deepcopy(mapper_config)
             raw_mapping_plugin["mapping"] = True

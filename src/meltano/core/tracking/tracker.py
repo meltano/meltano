@@ -14,16 +14,22 @@ from pathlib import Path
 from typing import Any, NamedTuple
 from urllib.parse import urlparse
 
+import structlog
 import tzlocal
 from cached_property import cached_property
 from psutil import Process
 from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
-from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking.project import ProjectContext
+from meltano.core.tracking import (
+    CliEvent,
+    ExceptionContext,
+    ProjectContext,
+    environment_context,
+)
+from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -32,15 +38,13 @@ from meltano.core.tracking.schemas import (
 )
 from meltano.core.utils import format_exception, hash_sha256
 
-from .environment import environment_context
-
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
 
 MICROSECONDS_PER_SECOND = 1000000
 
-logger = get_logger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BlockEvents(Enum):
@@ -75,25 +79,30 @@ class TelemetrySettings(NamedTuple):
     send_anonymous_usage_stats: bool | None
 
 
-# TODO: Can we store some of this info to make future invocations faster?
 class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     """Meltano tracker backed by Snowplow."""
 
     def __init__(
         self,
         project: Project,
-        request_timeout: float | tuple[float, float] | None = None,
+        request_timeout: float | tuple[float, float] | None = 3.5,
     ):
         """Initialize a tracker for the Meltano project.
 
         Args:
             project: The Meltano project.
-            request_timeout: Timeout for the HTTP requests. Can be set either as single float value which applies to both `connect` AND `read` timeout, or as tuple with two float values which specify the `connect` and `read` timeouts separately.
+            request_timeout: Timeout for the HTTP requests. Can be set either
+                as single float value which applies to both `connect` and
+                `read` timeout, or as tuple with two float values which specify
+                the `connect` and `read` timeouts separately.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
+        self.send_anonymous_usage_stats = self.settings_service.get(
+            "send_anonymous_usage_stats",
+            not self.settings_service.get("disable_tracking", False),
+        )
 
-        # TODO: do we want different endpoints when the release marker is not present?
         endpoints = self.settings_service.get("snowplow.collector_endpoints")
 
         emitters: list[Emitter] = []
@@ -115,7 +124,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             self.snowplow_tracker = SnowplowTracker(emitters=emitters)
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
-            atexit.register(self.track_exit_event)
+            self.setup_exit_event()
         else:
             self.snowplow_tracker = None
 
@@ -124,31 +133,26 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id: uuid.UUID = project_ctx.project_uuid
-        self.contexts: tuple[SelfDescribingJson] = (
+        self._contexts: tuple[SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
 
-        self.telemetry_state_change_check(stored_telemetry_settings)
+        if all(setting is None for setting in stored_telemetry_settings):
+            self.save_telemetry_settings()
+        else:
+            self.telemetry_state_change_check(stored_telemetry_settings)
 
-    @cached_property
-    def send_anonymous_usage_stats(self) -> bool:
-        """Return whether anonymous usages stats are enabled (bool).
-
-        - Return the value from 'send_anonymous_usage_stats', if set.
-        - Otherwise the opposite of 'tracking_disabled', if set.
-        - Otherwise return 'True'
+    @property
+    def contexts(self) -> tuple[SelfDescribingJson]:
+        """Get the contexts that will accompany events fired by this tracker.
 
         Returns:
-            True if anonymous usage stats are enabled.
+            The contexts that will accompany events fired by this tracker.
         """
-        if self.settings_service.get("send_anonymous_usage_stats", None) is not None:
-            return self.settings_service.get("send_anonymous_usage_stats")
-
-        if self.settings_service.get("tracking_disabled", None) is not None:
-            return not self.settings_service.get("tracking_disabled")
-
-        return True
+        # The `ExceptionContext` is re-created every time this is accessed because it details the
+        # exceptions that are being processed when it is created.
+        return (*self._contexts, ExceptionContext())
 
     def telemetry_state_change_check(
         self, stored_telemetry_settings: TelemetrySettings
@@ -158,18 +162,15 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Args:
             stored_telemetry_settings: the prior analytics settings
         """
-        # If `stored_telemetry_settings` is all `None`, then the settings have never been saved yet
-        save_settings = all(setting is None for setting in stored_telemetry_settings)
-
         if (
             stored_telemetry_settings.project_id is not None
             and stored_telemetry_settings.project_id != self.project_id
+            and self.send_anonymous_usage_stats
         ):
             # Project ID has changed
             self.track_telemetry_state_change_event(
                 "project_id", stored_telemetry_settings.project_id, self.project_id
             )
-            save_settings = True
 
         if (
             stored_telemetry_settings.send_anonymous_usage_stats is not None
@@ -182,10 +183,6 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 stored_telemetry_settings.send_anonymous_usage_stats,
                 self.send_anonymous_usage_stats,
             )
-            save_settings = True
-
-        if save_settings:
-            self.save_telemetry_settings()
 
     @cached_property
     def timezone_name(self) -> str:
@@ -216,7 +213,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Args:
             extra_contexts: The additional contexts to add to the `Tracker`.
         """
-        self.contexts = (*self.contexts, *extra_contexts)
+        self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
     def with_contexts(self, *extra_contexts) -> Tracker:
@@ -228,12 +225,12 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         Yields:
             A `Tracker` with additional Snowplow contexts.
         """
-        prev_contexts = self.contexts
-        self.contexts = (*prev_contexts, *extra_contexts)
+        prev_contexts = self._contexts
+        self._contexts = (*prev_contexts, *extra_contexts)
         try:
             yield self
         finally:
-            self.contexts = prev_contexts
+            self._contexts = prev_contexts
 
     def can_track(self) -> bool:
         """Check if the tracker can be used.
@@ -287,13 +284,15 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 err=format_exception(err),
             )
 
-    def track_command_event(self, event_json: dict[str, Any]) -> None:
+    def track_command_event(self, event: CliEvent) -> None:
         """Fire generic command tracking event.
 
         Args:
-            event_json: The event JSON to track. See cli_event schema for more details.
+            event: An member from `meltano.core.tracking.CliEvent`
         """
-        self.track_unstruct_event(SelfDescribingJson(CliEventSchema.url, event_json))
+        self.track_unstruct_event(
+            SelfDescribingJson(CliEventSchema.url, {"event": event.name})
+        )
 
     def track_telemetry_state_change_event(
         self,
@@ -308,6 +307,10 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             from_value: the old value
             to_value: the new value
         """
+        # Save the telemetry settings to ensure this is the only telemetry
+        # state change event fired for this particular setting change.
+        self.save_telemetry_settings()
+
         if self.snowplow_tracker is None:
             return  # The Snowplow tracker is not available (e.g. because no endpoints are set)
 
@@ -331,9 +334,14 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         try:
             self.snowplow_tracker.track_unstruct_event(
                 event_json,
-                # Provide no Snowplow contexts so as to avoid sending any extra information beyond
-                # the 'telemetry_state_change' event.
-                None,
+                # If tracking is disabled, then include only the minimal Snowplow contexts required
+                self.contexts
+                if self.send_anonymous_usage_stats
+                else tuple(
+                    ctx
+                    for ctx in self.contexts
+                    if isinstance(ctx, (EnvironmentContext, ProjectContext))
+                ),
             )
         except Exception as err:
             logger.debug(
@@ -359,7 +367,20 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         try:
             with open(self.analytics_json_path) as analytics_json_file:
                 analytics = json.load(analytics_json_file)
-        except FileNotFoundError:
+        except (OSError, json.JSONDecodeError):
+            return TelemetrySettings(None, None, None)
+
+        missing_keys = {
+            "client_id",
+            "project_id",
+            "send_anonymous_usage_stats",
+        } - set(analytics)
+
+        if missing_keys:
+            logger.debug(
+                "'analytics.json' has missing keys, and will be overwritten with new 'analytics.json'",
+                missing_keys=missing_keys,
+            )
             return TelemetrySettings(None, None, None)
         return TelemetrySettings(
             self._uuid_from_str(analytics.get("client_id"), warn=True),
@@ -368,16 +389,19 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
         )
 
     def save_telemetry_settings(self) -> None:
-        """Save settings to the 'analytics.json' file."""
-        with open(self.analytics_json_path, "w") as new_analytics_json_file:
-            json.dump(
-                {
-                    "client_id": str(self.client_id),
-                    "project_id": str(self.project_id),
-                    "send_anonymous_usage_stats": self.send_anonymous_usage_stats,
-                },
-                new_analytics_json_file,
-            )
+        """Attempt to save settings to the 'analytics.json' file."""
+        try:
+            with open(self.analytics_json_path, "w") as new_analytics_json_file:
+                json.dump(
+                    {
+                        "client_id": str(self.client_id),
+                        "project_id": str(self.project_id),
+                        "send_anonymous_usage_stats": self.send_anonymous_usage_stats,
+                    },
+                    new_analytics_json_file,
+                )
+        except OSError as err:
+            logger.debug("Unable to save 'analytics.json'", err=err)
 
     def _uuid_from_str(self, from_val: Any | None, warn: bool) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
@@ -402,7 +426,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
 
         try:
             return uuid.UUID(from_val)
-        except ValueError:
+        except (ValueError, TypeError):
             # Should only be reached if user manually edits 'analytics.json'.
             log_fn = logger.warning if warn else logger.debug
             log_fn(
@@ -425,9 +449,33 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             )
         )
 
+    def setup_exit_event(self):
+        """If not already done, register the atexit handler to fire the exit event.
+
+        This method also provides this tracker instance to the CLI module for
+        it to fire an exit event immediately before the CLI exits. The atexit
+        handler is used only as a fallback.
+        """
+        from meltano import cli
+
+        if cli.atexit_handler_registered:
+            return
+
+        cli.atexit_handler_registered = True
+
+        # Provide `meltano.cli` with this tracker to track the exit event with more context.
+        cli.exit_event_tracker = self
+
+        # As a fallback, use atexit to help ensure the exit event is sent.
+        atexit.register(self.track_exit_event)
+
     def track_exit_event(self):
         """Fire exit event."""
-        from meltano.cli import exit_code
+        from meltano import cli
+
+        if cli.exit_code_reported:
+            return
+        cli.exit_code_reported = True
 
         start_time = datetime.utcfromtimestamp(Process().create_time())
 
@@ -439,7 +487,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             SelfDescribingJson(
                 ExitEventSchema.url,
                 {
-                    "exit_code": exit_code,
+                    "exit_code": cli.exit_code,
                     "exit_timestamp": f"{now.isoformat()}Z",
                     "process_duration_microseconds": int(
                         (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND
@@ -447,3 +495,4 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
                 },
             )
         )
+        atexit.unregister(self.track_exit_event)

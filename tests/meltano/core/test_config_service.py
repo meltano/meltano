@@ -1,8 +1,6 @@
-import os
-import shutil
+from __future__ import annotations
 
 import pytest
-import yaml
 
 
 class TestConfigService:

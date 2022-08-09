@@ -1,5 +1,7 @@
 """Defines JobFinder (will be renamed to StateFinder)."""
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 from .job import HEARTBEAT_VALID_MINUTES, HEARTBEATLESS_JOB_VALID_HOURS, Job, State
@@ -27,7 +29,7 @@ class JobFinder:
         """
         return (
             session.query(Job)
-            .filter(Job.job_id == self.state_id)
+            .filter(Job.job_name == self.state_id)
             .order_by(Job.started_at.desc())
             .first()
         )
@@ -42,8 +44,8 @@ class JobFinder:
             All successful jobs for this instance's state ID
         """
         return session.query(Job).filter(
-            (Job.job_id == self.state_id)  # noqa: WPS465
-            & (Job.state == State.SUCCESS)
+            (Job.job_name == self.state_id)  # noqa: WPS465
+            & (Job.state == State.SUCCESS)  # noqa: WPS465
             & Job.ended_at.isnot(None)
         )
 
@@ -57,7 +59,8 @@ class JobFinder:
             All runnings states for state_id.
         """
         return session.query(Job).filter(
-            (Job.job_id == self.state_id) & (Job.state == State.RUNNING)  # noqa: WPS465
+            (Job.job_name == self.state_id)  # noqa: WPS465
+            & (Job.state == State.RUNNING)
         )
 
     def latest_success(self, session):
@@ -97,9 +100,9 @@ class JobFinder:
         query = (
             session.query(Job)
             .filter(
-                (Job.job_id == self.state_id)  # noqa: WPS465
-                & (Job.payload_flags != 0)
-                & (Job.payload_flags.op("&")(flags) == flags)
+                (Job.job_name == self.state_id)  # noqa: WPS465
+                & (Job.payload_flags != 0)  # noqa: WPS465
+                & (Job.payload_flags.op("&")(flags) == flags)  # noqa: WPS465
                 & Job.ended_at.isnot(None)
             )
             .order_by(Job.ended_at.asc())
@@ -165,7 +168,7 @@ class JobFinder:
         Returns:
             All stale states with instance's state ID
         """
-        return self.all_stale(session).filter(Job.job_id == self.state_id)
+        return self.all_stale(session).filter(Job.job_name == self.state_id)
 
     def get_all(self, session: object, since=None):
         """Return all state with the instance's state ID.
@@ -179,7 +182,7 @@ class JobFinder:
         """
         query = (
             session.query(Job)
-            .filter(Job.job_id == self.state_id)
+            .filter(Job.job_name == self.state_id)
             .order_by(Job.ended_at.asc())
         )
 

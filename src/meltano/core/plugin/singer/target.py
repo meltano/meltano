@@ -2,13 +2,13 @@
 
 This module contains the SingerTarget class as well as a supporting BookmarkWriter class.
 """
+from __future__ import annotations
+
 import json
 import logging
 from datetime import datetime
-from typing import List
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.db import project_engine
 from meltano.core.job import Job, Payload
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
@@ -76,9 +76,7 @@ class SingerTarget(SingerPlugin):
     ]
 
     def exec_args(self, plugin_invoker):
-        args = ["--config", plugin_invoker.files["config"]]
-
-        return args
+        return ["--config", plugin_invoker.files["config"]]
 
     @property
     def config_files(self):
@@ -90,7 +88,7 @@ class SingerTarget(SingerPlugin):
 
     @hook("before_invoke")
     async def setup_bookmark_writer_hook(
-        self, plugin_invoker: PluginInvoker, exec_args: List[str]
+        self, plugin_invoker: PluginInvoker, exec_args: list[str]
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 
@@ -113,8 +111,9 @@ class SingerTarget(SingerPlugin):
         output handler (the BookmarkWriter) to handle persisting state messages.
 
         Args:
-            plugin_invoker: The invocation handler who's add_out_handler method will be called to attach the bookmark writer
-            as an additional output handler.
+            plugin_invoker: The invocation handler whose `add_out_handler` method
+                will be called to attach the bookmark writer as an additional
+                output handler.
         """
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job or not elt_context.session:

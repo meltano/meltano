@@ -1,12 +1,37 @@
-import imp
+from __future__ import annotations
+
+import platform
+import sys
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+from types import ModuleType
 
 import pytest
-from asynctest import CoroutineMock, mock
+from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.superset import SupersetInvoker
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import asyncio
+
+
+def load_module_from_path(name: str, path: Path) -> ModuleType:
+    """Load a module given its name and filesystem path.
+
+    Replacement for the deprecated `imp.load_source`.
+
+    Args:
+        name: The name of the module as it would be in `sys.modules`.
+        path: The path of the `.py` file.
+
+    Returns:
+        The imported module.
+    """
+    spec = spec_from_file_location(name, path)
+    module = module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 class TestSuperset:
@@ -19,12 +44,16 @@ class TestSuperset:
     async def test_hooks(  # noqa:  WPS210
         self, subject, project, session, plugin_invoker_factory, monkeypatch
     ):
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+            )
         run_dir = project.run_dir("superset")
         config_path = run_dir.joinpath("superset_config.py")
 
         handle_mock = mock.Mock()
         handle_mock.name = subject.name
-        handle_mock.wait = CoroutineMock(return_value=0)
+        handle_mock.wait = AsyncMock(return_value=0)
         handle_mock.returncode = 0
 
         original_exec = asyncio.create_subprocess_exec
@@ -69,7 +98,8 @@ class TestSuperset:
                 assert config_path.exists()
                 assert project.plugin_dir(subject, "superset.db").exists()
 
-                config_module = imp.load_source("superset_config", str(config_path))
+                config_module = load_module_from_path("superset_config", config_path)
+
                 config_keys = dir(config_module)  # noqa: WPS421
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert (
@@ -94,7 +124,8 @@ class TestSuperset:
             async with invoker.prepared(session):
                 await invoker.invoke_async("--version")
 
-                config_module = imp.load_source("superset_config", str(config_path))
+                config_module = load_module_from_path("superset_config", config_path)
+
                 config_keys = dir(config_module)  # noqa: WPS421
                 # Verify default Meltano-managed settings are here
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys

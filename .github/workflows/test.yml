@@ -1,4 +1,4 @@
-name: Test
+name: Tests
 
 on:
   pull_request: {}
@@ -7,54 +7,131 @@ on:
   workflow_dispatch:
     inputs: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     strategy:
       matrix:
         include:
-        - { python-version: "3.7", os: "ubuntu-latest" }
-        - { python-version: "3.8", os: "ubuntu-latest" }
-        - { python-version: "3.9", os: "ubuntu-latest" }
+        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: sqlite }
+        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: postgresql }
+        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: mssql }
+        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: mssql }
+        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: mssql }
+        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: mssql }
+        # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
+        # Windows tests for Python 3.7 is temporarily disabled - see https://github.com/meltano/meltano/issues/6479
+        # - { python-version: "3.7",  os: "windows-2022",   backend-db: sqlite }
+        - { python-version: "3.8",  os: "windows-2022",   backend-db: sqlite }
+        - { python-version: "3.9",  os: "windows-2022",   backend-db: sqlite }
+        - { python-version: "3.10", os: "windows-2022",   backend-db: sqlite }
       fail-fast: false
 
-    name: Pytest on py${{ matrix.python-version }} (${{ matrix.os }})
+    name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
     env:
       PYTEST_MARKERS: not concurrent
+      FORCE_COLOR: 1
 
     steps:
     - name: Check out the repository
       uses: actions/checkout@v3.0.2
 
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4.2.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+        cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
+
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/constraints.txt
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
 
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4.0.0
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: x64
-        cache: 'poetry'
-
     - name: Upgrade pip
       env:
-        PIP_CONSTRAINT: .github/workflows/constraints.txt
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
         pip install pip
         pip --version
 
-    - name: Install Dependencies
+    - name: Configure Poetry
       run: |
         poetry env use "${{ matrix.python-version }}"
-        poetry install
+        poetry debug
+
+    - name: Start Postgres Container
+      if: always() && (matrix.backend-db == 'postgresql')
+      run: >
+        docker run -d
+        -p "5432:5432"
+        -e "POSTGRES_PASSWORD=postgres"
+        --name postgres
+        --health-cmd "pg_isready -d postgres -U postgres"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        postgres:11
+
+    - name: Start MSSQL Container
+      if: always() && (matrix.backend-db == 'mssql')
+      run: >
+        docker run -d
+        -p "1433:1433"
+        -e "SA_PASSWORD=Meltan0admin"
+        -e "ACCEPT_EULA=Y"
+        --name mssql
+        --health-cmd "/opt/mssql-tools/bin/sqlcmd -U sa -P Meltan0admin -Q 'select 1' -b -o /dev/null"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        mcr.microsoft.com/mssql/server:2019-latest
+
+    - name: Check running containers
+      run: |
+        docker ps -a
+
+    - name: Install Nox
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install nox
+        pipx inject nox nox-poetry
 
     - name: Run pytest
+      env:
+        PYTEST_BACKEND: ${{ matrix.backend-db }}
+
+        # Postgres backend
+        POSTGRES_HOST_AUTH_METHOD: trust
+        POSTGRES_ADDRESS: localhost
+        POSTGRES_PORT: 5432
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: pytest_warehouse
+
+        # MSSQL backend
+        MSSQL_ADDRESS: localhost
+        MSSQL_PORT: 1433
+        MSSQL_USER: sa
+        MSSQL_PASSWORD: Meltan0admin
+        MSSQL_DB: pytest_warehouse
+
       run: |
-        poetry run coverage run --parallel -m pytest -m "$PYTEST_MARKERS"
+        nox -rs tests --python=${{ matrix.python-version }} -- -m "${{ env.PYTEST_MARKERS }}"
 
     - name: Upload coverage data
       if: always() && (matrix.python-version == '3.9')
@@ -72,18 +149,18 @@ jobs:
 
     - name: Install Poetry
       run: |
-        pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+        pipx install --pip-args=--constraint=.github/workflows/resources/constraints.txt poetry
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v4.0.0
+      uses: actions/setup-python@v4.2.0
       with:
         python-version: '3.9'
         cache: 'poetry'
 
     - name: Upgrade pip
       run: |
-        pip install --constraint=.github/workflows/constraints.txt pip
+        pip install --constraint=.github/workflows/resources/constraints.txt pip
         pip --version
 
     - name: Download coverage data

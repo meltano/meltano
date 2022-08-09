@@ -1,4 +1,6 @@
 """Starts WSGI Webserver that will run the API App for a Meltano Project."""
+from __future__ import annotations
+
 import logging
 import platform
 import threading
@@ -44,7 +46,7 @@ class APIWorker(threading.Thread):
                         "Windows OS detected auto setting ff.enable_uvicorn"
                     )
                     logging.warning(
-                        "Add ff.start_uvicorn: True to your meltano.yml to supress this waring"
+                        "Add ff.enable_uvicorn: True to your meltano.yml to supress this waring"
                     )
                     enable_uvicorn = True
 

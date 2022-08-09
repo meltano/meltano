@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import warnings
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
@@ -76,6 +77,7 @@ class SettingsService(ABC):  # noqa: WPS214
     """Abstract base class for managing settings."""
 
     LOGGING = False
+    supports_environments = True
 
     def __init__(
         self,
@@ -97,6 +99,7 @@ class SettingsService(ABC):  # noqa: WPS214
         self.show_hidden = show_hidden
 
         self.env_override = env_override or {}
+
         self.config_override = config_override or {}
 
         self._setting_defs = None
@@ -109,7 +112,6 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             Label for the settings service.
         """
-        pass
 
     @property
     @abstractmethod
@@ -119,7 +121,6 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             URL for Meltano doc site.
         """
-        pass
 
     @property
     def env_prefixes(self) -> list[str]:
@@ -128,36 +129,26 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             prefixes for settings environment variables
         """
-        return []
+        return ["meltano"]
 
     @property
     @abstractmethod
     def db_namespace(self) -> str:
         """Return namespace for setting value records in system database."""
-        pass
 
     @property
     @abstractmethod
     def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings."""
-        pass
 
     @property
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
-        pass
 
     @property
     @abstractmethod
     def meltano_yml_config(self) -> dict:
         """Return current configuration in `meltano.yml`."""
-        pass
-
-    @property
-    @abstractmethod
-    def environment_config(self) -> dict:
-        """Return current configuration in `meltano.yml`."""
-        pass
 
     @abstractmethod
     def update_meltano_yml_config(self, config):
@@ -166,21 +157,10 @@ class SettingsService(ABC):  # noqa: WPS214
         Args:
             config: updated config
         """
-        pass
-
-    @abstractmethod
-    def update_meltano_environment_config(self, config: dict):
-        """Update environment configuration in `meltano.yml`.
-
-        Args:
-            config: updated config
-        """
-        pass
 
     @abstractmethod
     def process_config(self):
         """Process configuration dictionary to be used downstream."""
-        pass
 
     @property
     def flat_meltano_yml_config(self):
@@ -314,7 +294,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         return env
 
-    def get_with_metadata(  # noqa: WPS210
+    def get_with_metadata(  # noqa: WPS210, WPS615
         self,
         name: str,
         redacted=False,
@@ -382,12 +362,14 @@ class SettingsService(ABC):  # noqa: WPS214
                 value = expanded_value
 
         if setting_def:
-            if (
-                setting_def.kind == SettingKind.OBJECT
-                and metadata["source"] is SettingValueStore.DEFAULT
+            # Expand flattened config values if the root value is the default
+            # or inherited empty object.
+            if setting_def.kind == SettingKind.OBJECT and (
+                metadata["source"]
+                in {SettingValueStore.DEFAULT, SettingValueStore.INHERITED}
             ):
                 object_value = {}
-                object_source = SettingValueStore.DEFAULT
+                object_source = metadata["source"]
                 for setting_key in [  # noqa: WPS335
                     setting_def.name,
                     *setting_def.aliases,
@@ -424,7 +406,14 @@ class SettingsService(ABC):  # noqa: WPS214
                 metadata["redacted"] = True
                 value = REDACTED_VALUE
 
-        self.log(f"Got setting '{name}' with metadata: {metadata}")
+        self.log(f"Got setting {name!r} with metadata: {metadata}")
+
+        if setting_def is None and metadata["source"] is SettingValueStore.DEFAULT:
+            warnings.warn(
+                f"Unknown setting {name!r} - the default value `{value!r}` will be used",
+                RuntimeWarning,
+            )
+
         return value, metadata
 
     def get_with_source(self, *args, **kwargs):
@@ -453,7 +442,7 @@ class SettingsService(ABC):  # noqa: WPS214
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(
+    def set_with_metadata(  # noqa: WPS615
         self, path: list[str], value, store=SettingValueStore.AUTO, **kwargs
     ):
         """Set the value and metadata for a setting.
@@ -658,12 +647,16 @@ class SettingsService(ABC):  # noqa: WPS214
         Raises:
             FeatureNotAllowedException: if raise_error is True and feature flag is disallowed
         """
-        # experimental is a top-level setting
-        if feature == EXPERIMENTAL:
-            allowed = self.get(EXPERIMENTAL) or False
-        # other feature flags are nested under feature flag
-        else:
-            allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
+
+            # experimental is a top-level setting
+            if feature == EXPERIMENTAL:
+                allowed = self.get(EXPERIMENTAL) or False
+            # other feature flags are nested under feature flag
+            else:
+                allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
+
         try:
             yield allowed
         finally:

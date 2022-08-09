@@ -1,9 +1,10 @@
 """Project Upgrade CLI."""
 
+from __future__ import annotations
+
 import os
 
 import click
-from click_default_group import DefaultGroup
 
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
@@ -11,10 +12,11 @@ from meltano.core.upgrade_service import UpgradeService
 
 from . import cli
 from .params import pass_project
+from .utils import InstrumentedCmd, InstrumentedDefaultGroup
 
 
 @cli.group(
-    cls=DefaultGroup,
+    cls=InstrumentedDefaultGroup,
     default="all",
     default_if_no_args=True,
     short_help="Upgrade Meltano and your entire project to the latest version.",
@@ -38,8 +40,9 @@ def upgrade(ctx, project):
     ctx.obj["upgrade_service"] = upgrade_service
 
 
-@upgrade.command(
-    short_help="Upgrade Meltano and your entire project to the latest version."
+@upgrade.command(  # noqa: WPS125
+    cls=InstrumentedCmd,
+    short_help="Upgrade Meltano and your entire project to the latest version.",
 )
 @click.option(
     "--pip_url", type=str, envvar="MELTANO_UPGRADE_PIP_URL", help="Meltano pip URL."
@@ -58,7 +61,7 @@ def upgrade(ctx, project):
     help="Skip updating the Meltano package.",
 )
 @click.pass_context
-def all(ctx, pip_url, force, skip_package):  # noqa: WPS125
+def all(ctx, pip_url, force, skip_package):
     """
     Upgrade Meltano and your entire project to the latest version.
 
@@ -107,7 +110,7 @@ def all(ctx, pip_url, force, skip_package):  # noqa: WPS125
             )
 
 
-@upgrade.command(short_help="Upgrade the Meltano package only.")
+@upgrade.command(cls=InstrumentedCmd, short_help="Upgrade the Meltano package only.")
 @click.option(
     "--pip_url", type=str, envvar="MELTANO_UPGRADE_PIP_URL", help="Meltano pip URL."
 )
@@ -124,14 +127,18 @@ def package(ctx, **kwargs):
     ctx.obj["upgrade_service"].upgrade_package(**kwargs)
 
 
-@upgrade.command(short_help="Update files managed by file bundles only.")
+@upgrade.command(
+    cls=InstrumentedCmd, short_help="Update files managed by file bundles only."
+)
 @click.pass_context
 def files(ctx):
     """Update files managed by file bundles only."""
     ctx.obj["upgrade_service"].update_files()
 
 
-@upgrade.command(short_help="Apply migrations to system database only.")
+@upgrade.command(
+    cls=InstrumentedCmd, short_help="Apply migrations to system database only."
+)
 @click.pass_context
 def database(ctx):
     """Apply migrations to system database only."""

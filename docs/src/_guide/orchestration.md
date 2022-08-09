@@ -5,37 +5,22 @@ layout: doc
 weight: 6
 ---
 
-Most EL(T) pipelines aren't run just once, but over and over again, to make sure additions and changes in the source eventually make their way to the destination.
+Most data pipelines aren't run just once, but over and over again, to make sure additions and changes in the source eventually make their way to the destination.
 
 To help you realize this, Meltano supports scheduled pipelines that can be orchestrated using [Apache Airflow](https://airflow.apache.org/).
 
-When a new pipeline schedule is created using the [UI](/reference/ui) or [CLI](/reference/command-line-interface#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [CLI](/reference/command-line-interface#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 ## Create a Schedule
 
-### Specifying extractors and loaders
-
-To regularly schedule your ELT to run, use the ["Pipelines" interface in the UI](/reference/ui#pipelines), or the [`meltano schedule` command](/reference/command-line-interface#schedule):
-
-```bash
-meltano schedule add [SCHEDULE_NAME] --extractor [EXTRACTOR_NAME] --loader [TARGET_NAME] --interval [INTERVAL]
-```
-
-Example:
-
-```bash
-meltano schedule add carbon__sqlite --extractor tap-carbon-intensity --loader target-sqlite --interval="@daily"
-```
-
-Now that you've scheduled your first pipeline, you can load the "Pipeline" page in the UI and see it show up.
-
 ### Scheduling predefined jobs
 
-If you've defined a [job](/reference/command-line-interface#job) within your project, you can schedule it directly without having to manually pass its plugins to the `meltano schedule add` command:
+To regularly schedule your pipeline to run first define it as a [job](/reference/command-line-interface#job) within your project.
+Then you can schedule it using the [`meltano schedule add`](/reference/command-line-interface#schedule) command:
 
-```
+```bash
 # Define a job
-meltano job add tap-gitlab-to-target-postgres-with-dbt --tasks "[tap-gitlab target-postgres, dbt:run]"
+meltano job add tap-gitlab-to-target-postgres-with-dbt --tasks "tap-gitlab target-postgres dbt-postgres:run"
 
 # Schedule the job
 meltano schedule add daily-gitlab-load --job tap-gitlab-to-target-postgres-with-dbt --interval '@daily'
@@ -43,7 +28,7 @@ meltano schedule add daily-gitlab-load --job tap-gitlab-to-target-postgres-with-
 
 ## Installing Airflow
 
-While you can use Meltano's CLI or UI to define pipeline schedules,
+While you can use Meltano's CLI define pipeline schedules,
 actually executing them is the orchestrator's responsibility, so let's install Airflow:
 
 Change directories so that you are inside your Meltano project,
@@ -67,7 +52,7 @@ and invoke the `airflow` executable with the provided arguments.
 You can add the Meltano DAG generator to your project without also installing the Airflow orchestrator plugin by adding the [`airflow` file bundle](https://github.com/meltano/files-airflow/):
 
 ```bash
-meltano add files airflow
+meltano add files files-airflow
 ```
 
 Now, you'll want to copy the DAG generator in to your Airflow installation's `dags_folder`,
@@ -128,7 +113,7 @@ Start the Airflow UI: (will start in a separate browser)
 meltano invoke airflow webserver
 ```
 
-Start the Airflow scheduler, enabling job processing if you're not already running Meltano UI:
+Start the Airflow scheduler, enabling job processing:
 
 ```bash
 meltano invoke airflow scheduler

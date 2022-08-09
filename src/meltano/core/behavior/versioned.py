@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 
 class IncompatibleVersionError(Exception):
-    """Occurs when a component is incompatible with its representation"""
+    """Occurs when a component is incompatible with its representation."""
 
     def __init__(self, message, file_version: int, version: int):
         super().__init__(message)
@@ -12,7 +14,7 @@ class IncompatibleVersionError(Exception):
 
 
 class Versioned(ABC):
-    """Mixin to represent something that must be compatible with a certain version"""
+    """Mixin to represent something that must be compatible with a certain version."""
 
     @property
     @abstractmethod

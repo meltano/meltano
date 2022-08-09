@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import pytest
+
 from asserts import assert_cli_runner
 from meltano.cli import cli
 

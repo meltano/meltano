@@ -1,21 +1,20 @@
+from __future__ import annotations
+
 import logging
-from collections.abc import Iterable, Mapping
 from enum import Enum
 
 import humps
 from flask import current_app, json, request
+
 from meltano.core.utils import compose
 
 
 class KeyFrozenDict(dict):
-    pass
+    """Dict subclass that marks the dict as "frozen"."""
 
 
 def freeze_keys(d: dict):
-    """
-    Mark the dictionary as frozen, no automatic conversion
-    will be operated on it.
-    """
+    """Mark the dictionary as frozen - no automatic conversion will be operated on it."""
     if isinstance(d, KeyFrozenDict):
         return d
 
@@ -46,15 +45,11 @@ def key_convert(obj, converter):
         return converted
     elif isinstance(obj, list):
         return [key_convert(x, converter) for x in obj]
-    else:
-        return obj
+    return obj
 
 
 class JSONSchemeDecoder(json.JSONDecoder):
-    """
-    This JSONDecoder normalizes the returned `dict` to
-    use `snake` case naming scheme.
-    """
+    """This JSONDecoder normalizes the returned `dict` to use `snake` case naming scheme."""
 
     def __init__(self, *args, **kwargs):
         hooks = compose(kwargs.pop("object_hook", None), self.hook)
@@ -71,9 +66,7 @@ class JSONSchemeDecoder(json.JSONDecoder):
 
 
 class JSONSchemeEncoder(json.JSONEncoder):
-    """
-    This JSONEncoder supports the `X-JSON-SCHEME` header to
-    send the payload using requested naming scheme.
+    """This JSONEncoder supports the `X-JSON-SCHEME` header to send the payload using requested naming scheme.
 
     Available schemes are `camel` and `snake`.
     Defaults to `snake`.

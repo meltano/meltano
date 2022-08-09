@@ -1,9 +1,12 @@
 """Plugin glue code for Airflow."""
+from __future__ import annotations
+
 import configparser
 import logging
 import os
 import subprocess
-from distutils.version import StrictVersion
+
+from packaging.version import Version
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import AsyncSubprocessError
@@ -97,8 +100,8 @@ class Airflow(BasePlugin):
         """
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    @hook("before_configure")
-    async def before_configure(self, invoker: AirflowInvoker, session):  # noqa: WPS217
+    @hook("before_configure")  # noqa: WPS217
+    async def before_configure(self, invoker: AirflowInvoker, session):
         """Generate config file and keep metadata database up-to-date.
 
         Args:
@@ -146,9 +149,7 @@ class Airflow(BasePlugin):
 
         version = stdout.decode()
         init_db_cmd = (
-            ["initdb"]
-            if StrictVersion(version) < StrictVersion("2.0.0")
-            else ["db", "init"]
+            ["initdb"] if Version(version) < Version("2.0.0") else ["db", "init"]
         )
 
         handle = await invoker.invoke_async(

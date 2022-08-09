@@ -1,20 +1,33 @@
-from . import cli
-from .params import database_uri_option
+"""The Meltano REPL."""
+
+from __future__ import annotations
+
+import click
+
+from meltano.cli.cli import cli
+from meltano.cli.params import database_uri_option
+from meltano.cli.utils import InstrumentedCmd
 
 
-@cli.command(hidden=True)
+@cli.command(cls=InstrumentedCmd, hidden=True)
 @database_uri_option
-def repl():
-    # dynamic includes
-    import IPython
+@click.pass_context
+def repl(ctx: click.Context):
+    """Start the Meltano REPL."""
+    try:
+        import IPython
+    except ImportError as ex:
+        click.secho("The 'ipython' package must be installed to use the REPL", fg="red")
+        raise click.Abort from ex
+
     from traitlets.config import Config
 
     # First create a config object from the traitlets library
-    c = Config()
+    config = Config()
 
-    c.InteractiveShellApp.extensions = ["autoreload"]
-    c.InteractiveShellApp.exec_lines = [
-        'print("\\nBooting import Meltano REPL\\n")',
+    config.InteractiveShellApp.extensions = ["autoreload"]
+    config.InteractiveShellApp.exec_lines = [
+        r'print("\nBooting import Meltano REPL\n")',
         "from meltano.core.project import Project",
         "from meltano.core.project_settings_service import ProjectSettingsService",
         "from meltano.core.project_plugins_service import ProjectPluginsService",
@@ -24,11 +37,11 @@ def repl():
         "settings_service = ProjectSettingsService(project)",
         "_, Session = project_engine(project, default=True)",
         "session = Session()",
-        "%autoreload 2",
+        "%autoreload 2",  # noqa: WPS323
     ]
-    # c.InteractiveShell.colors = 'LightBG'
-    c.InteractiveShell.confirm_exit = False
-    c.TerminalIPythonApp.display_banner = True
+    # config.InteractiveShell.colors = 'LightBG'  # noqa: E800
+    config.InteractiveShell.confirm_exit = False
+    config.TerminalIPythonApp.display_banner = True
 
     # Now we start ipython with our configuration
-    IPython.start_ipython(argv=[], config=c)
+    IPython.start_ipython(argv=[], config=config)

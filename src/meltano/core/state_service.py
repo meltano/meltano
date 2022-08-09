@@ -4,10 +4,12 @@
 'payload' field. This is not to be confused with the Job's 'state' field,
 which refers to a given job run's status, e.g. 'RUNNING' or 'FAILED'.
 """
+from __future__ import annotations
+
 import datetime
 import json
 from collections import defaultdict
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 import structlog
 
@@ -35,7 +37,7 @@ class StateService:
         """
         self.session = session
 
-    def list_state(self, state_id_pattern: Optional[str] = None) -> Dict[str, Dict]:
+    def list_state(self, state_id_pattern: str | None = None) -> dict[str, dict]:
         """List all state found in the db.
 
         Args:
@@ -47,12 +49,12 @@ class StateService:
         states = defaultdict(dict)
         query = self.session.query(Job)
         if state_id_pattern:
-            query = query.filter(Job.job_id.like(state_id_pattern.replace("*", "%")))
-        for state_id in {job.job_id for job in query}:  # noqa: WPS335
+            query = query.filter(Job.job_name.like(state_id_pattern.replace("*", "%")))
+        for state_id in {job.job_name for job in query}:  # noqa: WPS335
             states[state_id] = self.get_state(state_id)
         return states
 
-    def _get_or_create_job(self, job: Union[Job, str]) -> Job:
+    def _get_or_create_job(self, job: Job | str) -> Job:
         """If Job is passed, return it. If state_id is passed, create new and return.
 
         Args:
@@ -66,13 +68,15 @@ class StateService:
         """
         if isinstance(job, str):
             now = datetime.datetime.utcnow()
-            return Job(job_id=job, state=State.STATE_EDIT, started_at=now, ended_at=now)
+            return Job(
+                job_name=job, state=State.STATE_EDIT, started_at=now, ended_at=now
+            )
         elif isinstance(job, Job):
             return job
         raise TypeError("job must be of type Job or of type str")
 
     @staticmethod
-    def validate_state(state: Dict[str, Any]):
+    def validate_state(state: dict[str, Any]):
         """Check that the given state str is valid.
 
         Args:
@@ -88,8 +92,8 @@ class StateService:
 
     def add_state(
         self,
-        job: Union[Job, str],
-        new_state: Optional[str],
+        job: Job | str,
+        new_state: str | None,
         payload_flags: Payload = Payload.STATE,
         validate=True,
     ):
@@ -109,10 +113,10 @@ class StateService:
         state_to_add_to.payload_flags = payload_flags
         state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to state {state_to_add_to.job_id} state payload {new_state_dict}"
+            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
 
-    def get_state(self, state_id: str) -> Dict:
+    def get_state(self, state_id: str) -> dict:
         """Get state for the given state_id.
 
         Args:
@@ -150,7 +154,7 @@ class StateService:
 
         return state
 
-    def set_state(self, state_id: str, new_state: Optional[str], validate: bool = True):
+    def set_state(self, state_id: str, new_state: str | None, validate: bool = True):
         """Set the state for the state_id.
 
         Args:
@@ -184,3 +188,26 @@ class StateService:
         src_state_dict = self.get_state(state_id_src)
         src_state = json.dumps(src_state_dict)
         self.add_state(state_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
+
+    def copy_state(self, state_id_src: str, state_id_dst: str):
+        """Copy state from Job state_id_src onto Job state_id_dst.
+
+        Args:
+            state_id_src: the state_id to get state from
+            state_id_dst: the state_id_to copy state onto
+        """
+        src_state_dict = self.get_state(state_id_src)
+        src_state = json.dumps(src_state_dict)
+        self.set_state(state_id_dst, src_state)
+
+    def move_state(self, state_id_src: str, state_id_dst: str):
+        """Move state from Job state_id_src to Job state_id_dst.
+
+        Args:
+            state_id_src: the state_id to get state from and clear
+            state_id_dst: the state_id_to move state onto
+        """
+        src_state_dict = self.get_state(state_id_src)
+        src_state = json.dumps(src_state_dict)
+        self.set_state(state_id_dst, src_state)
+        self.clear_state(state_id_src)

@@ -1,10 +1,11 @@
 """State management in CLI."""
+from __future__ import annotations
+
 import json
 import re
 from datetime import datetime as dt
 from functools import partial, reduce, wraps
 from operator import xor
-from typing import Optional
 
 import click
 import structlog
@@ -13,11 +14,11 @@ from meltano.cli.params import pass_project
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 from . import cli
+from .utils import InstrumentedCmd, InstrumentedGroup
 
 STATE_SERVICE_KEY = "state_service"
 
@@ -66,9 +67,7 @@ prompt_for_confirmation = partial(
 )
 
 
-def state_service_from_state_id(
-    project: Project, state_id: str
-) -> Optional[StateService]:
+def state_service_from_state_id(project: Project, state_id: str) -> StateService | None:
     """Instantiate by parsing a state_id."""
     state_id_re = re.compile(r"^(?P<env>.+)\:(?P<tap>.+)-to-(?P<target>.+)$")
     match = state_id_re.match(state_id)
@@ -97,7 +96,7 @@ def state_service_from_state_id(
     return None
 
 
-@cli.group(name="state", short_help="Manage Singer state.")
+@cli.group(cls=InstrumentedGroup, name="state", short_help="Manage Singer state.")
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_state(project: Project, ctx: click.Context):
@@ -108,23 +107,22 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session)
+    ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
 
 
-@meltano_state.command(name="list")
+@meltano_state.command(cls=InstrumentedCmd, name="list")
 @click.argument("pattern", required=False)
 @click.pass_context
 @pass_project()
 def list_state(
-    project: Project, ctx: click.Context, pattern: Optional[str]
+    project: Project, ctx: click.Context, pattern: str | None
 ):  # noqa: WPS125
     """List all state_ids for this project.
 
     Optionally pass a glob-style pattern to filter state_ids by.
     """
     state_service = ctx.obj[STATE_SERVICE_KEY]
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_state("list")
+    ctx.obj["legacy_tracker"].track_meltano_state("list")
     states = state_service.list_state(pattern)
     if states:
         for state_id, state in states.items():
@@ -141,7 +139,65 @@ def list_state(
         logger.info("No state IDs found.")
 
 
-@meltano_state.command(name="merge")
+@meltano_state.command(cls=InstrumentedCmd, name="copy")
+@prompt_for_confirmation(
+    prompt="This will overwrite state for the destination. Continue?"
+)
+@click.argument("src-state-id", type=str)
+@click.argument("dst-state-id", type=str)
+@pass_project(migrate=True)
+@click.pass_context
+def copy_state(
+    ctx: click.Context,
+    project: Project,
+    src_state_id: str,
+    dst_state_id: str,
+    force: bool,
+):
+    """Copy state to another job id."""
+    # Retrieve state for copying
+    state_service = (
+        state_service_from_state_id(project, src_state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    ctx.obj["legacy_tracker"].track_meltano_state("copy", dst_state_id)
+
+    state_service.copy_state(src_state_id, dst_state_id)
+
+    logger.info(
+        f"State for {dst_state_id} was successfully copied from {src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+    )
+
+
+@meltano_state.command(cls=InstrumentedCmd, name="move")
+@prompt_for_confirmation(
+    prompt="This will clear the source state and overwrite destination state. Continue?"
+)
+@click.argument("src-state-id", type=str)
+@click.argument("dst-state-id", type=str)
+@pass_project(migrate=True)
+@click.pass_context
+def move_state(
+    ctx: click.Context,
+    project: Project,
+    src_state_id: str,
+    dst_state_id: str,
+    force: bool,
+):
+    """Move state to another job id, clearing the original."""
+    # Retrieve state for moveing
+    state_service = (
+        state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    ctx.obj["legacy_tracker"].track_meltano_state("move", dst_state_id)
+
+    state_service.move_state(src_state_id, dst_state_id)
+
+    logger.info(
+        f"State for {src_state_id} was successfully moved to {dst_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+    )
+
+
+@meltano_state.command(cls=InstrumentedCmd, name="merge")
 @click.option(
     "--from-state-id",
     type=str,
@@ -160,16 +216,15 @@ def merge_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: Optional[str],
-    input_file: Optional[click.Path],
-    from_state_id: Optional[str],
+    state: str | None,
+    input_file: click.Path | None,
+    from_state_id: str | None,
 ):
     """Add bookmarks to existing state."""
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_state("merge", state_id)
+    ctx.obj["legacy_tracker"].track_meltano_state("merge", state_id)
     mutually_exclusive_options = ["--input-file", "STATE", "--from-state-id"]
     if not reduce(xor, map(bool, [state, input_file, from_state_id])):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
@@ -187,7 +242,7 @@ def merge_state(
     )
 
 
-@meltano_state.command(name="set")
+@meltano_state.command(cls=InstrumentedCmd, name="set")
 @prompt_for_confirmation(
     prompt="This will overwrite the state's current value. Continue?"
 )
@@ -204,16 +259,15 @@ def set_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: Optional[str],
-    input_file: Optional[click.Path],
+    state: str | None,
+    input_file: click.Path | None,
     force: bool,
 ):
     """Set state."""
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_state("set", state_id)
+    ctx.obj["legacy_tracker"].track_meltano_state("set", state_id)
     if not reduce(xor, map(bool, [state, input_file])):
         raise MutuallyExclusiveOptionsError("--input-file", "STATE")
     elif input_file:
@@ -226,7 +280,7 @@ def set_state(
     )
 
 
-@meltano_state.command(name="get")  # noqa: WPS46
+@meltano_state.command(cls=InstrumentedCmd, name="get")  # noqa: WPS46
 @click.argument("state-id")
 @pass_project(migrate=True)
 @click.pass_context
@@ -235,13 +289,12 @@ def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_state("get", state_id)
+    ctx.obj["legacy_tracker"].track_meltano_state("get", state_id)
     retrieved_state = state_service.get_state(state_id)
     click.echo(json.dumps(retrieved_state))
 
 
-@meltano_state.command(name="clear")
+@meltano_state.command(cls=InstrumentedCmd, name="clear")
 @prompt_for_confirmation(prompt="This will clear state for the job. Continue?")
 @click.argument("state-id")
 @pass_project(migrate=True)
@@ -251,6 +304,5 @@ def clear_state(ctx: click.Context, project: Project, state_id: str, force: bool
     state_service = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_state("clear", state_id)
+    ctx.obj["legacy_tracker"].track_meltano_state("clear", state_id)
     state_service.clear_state(state_id)

@@ -1,5 +1,8 @@
-"""Utilities for turning a string list of plugins into a usable list of BlockSet and PluginCommand objects."""
-from typing import Dict, Generator, List, Optional, Tuple, Union
+"""Utilities for turning a string list of plugins into a usable list of `BlockSet` and `PluginCommand` objects."""
+
+from __future__ import annotations
+
+from typing import Generator
 
 import click
 import structlog
@@ -33,7 +36,7 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
 
 
 def validate_block_sets(
-    log: structlog.BoundLogger, blocks: List[Union[BlockSet, PluginCommandBlock]]
+    log: structlog.BoundLogger, blocks: list[BlockSet | PluginCommandBlock]
 ) -> bool:
     """Perform validation of all blocks in a list that implement the BlockSet interface.
 
@@ -60,10 +63,10 @@ class BlockParser:  # noqa: D101
         self,
         log: structlog.BoundLogger,
         project,
-        blocks: List[str],
-        full_refresh: Optional[bool] = False,
-        no_state_update: Optional[bool] = False,
-        force: Optional[bool] = False,
+        blocks: list[str],
+        full_refresh: bool | None = False,
+        no_state_update: bool | None = False,
+        force: bool | None = False,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
@@ -87,10 +90,10 @@ class BlockParser:  # noqa: D101
         self._force = force
 
         self._plugins_service = ProjectPluginsService(project)
-        self._plugins: List[ProjectPlugin] = []
+        self._plugins: list[ProjectPlugin] = []
 
-        self._commands: Dict[int, str] = {}
-        self._mappings_ref: Dict[int, str] = {}
+        self._commands: dict[int, str] = {}
+        self._mappings_ref: dict[int, str] = {}
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
 
@@ -128,7 +131,7 @@ class BlockParser:  # noqa: D101
 
             self.log.debug("found plugin in cli invocation", plugin_name=plugin.name)
 
-    def _expand_jobs(self, blocks: List[str], task_sets: TaskSetsService) -> List[str]:
+    def _expand_jobs(self, blocks: list[str], task_sets: TaskSetsService) -> list[str]:
         """Expand any jobs present in a list of blocks into their raw block names.
 
         Example:
@@ -142,7 +145,7 @@ class BlockParser:  # noqa: D101
         Returns:
             List of block names with jobs expanded.
         """
-        expanded_blocks: List[str] = []
+        expanded_blocks: list[str] = []
         for name in blocks:
             if task_sets.exists(name):
                 self.log.debug(
@@ -157,7 +160,7 @@ class BlockParser:  # noqa: D101
 
     def find_blocks(
         self, offset: int = 0
-    ) -> Generator[Union[BlockSet, PluginCommandBlock], None, None]:
+    ) -> Generator[BlockSet | PluginCommandBlock, None, None]:
         """
         Find all blocks in the invocation.
 
@@ -195,7 +198,7 @@ class BlockParser:  # noqa: D101
                     f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{plugin.name}'"  # noqa: WPS237
                 )
 
-    def _find_plugin_or_mapping(self, name: str) -> Optional[ProjectPlugin]:
+    def _find_plugin_or_mapping(self, name: str) -> ProjectPlugin | None:
         """Find a plugin by name OR by mapping name.
 
         Args:
@@ -230,7 +233,7 @@ class BlockParser:  # noqa: D101
     def _find_next_elb_set(  # noqa: WPS231, WPS213
         self,
         offset: int = 0,
-    ) -> Tuple[Optional[ExtractLoadBlocks], int]:  # noqa: WPS231, WPS213
+    ) -> tuple[ExtractLoadBlocks | None, int]:  # noqa: WPS231, WPS213
         """
         Search a list of project plugins trying to find an extract ExtractLoad block set.
 
@@ -244,7 +247,7 @@ class BlockParser:  # noqa: D101
         Raises:
             BlockSetValidationError: If the block set is not valid.
         """
-        blocks: List[SingerBlock] = []
+        blocks: list[SingerBlock] = []
 
         base_builder = ELBContextBuilder(
             self.project, self._plugins_service
@@ -290,11 +293,25 @@ class BlockParser:  # noqa: D101
                     mapping=self._mappings_ref.get(next_block),
                     idx=next_block,
                 )
-                blocks.append(
-                    builder.make_block(
-                        plugin,
+                # Checks to see if the mapper plugin name is the same as the mappings name
+                # If they both match then a validation error is raised because the
+                # meltano run command needs the mappings name to obtain the settings to
+                # pass to the parent mapper plugin.  We also want to fail if the user names them
+                # the same to stop errors due to ambiguous commands.
+                if plugin.name == self._mappings_ref.get(next_block):
+                    self.log.warning(
+                        "Found unexpected mapper plugin name. ",
+                        plugin_name=plugin.name,
                     )
-                )
+                    raise BlockSetValidationError(
+                        f"Expected unique mappings name not the mapper plugin name: {plugin.name}."
+                    )
+                else:
+                    blocks.append(
+                        builder.make_block(
+                            plugin,
+                        )
+                    )
             elif plugin.type == PluginType.LOADERS:
                 self.log.debug("blocks", offset=offset, idx=next_block)
                 blocks.append(builder.make_block(plugin))

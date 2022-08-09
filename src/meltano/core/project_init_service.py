@@ -1,11 +1,12 @@
 """New Project Initialization Service."""
+from __future__ import annotations
+
 import os
 
 import click
 
 from .cli_messages import GREETING
 from .db import project_engine
-from .migration_service import MigrationError, MigrationService
 from .plugin.meltano_file import MeltanoFilePlugin
 from .project import Project
 from .project_settings_service import ProjectSettingsService, SettingValueStore
@@ -49,9 +50,10 @@ class ProjectInitService:
         click.echo(f" {self.project_name}")
 
         self.project = Project(self.project_name)
-        self.settings_service = ProjectSettingsService(self.project)
 
         self.create_files(add_discovery=add_discovery)
+
+        self.settings_service = ProjectSettingsService(self.project)
         self.set_send_anonymous_usage_stats()
         if activate:
             Project.activate(self.project)
@@ -104,6 +106,8 @@ class ProjectInitService:
         # register the system database connection
         engine, _ = project_engine(self.project, default=True)
 
+        from meltano.core.migration_service import MigrationError, MigrationService
+
         try:
             migration_service = MigrationService(engine)
             migration_service.upgrade(silent=True)
@@ -136,7 +140,11 @@ class ProjectInitService:
         click.secho("  cd ", nl=False)
         click.secho(self.project_name, fg="magenta")
         click.echo("  Visit ", nl=False)
-        click.secho("https://docs.meltano.com/getting-started#create-your-meltano-project", fg="cyan", nl=False)
+        click.secho(
+            "https://docs.meltano.com/getting-started#create-your-meltano-project",
+            fg="cyan",
+            nl=False,
+        )
         click.echo(" to learn where to go from here")
 
     def join_with_project_base(self, filename):
