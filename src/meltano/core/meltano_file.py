@@ -20,7 +20,6 @@ class MeltanoFile(Canonical):
     def __init__(
         self,
         version: int = VERSION,
-        default_environment: str | None = None,
         plugins: dict[str, dict] = None,
         schedules: list[dict] = None,
         environments: list[dict] = None,
@@ -32,7 +31,6 @@ class MeltanoFile(Canonical):
 
         Args:
             version: The meltano.yml version, currently always 1.
-            default_environment: The default environment to use for commands in this project.
             plugins: Plugin configuration for this project.
             schedules: Schedule configuration for this project.
             environments: Environment configuration for this project.
@@ -43,7 +41,6 @@ class MeltanoFile(Canonical):
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             version=version,
-            default_environment=default_environment,
             extras=extras,
             plugins=self.load_plugins(plugins or {}),
             schedules=self.load_schedules(schedules or []),
