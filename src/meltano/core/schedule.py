@@ -23,14 +23,14 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
 
     def __init__(
         self,
-        name: str = None,
-        extractor: str = None,
-        loader: str = None,
-        transform: str = None,
-        interval: str = None,
-        start_date: datetime = None,
-        job: str = None,
-        env: dict = None,
+        name: str | None = None,
+        extractor: str | None = None,
+        loader: str | None = None,
+        transform: str | None = None,
+        interval: str | None = None,
+        start_date: datetime.datetime | None = None,
+        job: str | None = None,
+        env: dict | None = None,
     ):
         """Initialize a Schedule.
 

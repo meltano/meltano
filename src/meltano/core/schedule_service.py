@@ -6,6 +6,8 @@ import logging
 import subprocess
 from datetime import date, datetime
 
+from croniter import croniter
+
 from meltano.core.setting_definition import SettingMissingError
 
 from .meltano_invoker import MeltanoInvoker
@@ -54,6 +56,18 @@ class ScheduleNotFoundError(Exception):
             namespace: The namespace that had no associated schedules.
         """
         self.namespace = namespace
+
+
+class BadCronError(Exception):
+    """Occurs when a cron expression is invalid."""
+
+    def __init__(self, cron: str):
+        """Initialize the exception.
+
+        Args:
+            cron: The cron expression that is invalid.
+        """
+        self.cron = cron
 
 
 class ScheduleService:
@@ -174,8 +188,12 @@ class ScheduleService:
             The added schedule.
 
         Raises:
+            BadCronError: If the cron expression is invalid.
             ScheduleAlreadyExistsError: If a schedule with the same name already exists.
         """
+        if schedule.interval is not None and not croniter.is_valid(schedule.interval):
+            raise BadCronError(schedule.interval)
+
         with self.project.meltano_update() as meltano:
             # guard if it already exists
             if schedule in meltano.schedules:
