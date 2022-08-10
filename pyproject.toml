@@ -123,6 +123,7 @@ concurrency = [
 ]
 parallel = true
 branch = true
+source = ["meltano"]
 
 [tool.coverage.paths]
 source = [
