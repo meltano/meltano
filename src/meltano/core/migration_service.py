@@ -110,6 +110,9 @@ class MigrationService:
                 fg="yellow",
                 err=True,
             )
+            raise MigrationError(
+                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)"
+            ) from err
         finally:
             conn.close()
 
