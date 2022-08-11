@@ -73,7 +73,7 @@ class pass_project:  # noqa: N801
                     migration_service.upgrade(silent=True)
                     migration_service.seed(project)
                 except MigrationError as err:
-                    raise CliError from err
+                    raise CliError(str(err))
 
             func(project, *args, **kwargs)
 
