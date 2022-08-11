@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
-from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -450,7 +450,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
         job = self.context.job
-        StaleJobFailer(job.job_name).fail_stale_jobs(self.context.session)
+        fail_stale_jobs(self.context.session, job.job_name)
         if not self.context.force:
             existing = JobFinder(job.job_name).latest_running(self.context.session)
             if existing:
