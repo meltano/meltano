@@ -1,14 +1,16 @@
 """Schedule management CLI."""
+
 from __future__ import annotations
 
 import json
 import sys
+from contextlib import closing
+from typing import Any, Iterable
 
 import click
 from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
-from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
@@ -22,18 +24,21 @@ from .utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
 
 
 @cli.group(
-    cls=InstrumentedDefaultGroup, default="add", short_help="Manage pipeline schedules."
+    cls=InstrumentedDefaultGroup,
+    default="add",
+    name="schedule",
+    short_help="Manage pipeline schedules.",
 )
 @click.pass_context
 @pass_project(migrate=True)
-def schedule(project, ctx):
+def schedule_cli(project, ctx):
     """
     Manage pipeline schedules.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
     ctx.obj["project"] = project
-    ctx.obj["schedule_service"] = ScheduleService(project)
+    ctx.obj["schedule_service"] = ScheduleService(project)  # noqa: WPS204
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
 
@@ -87,7 +92,7 @@ def _add_job(ctx, name: str, job: str, interval: str):
         session.close()
 
 
-@schedule.command(
+@schedule_cli.command(
     cls=PartialInstrumentedCmd, short_help="[default] Add a new schedule."
 )
 @click.argument("name")
@@ -135,7 +140,7 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
     _add_job(ctx, name, job, interval)
 
 
-def _format_job_list_output(entry: Schedule, job: TaskSets) -> dict:
+def _format_json_job(entry: Schedule, job: TaskSets) -> dict[str, Any]:
     return {
         "name": entry.name,
         "interval": entry.interval,
@@ -148,7 +153,7 @@ def _format_job_list_output(entry: Schedule, job: TaskSets) -> dict:
     }
 
 
-def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
+def _format_json_elt(entry: Schedule, session: Session) -> dict[str, Any]:
     start_date = coerce_datetime(entry.start_date)
     if start_date:
         start_date = start_date.date().isoformat()
@@ -172,68 +177,94 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     }
 
 
-@schedule.command(  # noqa: WPS125
-    cls=PartialInstrumentedCmd, short_help="List available schedules."
-)
-@click.option("--format", type=click.Choice(("json", "text")), default="text")
-@click.pass_context
-def list(ctx, format):  # noqa: WPS125
-    """List available schedules."""
-    project = ctx.obj["project"]
-    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+def _format_json_schedules(ctx: click.Context) -> Iterable[str]:
+    schedules = {"job": [], "elt": []}
+
+    for schedule in ctx.obj["schedule_service"].schedules():
+        schedules["job" if schedule.job else "elt"].append(schedule)
+
+    formatted_schedules = {
+        "job": [
+            _format_json_job(schedule, ctx.obj["task_sets_service"].get(schedule.job))
+            for schedule in schedules["job"]
+        ],
+        "elt": [],
+    }
+
+    # Only open a DB session if necessary.
+    if schedules["elt"]:
+        _, session_maker = project_engine(ctx.obj["project"])
+        with closing(session_maker()) as session:
+            for schedule in schedules["elt"]:
+                formatted_schedules["elt"].append(_format_json_elt(schedule, session))
+
+    # For consistency with the other `list_*_schedule` functions, we yield the
+    # JSON line-by-line:
+    yield from json.dumps({"schedules": formatted_schedules}, indent=2).split("\n")
+
+
+def _format_cron_schedules(ctx: click.Context) -> Iterable[str]:
+    project_dir = ctx.obj["project"].root.resolve()
+    for schedule in ctx.obj["schedule_service"].schedules():
+        interval = schedule.cron_interval if schedule.job else schedule.interval
+        args = schedule.job if schedule.job else " ".join(schedule.elt_args)
+        cmd = "run" if schedule.job else "elt"
+        env_str = " ".join(f"{key}='{value}'" for key, value in schedule.env.items())
+        yield (
+            f"{interval} (cd {project_dir} && {env_str} meltano {cmd} {args}) 2>&1 | logger -t meltano"
+        )
+
+
+def _format_text_schedules(ctx: click.Context) -> Iterable[str]:
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
-
-    _, sessionMaker = project_engine(project)  # noqa: N806
-    session = sessionMaker()
-    try:
-        fail_stale_jobs(session)
-
-        if format == "text":
-            transform_elt_markers = {
-                "run": ("→", "→"),
-                "only": ("×", "→"),
-                "skip": ("→", "x"),
-            }
-
-            for txt_schedule in schedule_service.schedules():
-                if txt_schedule.job:
-                    click.echo(
-                        f"[{txt_schedule.interval}] job {txt_schedule.name}: {txt_schedule.job} → {task_sets_service.get(txt_schedule.job).tasks}"
-                    )
-                else:
-                    markers = transform_elt_markers[txt_schedule.transform]
-                    click.echo(
-                        f"[{txt_schedule.interval}] elt {txt_schedule.name}: {txt_schedule.extractor} {markers[0]} {txt_schedule.loader} {markers[1]} transforms"
-                    )
-
-        elif format == "json":
-            job_schedules = []
-            elt_schedules = []
-            for json_schedule in schedule_service.schedules():
-                if json_schedule.job:
-                    job_schedules.append(
-                        _format_job_list_output(
-                            json_schedule, task_sets_service.get(json_schedule.job)
-                        )
-                    )
-                else:
-                    elt_schedules.append(
-                        _format_elt_list_output(json_schedule, session)
-                    )
-            click.echo(
-                json.dumps(
-                    {"schedules": {"job": job_schedules, "elt": elt_schedules}},
-                    indent=2,
-                )
+    transform_elt_markers = {
+        "run": "→→",
+        "only": "×→",
+        "skip": "→x",
+    }
+    for schedule in ctx.obj["schedule_service"].schedules():
+        if schedule.job:
+            yield (
+                f"[{schedule.interval}] job {schedule.name}: "
+                f"{schedule.job} → {task_sets_service.get(schedule.job).tasks}"
             )
-    finally:
-        session.close()
+        else:
+            el_marker, t_marker = transform_elt_markers[schedule.transform]
+            yield (
+                f"[{schedule.interval}] elt {schedule.name}: "
+                f"{schedule.extractor} {el_marker} {schedule.loader} {t_marker} transforms"
+            )
+
+
+@schedule_cli.command(
+    cls=PartialInstrumentedCmd,
+    name="list",
+    short_help="List available schedules.",
+)
+@click.option(
+    "--format",
+    "schedule_format",
+    type=click.Choice(("text", "json", "cron")),
+    default="text",
+)
+@click.pass_context
+def list_command(ctx: click.Context, schedule_format: str) -> None:
+    """List available schedules."""
+    click.echo(
+        "\n".join(
+            {
+                "text": _format_text_schedules,
+                "json": _format_json_schedules,
+                "cron": _format_cron_schedules,
+            }[schedule_format](ctx)
+        )
+    )
 
     legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
     legacy_tracker.track_meltano_schedule("list")
 
 
-@schedule.command(
+@schedule_cli.command(
     cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Run a schedule.",
@@ -256,7 +287,7 @@ def run(ctx, name, elt_options):
         sys.exit(exitcode)
 
 
-@schedule.command(
+@schedule_cli.command(
     cls=PartialInstrumentedCmd, name="remove", short_help="Remove a schedule."
 )
 @click.argument("name", required=True)
@@ -341,7 +372,7 @@ def _update_elt_schedule(
     return candidate
 
 
-@schedule.command(
+@schedule_cli.command(
     cls=PartialInstrumentedCmd, name="set", short_help="Update a schedule."
 )
 @click.argument("name", required=True)
