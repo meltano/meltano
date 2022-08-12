@@ -12,19 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare_summary:
-    name: Prepare workflow summary
-    runs-on: ubuntu-latest
-    steps:
-      - name: Write summary header
-        run: |
-          echo '## Test results' >> ${GITHUB_STEP_SUMMARY}
-          echo '' >> ${GITHUB_STEP_SUMMARY}
-          echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
-          echo '' >> ${GITHUB_STEP_SUMMARY}
-          echo '| PYTHON | OS     | DB     | PASSED | FAILED | XPASSED | XFAILED | SKIPPED | DESELECTED | WARNINGS | ERRORS | DURATION |' >> ${GITHUB_STEP_SUMMARY}
-          echo '|--------|--------|--------|--------|--------|---------|---------|---------|------------|----------|--------|----------|' >> ${GITHUB_STEP_SUMMARY}
-
   tests:
     strategy:
       matrix:
@@ -195,6 +182,34 @@ jobs:
       with:
         name: coverage-data
         path: ".coverage.*"
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+    - name: Summarize workflow
+      run: |
+        echo '## Test results' >> ${GITHUB_STEP_SUMMARY}
+        echo '' >> ${GITHUB_STEP_SUMMARY}
+        echo '| PYTHON | OS     | DB     | PASSED | FAILED | XPASSED | XFAILED | SKIPPED | DESELECTED | WARNINGS | ERRORS | DURATION |' >> ${GITHUB_STEP_SUMMARY}
+        echo '|--------|--------|--------|--------|--------|---------|---------|---------|------------|----------|--------|----------|' >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-01 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-02 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-03 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-04 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-05 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-06 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-07 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-08 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-09 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-11 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-12 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-14 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-15 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-16 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo '' >> ${GITHUB_STEP_SUMMARY}
+        echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
 
   coverage:
     runs-on: ubuntu-latest
