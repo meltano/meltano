@@ -32,7 +32,10 @@
     "vuepress-plugin-container": "^2.1.4"
   },
   "dependencies": {
+    "@docsearch/css": "^3.2.0",
+    "@docsearch/js": "^3.2.0",
     "bulma": "^0.9.3",
-    "bulma-timeline": "^3.0.4"
+    "bulma-timeline": "^3.0.4",
+    "webpack": "^4.46.0"
   }
 }
