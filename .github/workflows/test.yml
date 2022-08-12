@@ -143,6 +143,7 @@ jobs:
         MSSQL_PASSWORD: Meltan0admin
         MSSQL_DB: pytest_warehouse
 
+      shell: bash
       run: |
         export COLUMNS=160
         nox -rs tests --python=${{ matrix.python-version }} -- -m "${{ env.PYTEST_MARKERS }}" 2>&1 | \
@@ -158,6 +159,7 @@ jobs:
         echo "${{ env.pytest_results }}"
 
     - name: Append row to workflow summary table
+      shell: bash
       run: |
         pytest_results_count () { pattern="([0-9]+) $1" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
         echo "| \
