@@ -8,6 +8,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
+from ..core.tracking.tracker import Tracker
 from . import cli
 from .params import pass_project
 from .utils import CliError, PartialInstrumentedCmd, install_plugins
@@ -45,8 +46,7 @@ def install(
 
     \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#install
     """
-    tracker = ctx.obj["tracker"]
-    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     plugins_service = ProjectPluginsService(project)
 
@@ -69,9 +69,6 @@ def install(
     tracker.track_command_event(CliEvent.inflight)
 
     success = install_plugins(project, plugins, parallelism=parallelism, clean=clean)
-
-    legacy_tracker.track_meltano_install()
-
     if not success:
         tracker.track_command_event(CliEvent.failed)
         raise CliError("Failed to install plugin(s)")

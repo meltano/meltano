@@ -116,8 +116,7 @@ async def elt(
             "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
         )
 
-    tracker = ctx.obj["tracker"]
-    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
     # if transform is None we still need manually default to skip after firing the tracking event above.
@@ -160,9 +159,6 @@ async def elt(
         session.close()
 
     tracker.track_command_event(CliEvent.completed)
-    legacy_tracker.track_meltano_elt(
-        extractor=extractor, loader=loader, transform=transform
-    )
 
 
 def _elt_context_builder(
