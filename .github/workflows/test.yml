@@ -50,7 +50,7 @@ jobs:
       pytest-results-row-10: ${{ steps.append-results.outputs.pytest-results-row-10 }}
       pytest-results-row-11: ${{ steps.append-results.outputs.pytest-results-row-11 }}
       pytest-results-row-12: ${{ steps.append-results.outputs.pytest-results-row-12 }}
-      pytest-results-row-13: ${{ steps.append-results.outputs.pytest-results-row-13 }}
+      # pytest-results-row-13: ${{ steps.append-results.outputs.pytest-results-row-13 }}
       pytest-results-row-14: ${{ steps.append-results.outputs.pytest-results-row-14 }}
       pytest-results-row-15: ${{ steps.append-results.outputs.pytest-results-row-15 }}
       pytest-results-row-16: ${{ steps.append-results.outputs.pytest-results-row-16 }}
@@ -204,7 +204,7 @@ jobs:
         echo "${{ needs.tests.outputs.pytest-results-row-09 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-11 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-12 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
+        # echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-14 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-15 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-16 }}" >> ${GITHUB_STEP_SUMMARY}
