@@ -38,22 +38,22 @@ jobs:
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
     outputs:
-      pytest-results-row-01: ${{ steps.pytest.outputs.pytest-results-row-01 }}
-      pytest-results-row-02: ${{ steps.pytest.outputs.pytest-results-row-02 }}
-      pytest-results-row-03: ${{ steps.pytest.outputs.pytest-results-row-03 }}
-      pytest-results-row-04: ${{ steps.pytest.outputs.pytest-results-row-04 }}
-      pytest-results-row-05: ${{ steps.pytest.outputs.pytest-results-row-05 }}
-      pytest-results-row-06: ${{ steps.pytest.outputs.pytest-results-row-06 }}
-      pytest-results-row-07: ${{ steps.pytest.outputs.pytest-results-row-07 }}
-      pytest-results-row-08: ${{ steps.pytest.outputs.pytest-results-row-08 }}
-      pytest-results-row-09: ${{ steps.pytest.outputs.pytest-results-row-09 }}
-      pytest-results-row-10: ${{ steps.pytest.outputs.pytest-results-row-10 }}
-      pytest-results-row-11: ${{ steps.pytest.outputs.pytest-results-row-11 }}
-      pytest-results-row-12: ${{ steps.pytest.outputs.pytest-results-row-12 }}
-      pytest-results-row-13: ${{ steps.pytest.outputs.pytest-results-row-13 }}
-      pytest-results-row-14: ${{ steps.pytest.outputs.pytest-results-row-14 }}
-      pytest-results-row-15: ${{ steps.pytest.outputs.pytest-results-row-15 }}
-      pytest-results-row-16: ${{ steps.pytest.outputs.pytest-results-row-16 }}
+      pytest-results-row-01: ${{ steps.append-results.outputs.pytest-results-row-01 }}
+      pytest-results-row-02: ${{ steps.append-results.outputs.pytest-results-row-02 }}
+      pytest-results-row-03: ${{ steps.append-results.outputs.pytest-results-row-03 }}
+      pytest-results-row-04: ${{ steps.append-results.outputs.pytest-results-row-04 }}
+      pytest-results-row-05: ${{ steps.append-results.outputs.pytest-results-row-05 }}
+      pytest-results-row-06: ${{ steps.append-results.outputs.pytest-results-row-06 }}
+      pytest-results-row-07: ${{ steps.append-results.outputs.pytest-results-row-07 }}
+      pytest-results-row-08: ${{ steps.append-results.outputs.pytest-results-row-08 }}
+      pytest-results-row-09: ${{ steps.append-results.outputs.pytest-results-row-09 }}
+      pytest-results-row-10: ${{ steps.append-results.outputs.pytest-results-row-10 }}
+      pytest-results-row-11: ${{ steps.append-results.outputs.pytest-results-row-11 }}
+      pytest-results-row-12: ${{ steps.append-results.outputs.pytest-results-row-12 }}
+      pytest-results-row-13: ${{ steps.append-results.outputs.pytest-results-row-13 }}
+      pytest-results-row-14: ${{ steps.append-results.outputs.pytest-results-row-14 }}
+      pytest-results-row-15: ${{ steps.append-results.outputs.pytest-results-row-15 }}
+      pytest-results-row-16: ${{ steps.append-results.outputs.pytest-results-row-16 }}
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
@@ -131,7 +131,6 @@ jobs:
         pipx inject nox nox-poetry
 
     - name: Run pytest
-      id: pytest
       env:
         PYTEST_BACKEND: ${{ matrix.backend-db }}
 
@@ -159,6 +158,7 @@ jobs:
             { read pytest_results; echo "pytest_results='${pytest_results}'" >> ${GITHUB_ENV}; } )
 
     - name: Append row to workflow summary table
+      id: append-results
       shell: bash
       run: |
         pytest_results_count () { pattern="([0-9]+) $1" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
