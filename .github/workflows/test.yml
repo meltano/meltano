@@ -12,6 +12,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare_summary:
+    name: Prepare workflow summary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write summary header
+        run: |
+          echo '## Test results' >> ${GITHUB_STEP_SUMMARY}
+          echo '' >> ${GITHUB_STEP_SUMMARY}
+          echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted. >> ${GITHUB_STEP_SUMMARY}
+          echo '' >> ${GITHUB_STEP_SUMMARY}
+          echo '| PYTHON | OS     | DB     | PASSED | FAILED | XPASSED | XFAILED | SKIPPED | DESELECTED | WARNINGS | ERRORS | DURATION |' >> ${GITHUB_STEP_SUMMARY}
+          echo '|--------|--------|--------|--------|--------|---------|---------|---------|------------|----------|--------|----------|' >> ${GITHUB_STEP_SUMMARY}
+
   tests:
     strategy:
       matrix:
@@ -131,7 +144,40 @@ jobs:
         MSSQL_DB: pytest_warehouse
 
       run: |
-        nox -rs tests --python=${{ matrix.python-version }} -- -m "${{ env.PYTEST_MARKERS }}"
+        export COLUMNS=160
+        nox -rs tests --python=${{ matrix.python-version }} -- -m "${{ env.PYTEST_MARKERS }}" 2>&1 | \
+          tee >( \
+            tail | sed -r "s/[[:cntrl:]]\[([0-9]{1,3};)*[0-9]{1,3}m//g" | grep -E '^=+ [0-9].+ =+$' | \
+            { read pytest_results; echo "pytest_results='${pytest_results}'" >> ${GITHUB_ENV}; } )
+
+    - name: Check GITHUB_STEP_SUMMARY and pytest_results
+      run: |
+        echo "${GITHUB_STEP_SUMMARY}"
+        cat "${GITHUB_STEP_SUMMARY}"
+        echo '----------------------------------------------------------------'
+        echo "${{ env.pytest_results }}"
+
+    - name: Append row to workflow summary table
+      run: |
+        pytest_results_count () { pattern="([0-9]+) $1" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
+        echo "| \
+        ${{ matrix.python-version }} | \
+        ${RUNNER_OS} ${RUNNER_ARCH,,} | \
+        ${{ matrix.backend-db }} | \
+        $( pytest_results_count passed ) | \
+        $( pytest_results_count failed ) | \
+        $( pytest_results_count xpassed ) | \
+        $( pytest_results_count xfailed ) | \
+        $( pytest_results_count skipped ) | \
+        $( pytest_results_count deselected ) | \
+        $( pytest_results_count warning ) | \
+        $( pytest_results_count error ) | \
+        $( pattern="in ([\.0-9]+s)" && [[ $r =~ $pattern ]] && echo "${BASH_REMATCH[1]}" ) |" >> ${GITHUB_STEP_SUMMARY}
+
+    - name: Check GITHUB_STEP_SUMMARY again
+      run: |
+        echo "${GITHUB_STEP_SUMMARY}"
+        cat "${GITHUB_STEP_SUMMARY}"
 
     - name: Upload coverage data
       if: always() && (matrix.python-version == '3.9')
