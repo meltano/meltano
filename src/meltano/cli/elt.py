@@ -13,7 +13,7 @@ from structlog import stdlib as structlog_stdlib
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
-from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -221,7 +221,7 @@ async def dump_file(context_builder, dumpable):
 
 
 async def _run_job(tracker, project, job, session, context_builder, force=False):
-    StaleJobFailer(job.job_name).fail_stale_jobs(session)
+    fail_stale_jobs(session, job.job_name)
 
     if not force:
         existing = JobFinder(job.job_name).latest_running(session)

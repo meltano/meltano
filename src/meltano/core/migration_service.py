@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import closing
 
 import click
 import sqlalchemy
@@ -120,12 +121,9 @@ class MigrationService:
             project: The project to seed the database for.
         """
         _, session_maker = project_engine(project)
-        session = session_maker()
-        try:  # noqa: WPS501, WPS229 Found too long try body length and finally without except
+        with closing(session_maker()) as session:
             self._create_user_role(session)
             session.commit()
-        finally:
-            session.close()
 
     def _create_user_role(self, session: Session) -> None:
         """Actually perform the database seeding creating users/roles.
