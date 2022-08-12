@@ -240,7 +240,7 @@ export MELTANO_PROJECT_READONLY=true
 ### <a name="hub-url"></a>`hub_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
-- Default: [`https://hub.meltano.com`](https://hub.meltano.com)
+- Default: `https://hub.meltano.com/meltano/api/v1`
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
