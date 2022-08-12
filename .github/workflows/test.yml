@@ -174,7 +174,7 @@ jobs:
         $( pytest_results_count deselected ) | \
         $( pytest_results_count warning ) | \
         $( pytest_results_count error ) | \
-        $( pattern="in ([\.0-9]+s)" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" ) |"
+        $( pattern='in ([0-9]+)\.[0-9]+s' && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" )s |"
 
     - name: Upload coverage data
       if: always() && (matrix.python-version == '3.9')
