@@ -55,6 +55,11 @@ from .utils import (
     is_flag=True,
     help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
 )
+@click.option(
+    "--no-install",
+    is_flag=True,
+    help="Do not install the plugin after adding it to the project.",
+)
 @pass_project()
 @click.pass_context
 def add(
@@ -140,11 +145,12 @@ def add(
     )
     tracker.track_command_event(CliEvent.inflight)
 
-    success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
+    if not flags.get("no_install"):
+        success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
-    if not success:
-        tracker.track_command_event(CliEvent.failed)
-        raise CliError("Failed to install plugin(s)")
+        if not success:
+            tracker.track_command_event(CliEvent.failed)
+            raise CliError("Failed to install plugin(s)")
 
     _print_plugins(plugins)
     tracker.track_command_event(CliEvent.completed)
