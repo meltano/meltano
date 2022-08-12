@@ -29,25 +29,44 @@ jobs:
     strategy:
       matrix:
         include:
-        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: sqlite }
-        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: sqlite }
-        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: sqlite }
-        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: sqlite }
-        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: postgresql }
-        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: postgresql }
-        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: postgresql }
-        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: postgresql }
-        - { python-version: "3.7",  os: "ubuntu-latest",  backend-db: mssql }
-        - { python-version: "3.8",  os: "ubuntu-latest",  backend-db: mssql }
-        - { python-version: "3.9",  os: "ubuntu-latest",  backend-db: mssql }
-        - { python-version: "3.10", os: "ubuntu-latest",  backend-db: mssql }
+        - { id: '01', python-version: '3.7',  os: ubuntu-latest, backend-db: sqlite }
+        - { id: '02', python-version: '3.8',  os: ubuntu-latest, backend-db: sqlite }
+        - { id: '03', python-version: '3.9',  os: ubuntu-latest, backend-db: sqlite }
+        - { id: '04', python-version: '3.10', os: ubuntu-latest, backend-db: sqlite }
+        - { id: '05', python-version: '3.7',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '06', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '07', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '08', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
+        - { id: '09', python-version: '3.7',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '10', python-version: '3.8',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '11', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '12', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         # Windows tests for Python 3.7 is temporarily disabled - see https://github.com/meltano/meltano/issues/6479
-        # - { python-version: "3.7",  os: "windows-2022",   backend-db: sqlite }
-        - { python-version: "3.8",  os: "windows-2022",   backend-db: sqlite }
-        - { python-version: "3.9",  os: "windows-2022",   backend-db: sqlite }
-        - { python-version: "3.10", os: "windows-2022",   backend-db: sqlite }
+        # - { id: '13', python-version: '3.7',  os: windows-2022,  backend-db: sqlite }
+        - { id: '14', python-version: '3.8',  os: windows-2022,  backend-db: sqlite }
+        - { id: '15', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
+        - { id: '16', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
       fail-fast: false
+
+    # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
+    outputs:
+      pytest-results-row-01: ${{ steps.pytest.outputs.pytest-results-row-01 }}
+      pytest-results-row-02: ${{ steps.pytest.outputs.pytest-results-row-02 }}
+      pytest-results-row-03: ${{ steps.pytest.outputs.pytest-results-row-03 }}
+      pytest-results-row-04: ${{ steps.pytest.outputs.pytest-results-row-04 }}
+      pytest-results-row-05: ${{ steps.pytest.outputs.pytest-results-row-05 }}
+      pytest-results-row-06: ${{ steps.pytest.outputs.pytest-results-row-06 }}
+      pytest-results-row-07: ${{ steps.pytest.outputs.pytest-results-row-07 }}
+      pytest-results-row-08: ${{ steps.pytest.outputs.pytest-results-row-08 }}
+      pytest-results-row-09: ${{ steps.pytest.outputs.pytest-results-row-09 }}
+      pytest-results-row-10: ${{ steps.pytest.outputs.pytest-results-row-10 }}
+      pytest-results-row-11: ${{ steps.pytest.outputs.pytest-results-row-11 }}
+      pytest-results-row-12: ${{ steps.pytest.outputs.pytest-results-row-12 }}
+      pytest-results-row-13: ${{ steps.pytest.outputs.pytest-results-row-13 }}
+      pytest-results-row-14: ${{ steps.pytest.outputs.pytest-results-row-14 }}
+      pytest-results-row-15: ${{ steps.pytest.outputs.pytest-results-row-15 }}
+      pytest-results-row-16: ${{ steps.pytest.outputs.pytest-results-row-16 }}
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
@@ -125,6 +144,7 @@ jobs:
         pipx inject nox nox-poetry
 
     - name: Run pytest
+      id: pytest
       env:
         PYTEST_BACKEND: ${{ matrix.backend-db }}
 
@@ -162,7 +182,7 @@ jobs:
       shell: bash
       run: |
         pytest_results_count () { pattern="([0-9]+) $1" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
-        echo "| \
+        echo "::set-output name=pytest-results-row-${{ matrix.id }}::| \
         ${{ matrix.python-version }} | \
         ${RUNNER_OS} ${RUNNER_ARCH,,} | \
         ${{ matrix.backend-db }} | \
@@ -174,7 +194,7 @@ jobs:
         $( pytest_results_count deselected ) | \
         $( pytest_results_count warning ) | \
         $( pytest_results_count error ) | \
-        $( pattern="in ([\.0-9]+s)" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" ) |" >> ${GITHUB_STEP_SUMMARY}
+        $( pattern="in ([\.0-9]+s)" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" ) |"
 
     - name: Check GITHUB_STEP_SUMMARY again
       run: |
