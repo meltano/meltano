@@ -20,7 +20,7 @@ jobs:
         run: |
           echo '## Test results' >> ${GITHUB_STEP_SUMMARY}
           echo '' >> ${GITHUB_STEP_SUMMARY}
-          echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted. >> ${GITHUB_STEP_SUMMARY}
+          echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
           echo '' >> ${GITHUB_STEP_SUMMARY}
           echo '| PYTHON | OS     | DB     | PASSED | FAILED | XPASSED | XFAILED | SKIPPED | DESELECTED | WARNINGS | ERRORS | DURATION |' >> ${GITHUB_STEP_SUMMARY}
           echo '|--------|--------|--------|--------|--------|---------|---------|---------|------------|----------|--------|----------|' >> ${GITHUB_STEP_SUMMARY}
