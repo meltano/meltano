@@ -19,7 +19,7 @@ from meltano.core.environment import Environment
 from meltano.core.plugin.base import PluginRef
 
 from .behavior.versioned import Versioned
-from .error import Error
+from .error import EmptyMeltanoFileException, Error
 from .project_files import ProjectFiles
 from .utils import makedirs, truthy
 
@@ -227,6 +227,9 @@ class Project(Versioned):  # noqa: WPS214
     def meltano(self) -> MeltanoFileHint:
         """Return a copy of the current meltano config.
 
+        Raises:
+            EmptyMeltanoFileException: For empty meltano.yml
+
         Returns:
             the current meltano config
         """
@@ -236,6 +239,8 @@ class Project(Versioned):  # noqa: WPS214
 
         with open(self.meltanofile) as melt_ff:
             meltano_ff: dict = configure_yaml().load(melt_ff)
+        if meltano_ff is None:
+            raise EmptyMeltanoFileException
 
         uvicorn_enabled = (
             meltano_ff.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}")
