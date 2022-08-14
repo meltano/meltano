@@ -12,7 +12,7 @@ settings:
   # Replaces negated env_alias from `send_anonymous_usage_stats`
 - name: project_id
 - name: database_uri
-  value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db
+  value: sqlite:///$DOT_MELTANO_ROOT/.meltano/meltano.db
   env_specific: true
 - name: database_max_retries
   kind: integer
