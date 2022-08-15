@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sys
 from contextlib import closing
-from typing import Any, Iterable
+from typing import Any
 
 import click
 from sqlalchemy.orm import Session
@@ -141,7 +141,7 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
     _add_job(ctx, name, job, interval)
 
 
-def _format_json_job(entry: Schedule, job: TaskSets) -> dict[str, Any]:
+def _json_job(entry: Schedule, job: TaskSets) -> dict[str, Any]:
     return {
         "name": entry.name,
         "interval": entry.interval,
@@ -154,7 +154,7 @@ def _format_json_job(entry: Schedule, job: TaskSets) -> dict[str, Any]:
     }
 
 
-def _format_json_elt(entry: Schedule, session: Session) -> dict[str, Any]:
+def _json_elt(entry: Schedule, session: Session) -> dict[str, Any]:
     start_date = coerce_datetime(entry.start_date)
     if start_date:
         start_date = start_date.date().isoformat()
@@ -178,63 +178,50 @@ def _format_json_elt(entry: Schedule, session: Session) -> dict[str, Any]:
     }
 
 
-def _format_json_schedules(ctx: click.Context) -> Iterable[str]:
+def _format_json_schedules(ctx: click.Context) -> str:
     schedules = {"job": [], "elt": []}
 
     for schedule in ctx.obj["schedule_service"].schedules():
         schedules["job" if schedule.job else "elt"].append(schedule)
 
-    formatted_schedules = {
-        "job": [
-            _format_json_job(schedule, ctx.obj["task_sets_service"].get(schedule.job))
-            for schedule in schedules["job"]
-        ],
-        "elt": [],
-    }
-
-    # Only open a DB session if necessary.
-    if schedules["elt"]:
-        _, session_maker = project_engine(ctx.obj["project"])
-        with closing(session_maker()) as session:
-            for schedule in schedules["elt"]:
-                formatted_schedules["elt"].append(_format_json_elt(schedule, session))
-
-    # For consistency with the other `list_*_schedule` functions, we yield the
-    # JSON line-by-line:
-    yield from json.dumps({"schedules": formatted_schedules}, indent=2).split("\n")
-
-
-def _format_cron_schedules(ctx: click.Context) -> Iterable[str]:
-    project_dir = ctx.obj["project"].root.resolve()
-    for schedule in ctx.obj["schedule_service"].schedules():
-        interval = schedule.cron_interval if schedule.job else schedule.interval
-        args = schedule.job if schedule.job else " ".join(schedule.elt_args)
-        cmd = "run" if schedule.job else "elt"
-        env_str = " ".join(f"{key}='{value}'" for key, value in schedule.env.items())
-        yield (
-            f"{interval} (cd {project_dir} && {env_str} meltano {cmd} {args}) 2>&1 | logger -t meltano"
+    get_task = ctx.obj["task_sets_service"].get
+    _, session_maker = project_engine(ctx.obj["project"])
+    with closing(session_maker()) as session:
+        fail_stale_jobs(session)
+        return json.dumps(
+            {
+                "schedules": {
+                    "job": [_json_job(s, get_task(s.job)) for s in schedules["job"]],
+                    "elt": [_json_elt(s, session) for s in schedules["elt"]],
+                }
+            },
+            indent=2,
         )
 
 
-def _format_text_schedules(ctx: click.Context) -> Iterable[str]:
+def _format_text_schedules(ctx: click.Context) -> str:
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     transform_elt_markers = {
         "run": "→→",
         "only": "×→",
         "skip": "→x",
     }
-    for schedule in ctx.obj["schedule_service"].schedules():
+
+    def _format_single_text_schedule(schedule: Schedule) -> str:
         if schedule.job:
-            yield (
+            return (
                 f"[{schedule.interval}] job {schedule.name}: "
                 f"{schedule.job} → {task_sets_service.get(schedule.job).tasks}"
             )
-        else:
-            el_marker, t_marker = transform_elt_markers[schedule.transform]
-            yield (
-                f"[{schedule.interval}] elt {schedule.name}: "
-                f"{schedule.extractor} {el_marker} {schedule.loader} {t_marker} transforms"
-            )
+        el_marker, t_marker = transform_elt_markers[schedule.transform]
+        return (
+            f"[{schedule.interval}] elt {schedule.name}: "
+            f"{schedule.extractor} {el_marker} {schedule.loader} {t_marker} transforms"
+        )
+
+    return "\n".join(
+        _format_single_text_schedule(s) for s in ctx.obj["schedule_service"].schedules()
+    )
 
 
 @schedule_cli.command(
@@ -245,21 +232,17 @@ def _format_text_schedules(ctx: click.Context) -> Iterable[str]:
 @click.option(
     "--format",
     "schedule_format",
-    type=click.Choice(("text", "json", "cron")),
+    type=click.Choice(("text", "json")),
     default="text",
 )
 @click.pass_context
 def list_command(ctx: click.Context, schedule_format: str) -> None:
     """List available schedules."""
-    click.echo(
-        "\n".join(
-            {
-                "text": _format_text_schedules,
-                "json": _format_json_schedules,
-                "cron": _format_cron_schedules,
-            }[schedule_format](ctx)
-        )
-    )
+    formatters = {
+        "text": _format_text_schedules,
+        "json": _format_json_schedules,
+    }
+    click.echo(formatters[schedule_format](ctx))
 
     legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
     legacy_tracker.track_meltano_schedule("list")
