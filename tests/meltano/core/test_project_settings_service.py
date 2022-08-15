@@ -39,10 +39,14 @@ class TestProjectSettingsService:
         return Environment("testing", {})
 
     def test_get_with_source(self, subject, monkeypatch):
+        # A warning is raised because the setting does not exist.
+        with pytest.warns(RuntimeWarning):
+            assert subject.get_with_source(
+                "and_now_for_something_completely_different"
+            ) == (None, SettingValueStore.DEFAULT)
+
         def assert_value_source(value, source):
             assert subject.get_with_source("project_id") == (value, source)
-
-        assert_value_source(None, SettingValueStore.DEFAULT)
 
         subject.set(
             "project_id", "from_meltano_yml", store=SettingValueStore.MELTANO_YML
