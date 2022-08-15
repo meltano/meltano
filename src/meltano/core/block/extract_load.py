@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, closing
 from typing import AsyncIterator
 
 import structlog
@@ -459,11 +459,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     + "To ignore this check use the '--force' option."
                 )
 
-        try:  # noqa: WPS501
-            async with job.run(self.context.session):
+        with closing(self.context.session) as session:
+            async with job.run(session):
                 await self.execute()
-        finally:
-            self.context.session.close()
 
     async def terminate(self, graceful: bool = False) -> None:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.

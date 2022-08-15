@@ -30,7 +30,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         interval: str | None = None,
         start_date: datetime.datetime | None = None,
         job: str | None = None,
-        env: dict | None = None,
+        env: dict[str, str] | None = None,
     ):
         """Initialize a Schedule.
 
