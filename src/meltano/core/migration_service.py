@@ -106,10 +106,8 @@ class MigrationService:
                 click.secho("System database up-to-date.")
         except Exception as err:
             logging.exception(str(err))
-            click.secho(
-                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)",
-                fg="yellow",
-                err=True,
+            raise MigrationError(
+                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)"
             )
         finally:
             conn.close()
