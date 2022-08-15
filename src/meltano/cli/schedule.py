@@ -11,6 +11,7 @@ import click
 from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
+from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
