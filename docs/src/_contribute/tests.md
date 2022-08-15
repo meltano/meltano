@@ -11,6 +11,14 @@ Meltano uses [Pytest](https://docs.pytest.org/) as our primary test framework fo
 
 We recommend you familiarize yourself with [Pytest fixtures](https://docs.pytest.org/en/latest/explanation/fixtures.html), [Pytest parametrization](https://docs.pytest.org/en/latest/how-to/parametrize.html), and [`unittest.mock`](https://docs.python.org/dev/library/unittest.mock.html).
 
+### Pytest Best Practices
+
+When possible, ensure Pytest is reporting no errors, failures, warnings, xpasses (i.e. tests that we expected would fail passing instead), or unexpected skips. Additionally, the execution time should be consistent and short. Consider gating a test behind an optional `slow` or similar Pytest marker if it is slow or resource-hungry.
+
+After running Pytest in CI, a table summarizing all of the runs for every supported platform can be viewed by going to `https://github.com/meltano/meltano/actions/workflows/test.yml?query=branch:<your-branch-name>`, and selecting the top (i.e. most recent) result.
+
+If a test needs a particular environment in which to execute, do not rely on other tests to establish it. Tests that need a particular environment should either explicitly depend on other tests (via a Pytest plugin), use a fixture to establish it, or establish it themselves. It should be possible to execute the tests in a random order, and have them all (or any subset of them) consistently pass.
+
 ### Using Docker under Pytest
 
 If you'd like to add tests that rely on a Docker container running, you can do that by using `pytest-docker`. A session-scoped fixture for the service running under Docker should be added within the directory `tests/fixtures/docker`. The Docker service itself should be defined in `tests/fixtures/docker/docker-compose.yml`.
