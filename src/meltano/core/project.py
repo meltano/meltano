@@ -378,7 +378,7 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Resolved path to `.meltano` dir optionally joined to given paths.
         """
-        return self.dot_meltano_root.joinpath(".meltano", *joinpaths)
+        return self.dot_meltano_root.joinpath(*joinpaths)
 
     @makedirs
     def analyze_dir(self, *joinpaths, make_dirs: bool = True):
