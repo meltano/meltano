@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, closing
 from typing import AsyncIterator
 
 import structlog
@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
-from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -450,7 +450,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
         job = self.context.job
-        StaleJobFailer(job.job_name).fail_stale_jobs(self.context.session)
+        fail_stale_jobs(self.context.session, job.job_name)
         if not self.context.force:
             existing = JobFinder(job.job_name).latest_running(self.context.session)
             if existing:
@@ -459,11 +459,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     + "To ignore this check use the '--force' option."
                 )
 
-        try:  # noqa: WPS501
-            async with job.run(self.context.session):
+        with closing(self.context.session) as session:
+            async with job.run(session):
                 await self.execute()
-        finally:
-            self.context.session.close()
 
     async def terminate(self, graceful: bool = False) -> None:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.

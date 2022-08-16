@@ -32,7 +32,7 @@ class TestCliSchedule:
                     "--loader",
                     "target-mock",
                     "--interval",
-                    "@eon",
+                    "@yearly",
                     "--transform",
                     "run",
                 ],
@@ -45,7 +45,7 @@ class TestCliSchedule:
         assert schedule.extractor == "tap-mock"
         assert schedule.loader == "target-mock"
         assert schedule.transform == "run"
-        assert schedule.interval == "@eon"  # not anytime soon ;)
+        assert schedule.interval == "@yearly"  # not anytime soon ;)
         assert schedule.start_date == iso8601_datetime(test_date)
 
         # test adding a scheduled job
@@ -61,7 +61,7 @@ class TestCliSchedule:
                     "--job",
                     "mock-job",
                     "--interval",
-                    "@eon",
+                    "@yearly",
                 ],
             )
         assert res.exit_code == 0
@@ -71,7 +71,7 @@ class TestCliSchedule:
 
         assert schedule.name == "job-schedule-mock"
         assert schedule.job == "mock-job"
-        assert schedule.interval == "@eon"  # not anytime soon ;)
+        assert schedule.interval == "@yearly"  # not anytime soon ;)
 
         # test default schedule case where no argument (set, remove, add, etc) is provided
         with mock.patch(
@@ -85,7 +85,7 @@ class TestCliSchedule:
                     "--job",
                     "mock-job",
                     "--interval",
-                    "@eon",
+                    "@yearly",
                 ],
             )
         assert res.exit_code == 0
@@ -95,7 +95,7 @@ class TestCliSchedule:
 
         assert schedule.name == "job-schedule-mock"
         assert schedule.job == "mock-job"
-        assert schedule.interval == "@eon"  # not anytime soon ;)
+        assert schedule.interval == "@yearly"  # not anytime soon ;)
 
         # verify that you can't use job and elt flags together
         with mock.patch(
@@ -114,7 +114,7 @@ class TestCliSchedule:
                     "--loader",
                     "target-mock",
                     "--interval",
-                    "@eon",
+                    "@yearly",
                     "--transform",
                     "run",
                 ],

@@ -8,9 +8,6 @@ inputs:
   tags:
     description: 'The Docker tags for the image that will be built'
     required: true
-  build-args:
-    description: 'The Docker build args'
-    required: true
   registry:
     description: "Where to upload the images"
     required: true
@@ -24,7 +21,10 @@ inputs:
     description: 'The password to use when pushing the image'
     required: true
   python-version:
-    description: 'The Python version installed on the image'
+    description: 'The version of Python that will be installed on the image'
+    required: true
+  meltano-version:
+    description: 'The version of Meltano that will be installed on the image'
     required: true
 
 runs:
@@ -34,21 +34,23 @@ runs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
     - name: Build the image
-      uses: docker/build-push-action@v3
-      with:
-        load: true
-        context: "{{defaultContext}}:docker/meltano"
-        tags: ${{ inputs.tags }}
-        build-args: ${{ inputs.build-args }}
+      shell: bash
+      run: |
+        BUILD_CMD="docker build \
+          --build-arg PYTHON_VERSION=${{ inputs.python-version }} \
+          --build-arg MELTANO_VERSION=${{ inputs.meltano-version }} \
+          $(echo "${{ inputs.tags }}" | sed "s/^/-t ${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ' ') \
+          docker/meltano"
+        echo "${BUILD_CMD}"
+        eval "${BUILD_CMD}"
 
     - name: Get the ID of the image
       id: get-image-id
       shell: bash
-      run: echo "::set-output name=id::$(docker images -q meltano/meltano | head -n 1)"
+      run: |
+        docker images
+        echo "::set-output name=id::$(docker images -q ${{ inputs.registry }}/meltano/meltano | head -n 1)"
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
@@ -87,4 +89,4 @@ runs:
     - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
       shell: bash
-      run: docker image push --all-tags meltano/meltano
+      run: docker image push --all-tags ${{ inputs.registry }}/meltano/meltano

@@ -84,10 +84,7 @@ class ProjectSettingsService(SettingsService):
                     "Unable to restore 'project_id' from 'analytics.json'", err=err
                 )
             else:
-                self.update_meltano_yml_config(
-                    {"project_id": project_id, **self.meltano_yml_config}
-                )
-                self.set("project_id", project_id)
+                self.set("project_id", project_id, store=SettingValueStore.MELTANO_YML)
                 logger.debug("Restored 'project_id' from 'analytics.json'")
 
     @property
