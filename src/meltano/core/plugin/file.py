@@ -209,11 +209,10 @@ class FilePlugin(BasePlugin):
         Returns:
             A dictionary of file names and their contents.
         """
+        file_contents = self.project_file_contents(project, paths_to_update)
         return {
             relative_path: content
-            for relative_path, content in self.project_file_contents(
-                project, paths_to_update
-            ).items()
+            for relative_path, content in file_contents.items()
             if any(relative_path.match(path) for path in paths_to_update)
         }
 
