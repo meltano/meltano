@@ -16,6 +16,8 @@ plugins:
   - name: target-jsonl
     variant: andyh1203
     pip_url: target-jsonl
+    config:
+      do_timestamp_file: false
 environments:
 - name: dev
 - name: staging
