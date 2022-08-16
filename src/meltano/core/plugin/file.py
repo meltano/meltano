@@ -107,7 +107,7 @@ class FilePlugin(BasePlugin):
         """
 
         def with_update_header(content: str, relative_path: PathLike):
-            if str(relative_path) in paths_to_update:
+            if any(relative_path.match(path) for path in paths_to_update):
                 content = "\n\n".join([self.update_file_header(relative_path), content])
 
             return content
@@ -209,12 +209,11 @@ class FilePlugin(BasePlugin):
         Returns:
             A dictionary of file names and their contents.
         """
+        file_contents = self.project_file_contents(project, paths_to_update)
         return {
             relative_path: content
-            for relative_path, content in self.project_file_contents(
-                project, paths_to_update
-            ).items()
-            if str(relative_path) in paths_to_update
+            for relative_path, content in file_contents.items()
+            if any(relative_path.match(path) for path in paths_to_update)
         }
 
     def create_files(
