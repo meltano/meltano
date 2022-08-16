@@ -184,10 +184,12 @@ class TestCliUpgrade:
                 "airflow",
                 "set",
                 "_update",
-                json.dumps({
-                    "orchestrate/dags/meltano.py": False,
-                    "*.py": True,
-                })
+                json.dumps(
+                    {
+                        "orchestrate/dags/meltano.py": False,
+                        "*.py": True,
+                    },
+                ),
             ],
         )
         assert_cli_runner(result)
