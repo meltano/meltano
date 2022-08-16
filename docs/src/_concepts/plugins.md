@@ -738,7 +738,7 @@ files:
 ```
 
 <div class="notification is-info">
-  <p>If a file path starts with a <code>*</code>, it must be wrapped in quotes to be considered valid YAML. For example, using <code>*.yml</code> to match all <code>.yml</code> files:
+  <p>If a file path starts with a <code>*</code>, it must be wrapped in quotes to be considered valid YAML. For example, using <code>*.yml</code> to match all <code>.yml</code> files:</p>
 <pre>
 files:
 - name: dbt
