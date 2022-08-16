@@ -1,17 +1,16 @@
 """CLI command `meltano install`."""
+
 from __future__ import annotations
 
 import click
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
-
-from ..core.tracking.tracker import Tracker
-from . import cli
-from .params import pass_project
-from .utils import CliError, PartialInstrumentedCmd, install_plugins
+from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 
 
 @cli.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")

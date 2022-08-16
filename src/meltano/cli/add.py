@@ -1,21 +1,12 @@
 """Plugin Add CLI."""
+
 from __future__ import annotations
 
 import click
 
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.base import PluginRef
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project import Project
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
-
-from ..core.tracking.tracker import Tracker
-from . import cli
-from .params import pass_project
-from .utils import (
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
     add_plugin,
@@ -23,6 +14,13 @@ from .utils import (
     check_dependencies_met,
     install_plugins,
 )
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project import Project
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 
 
 @cli.command(  # noqa: WPS238

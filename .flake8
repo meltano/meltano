@@ -58,8 +58,6 @@ ignore =
     WPS211
     # Ignore 'too many return statements' - noqa parse inconsistent between py38 vs prior
     WPS212
-    # Allow local folder imports (import .module)
-    WPS300
     # Allow f-strings
     WPS305
     # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration

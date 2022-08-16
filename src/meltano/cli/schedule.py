@@ -1,4 +1,5 @@
 """Schedule management CLI."""
+
 from __future__ import annotations
 
 import json
@@ -7,18 +8,17 @@ import sys
 import click
 from sqlalchemy.orm import Session
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
+from meltano.core.project import Project
 from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.task_sets import TaskSets
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
-
-from ..core.project import Project
-from . import cli
-from .params import pass_project
-from .utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
 
 
 @cli.group(
