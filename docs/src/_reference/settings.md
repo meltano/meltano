@@ -237,10 +237,29 @@ meltano config meltano set project_readonly true
 export MELTANO_PROJECT_READONLY=true
 ```
 
+### <a name="hub-api-root"></a>`hub_api_root`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_API_ROOT`
+- Default: None
+
+This sets the value of the root url for the hub api.
+
+If provided, this setting overrides the [`hub_url`](#hub-url).
+
+#### How to use
+
+```bash
+meltano config meltano set hub_api_root "https://mysite.com/my-plugins"
+meltano config meltano set hub_api_root false
+
+export MELTANO_HUB_API_ROOT="https://mysite.com/my-plugins"
+export MELTANO_HUB_API_ROOT=false
+```
+
 ### <a name="hub-url"></a>`hub_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
-- Default: `https://hub.meltano.com/meltano/api/v1`
+- Default: `https://hub.meltano.com`
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
@@ -249,9 +268,9 @@ This manifest is primarily used by [`meltano discover`](/reference/command-line-
 #### How to use
 
 ```bash
-meltano config meltano set hub_url http://localhost:4000/meltano/api/v1
+meltano config meltano set hub_url http://localhost:4000
 
-export MELTANO_HUB_URL=http://localhost:4000/meltano/api/v1
+export MELTANO_HUB_URL=http://localhost:4000
 ```
 
 ### <a name="hub-url-auth"></a>`hub_url_auth`
