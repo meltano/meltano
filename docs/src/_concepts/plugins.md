@@ -721,9 +721,9 @@ The file bundle itself will not be added to your [`meltano.yml` project file](pr
 - [Environment variable](/guide/configuration#configuring-settings): `<BUNDLE>__UPDATE`, e.g. `DBT__UPDATE`
 - Default: `{}` (an empty object)
 
-A file bundle's `update` [extra](/guide/configuration#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans.
+A file bundle's `update` [extra](/guide/configuration#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans. [Glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns are supported to allow matching of multiple files with a single path.
 
-When a file path's value is `True`, the file is considered to be managed by the file bundle and updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run.
+When a file path's value is `True`, the matching files are considered to be managed by the file bundle and updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run.
 
 ##### How to use
 
@@ -734,7 +734,18 @@ files:
 - name: dbt
   update:
     transform/dbt_project.yml: false
+    profiles/*.yml: true
 ```
+
+<div class="notification is-info">
+  <p>If a file path starts with a <code>*</code>, it must be wrapped in quotes to be considered valid YAML. For example, using <code>*.yml</code> to match all <code>.yml</code> files:
+<pre>
+files:
+- name: dbt
+  update:
+    '*.yml': true
+</pre>
+</div>
 
 Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
@@ -745,8 +756,9 @@ export <BUNDLE>__UPDATE='{"<path>": <true/false>}'
 
 # For example:
 meltano config --plugin-type=files dbt set _update transform/dbt_project.yml false
+meltano config --plugin-type=files dbt set _update profiles/*.yml true
 
-export DBT__UPDATE='{"transform/dbt_project.yml": false}'
+export DBT__UPDATE='{"transform/dbt_project.yml": false, "profiles/*.yml": true}'
 ```
 
 ### Utilities
