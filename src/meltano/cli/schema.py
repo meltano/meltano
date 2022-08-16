@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import click
 
-from meltano.core.db import DB, project_engine
+from meltano.core.db import ensure_schema_exists, project_engine
 
 from . import cli
 from .params import pass_project
@@ -25,4 +25,4 @@ def schema():
 def create(project, schema_name, roles):
     """Create system DB schema, if not exists."""
     engine, _ = project_engine(project)
-    DB.ensure_schema_exists(engine, schema_name, grant_roles=roles)
+    ensure_schema_exists(engine, schema_name, grant_roles=roles)

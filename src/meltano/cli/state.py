@@ -111,7 +111,7 @@ def meltano_state(project: Project, ctx: click.Context):
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
-@click.argument("pattern", required=False)
+@click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
 @pass_project()
 def list_state(
