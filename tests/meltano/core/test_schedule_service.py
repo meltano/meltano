@@ -10,6 +10,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.schedule_service import (
+    BadCronError,
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
@@ -88,6 +89,11 @@ class TestScheduleService:
         with pytest.raises(ScheduleAlreadyExistsError):
             subject.add_schedule(all_schedules[0])
 
+        with pytest.raises(BadCronError) as excinfo:
+            subject.add_schedule(create_elt_schedule("bad-cron", interval="bad_cron"))
+
+        assert "bad_cron" in str(excinfo.value)
+
     def test_remove_schedule(self, subject):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -115,14 +121,14 @@ class TestScheduleService:
     def test_schedule_update(self, subject):
         schedule = subject.schedules()[0]
 
-        schedule.interval = "@pytest"
+        schedule.interval = "@yearly"
         subject.update_schedule(schedule)
 
         # there should be only 1 element with the set interval
-        assert sum(sbj.interval == "@pytest" for sbj in subject.schedules()) == 1
+        assert sum(sbj.interval == "@yearly" for sbj in subject.schedules()) == 1
 
         # it should be the first element
-        assert subject.schedules()[0].interval == "@pytest"
+        assert subject.schedules()[0].interval == "@yearly"
 
         # it should be a copy of the original element
         assert schedule is not subject.schedules()[0]
