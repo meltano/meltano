@@ -117,7 +117,11 @@ class TestTracker:
         # Create a new `ProjectSettingsService` because it is what restores the project ID
         restored_project_id = ProjectSettingsService(project).get("project_id")
 
-        assert original_project_id == restored_project_id
+        # Apply the same transformation that gets applied to the project ID
+        # when it is originally stored in `analytics.json`.
+        assert (
+            str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id
+        )
 
     @pytest.mark.xfail(
         platform.system() == "Windows",
