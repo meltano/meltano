@@ -59,5 +59,3 @@ def discover(ctx: click.Context, project: Project, plugin_type: str):
                 click.echo(f", variants: {', '.join(plugin.variant_labels)}")
             else:
                 click.echo()
-
-    ctx.obj["legacy_tracker"].track_meltano_discover(plugin_type=plugin_type)

@@ -90,12 +90,6 @@ async def select(
                 exclude=flags["exclude"],
                 remove=flags["remove"],
             )
-        ctx.obj["legacy_tracker"].track_meltano_select(
-            extractor=extractor,
-            entities_filter=entities_filter,
-            attributes_filter=attributes_filter,
-            flags=flags,
-        )
     except PluginExecutionError as err:
         raise CliError(f"Cannot list the selected attributes: {err}") from err
 
