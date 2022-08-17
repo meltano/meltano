@@ -5,7 +5,6 @@ import logging
 
 import click
 
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import CliContext, CliEvent, Tracker
@@ -58,7 +57,3 @@ def init(ctx, project_name, no_usage_stats):
     tracker.add_contexts(CliContext.from_click_context(ctx))
     tracker.track_command_event(CliEvent.started)
     ctx.obj["tracker"] = tracker
-    ctx.obj["legacy_tracker"] = LegacyTracker(
-        project, context_overrides=ctx.obj["tracker"].contexts
-    )
-    ctx.obj["legacy_tracker"].track_meltano_init(project_name=project_name)

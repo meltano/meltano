@@ -66,6 +66,8 @@ ignore =
     WPS306
     # Allow inconsistent returns - permitted because of too many false positives
     WPS324
+    # Allow syntax-level (process when first parsed, rather than at every run) string concatenation
+    WPS326
     # Allow assignment expressions (walrus operator :=)
     WPS332
     # Allow 'incorrect' order of methods in a class
@@ -244,6 +246,15 @@ per-file-ignores =
     tests/**/__init__.py:
         # Allow for using __init__.py to promote imports to the module namespace
         F401
+        # Don't require docstrings in tests
+        DAR101
+        DAR201
+        DAR301
+        D100
+        D101
+        D102
+        D103
+        D104
     src/meltano/__init__.py:
         # Found `__init__.py` module with logic
         WPS412
