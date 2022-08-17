@@ -75,7 +75,7 @@ class ProjectInitService:
         click.secho("Creating .meltano folder", fg="blue")
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
         click.secho("created", fg="blue", nl=False)
-        click.echo(f" .meltano in {self.project.dot_meltano_root}")
+        click.echo(f" .meltano in {self.project.sys_dir_root}")
 
     def create_files(self, add_discovery=False):
         """Create project files.

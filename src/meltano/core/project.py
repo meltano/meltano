@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
 PROJECT_ENVIRONMENT_ENV = "MELTANO_ENVIRONMENT"
 PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
-DOT_MELTANO_ROOT_ENV = "DOT_MELTANO_ROOT"
+PROJECT_SYS_DIR_ROOT = "MELTANO_SYS_DIR_ROOT"
 
 
 class ProjectNotFound(Error):
@@ -90,7 +90,9 @@ class Project(Versioned):  # noqa: WPS214
             root: the root directory for the project
         """
         self.root = Path(root).resolve()
-        self.dot_meltano_root = Path(os.getenv(DOT_MELTANO_ROOT_ENV, root)).resolve()
+        self.sys_dir_root = Path(
+            os.getenv(PROJECT_SYS_DIR_ROOT, self.root / ".meltano")
+        ).resolve()
         self.readonly = False
         self._project_files = None
         self.__meltano_ip_lock = None
@@ -378,7 +380,7 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Resolved path to `.meltano` dir optionally joined to given paths.
         """
-        return self.dot_meltano_root.joinpath(*joinpaths)
+        return self.sys_dir_root.joinpath(*joinpaths)
 
     @makedirs
     def analyze_dir(self, *joinpaths, make_dirs: bool = True):
