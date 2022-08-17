@@ -11,7 +11,6 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -113,9 +112,6 @@ def cli(  # noqa: WPS231
         ctx.obj["tracker"].add_contexts(
             CliContext.from_click_context(ctx)
         )  # backfill the `cli` CliContext
-        ctx.obj["legacy_tracker"] = LegacyTracker(
-            project, context_overrides=ctx.obj["tracker"].contexts
-        )
     except ProjectNotFound:
         ctx.obj["project"] = None
     except IncompatibleVersionError:
