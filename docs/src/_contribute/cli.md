@@ -48,8 +48,13 @@ For a technical explanation of how commands and groups work see https://click.pa
 
 ### Use of short and long options
 
-The options you expect to be used most frequently should always include both the long AND short variation of the option.
-For example `--help` and `-h`, `--tasks` and `-t`, `--force` and `-f`.
+For options you expect to be used frequently or for options with excessively long names, you may include both the long
+AND short variation of the option. For example `--help` and `-h`, `--force` and `-f`. However, you should avoid using
+the short form if it is ambiguous or is likely to overlap with another option in the same global command group. For
+example avoid using `-t` as a short form for `--tasks` as it may be confused with a hypothetical `--test` option.
+
+Note that in official documentation the long form is always preferred, if you can simply and clearly indicate that both
+are available without causing confusion you provide both. The short version alone should never be used in documentation.
 
 
 ### Desired verb/command linkage and structure
@@ -72,15 +77,6 @@ meltano <feature-group> get <something>
 - Use `list` to enumerate items as in `meltano job list`
 - Use `describe` to show details about an item
 
-### Abbreviations
-
-For excessively long options, especially in cases where no short flag is provided or a commonly used abbreviation is exists,
-you should allow the use of the abbreviation as a documented alias:
-
-```
-meltano --env=production
-meltano --environment=production
-```
 
 ### Global vs argument level flag casing
 
@@ -98,16 +94,8 @@ The caveat to this is *common* and *expected* global short options. For example 
 
 ### Reusing short options
 
-You may need to reuse a short option, but you should limit this to a single meaning per command group.
-Hypothetical example where reusing a short option is acceptable:
-
-```
-# ok to reuse short flag, because each application has a distinct meaning in two different top level feature group commands
-meltano somecommand -t run-specific-test
-meltano othercommand somejob -t invoke-some-TASK
-```
-
-An example a short flag should not be reused:
+Avoid reusing a short option if at all possible to avoid potential confusion. An example where short flag should not be
+reused:
 
 ```
 # ambiguous use that should be avoided
@@ -115,14 +103,12 @@ meltano somecommand run SOME_TASK [-t/--test SOME_TEST]
 meltano somecommand set [-t/--task SOME_TASK]
 ```
 
-In this scenario you have three options.
+In scenario's like this you have three paths.
 
 1. Choose a sensible alternate when its unlikely to cause confusion with OTHER options e.g. `-k/--task` and `-t/--test`.
-2. Dropping the use of the short flag of the option you feel will be used less frequently.
-3. Upper case the lesser used of the two short flags and lower case the more commonly used.
-
-During scenarios like this you may want to consider taking a look at common unix utilities like `grep` to see if they
-have a similar arguments or flag abbreviations you can draw inspiration from.
+2. Dropping the use of the short flag of the option you feel will be used less frequently AND the short flag is unlikely
+to cause confusion. This is a great path if the long flag is already terse.
+3. Drop the use of the short flag all together. If these flags aren't used frequently, this is a sensible default choice.
 
 ### Expected output formats
 
@@ -222,11 +208,28 @@ meltano run BLOCKS ...
 meltano install [] [PLUGIN_NAME] ...
 ```
 
+#### Flags
+
+For official documentation such as walkthroughs and guides use the long form of the flag. For example:
+
+```
+meltano --environment=PROD
+```
+
+In help output and general examples default to the long form or provide combined examples of the short and long form:
+
+```bash
+meltano [-E/--environment ENVIRONMENT]
+```
+
 ### Placeholders and angle brackets
 
-When writing help output its often useful to provide examples that utilize place holders. In complex cases where you're trying illustrate how a user might use feature, its often useful to use actual tap/target/mapping names to illustrate intent. But most commonly, especially for simple examples use common terms e.g. `TAP` rather than `extractor` or `tap-something`.
+When writing help output it is often useful to provide examples that utilize placeholders. In complex cases where you're
+trying to illustrate how a user might use feature, it is often useful to use actual tap/target/mapping names to illustrate
+intent. But most commonly, especially for simple examples use common terms e.g. `TAP` rather than `extractor` or `tap-something`.
 
-We also have significant historic use of angle brackets as place holders for user input in our documentation (and also help out). Which often looks like:
+We also have significant historic use of angle brackets as placeholders for user input in our documentation (and also
+help out). Which often looks like:
 
 ```
 meltano elt <tap_name> <target_name>
@@ -251,5 +254,5 @@ further information. If known, you should also document in what version you expe
 
 Prefer the term "preview" over "beta". Commands that enable a preview feature should be marked as such in help text and
 in the meltano documentation. Where possible if not in the help output, then at least in the documentation, you should also
-document when the command is expected to graduate from preview status, and what if any short comings, defects, or missing
+document when the command is expected to graduate from preview status, and what if any shortcomings, defects, or missing
 functionality it currently has.
