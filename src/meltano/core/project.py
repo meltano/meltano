@@ -121,6 +121,7 @@ class Project(Versioned):  # noqa: WPS214
         return {
             PROJECT_ROOT_ENV: str(self.root),
             PROJECT_ENVIRONMENT_ENV: environment_name,
+            PROJECT_SYS_DIR_ROOT: str(self.sys_dir_root),
         }
 
     @classmethod
