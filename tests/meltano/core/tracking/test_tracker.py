@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import platform
 import subprocess
@@ -13,6 +14,7 @@ from typing import TYPE_CHECKING, Any
 
 import mock
 import pytest
+from snowplow_tracker import Emitter
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -117,7 +119,11 @@ class TestTracker:
         # Create a new `ProjectSettingsService` because it is what restores the project ID
         restored_project_id = ProjectSettingsService(project).get("project_id")
 
-        assert original_project_id == restored_project_id
+        # Apply the same transformation that gets applied to the project ID
+        # when it is originally stored in `analytics.json`.
+        assert (
+            str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id
+        )
 
     @pytest.mark.xfail(
         platform.system() == "Windows",
@@ -423,3 +429,46 @@ class TestTracker:
 
         os.environ["MELTANO_SEND_ANONYMOUS_USAGE_STATS"] = "True"
         assert get_source() == "env"
+
+    def test_get_snowplow_tracker_invalid_endpoint(
+        self, project: Project, caplog, monkeypatch
+    ):
+        endpoints = """
+            [
+                "notvalid:8080",
+                "https://valid.endpoint:8080",
+                "file://bad.scheme",
+                "https://other.endpoint/path/to/collector"
+            ]
+        """
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
+        logging.getLogger().setLevel(logging.DEBUG)
+
+        with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
+            tracker = Tracker(project)
+
+        try:
+            assert len(caplog.records) == 2
+            assert caplog.records[0].levelname == "WARNING"
+            assert caplog.records[0].msg["event"] == "invalid_snowplow_endpoint"
+            assert caplog.records[0].msg["endpoint"] == "notvalid:8080"
+
+            assert caplog.records[1].levelname == "WARNING"
+            assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
+            assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
+
+            assert len(tracker.snowplow_tracker.emitters) == 2
+            assert isinstance(tracker.snowplow_tracker.emitters[0], Emitter)
+            assert (
+                tracker.snowplow_tracker.emitters[0].endpoint
+                == "https://valid.endpoint:8080/i"
+            )
+
+            assert isinstance(tracker.snowplow_tracker.emitters[1], Emitter)
+            assert (
+                tracker.snowplow_tracker.emitters[1].endpoint
+                == "https://other.endpoint/path/to/collector/i"
+            )
+        finally:
+            # Remove the seemingly valid emitters to prevent a logging error on exit.
+            tracker.snowplow_tracker.emitters = []

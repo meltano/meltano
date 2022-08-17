@@ -1,6 +1,8 @@
 """Extractor selection management CLI."""
 from __future__ import annotations
 
+from contextlib import closing
+
 import click
 
 from meltano.core.db import project_engine
@@ -88,12 +90,6 @@ async def select(
                 exclude=flags["exclude"],
                 remove=flags["remove"],
             )
-        ctx.obj["legacy_tracker"].track_meltano_select(
-            extractor=extractor,
-            entities_filter=entities_filter,
-            attributes_filter=attributes_filter,
-            flags=flags,
-        )
     except PluginExecutionError as err:
         raise CliError(f"Cannot list the selected attributes: {err}") from err
 
@@ -111,11 +107,8 @@ async def show(project, extractor, show_all=False):
     _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)
 
-    session = Session()
-    try:
+    with closing(Session()) as session:
         list_all = await select_service.list_all(session)
-    finally:
-        session.close()
 
     # legend
     click.secho("Legend:")

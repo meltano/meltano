@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import uuid
 
 import click
 
@@ -54,6 +55,11 @@ class ProjectInitService:
         self.create_files(add_discovery=add_discovery)
 
         self.settings_service = ProjectSettingsService(self.project)
+        self.settings_service.set(
+            "project_id",
+            f"{self.project_name}-{uuid.uuid4()}",
+            store=SettingValueStore.MELTANO_YML,
+        )
         self.set_send_anonymous_usage_stats()
         if activate:
             Project.activate(self.project)
