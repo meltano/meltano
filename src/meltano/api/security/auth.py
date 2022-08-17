@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from datetime import datetime
 from fnmatch import fnmatch
@@ -48,10 +50,7 @@ class ResourcePermission(Permission):
             if self.in_scope(need, scopes):
                 return False
 
-        if all(needs_scoped):
-            return True
-
-        return False
+        return all(needs_scoped)
 
 
 def permission_for(permission_type, context):
@@ -68,7 +67,7 @@ def passes_authentication_checks():
     settings_service = ProjectSettingsService(project)
 
     if not settings_service.get("ui.authentication"):
-        logging.debug(f"Authentication not required because it's disabled")
+        logging.debug("Authentication not required because it's disabled")
         return True
 
     if current_user.is_authenticated:
@@ -79,7 +78,7 @@ def passes_authentication_checks():
         # The `@roles_required("admin")` and `@block_if_readonly` checks
         # will take care of enforcing authentication as appropriate
         logging.debug(
-            f"Authentication not required because anonymous users have read-only access"
+            "Authentication not required because anonymous users have read-only access"
         )
         return True
 
@@ -128,21 +127,15 @@ def block_if_readonly(f):
 
 
 def unauthorized_callback():
-    """
-    Meltano is mainly an API, so let's return plain 403 (Forbidden)
-    instead of redirecting anywhere.
-    """
-
+    """Return a 403 (Forbidden) error instead of redirecting."""
     return "You do not have the required permissions.", 403
 
 
 def _identity_loaded_hook(sender, identity):
-    """
-    Meltano uses a resource permission scheme.
-    This hook will add the specific Permission
-    to the current identity.
-    """
+    """Add the specific permission to the current identity.
 
+    Note that Meltano uses a resource permission scheme.
+    """
     # something weird is going on here when testing
     # SQLAlchemy complains about the roles not being
     # in a session.
@@ -151,16 +144,13 @@ def _identity_loaded_hook(sender, identity):
 
     # each permission is a Need(permission_type, context),
     # i.e. ("view", "finance.*", "design")
-    for perm in (perm for role in current_user.roles for perm in role.permissions):
-        perm = Need(perm.type, perm.context)
-
-        identity.provides.add(perm)
+    for role in current_user.roles:
+        for perm in role.permissions:
+            identity.provides.add(Need(perm.type, perm.context))
 
 
 def _user_logged_in_hook(sender, user):
-    """
-    Update the audit columns for the User
-    """
+    """Update the audit columns for the user."""
     user.last_login_at = datetime.utcnow()
     user.last_activity_at = datetime.utcnow()
     user.login_count += 1

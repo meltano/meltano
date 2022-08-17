@@ -1,5 +1,8 @@
 """Migration and system db management."""
+from __future__ import annotations
+
 import logging
+from contextlib import closing
 
 import click
 import sqlalchemy
@@ -103,10 +106,8 @@ class MigrationService:
                 click.secho("System database up-to-date.")
         except Exception as err:
             logging.exception(str(err))
-            click.secho(
-                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)",
-                fg="yellow",
-                err=True,
+            raise MigrationError(
+                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)"
             )
         finally:
             conn.close()
@@ -118,12 +119,9 @@ class MigrationService:
             project: The project to seed the database for.
         """
         _, session_maker = project_engine(project)
-        session = session_maker()
-        try:  # noqa: WPS501, WPS229 Found too long try body length and finally without except
+        with closing(session_maker()) as session:
             self._create_user_role(session)
             session.commit()
-        finally:
-            session.close()
 
     def _create_user_role(self, session: Session) -> None:
         """Actually perform the database seeding creating users/roles.

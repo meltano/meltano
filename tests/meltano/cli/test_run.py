@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import asyncio
 import json
-from typing import List, Optional
 
 import pytest
 import structlog
@@ -8,7 +9,6 @@ from mock import AsyncMock, mock
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -148,8 +148,8 @@ def dbt_process(process_mock_factory, dbt):
 class EventMatcher:
     def __init__(self, result_output: str):
         """Build a matcher for the result output of a command."""
-        self.seen_events: List[dict] = []
-        self.seen_raw: List[str] = []
+        self.seen_events: list[dict] = []
+        self.seen_raw: list[str] = []
 
         for line in result_output.splitlines():
             try:
@@ -173,7 +173,7 @@ class EventMatcher:
             if matches:
                 return True
 
-    def find_by_event(self, event: str) -> Optional[List[dict]]:
+    def find_by_event(self, event: str) -> list[dict] | None:
         """Return the first matching event, that matches the given event.
 
         Args:
@@ -192,13 +192,11 @@ class EventMatcher:
 
 class TestCliRunScratchpadOne:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_parsing_failures(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -289,13 +287,11 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0].get("success")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_basic_invocations(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -371,13 +367,11 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0].get("success")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_multiple_commands(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -431,13 +425,11 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[1].get("success")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_complex_invocations(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -507,13 +499,11 @@ class TestCliRunScratchpadOne:
             assert dbt_done_event[0].get("stdio") == "stderr"
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_plugin_command_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -586,13 +576,11 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches("dbt failure")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_tap_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -672,13 +660,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_target_failure_before_tap_finished(  # noqa: WPS118
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -781,13 +767,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_target_failure_after_tap_finished(  # noqa: WPS118
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -868,13 +852,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_tap_and_target_failed(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -962,13 +944,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_tap_line_length_limit_error(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1042,13 +1022,11 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_mapper_config(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1202,13 +1180,11 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_mapper_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1290,13 +1266,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_dry_run(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,

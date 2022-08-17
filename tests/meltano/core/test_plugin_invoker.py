@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import platform
 
 import dotenv
@@ -89,8 +91,8 @@ class TestPluginInvoker:
         with pytest.raises(UnknownCommandError) as err:
             await plugin_invoker.invoke_async(command="foo")
 
-        assert err.value.command == "foo"  # noqa: WPS441
-        assert "supports the following commands" in str(err.value)  # noqa: WPS441
+        assert err.value.command == "foo"
+        assert "supports the following commands" in str(err.value)
 
     def test_expand_exec_args(self, plugin_invoker):
         exec_args = plugin_invoker.exec_args(
@@ -125,7 +127,7 @@ class TestPluginInvoker:
 
         assert (
             "Command 'cmd' referenced unset environment variable '$ENV_VAR_ARG' in an argument"
-            in str(err.value)  # noqa: WPS441
+            in str(err.value)
         )
 
     def test_alternate_command_executable(self, plugin_invoker):

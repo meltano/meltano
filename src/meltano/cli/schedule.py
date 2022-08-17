@@ -1,4 +1,5 @@
 """Schedule management CLI."""
+
 from __future__ import annotations
 
 import json
@@ -7,18 +8,17 @@ import sys
 import click
 from sqlalchemy.orm import Session
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
 from meltano.core.db import project_engine
-from meltano.core.job.stale_job_failer import StaleJobFailer
-from meltano.core.legacy_tracking import LegacyTracker
+from meltano.core.job.stale_job_failer import fail_stale_jobs
+from meltano.core.project import Project
 from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.task_sets import TaskSets
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
-
-from . import cli
-from .params import pass_project
-from .utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
 
 
 @cli.group(
@@ -47,9 +47,8 @@ def _add_elt(
     start_date: str | None,
 ):
     """Add a new legacy elt schedule."""
-    project = ctx.obj["project"]
+    project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
 
     _, session_maker = project_engine(project)
     session = session_maker()
@@ -57,7 +56,6 @@ def _add_elt(
         added_schedule = schedule_service.add_elt(
             session, name, extractor, loader, transform, interval, start_date
         )
-        legacy_tracker.track_meltano_schedule("add", added_schedule)
         click.echo(
             f"Scheduled elt '{added_schedule.name}' at {added_schedule.interval}"
         )
@@ -69,15 +67,13 @@ def _add_elt(
 
 def _add_job(ctx, name: str, job: str, interval: str):
     """Add a new scheduled job."""
-    project = ctx.obj["project"]
+    project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
 
     _, session_maker = project_engine(project)
     session = session_maker()
     try:
         added_schedule = schedule_service.add(name, job, interval)
-        legacy_tracker.track_meltano_schedule("add", added_schedule)
         click.echo(
             f"Scheduled job '{added_schedule.name}' at {added_schedule.interval}"
         )
@@ -172,10 +168,10 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     }
 
 
-@schedule.command(
+@schedule.command(  # noqa: WPS125
     cls=PartialInstrumentedCmd, short_help="List available schedules."
-)  # noqa: WPS441
-@click.option("--format", type=click.Choice(["json", "text"]), default="text")
+)
+@click.option("--format", type=click.Choice(("json", "text")), default="text")
 @click.pass_context
 def list(ctx, format):  # noqa: WPS125
     """List available schedules."""
@@ -186,7 +182,7 @@ def list(ctx, format):  # noqa: WPS125
     _, sessionMaker = project_engine(project)  # noqa: N806
     session = sessionMaker()
     try:
-        StaleJobFailer().fail_stale_jobs(session)
+        fail_stale_jobs(session)
 
         if format == "text":
             transform_elt_markers = {
@@ -229,9 +225,6 @@ def list(ctx, format):  # noqa: WPS125
     finally:
         session.close()
 
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_schedule("list")
-
 
 @schedule.command(
     cls=PartialInstrumentedCmd,
@@ -243,17 +236,10 @@ def list(ctx, format):  # noqa: WPS125
 @click.pass_context
 def run(ctx, name, elt_options):
     """Run a schedule."""
-    schedule_service = ctx.obj["schedule_service"]
-
-    this_schedule = schedule_service.find_schedule(name)
-    process = schedule_service.run(this_schedule, *elt_options)
-
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_schedule("run", this_schedule)
-
-    exitcode = process.returncode
-    if exitcode:
-        sys.exit(exitcode)
+    schedule_service: ScheduleService = ctx.obj["schedule_service"]
+    process = schedule_service.run(schedule_service.find_schedule(name), *elt_options)
+    if process.returncode:
+        sys.exit(process.returncode)
 
 
 @schedule.command(
@@ -267,11 +253,7 @@ def remove(ctx, name):
     Usage:
         meltano schedule remove <name>
     """
-    schedule_service: ScheduleService = ctx.obj["schedule_service"]
-    removed_schedule = schedule_service.find_schedule(name)
-    schedule_service.remove(name)
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_schedule("remove", removed_schedule)
+    ctx.obj["schedule_service"].remove(name)
 
 
 def _update_job_schedule(
@@ -381,7 +363,4 @@ def set_cmd(ctx, name, interval, job, extractor, loader, transform):
         )
 
     schedule_service.update_schedule(updated)
-
     click.echo(f"Updated schedule '{name}'")
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_schedule("set", updated)

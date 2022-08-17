@@ -1,9 +1,12 @@
 """Service for managing meltano schedules."""
 
+from __future__ import annotations
+
 import logging
 import subprocess
 from datetime import date, datetime
-from typing import Dict, List, Optional
+
+from croniter import croniter
 
 from meltano.core.setting_definition import SettingMissingError
 
@@ -55,6 +58,18 @@ class ScheduleNotFoundError(Exception):
         self.namespace = namespace
 
 
+class BadCronError(Exception):
+    """Occurs when a cron expression is invalid."""
+
+    def __init__(self, cron: str):
+        """Initialize the exception.
+
+        Args:
+            cron: The cron expression that is invalid.
+        """
+        self.cron = cron
+
+
 class ScheduleService:
     """Service for managing schedules."""
 
@@ -77,7 +92,7 @@ class ScheduleService:
         loader: str,
         transform: str,
         interval: str,
-        start_date: Optional[datetime] = None,
+        start_date: datetime | None = None,
         **env,
     ) -> Schedule:
         """Add a scheduled legacy elt task.
@@ -173,8 +188,16 @@ class ScheduleService:
             The added schedule.
 
         Raises:
+            BadCronError: If the cron expression is invalid.
             ScheduleAlreadyExistsError: If a schedule with the same name already exists.
         """
+        if (
+            schedule.interval is not None
+            and schedule.interval != "@once"
+            and not croniter.is_valid(schedule.interval)
+        ):
+            raise BadCronError(schedule.interval)
+
         with self.project.meltano_update() as meltano:
             # guard if it already exists
             if schedule in meltano.schedules:
@@ -252,7 +275,7 @@ class ScheduleService:
         except (PluginNotFoundError, StopIteration) as err:
             raise ScheduleNotFoundError(namespace) from err
 
-    def schedules(self) -> List[Schedule]:
+    def schedules(self) -> list[Schedule]:
         """Return all schedules in the project.
 
         Returns:
@@ -278,7 +301,7 @@ class ScheduleService:
             raise ScheduleNotFoundError(name) from err
 
     def run(
-        self, schedule: Schedule, *args, env: Dict = None, **kwargs
+        self, schedule: Schedule, *args, env: dict = None, **kwargs
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 

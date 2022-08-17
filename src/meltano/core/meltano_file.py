@@ -20,7 +20,6 @@ class MeltanoFile(Canonical):
     def __init__(
         self,
         version: int = VERSION,
-        default_environment: str | None = None,
         plugins: dict[str, dict] = None,
         schedules: list[dict] = None,
         environments: list[dict] = None,
@@ -32,7 +31,6 @@ class MeltanoFile(Canonical):
 
         Args:
             version: The meltano.yml version, currently always 1.
-            default_environment: The default environment to use for commands in this project.
             plugins: Plugin configuration for this project.
             schedules: Schedule configuration for this project.
             environments: Environment configuration for this project.
@@ -43,7 +41,6 @@ class MeltanoFile(Canonical):
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             version=version,
-            default_environment=default_environment,
             extras=extras,
             plugins=self.load_plugins(plugins or {}),
             schedules=self.load_schedules(schedules or []),
@@ -53,10 +50,10 @@ class MeltanoFile(Canonical):
         )
 
     def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
-        """Parse the meltano.yml file and return it as `ProjectPlugin` instances.
+        """Parse the `meltano.yml` file and return it as `ProjectPlugin` instances.
 
         Args:
-            plugins: Dict of plugin configurations.
+            plugins: Dictionary of plugin configurations.
 
         Returns:
             New ProjectPlugin instances.
@@ -69,7 +66,7 @@ class MeltanoFile(Canonical):
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         for plugin_type, raw_plugins in plugins.items():
-            if plugin_type == PluginType.MAPPERS:  # noqa: WPS441 - false positive
+            if plugin_type == PluginType.MAPPERS:
                 for mapper in raw_plugins:
                     plugin_type_plugins[PluginType.MAPPERS].append(
                         ProjectPlugin(PluginType.MAPPERS, **mapper)

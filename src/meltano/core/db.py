@@ -6,10 +6,12 @@ import logging
 import time
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
+
+from meltano.core.project import Project
 
 from .project_settings_service import ProjectSettingsService
 
@@ -18,9 +20,20 @@ from .project_settings_service import ProjectSettingsService
 _engines = {}
 
 
-def project_engine(project, default=False) -> tuple(Engine, sessionmaker):
-    """Creates and register a SQLAlchemy engine for a Meltano project instance."""
+def project_engine(
+    project: Project,
+    default: bool = False,
+) -> tuple[Engine, sessionmaker]:
+    """Create and register a SQLAlchemy engine for a Meltano project instance.
 
+    Args:
+        project: The Meltano project that the engine will be connected to.
+        default: Whether the engine created should be stored as the default
+            engine for this project.
+
+    Returns:
+        The engine, and a session maker bound to the engine.
+    """
     existing_engine = _engines.get(project)
     if existing_engine:
         return existing_engine
@@ -31,7 +44,8 @@ def project_engine(project, default=False) -> tuple(Engine, sessionmaker):
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri, pool_pre_ping=True)
 
-    check_db_connection(
+    # Connect to the database to ensure it is available.
+    connect(
         engine,
         max_retries=settings.get("database_max_retries"),
         retry_timeout=settings.get("database_retry_timeout"),
@@ -48,69 +62,101 @@ def project_engine(project, default=False) -> tuple(Engine, sessionmaker):
     return engine_session
 
 
-def check_db_connection(engine, max_retries, retry_timeout):  # noqa: WPS231
-    """Check if the database is available the first time a project's engine is created."""
+def connect(
+    engine: Engine,
+    max_retries: int,
+    retry_timeout: float,
+) -> Connection:
+    """Connect to the database.
+
+    Args:
+        engine: The DB engine with which the check will be performed.
+        max_retries: The maximum number of retries that will be attempted.
+        retry_timeout: The number of seconds to wait between retries.
+
+    Raises:
+        OperationalError: Error during DB connection - max retries exceeded.
+
+    Returns:
+        A connection to the database.
+    """
     attempt = 0
     while True:
-        try:  # noqa: WPS503
-            engine.connect()
+        try:
+            return engine.connect()
         except OperationalError:
-            if attempt == max_retries:
+            if attempt >= max_retries:
                 logging.error(
-                    "Could not connect to the Database. Max retries exceeded."
+                    f"Could not connect to the database after {attempt} "
+                    "attempts. Max retries exceeded."
                 )
                 raise
             attempt += 1
             logging.info(
-                f"DB connection failed. Will retry after {retry_timeout}s. Attempt {attempt}/{max_retries}"
+                f"DB connection failed. Will retry after {retry_timeout}s. "
+                f"Attempt {attempt}/{max_retries}"
             )
             time.sleep(retry_timeout)
-        else:
-            break
 
 
-def init_hook(engine):
-    function_map = {"sqlite": init_sqlite_hook}
+init_hooks = {
+    "sqlite": lambda x: x.execute("PRAGMA journal_mode=WAL"),
+}
+
+
+def init_hook(engine: Engine) -> None:
+    """Run the initialization hook for the provided DB engine.
+
+    The initialization hooks are taken from the `meltano.core.db.init_hooks`
+    dictionary, which maps the dialect name of the engine to a unary function
+    which will be called with the provided DB engine.
+
+    Args:
+        engine: The engine for which the init hook will be run.
+
+    Raises:
+        Exception: The init hook raised an exception.
+    """
+    try:
+        hook = init_hooks[engine.dialect.name]
+    except KeyError:
+        return
 
     try:
-        function_map[engine.dialect.name](engine)
-    except KeyError:
-        pass
-    except Exception as e:
-        raise Exception(f"Can't initialize database: {str(e)}") from e
+        hook(engine)
+    except Exception as ex:
+        raise Exception(f"Failed to initialize database: {ex!s}") from ex
 
 
-def init_sqlite_hook(engine):
-    # enable the WAL
-    engine.execute("PRAGMA journal_mode=WAL")
+def ensure_schema_exists(
+    engine: Engine,
+    schema_name: str,
+    grant_roles: tuple[str] = (),
+) -> None:
+    """Ensure the specified `schema_name` exists in the database.
 
+    Args:
+        engine: The DB engine to be used.
+        schema_name: The name of the schema.
+        grant_roles: Roles to grant to the specified schema.
+    """
+    schema_identifier = schema_name
+    group_identifiers = ",".join(grant_roles)
 
-class DB:
-    @classmethod
-    def ensure_schema_exists(cls, engine, schema_name, grant_roles=()):
-        """
-        Make sure that the given schema_name exists in the database. If not, create it.
+    create_schema = text(f"CREATE SCHEMA IF NOT EXISTS {schema_identifier}")
+    grant_select_schema = text(
+        f"ALTER DEFAULT PRIVILEGES IN SCHEMA {schema_identifier} GRANT SELECT ON TABLES TO {group_identifiers}"
+    )
+    grant_usage_schema = text(
+        f"GRANT USAGE ON SCHEMA {schema_identifier} TO {group_identifiers}"
+    )
 
-        :param db_conn: psycopg2 database connection
-        :param schema_name: database schema
-        """
-        schema_identifier = schema_name
-        group_identifiers = ",".join(grant_roles)
+    with engine.connect() as conn, conn.begin():
+        conn.execute(create_schema)
+        if grant_roles:
+            conn.execute(grant_select_schema)
+            conn.execute(grant_usage_schema)
 
-        create_schema = text(f"CREATE SCHEMA IF NOT EXISTS {schema_identifier}")
-        grant_select_schema = text(
-            f"ALTER DEFAULT PRIVILEGES IN SCHEMA {schema_identifier} GRANT SELECT ON TABLES TO {group_identifiers}"
-        )
-        grant_usage_schema = text(
-            f"GRANT USAGE ON SCHEMA {schema_identifier} TO {group_identifiers}"
-        )
-
-        with engine.connect() as conn, conn.begin():
-            conn.execute(create_schema)
-            if grant_roles:
-                conn.execute(grant_select_schema)
-                conn.execute(grant_usage_schema)
-
-        logging.info(f"Schema {schema_name} has been created successfully.")
-        for role in grant_roles:
-            logging.info(f"Usage has been granted for role: {role}.")
+    logging.info(f"Schema {schema_name} has been created successfully.")
+    for role in grant_roles:
+        logging.info(f"Usage has been granted for role: {role}.")

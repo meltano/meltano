@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 import platform
@@ -85,7 +87,7 @@ class TestCliState:
     ):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for (pattern, expected_result) in patterns_with_expected_results:
-                result = cli_runner.invoke(cli, ["state", "list", pattern])
+                result = cli_runner.invoke(cli, ["state", "list", "--pattern", pattern])
                 assert_cli_runner(result)
                 assert self.get_result_set(result) == expected_result
 

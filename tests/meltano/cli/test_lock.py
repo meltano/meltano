@@ -49,9 +49,9 @@ class TestLock:
 
         result = cli_runner.invoke(cli, ["lock", "--all"])
         assert result.exit_code == 0
-        assert "Lockfile exists for extractor tap-mock" in result.output
-        assert "Lockfile exists for loader target-mock" in result.output
-        assert "Locked definition" not in result.output
+        assert "Lockfile exists for extractor tap-mock" in result.stdout
+        assert "Lockfile exists for loader target-mock" in result.stdout
+        assert "Locked definition" not in result.stdout
 
     def test_lockfile_update(
         self,
@@ -76,8 +76,8 @@ class TestLock:
 
         result = cli_runner.invoke(cli, ["lock", "--all", "--update"])
         assert result.exit_code == 0
-        assert result.output.count("Lockfile exists") == 0
-        assert result.output.count("Locked definition") == 2
+        assert result.stdout.count("Lockfile exists") == 0
+        assert result.stdout.count("Locked definition") == 2
 
         new_checksum = tap_lock.sha256_checksum
         new_definition = tap_lock.load()
@@ -105,6 +105,6 @@ class TestLock:
             ["lock", "--all", "--update", "--plugin-type", "extractor"],
         )
         assert result.exit_code == 0
-        assert "Lockfile exists" not in result.output
-        assert "Locked definition for extractor tap-mock" in result.output
-        assert "Extractor tap-mock-inherited is an inherited plugin" in result.output
+        assert "Lockfile exists" not in result.stdout
+        assert "Locked definition for extractor tap-mock" in result.stdout
+        assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout

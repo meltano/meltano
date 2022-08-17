@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from flask import jsonify, request
 from flask_restful import Api, Resource, fields, marshal_with
 from flask_security import roles_required
@@ -10,18 +12,18 @@ from meltano.api.security.identity import users
 
 from .settings_helper import SettingsHelper
 
-settingsBP = APIBlueprint("settings", __name__)
-settingsApi = Api(settingsBP)
+settings_bp = APIBlueprint("settings", __name__)
+settings_api = Api(settings_bp)
 
 
-@settingsBP.route("/", methods=["GET"])
+@settings_bp.route("/", methods=["GET"])
 @roles_required("admin")
 def index():
     settings_helper = SettingsHelper()
     return jsonify(settings_helper.get_connections())
 
 
-@settingsBP.route("/save", methods=["POST"])
+@settings_bp.route("/save", methods=["POST"])
 @roles_required("admin")
 @block_if_readonly
 def save():
@@ -31,7 +33,7 @@ def save():
     return jsonify(settings)
 
 
-@settingsBP.route("/delete", methods=["POST"])
+@settings_bp.route("/delete", methods=["POST"])
 @roles_required("admin")
 @block_if_readonly
 def delete():
@@ -41,26 +43,11 @@ def delete():
     return jsonify(settings)
 
 
-@settingsBP.route("/connections/<name>/test")
-def test(name):
-    current_settings = Settings.query.first().settings
-    connections = current_settings["connections"]
-    try:
-        found_connection = next(
-            connection for connection in connections if connection["name"] == name
-        )
-    # this is a really broad exception catch, this will swallow sneaky errors
-    except Exception:
-        found_connection = {}
-
-    return jsonify(found_connection)
-
-
 class Canonical(fields.Raw):
-    def __init__(self, scopes=[], **kwargs):
+    def __init__(self, scopes=None, **kwargs):
         super().__init__(**kwargs)
 
-        self._scopes = scopes
+        self._scopes = [] if scopes is None else scopes
 
     def format(self, value):
         try:
@@ -134,16 +121,14 @@ class RolesResource(Resource):
         try:
             role = Role.query.filter_by(name=role["name"]).one()
 
-            if not user:
-                if role == "admin":
-                    return "The `admin` role cannot be deleted.", 403
-
-                # delete the role
-                db.session.delete(role)
-            else:
+            if user:
                 # unassign the user-role
                 assigned_user = role.users.filter(User.username == user).one()
                 role.users.remove(assigned_user)
+            else:
+                if role == "admin":
+                    return "The `admin` role cannot be deleted.", 403
+                db.session.delete(role)
 
             db.session.commit()
         except Exception as err:
@@ -196,14 +181,14 @@ class RolePermissionsResource(Resource):
             ).one()
             role.permissions.remove(perm)
             db.session.commit()
-        except:
+        except Exception:
             return role, 200
 
         return role, 201
 
 
-settingsApi.add_resource(AclResource, "/acl")
-settingsApi.add_resource(
+settings_api.add_resource(AclResource, "/acl")
+settings_api.add_resource(
     RolePermissionsResource, "/acl/roles/permissions", endpoint="role_permissions"
 )
-settingsApi.add_resource(RolesResource, "/acl/roles", endpoint="roles")
+settings_api.add_resource(RolesResource, "/acl/roles", endpoint="roles")

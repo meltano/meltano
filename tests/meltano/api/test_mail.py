@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 from meltano.api.mail import MailService

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import platform
@@ -8,7 +10,6 @@ from click.testing import CliRunner
 from mock import AsyncMock, Mock, patch
 
 from meltano.cli import cli
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
@@ -29,7 +30,7 @@ class TestCliInvoke:
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=0)
 
-        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
+        with patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -43,7 +44,7 @@ class TestCliInvoke:
 
     @pytest.fixture
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
-        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
+        with patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -166,7 +167,7 @@ class TestCliInvoke:
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=2)
 
-        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
+        with patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
@@ -185,7 +186,7 @@ class TestCliInvoke:
         project_plugins_service: ProjectPluginsService,
         tap: ProjectPlugin,
     ):
-        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
+        with patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
         ), patch.object(
@@ -225,7 +226,7 @@ class TestCliInvoke:
     ):
         settings_service = plugin_settings_service_factory(tap)
 
-        with patch.object(LegacyTracker, "track_event", return_value=None), patch(
+        with patch(
             "meltano.cli.invoke.ProjectPluginsService",
             return_value=project_plugins_service,
         ), patch.object(SingerTap, "discover_catalog"), patch.object(

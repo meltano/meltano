@@ -26,7 +26,7 @@ class OAuthError(Exception):
 def base64_pad(unpadded: str) -> str:
     """Add padding to a base64-encoded string.
 
-    Parameters:
+    Args:
         unpadded: The unpadded base64-encoded string.
 
     Returns:
@@ -42,7 +42,7 @@ jwt_decode = compose(json.loads, base64.urlsafe_b64decode, base64_pad)
 def setup_oauth_gitlab(oauth: OAuthClient) -> None:
     """Register OAuth for GitLab.
 
-    Parameters:
+    Args:
         oauth: The `OAuthClient` which has a Flask app for which the OAuth
             blueprint will be registered.
     """
@@ -78,7 +78,7 @@ def setup_oauth_gitlab(oauth: OAuthClient) -> None:
 def setup_oauth(app: Flask) -> None:
     """Set up OAuth for the given Flask app.
 
-    Parameters:
+    Args:
         app: The Flask app for which OAuth should be setup.
     """
     setup_oauth_gitlab(OAuthClient(app))
@@ -87,7 +87,7 @@ def setup_oauth(app: Flask) -> None:
 def gitlab_token_identity(token: dict[str, str]) -> OAuth:
     """Get an OAuth identity from a GitLab token.
 
-    Parameters:
+    Args:
         token: A dictionary with the token keyed by 'access_token'.
 
     Raises:

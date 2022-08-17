@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import pytest
 from mock import Mock
 from sqlalchemy.exc import OperationalError
 
-from meltano.core.db import check_db_connection
+from meltano.core.db import connect
 
 
 class TestConnectionRetries:
@@ -14,7 +16,7 @@ class TestConnectionRetries:
             "test_error", "test_error", "test_error"
         )
         with pytest.raises(OperationalError):
-            check_db_connection(engine=engine_mock, max_retries=3, retry_timeout=0.1)
+            connect(engine=engine_mock, max_retries=3, retry_timeout=0.1)
 
         assert engine_mock.connect.call_count == 4
 
@@ -25,5 +27,5 @@ class TestConnectionRetries:
             None,
         ]
 
-        check_db_connection(engine=engine_mock, max_retries=3, retry_timeout=0.1)
+        connect(engine=engine_mock, max_retries=3, retry_timeout=0.1)
         assert engine_mock.connect.call_count == 2
