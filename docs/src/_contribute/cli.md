@@ -53,8 +53,8 @@ AND short variation of the option. For example `--help` and `-h`, `--force` and 
 the short form if it is ambiguous or is likely to overlap with another option in the same global command group. For
 example avoid using `-t` as a short form for `--tasks` as it may be confused with a hypothetical `--test` option.
 
-Note that in official documentation the long form is always preferred, if you can simply and clearly indicate that both
-are available without causing confusion you provide both. The short version alone should never be used in documentation.
+Note that in documentation like guides and walkthrough the long form is always preferred. The short version alone should
+never be used in documentation.
 
 
 ### Desired verb/command linkage and structure
@@ -208,7 +208,7 @@ meltano run BLOCKS ...
 meltano install [] [PLUGIN_NAME] ...
 ```
 
-#### Flags
+#### Short and Long Options
 
 For official documentation such as walkthroughs and guides use the long form of the flag. For example:
 
