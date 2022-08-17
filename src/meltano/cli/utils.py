@@ -341,7 +341,7 @@ def add_plugin(
             click.echo(f"\tmeltano config {plugin.name} list")
             click.echo()
             click.echo(
-                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#switching-from-one-variant-to-another"
+                "To learn more, visit https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another"
             )
 
             click.echo()
@@ -359,7 +359,7 @@ def add_plugin(
 
             click.echo()
             click.echo(
-                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#multiple-variants"
+                "To learn more, visit https://docs.meltano.com/guide/plugin-management#multiple-variants"
             )
         else:
             click.echo(
