@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from meltano.core.job import Job
-from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.job.stale_job_failer import fail_stale_jobs
 
 
 class TestStaleJobFailer:
@@ -50,8 +50,7 @@ class TestStaleJobFailer:
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
 
-        failer = StaleJobFailer()
-        failer.fail_stale_jobs(session)
+        fail_stale_jobs(session)
 
         session.refresh(live_job)
         session.refresh(stale_job)
@@ -75,8 +74,7 @@ class TestStaleJobFailer:
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
 
-        failer = StaleJobFailer(state_id=stale_job.job_name)
-        failer.fail_stale_jobs(session)
+        fail_stale_jobs(session, state_id=stale_job.job_name)
 
         session.refresh(live_job)
         session.refresh(stale_job)

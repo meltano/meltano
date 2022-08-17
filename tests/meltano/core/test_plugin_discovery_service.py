@@ -12,11 +12,7 @@ import requests_mock
 from meltano.core import bundle
 from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import (
-    VERSION,
-    DiscoveryFile,
-    PluginNotFoundError,
-)
+from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.yaml import configure_yaml
 
@@ -69,7 +65,6 @@ class TestPluginDiscoveryService:
     @pytest.fixture
     def discovery_yaml(self, subject):
         """Disable the discovery mock."""
-        yaml.register_class(DiscoveryFile)
         with subject.project.root_dir("discovery.yml").open("w") as discovery_yaml:
             yaml.dump(subject._discovery, discovery_yaml)
 
