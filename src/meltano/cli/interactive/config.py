@@ -1,4 +1,6 @@
 """Interactive configuration handler."""
+from __future__ import annotations
+
 import json
 import textwrap
 
@@ -122,10 +124,6 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         click.echo(
             f"{self.indentation}allowing you to define custom layers of configuration within your project."
         )
-        click.echo()
-        click.echo(
-            f"{self.indentation}You will be asked where you would like to store setting values, and optionally which Environment to use."
-        )
 
     def _print_home_available_settings(self):
         """Print available setting names and current values."""
@@ -239,7 +237,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 )
             )
 
-    def configure(self, name, index=None, last_index=None):
+    def configure(self, name, index=None, last_index=None, show_set_prompt=True):
         """Configure a single setting interactively."""
         config_metadata = next(
             (
@@ -254,7 +252,11 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         click.echo(separator)
         click.echo()
 
-        modify = click.confirm("Set this value?", default=True)
+        if show_set_prompt:
+            modify = click.confirm("Set this value?", default=True)
+        else:
+            modify = True
+
         if modify:
             click.echo()
             new_value = click.prompt("New value", default="", show_default=False)
@@ -305,6 +307,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     name=choice_name,
                     index=branch,
                     last_index=len(self.setting_choices),
+                    show_set_prompt=False,
                 )
 
     def set_value(self, setting_name, value, store):

@@ -276,37 +276,22 @@ def reset(ctx, store):
 
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
-@click.argument("setting_name", nargs=-1, required=True)
-@click.argument("value")
+@click.option("--interactive", is_flag=True)
+@click.argument("setting_name", nargs=-1)
+@click.argument("value", required=False)
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
-def set_(ctx, setting_name, value, store):
+def set_(ctx, setting_name, value, store, interactive):
     """Set the configurations' setting `<name>` to `<value>`."""
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
-    interaction.set_value(setting_name=setting_name, value=value, store=store)
-
-
-@config.command()
-@click.argument("setting_name", nargs=-1, required=False)
-@click.option(
-    "--store",
-    type=click.Choice(SettingValueStore.writables()),
-    default=SettingValueStore.AUTO,
-)
-@click.option("--extras", is_flag=True)
-@click.pass_context
-def interactive(ctx, setting_name, store, extras):
-    """Set configuration interactively."""
-    interaction = InteractiveConfig(ctx=ctx, store=store, extras=extras)
-    if setting_name:
-        name = ".".join(list(setting_name))
-        interaction.configure(name=name)
-    else:
+    if interactive:
         interaction.configure_all()
+    else:
+        interaction.set_value(setting_name=setting_name, value=value, store=store)
 
 
 @config.command(cls=PartialInstrumentedCmd, name="test")
