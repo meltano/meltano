@@ -6,17 +6,17 @@ layout: doc
 
 ## Logging
 
-Logging in meltano can be controlled via standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
+Logging in meltano can be controlled via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
 
-By default, meltano will look for a `logging.yaml` file in the project root. However, you can override this by setting
-the [Environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or using the `meltano`
-CLI option `--log-config`. e.g. `meltano --log-config=my-prod-logging.yaml ...`.
+By default, meltano will look for this in a `logging.yaml` file in the project root. However, you can override this by
+setting the [environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or by using the
+`meltano` CLI option `--log-config`. e.g. `meltano --log-config=my-prod-logging.yaml ...`.
 
-The logging.yaml contains a few key sections that you should be aware of.
+A logging.yaml contains a few key sections that you should be aware of.
 
 - `formatters` - This section contains the formatters that are used by the handlers. This controls the output format of the log messages (e.g. json).
-- `handlers` - This section contains the handlers that are used by the loggers. This controls the output destination of the log messages (e.g. the console).
-- `loggers` - This section allows you to explicitly control specific application/module/class/etc level loggers.
+- `handlers` - This section contains the handlers which are used the loggers. This controls the output destination of the log messages (e.g. the console).
+- `loggers` - This section allows you to explicitly control specific module/class/etc named loggers.
 
 A few key points to note:
 
@@ -31,7 +31,7 @@ version: 1
 disable_existing_loggers: false
 
 formatters:
-  default:
+  default: # use a format similar to default generic python logging format
     format: "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
   structured_plain: # log format for structured plain text logs without colored output
     (): meltano.core.logging.console_log_formatter
@@ -115,6 +115,9 @@ root:
   propagate: yes
   handlers: [console, file]
 ```
+
+To have it be even more terse, you can use level `WARN` instead of `DEBUG`. In the case of something like a successful
+`meltano run` invocation this would produce no output at all.
 
 ## A generic starting config for log management providers
 
@@ -231,11 +234,11 @@ logs:
 
 See https://docs.datadoghq.com/logs/log_collection/python/?tab=jsonlogformatter for further details.
 
-## Google Cloud Logging config
+## Google Cloud logging config
 
-For Google Cloud Logging (stackpath) the default json log format is sufficient, and works out of the box.
-As such for capturing `meltano run`, `meltano invoke` and `meltano elt` console output directly via something
-like CloudRun the built-in json format is sufficient:
+For Google Cloud Logging (stackdriver) the default json log format is sufficient. That means when capturing `meltano run`,
+`meltano invoke` and `meltano elt` console output directly via something like CloudRun the built-in json format is
+sufficient:
 
 ```yaml
 version: 1
