@@ -6,10 +6,11 @@ layout: doc
 
 ## Logging
 
-Logging can be configured by providing a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
-By default meltano will look for a `logging.yaml` file in the project root. However, you can override this setting
+Logging in meltano can be controlled via standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
+
+By default, meltano will look for a `logging.yaml` file in the project root. However, you can override this by setting
 the [Environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or using the `meltano`
-CLI option `--log-config`.
+CLI option `--log-config`. e.g. `meltano --log-config=my-prod-logging.yaml ...`.
 
 The logging.yaml contains a few key sections that you should be aware of.
 
@@ -80,7 +81,7 @@ loggers:
     propogate: no
 ```
 
-### Local development logging
+## Local development config example
 
 While working with meltano locally it's sometimes nice to have more terse logging on the console, but still have DEBUG
 level info written to a log file behind scenes incase you need to debug something. To accomplish that, you can use a
@@ -115,7 +116,7 @@ root:
   handlers: [console, file]
 ```
 
-### A general config suitable for most providers
+## A generic starting config for log management providers
 
 Most logging management tools will readily accept structured logs delivered in JSON format. As such, when all else fails
 configuring Meltano to log in JSON format is a good first step.
@@ -176,7 +177,7 @@ root:
   handlers: [console]
 ```
 
-### Datadog logging config
+## Datadog logging config
 
 For Datadog logging you have a couple of options. The easiest approach maybe to simply log to a file in json format and
 collect it with the Datadog Agent.
@@ -230,7 +231,7 @@ logs:
 
 See https://docs.datadoghq.com/logs/log_collection/python/?tab=jsonlogformatter for further details.
 
-### Google Cloud Logging config
+## Google Cloud Logging config
 
 For Google Cloud Logging (stackpath) the default json log format is sufficient, and works out of the box.
 As such for capturing `meltano run`, `meltano invoke` and `meltano elt` console output directly via something
@@ -272,7 +273,7 @@ and ones that are useful for filter or grouping:
 - `success` - Whether something succeeded or failed.
 - `error` - Where possible indicates the error type if one occurred.
 
-## Tips/Tricks and various logging recipes
+## Tips and tricks
 
 Use `[jq](https://stedolan.github.io/jq/)` to filter the output of json formatted meltano logs to only show the lines you're interested in.
 
