@@ -44,7 +44,7 @@ def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
     Returns:
         The merged dict.
     """
-    base = copy.deepcopy(parent)
+    base = copy.copy(parent)
     for child in children:
         for key, value in child.items():
             if isinstance(value, Mapping):
