@@ -15,13 +15,13 @@ import fasteners
 from dotenv import dotenv_values
 from werkzeug.utils import secure_filename
 
+from meltano.core import yaml
 from meltano.core.behavior.versioned import Versioned
 from meltano.core.environment import Environment
 from meltano.core.error import Error
 from meltano.core.plugin.base import PluginRef
 from meltano.core.project_files import ProjectFiles
 from meltano.core.utils import makedirs, truthy
-from meltano.core.yaml import yaml
 
 if TYPE_CHECKING:
     from .meltano_file import MeltanoFile as MeltanoFileTypeHint
@@ -230,11 +230,10 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             The current meltano config
         """
-        from .meltano_file import MeltanoFile
-        from .settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
+        from meltano.core.meltano_file import MeltanoFile
+        from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 
-        with open(self.meltanofile) as melt_ff:
-            meltano_ff: dict[str, Any] = yaml.load(melt_ff)
+        meltano_ff: dict[str, Any] = yaml.load(self.meltanofile)
 
         uvicorn_enabled = (
             meltano_ff.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}")

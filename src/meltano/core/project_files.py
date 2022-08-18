@@ -10,10 +10,11 @@ from pathlib import Path
 from typing import Mapping, MutableMapping, Sequence, TypeVar
 
 from atomicwrites import atomic_write
+from cached_property import cached_property
 from ruamel.yaml import YAMLError
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-from meltano.core.yaml import yaml
+from meltano.core import yaml
 
 logger = logging.getLogger(__name__)
 TMapping = TypeVar("TMapping", bound=MutableMapping)
@@ -74,22 +75,18 @@ class ProjectFiles:  # noqa: WPS214
             meltano_file_path: The path to the meltano.yml file.
         """
         self.root = root.resolve()
-        self._meltano: CommentedMap | None = None
         self._meltano_file_path = meltano_file_path.resolve()
         self._plugin_file_map = {}
         self._raw_contents_map: dict[str, CommentedMap] = {}
 
-    @property
+    @cached_property
     def meltano(self) -> CommentedMap:
         """Return the contents of this project's `meltano.yml`.
 
         Returns:
             The contents of this projects `meltano.yml`.
         """
-        if self._meltano is None:
-            with open(self._meltano_file_path) as melt_f:
-                self._meltano = yaml.load(melt_f)
-        return self._meltano
+        return yaml.load(self._meltano_file_path)
 
     @property
     def include_paths(self) -> list[Path]:
@@ -107,7 +104,7 @@ class ProjectFiles:  # noqa: WPS214
         Returns:
             A dict representation of all project files.
         """
-        # meltano file may have changed in another process, so reset cache first
+        # meltano file may have changed in another process, so update the cache first
         self.reset_cache()
         self._raw_contents_map.clear()
         self._raw_contents_map[str(self._meltano_file_path)] = self.meltano
@@ -137,8 +134,11 @@ class ProjectFiles:  # noqa: WPS214
         return meltano_config
 
     def reset_cache(self) -> None:
-        """Reset cached view of the meltano.yml file."""
-        self._meltano = None
+        """Reset cached view of the `meltano.yml` file."""
+        try:
+            del self.__dict__["meltano"]
+        except KeyError:
+            pass
 
     def _is_valid_include_path(self, file_path: Path) -> None:
         """Determine if given path is a valid `include_paths` file.
@@ -249,17 +249,15 @@ class ProjectFiles:  # noqa: WPS214
         included_file_contents = []
         for path in self.include_paths:
             try:
-                with path.open() as file:
-                    contents: CommentedMap = yaml.load(file)
-                    self._raw_contents_map[str(path)] = contents
-                    # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
-                    self._index_file(
-                        include_file_path=path, include_file_contents=contents
-                    )
-                    included_file_contents.append(contents)
+                contents: CommentedMap = yaml.load(path)
             except YAMLError as exc:
                 logger.critical(f"Error while parsing YAML file: {path} \n {exc}")
                 raise exc
+            else:
+                self._raw_contents_map[str(path)] = contents
+                # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
+                self._index_file(include_file_path=path, include_file_contents=contents)
+                included_file_contents.append(contents)
         return included_file_contents
 
     def _add_mapping_entry(self, file_dicts, file, key, value):
