@@ -47,6 +47,7 @@ def upgrade():
             column_name="state",
             type_=sa.types.String(max_string_length),
             existing_type=sa.Enum(State, name="job_state"),
+            existing_nullable=True,
         )
 
     # In postgresql, drop the created Enum type so that
