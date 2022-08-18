@@ -7,7 +7,7 @@ import logging
 from collections import OrderedDict
 from os import PathLike
 from pathlib import Path
-from typing import Mapping, MutableMapping, TypeVar
+from typing import Mapping, MutableMapping, Sequence, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import YAMLError
@@ -47,11 +47,11 @@ def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
     base = copy.deepcopy(parent)
     for child in children:
         for key, value in child.items():
-            if isinstance(value, dict):
+            if isinstance(value, Mapping):
                 # get node or create one
                 node = base.setdefault(key, value.__class__())
                 base[key] = deep_merge(node, [value])
-            elif isinstance(value, list):
+            elif isinstance(value, Sequence):
                 node = base.setdefault(key, value.__class__())
                 node.extend(value)
             else:
