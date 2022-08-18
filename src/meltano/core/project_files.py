@@ -13,7 +13,7 @@ from atomicwrites import atomic_write
 from ruamel.yaml import YAMLError
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
-from meltano.core.yaml import configure_yaml
+from meltano.core.yaml import yaml
 
 logger = logging.getLogger(__name__)
 TMapping = TypeVar("TMapping", bound=MutableMapping)
@@ -78,18 +78,17 @@ class ProjectFiles:  # noqa: WPS214
         self._meltano_file_path = meltano_file_path.resolve()
         self._plugin_file_map = {}
         self._raw_contents_map: dict[str, CommentedMap] = {}
-        self._yaml = configure_yaml()
 
     @property
     def meltano(self) -> CommentedMap:
-        """Return the contents of this projects `meltano.yml`.
+        """Return the contents of this project's `meltano.yml`.
 
         Returns:
             The contents of this projects `meltano.yml`.
         """
         if self._meltano is None:
             with open(self._meltano_file_path) as melt_f:
-                self._meltano = self._yaml.load(melt_f)
+                self._meltano = yaml.load(melt_f)
         return self._meltano
 
     @property
@@ -251,7 +250,7 @@ class ProjectFiles:  # noqa: WPS214
         for path in self.include_paths:
             try:
                 with path.open() as file:
-                    contents: CommentedMap = self._yaml.load(file)
+                    contents: CommentedMap = yaml.load(file)
                     self._raw_contents_map[str(path)] = contents
                     # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
                     self._index_file(
@@ -381,4 +380,4 @@ class ProjectFiles:  # noqa: WPS214
 
     def _write_file(self, file_path: PathLike, contents: Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
-            self._yaml.dump(contents, fl)
+            yaml.dump(contents, fl)

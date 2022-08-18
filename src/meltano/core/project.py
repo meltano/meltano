@@ -9,22 +9,22 @@ import sys
 import threading
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import fasteners
 from dotenv import dotenv_values
 from werkzeug.utils import secure_filename
 
+from meltano.core.behavior.versioned import Versioned
 from meltano.core.environment import Environment
+from meltano.core.error import Error
 from meltano.core.plugin.base import PluginRef
-
-from .behavior.versioned import Versioned
-from .error import Error
-from .project_files import ProjectFiles
-from .utils import makedirs, truthy
+from meltano.core.project_files import ProjectFiles
+from meltano.core.utils import makedirs, truthy
+from meltano.core.yaml import yaml
 
 if TYPE_CHECKING:
-    from .meltano_file import MeltanoFile as MeltanoFileHint
+    from .meltano_file import MeltanoFile as MeltanoFileTypeHint
 
 
 logger = logging.getLogger(__name__)
@@ -224,18 +224,17 @@ class Project(Versioned):  # noqa: WPS214
         return self._project_files
 
     @property
-    def meltano(self) -> MeltanoFileHint:
+    def meltano(self) -> MeltanoFileTypeHint:
         """Return a copy of the current meltano config.
 
         Returns:
-            the current meltano config
+            The current meltano config
         """
         from .meltano_file import MeltanoFile
         from .settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
-        from .yaml import configure_yaml
 
         with open(self.meltanofile) as melt_ff:
-            meltano_ff: dict = configure_yaml().load(melt_ff)
+            meltano_ff: dict[str, Any] = yaml.load(melt_ff)
 
         uvicorn_enabled = (
             meltano_ff.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}")

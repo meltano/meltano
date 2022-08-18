@@ -5,14 +5,12 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from meltano.core.yaml import configure_yaml
+from meltano.core.yaml import yaml
 
 from .plugin.project_plugin import ProjectPlugin
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .project_plugins_service import ProjectPluginsService
-
-yaml = configure_yaml()
 
 
 class TransformAddService:

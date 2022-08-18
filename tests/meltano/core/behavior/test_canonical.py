@@ -7,7 +7,7 @@ import pytest
 from ruamel.yaml.comments import CommentedMap
 
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.yaml import configure_yaml
+from meltano.core.yaml import yaml
 
 definition = {
     # a, b, …, z
@@ -28,7 +28,6 @@ class TestCanonical:
         subject.test = "hello"
         yaml_definition = "\n".join(f"{k}: {v}" for k, v in iter(subject))
 
-        yaml = configure_yaml()
         buf = io.StringIO()
         yaml.dump(subject, buf)
         buf.seek(0)
@@ -150,7 +149,6 @@ class TestCanonical:
             - value # Comment in an array element
         """
         contents = dedent(contents)
-        yaml = configure_yaml()
         in_stream = io.StringIO(contents)
         mapping = yaml.load(in_stream)
         subject = Canonical.parse(mapping)
