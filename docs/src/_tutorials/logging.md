@@ -116,7 +116,7 @@ root:
   handlers: [console, file]
 ```
 
-To have it be even more terse, you can use level `WARN` instead of `DEBUG`. In the case of something like a successful
+To have it be even more terse, you can use level `WARN` instead of `INFO`. In the case of something like a successful
 `meltano run` invocation this would produce no output at all.
 
 ## A generic starting config for log management providers
