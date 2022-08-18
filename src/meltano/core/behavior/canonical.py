@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+from functools import lru_cache
 from os import PathLike
 from typing import Any, TypeVar
 
@@ -128,6 +129,31 @@ class Canonical:  # noqa: WPS214 (too many methods)
         Returns:
             Parsed instance.
         """
+
+        class IdHashBox:
+            """Wrapper class that makes the hash of an object its Python ID."""
+
+            def __init__(self, content: Any):
+                self.content = content
+
+            def __hash__(self) -> int:
+                return id(self)
+
+        return cls._parse(IdHashBox(obj))
+
+    @classmethod
+    @lru_cache()
+    def _parse(cls: type[T], obj: Any) -> T:
+        """Parse a 'Canonical' object from a dictionary or return the instance.
+
+        Args:
+            obj: Dictionary or instance to parse.
+
+        Returns:
+            Parsed instance.
+        """
+        obj = obj.content
+
         if obj is None:
             return None
 
