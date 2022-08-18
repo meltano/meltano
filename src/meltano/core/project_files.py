@@ -7,10 +7,9 @@ import logging
 from collections import OrderedDict
 from os import PathLike
 from pathlib import Path
-from typing import Mapping, MutableMapping, Sequence, TypeVar
+from typing import Any, Mapping, MutableMapping, Sequence, TypeVar
 
 from atomicwrites import atomic_write
-from cached_property import cached_property
 from ruamel.yaml import YAMLError
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
@@ -78,8 +77,9 @@ class ProjectFiles:  # noqa: WPS214
         self._meltano_file_path = meltano_file_path.resolve()
         self._plugin_file_map = {}
         self._raw_contents_map: dict[str, CommentedMap] = {}
+        self._cached_loaded: CommentedMap | None = None
 
-    @cached_property
+    @property
     def meltano(self) -> CommentedMap:
         """Return the contents of this project's `meltano.yml`.
 
@@ -104,12 +104,23 @@ class ProjectFiles:  # noqa: WPS214
         Returns:
             A dict representation of all project files.
         """
-        # meltano file may have changed in another process, so update the cache first
-        self.reset_cache()
+        prev_raw_contents_map = self._raw_contents_map.copy()
         self._raw_contents_map.clear()
         self._raw_contents_map[str(self._meltano_file_path)] = self.meltano
         included_file_contents = self._load_included_files()
-        return deep_merge(self.meltano, included_file_contents)
+
+        # If the exact same objects are loaded again, use the cached result:
+        k = TypeVar("k")
+
+        def id_vals(x: dict[k, Any]) -> dict[k, int]:
+            return {k: id(v) for k, v in x.items()}
+
+        if self._cached_loaded is None or id_vals(prev_raw_contents_map) != id_vals(
+            self._raw_contents_map
+        ):
+            self._cached_loaded = deep_merge(self.meltano, included_file_contents)
+
+        return self._cached_loaded
 
     def update(self, meltano_config: dict) -> dict:
         """Update config by overriding current config with new, changed config.
@@ -130,15 +141,7 @@ class ProjectFiles:  # noqa: WPS214
         unused_files = [fl for fl in self.include_paths if str(fl) not in file_dicts]
         for unused_file_path in unused_files:
             self._write_file(unused_file_path, BLANK_SUBFILE)
-        self.reset_cache()
         return meltano_config
-
-    def reset_cache(self) -> None:
-        """Reset cached view of the `meltano.yml` file."""
-        try:
-            del self.__dict__["meltano"]
-        except KeyError:
-            pass
 
     def _is_valid_include_path(self, file_path: Path) -> None:
         """Determine if given path is a valid `include_paths` file.
