@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
-from os import PathLike
 from pathlib import Path
 
 from ruamel.yaml import YAML
@@ -32,10 +32,10 @@ class CachedCommentedMap:
     data: CommentedMap
 
 
-cache: dict[PathLike, CachedCommentedMap] = {}
+cache: dict[os.PathLike, CachedCommentedMap] = {}
 
 
-def load(path: PathLike) -> CommentedMap:
+def load(path: os.PathLike) -> CommentedMap:
     """Load the specified YAML file with caching.
 
     The cache is used if both the file path and its content hash match what is stored.

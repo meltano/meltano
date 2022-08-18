@@ -83,7 +83,7 @@ class Project(Versioned):  # noqa: WPS214
     _meltano_rw_lock = fasteners.ReaderWriterLock()
     _default = None
 
-    def __init__(self, root: Path | str):
+    def __init__(self, root: os.PathLike):
         """Instantiate a Project from its root directory.
 
         Args:
@@ -91,7 +91,6 @@ class Project(Versioned):  # noqa: WPS214
         """
         self.root = Path(root).resolve()
         self.readonly = False
-        self._project_files = None
         self.active_environment: Environment | None = None
 
     @cached_property
@@ -204,18 +203,14 @@ class Project(Versioned):  # noqa: WPS214
 
         return project
 
-    @property
-    def project_files(self):
-        """Return a singleton ProjectFiles file manager instance.
+    @cached_property
+    def project_files(self) -> ProjectFiles:
+        """Return a singleton `ProjectFiles` file manager instance.
 
         Returns:
-            ProjectFiles file manager
+            `ProjectFiles` file manager.
         """
-        if self._project_files is None:
-            self._project_files = ProjectFiles(
-                root=self.root, meltano_file_path=self.meltanofile
-            )
-        return self._project_files
+        return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
 
     @property
     def meltano(self) -> MeltanoFileTypeHint:
