@@ -15,6 +15,41 @@ from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
 T = TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
 
 
+class IdHashBox:
+    """Wrapper class that makes the hash of an object its Python ID."""
+
+    def __init__(self, content: Any):
+        """Initialize the `IdHashBox`.
+
+        Parameters:
+            content: The object that will be stored within the `IdHashBox`.
+                Its Python ID will be used to hash the `IdHashBox` instance.
+        """
+        self.content = content
+
+    def __hash__(self) -> int:
+        """Hash the `IdHashBox` according to the Python ID of its content.
+
+        Returns:
+            The Python ID of the content of the `IdHashBox` instance.
+        """
+        return id(self.content)
+
+    def __eq__(self, other: Any) -> bool:
+        """Check equality of this instance and some other object.
+
+        Parameters:
+            other: The object to check equality with.
+
+        Returns:
+            Whether this instance and `other` have the same hash.
+        """
+        return hash(self) == hash(other)
+
+
+CANONICAL_PARSE_CACHE_SIZE = 4096
+
+
 class Canonical:  # noqa: WPS214 (too many methods)
     """Defines an object that can be represented as a subset of its attributes.
 
@@ -129,30 +164,20 @@ class Canonical:  # noqa: WPS214 (too many methods)
         Returns:
             Parsed instance.
         """
-
-        class IdHashBox:
-            """Wrapper class that makes the hash of an object its Python ID."""
-
-            def __init__(self, content: Any):
-                self.content = content
-
-            def __hash__(self) -> int:
-                return id(self)
-
         return cls._parse(IdHashBox(obj))
 
     @classmethod
-    @lru_cache()
-    def _parse(cls: type[T], obj: Any) -> T:
-        """Parse a 'Canonical' object from a dictionary or return the instance.
+    @lru_cache(maxsize=CANONICAL_PARSE_CACHE_SIZE)
+    def _parse(cls: type[T], boxed_obj: IdHashBox) -> T:
+        """Parse a `Canonical` object from a dictionary or return the instance.
 
         Args:
-            obj: Dictionary or instance to parse.
+            boxed_obj: Dictionary or instance to parse wrapped in an `IdHashBox`.
 
         Returns:
             Parsed instance.
         """
-        obj = obj.content
+        obj = boxed_obj.content
 
         if obj is None:
             return None
