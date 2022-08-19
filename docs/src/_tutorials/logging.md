@@ -170,7 +170,6 @@ formatters:
 handlers:
   console:
     class: logging.StreamHandler
-    level: WARNING
     formatter: json
     stream: "ext://sys.stderr"
 
