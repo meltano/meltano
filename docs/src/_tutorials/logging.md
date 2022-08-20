@@ -277,7 +277,7 @@ and ones that are useful for filter or grouping:
 
 ## Tips and tricks
 
-Use `[jq](https://stedolan.github.io/jq/)` to filter the output of json formatted meltano logs to only show the lines you're interested in.
+Use [jq](https://stedolan.github.io/jq/) to filter the output of JSON formatted Meltano logs to only show the lines you're interested in.
 
 ```bash
 cat meltano.log | jq -c 'select(.string_id == "tap-gitlab" and .stdio == "stderr") | .event'
