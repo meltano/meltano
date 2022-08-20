@@ -15,7 +15,7 @@ setting the [environment variable](/guide/configuration#configuring-settings) `M
 A logging.yaml contains a few key sections that you should be aware of.
 
 - `formatters` - This section contains the formatters that are used by the handlers. This controls the output format of the log messages (e.g. json).
-- `handlers` - This section contains the handlers which are used the loggers. This controls the output destination of the log messages (e.g. the console).
+- `handlers` - This section contains the handlers which are used by the loggers. This controls the output destination of the log messages (e.g. the console).
 - `loggers` - This section allows you to explicitly control specific module/class/etc named loggers.
 
 A few key points to note:
