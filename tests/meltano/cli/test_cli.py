@@ -6,8 +6,37 @@ import pytest
 
 import meltano
 from meltano.cli import cli
+from meltano.core.error import EmptyMeltanoFileException
 from meltano.core.project import PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
+
+CLI_COMMANDS = frozenset(
+    (
+        "add",
+        "config",
+        "discover",
+        "dragon",
+        "elt",
+        "environment",
+        "init",
+        "install",
+        "invoke",
+        "job",
+        "lock",
+        "job",
+        "lock",
+        "remove",
+        "run",
+        "schedule",
+        "schema",
+        "select",
+        "state",
+        "test",
+        "ui",
+        "upgrade",
+        "user",
+    )
+)
 
 
 class TestCli:
@@ -28,6 +57,14 @@ class TestCli:
     def deactivate_project(self):
         Project.deactivate()
 
+    @pytest.fixture()
+    def empty_project(self, test_empty_meltano_yml, pushd):
+        project = Project(test_empty_meltano_yml)
+        try:
+            yield project
+        finally:
+            Project.deactivate()
+
     def test_activate_project(self, project, cli_runner, pushd):
         assert Project._default is None
 
@@ -37,6 +74,14 @@ class TestCli:
         assert Project._default is not None
         assert Project._default.root == project.root
         assert Project._default.readonly is False
+
+    @pytest.mark.parametrize("cli_command", CLI_COMMANDS)
+    def test_empty_meltanp_yml_project(
+        self, empty_project, cli_runner, pushd, cli_command
+    ):
+        pushd(empty_project.root)
+        with pytest.raises(EmptyMeltanoFileException):
+            cli_runner.invoke(cli, [cli_command], catch_exceptions=False)
 
     def test_activate_project_readonly_env(
         self, project, cli_runner, pushd, monkeypatch
