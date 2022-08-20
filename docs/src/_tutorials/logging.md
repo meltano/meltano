@@ -83,7 +83,7 @@ loggers:
 
 ## Local development config example
 
-While working with meltano locally it's sometimes nice to have more terse logging on the console, but still have DEBUG
+While working with Meltano locally it's sometimes nice to have more terse logging on the console, but still have DEBUG
 level info written to a log file behind scenes incase you need to debug something. To accomplish that, you can use a
 file like:
 
