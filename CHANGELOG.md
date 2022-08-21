@@ -81,6 +81,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#6638](https://github.com/meltano/meltano/issues/6638) Error handling on project init
+
 - [#5985](https://github.com/meltano/meltano/issues/5985) - Address warning in Airflow plugin version check by using recommended `packaging.version.Version`.
 
 ## 2.1.0 - (2022-06-17)
