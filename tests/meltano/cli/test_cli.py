@@ -76,7 +76,7 @@ class TestCli:
         assert Project._default.readonly is False
 
     @pytest.mark.parametrize("cli_command", CLI_COMMANDS)
-    def test_empty_meltanp_yml_project(
+    def test_empty_meltano_yml_project(
         self, empty_project, cli_runner, pushd, cli_command
     ):
         pushd(empty_project.root)
