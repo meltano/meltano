@@ -111,7 +111,7 @@ def meltano_state(project: Project, ctx: click.Context):
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
-@click.argument("pattern", required=False)
+@click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
 @pass_project()
 def list_state(
@@ -121,8 +121,7 @@ def list_state(
 
     Optionally pass a glob-style pattern to filter state_ids by.
     """
-    state_service = ctx.obj[STATE_SERVICE_KEY]
-    ctx.obj["legacy_tracker"].track_meltano_state("list")
+    state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
     states = state_service.list_state(pattern)
     if states:
         for state_id, state in states.items():
@@ -156,10 +155,9 @@ def copy_state(
 ):
     """Copy state to another job id."""
     # Retrieve state for copying
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, src_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("copy", dst_state_id)
 
     state_service.copy_state(src_state_id, dst_state_id)
 
@@ -185,10 +183,9 @@ def move_state(
 ):
     """Move state to another job id, clearing the original."""
     # Retrieve state for moveing
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("move", dst_state_id)
 
     state_service.move_state(src_state_id, dst_state_id)
 
@@ -221,12 +218,15 @@ def merge_state(
     from_state_id: str | None,
 ):
     """Add bookmarks to existing state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("merge", state_id)
-    mutually_exclusive_options = ["--input-file", "STATE", "--from-state-id"]
-    if not reduce(xor, map(bool, [state, input_file, from_state_id])):
+    mutually_exclusive_options = {
+        "--input-file": input_file,
+        "STATE": state,
+        "--from-state-id": from_state_id,
+    }
+    if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     elif input_file:
         with open(input_file) as state_f:
@@ -264,12 +264,15 @@ def set_state(
     force: bool,
 ):
     """Set state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("set", state_id)
-    if not reduce(xor, map(bool, [state, input_file])):
-        raise MutuallyExclusiveOptionsError("--input-file", "STATE")
+    mutually_exclusive_options = {
+        "--input-file": input_file,
+        "STATE": state,
+    }
+    if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
+        raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     elif input_file:
         with open(input_file) as state_f:
             state_service.set_state(state_id, state_f.read())
@@ -286,10 +289,9 @@ def set_state(
 @click.pass_context
 def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS463
     """Get state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("get", state_id)
     retrieved_state = state_service.get_state(state_id)
     click.echo(json.dumps(retrieved_state))
 
@@ -301,8 +303,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS
 @click.pass_context
 def clear_state(ctx: click.Context, project: Project, state_id: str, force: bool):
     """Clear state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("clear", state_id)
     state_service.clear_state(state_id)

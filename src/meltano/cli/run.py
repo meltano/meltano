@@ -7,7 +7,6 @@ import structlog
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -89,7 +88,6 @@ async def run(
             change_console_log_level()
 
     tracker: Tracker = ctx.obj["tracker"]
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
 
     parser_blocks = []  # noqa: F841
     try:
@@ -116,7 +114,6 @@ async def run(
         tracker.track_command_event(CliEvent.failed)
         raise err
     tracker.track_command_event(CliEvent.completed)
-    legacy_tracker.track_meltano_run(blocks)
 
 
 async def _run_blocks(
