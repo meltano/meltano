@@ -281,7 +281,7 @@ class ScheduleService:
         Returns:
             The list of schedules.
         """
-        return self.project.meltano.schedules
+        return self.project.meltano.schedules.copy()
 
     def find_schedule(self, name) -> Schedule:
         """Find a schedule by name.
