@@ -96,14 +96,12 @@ class Canonical:  # noqa: WPS214 (too many methods)
             Canonical representation of the given instance.
         """
         if isinstance(target, Canonical):
-            result = CommentedMap(
-                [(key, Canonical.as_canonical(val)) for key, val in target]
-            )
+            result = CommentedMap([(key, cls.as_canonical(val)) for key, val in target])
             target.attrs.copy_attributes(result)
             return result
 
         if isinstance(target, (CommentedSet, CommentedSeq)):
-            result = CommentedSeq(Canonical.as_canonical(val) for val in target)
+            result = CommentedSeq(cls.as_canonical(val) for val in target)
             target.copy_attributes(result)
             return result
 
@@ -113,24 +111,20 @@ class Canonical:  # noqa: WPS214 (too many methods)
                 if isinstance(val, Canonical):
                     results[key] = val.canonical()
                 else:
-                    results[key] = Canonical.as_canonical(val)
+                    results[key] = cls.as_canonical(val)
             target.copy_attributes(results)
             return results
 
-        if isinstance(target, set):
-            return list(map(Canonical.as_canonical, target))
-
-        if isinstance(target, list):
-            return list(map(Canonical.as_canonical, target))
+        if isinstance(target, (list, set)):
+            return list(map(cls.as_canonical, target))
 
         if isinstance(target, dict):
-            results = {}
-            for key, val in target.items():
-                if isinstance(val, Canonical):
-                    results[key] = val.canonical()
-                else:
-                    results[key] = Canonical.as_canonical(val)
-            return results
+            return {
+                key: val.canonical()
+                if isinstance(val, Canonical)
+                else cls.as_canonical(val)
+                for key, val in target.items()
+            }
 
         return copy.deepcopy(target)
 
@@ -140,7 +134,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         Returns:
             A canonical representation of the current instance.
         """
-        return Canonical.as_canonical(self)
+        return type(self).as_canonical(self)
 
     def with_attrs(self: T, *args: Any, **kwargs: Any) -> T:
         """Return a new instance with the given attributes set.
@@ -152,7 +146,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         Returns:
             A new instance with the given attributes set.
         """
-        return self.__class__(**{**self.canonical(), **kwargs})
+        return type(self)(**{**self.canonical(), **kwargs})
 
     @classmethod
     def parse(cls: type[T], obj: Any) -> T:
@@ -253,7 +247,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
             attr: Attribute to set.
             value: Value to set.
         """
-        if attr.startswith("_") or hasattr(self.__class__, attr):  # noqa: WPS421
+        if attr.startswith("_") or hasattr(type(self), attr):  # noqa: WPS421
             super().__setattr__(attr, value)
         else:
             self._dict[attr] = value
@@ -339,7 +333,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
             others = [*others, kwargs]
 
         for other in others:
-            other = Canonical.as_canonical(other)
+            other = type(self).as_canonical(other)
 
             for key, val in other.items():
                 setattr(self, key, val)
@@ -356,7 +350,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
             The serialized YAML representation of the object.
         """
         return dumper.represent_mapping(
-            "tag:yaml.org,2002:map", Canonical.as_canonical(obj), flow_style=False
+            "tag:yaml.org,2002:map", cls.as_canonical(obj), flow_style=False
         )
 
     @classmethod
@@ -371,8 +365,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
             The serialized YAML representation of the object.
         """
         return representer.represent_mapping(
-            "tag:yaml.org,2002:map",
-            Canonical.as_canonical(obj),
+            "tag:yaml.org,2002:map", cls.as_canonical(obj)
         )
 
     @classmethod

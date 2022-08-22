@@ -10,8 +10,7 @@ from pathlib import Path
 from typing import Any, Mapping, MutableMapping, Sequence, TypeVar
 
 from atomicwrites import atomic_write
-from ruamel.yaml import YAMLError
-from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
 from meltano.core import yaml
 

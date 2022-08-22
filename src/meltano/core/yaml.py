@@ -6,8 +6,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from ruamel.yaml import YAML
-from ruamel.yaml.comments import CommentedMap
+from ruamel.yaml import YAML, CommentedMap
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.discovery_file import DiscoveryFile
