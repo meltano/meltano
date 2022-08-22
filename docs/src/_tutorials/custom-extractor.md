@@ -23,6 +23,7 @@ in the SDK documentation to create a new project from the provided cookiecutter 
 2. As you are developing, consult the [SDK Dev Guide](https://sdk.meltano.com/en/latest/dev_guide.html) for developer documentation and the
 [Code Samples](https://sdk.meltano.com/en/latest/code_samples.html) page to find
 reusable sample code.
+3. For more in-depth information about the available features of the SDK, consult the [Python API Reference documentation](https://sdk.meltano.com/en/latest/reference.html).
 
 <div class="notification is-info">
   <p><strong>Cookiecutter</strong></p>
@@ -44,8 +45,10 @@ plugins:
     # Insert a new entry:
     - name: tap-my-custom-source
       namespace: tap_my_custom_source
-      # Absolute path to local test script:
-      executable: /path/to/tap-my-custom-source.sh
+      # Installs the plugin from a local path
+      # in 'editable' mode (https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs).
+      # Can point to '.' if it's in the same directory as `meltano.yml`
+      executable: -e /path/to/tap-my-custom-source
       capabilities:
         - state
         - catalog
