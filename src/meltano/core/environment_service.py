@@ -28,7 +28,7 @@ class EnvironmentService:
         """Create a new EnvironmentService for a Meltano Project.
 
         Args:
-            A Meltano Project.
+            project: A Meltano Project.
         """
         self.project = project
 
@@ -71,7 +71,7 @@ class EnvironmentService:
         Returns:
             A list of Environment objects.
         """
-        return self.project.meltano.environments
+        return self.project.meltano.environments.copy()
 
     def remove(self, name: str) -> str:
         """Remove an Environment by name.
