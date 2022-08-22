@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+from time import perf_counter_ns
 
 import pytest
 
@@ -140,3 +141,17 @@ class TestCli:
             ["--no-environment", "--environment", "null", "discover"],
         )
         assert Project._default.active_environment is None
+
+
+class TestLargeConfigProject:
+    def test_list_config_performance(self, large_config_project: Project, cli_runner):
+        start = perf_counter_ns()
+        assert (
+            cli_runner.invoke(
+                cli, ["--no-environment", "config", "target-with-large-config", "list"]
+            ).exit_code
+            == 0
+        )
+        duration_ns = perf_counter_ns() - start
+        # Ensure the large config can be processed in less than 6 seconds
+        assert duration_ns < 6000000000
