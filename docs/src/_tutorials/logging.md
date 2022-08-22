@@ -16,11 +16,15 @@ A logging.yaml contains a few key sections that you should be aware of.
 
 - `formatters` - This section contains the formatters that are used by the handlers. This controls the output format of the log messages (e.g. json).
 - `handlers` - This section contains the handlers which are used by the loggers. This controls the output destination of the log messages (e.g. the console).
+- `root` - The root section cover the root logger, which is effectively the default config for all loggers unless they are otherwise configured.
 - `loggers` - This section allows you to explicitly control specific module/class/etc named loggers.
 
 A few key points to note:
 
-1. Different handlers can use different formats.
+1. Different handlers can use different formats. Meltano ships with [3 formatters](https://github.com/meltano/meltano/blob/main/src/meltano/core/logging/formatters.py):
+   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization.
+   - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
+   - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
 2. Different loggers can use different handlers and log at different log levels.
 3. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
 
@@ -66,7 +70,7 @@ handlers:
     encoding: utf8
 
 root:
-  level: DEBUG
+  level: DEBUG # the root logger must always specify a level
   propagate: yes # propagate to child loggers
   handlers: [console, meltano_log, my_info_file_handler] # by default use these three handlers
 
@@ -80,6 +84,8 @@ loggers:
     handlers: [console, meltano_log]
     propogate: no
 ```
+
+For a detailed explanation of the above of the file format, see the [python logging documentation](https://docs.python.org/3/library/logging.config.html#configuration-file-format).
 
 ## Local development config example
 
@@ -181,8 +187,8 @@ root:
 
 ## Datadog logging config
 
-For Datadog logging you have a couple of options. The easiest approach maybe to simply log to a file in json format and
-collect it with the Datadog Agent.
+You have a couple options for configuring logs for Datadog. The easiest approach may be to log to a file in JSON format
+and collect it with the Datadog Agent.
 
 To do so you'll want to use a `logging.yaml` config that writes directly to a file like in the previously examples:
 
