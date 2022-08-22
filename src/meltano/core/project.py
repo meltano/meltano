@@ -212,6 +212,13 @@ class Project(Versioned):  # noqa: WPS214
         """
         return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
 
+    def clear_cache(self) -> None:
+        """Clear cached project files (e.g. `meltano.yml`)."""
+        try:
+            del self.__dict__["project_files"]
+        except KeyError:
+            pass
+
     @property
     def meltano(self) -> MeltanoFileTypeHint:
         """Return a copy of the current meltano config.
