@@ -1,7 +1,6 @@
 """New Project Initialization Service."""
 from __future__ import annotations
 
-import errno
 import os
 import uuid
 
@@ -51,6 +50,10 @@ class ProjectInitService:
         except PermissionError:
             raise ProjectInitServiceError(
                 f"Permission denied to create {self.project_name}."
+            )
+        except Exception as e:
+            raise ProjectInitServiceError(
+                f"Could not create directory {self.project_name}. {e}"
             )
 
         click.secho("Created", fg="blue", nl=False)
