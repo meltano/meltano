@@ -2,6 +2,7 @@
 title: Logging and Monitoring
 description: Learn how to configure logging and monitoring for Meltano.
 layout: doc
+weight: 19
 ---
 
 ## Logging
