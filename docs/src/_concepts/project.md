@@ -324,7 +324,7 @@ In a newly initialized project, this file will be included in [`.gitignore`](#gi
 
 Meltano stores various files for internal use inside a `.meltano` directory inside your project.
 
-**Note**: `$MELTANO_SYS_DIR_ROOT` can be used as a replacement to `.meltano` directory.
+**Note**: `$MELTANO_SYS_DIR_ROOT` can be used as a replacement to `$MELTANO_PROJECT_ROOT/.meltano` directory.
 
 These files are specific to the environment Meltano is running in, and should not be checked into version control.
 In a newly initialized project, this directory will be included in [`.gitignore`](#gitignore) by default.
