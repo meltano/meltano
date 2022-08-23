@@ -324,6 +324,8 @@ In a newly initialized project, this file will be included in [`.gitignore`](#gi
 
 Meltano stores various files for internal use inside a `.meltano` directory inside your project.
 
+**Note**: `$MELTANO_SYS_DIR_ROOT` can be used as a replacement to `.meltano` directory.
+
 These files are specific to the environment Meltano is running in, and should not be checked into version control.
 In a newly initialized project, this directory will be included in [`.gitignore`](#gitignore) by default.
 
@@ -336,6 +338,7 @@ While you would usually not want to modify files in this directory directly, kno
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
 
+if `$MELTANO_SYS_DIR_ROOT` is set, all the above mentioned paths `.meltano/*` will point to `$MELTANO_SYS_DIR_ROOT/*`.
 ## System database
 
 Meltano stores various types of metadata in a project-specific system database,
