@@ -46,7 +46,7 @@ def load(path: os.PathLike) -> CommentedMap:
         The loaded YAML file.
     """
     path = Path(path).resolve()
-    with open(path, "rb") as yaml_file:
+    with open(path) as yaml_file:
         hashed = hash_sha256(yaml_file.read())
 
         if path in cache and cache[path].sha256 == hashed:
