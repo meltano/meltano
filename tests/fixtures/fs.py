@@ -36,6 +36,13 @@ def test_dir(tmp_path_factory) -> Path:
         os.chdir(cwd)
 
 
+@pytest.fixture(scope="session")
+def test_empty_meltano_yml(test_dir):
+    meltano_file = test_dir / "meltano.yml"
+    meltano_file.write_text("")
+    return test_dir
+
+
 @pytest.fixture
 def pushd(request):
     def _pushd(path):
