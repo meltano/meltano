@@ -10,34 +10,6 @@ from meltano.core.error import EmptyMeltanoFileException
 from meltano.core.project import PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
-CLI_COMMANDS = frozenset(
-    (
-        "add",
-        "config",
-        "discover",
-        "dragon",
-        "elt",
-        "environment",
-        "init",
-        "install",
-        "invoke",
-        "job",
-        "lock",
-        "job",
-        "lock",
-        "remove",
-        "run",
-        "schedule",
-        "schema",
-        "select",
-        "state",
-        "test",
-        "ui",
-        "upgrade",
-        "user",
-    )
-)
-
 
 class TestCli:
     @pytest.fixture()
@@ -75,13 +47,10 @@ class TestCli:
         assert Project._default.root == project.root
         assert Project._default.readonly is False
 
-    @pytest.mark.parametrize("cli_command", CLI_COMMANDS)
-    def test_empty_meltano_yml_project(
-        self, empty_project, cli_runner, pushd, cli_command
-    ):
+    def test_empty_meltano_yml_project(self, empty_project, cli_runner, pushd):
         pushd(empty_project.root)
         with pytest.raises(EmptyMeltanoFileException):
-            cli_runner.invoke(cli, [cli_command], catch_exceptions=False)
+            cli_runner.invoke(cli, ["config"], catch_exceptions=False)
 
     def test_activate_project_readonly_env(
         self, project, cli_runner, pushd, monkeypatch
