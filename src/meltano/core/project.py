@@ -213,7 +213,12 @@ class Project(Versioned):  # noqa: WPS214
         return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
 
     def clear_cache(self) -> None:
-        """Clear cached project files (e.g. `meltano.yml`)."""
+        """Clear cached project files (e.g. `meltano.yml`).
+
+        This can be useful if the cached `ProjectFiles` object has been
+        modified in-place, but not updated on-disk, and you need the on-disk
+        version.
+        """
         try:
             del self.__dict__["project_files"]
         except KeyError:
