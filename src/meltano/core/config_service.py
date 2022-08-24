@@ -8,9 +8,8 @@ from contextlib import contextmanager
 import yaml
 
 from meltano.core import bundle
-
-from .project import Project
-from .setting_definition import SettingDefinition
+from meltano.core.project import Project
+from meltano.core.setting_definition import SettingDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +52,7 @@ class ConfigService:
             The contents of meltano.yml.
         """
         if self._current_meltano_yml is None or not self._use_cache:
+            self.project.clear_cache()
             self._current_meltano_yml = self.project.meltano
         return self._current_meltano_yml
 

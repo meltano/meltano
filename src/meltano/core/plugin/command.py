@@ -80,14 +80,6 @@ class Command(Canonical):
 
         return expanded
 
-    def canonical(self):
-        """Serialize the command.
-
-        Returns:
-            Python object.
-        """
-        return Command.as_canonical(self)
-
     @classmethod
     def as_canonical(cls, target):
         """Serialize the target command.
