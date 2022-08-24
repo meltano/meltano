@@ -77,6 +77,7 @@ bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^6.4.1"}
+commitizen-version-bump = { git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main" }
 freezegun = "^0.3.12"
 isort = "^5.10.1"
 mock = "^4.0.3"
