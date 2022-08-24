@@ -456,7 +456,8 @@ def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
 
             if not val:
                 logger.debug(f"Variable '${var}' is empty.")
-
+                if raise_if_missing:
+                    raise EnvironmentVariableNotSetError(var)
             return val
         except KeyError as e:
             if raise_if_missing:
