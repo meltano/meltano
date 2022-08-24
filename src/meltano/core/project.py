@@ -19,7 +19,7 @@ from werkzeug.utils import secure_filename
 from meltano.core import yaml
 from meltano.core.behavior.versioned import Versioned
 from meltano.core.environment import Environment
-from meltano.core.error import Error
+from meltano.core.error import EmptyMeltanoFileException, Error
 from meltano.core.plugin.base import PluginRef
 from meltano.core.project_files import ProjectFiles
 from meltano.core.utils import makedirs, truthy
@@ -223,13 +223,18 @@ class Project(Versioned):  # noqa: WPS214
     def meltano(self) -> MeltanoFileTypeHint:
         """Return a copy of the current meltano config.
 
+        Raises:
+            EmptyMeltanoFileException: The `meltano.yml` file is empty.
+
         Returns:
-            The current meltano config
+            The current meltano config.
         """
         from meltano.core.meltano_file import MeltanoFile
         from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 
         conf: dict[str, Any] = yaml.load(self.meltanofile)
+        if conf is None:
+            raise EmptyMeltanoFileException()
 
         lock = (
             self._meltano_rw_lock.write_lock
