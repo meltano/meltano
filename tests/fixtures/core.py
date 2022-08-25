@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from fixtures.utils import tmp_project
 from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.config_service import ConfigService
@@ -40,6 +41,8 @@ from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleSe
 from meltano.core.state_service import StateService
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
+
+current_dir = Path(__file__).parent
 
 
 @pytest.fixture(scope="class")
@@ -489,24 +492,12 @@ def project_function(test_dir, project_init_service):
 
 @pytest.fixture(scope="class")
 def project_files(test_dir, compatible_copy_tree):
-    project_init_service = ProjectInitService("a_multifile_meltano_project_core")
-    project = project_init_service.init(add_discovery=False)
-    logging.debug(f"Created new project at {project.root}")
-
-    current_dir = Path(__file__).parent
-    multifile_project_root = current_dir.joinpath("multifile_project/")
-
-    os.remove(project.meltanofile)
-    compatible_copy_tree(multifile_project_root, project.root)
-    # cd into the new project root
-    os.chdir(project.root)
-
-    try:
+    with tmp_project(
+        "a_multifile_meltano_project_core",
+        current_dir / "multifile_project",
+        compatible_copy_tree,
+    ) as project:
         yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-    finally:
-        Project.deactivate()
-        os.chdir(test_dir)
-        logging.debug(f"Cleaned project at {project.root}")
 
 
 @pytest.fixture(scope="class")

@@ -37,7 +37,7 @@ def test_dir(tmp_path_factory) -> Path:
 
 
 @pytest.fixture(scope="session")
-def test_empty_meltano_yml(test_dir):
+def empty_meltano_yml_dir(test_dir):
     meltano_file = test_dir / "meltano.yml"
     meltano_file.write_text("")
     return test_dir

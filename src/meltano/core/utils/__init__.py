@@ -456,7 +456,8 @@ def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
 
             if not val:
                 logger.debug(f"Variable '${var}' is empty.")
-
+                if raise_if_missing:
+                    raise EnvironmentVariableNotSetError(var)
             return val
         except KeyError as e:
             if raise_if_missing:
@@ -499,7 +500,7 @@ def human_size(num, suffix="B"):
     return f"{val:3.1f}{prefix}{suffix}"
 
 
-def hash_sha256(value: str) -> str:
+def hash_sha256(value: str | bytes) -> str:
     """Get the sha256 hash of a string.
 
     Args:
@@ -513,7 +514,9 @@ def hash_sha256(value: str) -> str:
     """
     if value is None:
         raise ValueError("Cannot hash None.")
-    return hashlib.sha256(value.encode()).hexdigest()
+    if isinstance(value, str):
+        value = value.encode()
+    return hashlib.sha256(value).hexdigest()
 
 
 def format_exception(exception: BaseException) -> str:
