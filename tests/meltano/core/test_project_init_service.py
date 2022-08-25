@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import platform
+import stat
 from typing import TYPE_CHECKING
 
 import pytest
@@ -30,7 +32,8 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
     project_name = "test_project"
 
     protected_dir = tmp_path.joinpath("protected")
-    protected_dir.mkdir(mode=0o555)  # read and execute, but not write
+    protected_dir.mkdir()
+    protected_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
     pushd(protected_dir)
     with pytest.raises(
         ProjectInitServiceError,
@@ -40,6 +43,10 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
 
 
 def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
+    if platform.system() == "Windows":
+        pytest.xfail(
+            "Windows can't remove a directory that is in use. See https://docs.python.org/3/library/os.html#os.remove"
+        )
     project_name = "test_project"
 
     missing_dir = tmp_path.joinpath("missing")
