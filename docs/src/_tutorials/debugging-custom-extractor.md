@@ -24,6 +24,8 @@ poetry config virtualenv.in-project true
 
 ## What to put in VSCode launch.json
 
+Add the following [launch configuration](https://code.visualstudio.com/docs/editor/debugging#_launch-configurations) to your project:
+
 ```json
 {
     "version": "0.2.0",
