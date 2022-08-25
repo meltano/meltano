@@ -38,14 +38,14 @@ class PluginTestService(ABC):
         self.plugin_invoker = plugin_invoker
 
     @abstractmethod
-    def validate(self) -> bool | str:
+    async def validate(self) -> tuple[bool, str]:
         """Abstract method to validate plugin configuration."""
 
 
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self) -> bool | str:
+    async def validate(self) -> tuple[bool, str]:
         """Validate extractor configuration."""
         process = None
 
