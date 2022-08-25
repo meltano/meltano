@@ -22,8 +22,9 @@ from meltano.core.settings_store import StoreNotSupportedError
 PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"
 SETTING_COLOR = "blue1"
+VALUE_COLOR = "green"
 
-HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plugin_name.capitalize() }}[/{{ plugin_color }}] {% if environment_name %}in Environment [{{ environment_color }}]{{ environment_name }}[/{{ environment_color }}]{% endif %} Interactively[/bold underline]
+HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plugin_name.capitalize() | safe }}[/{{ plugin_color }}] {% if environment_name %}in Environment[{{ environment_color }}]{{ environment_name }}[/{{ environment_color }}] {% endif %}Interactively[/bold underline]
 
 Following the prompts below, you will be guided through configuration of this plugin.
 
@@ -41,10 +42,10 @@ Within meltano.yml you can also associate configuration with a Meltano Environme
 
 [bold underline]Settings[/bold underline]
 {% for setting in settings %}
-{{ loop.index }}. [blue]{{ setting["name"] }}[/blue]: {{ setting["description"][:50] + "..."}}
+{{ loop.index }}. [blue]{{ setting["name"] }}[/blue]: {{ setting["description"] | safe }}
 {%- endfor %}
 
-{% if plugin_url %}To learn more about {{ plugin_name }} and its settings, visit [link={{ plugin_url }}]{{ plugin_url }}[/link]{% endif %}
+{% if plugin_url %}To learn more about {{ plugin_name | safe }} and its settings, visit [link={{ plugin_url }}]{{ plugin_url }}[/link]{% endif %}
 """
 
 
@@ -126,7 +127,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         pre = []
         pre.append(
             Text.from_markup(
-                f"[underline {PLUGIN_COLOR}]{self.settings.label.capitalize()}[/underline {PLUGIN_COLOR}] Setting {index} of {last_index}"
+                f"[bold underline][{PLUGIN_COLOR}]{self.settings.label.capitalize()}[/{PLUGIN_COLOR}][/bold underline] Setting {index} of {last_index}"
             )
         )
         # setting is custom or extra
@@ -162,7 +163,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             current_value = value or ""
         details.add_row(
             Text(f"Current Value ({label})"),
-            Text.from_markup(f"[green]'{current_value}'[/green]"),
+            Text.from_markup(f"[{VALUE_COLOR}]'{current_value}'[/{VALUE_COLOR}]"),
         )
         # setting kind
         if setting_def.kind:
@@ -182,7 +183,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if setting_def.description:
             post.append(
                 Group(
-                    Text("Description:"),
+                    Text(" Description:"),
                     Panel(Markdown(setting_def.description, justify="left")),
                 )
             )
@@ -191,7 +192,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if docs_url:
             post.append(
                 Text.from_markup(
-                    f"To learn more about {self.settings.label} and its settings, visit [link={docs_url}]{docs_url}[/link]"
+                    f" To learn more about {self.settings.label} and its settings, visit [link={docs_url}]{docs_url}[/link]"
                 )
             )
         self.console.print(Panel(Group(*pre, details, *post)))
@@ -213,12 +214,12 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         )
         click.echo()
 
-        if show_set_prompt:
-            modify = click.confirm("Set this value?", default=True)
-        else:
-            modify = True
-
-        if modify:
+        action = click.prompt(
+            "Set this value (Y/n) or exit (e)?",
+            default="y",
+            type=click.Choice(["y", "n", "e"], case_sensitive=False),
+        )
+        if action.lower() == "y":
             new_value = click.prompt("New value", default="", show_default=False)
             click.echo()
             self.set_value(
@@ -228,8 +229,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             )
             click.echo()
             click.pause()
-
-        return InteractionStatus.SKIP
+        elif action.lower() == "n":
+            return InteractionStatus.SKIP
+        else:
+            return InteractionStatus.EXIT
 
     def configure_all(self):
         """Configure all settings."""
@@ -237,13 +240,12 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             click.clear()
             self._print_home_screen()
             click.echo()
-            choices = ["all"] + [idx for idx, _, _ in self.setting_choices]
+            choices = ["all"] + [idx for idx, _, _ in self.setting_choices] + ["e"]
             branch = click.prompt(
-                "Loop through all settings, or select a specific setting by number?",
+                "Loop through all settings (all), select a setting by number, or exit (e)?",
                 type=click.Choice(choices, case_sensitive=False),
                 default="all",
             )
-            branch = "all"
             if branch == "all":
                 for index, name, _ in self.setting_choices:
                     status = InteractionStatus.START
@@ -258,6 +260,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     if status == InteractionStatus.EXIT:
                         click.clear()
                         break
+            elif branch.lower() == "e":
+                click.echo()
+                break
             else:
                 choice_name = next(
                     (nme for idx, nme, _ in self.setting_choices if idx == branch)
@@ -290,7 +295,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         store = metadata["store"]
         click.secho(
             f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
-            fg="green",
+            fg=VALUE_COLOR,
         )
 
         current_value, source = settings.get_with_source(name, session=self.session)
@@ -315,7 +320,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         store = metadata["store"]
         click.secho(
             f"{settings.label.capitalize()} setting '{name}' in {store.label} was unset",
-            fg="green",
+            fg=VALUE_COLOR,
         )
 
         current_value, source = settings.get_with_source(name, session=self.session)
