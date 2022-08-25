@@ -1,5 +1,5 @@
 ---
-title: Debugging a Custom Extractor
+title: Debug a Custom Extractor
 description: Learn how to debug a custom data extractor.
 layout: doc
 ---
