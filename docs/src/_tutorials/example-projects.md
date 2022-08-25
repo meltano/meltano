@@ -7,12 +7,12 @@ If you have a production project that you'd like to add please open a [Pull Requ
 
 We group example projects into three categories:
 1. Running in production
-2. Simpler examples usually solving one problem 
+2. Simpler examples usually solving one problem
 3. Complete sandbox projects to play around with
 
 ### 1. Running in production
 
-The following Meltano projects are real-world examples of Meltano in production use. If you're about to launch your pipelines 
+The following Meltano projects are real-world examples of Meltano in production use. If you're about to launch your pipelines
 into your own production environment or want to take a look at how others organize their projoects, these projects are a great place to start.
 
 - **[Meltano Squared](https://github.com/meltano/squared)** - This is the project the Meltano team uses to manage their Meltano instance.
@@ -34,5 +34,3 @@ The following projects are beginner projects with mocks, local csvs, local datab
 
 - **[Meltano Dbt Jaffle shop](https://github.com/pnadolny13/meltano_example_implementations/tree/main/meltano_projects/singer_dbt_jaffle)** - The dbt jaffle shop project placed in a meltano context, with local postgres, completely self-contained.
 - **[Meltano Extract Load Example](https://github.com/sbalnojan/meltano-example-el)** - A simple AWS S3c CSV extract and load into a postgres database. All mocked, completely self-contained.
-
-
