@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import contextlib
 import json
-import textwrap
 
 import click
+from jinja2 import BaseLoader, Environment
+from rich.console import Console, Group
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.cli.utils import CliError
@@ -14,8 +19,33 @@ from meltano.core.environment_service import EnvironmentService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 
-PLUGIN_COLOUR = "magenta"
-ENVIRONMENT_COLOUR = "yellow"
+PLUGIN_COLOR = "magenta"
+ENVIRONMENT_COLOR = "orange1"
+SETTING_COLOR = "blue1"
+
+HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plugin_name.capitalize() }}[/{{ plugin_color }}] {% if environment_name %}in Environment [{{ environment_color }}]{{ environment_name }}[/{{ environment_color }}]{% endif %} Interactively[/bold underline]
+
+Following the prompts below, you will be guided through configuration of this plugin.
+
+Meltano is responsible for managing the configuration of all of a project’s plugins.
+It knows what settings are supported by each plugin, and how and when different types of plugins expect to be fed that configuration.
+
+To determine the values of settings, Meltano will look in 4 main places, with each taking precedence over the next:
+
+  1. Environment variables
+  2. Your meltano.yml project file
+  3. Your project's system database
+  4. The default values set in the plugin's settings metadata
+
+Within meltano.yml you can also associate configuration with a Meltano Environment, allowing you to define custom layers of configuration within your project.
+
+[bold underline]Settings[/bold underline]
+{% for setting in settings %}
+{{ loop.index }}. [blue]{{ setting["name"] }}[/blue]: {{ setting["description"][:50] + "..."}}
+{%- endfor %}
+
+{% if plugin_url %}To learn more about {{ plugin_name }} and its settings, visit [link={{ plugin_url }}]{{ plugin_url }}[/link]{% endif %}
+"""
 
 
 class InteractiveConfig:  # noqa: WPS230, WPS214
@@ -31,8 +61,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.session = self.ctx.obj["session"]
         self.plugin = self.ctx.obj["settings"].plugin
         self.environment_service = EnvironmentService(self.project)
-        self.max_width = max_width or 75  # noqa: WPS432
-        self.indentation = "  "
+        self.max_width = 75
+        self.console = Console()
 
     @property
     def configurable_settings(self):
@@ -53,190 +83,118 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             setting_choices.append((str(index + 1), name, description))
         return setting_choices
 
-    @property
-    def environment_label(self):
-        """Format the current Environment for presentation."""
-        if self.project.active_environment:
-            return f"Environment '{self.project.active_environment.name}'"
-        return "Base (i.e. no Environment)"
-
-    def wrap(self, text: str, indentation: str = "") -> str:
-        """Wrap text to maximum width."""
-        return f"\n{indentation}".join(textwrap.wrap(text, width=self.max_width))
-
     def truncate(self, text: str) -> str:
         """Truncate text."""
         return f"{text[: self.max_width - 3]}..."
 
-    def _print_home_title(self):
-        """Print title text."""
-        environment_name = None
-        if self.project.active_environment:
-            environment_name = self.project.active_environment.name
-
-        if environment_name:
-            title = f"Configuring {self.settings.label.capitalize()} in Environment '{environment_name}' interactively."
-        else:
-            title = f"Configuring {self.settings.label.capitalize()} interactively."
-        separator = "-" * len(title)
-
-        click.echo()
-        click.echo(separator)
-        click.echo("Configuring", nl=False)
-        click.secho(f" {self.settings.label.capitalize()}", nl=False, fg=PLUGIN_COLOUR)
-        if environment_name:
-            click.echo(" in Environment ", nl=False)
-            click.secho(f"'{environment_name}'", fg="green", nl=False)
-        click.echo(" interactively.")
-        click.echo(separator)
-
-    def _print_home_help(self):
-        """Print help text."""
-        click.echo()
-        click.echo(
-            f"{self.indentation}By following the prompts below, you will be guided through configuration of this plugin."
-        )
-        click.echo()
-        click.echo(
-            f"{self.indentation}Meltano is responsible for managing the configuration of all of a project’s plugins."
-        )
-        click.echo(
-            f"{self.indentation}It knows what settings are supported by each plugin, and how and when different"
-        )
-        click.echo(
-            f"{self.indentation}types of plugins expect to be fed that configuration."
-        )
-        click.echo()
-        click.echo(
-            f"{self.indentation}To determine the values of settings, Meltano will look in 4 main places,"
-        )
-        click.echo(f"{self.indentation}with each taking precedence over the next:")
-        click.echo()
-        click.echo(f"{self.indentation*2}1) Environment variables")
-        click.echo(f"{self.indentation*2}2) Your meltano.yml project file")
-        click.echo(f"{self.indentation*2}3) Your project's system database")
-        click.echo(
-            f"{self.indentation*2}4) The default values set in the plugin's settings metadata"
-        )
-        click.echo()
-        click.echo(
-            f"{self.indentation}Within meltano.yml you can also associate configuration with a Meltano Environment,"
-        )
-        click.echo(
-            f"{self.indentation}allowing you to define custom layers of configuration within your project."
-        )
-
-    def _print_home_available_settings(self):
-        """Print available setting names and current values."""
-        title = f"Available '{self.settings.plugin.name}' Settings"
-        separator = "-" * len(title)
-        click.echo()
-        click.echo(separator)
-        click.echo("Available ", nl=False)
-        click.secho(f"'{self.settings.plugin.name}'", nl=False, fg=PLUGIN_COLOUR)
-        click.echo(" Settings")
-        click.echo(separator)
-        click.echo()
-        for index, name, description in self.setting_choices:
-            click.echo(f"{self.indentation}{index}) ", nl=False)
-            click.secho(f"{name}", nl=False, fg="blue")
-            if description:
-                pretty_description = description.replace("\n", " ")
-                click.secho(f": {self.truncate(pretty_description)}")
-            else:
-                click.echo()
-
     def _print_home_screen(self):
         """Print screen for this interactive."""
-        self._print_home_title()
-        self._print_home_help()
-        self._print_home_available_settings()
+        markdown_template = Environment(loader=BaseLoader, autoescape=True).from_string(
+            HOME_SCREEN_TEMPLATE
+        )
+        markdown_text = markdown_template.render(
+            {
+                "plugin_color": PLUGIN_COLOR,
+                "environment_color": ENVIRONMENT_COLOR,
+                "setting_color": SETTING_COLOR,
+                "plugin_name": self.settings.label,
+                "plugin_url": self.settings.docs_url,
+                "environment_name": self.project.active_environment.name
+                if self.project.active_environment
+                else None,
+                "settings": [
+                    {
+                        "name": name,
+                        "description": self.truncate(description.replace("\n", " ")),
+                    }
+                    for _, name, description in self.setting_choices
+                ],
+            }
+        )
+        self.console.print(Panel(Text.from_markup(markdown_text)))
 
-    def _print_setting_title(self, index, last_index):
-        """Print setting title."""
-        title = f"{self.settings.label.capitalize()}"
-        subtitle = ""
-        if index and last_index:
-            subtitle = f" (Setting {index} of {last_index})"
-            title += subtitle
-        separator_width = len(title)
-        separator = "-" * separator_width
-
-        click.echo()
-        click.echo(separator)
-        click.secho(f"{self.settings.label.capitalize()}", nl=False, fg=PLUGIN_COLOUR)
-        click.echo(f" (Setting {index} of {last_index})")
-        click.echo(separator)
-        return separator
-
-    def _print_setting(self, name, config_metadata):
+    def _print_setting(self, name, config_metadata, index, last_index):
         """Print setting."""
         value = config_metadata["value"]
         source = config_metadata["source"]
         setting_def = config_metadata["setting"]
+        details = Table(show_header=False)
+        details.add_column("name", justify="right")
+        details.add_column("value")
 
-        if setting_def.description:
-            click.echo()
-            click.echo(
-                f"{self.indentation}{self.wrap(setting_def.description, indentation=self.indentation)}"
+        # title
+        pre = []
+        pre.append(
+            Text.from_markup(
+                f"[underline {PLUGIN_COLOR}]{self.settings.label.capitalize()}[/underline {PLUGIN_COLOR}] Setting {index} of {last_index}"
             )
-
+        )
+        # setting is custom or extra
         if setting_def.is_extra:
-            click.echo()
-            click.secho(
-                f"{self.indentation}Custom Extra: plugin-specific options handled by Meltano",
-                fg="yellow",
+            pre.append(
+                Text.from_markup(
+                    "[yellow1]Custom Extra: plugin-specific options handled by Meltano[/yellow1]"
+                )
             )
         elif setting_def.is_custom:
-            click.echo()
-            click.secho(
-                f"{self.indentation}Custom Setting: possibly unsupported by the plugin",
-                fg="yellow",
+            pre.append(
+                Text.from_markup(
+                    "[yellow]Custom Setting: possibly unsupported by the plugin[/yellow1]"
+                )
             )
-
-        click.echo()
-        click.echo(f"{self.indentation}Name: ", nl=False)
-        click.secho(f"{name}", fg="blue")
-
-        kind = setting_def.kind
-        if kind:
-            click.echo(f"{self.indentation}Kind: {kind}")
-
-        env_keys = [
-            var.definition for var in self.settings.setting_env_vars(setting_def)
-        ]
-        click.echo(f"{self.indentation}Env: {', '.join(env_keys)}")
-
-        if source is not SettingValueStore.DEFAULT:
-            default_value = setting_def.value
-            if default_value is not None:
-                click.echo(f"{self.indentation}Default: {default_value!r}")
-
+        # setting name
+        details.add_row(
+            Text("Name"), Text.from_markup(f"[{SETTING_COLOR}]{name}[/{SETTING_COLOR}]")
+        )
+        # current value
         if source is SettingValueStore.DEFAULT:
             label = "default"
         elif source is SettingValueStore.INHERITED:
             label = f"inherited from '{self.settings.plugin.parent.name}'"
         else:
             label = f"from {source.label}"
-
         expanded_value = value
         unexpanded_value = config_metadata.get("unexpanded_value")
         if unexpanded_value:
-            current_value = click.style(f"{unexpanded_value!r}", fg="green")
-            click.echo(f"{self.indentation}Current Expanded Value: '{expanded_value}'")
+            current_value = unexpanded_value or ""
+            details.add_row(Text("Current Expanded Value"), Text(f"'{expanded_value}'"))
         else:
-            current_value = click.style(f"{value!r}", fg="green")
-        click.echo(f"{self.indentation}Current Value ({label}): {current_value}")
-
-        docs_url = self.settings.docs_url
-        if docs_url:
-            click.echo()
-            click.echo(
-                self.wrap(
-                    f"{self.indentation}To learn more about {self.settings.label} and its settings, visit {docs_url}",
-                    indentation=self.indentation,
+            current_value = value or ""
+        details.add_row(
+            Text(f"Current Value ({label})"),
+            Text.from_markup(f"[green]'{current_value}'[/green]"),
+        )
+        # setting kind
+        if setting_def.kind:
+            details.add_row(Text("Kind"), Text(f"{setting_def.kind}"))
+        # default value
+        if source is not SettingValueStore.DEFAULT:
+            default_value = setting_def.value
+            if default_value is not None:
+                details.add_row(Text("Default"), Text(f"{default_value!r}"))
+        # env vars
+        env_keys = [
+            var.definition for var in self.settings.setting_env_vars(setting_def)
+        ]
+        details.add_row(Text("Env(s)"), Text(f"{', '.join(env_keys)}"))
+        # setting description (markdown)
+        post = []
+        if setting_def.description:
+            post.append(
+                Group(
+                    Text("Description:"),
+                    Panel(Markdown(setting_def.description, justify="left")),
                 )
             )
+        # docs url
+        docs_url = self.settings.docs_url
+        if docs_url:
+            post.append(
+                Text.from_markup(
+                    f"To learn more about {self.settings.label} and its settings, visit [link={docs_url}]{docs_url}[/link]"
+                )
+            )
+        self.console.print(Panel(Group(*pre, details, *post)))
 
     def configure(self, name, index=None, last_index=None, show_set_prompt=True):
         """Configure a single setting interactively."""
@@ -247,10 +205,12 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 if nme == name
             )
         )
-        separator = self._print_setting_title(index=index, last_index=last_index)
-        self._print_setting(name=name, config_metadata=config_metadata)
-        click.echo()
-        click.echo(separator)
+        self._print_setting(
+            name=name,
+            config_metadata=config_metadata,
+            index=index,
+            last_index=last_index,
+        )
         click.echo()
 
         if show_set_prompt:
@@ -259,7 +219,6 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             modify = True
 
         if modify:
-            click.echo()
             new_value = click.prompt("New value", default="", show_default=False)
             click.echo()
             self.set_value(
@@ -277,7 +236,6 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         while True:
             click.clear()
             self._print_home_screen()
-
             click.echo()
             choices = ["all"] + [idx for idx, _, _ in self.setting_choices]
             branch = click.prompt(
@@ -285,6 +243,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 type=click.Choice(choices, case_sensitive=False),
                 default="all",
             )
+            branch = "all"
             if branch == "all":
                 for index, name, _ in self.setting_choices:
                     status = InteractionStatus.START
