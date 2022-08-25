@@ -7,6 +7,9 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
+from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 class EnvVarResolutionExpectation(NamedTuple):
@@ -343,3 +346,43 @@ def test_environment_variable_inheritance_meltano_env_only(
     )
     assert_cli_runner(result)
     assert result.stdout.strip() == "STACKED=12"
+
+
+def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
+    project_settings_service = ProjectSettingsService(project)
+    project_settings_service.set(
+        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+    )
+    with project.meltano_update() as meltanofile:
+        meltanofile.update(_meltanofile_update_dict())
+        meltanofile.update({"env": {"some_var": "$NONEXISTENT"}})
+    result = cli_runner.invoke(
+        cli,
+        [
+            "invoke",
+            "--print-var",
+            "STACKED",
+            "test-env-var-resolution",
+        ],
+    )
+    assert isinstance(result.exception, EnvironmentVariableNotSetError)
+
+
+def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
+    project_settings_service = ProjectSettingsService(project)
+    project_settings_service.set(
+        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+    )
+    with project.meltano_update() as meltanofile:
+        meltanofile.update(_meltanofile_update_dict())
+        meltanofile.update({"env": {"some_var": "some_${NONEXISTENT}_value"}})
+    result = cli_runner.invoke(
+        cli,
+        [
+            "invoke",
+            "--print-var",
+            "STACKED",
+            "test-env-var-resolution",
+        ],
+    )
+    assert isinstance(result.exception, EnvironmentVariableNotSetError)

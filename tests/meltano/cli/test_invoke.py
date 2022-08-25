@@ -13,6 +13,7 @@ from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
+from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 
@@ -184,6 +185,7 @@ class TestCliInvoke:
         self,
         cli_runner: CliRunner,
         project_plugins_service: ProjectPluginsService,
+        project: Project,
         tap: ProjectPlugin,
     ):
         with patch(
@@ -202,18 +204,21 @@ class TestCliInvoke:
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
             assert look_up_state.call_count == 0
+            project.clear_cache()
 
             # Dumping config doesn't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
             assert look_up_state.call_count == 0
+            project.clear_cache()
 
             # Sync mode triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name])
             assert discover_catalog.call_count == 1
             assert apply_catalog_rules.call_count == 1
             assert look_up_state.call_count == 1
+            project.clear_cache()
 
             # Dumping catalog triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "catalog", tap.name])

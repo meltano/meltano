@@ -5,14 +5,11 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from meltano.core.yaml import configure_yaml
-
-from .plugin.project_plugin import ProjectPlugin
-from .plugin.settings_service import PluginSettingsService
-from .project import Project
-from .project_plugins_service import ProjectPluginsService
-
-yaml = configure_yaml()
+from meltano.core import yaml
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class TransformAddService:
@@ -51,7 +48,7 @@ class TransformAddService:
         if not os.path.exists(self.packages_file):
             self.packages_file.touch()
 
-        package_yaml = yaml.load(self.packages_file.open()) or {"packages": []}
+        package_yaml = yaml.load(self.packages_file) or {"packages": []}
 
         git_repo = plugin.pip_url
         if not git_repo:
@@ -91,7 +88,7 @@ class TransformAddService:
         package_name = settings_service.get("_package_name")
         package_vars = settings_service.get("_vars")
 
-        dbt_project_yaml = yaml.load(self.dbt_project_file.open())
+        dbt_project_yaml = yaml.load(self.dbt_project_file)
 
         model_def = {}
 

@@ -48,7 +48,10 @@ plugins:
       # Installs the plugin from a local path
       # in 'editable' mode (https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs).
       # Can point to '.' if it's in the same directory as `meltano.yml`
-      executable: -e /path/to/tap-my-custom-source
+      pip_url: -e /path/to/tap-my-custom-source
+      # Name of custom tap that will be invoked.
+      # Can be found in the pyproject.toml of your custom tap under CLI declaration
+      executable: tap-my-custom-source
       capabilities:
         - state
         - catalog
