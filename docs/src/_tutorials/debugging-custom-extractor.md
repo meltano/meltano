@@ -8,8 +8,8 @@ layout: doc
 
 ```python
 if __name__ == "__main__":
-  # TapCustomExtractor is the class name of your tap in tap.py
-  TapCustomExtractor.cli()
+    # TapCustomExtractor is the class name of your tap in tap.py
+    TapCustomExtractor.cli()
 ```
 
 ## Create a Local Venv That Your Debugger Can Use
