@@ -71,8 +71,13 @@ class ExtractorTestService(PluginTestService):
 
             if message_type == "RECORD":
                 process.terminate()
-                return True, None
+                break
 
-        await process.wait()
+        returncode = await process.wait()
 
-        return False, last_line if process.returncode else "No RECORD message received"
+        # considered valid if subprocess is terminated (exit status < 0) on RECORD message received
+        # see https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess.returncode
+        return (
+            returncode < 0,
+            last_line if returncode != 0 else "No RECORD message received",
+        )
