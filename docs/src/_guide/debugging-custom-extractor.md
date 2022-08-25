@@ -2,6 +2,7 @@
 title: Debug a Custom Extractor
 description: Learn how to debug a custom data extractor.
 layout: doc
+weight: 25
 ---
 
 ## Add a main block in tap.py of your Custom Extractor
