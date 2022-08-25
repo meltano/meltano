@@ -1,6 +1,8 @@
 """Interactive configuration handler."""
+
 from __future__ import annotations
 
+import contextlib
 import json
 import textwrap
 
@@ -74,10 +76,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         if environment_name:
             title = f"Configuring {self.settings.label.capitalize()} in Environment '{environment_name}' interactively."
-            separator = "-" * len(title)
         else:
             title = f"Configuring {self.settings.label.capitalize()} interactively."
-            separator = "-" * len(title)
+        separator = "-" * len(title)
 
         click.echo()
         click.echo(separator)
@@ -312,10 +313,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
     def set_value(self, setting_name, value, store):
         """Set value helper function."""
-        try:
+        with contextlib.suppress(json.JSONDecodeError):
             value = json.loads(value)
-        except json.JSONDecodeError:
-            pass
 
         settings = self.settings
         path = list(setting_name)
