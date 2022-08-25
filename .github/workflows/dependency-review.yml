@@ -24,8 +24,7 @@ jobs:
 
       - name: GitHub dependency vulnerability check
         if: ${{ github.event_name == 'pull_request_target' }}
-        # Use this fork until https://github.com/actions/dependency-review-action/pull/165 is merged
-        uses: WillDaSilva/dependency-review-action@main
+        uses: actions/dependency-review-action@v2.1.0
 
       - name: FOSSA dependency license check
         run: |

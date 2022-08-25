@@ -13,4 +13,4 @@ jobs:
       uses: actions/add-to-project@main
       with:
         project-url: 'https://github.com/orgs/meltano/projects/4'
-        github-token: ${{ secrets.MELTYBOT_GITHUB_PROJECT_AUTH_TOKEN }}
+        github-token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
