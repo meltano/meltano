@@ -55,8 +55,6 @@ Feel free to change this but ensure the config has all the required config field
 
 You should now be able to add breakpoints where you need and run the debugger.
 
-
-
 ## References
 
 - [Stack Overflow: How to debug a singer tap using vs code](https://stackoverflow.com/questions/71897120/how-to-debug-a-singer-tap-using-vs-code)
