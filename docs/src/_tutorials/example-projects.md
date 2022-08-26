@@ -35,5 +35,3 @@ The following projects are beginner projects with mocks, local CSVs, local datab
 - **[Meltano Dbt Jaffle shop](https://github.com/pnadolny13/meltano_example_implementations/tree/main/meltano_projects/singer_dbt_jaffle)** - The dbt jaffle shop project placed in a meltano context, with local postgres, completely self-contained.
 - **[Meltano Extract Load Example](https://github.com/sbalnojan/meltano-example-el)** - A simple AWS S3 CSV extract and load into a PostgreSQL database. All mocked and completely self-contained.
 - **[Meltano DB -> DB Example](https://github.com/sbalnojan/meltano-example-el-db)** - A simple extract from a Postgres database and load into a second Postgres database. All mocked and completely self-contained.
-
-
