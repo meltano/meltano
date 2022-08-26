@@ -93,8 +93,8 @@ plugins:
       MY_ENV_VAR: plugin_level_env_var
   loaders:
   - name: target-postgres
-	variant: transferwise
-	pip_url: pipelinewise-target-postgres
+    variant: transferwise
+    pip_url: pipelinewise-target-postgres
 environments:
 - name: dev
   env:
