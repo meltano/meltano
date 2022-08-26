@@ -294,10 +294,10 @@ extractors:
 1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
    ```bash
-   meltano config <plugin> interactive
+   meltano config <plugin> set --interactive
 
    # For example:
-   meltano config tap-gitlab interactive
+   meltano config tap-gitlab set --interactive
    ```
 
 Follow the prompts to step through all available settings, or select an individual setting to configure.

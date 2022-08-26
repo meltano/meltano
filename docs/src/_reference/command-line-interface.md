@@ -262,16 +262,16 @@ Interactive config supports the same options as the direct `set` and `unset` (i.
 
 ```bash
 # Configure plugin interactively
-meltano config <plugin> interactive
+meltano config <plugin> set --interactive
 
 # Configure settings for specific environment interactively
-meltano --environment=prod config <plugin> interactive
+meltano --environment=prod config <plugin> set --interactive
 
 # Configure settings and extras interactively
-meltano config <plugin> interactive --extras
+meltano config <plugin> set --interactive --extras
 
 # Configure specific store interactively
-meltano config <plugin> interactive --store=meltano_yml
+meltano config <plugin> set --interactive --store=meltano_yml
 ```
 
 ## `discover`
