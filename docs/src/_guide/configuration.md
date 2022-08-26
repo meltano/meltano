@@ -131,6 +131,13 @@ Environment levels within `meltano.yml` resolve in order of precedence (within a
 - terminal env # lowest
 ```
 
+<div class="notification is-info">
+	<p>
+	We are considering adding support for the <code>env</code> key to <a href="/concepts/project#jobs">jobs</a> as well as updating the precedence order when we do.
+	We'd love to hear your thoughts in the <a href="https://github.com/meltano/meltano/issues/6386">GitHub issue</a> about this possible change!
+	</p>
+</div>
+
 This allows you to override environment variables per plugin and per environment, as needed for your use case.
 
 ### Configuring settings
