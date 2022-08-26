@@ -35,7 +35,7 @@ export default {
   docsUrl(path = '/', fragment) {
     fragment = fragment ? `#${fragment}` : ''
 
-    return `https://meltano.com/docs${path}.html${fragment}`
+    return `https://docs.meltano.com/${path}${fragment}`
   },
 
   downloadBlobAsFile(blob, fileName) {

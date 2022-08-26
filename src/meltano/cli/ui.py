@@ -54,7 +54,8 @@ def ensure_secure_setup(project: Project):
         for fact in facts:
             click.echo(fact)
         click.echo(
-            "For more information about these settings and how to set them, visit https://www.meltano.com/docs/settings.html#ui-authentication"
+            "For more information about these settings and how to set them, visit "
+            "https://docs.meltano.com/reference/settings#uiauthentication"
         )
         click.echo()
 

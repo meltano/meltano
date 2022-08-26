@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.4.0"
+version = "2.5.0"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -78,6 +78,7 @@ bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^6.4.1"}
+commitizen-version-bump = { git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main" }
 freezegun = "^0.3.12"
 isort = "^5.10.1"
 mock = "^4.0.3"
@@ -142,8 +143,8 @@ exclude_lines = [
 ]
 
 [tool.commitizen]
-name = "cz_customize"
-version = "2.4.0"
+name = "cz_version_bump"
+version = "2.5.0"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
     "pyproject.toml:^version =",
@@ -152,25 +153,6 @@ version_files = [
     'src/webapp/package.json:^  "version":',
     'docs/package.json:^  "version":',
 ]
-
-[tool.commitizen.customize]
-commit_parser = '^(?P<change_type>feat|fix|refactor|perf|break|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?'
-change_type_order = [
-  "BREAKING CHANGES",
-  "✨ New",
-  "🐛 Fixes",
-  "⚙️ Under the Hood",
-  "⚡ Performance Improvements",
-  "📚 Documentation Improvements",
-]
-
-[tool.commitizen.customize.change_type_map]
-break = "BREAKING CHANGES"
-feat = "✨ New"
-fix = "🐛 Fixes"
-refactor = "⚙️ Under the Hood"
-docs = "📚 Documentation Improvements"
-perf = "⚡ Performance Improvements"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

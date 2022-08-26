@@ -13,20 +13,17 @@ from ruamel.yaml import YAMLError
 
 import meltano
 from meltano.core import bundle
+from meltano.core.behavior.versioned import IncompatibleVersionError, Versioned
+from meltano.core.discovery_file import DiscoveryFile
+from meltano.core.plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
 from meltano.core.plugin.base import StandalonePlugin
+from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.factory import base_plugin_factory
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
-from meltano.core.yaml import configure_yaml
-
-from .behavior.versioned import IncompatibleVersionError, Versioned
-from .discovery_file import DiscoveryFile
-from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
-from .plugin.error import PluginNotFoundError
-from .plugin.factory import base_plugin_factory
-from .plugin.project_plugin import ProjectPlugin
-from .project_settings_service import ProjectSettingsService
-from .utils import NotFound, find_named
-
-yaml = configure_yaml()
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import NotFound, find_named
+from meltano.core.yaml import yaml
 
 
 class DiscoveryInvalidError(Exception):
@@ -38,7 +35,7 @@ class DiscoveryUnavailableError(Exception):
 
 
 # Increment this version number whenever the schema of discovery.yml is changed.
-# See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
+# See https://docs.meltano.com/contribute/plugins#discoveryyml-version for more information.
 VERSION = 22
 
 

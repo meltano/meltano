@@ -237,10 +237,29 @@ meltano config meltano set project_readonly true
 export MELTANO_PROJECT_READONLY=true
 ```
 
+### <a name="hub-api-root"></a>`hub_api_root`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_API_ROOT`
+- Default: None
+
+This sets the value of the root url for the hub api.
+
+If provided, this setting overrides the [`hub_url`](#hub-url).
+
+#### How to use
+
+```bash
+meltano config meltano set hub_api_root "https://mysite.com/my-plugins"
+meltano config meltano set hub_api_root false
+
+export MELTANO_HUB_API_ROOT="https://mysite.com/my-plugins"
+export MELTANO_HUB_API_ROOT=false
+```
+
 ### <a name="hub-url"></a>`hub_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
-- Default: [`https://hub.meltano.com`](https://hub.meltano.com)
+- Default: `https://hub.meltano.com`
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
@@ -252,6 +271,28 @@ This manifest is primarily used by [`meltano discover`](/reference/command-line-
 meltano config meltano set hub_url http://localhost:4000
 
 export MELTANO_HUB_URL=http://localhost:4000
+```
+
+### <a name="hub-url-auth"></a>`hub_url_auth`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL_AUTH`
+- Default: None
+
+The value of the `Authorization` header sent when making a request to [`hub_url`](#hub-url).
+
+No `Authorization` header is applied under the following conditions:
+
+- `hub_url_auth` is not set
+- `hub_url_auth` is set to `false`, `null` or an empty string
+
+#### How to use
+
+```bash
+meltano config meltano set hub_url_auth "Bearer $ACCESS_TOKEN"
+meltano config meltano set hub_url_auth false
+
+export MELTANO_HUB_URL_AUTH="Bearer $ACCESS_TOKEN"
+export MELTANO_HUB_URL_AUTH=false
 ```
 
 ### <a name="discovery-url"></a>`discovery_url`

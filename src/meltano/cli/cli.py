@@ -67,7 +67,7 @@ def cli(  # noqa: WPS231
     """
     ELT for the DataOps era.
 
-    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface
     """
     ctx.ensure_object(dict)
 
@@ -120,6 +120,6 @@ def cli(  # noqa: WPS231
             fg="yellow",
         )
         click.echo(
-            "For more details, visit http://meltano.com/docs/installation.html#upgrading-meltano-version"
+            "For more details, visit https://docs.meltano.com/guide/installation#upgrading-meltano-version"
         )
         sys.exit(3)
