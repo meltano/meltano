@@ -29,6 +29,10 @@ def test_project_init_directory_exists(tmp_path: Path, pushd):
 
 
 def test_project_init_no_write_permission(tmp_path: Path, pushd):
+    if platform.system() == "Windows":
+        pytest.xfail(
+            "Windows can still create new directories inside a read-only directory."
+        )
     project_name = "test_project"
 
     protected_dir = tmp_path.joinpath("protected")
