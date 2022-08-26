@@ -1,7 +1,6 @@
 """New Project Initialization Service."""
 from __future__ import annotations
 
-import errno
 import os
 import uuid
 
@@ -44,18 +43,19 @@ class ProjectInitService:
         """
         try:
             os.mkdir(self.project_name)
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                raise ProjectInitServiceError(
-                    f"Directory {self.project_name} already exists."
-                )
-            elif e.errno in {errno.EPERM, errno.EACCES}:
-                raise ProjectInitServiceError(
-                    f"Permission denied to create {self.project_name}."
-                )
+        except FileExistsError:
             raise ProjectInitServiceError(
-                f"Could not create directory {self.project_name}: {e}."
+                f"Directory {self.project_name} already exists."
             )
+        except PermissionError:
+            raise ProjectInitServiceError(
+                f"Permission denied to create {self.project_name}."
+            )
+        except Exception as e:
+            raise ProjectInitServiceError(
+                f"Could not create directory {self.project_name}. {e}"
+            )
+
         click.secho("Created", fg="blue", nl=False)
         click.echo(f" {self.project_name}")
 
