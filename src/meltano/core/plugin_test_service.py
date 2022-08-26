@@ -18,12 +18,24 @@ class PluginTestServiceFactory:
     """Factory class to resolve a plugin test service."""
 
     def __init__(self, plugin_invoker: PluginInvoker):
-        """Construct a PluginTestServiceFactory instance."""
+        """Construct a PluginTestServiceFactory instance.
+
+        Args:
+            plugin_invoker: The invocation instance of the plugin to test.
+        """
         self.plugin_invoker = plugin_invoker
 
     def get_test_service(self):
-        """Resolve a test service instance for a plugin type."""
+        """Resolve a test service instance for a plugin type.
+
+        Returns:
+            The test service instance.
+
+        Raises:
+            PluginNotSupportedError: If the plugin type is not supported for testing.
+        """
         test_services = {PluginType.EXTRACTORS: ExtractorTestService}
+
         try:
             return test_services[self.plugin_invoker.plugin.type](self.plugin_invoker)
         except KeyError as err:
@@ -34,7 +46,11 @@ class PluginTestService(ABC):
     """Abstract base class for plugin test operations."""
 
     def __init__(self, plugin_invoker: PluginInvoker):
-        """Construct a PluginTestService instance."""
+        """Construct a PluginTestService instance.
+
+        Args:
+            plugin_invoker: The invocation instance of the plugin to test
+        """
         self.plugin_invoker = plugin_invoker
 
     @abstractmethod
@@ -46,7 +62,11 @@ class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
     async def validate(self) -> tuple[bool, str]:
-        """Validate extractor configuration."""
+        """Validate extractor configuration.
+
+        Returns:
+            The validation result and supporting context message (if applicable).
+        """
         process = None
 
         try:
@@ -79,5 +99,5 @@ class ExtractorTestService(PluginTestService):
         # see https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess.returncode
         return (
             returncode < 0,
-            last_line if returncode != 0 else "No RECORD message received",
+            last_line if returncode else "No RECORD message received",
         )
