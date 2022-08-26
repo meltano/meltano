@@ -78,8 +78,8 @@ class TestCliConfig:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = AsyncMock(return_value=0)
-        mock_invoke.returncode = 0
+        mock_invoke.wait = AsyncMock(return_value=-1)
+        mock_invoke.returncode = -1
         payload = json.dumps({"type": "RECORD"}).encode()
         mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
