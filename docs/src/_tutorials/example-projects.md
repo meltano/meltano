@@ -15,7 +15,7 @@ We group example projects into three categories:
 The following Meltano projects are real-world examples of Meltano in production use. If you're about to launch your pipelines
 into your own production environment or want to take a look at how others organize their projoects, these projects are a great place to start.
 
-- **[Meltano Squared](https://github.com/meltano/squared)** - This is the project the Meltano team uses to manage their Meltano instance.
+- **[Meltano Squared](https://github.com/meltano/squared)** - This is the project the Meltano team uses to manage their Meltano instance. Meltano Squared is quite comprehensive running on kubernetes, leveraging multiple yaml files, environments, plugin inheritance, Great Expectations, SQLFluff, dbt, Airflow and Superset.
 - **[GitLab Data Meltano](https://gitlab.com/gitlab-data/gitlab-data-meltano)** - This is the project GitLab uses to manage Meltano.
 
 ### 2. Simple Meltano example projects
@@ -34,3 +34,6 @@ The following projects are beginner projects with mocks, local CSVs, local datab
 
 - **[Meltano Dbt Jaffle shop](https://github.com/pnadolny13/meltano_example_implementations/tree/main/meltano_projects/singer_dbt_jaffle)** - The dbt jaffle shop project placed in a meltano context, with local postgres, completely self-contained.
 - **[Meltano Extract Load Example](https://github.com/sbalnojan/meltano-example-el)** - A simple AWS S3 CSV extract and load into a PostgreSQL database. All mocked and completely self-contained.
+- **[Meltano DB -> DB Example](https://github.com/sbalnojan/meltano-example-el-db)** - A simple extract from a Postgres database and load into a second Postgres database. All mocked and completely self-contained.
+
+
