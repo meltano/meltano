@@ -8,10 +8,11 @@ from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.project import Project
 
 
 class TestCliConfig:
-    def test_config(self, project, cli_runner, tap, project_plugins_service):
+    def test_config(self, project: Project, cli_runner, tap, project_plugins_service):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
@@ -26,7 +27,9 @@ class TestCliConfig:
             json_config = json.loads(result.stdout)
             assert json_config["test"] == "mock"
 
-    def test_config_extras(self, project, cli_runner, tap, project_plugins_service):
+    def test_config_extras(
+        self, project: Project, cli_runner, tap, project_plugins_service
+    ):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
@@ -37,7 +40,9 @@ class TestCliConfig:
             json_config = json.loads(result.stdout)
             assert "_select" in json_config
 
-    def test_config_env(self, project, cli_runner, tap, project_plugins_service):
+    def test_config_env(
+        self, project: Project, cli_runner, tap, project_plugins_service
+    ):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
             return_value=project_plugins_service,
@@ -52,7 +57,7 @@ class TestCliConfig:
             assert "TAP_MOCK_TEST='mock'" in result.stdout
 
     def test_config_meltano(
-        self, project, cli_runner, engine_uri, project_plugins_service
+        self, project: Project, cli_runner, engine_uri, project_plugins_service
     ):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
@@ -66,7 +71,9 @@ class TestCliConfig:
             assert json_config["database_uri"] == engine_uri
             assert json_config["cli"]["log_level"] == "info"
 
-    def test_config_test(self, project, cli_runner, tap, project_plugins_service):
+    def test_config_test(
+        self, project: Project, cli_runner, tap, project_plugins_service
+    ):
 
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
@@ -90,7 +97,7 @@ class TestCliConfig:
 
                 assert "Plugin configuration is valid" in result.stdout
 
-    def test_config_meltano_test(self, project, cli_runner):
+    def test_config_meltano_test(self, project: Project, cli_runner):
         result = cli_runner.invoke(cli, ["config", "meltano", "test"])
 
         assert result.exit_code == 1
@@ -102,7 +109,7 @@ class TestCliConfig:
 
 class TestCliConfigSet:
     def test_environments_order_of_precedence(
-        self, project, cli_runner, tap, project_plugins_service
+        self, project: Project, cli_runner, tap, project_plugins_service
     ):
         with mock.patch(
             "meltano.cli.config.ProjectPluginsService",
