@@ -16,7 +16,7 @@ The following Meltano projects are real-world examples of Meltano in production 
 into your own production environment or want to take a look at how others organize their projoects, these projects are a great place to start.
 
 - **[Meltano Squared](https://github.com/meltano/squared)** - This is the project the Meltano team uses to manage their Meltano instance.
-- **[Gitlab Data Meltano](https://gitlab.com/gitlab-data/gitlab-data-meltano)** - This is the project GitLab uses to manage Meltano.
+- **[GitLab Data Meltano](https://gitlab.com/gitlab-data/gitlab-data-meltano)** - This is the project GitLab uses to manage Meltano.
 
 ### 2. Simple Meltano example projects
 
