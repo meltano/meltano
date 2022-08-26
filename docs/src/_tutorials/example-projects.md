@@ -25,7 +25,7 @@ The following Meltano projects are designed to illustrate a solution to one prob
 - **[Meltano & SQLFluff for dbt](https://gitlab.com/rabidaudio/meltano-sqlfluff-example)** - A simple project setting up SQLFluff via meltano as a linter for dbt (also via Meltano).
 - **[Data Stack 4 Fun & Nonprofits](https://github.com/andrewcstewart/ds4fnp)** - A larger setup accompanied by a tutorial series setting up Meltano, Gitpod, dbt and superset.
 - **[Meltano Getting Started Project](https://github.com/meltano/demo-project)** - If you follow the getting started doc part, this will be the resulting Meltano project.
-- **[Meltano orchestrating dbt using Airflow](https://github.com/pnadolny13/meltano_example_implementations/tree/main/meltano_projects/dbt_orchestration)** - Meltano project orchestrating the loading of CSVs into a database with a dbt run afterwards. Also self-contained. There also is a [video demonstrating this dbt Airflow project in action](https://www.youtube.com/watch?v=pNGJ96HOioM&t=919s).
+- **[Meltano orchestrating dbt using Airflow](https://github.com/pnadolny13/meltano_example_implementations/tree/main/meltano_projects/dbt_orchestration)** - Meltano project orchestrating the loading of CSVs into a database with a dbt run afterwards. Also self-contained. There also is a [video demonstrating this dbt & Airflow project in action](https://www.youtube.com/watch?v=pNGJ96HOioM&t=919s).
 
 
 ### 3. Sandbox projects
