@@ -30,7 +30,7 @@ The following Meltano projects are designed to illustrate a solution to one prob
 
 ### 3. Sandbox projects
 
-The following projects are beginner projects with mocks, local csvs, local databases to make them self-contained. A great place to peek into if you want to see Meltano projects in action for the first time and play around with basic functionality like extracting a CSV and loading it into a database.
+The following projects are beginner projects with mocks, local CSVs, local databases to make them self-contained. A great place to peek into if you want to see Meltano projects in action for the first time and play around with basic functionality like extracting a CSV and loading it into a database.
 
 - **[Meltano Dbt Jaffle shop](https://github.com/pnadolny13/meltano_example_implementations/tree/main/meltano_projects/singer_dbt_jaffle)** - The dbt jaffle shop project placed in a meltano context, with local postgres, completely self-contained.
 - **[Meltano Extract Load Example](https://github.com/sbalnojan/meltano-example-el)** - A simple AWS S3c CSV extract and load into a postgres database. All mocked, completely self-contained.
