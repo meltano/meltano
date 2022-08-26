@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.5.0 (2022-08-24)
+
+### ✨ New
+
+- [#6596](https://github.com/meltano/meltano/issues/6596) Support glob paths in file plugin `update` extra
+- [#6578](https://github.com/meltano/meltano/issues/6578) Add `--no-install` option to `meltano add`
+
+### 🐛 Fixes
+
+- [#6656](https://github.com/meltano/meltano/issues/6656) Correct STRICT_ENV_VAR_MODE behavior
+- [#6627](https://github.com/meltano/meltano/issues/6627) Raise exception when meltano.yml is empty
+- [#6643](https://github.com/meltano/meltano/issues/6643) Address `alter_column` warning for MSSQL
+- [#6636](https://github.com/meltano/meltano/issues/6636) Use `docs.meltano.com` instead of `meltano.com/docs`
+- [#6601](https://github.com/meltano/meltano/issues/6601) raise error on migration fail
+- [#6609](https://github.com/meltano/meltano/issues/6609) `meltano state list` change pattern from argument to option
+- [#6592](https://github.com/meltano/meltano/issues/6592) Validate CRON expressions
+- [#6543](https://github.com/meltano/meltano/issues/6543) Register legacy `DiscoveryFile` object in Ruamel YAML instance
+- [#6593](https://github.com/meltano/meltano/issues/6593) Docker workflow
+- [#6582](https://github.com/meltano/meltano/issues/6582) Make `default_environment` a top-level setting
+- [#6584](https://github.com/meltano/meltano/issues/6584) Avoid `pyproject.toml` Poetry parsing issue
+
+### ⚙️ Under the Hood
+
+- [#6621](https://github.com/meltano/meltano/issues/6621) Make `ProjectInitService.init` generate/set a `project_id`
+- [#6611](https://github.com/meltano/meltano/issues/6611) Use `closing` for DB sessions & add docstrings to `meltano.core.db`
+- [#6610](https://github.com/meltano/meltano/issues/6610) Replace `StaleJobFailer` class with `fail_stale_jobs` function
+
+### ⚡ Performance Improvements
+
+- [#6644](https://github.com/meltano/meltano/issues/6644) Improve performance when handling large yaml files
+
+### 📚 Documentation Improvements
+
+- [#6663](https://github.com/meltano/meltano/issues/6663) update custom extractor tutorial to use pip_url
+- [#6648](https://github.com/meltano/meltano/issues/6648) logging configuration guide
+- [#6650](https://github.com/meltano/meltano/issues/6650) Update Custom Extractor tutorial to use an editable install
+- [#6631](https://github.com/meltano/meltano/issues/6631) Add "Pytest Best Practices" section to contributing docs
+- [#6602](https://github.com/meltano/meltano/issues/6602) Update `Docker` definition in `glossary.yml`
+
 ## v2.4.0 (2022-08-05)
 
 ### ✨ New
