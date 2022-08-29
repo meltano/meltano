@@ -1073,9 +1073,9 @@ Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` set
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
 - Default: `False`
 
-### <a name="ff-env-var-strict-mode"></a>`ff.env_var_strict_mode`
+### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENV_VAR_STRICT_MODE`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_STRICT_ENV_VAR_MODE`
 - Default: `False`
 
 Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.
