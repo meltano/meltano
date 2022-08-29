@@ -218,6 +218,7 @@ class TestScheduleService:
             "mock-job-schedule",
             "mock-job",
             "@daily",
+            MOCK_ENV_FROM_SCHED="env_var_value_from_schedule_def",
         )
 
         # It fails because mock-job is not a valid job
@@ -239,7 +240,10 @@ class TestScheduleService:
                     "--dry-run",
                     schedule.job,
                 ],
-                env={"MOCK_ENV_ENTRY": "athing"},
+                env={
+                    "MOCK_ENV_ENTRY": "athing",
+                    "MOCK_ENV_FROM_SCHED": "env_var_value_from_schedule_def",
+                },
             )
 
     def test_find_namespace_schedule(
