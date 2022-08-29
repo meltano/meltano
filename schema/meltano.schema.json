@@ -761,6 +761,9 @@
           "description": "The name of the extractor plugin",
           "examples": ["tap-gitlab"]
         },
+	  "env": {
+	      "$ref": "#/definitions/env"
+	  },
         "loader": {
           "type": "string",
           "description": "The name of the loader plugin",

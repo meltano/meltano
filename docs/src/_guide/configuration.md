@@ -91,6 +91,10 @@ plugins:
     env:
       # root level plugin env
       MY_ENV_VAR: plugin_level_env_var
+  loaders:
+  - name: target-postgres
+    variant: transferwise
+    pip_url: pipelinewise-target-postgres
 environments:
 - name: dev
   env:
@@ -104,6 +108,15 @@ environments:
           env:
             # environment level plugin env
             MY_ENV_VAR: environment_level_plugin_env_var
+schedules:
+- name: daily-google-analytics-load
+  interval: '@daily'
+  extractor: tap-google-analytics
+  loader: target-postgres
+  transform: skip
+  start_date: 2022-08-24 00:00:00
+  env:
+    SCHEDULE_SPECIFIC_ENV_VAR: schedule_specific_value
 ```
 
 Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context):
@@ -113,9 +126,17 @@ Environment levels within `meltano.yml` resolve in order of precedence (within a
 - environment level env
 - root level plugin env
 - root level env
+- schedule level env
 - .env file
 - terminal env # lowest
 ```
+
+<div class="notification is-info">
+	<p>
+	We are considering adding support for the <code>env</code> key to <a href="/concepts/project#jobs">jobs</a> as well as updating the precedence order when we do.
+	We'd love to hear your thoughts in the <a href="https://github.com/meltano/meltano/issues/6386">GitHub issue</a> about this possible change!
+	</p>
+</div>
 
 This allows you to override environment variables per plugin and per environment, as needed for your use case.
 
