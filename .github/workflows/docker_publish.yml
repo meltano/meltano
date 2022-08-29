@@ -65,11 +65,20 @@ jobs:
     - name: Assemble image tags
       id: assemble-tags
       run: |
+        MELTANO_VERSION="${{ steps.get-meltano-version.outputs.release-version }}"
+        MELTANO_VERSION_ARRAY=(${MELTANO_VERSION//./ })
+        MELTANO_VERSION_MAJOR="${MELTANO_VERSION_ARRAY[0]}"
+        MELTANO_VERSION_MAJOR_MINOR="${MELTANO_VERSION_ARRAY[0]}.${MELTANO_VERSION_ARRAY[1]}"
+        MELTANO_VERSION_MAJOR_MINOR_PATCH="${MELTANO_VERSION_ARRAY[0]}.${MELTANO_VERSION_ARRAY[1]}.${MELTANO_VERSION_ARRAY[2]}"
         # To save space, only publish the `latest` tag for each images to the GitHub registry
         if [[ "${{ env.registry }}" != "ghcr.io" ]]; then
-          echo "v${{ steps.get-meltano-version.outputs.release-version }}-python${{ matrix.python-version }}" >> tags
+          echo "v${MELTANO_VERSION_MAJOR}-python${{ matrix.python-version }}" >> tags
+          echo "v${MELTANO_VERSION_MAJOR_MINOR}-python${{ matrix.python-version }}" >> tags
+          echo "v${MELTANO_VERSION_MAJOR_MINOR_PATCH}-python${{ matrix.python-version }}" >> tags
           [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "SHA-${{ github.sha }}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${{ steps.get-meltano-version.outputs.release-version }}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${MELTANO_VERSION_MAJOR}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${MELTANO_VERSION_MAJOR_MINOR}" >> tags
+          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${MELTANO_VERSION_MAJOR_MINOR_PATCH}" >> tags
         fi
         echo "latest-python${{ matrix.python-version }}" >> tags
         [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "latest" >> tags
