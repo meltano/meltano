@@ -23,7 +23,7 @@ def test_project_init_directory_exists(tmp_path: Path, pushd):
     pushd(projects_dir)
     with pytest.raises(
         ProjectInitServiceError,
-        match='Directory "test_project" already exists',
+        match=f"Directory {project_name!r} already exists",
     ):
         ProjectInitService(project_name).init(activate=False, add_discovery=False)
 
