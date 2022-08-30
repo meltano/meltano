@@ -433,7 +433,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                     self.plugin, self.plugin.executable
                 ) from err
 
-    async def invoke_async(self, *args, **kwargs):
+    async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:
         """Invoke a command.
 
         Args:
