@@ -59,6 +59,6 @@ def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
     missing_dir.rmdir()  # remove the parent directory
     with pytest.raises(
         ProjectInitServiceError,
-        match='Could not create directory "test_project".',
+        match=f"Could not create directory {project_name!r}.",
     ):
         ProjectInitService(project_name).init(activate=False, add_discovery=False)
