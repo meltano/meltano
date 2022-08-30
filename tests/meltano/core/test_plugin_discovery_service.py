@@ -14,11 +14,9 @@ from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.yaml import configure_yaml
+from meltano.core.yaml import yaml
 
 HTTP_STATUS_TEAPOT = 418
-
-yaml = configure_yaml()
 
 
 @pytest.fixture(scope="class")

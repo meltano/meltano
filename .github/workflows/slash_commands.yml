@@ -10,7 +10,7 @@ jobs:
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v3
         with:
-          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
           issue-type: pull-request
           permission:
             write
