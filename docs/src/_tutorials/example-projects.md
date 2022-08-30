@@ -13,7 +13,7 @@ We group example projects into three categories:
 ### 1. Running in production
 
 The following Meltano projects are real-world examples of Meltano in production use. If you're about to launch your pipelines
-into your own production environment or want to take a look at how others organize their projoects, these projects are a great place to start.
+into your own production environment or want to take a look at how others organize their projects, these projects are a great place to start.
 
 - **[Meltano Squared](https://github.com/meltano/squared)** - This is the project the Meltano team uses to manage their Meltano instance. Meltano Squared is quite comprehensive running on kubernetes, leveraging multiple yaml files, environments, plugin inheritance, Great Expectations, SQLFluff, dbt, Airflow and Superset.
 - **[GitLab Data Meltano](https://gitlab.com/gitlab-data/gitlab-data-meltano)** - This is the project GitLab uses to manage Meltano.
