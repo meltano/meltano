@@ -26,6 +26,26 @@ meltano job add tap-gitlab-to-target-postgres-with-dbt --tasks "tap-gitlab targe
 meltano schedule add daily-gitlab-load --job tap-gitlab-to-target-postgres-with-dbt --interval '@daily'
 ```
 
+This would add the following schedule to your `meltano.yml`:
+
+```yaml
+schedules:
+- name: daily-gitlab-load
+  interval: '@daily'
+  job: tap-gitlab-to-target-postgres-with-dbt
+```
+
+If you have schedule-specific environment variables that you would like to pass to the invocation environments of the plugins run by the schedule, you can supply those via the `env` key like so:
+
+```yaml
+schedules:
+- name: daily-gitlab-load
+  interval: '@daily'
+  job: tap-gitlab-to-target-postgres-with-dbt
+  env:
+    SCHEDULE_SPECIFIC_ENV_VAR: schedule_specific_value
+```
+
 ## Installing Airflow
 
 While you can use Meltano's CLI define pipeline schedules,
