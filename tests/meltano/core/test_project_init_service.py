@@ -41,7 +41,7 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
     pushd(protected_dir)
     with pytest.raises(
         ProjectInitServiceError,
-        match='Permission denied to create "test_project"',
+        match=f"Permission denied to create {project_name!r}",
     ):
         ProjectInitService(project_name).init(activate=False, add_discovery=False)
 
