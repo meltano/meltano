@@ -45,6 +45,8 @@ def tests(session: Session) -> None:
         "pytest",
         "pytest-asyncio",
         "pytest-docker",
+        "pytest-order",
+        "pytest-randomly",
         "requests-mock",
     )
 
