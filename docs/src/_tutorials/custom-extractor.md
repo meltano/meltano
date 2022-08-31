@@ -53,6 +53,8 @@ plugins:
       # Can be found in the pyproject.toml of your custom tap under CLI declaration
       executable: tap-my-custom-source
       capabilities:
+        # For a reference of plugin capabilities, see:
+        # https://docs.meltano.com/reference/plugin-definition-syntax#capabilities
         - state
         - catalog
         - discover

@@ -24,8 +24,9 @@ In order to use a given package as a plugin in a [project](project),
 assuming it meets the requirements of the [plugin type](#types) in question, Meltano needs to know:
 
 1. where to find the package, typically a [pip package](https://pip.pypa.io/en/stable/) identified by its name on [PyPI](https://pypi.org/), public or private Git repository URL, or local directory path,
-2. what [settings](/guide/configuration) and other capabilities it supports, and finally
-3. what its [configuration](/guide/configuration) should be when invoked.
+2. what [settings](/guide/configuration) it supports
+3. what [capabilities](/reference/plugin-definition-syntax#capabilities) it supports, and finally
+4. what its [configuration](/guide/configuration) should be when invoked.
 
 Together, a package's location (1) and the metadata (2) describing it in terms Meltano can understand make up the **base plugin description**.
 In your project, **plugins** extend this description with a specific configuration (3) and a unique name.
