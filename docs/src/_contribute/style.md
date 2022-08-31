@@ -84,8 +84,12 @@ For new, deprecated, or experimental features, the relevant code path can be wra
 1. Determine a descriptive name for the feature flag and add it as a [`FeatureFlags` Enum value](https://github.com/meltano/meltano/blob/3237022624c9594852abe69acb4da3dbf1ce5c05/src/meltano/core/settings_service.py#L30)
 1. Wrap your code blocks in a `ProjectSettingsService.feature_flag()` context as demonstrated below.
 1. Add documentation about the new feature flag to the [Feature Flags section of the settings reference docs](/reference/settings#feature-flags)
+1. In any documentation about the feature, note that the feature is experimental and link to the [Feature Flags section of the settings reference docs](/reference/settings#feature-flags). This note should be something similar to:
+> This feature is experimental and must be enabled using feature flags. See the docs here: ...
+1. Add your feature flag metadata to [settings.yml](https://github.com/meltano/meltano/blob/3237022624c9594852abe69acb4da3dbf1ce5c05/src/meltano/core/bundle/settings.yml#L189) so that it is recognized as a project-wide configuration setting.
 
 ```python
+# Example feature flag usage
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
