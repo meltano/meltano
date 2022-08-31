@@ -198,7 +198,7 @@ environments:
             STACKED: "${STACKED}5"  # '12345'
 ```
 
-Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the resolution and inheritance behavior of `config` or `settings` keys.
+Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the [resolution and inheritance behavior of `config` or `settings` keys](/guide/configuration#configuration-layers).
 Because settings and environment variable behavior can become complex when set in multiple places, the [`meltano invoke` command](/reference/command-line-interface#invoke) provides a `--print-var` option which allows you to easily inspect what value is being supplied for a given environment variable within your plugin's invocation environment at runtime.
 
 ### Configuring settings
