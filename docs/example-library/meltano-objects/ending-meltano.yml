@@ -7,7 +7,6 @@ environments:
 - name: qa
 - name: prod
 plugins:
-  extractors: []
   loaders:
   - name: target-jsonl
     variant: andyh1203
