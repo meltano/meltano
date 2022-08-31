@@ -45,8 +45,8 @@ class TestExtractorTestService:
     def setup(self, mock_invoker):
         self.mock_invoke = Mock()
         self.mock_invoke.name = "utility-mock"
-        self.mock_invoke.wait = AsyncMock(return_value=0)
-        self.mock_invoke.returncode = 0
+        self.mock_invoke.wait = AsyncMock(return_value=-1)
+        self.mock_invoke.returncode = -1
         self.mock_invoker = mock_invoker
         self.mock_invoker.invoke_async = AsyncMock(return_value=self.mock_invoke)
 
@@ -61,7 +61,7 @@ class TestExtractorTestService:
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert is_valid
-        assert detail is None
+        assert detail == MOCK_RECORD_MESSAGE
 
     @pytest.mark.asyncio
     async def test_validate_success_ignore_non_json(self):
@@ -74,7 +74,7 @@ class TestExtractorTestService:
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert is_valid
-        assert detail is None
+        assert detail == MOCK_RECORD_MESSAGE
 
     @pytest.mark.asyncio
     async def test_validate_success_ignore_non_record_msg(self):
@@ -90,7 +90,7 @@ class TestExtractorTestService:
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert is_valid
-        assert detail is None
+        assert detail == MOCK_RECORD_MESSAGE
 
     @pytest.mark.asyncio
     async def test_validate_success_stop_after_record_msg(self):
@@ -107,7 +107,7 @@ class TestExtractorTestService:
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert is_valid
-        assert detail is None
+        assert detail == MOCK_RECORD_MESSAGE
 
         assert self.mock_invoke.stdout.readline.call_count == 2
 
@@ -118,6 +118,9 @@ class TestExtractorTestService:
         self.mock_invoke.stdout.readline = AsyncMock(
             return_value=(b"%b" % MOCK_STATE_MESSAGE.encode())
         )
+
+        self.mock_invoke.wait = AsyncMock(return_value=0)
+        self.mock_invoke.returncode = 0
 
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
