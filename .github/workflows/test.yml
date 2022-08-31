@@ -90,7 +90,7 @@ jobs:
     - name: Configure Poetry
       run: |
         poetry env use "${{ matrix.python-version }}"
-        poetry debug
+        poetry debug info
 
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql')
