@@ -21,6 +21,7 @@ class TestEnvironmentService:
     def environment(self, environment_service: EnvironmentService) -> Environment:
         return environment_service.add("test-environment")
 
+    @pytest.mark.order(0)
     def test_add_environment(self, subject: EnvironmentService):
         count = 10
         environments = [Environment(f"environment_{idx}") for idx in range(count)]
@@ -41,6 +42,7 @@ class TestEnvironmentService:
         ):
             subject.add_environment(environments[3])
 
+    @pytest.mark.order(1)
     def test_remove_environment(
         self,
         subject: EnvironmentService,
@@ -56,6 +58,7 @@ class TestEnvironmentService:
         ):
             subject.remove("i-do-not-exist")
 
+    @pytest.mark.order(2)
     def test_list_environments(
         self,
         subject: EnvironmentService,
