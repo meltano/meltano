@@ -32,6 +32,7 @@ api/parser
 *.ntvs*
 *.njsproj
 *.sln
+.sourcery.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
