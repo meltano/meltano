@@ -158,6 +158,7 @@ class TestTracker:
                 assert mocked.call_count == 0
 
     def test_analytics_json_is_created(self, project: Project):
+        Tracker(project)
         check_analytics_json(project)
         with delete_analytics_json(project):
             Tracker(project)
