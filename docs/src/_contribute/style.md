@@ -12,6 +12,7 @@ weight: 10
 Meltano uses the below tools to enforce consistent code style. Explore the [repo](https://github.com/meltano/meltano) to learn of the specific rules and settings of each.
 
 Python:
+
 - [isort](https://pycqa.github.io/isort/)
 - [Black](https://github.com/ambv/black)
 - [Flake8](https://flake8.pycqa.org/en/latest/)
@@ -24,6 +25,7 @@ and `wemake-python-styleguide` is a plugin for Flake8 that offers an extensive s
 [MyPy is currently not executed in CI](https://github.com/meltano/meltano/issues/6491). It currently raises many issues when run. We intend to address them over time.
 
 Javascript:
+
 - [ESLint](https://eslint.org/docs/rules/)
 - [ESLint Vue Plugin](https://github.com/vuejs/eslint-plugin-vue)
 - [Prettier](https://prettier.io/)
@@ -85,7 +87,7 @@ For new, deprecated, or experimental features, the relevant code path can be wra
 1. Wrap your code blocks in a `ProjectSettingsService.feature_flag()` context as demonstrated below.
 1. Add documentation about the new feature flag to the [Feature Flags section of the settings reference docs](/reference/settings#feature-flags)
 1. In any documentation about the feature, note that the feature is experimental and link to the [Feature Flags section of the settings reference docs](/reference/settings#feature-flags). This note should be something similar to:
-> This feature is experimental and must be enabled using feature flags. See the docs here: ...
+   > This feature is experimental and must be enabled using feature flags. See the docs here: ...
 1. Add your feature flag metadata to [settings.yml](https://github.com/meltano/meltano/blob/3237022624c9594852abe69acb4da3dbf1ce5c05/src/meltano/core/bundle/settings.yml#L189) so that it is recognized as a project-wide configuration setting.
 
 ```python
