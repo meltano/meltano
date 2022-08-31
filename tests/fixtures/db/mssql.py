@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import logging
 import os
@@ -70,7 +72,9 @@ def engine_uri():
 
     # Recreate the database using the master database
     master_engine_uri = create_connection_url(host, port, user, password, "master")
-    engine = create_engine(master_engine_uri, isolation_level="AUTOCOMMIT")
+    engine = create_engine(
+        master_engine_uri, isolation_level="AUTOCOMMIT", pool_size=512
+    )
     recreate_database(engine, database)
 
     # Connect to the database where the tests will be run

@@ -27,7 +27,7 @@ def engine_uri():
 
     # create the database
     engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
-    engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
+    engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT", pool_size=512)
     recreate_database(engine, database)
 
     return f"postgresql://{user}:{password}@{host}:{port}/{database}"
