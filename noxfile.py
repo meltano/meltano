@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from random import randint
 from textwrap import dedent
 
 try:
@@ -57,6 +58,7 @@ def tests(session: Session) -> None:
             "--parallel",
             "-m",
             "pytest",
+            f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
             *session.posargs,
             env={"NOX_CURRENT_SESSION": "tests"},
         )
