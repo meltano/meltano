@@ -76,13 +76,19 @@ Object properties and methods are alphabetical where `Vuex` stores are the excep
 ### Feature Flags
 
 Sometimes it is useful to be able to make preview features available or allow deprecated features to be used for backwards compatibility.
-To accomplish this, Meltano implements feature flags.
-For new, deprecated, or experimental features, the relevant code path can be wrapped in a feature flag context.
 
-For example:
+To accomplish this, Meltano implements feature flags.
+
+For new, deprecated, or experimental features, the relevant code path can be wrapped in a feature flag context. The process for adding new feature flags is as follows:
+
+1. Determine a descriptive name for the feature flag and add it as a [`FeatureFlags` Enum value](https://github.com/meltano/meltano/blob/3237022624c9594852abe69acb4da3dbf1ce5c05/src/meltano/core/settings_service.py#L30)
+1. Wrap your code blocks in a `ProjectSettingsService.feature_flag()` context as demonstrated below.
+1. Add documentation about the new feature flag to the [Feature Flags section of the settings reference docs](/reference/settings#feature-flags)
+
 ```python
+from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.settings_service import EXPERIMENTAL
+from meltano.core.settings_service import FeatureFlags
 
 class ExistingClass:
 
@@ -90,17 +96,18 @@ class ExistingClass:
         self.project = Project.find()
         self.settings_service = ProjectSettingsService(self.project)
 
-    # If this method is called elsewhere in the code and experimental features are
-    # not allowed, it will throw an error:
+    # If this method is called elsewhere in the code and the NEW_BEHAVIOR
+    # feature flag is not set to 'true' it will throw an error:
     def experimental_method(self):
-        with self.settings_service.feature_flag(EXPERIMENTAL):
-            print("Doing experimental behavior...")
+        with self.settings_service.feature_flag(FeatureFlags.NEW_BEHAVIOR):
+            print("Doing new behavior...")
 
     # If this method is called elsewhere, its behavior will vary based on whether
     # the feature flag is set in the project
     # The same pattern can be used to deprecate existing behavior
+    # Notice the "raise_error=False" in the feature_flag method call
     def existing_method_with_new_behavior(self):
-        with self.settings_service.feature_flag("new_behavior") as new_behavior:
+        with self.settings_service.feature_flag(FeatureFlags.NEW_BEHAVIOR, raise_error=False) as new_behavior:
             if new_behavior:
                 print("Doing the new behavior...")
             else:
