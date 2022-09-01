@@ -40,19 +40,20 @@ def un_engine_uri(monkeypatch):
 
 
 def _attempt_vacuum_db(engine):
+    op_error = None
     for _ in range(5):  # Retry 5 times
         try:
-
             close_all_sessions()
             metadata = MetaData(bind=engine)
             metadata.reflect()
             metadata.drop_all()
-        except OperationalError as ex:  # noqa: F841
+        except OperationalError as ex:
+            op_error = ex
             sleep(VACUUM_DB_RETRY_DELAY)
             continue
         break
     else:
-        warnings.warn(f"'vacuum_db' fixture failed: {ex!r}")  # noqa: F821
+        warnings.warn(f"'vacuum_db' fixture failed: {op_error!r}")
 
 
 @pytest.fixture(scope="class", autouse=True)
