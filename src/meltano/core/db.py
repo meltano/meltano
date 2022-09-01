@@ -15,6 +15,8 @@ from meltano.core.project import Project
 
 from .project_settings_service import ProjectSettingsService
 
+POOL_SIZE = 512
+
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = {}
@@ -42,7 +44,11 @@ def project_engine(
 
     engine_uri = settings.get("database_uri")
     logging.debug(f"Creating engine {project}@{engine_uri}")
-    engine = create_engine(engine_uri, pool_pre_ping=True)
+    engine = create_engine(
+        engine_uri,
+        pool_pre_ping=True,
+        pool_size=POOL_SIZE,
+    )
 
     # Connect to the database to ensure it is available.
     connect(
