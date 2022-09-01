@@ -38,7 +38,7 @@ def app(create_app):
 
 
 @pytest.fixture(scope="class")
-def create_app(request, project, vacuum_db):
+def create_app(request, project):
     def _factory(**kwargs):
         config = {"TESTING": True, "LOGIN_DISABLED": False, "ENV": "test", **kwargs}
 
