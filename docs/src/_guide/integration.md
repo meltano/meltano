@@ -280,9 +280,13 @@ In prior versions of the Singer spec, the `--properties` option was used instead
 If this is the case for a tap, ensure `properties` is set as a [capability](/contribute/plugins) for the tap instead of `catalog`.
 Then `meltano elt` will accept the catalog file and will pass it to the tap using the appropriate flag.
 
+For more information, please refer to the [plugin capabilities reference](/reference/plugin-definition-syntax#capabilities).
+
 ### Incremental Replication Not Running as Expected
 
 If you're trying to run a pipeline with incremental replication using `meltano elt` but it's running a full sync, ensure that you're passing a [State ID](/getting-started#run-a-data-integration-el-pipeline) via the [`--state-id` flag](/reference/command-line-interface#how-to-use-4).
+
+If using a custom tap, ensure that the tap declares the `state` capability as described in the [plugin capabilities reference](/reference/plugin-definition-syntax#capabilities).
 
 ### Testing Specific Failing Streams
 

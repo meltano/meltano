@@ -91,6 +91,10 @@ plugins:
     env:
       # root level plugin env
       MY_ENV_VAR: plugin_level_env_var
+  loaders:
+  - name: target-postgres
+    variant: transferwise
+    pip_url: pipelinewise-target-postgres
 environments:
 - name: dev
   env:
@@ -104,6 +108,15 @@ environments:
           env:
             # environment level plugin env
             MY_ENV_VAR: environment_level_plugin_env_var
+schedules:
+- name: daily-google-analytics-load
+  interval: '@daily'
+  extractor: tap-google-analytics
+  loader: target-postgres
+  transform: skip
+  start_date: 2022-08-24 00:00:00
+  env:
+    SCHEDULE_SPECIFIC_ENV_VAR: schedule_specific_value
 ```
 
 Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context):
@@ -113,11 +126,80 @@ Environment levels within `meltano.yml` resolve in order of precedence (within a
 - environment level env
 - root level plugin env
 - root level env
+- schedule level env
 - .env file
 - terminal env # lowest
 ```
 
+<div class="notification is-info">
+	<p>
+	We are considering adding support for the <code>env</code> key to <a href="/concepts/project#jobs">jobs</a> as well as updating the precedence order when we do.
+	We'd love to hear your thoughts in the <a href="https://github.com/meltano/meltano/issues/6386">GitHub issue</a> about this possible change!
+	</p>
+</div>
+
 This allows you to override environment variables per plugin and per environment, as needed for your use case.
+
+#### Environment variable expansion
+
+Environment variable values within a given layer of your `meltano.yml` can inherit values from other layers.
+For example, if your terminal environment has the environment variable `TERMINAL_ENVIRONMENT_VARIABLE` set to the value `1` and you then add the following to your `meltano.yml`
+
+```yaml
+environments:
+  - name: dev
+    env:
+      INHERITED: ${TERMINAL_ENVIRONMENT_VARIABLE}2
+```
+
+then the environment variable `INHERITED` would be expanded to have the value of `12` in your `dev` environment.
+
+Environment variables are inherited across layers in the following order, where environment variable values at each level are expanded using values from the layers above it.
+
+```
+- terminal env and .env
+- root-level env in meltano.yml
+- active environment env
+- root-level plugin-level env
+- active environment-level plugin-level env
+```
+
+The following example illustrates how values are expanded:
+
+```
+env:
+  # Level 2: top-level `env:`
+  # Inherits from terminal context
+  LEVEL_NUM: "2"                  #  '2'
+  STACKED: "${STACKED}2"          # '12'
+plugins:
+  extractors:
+    tap-foobar:
+      env:
+        # Level 4: plugin-level `env:`
+        # Inherits from a environment-level `env:` if an environment is active
+        # Inherits directly from top-level `env:` if no environment is active
+        LEVEL_NUM: "4"            #    '4'
+        STACKED: "${STACKED}4"    # '1234'
+environments:
+  prod:
+    env:
+      # Level 3: environment-level `env:`
+      # Inherits from top-level `env:`
+      LEVEL_NUM: "3"              #   '3'
+      STACKED: "${STACKED}3"      # '123'
+    plugins:
+      extractors:
+        tap-foobar:
+          env:
+            # Level 5: environment-level plugin `env:`
+            # Inherits from (global) plugin-level `env:`
+            LEVEL_NUM: "5"          #     '5'
+            STACKED: "${STACKED}5"  # '12345'
+```
+
+Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the [resolution and inheritance behavior of `config` or `settings` keys](/guide/configuration#configuration-layers).
+Because settings and environment variable behavior can become complex when set in multiple places, the [`meltano invoke` command](/reference/command-line-interface#invoke) provides a `--print-var` option which allows you to easily inspect what value is being supplied for a given environment variable within your plugin's invocation environment at runtime.
 
 ### Configuring settings
 
@@ -216,12 +298,9 @@ Conflicting values for setting found in: ['MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME', '
 
 ### Expansion in setting values
 
-Inside the values of settings in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
-environment variables can be referenced to dynamically adapt a plugin's configuration to the environment it is run in,
-specific properties of your project, or the plugins it is run with inside a
-[`meltano elt`](/reference/command-line-interface#elt) pipeline.
+Inside the values of settings in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), environment variables can be referenced to dynamically adapt a plugin's configuration to the environment it is run in, specific properties of your project, or the plugins it is run with inside a [`meltano run`](/reference/command-line-interface#run) pipeline.
 
-#### Available environment variables
+#### Available plugin environment variables
 
 The following variables can be referenced from any setting:
 
