@@ -155,6 +155,23 @@ version_files = [
     'docs/package.json:^  "version":',
 ]
 
+[tool.mypy]
+files = "src"
+
+# The following whitelist is used to allow for incremental adoption
+# of MyPy. Modules should be removed from this whitelist as and when
+# their respective type errors have been addressed. No new modules
+# should be added to this whitelist.
+[[tool.mypy.overrides]]
+module = [
+  "meltano.api.*",
+  "meltano.cli.*",
+  "meltano.core.*",
+  "meltano.migrations.*",
+  "meltano.oauth.*",
+]
+ignore_errors = true
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

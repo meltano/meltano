@@ -3,5 +3,5 @@
 
 from __future__ import annotations
 
-# Managed by bumpversion
+# Managed by commitizen
 __version__ = "2.5.0"
