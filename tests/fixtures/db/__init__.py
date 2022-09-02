@@ -69,14 +69,8 @@ def vacuum_db(engine_sessionmaker):
 
 @pytest.fixture(scope="class")
 def engine_sessionmaker(engine_uri):
-    # create the engine
-    engine = create_engine(
-        engine_uri,
-        poolclass=NullPool,
-    )
-    create_session = sessionmaker(bind=engine)
-
-    return (engine, create_session)
+    engine = create_engine(engine_uri, poolclass=NullPool)
+    return (engine, sessionmaker(bind=engine))
 
 
 @pytest.fixture()
