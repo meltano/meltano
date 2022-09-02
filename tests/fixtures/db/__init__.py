@@ -9,13 +9,11 @@ from typing import Generator
 import pytest
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
-from sqlalchemy.exc import OperationalError, SAWarning
+from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
 from sqlalchemy.pool import NullPool
 
 from meltano.core.project import Project
-
-VACUUM_DB_RETRY_DELAY = 5.0
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -40,23 +38,6 @@ def un_engine_uri(monkeypatch):
     monkeypatch.delenv("MELTANO_DATABASE_URI")
 
 
-def _attempt_vacuum_db(engine):
-    op_error = None
-    for _ in range(5):  # Retry 5 times
-        try:
-            close_all_sessions()
-            metadata = MetaData(bind=engine)
-            metadata.reflect()
-            metadata.drop_all()
-        except OperationalError as ex:
-            op_error = ex
-            sleep(VACUUM_DB_RETRY_DELAY)
-            continue
-        break
-    else:
-        warnings.warn(f"'vacuum_db' fixture failed: {op_error!r}")
-
-
 @pytest.fixture(scope="class", autouse=True)
 def vacuum_db(engine_sessionmaker):
     try:
@@ -64,7 +45,10 @@ def vacuum_db(engine_sessionmaker):
     finally:
         logging.debug("Cleaning system database...")
         engine, _ = engine_sessionmaker
-        _attempt_vacuum_db(engine)
+        close_all_sessions()
+        metadata = MetaData(bind=engine)
+        metadata.reflect()
+        metadata.drop_all()
 
 
 @pytest.fixture(scope="class")
