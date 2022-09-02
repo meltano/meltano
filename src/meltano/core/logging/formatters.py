@@ -22,7 +22,7 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
 
 
 def plain_rich_traceback(sio: TextIO, exc_info: structlog.types.ExcInfo) -> None:
-    """Pretty-print `exc_info` to `sio` using the rich package.
+    """Pretty-print `exc_info` to `sio` using the rich package, with colors disabled.
 
     To be passed into `ConsoleRenderer`'s `exception_formatter` argument.
 
