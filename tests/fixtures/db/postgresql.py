@@ -6,6 +6,7 @@ import os
 import pytest
 import sqlalchemy
 from sqlalchemy import create_engine, text
+from sqlalchemy.pool import NullPool
 
 
 def recreate_database(engine, db_name):
@@ -27,7 +28,12 @@ def engine_uri():
 
     # create the database
     engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
-    engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT", pool_size=512)
+    engine = create_engine(
+        engine_uri,
+        isolation_level="AUTOCOMMIT",
+        poolclass=NullPool,
+        # pool_size=512,  # noqa: E800
+    )
     recreate_database(engine, database)
 
     return f"postgresql://{user}:{password}@{host}:{port}/{database}"

@@ -11,6 +11,7 @@ from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import OperationalError, SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from meltano.core.project import Project
 
@@ -69,7 +70,10 @@ def vacuum_db(engine_sessionmaker):
 @pytest.fixture(scope="class")
 def engine_sessionmaker(engine_uri):
     # create the engine
-    engine = create_engine(engine_uri)
+    engine = create_engine(
+        engine_uri,
+        poolclass=NullPool,
+    )
     create_session = sessionmaker(bind=engine)
 
     return (engine, create_session)

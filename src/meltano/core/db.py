@@ -9,13 +9,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
 
 from meltano.core.project import Project
 
 from .project_settings_service import ProjectSettingsService
 
-POOL_SIZE = 128
+POOL_SIZE = 20
+POOL_MAX_OVERFLOW = 10
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
@@ -45,19 +47,13 @@ def project_engine(
     engine_uri = settings.get("database_uri")
     logging.debug(f"Creating engine '{project}@{engine_uri}'")
 
-    kwargs = {
-        "url": engine_uri,
-        "pool_pre_ping": True,
-        "pool_size": POOL_SIZE,
-    }
-
-    try:
-        engine = create_engine(**kwargs)
-    except TypeError:
-        # The `pool_size` argument should be specified whenever possible, but
-        # does not work with all configurations.
-        kwargs.pop("pool_size")
-        engine = create_engine(**kwargs)
+    engine = create_engine(
+        engine_uri,
+        # pool_pre_ping=True,  # noqa: E800
+        poolclass=NullPool,
+        # pool_size=POOL_SIZE,  # noqa: E800
+        # max_overflow=POOL_MAX_OVERFLOW,  # noqa: E800
+    )
 
     # Connect to the database to ensure it is available.
     connect(

@@ -8,6 +8,7 @@ import pytest
 import sqlalchemy as sa
 from sqlalchemy import DDL, create_engine
 from sqlalchemy.engine import URL
+from sqlalchemy.pool import NullPool
 
 
 def recreate_database(engine, db_name):
@@ -73,7 +74,10 @@ def engine_uri():
     # Recreate the database using the master database
     master_engine_uri = create_connection_url(host, port, user, password, "master")
     engine = create_engine(
-        master_engine_uri, isolation_level="AUTOCOMMIT", pool_size=512
+        master_engine_uri,
+        isolation_level="AUTOCOMMIT",
+        poolclass=NullPool,
+        # pool_size=512,  # noqa: E800
     )
     recreate_database(engine, database)
 
