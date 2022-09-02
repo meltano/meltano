@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Sequence, TextIO
 
 import structlog
+from rich.console import Console
+from rich.traceback import Traceback
 from structlog.types import Processor
 
 TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
@@ -17,6 +19,21 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
         TIMESTAMPER,
     )
 )
+
+
+def plain_rich_traceback(sio: TextIO, exc_info: structlog.types.ExcInfo) -> None:
+    """Pretty-print `exc_info` to `sio` using the rich package.
+
+    To be passed into `ConsoleRenderer`'s `exception_formatter` argument.
+
+    Args:
+        sio: Return of open() in text mode.
+        exc_info: Execution info.
+    """
+    sio.write("\n")
+    Console(file=sio, no_color=True).print(
+        Traceback.from_exception(*exc_info, show_locals=True)
+    )
 
 
 def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormatter:
@@ -45,7 +62,7 @@ def console_log_formatter(colors: bool = False) -> structlog.stdlib.ProcessorFor
         A configured console log formatter.
     """
     exception_formatter = (
-        structlog.dev.rich_traceback if colors else structlog.dev.plain_traceback
+        structlog.dev.rich_traceback if colors else plain_rich_traceback
     )
     return _process_formatter(
         structlog.dev.ConsoleRenderer(
