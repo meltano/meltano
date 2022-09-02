@@ -171,5 +171,5 @@ class TestLargeConfigProject:
             == 0
         )
         duration_ns = perf_counter_ns() - start
-        # Ensure the large config can be processed in less than 15 seconds
-        assert duration_ns < 15000000000
+        # Ensure the large config can be processed in less than 20 seconds
+        assert duration_ns < 20000000000
