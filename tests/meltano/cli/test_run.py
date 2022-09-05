@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 
 import pytest
 import structlog
@@ -10,6 +11,7 @@ from mock import AsyncMock, mock
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
+from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
@@ -1318,3 +1320,60 @@ class TestCliRunScratchpadOne:
             assert not matcher.find_by_event("Block run completed.")
             assert create_subprocess_exec.call_count == 0
             assert asyncio_mock.call_count == 0
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.parametrize(
+        "colors",
+        [True, False],
+    )
+    def test_default_console_exception_handler(
+        self,
+        colors,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        # toggle color in logging configuration
+        logging_config = default_config(log_level="info")
+        if not colors:
+            logging_config["formatters"]["colored"] = {
+                "()": "meltano.core.logging.console_log_formatter",
+                "colors": colors,
+            }
+
+        # in this scenario, the tap fails on the third read. Target should still complete.
+        args = ["run", tap.name, target.name]
+
+        tap_process.wait.return_value = 1
+        tap_process.returncode = 1
+        tap_process.stderr.readline.side_effect = (
+            b"tap starting\n",
+            b"tap running\n",
+            b"tap failure\n",
+        )
+
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
+
+        with mock.patch(
+            "meltano.core.logging.utils.default_config", return_value=logging_config
+        ), mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ), mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            ansi_color_escape = re.compile(r"\x1b\[[0-9;]+m")
+            match = ansi_color_escape.search(result.stderr)
+            if colors:
+                assert match
+            else:
+                assert not match

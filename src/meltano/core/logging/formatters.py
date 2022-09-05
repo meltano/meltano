@@ -4,10 +4,13 @@ from __future__ import annotations
 
 from typing import Sequence, TextIO
 
+import click
 import structlog
 from rich.console import Console
-from rich.traceback import Traceback
+from rich.traceback import Traceback, install
 from structlog.types import Processor
+
+install(suppress=[click])
 
 TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
 
