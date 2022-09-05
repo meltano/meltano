@@ -22,6 +22,7 @@ class TestSingerTap:
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
+    @pytest.mark.order(0)
     @pytest.mark.asyncio
     async def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
@@ -179,6 +180,7 @@ class TestSingerTap:
         elt_context.full_refresh = True
         await assert_state(None)
 
+    @pytest.mark.order(1)
     @pytest.mark.asyncio
     async def test_discover_catalog(  # noqa: WPS213
         self, session, plugin_invoker_factory, subject

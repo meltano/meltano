@@ -1520,6 +1520,32 @@ docker-compose-v1 = ["docker-compose (>=1.27.3,<2.0)"]
 tests = ["pytest-pycodestyle (>=2.0.0,<3.0)", "pytest-pylint (>=0.14.1,<1.0)", "requests (>=2.22.0,<3.0)"]
 
 [[package]]
+name = "pytest-order"
+version = "1.0.1"
+description = "pytest plugin to run your tests in a specific order"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pytest = [
+    {version = ">=6.2.4", markers = "python_version >= \"3.10\""},
+    {version = ">=5.0", markers = "python_version < \"3.10\""},
+]
+
+[[package]]
+name = "pytest-randomly"
+version = "3.12.0"
+description = "Pytest plugin to randomly order tests and control random.seed."
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+importlib-metadata = {version = ">=3.6.0", markers = "python_version < \"3.10\""}
+pytest = "*"
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -2100,7 +2126,7 @@ repl = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "bd17cac83056f83a91c15fef1928945de201029b156ed83f309e45cc005555ef"
+content-hash = "f74b7aa0c270f802f6ba6acda74ac45ee24b72499619c7330f58f37de4c14705"
 
 [metadata.files]
 aiodocker = [
@@ -3282,6 +3308,14 @@ pytest-cov = [
 pytest-docker = [
     {file = "pytest-docker-1.0.0.tar.gz", hash = "sha256:f2866121e06170a4fc5e441f5db0c11c5f1ea9726e39819e46c2fc1b935d5c33"},
     {file = "pytest_docker-1.0.0-py3-none-any.whl", hash = "sha256:bb32d58ebf9ccaf90c1f1853bc17a6cbe4ba65ce40385e33c067892a6d5628df"},
+]
+pytest-order = [
+    {file = "pytest-order-1.0.1.tar.gz", hash = "sha256:5dd6b929fbd7eaa6d0ee07586f65c623babb0afe72b4843c5f15055d6b3b1b1f"},
+    {file = "pytest_order-1.0.1-py3-none-any.whl", hash = "sha256:bbe6e63a8e23741ab3e810d458d1ea7317e797b70f9550512d77d6e9e8fd1bbb"},
+]
+pytest-randomly = [
+    {file = "pytest-randomly-3.12.0.tar.gz", hash = "sha256:d60c2db71ac319aee0fc6c4110a7597d611a8b94a5590918bfa8583f00caccb2"},
+    {file = "pytest_randomly-3.12.0-py3-none-any.whl", hash = "sha256:f4f2e803daf5d1ba036cc22bf4fe9dbbf99389ec56b00e5cba732fb5c1d07fdd"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},

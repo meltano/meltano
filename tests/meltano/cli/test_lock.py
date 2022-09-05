@@ -22,6 +22,7 @@ class TestLock:
         ):
             yield
 
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "args",
         [
@@ -37,6 +38,7 @@ class TestLock:
         exception_message = "Exactly one of --all or plugin name must be specified."
         assert exception_message == str(result.exception)
 
+    @pytest.mark.order(1)
     def test_lockfile_exists(
         self,
         cli_runner: CliRunner,
@@ -53,6 +55,7 @@ class TestLock:
         assert "Lockfile exists for loader target-mock" in result.stdout
         assert "Locked definition" not in result.stdout
 
+    @pytest.mark.order(2)
     def test_lockfile_update(
         self,
         cli_runner: CliRunner,
@@ -88,6 +91,7 @@ class TestLock:
         assert new_setting.name == "foo"
         assert new_setting.value == "bar"
 
+    @pytest.mark.order(3)
     def test_lockfile_update_extractors(
         self,
         cli_runner: CliRunner,
