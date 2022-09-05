@@ -75,7 +75,9 @@ def default_config(log_level: str) -> dict:
         "formatters": {
             "colored": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(colors=True),
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=True, exception_formatter=structlog.dev.rich_traceback
+                ),
                 "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
             },
         },

@@ -43,10 +43,19 @@ class ProjectInitService:
         """
         try:
             os.mkdir(self.project_name)
-        except Exception as exp:  # noqa: F841
+        except FileExistsError as ex:
             raise ProjectInitServiceError(
-                f"Directory {self.project_name} already exists."
-            )
+                f"Directory {self.project_name!r} already exists."
+            ) from ex
+        except PermissionError as ex:
+            raise ProjectInitServiceError(
+                f"Permission denied to create {self.project_name!r}."
+            ) from ex
+        except Exception as ex:
+            raise ProjectInitServiceError(
+                f"Could not create directory {self.project_name!r}. {ex}"
+            ) from ex
+
         click.secho("Created", fg="blue", nl=False)
         click.echo(f" {self.project_name}")
 

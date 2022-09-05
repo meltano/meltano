@@ -7,10 +7,6 @@ environments:
 - name: qa
 - name: prod
 plugins:
-  extractors:
-  - name: tap-gitlab
-    variant: meltanolabs
-    pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
   loaders:
   - name: target-jsonl
     variant: andyh1203

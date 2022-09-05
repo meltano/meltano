@@ -67,7 +67,6 @@ class TestCliConfig:
             assert_cli_runner(result)
 
             json_config = json.loads(result.stdout)
-            assert json_config["send_anonymous_usage_stats"] is True
             assert json_config["database_uri"] == engine_uri
             assert json_config["cli"]["log_level"] == "info"
 
@@ -78,8 +77,8 @@ class TestCliConfig:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = AsyncMock(return_value=0)
-        mock_invoke.returncode = 0
+        mock_invoke.wait = AsyncMock(return_value=-1)
+        mock_invoke.returncode = -1
         payload = json.dumps({"type": "RECORD"}).encode()
         mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 

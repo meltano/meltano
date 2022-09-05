@@ -36,6 +36,7 @@ class TestCliAdd:
         shutil.rmtree(".", ignore_errors=True)
         project_init_service.create_files(project)
 
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "plugin_type,plugin_name,default_variant,required_plugin_refs",
         [
@@ -110,6 +111,7 @@ class TestCliAdd:
 
                 install_plugin_mock.assert_called()
 
+    @pytest.mark.order(1)
     def test_add_multiple(self, project, cli_runner, project_plugins_service):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -147,6 +149,7 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
             )
 
+    @pytest.mark.order(2)
     def test_add_transform(self, project, cli_runner):
         # adding Transforms requires the legacy 'dbt' Transformer
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
