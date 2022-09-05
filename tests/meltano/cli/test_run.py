@@ -1326,7 +1326,7 @@ class TestCliRunScratchpadOne:
         "colors",
         [True, False],
     )
-    def test_default_console_exception_handler(
+    def test_color_console_exception_handler(
         self,
         colors,
         cli_runner,
