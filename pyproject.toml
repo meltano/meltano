@@ -94,6 +94,7 @@ pytest-randomly = "^3.12"
 pyupgrade = "^2.29.1"
 requests-mock = "^1.6.0"
 tox = "^3.24.4"
+types-requests = "^2.28.9"
 wemake-python-styleguide = "^0.16.1"
 
 [tool.poetry.scripts]
@@ -221,7 +222,6 @@ module = [
   "meltano.core.bundle.*",
   "meltano.core.compiler.*",
   "meltano.core.container.*",
-  "meltano.core.hub.*",
   "meltano.core.job.*",
   "meltano.core.legacy_tracking.*",
   "meltano.core.logging.*",
