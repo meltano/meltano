@@ -22,7 +22,8 @@ Python:
 Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code,
 and `wemake-python-styleguide` is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
 
-[MyPy is currently not executed in CI](https://github.com/meltano/meltano/issues/6491). It currently raises many issues when run. We intend to address them over time.
+[MyPy is being adopted incrementally by this codebase](https://github.com/meltano/meltano/issues/6491). If you are adding new code, please use type hints.
+To enable type checks for an existing module, _de-glob_ it in the whitelist in `pyproject.toml` and fix any errors.
 
 Javascript:
 
