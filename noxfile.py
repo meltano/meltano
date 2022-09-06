@@ -82,3 +82,17 @@ def coverage(session: Session) -> None:
         session.run("coverage", "combine")
 
     session.run("coverage", *args)
+
+
+@nox_session(python=main_python_version)
+def mypy(session: Session) -> None:
+    """Run mypy type checking.
+
+    Args:
+        session: Nox session.
+    """
+    args = session.posargs or ["src/meltano"]
+
+    session.install(".")
+    session.install("mypy", "sqlalchemy2-stubs")
+    session.run("mypy", *args)
