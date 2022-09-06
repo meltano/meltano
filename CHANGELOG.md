@@ -106,7 +106,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* Update custom extractor tutorial content
 
 - [#2830](https://github.com/meltano/meltano/issues/2830) Add support for Python 3.10.
 - [#3452](https://gitlab.com/meltano/meltano/-/issues/3452) Add `copy` and `move` commands to `meltano state`
