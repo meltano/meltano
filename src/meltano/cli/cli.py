@@ -94,7 +94,6 @@ def cli(  # noqa: WPS231
         selected_environment = None
         is_default_environment = False
         if no_environment or (environment and environment.lower() == "null"):
-            project.deactivate_environment()
             logger.info("No environment is active")
         elif environment:
             selected_environment = environment
