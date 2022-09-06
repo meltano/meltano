@@ -10,3 +10,4 @@ class InteractionStatus(str, Enum):
     EXIT = "exit"
     SKIP = "skip"
     START = "start"
+    RETRY = "retry"
