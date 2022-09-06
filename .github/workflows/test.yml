@@ -202,6 +202,7 @@ jobs:
         echo "${{ needs.tests.outputs.pytest-results-row-07 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-08 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-09 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-10 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-11 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-12 }}" >> ${GITHUB_STEP_SUMMARY}
         # echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
@@ -255,3 +256,46 @@ jobs:
 
     - name: Upload coverage report
       uses: codecov/codecov-action@v3.1.0
+
+  mypy:
+    name: "Static type checking"
+    runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: 1
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3.0.2
+
+    - name: Setup Python 3.9
+      uses: actions/setup-python@v4.2.0
+      with:
+        python-version: '3.9'
+        architecture: x64
+        cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
+
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install poetry
+        poetry --version
+
+    - name: Upgrade pip
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pip install pip
+        pip --version
+
+    - name: Install Nox
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install nox
+        pipx inject nox nox-poetry
+
+    - name: Run mypy
+      run: |
+        nox -rs mypy

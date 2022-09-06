@@ -56,6 +56,7 @@ class TestCliUpgrade:
         )
         assert "run `meltano upgrade --skip-package`" not in result.stdout
 
+    @pytest.mark.order(before="test_upgrade_files_glob_path")
     def test_upgrade_files(
         self, session, project, cli_runner, config_service, meltano_hub_service
     ):

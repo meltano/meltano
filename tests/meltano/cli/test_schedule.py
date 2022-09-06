@@ -9,6 +9,7 @@ from meltano.core.utils import iso8601_datetime
 
 
 class TestCliSchedule:
+    @pytest.mark.order(0)
     @pytest.mark.usefixtures("tap", "target")
     @mock.patch(
         "meltano.core.schedule_service.PluginSettingsService.get", autospec=True

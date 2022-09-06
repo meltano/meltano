@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from random import randint
 from textwrap import dedent
 
 try:
@@ -45,6 +46,8 @@ def tests(session: Session) -> None:
         "pytest",
         "pytest-asyncio",
         "pytest-docker",
+        "pytest-order",
+        "pytest-randomly",
         "requests-mock",
     )
 
@@ -55,6 +58,7 @@ def tests(session: Session) -> None:
             "--parallel",
             "-m",
             "pytest",
+            f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
             *session.posargs,
             env={"NOX_CURRENT_SESSION": "tests"},
         )
@@ -78,3 +82,21 @@ def coverage(session: Session) -> None:
         session.run("coverage", "combine")
 
     session.run("coverage", *args)
+
+
+@nox_session(python=main_python_version)
+def mypy(session: Session) -> None:
+    """Run mypy type checking.
+
+    Args:
+        session: Nox session.
+    """
+    args = session.posargs or ["src/meltano"]
+
+    session.install(".")
+    session.install(
+        "mypy",
+        "sqlalchemy2-stubs",
+        "types-requests",
+    )
+    session.run("mypy", *args)

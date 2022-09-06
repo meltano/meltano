@@ -23,7 +23,7 @@ A logging.yaml contains a few key sections that you should be aware of.
 A few key points to note:
 
 1. Different handlers can use different formats. Meltano ships with [3 formatters](https://github.com/meltano/meltano/blob/main/src/meltano/core/logging/formatters.py):
-   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization.
+   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library.
    - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
    - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
 2. Different loggers can use different handlers and log at different log levels.
@@ -40,10 +40,10 @@ formatters:
     format: "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
   structured_plain: # log format for structured plain text logs without colored output
     (): meltano.core.logging.console_log_formatter
-    colors: False
+    colors: False # also disables `rich` traceback formatting
   structured_colored: # log format for structured plain text logs WITH colored output
     (): meltano.core.logging.console_log_formatter
-    colors: True
+    colors: True # also enables traceback formatting with `rich`
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
     sort_keys: False
