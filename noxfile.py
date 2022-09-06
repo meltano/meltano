@@ -91,5 +91,9 @@ def mypy(session: Session) -> None:
     args = session.posargs or ["src/meltano"]
 
     session.install(".")
-    session.install("mypy", "sqlalchemy2-stubs")
+    session.install(
+        "mypy",
+        "sqlalchemy2-stubs",
+        "types-requests",
+    )
     session.run("mypy", *args)
