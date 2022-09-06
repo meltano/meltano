@@ -40,11 +40,11 @@ def tests(session: Session) -> None:
         session.install(".")
 
     session.install(
-        "coverage[toml]",
         "freezegun",
         "mock",
         "pytest",
         "pytest-asyncio",
+        "pytest-cov",
         "pytest-docker",
         "pytest-order",
         "pytest-randomly",
@@ -54,10 +54,6 @@ def tests(session: Session) -> None:
 
     try:
         session.run(
-            "coverage",
-            "run",
-            "--parallel",
-            "-m",
             "pytest",
             f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
             *session.posargs,
