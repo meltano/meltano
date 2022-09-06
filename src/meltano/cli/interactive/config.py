@@ -16,7 +16,7 @@ from rich.text import Text
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.cli.utils import CliError
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.settings_service import SettingValueStore
+from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 
 PLUGIN_COLOR = "magenta"
@@ -69,7 +69,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
     def configurable_settings(self):
         """Return settings available for interactive configuration."""
         return self.settings.config_with_metadata(
-            session=self.session, extras=self.extras
+            session=self.session, extras=self.extras, redacted=True
         )
 
     @property
@@ -197,7 +197,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             )
         self.console.print(Panel(Group(*pre, details, *post)))
 
-    def configure(self, name, index=None, last_index=None, show_set_prompt=True):
+    def configure(
+        self, name, index=None, last_index=None, show_set_prompt=True, is_secret=False
+    ):
         """Configure a single setting interactively."""
         config_metadata = next(
             (
@@ -214,13 +216,26 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         )
         click.echo()
 
-        action = click.prompt(
-            "Set this value (Y/n) or exit (e)?",
-            default="y",
-            type=click.Choice(["y", "n", "e"], case_sensitive=False),
-        )
+        if show_set_prompt:
+            action = click.prompt(
+                "Set this value (Y/n) or exit (e)?",
+                default="y",
+                type=click.Choice(["y", "n", "e"], case_sensitive=False),
+            )
+        else:
+            action = "y"
+
         if action.lower() == "y":
-            new_value = click.prompt("New value", default="", show_default=False)
+            if config_metadata["setting"].is_redacted:
+                new_value = click.prompt(
+                    "New value",
+                    default="",
+                    show_default=False,
+                    hide_input=True,
+                    confirmation_prompt=True,
+                )
+            else:
+                new_value = click.prompt("New value", default="", show_default=False)
             click.echo()
             self.set_value(
                 setting_name=tuple(name.split(".")),
@@ -229,10 +244,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             )
             click.echo()
             click.pause()
+            return InteractionStatus.SKIP
         elif action.lower() == "n":
             return InteractionStatus.SKIP
-        else:
-            return InteractionStatus.EXIT
+        return InteractionStatus.EXIT
 
     def configure_all(self):
         """Configure all settings."""
@@ -293,6 +308,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         name = metadata["name"]
         store = metadata["store"]
+        if metadata["setting"].is_redacted:
+            value = REDACTED_VALUE
         click.secho(
             f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
             fg=VALUE_COLOR,
@@ -300,6 +317,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
+            if metadata["setting"].is_redacted:
+                current_value = REDACTED_VALUE
             click.secho(
                 f"Current value is still: {current_value!r} (from {source.label})",
                 fg="yellow",
