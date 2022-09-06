@@ -202,6 +202,7 @@ jobs:
         echo "${{ needs.tests.outputs.pytest-results-row-07 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-08 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-09 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-10 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-11 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-12 }}" >> ${GITHUB_STEP_SUMMARY}
         # echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
