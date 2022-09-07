@@ -9,6 +9,7 @@ from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import find_named
 
 
+@pytest.mark.order(0)
 class TestPluginDefinition:
     ATTRS = {
         "minimal": {"name": "tap-example", "namespace": "tap_example"},

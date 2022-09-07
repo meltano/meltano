@@ -43,7 +43,7 @@ def install(
     """
     Install all the dependencies of your project based on the meltano.yml file.
 
-    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#install
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#install
     """
     tracker: Tracker = ctx.obj["tracker"]
 

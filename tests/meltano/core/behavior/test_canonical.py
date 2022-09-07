@@ -7,10 +7,10 @@ import pytest
 from ruamel.yaml.comments import CommentedMap
 
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.yaml import configure_yaml
+from meltano.core.yaml import yaml
 
 definition = {
-    # a, b, …, z
+    # {'a': None, 'b': 1, 'c': None, 'd': 3, 'e': None, ...}
     chr(ord("a") + i): i if i % 2 else None
     for i in range(10)
 }
@@ -28,7 +28,6 @@ class TestCanonical:
         subject.test = "hello"
         yaml_definition = "\n".join(f"{k}: {v}" for k, v in iter(subject))
 
-        yaml = configure_yaml()
         buf = io.StringIO()
         yaml.dump(subject, buf)
         buf.seek(0)
@@ -150,18 +149,16 @@ class TestCanonical:
             - value # Comment in an array element
         """
         contents = dedent(contents)
-        yaml = configure_yaml()
-        in_stream = io.StringIO(contents)
-        mapping = yaml.load(in_stream)
+        mapping = yaml.load(io.StringIO(contents))
         subject = Canonical.parse(mapping)
         assert subject.test == "value"
         assert subject.object["key"] == "value"
         assert subject.array[0] == "value"
 
-        obj = subject.as_canonical(subject)
+        obj = subject.canonical()
         assert isinstance(obj, CommentedMap)
 
-        out_stream = io.StringIO(contents)
+        out_stream = io.StringIO()
         yaml.dump(obj, out_stream)
         out_stream.seek(0)
         new_contents = out_stream.read()

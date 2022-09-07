@@ -327,7 +327,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         project_settings_service = ProjectSettingsService(
             self.project, config_service=self.plugins_service.config_service
         )
-        with self.settings_service.feature_flag(
+        with project_settings_service.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
         ) as strict_env_var_mode:
 
@@ -433,7 +433,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                     self.plugin, self.plugin.executable
                 ) from err
 
-    async def invoke_async(self, *args, **kwargs):
+    async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:
         """Invoke a command.
 
         Args:

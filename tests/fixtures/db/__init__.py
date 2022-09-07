@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import warnings
 from contextlib import closing
+from time import sleep
 from typing import Generator
 
 import pytest
@@ -10,6 +11,7 @@ from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from meltano.core.project import Project
 
@@ -51,11 +53,8 @@ def vacuum_db(engine_sessionmaker):
 
 @pytest.fixture(scope="class")
 def engine_sessionmaker(engine_uri):
-    # create the engine
-    engine = create_engine(engine_uri)
-    create_session = sessionmaker(bind=engine)
-
-    return (engine, create_session)
+    engine = create_engine(engine_uri, poolclass=NullPool)
+    return (engine, sessionmaker(bind=engine))
 
 
 @pytest.fixture()

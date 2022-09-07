@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import json
-import os
 import platform
 import tempfile
 from pathlib import Path
@@ -12,6 +11,7 @@ import pytest
 import yaml
 from jsonschema import validate
 
+from fixtures.utils import cd
 from meltano.core.project_files import deep_merge
 
 
@@ -19,22 +19,18 @@ from meltano.core.project_files import deep_merge
 def cd_temp_subdir():
     original_dir = Path.cwd()
     with tempfile.TemporaryDirectory(dir=original_dir) as name:
-        new_dir = Path(name).resolve()
-        os.chdir(new_dir)
-        yield new_dir
-    os.chdir(original_dir)
+        with cd(Path(name).resolve()) as new_dir:
+            yield new_dir
 
 
 @pytest.fixture
 def cd_temp_dir():
-    original_dir = Path.cwd()
     with tempfile.TemporaryDirectory() as name:
-        new_dir = Path(name).resolve()
-        os.chdir(new_dir)
-        yield new_dir
-    os.chdir(original_dir)
+        with cd(Path(name).resolve()) as new_dir:
+            yield new_dir
 
 
+@pytest.mark.order(0)
 @pytest.mark.parametrize(
     "parent,children,expected",
     [
@@ -49,6 +45,7 @@ def test_deep_merge(parent, children, expected):
 
 
 class TestProjectFiles:
+    @pytest.mark.order(1)
     def test_resolve_subfiles(self, project_files):
         assert project_files._meltano_file_path == (project_files.root / "meltano.yml")
         assert project_files.meltano == {
@@ -108,6 +105,7 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    @pytest.mark.order(2)
     @pytest.mark.skipif(
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
@@ -125,6 +123,7 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    @pytest.mark.order(3)
     @pytest.mark.skipif(
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
@@ -141,6 +140,7 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    @pytest.mark.order(4)
     def test_jsonschema(self, project_files):
         schema_path = (
             Path(__file__).resolve().parents[3] / "schema" / "meltano.schema.json"
@@ -169,6 +169,7 @@ class TestProjectFiles:
                 )
             validate(instance=yaml_content, schema=schema_content)
 
+    @pytest.mark.order(5)
     def test_load(self, project_files):
         expected_result = {
             "version": 1,
@@ -255,6 +256,7 @@ class TestProjectFiles:
         read_result = project_files.load()
         assert read_result == expected_result
 
+    @pytest.mark.order(6)
     def test_update(self, project_files):
         meltano_config = project_files.load()
         meltano_config["version"] = 2
@@ -352,6 +354,7 @@ class TestProjectFiles:
         read_result = project_files.load()
         assert read_result == expected_result
 
+    @pytest.mark.order(7)
     def test_preserve_format(self, project_files):
         meltano_config = project_files.load()
         meltano_config["version"] = 3
@@ -454,6 +457,7 @@ class TestProjectFiles:
         included_path = project_files.root / "subconfig_2.yml"
         assert included_path.read_text() == dedent(expected_subconfig_2_contents)
 
+    @pytest.mark.order(-1)
     def test_remove_all_file_contents(self, project_files):
         meltano_config = project_files.load()
         meltano_config["plugins"]["extractors"] = [
