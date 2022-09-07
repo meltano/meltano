@@ -158,16 +158,16 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             label = f"inherited from '{self.settings.plugin.parent.name}'"
         else:
             label = f"from {source.label}"
-        expanded_value = value
+        expanded_value = value if value is not None else ""
         unexpanded_value = config_metadata.get("unexpanded_value")
         if unexpanded_value:
-            current_value = unexpanded_value or ""
-            details.add_row(Text("Current Expanded Value"), Text(f"'{expanded_value}'"))
+            current_value = unexpanded_value if unexpanded_value is not None else ""
+            details.add_row(Text("Current Expanded Value"), Text(f"{expanded_value}"))
         else:
-            current_value = value or ""
+            current_value = value if value is not None else ""
         details.add_row(
             Text(f"Current Value ({label})"),
-            Text.from_markup(f"[{VALUE_COLOR}]'{current_value}'[/{VALUE_COLOR}]"),
+            Text.from_markup(f"[{VALUE_COLOR}]{current_value}[/{VALUE_COLOR}]"),
         )
         # setting kind
         if setting_def.kind:
