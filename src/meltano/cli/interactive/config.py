@@ -40,6 +40,8 @@ To determine the values of settings, Meltano will look in 4 main places, with ea
 
 Within meltano.yml you can also associate configuration with a Meltano Environment, allowing you to define custom layers of configuration within your project.
 
+To learn more about configuration options, see the [link=https://docs.meltano.com/guide/configuration]Meltano Configuration Guide[/link]
+
 [bold underline]Settings[/bold underline]
 {% for setting in settings %}
 {{ loop.index }}. [blue]{{ setting["name"] }}[/blue]: {{ setting["description"] | safe }}
