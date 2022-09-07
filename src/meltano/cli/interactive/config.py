@@ -140,7 +140,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         elif setting_def.is_custom:
             pre.append(
                 Text.from_markup(
-                    "[yellow]Custom Setting: possibly unsupported by the plugin[/yellow1]"
+                    "[yellow1]Custom Setting: possibly unsupported by the plugin[/yellow1]"
                 )
             )
         # setting name
