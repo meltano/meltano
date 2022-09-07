@@ -226,36 +226,43 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             action = "y"
 
         if action.lower() == "y":
-            if config_metadata["setting"].is_redacted:
-                new_value = click.prompt(
-                    "New value",
-                    default="",
-                    show_default=False,
-                    hide_input=True,
-                    confirmation_prompt=True,
-                )
-            else:
-                new_value = click.prompt("New value", default="", show_default=False)
-            click.echo()
-            try:
-                self.set_value(
-                    setting_name=tuple(name.split(".")),
-                    value=new_value,
-                    store=self.store,
-                )
-            except KeyboardInterrupt:  # noqa: WPS329
-                raise
-            except Exception as e:
-                click.secho(f"Failed to set value: {e}", fg="red")
+            status = InteractionStatus.RETRY
+            while status == InteractionStatus.RETRY:
+
+                if config_metadata["setting"].is_redacted:
+                    new_value = click.prompt(
+                        "New value",
+                        default="",
+                        show_default=False,
+                        hide_input=True,
+                        confirmation_prompt=True,
+                    )
+                else:
+                    new_value = click.prompt(
+                        "New value", default="", show_default=False
+                    )
+
                 click.echo()
-                click.pause()
-                return InteractionStatus.RETRY
-            click.echo()
-            click.pause()
-            return InteractionStatus.SKIP
+                try:
+                    self.set_value(
+                        setting_name=tuple(name.split(".")),
+                        value=new_value,
+                        store=self.store,
+                    )
+                    click.echo()
+                    click.pause()
+                    status = InteractionStatus.SKIP
+                except KeyboardInterrupt:  # noqa: WPS329
+                    raise
+                except Exception as e:
+                    click.secho(f"Failed to set value: {e}", fg="red")
+                    click.echo()
+                    click.pause()
+                    status = InteractionStatus.RETRY
+
         elif action.lower() == "n":
-            return InteractionStatus.SKIP
-        return InteractionStatus.EXIT
+            status = InteractionStatus.SKIP
+        return status
 
     def configure_all(self):
         """Configure all settings."""
@@ -276,14 +283,12 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                         InteractionStatus.SKIP,
                         InteractionStatus.EXIT,
                     }:
-                        status = InteractionStatus.RETRY
-                        while status == InteractionStatus.RETRY:
-                            click.clear()
-                            status = self.configure(
-                                name=name,
-                                index=index,
-                                last_index=len(self.setting_choices),
-                            )
+                        click.clear()
+                        status = self.configure(
+                            name=name,
+                            index=index,
+                            last_index=len(self.setting_choices),
+                        )
                     if status == InteractionStatus.EXIT:
                         click.clear()
                         break
@@ -294,15 +299,13 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 choice_name = next(
                     (nme for idx, nme, _ in self.setting_choices if idx == branch)
                 )
-                status = InteractionStatus.RETRY
-                while status == InteractionStatus.RETRY:
-                    click.clear()
-                    status = self.configure(
-                        name=choice_name,
-                        index=branch,
-                        last_index=len(self.setting_choices),
-                        show_set_prompt=False,
-                    )
+                click.clear()
+                status = self.configure(
+                    name=choice_name,
+                    index=branch,
+                    last_index=len(self.setting_choices),
+                    show_set_prompt=False,
+                )
 
     def set_value(self, setting_name, value, store):
         """Set value helper function."""
