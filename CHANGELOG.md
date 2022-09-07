@@ -210,7 +210,6 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 ### Under the Hood
 
-## 1.102.0 - (2022-04-28)
 - Improved [telemetry](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry) coverage across the product.
 
 ## 1.105.0 - (2022-05-19)
