@@ -64,7 +64,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.session = self.ctx.obj["session"]
         self.plugin = self.ctx.obj["settings"].plugin
         self.environment_service = EnvironmentService(self.project)
-        self.max_width = 75
+        self.max_width = max_width or 75  # noqa: WPS432
         self.console = Console()
 
     @property
@@ -202,7 +202,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         self.console.print(Panel(Group(*pre, details, *post)))
 
-    def _value_prompt(self, config_metadata):
+    @staticmethod
+    def _value_prompt(config_metadata):
         if config_metadata["setting"].kind != SettingKind.OPTIONS:
             return (
                 click.prompt(
