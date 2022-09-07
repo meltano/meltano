@@ -103,8 +103,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## 2.2.0 - (2022-07-01)
 
-## Unreleased
-
 ---
 
 ### New
