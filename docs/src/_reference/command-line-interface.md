@@ -258,7 +258,7 @@ meltano config <plugin> reset
 
 To make configuring plugins as easy as possible, Meltano includes an interactive configuration mode.
 Follow the interactive prompts to either step through a list of available plugin settings or to select a specific setting to set/unset.
-Interactive config supports the same options as the direct `set` and `unset` (i.e. `--extras` and `--store=`).
+Interactive config supports the same options as the direct `set` command (i.e. `--extras` and `--store=`).
 
 ```bash
 # Configure plugin interactively
