@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import warnings
 from contextlib import closing
-from time import sleep
 from typing import Generator
 
 import pytest
