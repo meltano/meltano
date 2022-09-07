@@ -16,7 +16,7 @@ from rich.text import Text
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.cli.utils import CliError
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
+from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 
 PLUGIN_COLOR = "magenta"
@@ -86,7 +86,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
     def truncate(self, text: str) -> str:
         """Truncate text."""
-        return f"{text[: self.max_width - 3]}..."
+        if len(text) >= self.max_width:
+            return f"{text[: self.max_width - 3]}..."
+        return text
 
     def _print_home_screen(self):
         """Print screen for this interactive."""
@@ -197,6 +199,38 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             )
         self.console.print(Panel(Group(*pre, details, *post)))
 
+    def _value_prompt(self, config_metadata):
+        if config_metadata["setting"].kind != SettingKind.OPTIONS:
+            return (
+                click.prompt(
+                    "New value:",
+                    default="",
+                    show_default=False,
+                    hide_input=True,
+                    confirmation_prompt=True,
+                )
+                if config_metadata["setting"].is_redacted
+                else click.prompt("New value", default="", show_default=False)
+            )
+
+        options_index = {
+            str(index + 1): value
+            for index, value in enumerate(
+                (chs["label"], chs["value"])
+                for chs in config_metadata["setting"].options
+            )
+        }
+
+        for index, value in options_index.items():
+            click.echo(f"{index}. {value[0]}")
+        click.echo()
+        chosen_index = click.prompt(
+            "Select value:",
+            type=click.Choice(list(options_index.keys())),
+            show_default=False,
+        )
+        return options_index[chosen_index][1]
+
     def configure(
         self, name, index=None, last_index=None, show_set_prompt=True, is_secret=False
     ):
@@ -214,33 +248,30 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             index=index,
             last_index=last_index,
         )
-        click.echo()
 
+        action = "y"
         if show_set_prompt:
-            action = click.prompt(
-                "Set this value (Y/n) or exit (e)?",
-                default="y",
-                type=click.Choice(["y", "n", "e"], case_sensitive=False),
-            )
-        else:
-            action = "y"
+            try:
+                click.echo()
+                action = click.prompt(
+                    "Set this value (Y/n) or exit (e)?",
+                    default="y",
+                    type=click.Choice(["y", "n", "e"], case_sensitive=False),
+                )
+            except click.Abort:
+                action = "e"
 
         if action.lower() == "y":
             status = InteractionStatus.RETRY
             while status == InteractionStatus.RETRY:
 
-                if config_metadata["setting"].is_redacted:
-                    new_value = click.prompt(
-                        "New value",
-                        default="",
-                        show_default=False,
-                        hide_input=True,
-                        confirmation_prompt=True,
-                    )
-                else:
-                    new_value = click.prompt(
-                        "New value", default="", show_default=False
-                    )
+                try:
+                    new_value = self._value_prompt(config_metadata)
+                except click.Abort:
+                    click.echo()
+                    click.echo("Skipping...")
+                    click.pause()
+                    return InteractionStatus.SKIP
 
                 click.echo()
                 try:
@@ -251,53 +282,61 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     )
                     click.echo()
                     click.pause()
-                    status = InteractionStatus.SKIP
-                except KeyboardInterrupt:  # noqa: WPS329
-                    raise
+                    return InteractionStatus.SKIP
                 except Exception as e:
                     click.secho(f"Failed to set value: {e}", fg="red")
                     click.echo()
                     click.pause()
-                    status = InteractionStatus.RETRY
+                    return InteractionStatus.RETRY
 
         elif action.lower() == "n":
-            status = InteractionStatus.SKIP
-        return status
+            return InteractionStatus.SKIP
+
+        elif action.lower() == "e":
+            return InteractionStatus.EXIT
 
     def configure_all(self):
         """Configure all settings."""
         while True:
             click.clear()
             self._print_home_screen()
-            click.echo()
-            choices = ["all"] + [idx for idx, _, _ in self.setting_choices] + ["e"]
-            branch = click.prompt(
-                "Loop through all settings (all), select a setting by number, or exit (e)?",
-                type=click.Choice(choices, case_sensitive=False),
-                default="all",
-            )
+            numeric_choices = [idx for idx, _, _ in self.setting_choices]
+            choices = ["all"] + numeric_choices + ["e"]
+
+            branch = "all"
+            try:
+                click.echo()
+                branch = click.prompt(
+                    f"Loop through all settings (all), select a setting by number ({min(int(chs) for chs in numeric_choices)} - {max(int(chs) for chs in numeric_choices)}), or exit (e)?",
+                    type=click.Choice(choices, case_sensitive=False),
+                    default="all",
+                    show_choices=False,
+                )
+            except click.Abort:
+                click.echo()
+                branch = "e"
+
             if branch == "all":
                 for index, name, _ in self.setting_choices:
+                    click.clear()
                     status = InteractionStatus.START
                     while status not in {
                         InteractionStatus.SKIP,
                         InteractionStatus.EXIT,
                     }:
-                        click.clear()
                         status = self.configure(
                             name=name,
                             index=index,
                             last_index=len(self.setting_choices),
                         )
                     if status == InteractionStatus.EXIT:
-                        click.clear()
                         break
             elif branch.lower() == "e":
                 click.echo()
-                break
+                return
             else:
                 choice_name = next(
-                    (nme for idx, nme, _ in self.setting_choices if idx == branch)
+                    nme for idx, nme, _ in self.setting_choices if idx == branch
                 )
                 click.clear()
                 status = self.configure(
