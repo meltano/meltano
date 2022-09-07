@@ -158,13 +158,15 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             label = f"inherited from '{self.settings.plugin.parent.name}'"
         else:
             label = f"from {source.label}"
-        expanded_value = value if value is not None else ""
+        expanded_value = value if value is not None else "(empty string)"
         unexpanded_value = config_metadata.get("unexpanded_value")
         if unexpanded_value:
-            current_value = unexpanded_value if unexpanded_value is not None else ""
+            current_value = (
+                unexpanded_value if unexpanded_value is not None else "(empty string)"
+            )
             details.add_row(Text("Current Expanded Value"), Text(f"{expanded_value}"))
         else:
-            current_value = value if value is not None else ""
+            current_value = value if value is not None else "(empty string)"
         details.add_row(
             Text(f"Current Value ({label})"),
             Text.from_markup(f"[{VALUE_COLOR}]{current_value}[/{VALUE_COLOR}]"),
@@ -205,7 +207,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if config_metadata["setting"].kind != SettingKind.OPTIONS:
             return (
                 click.prompt(
-                    "New value:",
+                    "New value",
                     default="",
                     show_default=False,
                     hide_input=True,
@@ -223,11 +225,12 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             )
         }
 
+        click.echo()
         for index, value in options_index.items():
             click.echo(f"{index}. {value[0]}")
         click.echo()
         chosen_index = click.prompt(
-            "Select value:",
+            "Select value",
             type=click.Choice(list(options_index.keys())),
             show_default=False,
         )
@@ -264,9 +267,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 action = "e"
 
         if action.lower() == "y":
-            status = InteractionStatus.RETRY
-            while status == InteractionStatus.RETRY:
-
+            while True:
+                click.echo()
                 try:
                     new_value = self._value_prompt(config_metadata)
                 except click.Abort:
@@ -275,8 +277,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     click.pause()
                     return InteractionStatus.SKIP
 
-                click.echo()
                 try:
+                    click.echo()
                     self.set_value(
                         setting_name=tuple(name.split(".")),
                         value=new_value,
@@ -287,9 +289,6 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     return InteractionStatus.SKIP
                 except Exception as e:
                     click.secho(f"Failed to set value: {e}", fg="red")
-                    click.echo()
-                    click.pause()
-                    return InteractionStatus.RETRY
 
         elif action.lower() == "n":
             return InteractionStatus.SKIP
