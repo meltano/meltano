@@ -273,8 +273,6 @@ _**Meltano 2.0** is a major update with multiple new features and some breaking 
 
 - [#3446](https://gitlab.com/meltano/meltano/-/issues/3446) Fixes bug where `meltano run` could pass `None` as argument to a plugin command.
 
-## 1.101.0 - (2022-04-21)
-
 ## 1.102.0 - (2022-04-28)
 
 ---
