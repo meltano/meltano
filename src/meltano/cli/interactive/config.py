@@ -127,31 +127,30 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         details.add_column("name", justify="right")
         details.add_column("value")
 
-        # title
-        pre = []
-        pre.append(
+        pre = [
             Text.from_markup(
                 f"[bold underline][{PLUGIN_COLOR}]{self.settings.label.capitalize()}[/{PLUGIN_COLOR}][/bold underline] Setting {index} of {last_index}"
             )
-        )
-        # setting is custom or extra
+        ]
+
         if setting_def.is_extra:
             pre.append(
                 Text.from_markup(
                     "[yellow1]Custom Extra: plugin-specific options handled by Meltano[/yellow1]"
                 )
             )
+
         elif setting_def.is_custom:
             pre.append(
                 Text.from_markup(
                     "[yellow1]Custom Setting: possibly unsupported by the plugin[/yellow1]"
                 )
             )
-        # setting name
+
         details.add_row(
             Text("Name"), Text.from_markup(f"[{SETTING_COLOR}]{name}[/{SETTING_COLOR}]")
         )
-        # current value
+
         if source is SettingValueStore.DEFAULT:
             label = "default"
         elif source is SettingValueStore.INHERITED:
@@ -164,6 +163,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             current_value = (
                 unexpanded_value if unexpanded_value is not None else "(empty string)"
             )
+
             details.add_row(Text("Current Expanded Value"), Text(f"{expanded_value}"))
         else:
             current_value = value if value is not None else "(empty string)"
@@ -171,20 +171,18 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             Text(f"Current Value ({label})"),
             Text.from_markup(f"[{VALUE_COLOR}]{current_value}[/{VALUE_COLOR}]"),
         )
-        # setting kind
+
         if setting_def.kind:
             details.add_row(Text("Kind"), Text(f"{setting_def.kind}"))
-        # default value
         if source is not SettingValueStore.DEFAULT:
             default_value = setting_def.value
             if default_value is not None:
                 details.add_row(Text("Default"), Text(f"{default_value!r}"))
-        # env vars
         env_keys = [
             var.definition for var in self.settings.setting_env_vars(setting_def)
         ]
+
         details.add_row(Text("Env(s)"), Text(f"{', '.join(env_keys)}"))
-        # setting description (markdown)
         post = []
         if setting_def.description:
             post.append(
@@ -193,7 +191,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     Panel(Markdown(setting_def.description, justify="left")),
                 )
             )
-        # docs url
+
         docs_url = self.settings.docs_url
         if docs_url:
             post.append(
@@ -201,6 +199,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     f" To learn more about {self.settings.label} and its settings, visit [link={docs_url}]{docs_url}[/link]"
                 )
             )
+
         self.console.print(Panel(Group(*pre, details, *post)))
 
     def _value_prompt(self, config_metadata):
@@ -236,9 +235,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         )
         return options_index[chosen_index][1]
 
-    def configure(
-        self, name, index=None, last_index=None, show_set_prompt=True, is_secret=False
-    ):
+    def configure(self, name, index=None, last_index=None, show_set_prompt=True):
         """Configure a single setting interactively."""
         config_metadata = next(
             (
