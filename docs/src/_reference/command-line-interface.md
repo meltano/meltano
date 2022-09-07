@@ -271,7 +271,7 @@ meltano --environment=prod config <plugin> set --interactive
 meltano config <plugin> set --interactive --extras
 
 # Configure specific store interactively
-meltano config <plugin> set --interactive --store=meltano_yml
+meltano config <plugin> set --interactive --store=dotenv
 ```
 
 ## `discover`
