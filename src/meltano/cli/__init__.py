@@ -10,6 +10,7 @@ from meltano.core.logging import setup_logging
 from meltano.core.project import ProjectReadonly
 from meltano.core.tracking.contexts.exception import ExceptionContext  # noqa: F401
 
+from .interactive import InteractionStatus, InteractiveConfig  # noqa: F401
 from .utils import CliError
 
 # TODO: Importing the cli.cli module breaks other cli module imports
@@ -60,7 +61,11 @@ logger = logging.getLogger(__name__)
 
 
 def _run_cli():
-    """Run the Meltano CLI."""
+    """Run the Meltano CLI.
+
+    Raises:
+        KeyboardInterrupt: if caught.
+    """
     try:
         try:  # noqa: WPS505
             cli(obj={"project": None})

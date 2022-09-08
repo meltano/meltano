@@ -254,6 +254,26 @@ meltano config <plugin> unset _<extra>
 meltano config <plugin> reset
 ```
 
+### How to use: Interactive config
+
+To make configuring plugins as easy as possible, Meltano includes an interactive configuration mode.
+Follow the interactive prompts to either step through a list of available plugin settings or to select a specific setting to set/unset.
+Interactive config supports the same options as the direct `set` command (i.e. `--extras` and `--store=`).
+
+```bash
+# Configure plugin interactively
+meltano config <plugin> set --interactive
+
+# Configure settings for specific environment interactively
+meltano --environment=prod config <plugin> set --interactive
+
+# Configure settings and extras interactively
+meltano config <plugin> set --interactive --extras
+
+# Configure specific store interactively
+meltano config <plugin> set --interactive --store=dotenv
+```
+
 ## `discover`
 
 Lists the available [discoverable plugins](/concepts/plugins#discoverable-plugins) and their [variants](/concepts/plugins#variants).
