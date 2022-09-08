@@ -18,6 +18,7 @@ from meltano.cli.utils import CliError
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
+from meltano.core.tracking import CliEvent
 
 PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"
@@ -63,6 +64,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.settings = self.ctx.obj["settings"]
         self.session = self.ctx.obj["session"]
         self.plugin = self.ctx.obj["settings"].plugin
+        self.tracker = self.ctx.obj["tracker"]
         self.environment_service = EnvironmentService(self.project)
         self.max_width = max_width or 75  # noqa: WPS432
         self.console = Console()
@@ -281,6 +283,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                         setting_name=tuple(name.split(".")),
                         value=new_value,
                         store=self.store,
+                        interactive=True,
                     )
                     click.echo()
                     click.pause()
@@ -332,6 +335,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                         break
             elif branch.lower() == "e":
                 click.echo()
+                self.tracker.track_command_event(CliEvent.completed)
                 return
             else:
                 choice_name = next(
@@ -345,7 +349,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     show_set_prompt=False,
                 )
 
-    def set_value(self, setting_name, value, store):
+    def set_value(self, setting_name, value, store, interactive=False):
         """Set value helper function."""
         with contextlib.suppress(json.JSONDecodeError):
             value = json.loads(value)
@@ -357,6 +361,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 path, value, store=store, session=self.session
             )
         except StoreNotSupportedError as err:
+            if not interactive:
+                self.tracker.track_command_event(CliEvent.aborted)
             raise CliError(
                 f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
             ) from err
@@ -378,6 +384,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 f"Current value is still: {current_value!r} (from {source.label})",
                 fg="yellow",
             )
+
+        if not interactive:
+            self.tracker.track_command_event(CliEvent.completed)
 
     def unset_value(self, setting_name, store):
         """Unset value helper."""
