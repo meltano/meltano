@@ -335,5 +335,32 @@ def test(ctx):
 @click.pass_context
 def unset(ctx, setting_name, store):
     """Unset the configurations' setting called `<name>`."""
-    interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
-    interaction.unset_value(setting_name=setting_name, store=store)
+    store = SettingValueStore(store)
+
+    settings = ctx.obj["settings"]
+    session = ctx.obj["session"]
+    tracker = ctx.obj["tracker"]
+
+    path = list(setting_name)
+    try:
+        metadata = settings.unset(path, store=store, session=session)
+    except StoreNotSupportedError as err:
+        tracker.track_command_event(CliEvent.aborted)
+        raise CliError(
+            f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
+        ) from err
+
+    name = metadata["name"]
+    store = metadata["store"]
+    click.secho(
+        f"{settings.label.capitalize()} setting '{name}' in {store.label} was unset",
+        fg="green",
+    )
+
+    current_value, source = settings.get_with_source(name, session=session)
+    if source is not SettingValueStore.DEFAULT:
+        click.secho(
+            f"Current value is now: {current_value!r} ({get_label(metadata)})",
+            fg="yellow",
+        )
+    tracker.track_command_event(CliEvent.completed)

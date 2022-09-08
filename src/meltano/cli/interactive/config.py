@@ -289,6 +289,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     click.pause()
                     return InteractionStatus.SKIP
                 except Exception as e:
+                    self.tracker.track_command_event(CliEvent.inflight)
                     click.secho(f"Failed to set value: {e}", fg="red")
 
         elif action.lower() == "n":
@@ -334,8 +335,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     if status == InteractionStatus.EXIT:
                         break
             elif branch.lower() == "e":
-                click.echo()
                 self.tracker.track_command_event(CliEvent.completed)
+                click.echo()
                 return
             else:
                 choice_name = next(
@@ -361,7 +362,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 path, value, store=store, session=self.session
             )
         except StoreNotSupportedError as err:
-            if not interactive:
+            if interactive:
+                self.tracker.track_command_event(CliEvent.inflight)
+            else:
                 self.tracker.track_command_event(CliEvent.aborted)
             raise CliError(
                 f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
@@ -385,30 +388,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 fg="yellow",
             )
 
-        if not interactive:
+        if interactive:
+            self.tracker.track_command_event(CliEvent.inflight)
+        else:
             self.tracker.track_command_event(CliEvent.completed)
-
-    def unset_value(self, setting_name, store):
-        """Unset value helper."""
-        settings = self.settings
-        path = list(setting_name)
-        try:
-            metadata = settings.unset(path, store=store, session=self.session)
-        except StoreNotSupportedError as err:
-            raise CliError(
-                f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
-            ) from err
-
-        name = metadata["name"]
-        store = metadata["store"]
-        click.secho(
-            f"{settings.label.capitalize()} setting '{name}' in {store.label} was unset",
-            fg=VALUE_COLOR,
-        )
-
-        current_value, source = settings.get_with_source(name, session=self.session)
-        if source is not SettingValueStore.DEFAULT:
-            click.secho(
-                f"Current value is now: {current_value!r} (from {source.label})",
-                fg="yellow",
-            )
