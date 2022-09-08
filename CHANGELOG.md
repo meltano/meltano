@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.6.0 (2022-09-08)
+
+### ✨ New
+
+- [#5892](https://github.com/meltano/meltano/issues/5892) add `--interactive` CLI flag in `meltano config set` -- _**Thanks @MeltyBot!**_
+- [#6640](https://github.com/meltano/meltano/issues/6640) add rich exception formatting, configurable from `logging.yaml` -- _**Thanks @kgpayne!**_
+
+### 🐛 Fixes
+
+- [#6694](https://github.com/meltano/meltano/issues/6694) Regression in `meltano remove` with error stating the plugin is missing the `settings_with_extras` attribute -- _**Thanks @kgpayne!**_
+- [#6652](https://github.com/meltano/meltano/issues/6652) Catch permission errors when creating a new project -- _**Thanks @jakegut!**_
+- [#6676](https://github.com/meltano/meltano/issues/6676) Prevent warnings/errors when running `meltano config <plugin> test` -- _**Thanks @ReubenFrankel!**_
+
+### 📚 Documentation Improvements
+
+- [#6716](https://github.com/meltano/meltano/issues/6716) Document strategy for incremental adoption of static typing -- _**Thanks @edgarrmondragon!**_
+- [#6539](https://github.com/meltano/meltano/issues/6539) CLI design guidelines -- _**Thanks @pandemicsyn!**_
+- [#6706](https://github.com/meltano/meltano/issues/6706) add troubleshooting page -- _**Thanks @jared-rimmer!**_
+- [#6697](https://github.com/meltano/meltano/issues/6697) Expand feature flags docs in contributors' guide -- _**Thanks @cjohnhanson!**_
+- [#6689](https://github.com/meltano/meltano/issues/6689) add capabilities reference doc, link to it where applicable -- _**Thanks @aaronsteers!**_
+- [#6688](https://github.com/meltano/meltano/issues/6688) Add docs about environment variable expansion. -- _**Thanks @cjohnhanson!**_
+- [#6671](https://github.com/meltano/meltano/issues/6671) add example meltano projects -- _**Thanks @sbalnojan!**_
+- [#6674](https://github.com/meltano/meltano/issues/6674) Add test and docs for schedule `env` key -- _**Thanks @cjohnhanson!**_
+- [#6680](https://github.com/meltano/meltano/issues/6680) Correct feature flag name for strict env var mode -- _**Thanks @cjohnhanson!**_
+- [#6672](https://github.com/meltano/meltano/issues/6672) Add tutorial on how to debug a custom extractor -- _**Thanks @jared-rimmer!**_
+
 ## v2.5.0 (2022-08-24)
 
 ### ✨ New
