@@ -40,23 +40,20 @@ def tests(session: Session) -> None:
         session.install(".")
 
     session.install(
-        "coverage[toml]",
         "freezegun",
         "mock",
         "pytest",
         "pytest-asyncio",
+        "pytest-cov",
         "pytest-docker",
         "pytest-order",
         "pytest-randomly",
+        "pytest-xdist",
         "requests-mock",
     )
 
     try:
         session.run(
-            "coverage",
-            "run",
-            "--parallel",
-            "-m",
             "pytest",
             f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
             *session.posargs,
@@ -94,5 +91,9 @@ def mypy(session: Session) -> None:
     args = session.posargs or ["src/meltano"]
 
     session.install(".")
-    session.install("mypy", "sqlalchemy2-stubs")
+    session.install(
+        "mypy",
+        "sqlalchemy2-stubs",
+        "types-requests",
+    )
     session.run("mypy", *args)

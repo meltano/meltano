@@ -64,12 +64,12 @@ def create_connection_url(
 
 
 @pytest.fixture(scope="session")
-def engine_uri():
+def engine_uri(worker_id: str):
     host = os.getenv("MSSQL_ADDRESS")
     port = os.getenv("MSSQL_PORT", 1433)
     user = os.getenv("MSSQL_USER")
     password = os.getenv("MSSQL_PASSWORD")
-    database = os.getenv("MSSQL_DB", "pytest_meltano")
+    database = f"{os.getenv('MSSQL_DB', 'pytest_meltano')}_{worker_id}"
 
     # Recreate the database using the master database
     master_engine_uri = create_connection_url(host, port, user, password, "master")
