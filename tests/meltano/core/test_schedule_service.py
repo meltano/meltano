@@ -68,6 +68,7 @@ class TestScheduleService:
     def subject(self, schedule_service):
         return schedule_service
 
+    @pytest.mark.order(0)
     def test_add_schedules(self, subject, create_elt_schedule, create_job_schedule):
         count = 5
 

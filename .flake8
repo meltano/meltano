@@ -204,6 +204,10 @@ per-file-ignores =
         WPS213
         # Allow many decorators, since `click` uses them to define the CLI
         WPS216
+        # Allow many module members
+        WPS202
+        # Allow 'overuse' of expressions (e.g. ctx.obj["settings"])
+        WPS204
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101

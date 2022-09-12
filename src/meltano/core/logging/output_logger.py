@@ -1,3 +1,4 @@
+"""Output Logger."""
 from __future__ import annotations
 
 import asyncio
@@ -19,7 +20,14 @@ from .utils import capture_subprocess_output
 
 
 class OutputLogger:
+    """Output Logger."""
+
     def __init__(self, file):
+        """Instantiate an Output Logger.
+
+        Args:
+            file: A file to output to.
+        """
         self.file = file
         self.stdout = sys.stdout
         self.stderr = sys.stderr
@@ -55,25 +63,66 @@ class OutputLogger:
 
 
 class LineWriter:
+    """Line Writer."""
+
     def __init__(self, out):
+        """Instantiate a Line Writer.
+
+        Args:
+            out: The location to write to.
+        """
         self.__out = out
 
     def __getattr__(self, name):
+        """Get attribute.
+
+        Args:
+            name: The attribute name.
+
+        Returns:
+            The specified attributes value.
+        """
         return getattr(self.__out, name)
 
     def write(self, line):
+        """Write a line.
+
+        Args:
+            line: A line to write.
+        """
         self.__out.writeline(line.rstrip())
 
 
 class FileDescriptorWriter:
+    """File Descriptor Writer."""
+
     def __init__(self, out, fd):
+        """Instantiate File Descriptor Writer.
+
+        Args:
+            out: Output location.
+            fd: A file descriptor.
+        """
         self.__out = out
         self.__writer = os.fdopen(fd, "w")
 
     def __getattr__(self, name):
+        """Get attribute.
+
+        Args:
+            name: The attribute name.
+
+        Returns:
+            The specified attributes value.
+        """
         return getattr(self.__writer, name)
 
     def isatty(self):
+        """Is out location a tty.
+
+        Returns:
+            True if output location is a tty.
+        """
         return self.__out.isatty()
 
 
@@ -113,7 +162,9 @@ class Out:  # noqa: WPS230
             logging.FileHandler using an uncolorized console formatter
         """
         formatter = structlog.stdlib.ProcessorFormatter(
-            processor=structlog.dev.ConsoleRenderer(colors=False),
+            processor=structlog.dev.ConsoleRenderer(
+                colors=False, exception_formatter=structlog.dev.plain_traceback
+            ),
             foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
         )
         handler = logging.FileHandler(self.file)
@@ -122,11 +173,23 @@ class Out:  # noqa: WPS230
 
     @contextmanager
     def line_writer(self):
+        """Yield a line writer instance.
+
+        Yields:
+            A line writer instance
+        """
         yield LineWriter(self)
 
     @contextmanager
     def redirect_logging(self, ignore_errors=()):
-        """Redirect log entries to a temporarily added file handler."""
+        """Redirect log entries to a temporarily added file handler.
+
+        Args:
+            ignore_errors: A tuple of Error classes to ignore.
+
+        Yields:
+            With the side-effect of redirecting logging.
+        """  # noqa: DAR401
         logger = logging.getLogger()
         logger.addHandler(self.redirect_log_handler)
         ignored_errors = (
@@ -146,6 +209,11 @@ class Out:  # noqa: WPS230
 
     @asynccontextmanager
     async def writer(self):
+        """Yield a writer.
+
+        Yields:
+            A writer.
+        """
         read_fd, write_fd = os.pipe()
 
         reader = asyncio.ensure_future(self._read_from_fd(read_fd))
@@ -161,18 +229,32 @@ class Out:  # noqa: WPS230
 
     @asynccontextmanager
     async def redirect_stdout(self):
+        """Redirect STDOUT.
+
+        Yields:
+            A writer with redirected output.
+        """
         async with self.writer() as stdout:
             with redirect_stdout(stdout):
                 yield
 
     @asynccontextmanager
     async def redirect_stderr(self):
+        """Redirect STDERR.
+
+        Yields:
+            A writer with redirected output.
+        """
         async with self.writer() as stderr:
             with redirect_stderr(stderr):
                 yield
 
     def writeline(self, line: str) -> None:
-        """Write a line to the underlying structured logger, cleaning up any dangling control chars."""
+        """Write a line to the underlying structured logger, cleaning up any dangling control chars.
+
+        Args:
+            line: A line to write.
+        """
         self.last_line = line
         self.logger.log(self.write_level, line.rstrip(), name=self.name)
 

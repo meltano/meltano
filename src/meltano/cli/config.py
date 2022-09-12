@@ -24,6 +24,7 @@ from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 from . import cli
+from .interactive import InteractiveConfig
 from .params import pass_project
 from .utils import CliError, InstrumentedGroup, PartialInstrumentedCmd
 
@@ -275,53 +276,22 @@ def reset(ctx, store):
 
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
-@click.argument("setting_name", nargs=-1, required=True)
-@click.argument("value")
+@click.option("--interactive", is_flag=True)
+@click.argument("setting_name", nargs=-1)
+@click.argument("value", required=False)
 @click.option(
     "--store",
     type=click.Choice(SettingValueStore.writables()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
-def set_(ctx, setting_name, value, store):
+def set_(ctx, setting_name, value, store, interactive):
     """Set the configurations' setting `<name>` to `<value>`."""
-    store = SettingValueStore(store)
-    tracker = ctx.obj["tracker"]
-    try:
-        value = json.loads(value)
-    except json.JSONDecodeError:
-        pass
-
-    settings = ctx.obj["settings"]
-    session = ctx.obj["session"]
-
-    path = list(setting_name)
-    try:
-        value, metadata = settings.set_with_metadata(
-            path, value, store=store, session=session
-        )
-    except StoreNotSupportedError as err:
-        tracker.track_command_event(CliEvent.aborted)
-        raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
-        ) from err
-
-    name = metadata["name"]
-    store = metadata["store"]
-    click.secho(
-        f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
-        fg="green",
-    )
-
-    current_value, metadata = settings.get_with_metadata(name, session=session)
-    source = metadata["source"]
-    if source != store:
-        message = f"Current value is still: {current_value!r} {get_label(metadata)}"
-        click.secho(
-            message,
-            fg="yellow",
-        )
-    tracker.track_command_event(CliEvent.completed)
+    interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
+    if interactive:
+        interaction.configure_all()
+    else:
+        interaction.set_value(setting_name=setting_name, value=value, store=store)
 
 
 @config.command(cls=PartialInstrumentedCmd, name="test")
