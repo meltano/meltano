@@ -12,11 +12,11 @@ from meltano.core.project_init_service import ProjectInitService
 
 
 @contextmanager
-def cd(path: Path):
+def cd(path: Path) -> Path:
     prev_dir = os.getcwd()
     os.chdir(path)
     try:
-        yield
+        yield path
     finally:
         os.chdir(prev_dir)
 

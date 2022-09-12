@@ -24,42 +24,42 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
 
 1. Create and navigate to a directory to hold your Meltano projects:
 
-    ```bash
-    mkdir meltano-projects
-    cd meltano-projects
-    ```
+   ```bash
+   mkdir meltano-projects
+   cd meltano-projects
+   ```
 
 1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
-    ```bash
-    #For Windows (PowerShell): New-Alias Python3 Python
-    python3 -m pip install --user pipx
-    python3 -m pipx ensurepath
-    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
-    source ~/.bashrc
-    ```
+   ```bash
+   #For Windows (PowerShell): New-Alias Python3 Python
+   python3 -m pip install --user pipx
+   python3 -m pipx ensurepath
+   #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
+   source ~/.bashrc
+   ```
 
-    <div class="notification is-info">
-      <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
-    </div>
+   <div class="notification is-info">
+     <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
+   </div>
 
 1. Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
 
-    ```bash
-    pipx install meltano
-    ```
+   ```bash
+   pipx install meltano
+   ```
 
-    If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
+   If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
 
-    ```bash
-    pipx install meltano --python <path to desired Python executable>
-    ```
+   ```bash
+   pipx install meltano --python <path to desired Python executable>
+   ```
 
 1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
 
-    ```bash
-    meltano --version
-    ```
+   ```bash
+   meltano --version
+   ```
 
 If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation#local-installation) of the [Installation guide](/guide/installation) for more details.
 
@@ -73,55 +73,55 @@ _To learn more about Meltano projects, refer to the [Projects concept doc](/conc
 
 1. Navigate to the directory that you'd like to hold your Meltano projects if you haven't already done so:
 
-    ```bash
-    mkdir meltano-projects
-    cd meltano-projects
-    ```
+   ```bash
+   mkdir meltano-projects
+   cd meltano-projects
+   ```
 
 1. Initialize a new project in a directory of your choosing using [`meltano init`](/reference/command-line-interface#init):
 
-    ```bash
-    meltano init <project directory name>
+   ```bash
+   meltano init <project directory name>
 
-    # For example:
-    meltano init my-meltano-project
+   # For example:
+   meltano init my-meltano-project
 
-    # If you're using Docker, don't forget to mount the current working directory:
-    docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
-    ```
+   # If you're using Docker, don't forget to mount the current working directory:
+   docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
+   ```
 
-    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
+   This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
 
-    ```yml
-    version: 1
-    default_environment: dev
-    project_id: <random UUID>
-    environments:
-    - name: dev
-    - name: staging
-    - name: prod
-    ```
+   ```yml
+   version: 1
+   default_environment: dev
+   project_id: <random UUID>
+   environments:
+   - name: dev
+   - name: staging
+   - name: prod
+   ```
 
-    The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), or [pipeline schedules](/concepts/project#schedules) yet, but does include 3 [environments](/concepts/environments) that you can use if you wish.
+   The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), or [pipeline schedules](/concepts/project#schedules) yet, but does include 3 [environments](/concepts/environments) that you can use if you wish.
 
-    Note that anonymous usage stats are enabled by default; if you want to learn more about how the product benefits from them or how to change the default settings, see the [settings reference](/reference/settings#send-anonymous-usage-stats) page for more details.
+   Note that anonymous usage stats are enabled by default; if you want to learn more about how the product benefits from them or how to change the default settings, see the [settings reference](/reference/settings#send-anonymous-usage-stats) page for more details.
 
 1. Navigate to the newly created project directory:
 
-    ```bash
-    cd <project directory>
+   ```bash
+   cd <project directory>
 
-    # For example:
-    cd my-meltano-project
-    ```
+   # For example:
+   cd my-meltano-project
+   ```
 
 1. Optionally, if you'd like to version control your changes, initialize a [Git](https://git-scm.com/) repository and create an initial commit:
 
-    ```bash
-    git init
-    git add --all
-    git commit -m 'Initial Meltano project'
-    ```
+   ```bash
+   git init
+   git add --all
+   git commit -m 'Initial Meltano project'
+   ```
 
 This will allow you to use [`git diff`](https://git-scm.com/docs/git-diff) to easily check the impact of the [`meltano` commands](/reference/command-line-interface) you'll run below on your project files, most notably your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
@@ -131,28 +131,29 @@ As part of creating your Meltano project, we automatically added your first [env
 
 1. List your available environments:
 
-    ```bash
-    meltano environment list
-    ```
+   ```bash
+   meltano environment list
+   ```
 
 1. Activate your environment for your shell session:
 
-    ```bash
-    export MELTANO_ENVIRONMENT=dev
-    ```
-    or for Windows PowerShell:
+   ```bash
+   export MELTANO_ENVIRONMENT=dev
+   ```
 
-    ```powershell
-    $env:MELTANO_ENVIRONMENT="dev"
-    ```
+   or for Windows PowerShell:
 
-    Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
+   ```powershell
+   $env:MELTANO_ENVIRONMENT="dev"
+   ```
+
+   Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
 
 1. [optional] Add a new environment:
 
-    ```bash
-    meltano environment add <environment name>
-    ```
+   ```bash
+   meltano environment add <environment name>
+   ```
 
 ## Add an Extractor to Pull Data from a Source
 
@@ -166,9 +167,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if an extractor for your data source is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-    ```bash
-    meltano discover extractors
-    ```
+        ```bash
+        meltano discover extractors
+        ```
 
 1.  Depending on the result, pick your next step:
 
@@ -290,51 +291,64 @@ extractors:
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 </div>
 
-1. Find out what settings your extractor supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
+1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
    ```bash
-   meltano config <plugin> list
+   meltano config <plugin> set --interactive
 
    # For example:
-   meltano config tap-gitlab list
+   meltano config tap-gitlab set --interactive
    ```
 
-1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
+Follow the prompts to step through all available settings, or select an individual setting to configure.
 
-   <div class="notification is-info">
-     <p>
-       <strong>See <a href="https://hub.meltano.com/extractors/gitlab#private-token">MeltanoHub for details</a> on how to get a GitLab `private_token` for tap-gitlab.</strong>
-     </p>
-   </div>
+You can also optionally use the `list`, `set` and `unset` commands directly to view and change plugin configuration:
 
-   ```bash
-   meltano config <plugin> set <setting> <value>
+- Find out what settings your extractor supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
 
-   # For example:
-   meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
-   meltano config tap-gitlab set start_date 2022-03-01T00:00:00Z
-   meltano config tap-gitlab set private_token my_private_token
-   ```
+  ```bash
+  meltano config <plugin> list
 
-   This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
+  # For example:
+  meltano config tap-gitlab list
+  ```
 
-   ```yml
-   environments:
-     - name: dev
-       config:
-         plugins:
-           extractors:
-             - name: tap-gitlab
-               config:
-                 projects: meltano/meltano meltano/tap-gitlab
-                 start_date: "2022-03-01T00:00:00Z"
-   ```
+- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
 
-   Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
+    <div class="notification is-info">
+      <p>
+        <strong>See <a href="https://hub.meltano.com/extractors/gitlab#private-token">MeltanoHub for details</a> on how to get a GitLab `private_token` for tap-gitlab.</strong>
+      </p>
+    </div>
 
-   ```bash
-   export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
-   ```
+  ```bash
+  meltano config <plugin> set <setting> <value>
+
+  # For example:
+  meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
+  meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
+  meltano config tap-gitlab set private_token my_private_token
+  ```
+
+  This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
+
+  ```yml
+  environments:
+    - name: dev
+      config:
+        plugins:
+          extractors:
+            - name: tap-gitlab
+              config:
+                projects: meltano/meltano meltano/tap-gitlab
+                start_date: "2021-10-01T00:00:00Z"
+  ```
+
+  Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
+
+  ```bash
+  export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
+  ```
 
 1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/reference/command-line-interface#config):
 
@@ -544,11 +558,11 @@ which will be responsible for loading [extracted](#add-an-extractor-to-pull-data
 _To learn more about adding plugins to your project, refer to the [Plugin Management guide](/guide/plugin-management#adding-a-plugin-to-your-project)._
 
 1.  Find out if a loader for your data destination is [supported out of the box](/concepts/plugins#discoverable-plugins)
-by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
+    by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-    ```bash
-    meltano discover loaders
-    ```
+        ```bash
+        meltano discover loaders
+        ```
 
 1.  Depending on the result, pick your next step:
 
@@ -907,17 +921,17 @@ Refer to the [transformers page](https://hub.meltano.com/transformers/) on Melta
 
 1. Configure dbt-postgres
 
-    ```bash
-    meltano config dbt-postgres list
+   ```bash
+   meltano config dbt-postgres list
 
-    # For example:
-    meltano config dbt-postgres set host localhost
-    meltano config dbt-postgres set user meltano
-    meltano config dbt-postgres set password meltano
-    meltano config dbt-postgres set port 5432
-    meltano config dbt-postgres set dbname warehouse
-    meltano config dbt-postgres set schema analytics
-    ```
+   # For example:
+   meltano config dbt-postgres set host localhost
+   meltano config dbt-postgres set user meltano
+   meltano config dbt-postgres set password meltano
+   meltano config dbt-postgres set port 5432
+   meltano config dbt-postgres set dbname warehouse
+   meltano config dbt-postgres set schema analytics
+   ```
 
 1. Once dbt has been installed and configured in your Meltano project, you will see the `/transform` directory populated with dbt artifacts.
 
@@ -980,14 +994,14 @@ Refer to the [transformers page](https://hub.meltano.com/transformers/) on Melta
 
 1. Run your dbt models either using [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke):
 
-     ```bash
-     meltano invoke dbt-postgres:<command>
+   ```bash
+   meltano invoke dbt-postgres:<command>
 
-     # For example:
-     meltano invoke dbt-postgres:run
-     ```
+   # For example:
+   meltano invoke dbt-postgres:run
+   ```
 
-    The [`meltano run`](/reference/command-line-interface#run) command allows you to execute dbt in the same way as `invoke` but in a much more flexible fashion. This allows for inline dbt execution and more advanced reverse ETL use cases:
+   The [`meltano run`](/reference/command-line-interface#run) command allows you to execute dbt in the same way as `invoke` but in a much more flexible fashion. This allows for inline dbt execution and more advanced reverse ETL use cases:
 
    ```bash
    meltano run <extractor> <loader> <other_plugins>

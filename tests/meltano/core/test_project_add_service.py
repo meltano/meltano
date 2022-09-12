@@ -24,6 +24,7 @@ class TestProjectAddService:
         assert hub_request_counter["/extractors/index"] == 1
         assert len(hub_request_counter) == 1
 
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(  # noqa: WPS317
         ("plugin_type", "plugin_name", "variant", "default_variant"),
         [
@@ -109,6 +110,7 @@ class TestProjectAddService:
         assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
         assert len(hub_request_counter) == 2
 
+    @pytest.mark.order(after="test_add_inherited")
     def test_lockfile_inherited(
         self,
         subject: ProjectAddService,

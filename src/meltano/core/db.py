@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
 
 from meltano.core.project import Project
@@ -41,8 +42,9 @@ def project_engine(
     settings = ProjectSettingsService(project)
 
     engine_uri = settings.get("database_uri")
-    logging.debug(f"Creating engine {project}@{engine_uri}")
-    engine = create_engine(engine_uri, pool_pre_ping=True)
+    logging.debug(f"Creating engine '{project}@{engine_uri}'")
+
+    engine = create_engine(engine_uri, poolclass=NullPool)
 
     # Connect to the database to ensure it is available.
     connect(
