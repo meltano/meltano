@@ -1,36 +1,45 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Ending a path in a `/` will specify the code owners for every file
+
 # nested in that directory, on any level
 
 # Default owners
-* @pandemicsyn @edgarrmondragon
+
+- @pandemicsyn @edgarrmondragon
 
 # CI
+
 .github/actions/ @WillDaSilva @meltano/engineering
 .github/workflows/ @WillDaSilva @meltano/engineering
 
 # Discovery (End-of-Life)
+
 /src/meltano/core/bundle/discovery.yml @aaronsteers
 
 # Web App and API owners
-/src/webapp/ @alexmarple @pandemicsyn
-/src/meltano/api/ @pandemicsyn @alexmarple
+
+/src/webapp/ @pandemicsyn
+/src/meltano/api/ @pandemicsyn
 
 # Docs (General)
+
 /docs/ @afolson @tayloramurphy @meltano/engineering @meltano/marketing
 /README.md @afolson @tayloramurphy @meltano/engineering @meltano/marketing
 
 # Docs (Contributing)
+
 /CONTRIBUTING.md @afolson @tayloramurphy @meltano/engineering
 
 # Integration tests
+
 /docs/example-library/ @meltano/product @meltano/engineering
 
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
+
 /CHANGELOG.md @meltano/engineering
 /docs/package.json @meltano/engineering
-/package.json  @meltano/engineering
-/pyproject.toml  @meltano/engineering
-/src/meltano/__init__.py  @meltano/engineering
-/src/webapp/package.json  @meltano/engineering
+/package.json @meltano/engineering
+/pyproject.toml @meltano/engineering
+/src/meltano/**init**.py @meltano/engineering
+/src/webapp/package.json @meltano/engineering
