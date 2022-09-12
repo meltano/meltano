@@ -7,13 +7,19 @@ weight: 1
 
 This document is intended to give you enough technical understanding of Meltano to becoming excited about it and wanting to use it! It's not going to teach you how to use it, we got Tutorials & How Tos for that. When you're ready to start your first Meltano project, we recommend you dive right into our Tutorial.
 
----
+### What users say
 
-## Meltano at a Glance
+_"For us it's a better day at work when we can use Meltano."_ - Nino Müller, Head of Technology at Substring
+
+
+_"I love Meltano because it’s so pleasant to use with its DevOps and Everything-as-Code style. It is easy to set up, flexible, and integrates with pretty much any orchestrator as well as the data built tool (dbt)"._  - Martin Morset
+
+## Meltano at a glance
 Welcome to your Open Source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
 
 
 ### Why companies love to build with Meltano
+
 - **No lock-in**: It's open source and has a strong community, you'll always be free.. (derisk)
 - **It's extensible from day 1**: It's super easy to add a custom connection using the SDKs/EDKs.
 - **Amazing developer experience**: Developers go from start to finish on new data projects, including extraction, loading, transforming & orchestrating data within days.
@@ -29,7 +35,7 @@ Welcome to your Open Source DataOps Infrastructure to manage and centralize all 
 
 ### The Quick Introduction
 Waiting to see how Meltano works within 90 secs? We got you covered:
-<iframe width="1123" height="632" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="800" height="632" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 ## Core Workflow
@@ -43,13 +49,13 @@ Meltano allows you to do any combination of these steps inside your Meltano proj
 
 ### Extracting & Loading data
 Here's a complete walk-through pulling data from AWS S3 and dumping it into a PostgreSQL database within 60 secs.
-
-<iframe width="1123" height="632" src="https://www.youtube.com/embed/htbVZIR3tbs" title="How to Use Meltano in 60 Seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
+<div class="language-bash highlighter-rouge">
+    <iframe width="800" height="632" src="https://www.youtube.com/embed/htbVZIR3tbs" title="How to Use Meltano in 60 Seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
 ### Transforming data
 Here's a complete walk-through extending the extract & load to include more CSVs and running a dbt-project over them to transform the data.
 
-<iframe width="1123" height="632" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="800" height="632" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Orchestrating workflows
 Meltano uses Airflow as orchestrator for the pipelines. It's as simple as adding Airflow as a plugin to your project and then running
@@ -63,7 +69,7 @@ to add the schedule. Meltano also provides commands to start an Airflow instance
 ### Adding Additional Steps
 Need to add additional steps to your data pipeline? Here's a complete setup also pulling in superset as visualization tool.
 
-<iframe width="1123" height="632" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="800" height="632" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Getting Started Resources
 This was just a glance at why you should use Meltano. If you're now as excited to use Meltano as we are, we recommend you head over to the [Getting Started Tutorial](/gettingstarted). 
