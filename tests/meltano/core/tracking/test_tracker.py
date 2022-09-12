@@ -173,7 +173,7 @@ class TestTracker:
             f'["{str(uuid.uuid4())}","{str(uuid.uuid4())}", true]',
             f'client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
         ],
-        ids=lambda param: hash_sha256(param)[:8],
+        ids=(0, 1, 2, 3, 4),
     )
     def test_invalid_analytics_json_is_overwritten(
         self, project: Project, analytics_json_content: str
