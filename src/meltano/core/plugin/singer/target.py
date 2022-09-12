@@ -12,6 +12,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
+from meltano.core.state_service import StateService
 
 from . import PluginType, SingerPlugin
 
@@ -21,16 +22,24 @@ logger = logging.getLogger(__name__)
 class BookmarkWriter:
     """A basic bookmark writer suitable for use as an output handler."""
 
-    def __init__(self, job: Job, session: object, payload_flag: int = Payload.STATE):
+    def __init__(
+        self,
+        job: Job,
+        session: object,
+        state_service: StateService | None = None,
+        payload_flag: int = Payload.STATE,
+    ):
         """Bookmark writer with a writelines implementation to support ingesting and persisting state messages.
 
         Args:
             job: meltano elt job associated with this invocation and who's state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
+            state_service: TODO
             payload_flag: a valid payload flag, one of Payload.STATE or Payload.INCOMPLETE_STATE.
         """
         self.job = job
         self.session = session
+        self.state_service = state_service or StateService(session)
         self.payload_flag = payload_flag
 
     def writeline(self, line: str):
