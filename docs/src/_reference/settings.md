@@ -1013,49 +1013,6 @@ export OAUTH_GITLAB_CLIENT_SECRET=<gitlab-client-secret>
 export OAUTH_GITLAB_SECRET=<gitlab-client-secret>
 ```
 
-## Analytics Tracking IDs (deprecated, will be removed in a future version)
-
-Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
-
-### `tracking_ids.cli`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_CLI`
-- Default: `UA-132758957-3`
-
-Tracking ID for usage of the [`meltano` CLI](/reference/command-line-interface).
-
-```bash
-meltano config meltano set tracking_ids cli UA-123456789-1
-
-export MELTANO_TRACKING_IDS_CLI=UA-123456789-1
-```
-
-### `tracking_ids.ui`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI`
-- Default: `UA-132758957-2`
-
-Tracking ID for usage of [Meltano UI](/reference/ui).
-
-```bash
-meltano config meltano set tracking_ids ui UA-123456789-2
-
-export MELTANO_TRACKING_IDS_UI=UA-123456789-2
-```
-
-### `tracking_ids.ui_embed`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`
-- Default: `UA-132758957-6`
-
-Tracking ID for usage of [Meltano UI](/reference/ui)'s [Embed feature](/guide/analysis#share-reports-and-dashboards).
-
-```bash
-meltano config meltano set tracking_ids ui_embed UA-123456789-3
-
-export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3
-```
-
 ## Snowplow Tracking
 
 ### `snowplow.collector_endpoints`
