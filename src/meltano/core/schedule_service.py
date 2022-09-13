@@ -8,6 +8,7 @@ from datetime import date, datetime
 
 from croniter import croniter
 
+from meltano.core.error import MeltanoError
 from meltano.core.setting_definition import SettingMissingError
 
 from .meltano_invoker import MeltanoInvoker
@@ -21,7 +22,7 @@ from .task_sets_service import TaskSetsService
 from .utils import NotFound, coerce_datetime, find_named, iso8601_datetime
 
 
-class ScheduleAlreadyExistsError(Exception):
+class ScheduleAlreadyExistsError(MeltanoError):
     """Occurs when a schedule already exists."""
 
     def __init__(self, schedule: Schedule):
@@ -32,8 +33,11 @@ class ScheduleAlreadyExistsError(Exception):
         """
         self.schedule = schedule
 
+        reason = f"Schedule '{self.schedule.name}' already exists"
+        super().__init__(reason)
 
-class ScheduleDoesNotExistError(Exception):
+
+class ScheduleDoesNotExistError(MeltanoError):
     """Occurs when a schedule does not exist."""
 
     def __init__(self, name: str):
@@ -45,8 +49,12 @@ class ScheduleDoesNotExistError(Exception):
         """
         self.name = name
 
+        reason = f"Schedule '{self.name}' does not exist"
+        instruction = "Use `meltano schedule add` to add a schedule"
+        super().__init__(reason, instruction)
 
-class ScheduleNotFoundError(Exception):
+
+class ScheduleNotFoundError(MeltanoError):
     """Occurs when a schedule for a namespace cannot be found."""
 
     def __init__(self, namespace: str):
@@ -57,8 +65,12 @@ class ScheduleNotFoundError(Exception):
         """
         self.namespace = namespace
 
+        reason = f"No schedule found for namespace {self.namespace}"
+        instruction = "Use `meltano schedule add` to add a schedule"
+        super().__init__(reason, instruction)
 
-class BadCronError(Exception):
+
+class BadCronError(MeltanoError):
     """Occurs when a cron expression is invalid."""
 
     def __init__(self, cron: str):
@@ -68,6 +80,10 @@ class BadCronError(Exception):
             cron: The cron expression that is invalid.
         """
         self.cron = cron
+
+        reason = f"Invalid Cron expression or alias: '{self.cron}'"
+        instruction = "Please use a valid cron expression"
+        super().__init__(reason, instruction)
 
 
 class ScheduleService:
