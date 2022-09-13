@@ -9,7 +9,6 @@ from meltano.core.state_store import DBStateStoreManager
 class TestDBStateStoreManager:
     @pytest.fixture
     def subject(self, session):
-        # TODO: populate a bunch of mock state
         mock_state = JobState(
             job_name="mock_job",
             partial_state={

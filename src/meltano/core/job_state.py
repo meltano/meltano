@@ -1,13 +1,13 @@
 """Defines JobState model class."""
 from __future__ import annotations
 
-from sqlalchemy import Column, ForeignKey, func, types
+from sqlalchemy import Column, func, types
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Session
 
 from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import GUID, JSONEncodedDict
+from meltano.core.sqlalchemy import JSONEncodedDict
 from meltano.core.utils import merge
 
 
@@ -32,7 +32,15 @@ class JobState(SystemModel):
 
     @classmethod
     def from_job_history(cls, session: Session, job_name: str):
-        """ """
+        """Build JobState from job run history.
+
+        Args:
+            session: the session to use in finding job history
+            job_name: the name of the job to build JobState for
+
+        Returns:
+            JobState built from job run history
+        """
         completed_state = {}
         partial_state = {}
         incomplete_since = None

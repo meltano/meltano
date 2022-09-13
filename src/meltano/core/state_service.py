@@ -8,15 +8,12 @@ from __future__ import annotations
 
 import datetime
 import json
-from collections import defaultdict
 from typing import Any
 
 import structlog
 
-from meltano.core.behavior.canonical import Canonical
-from meltano.core.job import Job, JobFinder, Payload, State
+from meltano.core.job import Job, Payload, State
 from meltano.core.state_store import DBStateStoreManager
-from meltano.core.utils import merge
 
 logger = structlog.getLogger(__name__)
 
@@ -125,7 +122,6 @@ class StateService:
         logger.debug(
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
-
         self.state_store_manager.set(
             job_name=state_to_add_to.job_name,
             state=json.dumps(new_state_dict),
@@ -157,9 +153,6 @@ class StateService:
             payload_flags=Payload.STATE,
             validate=validate,
         )
-        self.state_store_manager.set(
-            job_name=state_id, state=new_state, complete=True, overwrite=True
-        )
 
     def clear_state(self, state_id, save: bool = True):
         """Clear the state for the state_id.
@@ -169,6 +162,7 @@ class StateService:
             save: whether or not to immediately save the state
         """
         self.set_state(state_id, json.dumps({}), validate=False)
+        self.state_store_manager.clear(state_id)
 
     def merge_state(self, state_id_src: str, state_id_dst: str):
         """Merge state from state_id_src into state_id_dst.

@@ -40,7 +40,6 @@ from meltano.core.project_plugins_service import (
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.state_service import StateService
-from meltano.core.state_store import DBStateStoreManager
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 

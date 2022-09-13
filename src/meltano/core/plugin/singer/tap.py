@@ -590,4 +590,4 @@ class SingerTap(SingerPlugin):
 
         key_json = json.dumps(key_dict)
 
-        return sha1(key_json.encode()).hexdigest()  # noqa: S303
+        return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324

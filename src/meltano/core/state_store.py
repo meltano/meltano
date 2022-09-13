@@ -41,7 +41,7 @@ class StateStoreManager(ABC):
         """Get the job state for the given job_name.
 
         Args:
-            job_name the name of the job to get state for.
+            job_name: the name of the job to get state for.
 
         Raises:
             NotImplementedError: always, this is an abstract method
@@ -50,22 +50,38 @@ class StateStoreManager(ABC):
 
     @abstractmethod
     def clear(self, job_name):
-        """TODO"""
+        """Clear state for the given job_name.
+
+        Args:
+            job_name: the job name to clear state for
+        """
         ...
 
     @abstractmethod
     def get_job_names(self, pattern=None):
-        """TODO"""
+        """Get all job names available in this state store manager.
+
+        Args:
+            pattern: glob-style pattern to filter by
+        """
         ...
 
     @abstractmethod
     def acquire_lock(self, job_name):
-        """TODO: docstring"""
+        """Acquire a naive lock for the given job's state.
+
+        Args:
+            job_name: the job name to lock
+        """
         ...
 
     @abstractmethod
     def release_lock(self, job_name):
-        """TODO: docstring"""
+        """Release lock for given job's state.
+
+        Args:
+            job_name: the job name to unlock
+        """
         ...
 
 
@@ -73,7 +89,13 @@ class DBStateStoreManager(StateStoreManager):
     """StateStoreManager implementation for state stored in the system db."""
 
     def __init__(self, *args, session: Session, **kwargs):
-        """TODO: docstring"""
+        """Initialize the DBStateStoreManager.
+
+        Args:
+            args: optional positional args to supply to StateStoreManager
+            session: the db session to use
+            kwargs: optional keyword args to supply to StateStoreManager
+        """
         super().__init__(*args, **kwargs)
         self.session = session
 
@@ -85,11 +107,10 @@ class DBStateStoreManager(StateStoreManager):
             state: the state to set.
             complete: true if the state being set is for a complete run, false if partial
         """
-        # TODO: should state be dict?
         existing_job_state: JobState = (
             self.session.query(JobState).filter(JobState.job_name == job_name).first()
         )
-        partial_state = json.loads(state) if not complete else {}
+        partial_state = {} if complete else json.loads(state)
         completed_state = json.loads(state) if complete else {}
         if existing_job_state:
             if existing_job_state.partial_state and not complete:
@@ -110,7 +131,10 @@ class DBStateStoreManager(StateStoreManager):
         """Get the job state for the given job_name.
 
         Args:
-            job_name the name of the job to get state for.
+            job_name: the name of the job to get state for
+
+        Returns:
+            The current state for the given job
         """
         job_state: JobState | None = (
             self.session.query(JobState).filter(JobState.job_name == job_name).first()
@@ -122,7 +146,11 @@ class DBStateStoreManager(StateStoreManager):
         )
 
     def clear(self, job_name):
-        """TODO"""
+        """Clear state for the given job_name.
+
+        Args:
+            job_name: the job name to clear state for
+        """
         job_state: JobState | None = (
             self.session.query(JobState).filter(JobState.job_name == job_name).first()
         )
@@ -131,7 +159,14 @@ class DBStateStoreManager(StateStoreManager):
             self.session.commit()
 
     def get_job_names(self, pattern: str | None = None):
-        """ """
+        """Get all job names available in this state store manager.
+
+        Args:
+            pattern: glob-style pattern to filter by
+
+        Returns:
+            Generator yielding names of available jobs
+        """
         if pattern:
             return (
                 job_state.job_name
@@ -139,14 +174,26 @@ class DBStateStoreManager(StateStoreManager):
                 .filter(JobState.job_name.like(pattern.replace("*", "%")))
                 .all()
             )
-        else:
-            return (
-                name
-                for (name,) in self.session.execute(select(JobState.job_name)).all()
-            )
+        return self.session.execute(select(JobState.job_name)).all()
 
     def acquire_lock(self, job_name):
+        """Acquire a naive lock for the given job's state.
+
+        For DBStateStoreManager, the db manages transactions.
+        This does nothing.
+
+        Args:
+            job_name: the job name to lock
+        """
         ...
 
     def release_lock(self, job_name):
+        """Release the lock for the given job's state.
+
+        For DBStateStoreManager, the db manages transactions.
+        This does nothing.
+
+        Args:
+            job_name: the job name to unlock
+        """
         ...

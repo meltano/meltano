@@ -35,6 +35,7 @@ class BookmarkWriter:
             job: meltano elt job associated with this invocation and who's state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: a valid payload flag, one of Payload.STATE or Payload.INCOMPLETE_STATE.
+            state_service: StateService to use for bookmarking state.
         """
         self.job = job
         self.session = session
@@ -77,6 +78,8 @@ class BookmarkWriter:
 
 
 class SingerTarget(SingerPlugin):
+    """A plugin for singer targets."""
+
     __plugin_type__ = PluginType.LOADERS
 
     EXTRA_SETTINGS = [
@@ -85,14 +88,32 @@ class SingerTarget(SingerPlugin):
     ]
 
     def exec_args(self, plugin_invoker):
+        """Get command-line args to pass to the plugin.
+
+        Args:
+            plugin_invoker: PluginInvoker running this target.
+
+        Returns:
+            Command-line args for target
+        """
         return ["--config", plugin_invoker.files["config"]]
 
     @property
     def config_files(self):
+        """Get config files for this target.
+
+        Returns:
+            The config_files for this target.
+        """
         return {"config": f"target.{self.instance_uuid}.config.json"}
 
     @property
     def output_files(self):
+        """Get output files for this target.
+
+        Returns:
+            The output files for this target.
+        """
         return {"state": "new_state.json"}
 
     @hook("before_invoke")

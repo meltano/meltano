@@ -12,9 +12,7 @@ from alembic import op
 from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.core.sqlalchemy import JSONEncodedDict
-from meltano.migrations import JSONEncodedDict
 from meltano.migrations.utils.dialect_typing import (
-    datetime_for_dialect,
     get_dialect_name,
     max_string_length_for_dialect,
 )
@@ -29,7 +27,6 @@ depends_on = None
 def upgrade():
     # Create state table
     dialect_name = get_dialect_name()
-    datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)
     op.create_table(
         "state",

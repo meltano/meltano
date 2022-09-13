@@ -284,3 +284,6 @@ per-file-ignores =
         # Many of these utility functions are descriptively
 	# name and self-documenting
 	D103
+    src/meltano/core/state_store.py:
+	# Ignore ... in ABC
+	WPS428
