@@ -26,15 +26,14 @@ class BookmarkWriter:
         self,
         job: Job,
         session: object,
-        state_service: StateService | None = None,
         payload_flag: int = Payload.STATE,
+        state_service: StateService | None = None,
     ):
         """Bookmark writer with a writelines implementation to support ingesting and persisting state messages.
 
         Args:
             job: meltano elt job associated with this invocation and who's state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
-            state_service: TODO
             payload_flag: a valid payload flag, one of Payload.STATE or Payload.INCOMPLETE_STATE.
         """
         self.job = job
@@ -67,6 +66,7 @@ class BookmarkWriter:
         job.payload_flags |= self.payload_flag
         try:
             job.save(self.session)
+            self.state_service.add_state(job, job.payload, job.payload_flags)
         except Exception:
             logging.warning(
                 "Unable to persist state, or received state is invalid, incremental state has not been updated"
