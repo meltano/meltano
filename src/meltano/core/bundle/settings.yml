@@ -173,14 +173,6 @@ settings:
   env: OAUTH_GITLAB_CLIENT_SECRET
   env_specific: true
 
-# Analytics Tracking IDs
-- name: tracking_ids.cli
-  value: UA-132758957-3
-- name: tracking_ids.ui
-  value: UA-132758957-2
-- name: tracking_ids.ui_embed
-  value: UA-132758957-6
-
 # Snowplow Tracking
 - name: snowplow.collector_endpoints
   kind: array
