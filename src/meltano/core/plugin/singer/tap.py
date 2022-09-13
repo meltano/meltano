@@ -262,7 +262,6 @@ class SingerTap(SingerPlugin):
             state_path.unlink()
         except FileNotFoundError:
             pass
-
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job:
             # Running outside pipeline context: incremental state could not be loaded
@@ -291,10 +290,10 @@ class SingerTap(SingerPlugin):
             return
         # the `state.json` is stored in the database
         state = StateService(elt_context.session).get_state(elt_context.job.job_name)
-
         if state:
-            with state_path.open("w") as state_file:
-                json.dump(state.get("singer_state"), state_file, indent=2)
+            if state.get("singer_state"):
+                with state_path.open("w") as state_file:
+                    json.dump(state.get("singer_state"), state_file, indent=2)
         else:
             logger.warning("No state was found, complete import.")
 

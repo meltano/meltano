@@ -49,6 +49,11 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
+    def clear(self, job_name):
+        """TODO"""
+        ...
+
+    @abstractmethod
     def get_job_names(self, pattern=None):
         """TODO"""
         ...
@@ -72,16 +77,13 @@ class DBStateStoreManager(StateStoreManager):
         super().__init__(*args, **kwargs)
         self.session = session
 
-    def set(
-        self, job_name: str, state: str, complete: bool, overwrite: bool = False
-    ) -> None:
+    def set(self, job_name: str, state: str, complete: bool) -> None:
         """Set the job state for the given job_name.
 
         Args:
             job_name: the name of the job to set state for.
             state: the state to set.
             complete: true if the state being set is for a complete run, false if partial
-            overwrite: true if partial state should overwrite existing complete state
         """
         # TODO: should state be dict?
         existing_job_state: JobState = (
@@ -90,7 +92,7 @@ class DBStateStoreManager(StateStoreManager):
         partial_state = json.loads(state) if not complete else {}
         completed_state = json.loads(state) if complete else {}
         if existing_job_state:
-            if existing_job_state.partial_state and not overwrite:
+            if existing_job_state.partial_state and not complete:
                 partial_state = merge(partial_state, existing_job_state.partial_state)
             if not complete:
                 completed_state = existing_job_state.completed_state
@@ -118,6 +120,15 @@ class DBStateStoreManager(StateStoreManager):
             if job_state
             else {}
         )
+
+    def clear(self, job_name):
+        """TODO"""
+        job_state: JobState | None = (
+            self.session.query(JobState).filter(JobState.job_name == job_name).first()
+        )
+        if job_state:
+            self.session.delete(job_state)
+            self.session.commit()
 
     def get_job_names(self, pattern: str | None = None):
         """ """
