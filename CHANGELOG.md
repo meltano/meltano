@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.6.1 (2022-09-13)
+
+### 🐛 Fixes
+
+- [#6745](https://github.com/meltano/meltano/issues/6745) Use random UUID as default `project_id`
+
+### 📚 Documentation Improvements
+
+- [#6743](https://github.com/meltano/meltano/issues/6743) Describe how `project_id` is hashed
+
 ## v2.6.0 (2022-09-12)
 
 ### ✨ New
