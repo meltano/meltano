@@ -38,22 +38,20 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
 
-By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
+By default, Meltano shares anonymous usage data with the Meltano team using Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
 
 We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
-If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
-This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
+If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project. If the project ID is a UUID, then it will be sent unchanged. Otherwise, it will be [hashed](#q-what-is-a-one-way-hash-and-how-is-it-helpful), and its hash will be used to derive a UUID which will be used to uniquely identify your project.
 
-If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
-the Tracking IDs can be configured using the `tracking_ids.*` settings below.
+This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
 the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
 
 Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
 
-See more about our [anonymization standards](/reference/settings#anonymization-standards) and [anonymous usage stats Q&A](/reference/settings#anonymous-usage-stats-qa) below for more details.
+See more about our [anonymization standards](#anonymization-standards) and [anonymous usage stats Q&A](#anonymous-usage-stats-qa) below for more details.
 Also refer to the Meltano data team handbook page for our ["Philosophy of Telemetry"](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry).
 
 With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
@@ -128,14 +126,14 @@ If you still have any concerns about keeping anonymous reporting enabled, we hop
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_ID`
 - Default: None
 
-Used by Meltano to uniquely identify your project in Google Analytics if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
+Used by Meltano to uniquely identify your project if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
 
 #### How to use
 
 ```bash
-meltano config meltano set project_id <randomly-generated-token>
+meltano config meltano set project_id '<unique identifier>'
 
-export MELTANO_PROJECT_ID=<randomly-generated-token>
+export MELTANO_PROJECT_ID='<unique identifier>'
 ```
 
 ### <a name="database-uri"></a>`database_uri`
