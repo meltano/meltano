@@ -19,7 +19,7 @@ _Steps 1-4 are customizing the meltano.yml to suit your setup, if you're comfort
 ## 1. Add a (local) custom jupyter utility
 You can add a custom plugin either [via the CLI](https://docs.meltano.com/guide/plugin-management#custom-plugins) or [using the YAML file](https://docs.meltano.com/concepts/project#custom-plugin-definitions). As jupyter serves multiple purposes, the type "utility" is recommended as plugin type.
 
-For jupyter, you can choose both the "classi notebook" installed via the pip-package "jupyter" or the newer jupyterlab installed via the pip-package jupyterlab.
+For Jupyter, you can choose both the "classic notebook" installed via the pip-package "jupyter" or the newer jupyterlab installed via the pip-package jupyterlab.
 
 _Note: The code snippets will use jupyterlab, if you want the classic notebook, just replace jupyterlab=>jupyter, the "executable" stays the same._
 
