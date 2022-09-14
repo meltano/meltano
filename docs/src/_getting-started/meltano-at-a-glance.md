@@ -12,7 +12,7 @@ This document is intended to give you enough technical understanding of Meltano 
 _"For us it's a better day at work when we can use Meltano."_ - Nino Müller, Head of Technology at Substring
 
 
-_"I love Meltano because it’s so pleasant to use with its DevOps and Everything-as-Code style. It is easy to set up, flexible, and integrates with pretty much any orchestrator as well as the data built tool (dbt)"._  - Martin Morset
+_"I love Meltano because it’s so pleasant to use with its DevOps and Everything-as-Code style. It is easy to set up, flexible, and integrates with pretty much any orchestrator as well as dbt (data build tool)"._  - Martin Morset
 
 ## Meltano at a glance
 Welcome to your Open Source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
