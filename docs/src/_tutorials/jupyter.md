@@ -1,5 +1,5 @@
 ---
-title: How to use jupyter with Meltano
+title: How to use Jupyter with Meltano
 description: Using jupyter Python notebook as transformation tooling or to run analyses across your meltano maintained data.
 layout: doc
 weight: 4
