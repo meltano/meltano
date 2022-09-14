@@ -5,7 +5,7 @@ layout: doc
 weight: 1
 ---
 
-This document is intended to give you enough technical understanding of Meltano to becoming excited about it and wanting to use it! It's not going to teach you how to use it, we got Tutorials & How Tos for that. When you're ready to start your first Meltano project, we recommend you dive right into our Tutorial.
+This document is intended to give you enough technical understanding of Meltano to become excited about it and wanting to use it! It's not going to teach you how to use it, we've got Tutorials & How To's for that. When you're ready to start your first Meltano project, we recommend you dive right into our Tutorial.
 
 ### What users say
 
