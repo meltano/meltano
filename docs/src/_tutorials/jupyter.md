@@ -5,7 +5,7 @@ layout: doc
 weight: 4
 ---
 
-As of _Sep-2022_, jupyter is not yet available as utility on the [hub](https://hub.meltano.com/), so you need to add it to your Meltano project as (local) custom plugin. Even if it is available as plugin on the hub, you will probably want to do some customization, so it will make sense to create your own version.
+As of _Sep-2022_, jupyter is not yet available as utility on the [Meltano Hub](https://hub.meltano.com/), so you need to add it to your Meltano project as (local) custom plugin. Even if it is available as plugin on the Hub, you will probably want to do some customization, so it will make sense to create your own version.
 
 The steps involved are:
 1. Add a (local) custom jupyter utility
