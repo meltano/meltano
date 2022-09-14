@@ -46,7 +46,7 @@ plugins:
 Using the command line, you can also run ```meltano add --custom utility jupyterlab``` and interactively fill out these properties.
 
 
-### 2. Add potential Python libraries you will need
+## 2. Add potential Python libraries you will need
 To work with jupyter notebooks, you will end up using additional Python libraries which will generally fall into three categories
 1. helper libraries like matplotlib or pandas
 2. connection libraries like sqlAlchemy (and psycopg2)
