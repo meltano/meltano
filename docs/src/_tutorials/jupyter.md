@@ -41,7 +41,7 @@ plugins:
 
 ```
 
- Run ```meltano install``` to ensure the correctness of your yaml file. Then run ```meltano invoke jupyterlab:launch``` to launch the GUI.
+ Run `meltano install` to ensure the correctness of your yaml file. Then run `meltano invoke jupyterlab:launch` to launch the GUI.
 
 Using the command line, you can also run ```meltano add --custom utility jupyterlab``` and interactively fill out these properties.
 
