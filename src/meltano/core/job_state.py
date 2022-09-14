@@ -1,6 +1,8 @@
 """Defines JobState model class."""
 from __future__ import annotations
 
+from typing import Any, Dict
+
 from sqlalchemy import Column, func, types
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Session
@@ -41,8 +43,8 @@ class JobState(SystemModel):
         Returns:
             JobState built from job run history
         """
-        completed_state = {}
-        partial_state = {}
+        completed_state: Dict[Any, Any] = {}
+        partial_state: Dict[Any, Any] = {}
         incomplete_since = None
         finder = JobFinder(job_name)
 
