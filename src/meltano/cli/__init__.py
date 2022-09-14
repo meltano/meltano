@@ -4,8 +4,10 @@ from __future__ import annotations
 import logging
 import os
 import sys
+from textwrap import dedent
 from typing import TYPE_CHECKING
 
+from meltano.core.error import MeltanoError
 from meltano.core.logging import setup_logging
 from meltano.core.project import ProjectReadonly
 from meltano.core.tracking.contexts.exception import ExceptionContext  # noqa: F401
@@ -59,6 +61,28 @@ setup_logging()
 
 logger = logging.getLogger(__name__)
 
+troubleshooting_message = """\
+Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps or to
+join our friendly slack community.
+"""
+
+
+def handle_meltano_error(error: MeltanoError):
+    """Handle a MeltanoError.
+
+    Args:
+        error: The error to handle.
+
+    Raises:
+        CliError: always.
+    """
+    if error.instruction:
+        message = f"{error.reason}. {error.instruction}."
+    else:
+        message = error.reason
+
+    raise CliError(message) from error
+
 
 def _run_cli():
     """Run the Meltano CLI.
@@ -67,7 +91,7 @@ def _run_cli():
         KeyboardInterrupt: if caught.
     """
     try:
-        try:  # noqa: WPS505
+        try:  # noqa: WPS225, WPS505
             cli(obj={"project": None})
         except ProjectReadonly as err:
             raise CliError(
@@ -75,8 +99,11 @@ def _run_cli():
             ) from err
         except KeyboardInterrupt:  # noqa: WPS329
             raise
+        except MeltanoError as err:
+            handle_meltano_error(err)
         except Exception as err:
-            raise CliError(str(err)) from err
+            message = f"{troubleshooting_message}\n{err}"
+            raise CliError(message) from err
     except CliError as cli_error:
         cli_error.print()
         sys.exit(1)

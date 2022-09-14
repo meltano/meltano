@@ -28,13 +28,6 @@ class MeltanoError(Exception):
         self.reason = reason
         self.instruction = instruction
 
-        if instruction:
-            message = f"{reason}. {instruction}."
-        else:
-            message = reason
-
-        super().__init__(message, *args)
-
 
 class Error(Exception):
     """Base exception for ELT errors."""

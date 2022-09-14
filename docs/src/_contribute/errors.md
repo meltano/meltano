@@ -9,9 +9,9 @@ This section describes how to create custom exception classes for Meltano.
 
 ## Creating a custom exception
 
-_All_ new custom exceptions must inherit from `meltano.core.error.MeltanoError` or one of its subclasses. The subclass declaration takes the optional
+_All_ new custom exceptions must inherit from `meltano.core.error.MeltanoError` or one of its subclasses.
 
-The subclassed exception has to be instantiated with a required `reason` argument, which is a string describing the error, as well as the optional `instruction` argument that can be used to provide additional next troubleshooting steps to the user.
+The `meltano.core.error.MeltanoError` initializer takes in a `reason` argument, which is a string describing the error, as well as the optional `instruction` argument that can be used to provide additional troubleshooting steps for the user.
 
 ```python
 from meltano.core.error import MeltanoError

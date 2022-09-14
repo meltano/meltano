@@ -94,10 +94,8 @@ class TestScheduleService:
             subject.add_schedule(create_elt_schedule("bad-cron", interval="bad_cron"))
 
         assert "bad_cron" in str(excinfo.value)
-        assert str(excinfo.value) == (
-            "Invalid Cron expression or alias: 'bad_cron'. "
-            "Please use a valid cron expression."
-        )
+        assert excinfo.value.reason == "Invalid Cron expression or alias: 'bad_cron'"
+        assert excinfo.value.instruction == "Please use a valid cron expression"
 
     def test_remove_schedule(self, subject):
         if platform.system() == "Windows":
