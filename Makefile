@@ -60,7 +60,7 @@ docker_images: base_image prod_image ## Build the Meltano Docker images
 
 docs: ## Serve docs
 	cd docs &&\
-	 bundle exec jekyll serve 
+	 bundle exec jekyll serve
 
 # Docker Image Related
 # ====================
