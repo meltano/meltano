@@ -129,7 +129,7 @@ If you want to use "nbconvert" you will want to add a command to the plugin, rep
         description: Start lab server
 ```
 
-. You can then execute with ```meltano invoke jupyterlab:execute```
+You can then execute with ```meltano invoke jupyterlab:execute```
 
 If you want to use papermill, the easiest option is to use [plugin inheritance](https://docs.meltano.com/concepts/project#inheriting-plugin-definitions) to reuse the venvs created for each plugin. That way, you will not need to install jupyterlabs and all the dependencies twice. Here's an example yaml block:
 
