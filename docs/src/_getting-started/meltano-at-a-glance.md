@@ -67,7 +67,7 @@ meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-p
 to add the schedule. Meltano also provides commands to start an Airflow instance to execute on these schedules. You can find out more about it in the [Orchestrate Data Section](https://docs.meltano.com/guide/orchestration).
 
 ### Adding Additional Steps
-Need to add additional steps to your data pipeline? Here's a complete setup also pulling in superset as visualization tool.
+Need to add additional steps to your data pipeline? Here's a complete setup also pulling in Superset as visualization tool.
 
 <iframe width="800" height="632" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
