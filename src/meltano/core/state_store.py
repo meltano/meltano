@@ -174,7 +174,10 @@ class DBStateStoreManager(StateStoreManager):
                 .filter(JobState.job_name.like(pattern.replace("*", "%")))
                 .all()
             )
-        return self.session.execute(select(JobState.job_name)).all()
+        return (
+            record[0]
+            for record in self.session.execute(select(JobState.job_name)).all()
+        )
 
     def acquire_lock(self, job_name):
         """Acquire a naive lock for the given job's state.
