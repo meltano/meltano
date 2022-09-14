@@ -26,5 +26,3 @@ Below is a list video tutorials & demos on specific Meltano-related topics. Most
 - **[DemoDay - Meltano Container Spec](https://youtu.be/udCPX0EawtM?t=144)** - How to use the container spec to run commands in containers.
 - **[DemoDay - Meltano Great Expectations](https://youtu.be/udCPX0EawtM?t=882)** - Meltano Great Expectations introduced.
 - **[DemoDay - Meltano Mapper Plugins](https://youtu.be/udCPX0EawtM?t=1321)** - How Meltano mapper plugins, in particular the default transferwise plugin works.
-
-
