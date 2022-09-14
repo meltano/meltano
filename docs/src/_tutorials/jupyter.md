@@ -23,7 +23,7 @@ For jupyter, you can choose both the "classi notebook" installed via the pip-pac
 
 _Note: The code snippets will use jupyterlab, if you want the classic notebook, just replace jupyterlab=>jupyter, the "executable" stays the same._
 
-Via the yaml file: add the follow code block inside your _meltano.yml_ (ignore the _launch_ip0_ command if not necessary for you):
+Via the yaml file: add the follow code block inside your `meltano.yml` (ignore the _launch_ip0_ command if not necessary for you):
 ```yaml
 plugins:
   utilities: # meltano invoke jupyter will start up the lab...
