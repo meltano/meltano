@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from .behavior.canonical import Canonical
-from .plugin import PluginDefinition, PluginType
+from meltano.core.behavior.canonical import Canonical
+from meltano.core.plugin import PluginDefinition, PluginType
 
 
 class DiscoveryFile(Canonical):
