@@ -26,7 +26,7 @@ Welcome to your Open Source DataOps Infrastructure! With Meltano you can move yo
 - **Small surface area**: Features like "inline transformations" remove unnecessary steps from your data pipelines, and help companies stay compliant to security & GDPR regulations.
 
 ### Key Features of Meltano, developers will love
-- **Start simple**: Meltano is pip-installable and comes in a prepackaged docker container, you can have your first ELT pipeline running litterally within minutes.
+- **Start simple**: Meltano is pip-installable and comes in a prepackaged docker container, you can have your first ELT pipeline running within minutes.
 - **DataOps out-of-the-box**: Meltano provides tools that make DataOps best practices easy to use in every project.
 - **Integrates with everything**: 300+ natively supported data sources & targets, as well as additional plugins like great expectations or dbt are natively available. 
 - **Easily customizable**: Meltano isn't just extensible, it's built to be extended! The SDK for Singer Connectors & EDK for Meltano Components are easy to use. Meltano Hub helps you find all of the connectors and components created across the data community.
