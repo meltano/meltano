@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 from textwrap import dedent
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 from meltano.core.error import MeltanoError
 from meltano.core.logging import setup_logging
@@ -62,12 +62,12 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 troubleshooting_message = """\
-Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps or to
-join our friendly slack community.
+Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to
+join our friendly Slack community.
 """
 
 
-def handle_meltano_error(error: MeltanoError):
+def handle_meltano_error(error: MeltanoError) -> NoReturn:
     """Handle a MeltanoError.
 
     Args:
@@ -76,12 +76,11 @@ def handle_meltano_error(error: MeltanoError):
     Raises:
         CliError: always.
     """
-    if error.instruction:
-        message = f"{error.reason}. {error.instruction}."
-    else:
-        message = error.reason
-
-    raise CliError(message) from error
+    raise CliError(
+        f"{error.reason}. {error.instruction}."
+        if error.instruction
+        else f"{error.reason}."
+    ) from error
 
 
 def _run_cli():
@@ -102,8 +101,7 @@ def _run_cli():
         except MeltanoError as err:
             handle_meltano_error(err)
         except Exception as err:
-            message = f"{troubleshooting_message}\n{err}"
-            raise CliError(message) from err
+            raise CliError(f"{troubleshooting_message}\n{err}") from err
     except CliError as cli_error:
         cli_error.print()
         sys.exit(1)

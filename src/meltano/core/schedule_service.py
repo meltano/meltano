@@ -32,9 +32,7 @@ class ScheduleAlreadyExistsError(MeltanoError):
             schedule: The schedule that already exists.
         """
         self.schedule = schedule
-
-        reason = f"Schedule '{self.schedule.name}' already exists"
-        super().__init__(reason)
+        super().__init__(reason=f"Schedule '{self.schedule.name}' already exists")
 
 
 class ScheduleDoesNotExistError(MeltanoError):

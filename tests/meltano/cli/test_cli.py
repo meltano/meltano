@@ -163,7 +163,7 @@ class TestCli:
 
     def test_handle_meltano_error(self):
         exception = MeltanoError(reason="This failed", instruction="Try again")
-        with pytest.raises(CliError):
+        with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
 
 
