@@ -34,7 +34,7 @@ class MeltanoError(Exception):
         """
         self.reason = reason
         self.instruction = instruction
-        super().__init__(*args, **kwargs)
+        super().__init__(reason, instruction, *args, **kwargs)
 
 
 class Error(Exception):
