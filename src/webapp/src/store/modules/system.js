@@ -23,11 +23,17 @@ const getters = {
 }
 
 const actions = {
-  check({ commit }) {
-    return systemApi.version({ include_latest: true }).then(response => {
-      commit('setVersion', response.data.version)
-      commit('setLatestVersion', response.data.latestVersion)
-    })
+  check(context, args) {
+    return systemApi
+      .version({ include_latest: args.include_latest })
+      .then(response => {
+        context.commit('setVersion', response.data.version)
+        if (response.data.hasOwnProperty('latestVersion')) {
+          context.commit('setLatestVersion', response.data.latestVersion)
+        } else {
+          context.commit('setLatestVersion', null)
+        }
+      })
   },
 
   upgrade({ state, commit }) {

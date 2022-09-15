@@ -129,6 +129,7 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
             "isAnonymousReadonlyEnabled": "ui.anonymous_readonly",
             "isNotificationEnabled": "ui.notification",
             "isAnalysisEnabled": "ui.analysis",
+            "isUpdateCheckEnabled": "ui.update_check",
             "logoUrl": "ui.logo_url",
             "oauthServiceUrl": "oauth_service.url",
         }

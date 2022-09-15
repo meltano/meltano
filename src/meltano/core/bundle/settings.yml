@@ -104,6 +104,9 @@ settings:
 - name: ui.analysis
   kind: boolean
   value: false
+- name: ui.update_check
+  kind: boolean
+  value: true
 
 # UI customization
 - name: ui.logo_url

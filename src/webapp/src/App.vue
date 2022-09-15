@@ -13,7 +13,11 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('system/check')
+    const isUpdateCheckEnabled = this.$flask.isUpdateCheckEnabled
+    this.$store.dispatch('system/check', {
+      include_latest: isUpdateCheckEnabled
+    })
+
     this.$store.dispatch('system/fetchIdentity')
     this.tryAcknowledgeAnalyticsTracking()
   },

@@ -125,6 +125,7 @@ ENV/
 env.bak/
 venv.bak/
 .env.dev
+.nvmrc
 
 # Spyder project settings
 .spyderproject

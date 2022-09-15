@@ -13,6 +13,7 @@ export default function() {
         .split(',')
         .filter(Boolean),
       isAnalysisEnabled: true,
+      isUpdateCheckEnabled: false,
       isNotificationEnabled: false,
       isProjectReadonlyEnabled: false,
       isReadonlyEnabled: false,
