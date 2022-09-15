@@ -172,17 +172,17 @@ class ScheduleService:
         Returns:
             The start_date of the extractor, or now.
         """
-        extractor = self.plugins_service.find_plugin(
+        extractor_plugin = self.plugins_service.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
         start_date = None
         try:
             settings_service = PluginSettingsService(
-                self.project, extractor, plugins_service=self.plugins_service
+                self.project, extractor_plugin, plugins_service=self.plugins_service
             )
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
-            logging.debug(f"`start_date` not found in {extractor}.")
+            logging.debug(f"`start_date` not found in {extractor_plugin}.")
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting

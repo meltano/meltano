@@ -182,7 +182,6 @@ module = [
   "meltano.core.elt_context",
   "meltano.core.environment",
   "meltano.core.environment_service",
-  "meltano.core.error",
   "meltano.core.extract_utils",
   "meltano.core.extractor",
   "meltano.core.meltano_file",
