@@ -835,4 +835,9 @@ def generate_state_id(
         state_id_suffix,
     ]
 
+    if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
+        raise RunnerError(
+            f"Cannot generate a state ID from components containing the delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+        )
+
     return STATE_ID_COMPONENT_DELIMITER.join(c for c in state_id_components if c)
