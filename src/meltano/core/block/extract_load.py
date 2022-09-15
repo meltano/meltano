@@ -23,7 +23,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.state_service import StateService
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER, StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -835,4 +835,4 @@ def generate_state_id(
         state_id_suffix,
     ]
 
-    return ":".join(c for c in state_id_components if c)
+    return STATE_ID_COMPONENT_DELIMITER.join(c for c in state_id_components if c)
