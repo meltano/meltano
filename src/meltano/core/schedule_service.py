@@ -47,9 +47,10 @@ class ScheduleDoesNotExistError(MeltanoError):
         """
         self.name = name
 
-        reason = f"Schedule '{self.name}' does not exist"
-        instruction = "Use `meltano schedule add` to add a schedule"
-        super().__init__(reason, instruction)
+        super().__init__(
+            reason=f"Schedule '{name}' does not exist",
+            instruction="Use `meltano schedule add` to add a schedule",
+        )
 
 
 class ScheduleNotFoundError(MeltanoError):
