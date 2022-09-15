@@ -14,6 +14,7 @@ from meltano.core.schedule_service import (
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleNotFoundError,
     SettingMissingError,
 )
 
@@ -272,3 +273,7 @@ class TestScheduleService:
         ):
             found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
             assert found_schedule.extractor == custom_tap.name
+
+    def test_find_namespace_schedule_not_found(self, subject):
+        with pytest.raises(ScheduleNotFoundError):
+            subject.find_namespace_schedule("no-such-namespace")
