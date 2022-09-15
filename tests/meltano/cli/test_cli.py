@@ -6,8 +6,9 @@ from time import perf_counter_ns
 import pytest
 
 import meltano
-from meltano.cli import cli
-from meltano.core.error import EmptyMeltanoFileException
+from meltano.cli import cli, handle_meltano_error
+from meltano.cli.utils import CliError
+from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.project import PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -159,6 +160,11 @@ class TestCli:
             ["--no-environment", "--environment", "null", "discover"],
         )
         assert Project._default.active_environment is None
+
+    def test_handle_meltano_error(self):
+        exception = MeltanoError(reason="This failed", instruction="Try again")
+        with pytest.raises(CliError, match="This failed. Try again."):
+            handle_meltano_error(exception)
 
 
 class TestLargeConfigProject:
