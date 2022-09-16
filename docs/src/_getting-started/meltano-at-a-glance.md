@@ -28,10 +28,10 @@ Welcome to your Open Source DataOps Infrastructure to manage and centralize all 
 ### Key Features of Meltano, developers will love
 - **Start simple**: Meltano is pip-installable and comes in a prepackaged docker container, you can have your first ELT pipeline running litterally within minutes.
 - **DataOps out-of-the-box**: Meltano provides tools that make DataOps best practices easy to use in every project.
-- **Integrates with everything**: 300+ natively supported data sources & targets, as well as additional plugins like great expectations or dbt are natively available. 
+- **Integrates with everything**: 300+ natively supported data sources & targets, as well as additional plugins like great expectations or dbt are natively available.
 - **Easily customizable**: Meltano isn't just extensible, it's built to be extended! SDK & EDK are easy to use, plugins created by others are available on the Hub.
 - **Mature system**: Developed since [2018](https://handbook.meltano.com/timeline), runs in production at large companies like GitLab, and currently powers over a million pipeline runs monthly.
-- **First class ELT tooling built-in**: Extract data from any data source, load into any target, use inline maps to transform on data on the fly, and test the incoming data with great expectations, all in one package. 
+- **First class ELT tooling built-in**: Extract data from any data source, load into any target, use inline maps to transform on data on the fly, and test the incoming data with great expectations, all in one package.
 
 ### The Quick Introduction
 Waiting to see how Meltano works within 90 secs? We got you covered:
@@ -72,7 +72,7 @@ Need to add additional steps to your data pipeline? Here's a complete setup also
 <iframe width="800" height="632" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Getting Started Resources
-This was just a glance at why you should use Meltano. If you're now as excited to use Meltano as we are, we recommend you head over to the [Getting Started Tutorial](/gettingstarted). 
+This was just a glance at why you should use Meltano. If you're now as excited to use Meltano as we are, we recommend you head over to the [Getting Started Tutorial](/gettingstarted).
 
 
-If you cannot find an answer to your question, there's always an active [Meltano Slack Community](https://meltano.com/slack) to help you out. 
+If you cannot find an answer to your question, there's always an active [Meltano Slack Community](https://meltano.com/slack) to help you out.
