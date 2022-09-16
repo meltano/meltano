@@ -633,7 +633,11 @@ class TestExtractLoadUtils:
 
         project.active_environment = None
         with pytest.raises(RunnerError):
-            assert generate_state_id(project, block1, block2) == "block1-to-block2"
+            assert (
+                generate_state_id(project, None, block1, block2) == "block1-to-block2"
+            )
 
         project.active_environment = Environment(name="test")
-        assert generate_state_id(project, block1, block2) == "test:block1-to-block2"
+        assert (
+            generate_state_id(project, None, block1, block2) == "test:block1-to-block2"
+        )
