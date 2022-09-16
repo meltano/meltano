@@ -70,7 +70,7 @@ prompt_for_confirmation = partial(
 def state_service_from_state_id(project: Project, state_id: str) -> StateService | None:
     """Instantiate by parsing a state_id."""
     state_id_re = re.compile(
-        r"^(?P<env>.+)\:(?P<tap>.+)-to-(?P<target>.+)?(\:(?P<suffix>.+))$"
+        r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$"
     )
     match = state_id_re.match(state_id)
     if match:
