@@ -12,15 +12,14 @@ We're going to take data from a "source", namely GitLab, and extract a list of p
 To test that this part works, we will dump the data into JSON files.
 In Part 2, we will then place this data into a PostgreSQL database.
 
-We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running
+We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running ``` meltano version```
 
-```bash 
-$ meltano --version
-...
-> meltano v2.6.0
-```
+![Meltano Version](images/part1/gif_meltano_version.gif)
+
 
 This tutorial is written using meltano >= v2.0.0.
+
+If you don't have a GitLab account to follow along, you could either exchange the commands for a differe tap, like GitHub or PostgreSQL, or you create a free GitLab account. You will also need a [personal access token to your GitLab account](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) which you can create under "Edit Profile > "Access Tokens" > .
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -38,6 +37,8 @@ will hold the [plugins](/concepts/plugins) that implement the details of our E(t
    ```bash
    meltano init my-meltano-project
    ```
+
+![Meltano Init](images/part1/gif_meltano_init.gif)
 
    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
 
@@ -65,17 +66,8 @@ Now that you have your very own Meltano project, it's time to add [plugins](/con
 
     ```bash
     $ meltano add extractor tap-gitlab
-    ...
-    > Added extractor 'tap-gitlab' to your Meltano project
-    > Variant:        meltanolabs (default)
-    > Repository:     https://github.com/MeltanoLabs/tap-gitlab
-    > Documentation:  https://hub.meltano.com/extractors/tap-gitlab
-
-    > Installing extractor 'tap-gitlab'
-    > Installed extractor 'tap-gitlab'
-    ...
-
     ```
+![Meltano Version](images/part1/gif_meltano_add_extr.gif)
 
     This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
@@ -92,11 +84,10 @@ Now that you have your very own Meltano project, it's time to add [plugins](/con
 
     ```bash
     $ meltano invoke tap-gitlab --help
-    ...
-    > usage: tap-gitlab [-h] -c CONFIG [-s STATE] [-p PROPERTIES] [--catalog CATALOG] [-d]
-    ...
     ```
     If you see the extractor's help message printed, the plugin was definitely installed successfully.
+    ![Meltano Tap Help](images/part1/gif_meltano_invoke_tg_help.gif)
+
 
 ### Configure the Extractor
 
@@ -106,12 +97,11 @@ The GitLab tap requires [configuration](/guide/configuration) before it can star
 
    ```bash
    $ meltano config tap-gitlab set --interactive
-   ...
-   > Loop through all settings (all), select a setting by number (1 - 8), or exit (e)? [all]: all
-   ...
    ```
-
 2. Follow the prompts to step through all available settings, the ones you'll need to fill out are projects, start_date and your private_token.
+
+![Meltano Version](images/part1/gif_meltano_config_interact.gif)
+
   This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
   ```yml
@@ -133,21 +123,8 @@ The GitLab tap requires [configuration](/guide/configuration) before it can star
    ```bash
    meltano config tap-gitlab
    ```
+![Meltano Version](images/part1/gif_meltano_config_show.gif)
 
-   This will show the current configuration:
-
-   ```json
-   {
-     "api_url": "https://gitlab.com",
-     "private_token": "my_private_token",
-     "groups": "",
-     "projects": "meltano/meltano meltano/tap-gitlab",
-     "ultimate_license": false,
-     "fetch_merge_request_commits": false,
-     "fetch_pipelines_extended": false,
-     "start_date": "2022-03-01T00:00:00Z"
-   }
-   ```
 
 ### Select Entities and Attributes to Extract
 
@@ -160,6 +137,8 @@ By default, Meltano will instruct extractors to extract all supported entities a
    ```bash
    meltano select tap-gitlab --list --all
    ```
+  ![Meltano Version](images/part1/gif_meltano_select_all.gif)
+
 
 1. select the entities and attributes for extraction using [`meltano select`](/reference/command-line-interface#select):
 
@@ -215,6 +194,8 @@ By default, Meltano will instruct extractors to extract all supported entities a
 To test that the extraction process works, we add a JSON target. 
 
 1. Add the JSON targt using ```meltano add loader target-jsonl```.
+![Meltano Version](images/part1/gif_meltano_add_loader_jsonl.gif)
+
 
 This target requires zero configuration, it just outputs the data into a timestamped ```jsonl``` file.
 
@@ -227,8 +208,10 @@ There's just one step here: run your newly added extractor and jsonl loader in a
 ```bash
 $ meltano run tap-gitlab target-jsonl
 ```
+![Meltano Version](images/part1/gif_meltano_run.gif)
+
 You should see data flowing from your source into the jsonl file.
-You can verify that it worked by looking inside the newly created file called ```tap_gitlab-{timestamp}.jsonl```. 
+You can verify that it worked by looking inside the newly created file called ```output/commits.jsonl```. 
 ## Next Steps
 
 Next, head over to [Part 2: Loading extracted data into a target (currently inside the large Getting Started Tutorial)](/getting-started/#add-a-loader-to-send-data-to-a-destination).
