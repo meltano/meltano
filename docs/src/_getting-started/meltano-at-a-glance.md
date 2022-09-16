@@ -28,10 +28,10 @@ Welcome to your Open Source DataOps Infrastructure! With Meltano you can move yo
 ### Key Features of Meltano, developers will love
 - **Start simple**: Meltano is pip-installable and comes in a prepackaged docker container, you can have your first ELT pipeline running within minutes.
 - **DataOps out-of-the-box**: Meltano provides tools that make DataOps best practices easy to use in every project.
-- **Integrates with everything**: 300+ natively supported data sources & targets, as well as additional plugins like great expectations or dbt are natively available. 
+- **Integrates with everything**: 300+ natively supported data sources & targets, as well as additional plugins like great expectations or dbt are natively available.
 - **Easily customizable**: Meltano isn't just extensible, it's built to be extended! The SDK for Singer Connectors & EDK for Meltano Components are easy to use. Meltano Hub helps you find all of the connectors and components created across the data community.
 - **Mature system**: Developed since [2018](https://handbook.meltano.com/timeline), runs in production at large companies like GitLab, and currently powers over a million pipeline runs monthly.
-- **First class ELT tooling built-in**: Extract data from any data source, load into any target, use inline maps to transform on data on the fly, and test the incoming data, all in one package. 
+- **First class ELT tooling built-in**: Extract data from any data source, load into any target, use inline maps to transform on data on the fly, and test the incoming data, all in one package.
 
 ### The Quick Introduction
 Waiting to see how Meltano works within 90 secs? We got you covered:
