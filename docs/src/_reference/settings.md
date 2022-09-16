@@ -464,14 +464,20 @@ The host to bind to.
 Together with the [`ui.bind_port` setting](#ui-bind-port), this setting corresponds to
 [Gunicorn's `bind` setting](https://docs.gunicorn.org/en/stable/settings.html#bind).
 
+### <a name="ui-update-check"></a>`ui.update_check`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_UPDATE_CHECK`
+- Type: `boolean`
+- Default: `true`
+
+Whether to check for newer Meltano versions and display update notifications in the UI.
+
 #### How to use
 
 ```bash
-meltano config meltano set ui bind_host 127.0.0.1
+meltano config meltano set ui update_check false
 
-export MELTANO_UI_BIND_HOST=127.0.0.1
-
-meltano ui --bind=127.0.0.1
+export MELTANO_UI_UPDATE_CHECK=false
 ```
 
 ### <a name="ui-bind-port"></a>`ui.bind_port`
@@ -492,7 +498,6 @@ meltano config meltano set ui bind_port 80
 
 export MELTANO_UI_BIND_PORT=80
 
-meltano ui --bind-port=80
 ```
 
 ### <a name="ui-server-name"></a>`ui.server_name`
