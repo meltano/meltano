@@ -4,11 +4,15 @@ import platform
 
 import pytest
 
-from meltano.core.environment import Environment
+from meltano.core.environment import (
+    Environment,
+    EnvironmentNameContainsStateIdDelimiterError,
+)
 from meltano.core.environment_service import (
     EnvironmentAlreadyExistsError,
     EnvironmentService,
 )
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
 
@@ -69,3 +73,10 @@ class TestEnvironmentService:
             )
         new_environment = subject.add("new-environment")
         assert subject.list_environments() == [new_environment]
+
+    def test_add_name_contains_state_id_component_delimiter(
+        self,
+        subject: EnvironmentService,
+    ):
+        with pytest.raises(EnvironmentNameContainsStateIdDelimiterError):
+            subject.add(f"test{STATE_ID_COMPONENT_DELIMITER}")
