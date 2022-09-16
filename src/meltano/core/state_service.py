@@ -13,6 +13,7 @@ from typing import Any
 import structlog
 
 from meltano.core.job import Job, Payload, State
+from meltano.core.job_state import SINGER_STATE_KEY
 from meltano.core.state_store import DBStateStoreManager
 
 logger = structlog.getLogger(__name__)
@@ -92,9 +93,9 @@ class StateService:
         Raises:
             InvalidJobStateError: if supplied state is not valid singer state
         """
-        if "singer_state" not in state:
+        if SINGER_STATE_KEY not in state:
             raise InvalidJobStateError(
-                "singer_state not found in top level of provided state"
+                f"{SINGER_STATE_KEY} not found in top level of provided state"
             )
 
     def add_state(

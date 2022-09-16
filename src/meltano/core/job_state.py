@@ -12,6 +12,8 @@ from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import JSONEncodedDict
 from meltano.core.utils import merge
 
+SINGER_STATE_KEY = "singer_state"
+
 
 class JobState(SystemModel):
     """Model class that represents the current state of a given job.
@@ -53,7 +55,7 @@ class JobState(SystemModel):
         state_job = finder.latest_with_payload(session, flags=Payload.STATE)
         if state_job:
             incomplete_since = state_job.ended_at
-            if "singer_state" in state_job.payload:
+            if SINGER_STATE_KEY in state_job.payload:
                 merge(state_job.payload, partial_state)
 
         # If there have been any incomplete jobs since the most recent completed jobs,
@@ -64,7 +66,7 @@ class JobState(SystemModel):
             session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
         )
         for incomplete_state_job in incomplete_state_jobs:
-            if "singer_state" in incomplete_state_job.payload:
+            if SINGER_STATE_KEY in incomplete_state_job.payload:
                 partial_state = merge(incomplete_state_job.payload, partial_state)
 
         return cls(

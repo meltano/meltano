@@ -107,7 +107,7 @@ class DBStateStoreManager(StateStoreManager):
             state: the state to set.
             complete: true if the state being set is for a complete run, false if partial
         """
-        existing_job_state: JobState = (
+        existing_job_state = (
             self.session.query(JobState).filter(JobState.job_name == job_name).first()
         )
         partial_state = {} if complete else json.loads(state)

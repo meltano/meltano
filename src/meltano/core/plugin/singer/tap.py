@@ -19,7 +19,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
-from meltano.core.state_service import StateService
+from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
 from . import PluginType, SingerPlugin
@@ -291,9 +291,9 @@ class SingerTap(SingerPlugin):
         # the `state.json` is stored in the database
         state = StateService(elt_context.session).get_state(elt_context.job.job_name)
         if state:
-            if state.get("singer_state"):
+            if state.get(SINGER_STATE_KEY):
                 with state_path.open("w") as state_file:
-                    json.dump(state.get("singer_state"), state_file, indent=2)
+                    json.dump(state.get(SINGER_STATE_KEY), state_file, indent=2)
         else:
             logger.warning("No state was found, complete import.")
 

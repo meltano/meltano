@@ -12,7 +12,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.state_service import StateService
+from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
 from . import PluginType, SingerPlugin
 
@@ -63,7 +63,7 @@ class BookmarkWriter:
             )
 
         job = self.job
-        job.payload["singer_state"] = new_state
+        job.payload[SINGER_STATE_KEY] = new_state
         job.payload_flags |= self.payload_flag
         try:
             job.save(self.session)
