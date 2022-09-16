@@ -27,7 +27,7 @@ class EnvironmentNameContainsStateIdDelimiterError(Exception):
         """Create a new exception.
 
         Args:
-            name: THe name of the environment.
+            name: The name of the environment.
         """
         super().__init__(
             f"The environment name '{name}' cannot contain the state ID component delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
