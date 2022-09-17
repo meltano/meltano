@@ -11,6 +11,7 @@ from mock import AsyncMock, mock
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
+from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -367,6 +368,62 @@ class TestCliRunScratchpadOne:
             assert dbt_start_event[0].get("cmd_type") == "command"
             assert dbt_start_event[0].get("stdio") == "stderr"
             assert matcher.find_by_event("Block run completed.")[0].get("success")
+
+    @pytest.mark.backend("sqlite")
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_custom_suffix(
+        self,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+        job_logging_service: JobLoggingService,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        # verify that a state ID with custom suffix is generated for an ELB run
+        args = [
+            "run",
+            tap.name,
+            target.name,
+            "--state-id-suffix",
+            "test-suffix",
+        ]
+
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+
+            assert matcher.event_matches(
+                "All ExtractLoadBlocks validated, starting execution."
+            )
+            target_stop_event = matcher.find_by_event("target done")
+            assert len(target_stop_event) == 1
+            assert target_stop_event[0].get("name") == target.name
+            assert target_stop_event[0].get("cmd_type") == "elb"
+            assert target_stop_event[0].get("stdio") == "stderr"
+            assert matcher.find_by_event("Block run completed.")[0].get("success")
+
+            job_logging_service.get_latest_log(
+                f"dev:{tap.name}-to-{target.name}:test-suffix"
+            )
 
     @pytest.mark.backend("sqlite")
     @mock.patch(
