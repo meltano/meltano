@@ -412,12 +412,43 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
+    @pytest.mark.parametrize(
+        "suffix_args",
+        [
+            (
+                "test-suffix",
+                "test-suffix",
+                [],
+            ),
+            (
+                "${TEST_SUFFIX}",
+                "test-suffix-single-env",
+                [
+                    ("TEST_SUFFIX", "test-suffix-single-env"),
+                ],
+            ),
+            (
+                "test-suffix-${TEST_SUFFIX_0}-${TEST_SUFFIX_1}",
+                "test-suffix-multiple-env",
+                [
+                    ("TEST_SUFFIX_0", "multiple"),
+                    ("TEST_SUFFIX_1", "env"),
+                ],
+            ),
+        ],
+        ids=[
+            "static",
+            "dynamic (single env)",
+            "dynamic (multiple env)",
+        ],
+    )
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_custom_suffix_active_environment(
         self,
         default_config,
+        suffix_args,
         cli_runner,
         project: Project,
         tap,
@@ -427,12 +458,14 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service: JobLoggingService,
     ):
+        state_id_suffix, expected_suffix, suffix_env = suffix_args
+
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
         # verify that a state ID with custom suffix from active environment is generated for an ELB run
         project.activate_environment("dev")
-        project.active_environment.state_id_suffix = "test-suffix"
+        project.active_environment.state_id_suffix = state_id_suffix
 
         args = ["run", tap.name, target.name]
 
@@ -443,8 +476,12 @@ class TestCliRunScratchpadOne:
         ) as asyncio_mock, mock.patch(
             "meltano.core.block.parser.ProjectPluginsService",
             return_value=project_plugins_service,
-        ):
+        ), pytest.MonkeyPatch().context() as mp:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            for env in suffix_env:
+                mp.setenv(*env)
+
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
 
@@ -452,7 +489,7 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0].get("success")
 
             job_logging_service.get_latest_log(
-                f"dev:{tap.name}-to-{target.name}:test-suffix"
+                f"dev:{tap.name}-to-{target.name}:${expected_suffix}"
             )
 
     @pytest.mark.backend("sqlite")
