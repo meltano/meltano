@@ -3,6 +3,7 @@ title: Pull Request Process
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
 weight: 3
+hidden: true
 ---
 
 Meltano uses an approval workflow for all pull requests.

@@ -5,12 +5,36 @@ from __future__ import annotations
 from asyncio.streams import StreamReader
 from asyncio.subprocess import Process
 from enum import Enum
+from typing import Any
 
 
 class ExitCode(int, Enum):  # noqa: D101
     OK = 0
     FAIL = 1
     NO_RETRY = 2
+
+
+class MeltanoError(Exception):
+    """Base class for all user-facing errors."""
+
+    def __init__(
+        self,
+        reason: str,
+        instruction: str | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize a MeltanoError.
+
+        Args:
+            reason: A short explanation of the error.
+            instruction: A short instruction on how to fix the error.
+            args: Additional arguments to pass to the base exception class.
+            kwargs: Keyword arguments to pass to the base exception class.
+        """
+        self.reason = reason
+        self.instruction = instruction
+        super().__init__(reason, instruction, *args, **kwargs)
 
 
 class Error(Exception):
