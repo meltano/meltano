@@ -154,6 +154,7 @@ class Environment(NameEq, Canonical):
         name: str,
         config: dict | None = None,
         env: dict | None = None,
+        state_id_suffix: str | None = None,
     ) -> None:
         """Create a new environment object.
 
@@ -161,6 +162,7 @@ class Environment(NameEq, Canonical):
             name: Environment name. Must be unique.
             config: Dictionary with environment configuration.
             env: Optional override environment values.
+            state_id_suffix: State ID suffix to use.
 
         Raises:
             EnvironmentNameContainsStateIdDelimiterError: If the name contains the state ID component delimiter string.
@@ -173,6 +175,7 @@ class Environment(NameEq, Canonical):
         self.name = name
         self.config = EnvironmentConfig(**(config or {}))
         self.env = env or {}
+        self.state_id_suffix = state_id_suffix
 
     @classmethod
     def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:

@@ -832,7 +832,7 @@ def generate_state_id(
     state_id_components = [
         project.active_environment.name,
         f"{consumer.string_id}-to-{producer.string_id}",
-        state_id_suffix,
+        state_id_suffix or project.active_environment.state_id_suffix,
     ]
 
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
