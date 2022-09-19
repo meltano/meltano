@@ -16,7 +16,7 @@ As always, we highly recommend git versioning your Meltano project prior to foll
 
 ### Add dbt Transformer
 
-Add your adapter specific dbt variant (e.g. dbt-postgres) that can be found on [MeltanoHub](https://hub.meltano.com/transformers/).
+Add your adapter-specific dbt variant (e.g. dbt-postgres) that can be found on [MeltanoHub](https://hub.meltano.com/transformers/).
 
 
 ```
@@ -26,8 +26,9 @@ meltano add transformer dbt-<adapter_name>
 meltano add transformer dbt-postgres
 ```
 
-Next configure your transformer to include database names, connection credentials, etc. see the [transform data guide](https://docs.meltano.com/guide/transformation#install-dbt) for more details.
-Or use the interactive config flag to follow prompts.
+Next configure your transformer to include database names, connection credentials, etc. 
+See the [transform data guide](https://docs.meltano.com/guide/transformation#install-dbt) for more details.
+Or use the [interactive config flag](/reference/command-line-interface#how-to-use-interactive-config) to follow prompts.
 
 ```
 meltano config dbt-snowflake set --interactive
@@ -41,13 +42,13 @@ meltano invoke dbt-postgres debug
 
 ### Migrating dbt Code Into Meltano
 
-Note that adding a transformer creates scaffolding within your Meltano `transform` directory including a `dbt_project.yml` and `profile/profiles.yml`.
+Note that adding a transformer creates scaffolding within your Meltano `/transform` directory including a `dbt_project.yml` and `/profile/profiles.yml`.
 If you have an existing dbt project you will already have your own version of these files in your other repo so we'll describe how to merge what you have and what Meltano provides and expects.
 
 #### Meltano's Default Structure For dbt
 
 Meltano expects dbt project files to exist in the default directories listed below.
-You can either place your files in the appropriate directories or you can update the given `dbt_project.yml` follow the directory structure of your existing project, if thats preferred.
+You can either place your files in the appropriate directories or you can update the given `dbt_project.yml` to follow the directory structure of your existing project, if thats preferred.
 
 - data - this is where seed files are stored. See [seeds dbt docs](https://docs.getdbt.com/docs/building-a-dbt-project/seeds)
 - models - this is where models are stored. See [models dbt docs](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)
@@ -66,4 +67,4 @@ Meltano's dbt installation comes with pre-configured [dbt targets](https://docs.
 
 If you had any configurations in your dbt_project.yml such as definitions of how models are materialized, target databases, schemas, etc. you can directly copy them into your new Meltano dbt_project.yml file.
 
-Again Meltano doesn't require this structure, any valid dbt project will work, but this is the default recommended structure with some base configurations for a simple integration between Meltano x dbt.
+Again Meltano doesn't require this structure, any valid dbt project will work, but this is the default recommended structure with some base configurations for a simple integration between Meltano and dbt.
