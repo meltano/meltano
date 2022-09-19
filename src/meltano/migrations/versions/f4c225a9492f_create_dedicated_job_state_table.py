@@ -46,7 +46,7 @@ class JobState(SystemModel):
     """
 
     __tablename__ = "state"
-    job_name = Column(types.String, unique=True, primary_key=True)
+    job_name = Column(types.String, unique=True, primary_key=True, nullable=False)
 
     updated_at = Column(
         types.TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp()
@@ -316,9 +316,9 @@ class Job(SystemModel):  # noqa: WPS214
     __tablename__ = "runs"
 
     id = Column(types.Integer, primary_key=True)
-    job_name = Column(types.String)
+    job_name = Column(types.String(1024))
     run_id = Column(GUID, nullable=False, default=uuid.uuid4)
-    _state = Column(name="state", type_=types.String)
+    _state = Column(name="state", type_=types.String(10))
     started_at = Column(types.DateTime)
     last_heartbeat_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
@@ -373,7 +373,7 @@ def upgrade():
     max_string_length = max_string_length_for_dialect(dialect_name)
     op.create_table(
         "state",
-        sa.Column("job_name", sa.String(max_string_length)),
+        sa.Column("job_name", sa.String(max_string_length), nullable=False),
         sa.Column(
             "partial_state",
             MutableDict.as_mutable(JSONEncodedDict(max_string_length)),

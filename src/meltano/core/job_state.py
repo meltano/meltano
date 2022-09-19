@@ -25,7 +25,7 @@ class JobState(SystemModel):
     """
 
     __tablename__ = "state"
-    job_name = Column(types.String, unique=True, primary_key=True)
+    job_name = Column(types.String, unique=True, primary_key=True, nullable=False)
 
     updated_at = Column(
         types.TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp()
