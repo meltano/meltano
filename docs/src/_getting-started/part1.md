@@ -45,7 +45,7 @@ will hold the [plugins](/concepts/plugins) that implement the details of our E(t
    ```yml
    version: 1
    default_environment: dev
-   project_id: u3u5u4ueudufhfh4h4h5ddkjh
+   project_id: <unique-GUID>
    environments:
    - name: dev
    - name: staging
