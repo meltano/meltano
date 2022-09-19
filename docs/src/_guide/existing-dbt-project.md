@@ -26,7 +26,7 @@ meltano add transformer dbt-<adapter_name>
 meltano add transformer dbt-postgres
 ```
 
-Next configure your transformer to include database names, connection credentials, etc. 
+Next configure your transformer to include database names, connection credentials, etc.
 See the [transform data guide](https://docs.meltano.com/guide/transformation#install-dbt) for more details.
 Or use the [interactive config flag](/reference/command-line-interface#how-to-use-interactive-config) to follow prompts.
 
