@@ -48,7 +48,7 @@
          this.loadLines()
          if (!options.noInit) this.init()
      }
- 
+
      loadLines() {
          // Load all the lines and create the container so that the size is fixed
          // Otherwise it would be changing and the user viewport would be constantly
@@ -67,7 +67,7 @@
          this.container.appendChild(restart)
          this.container.setAttribute('data-termynal', '');
      }
- 
+
      /**
       * Initialise the widget, get lines, clear container and start animation.
       */
@@ -81,7 +81,7 @@
              containerStyle.width : undefined;
          this.container.style.minHeight = containerStyle.height !== '0px' ?
              containerStyle.height : undefined;
- 
+
          this.container.setAttribute('data-termynal', '');
          this.container.innerHTML = '';
          for (let line of this.lines) {
@@ -89,34 +89,34 @@
          }
          this.start();
      }
- 
+
      /**
       * Start the animation and rener the lines depending on their data attributes.
       */
      async start() {
          this.addFinish()
          await this._wait(this.startDelay);
- 
+
          for (let line of this.lines) {
              const type = line.getAttribute(this.pfx);
              const delay = line.getAttribute(`${this.pfx}-delay`) || this.lineDelay;
- 
+
              if (type == 'input') {
                  line.setAttribute(`${this.pfx}-cursor`, this.cursor);
                  await this.type(line);
                  await this._wait(delay);
              }
- 
+
              else if (type == 'progress') {
                  await this.progress(line);
                  await this._wait(delay);
              }
- 
+
              else {
                  this.container.appendChild(line);
                  await this._wait(delay);
              }
- 
+
              line.removeAttribute(`${this.pfx}-cursor`);
          }
          this.addRestart()
@@ -125,7 +125,7 @@
          this.typeDelay = this.originalTypeDelay
          this.startDelay = this.originalStartDelay
      }
- 
+
      generateRestart() {
          const restart = document.createElement('a')
          restart.onclick = (e) => {
@@ -138,7 +138,7 @@
          restart.innerHTML = "restart prompt ↻"
          return restart
      }
- 
+
      generateFinish() {
          const finish = document.createElement('a')
          finish.onclick = (e) => {
@@ -153,17 +153,17 @@
          this.finishElement = finish
          return finish
      }
- 
+
      addRestart() {
          const restart = this.generateRestart()
          this.container.appendChild(restart)
      }
- 
+
      addFinish() {
          const finish = this.generateFinish()
          this.container.appendChild(finish)
      }
- 
+
      /**
       * Animate a typed line.
       * @param {Node} line - The line element to render.
@@ -172,14 +172,14 @@
          const chars = [...line.textContent];
          line.textContent = '';
          this.container.appendChild(line);
- 
+
          for (let char of chars) {
              const delay = line.getAttribute(`${this.pfx}-typeDelay`) || this.typeDelay;
              await this._wait(delay);
              line.textContent += char;
          }
      }
- 
+
      /**
       * Animate a progress bar.
       * @param {Node} line - The line element to render.
@@ -194,7 +194,7 @@
              || this.progressPercent;
          line.textContent = '';
          this.container.appendChild(line);
- 
+
          for (let i = 1; i < chars.length + 1; i++) {
              await this._wait(this.typeDelay);
              const percent = Math.round(i / chars.length * 100);
@@ -204,7 +204,7 @@
              }
          }
      }
- 
+
      /**
       * Helper function for animation delays, called with `await`.
       * @param {number} time - Timeout, in ms.
@@ -212,7 +212,7 @@
      _wait(time) {
          return new Promise(resolve => setTimeout(resolve, time));
      }
- 
+
      /**
       * Converts line data objects into line elements.
       *
@@ -224,11 +224,11 @@
          return lineData.map(line => {
              let div = document.createElement('div');
              div.innerHTML = `<span ${this._attributes(line)}>${line.value || ''}</span>`;
- 
+
              return div.firstElementChild;
          });
      }
- 
+
      /**
       * Helper function for generating attributes string.
       *
@@ -249,11 +249,11 @@
                  attrs += `${this.pfx}-${prop}="${line[prop]}" `
              }
          }
- 
+
          return attrs;
      }
  }
- 
+
  /**
  * HTML API: If current script has container(s) specified, initialise Termynal.
  */
