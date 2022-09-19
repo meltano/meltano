@@ -140,7 +140,7 @@ By default, Meltano will instruct extractors to extract all supported entities a
   ![Meltano Version](images/part1/gif_meltano_select_all.gif)
 
 
-1. select the entities and attributes for extraction using [`meltano select`](/reference/command-line-interface#select):
+1. Select the entities and attributes for extraction using [`meltano select`](/reference/command-line-interface#select):
 
    ```bash
    meltano select tap-gitlab commits id
