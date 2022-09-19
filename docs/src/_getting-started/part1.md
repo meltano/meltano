@@ -19,7 +19,7 @@ We'll assume you have [Meltano installed](/getting-started/installation) already
 
 This tutorial is written using meltano >= v2.0.0.
 
-If you don't have a GitLab account to follow along, you could either exchange the commands for a differe tap, like GitHub or PostgreSQL, or you create a free GitLab account. You will also need a [personal access token to your GitLab account](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) which you can create under "Edit Profile > "Access Tokens" > .
+If you don't have a GitLab account to follow along, you could either exchange the commands for a different tap, like GitHub or PostgreSQL, or you create a free GitLab account. You will also need a [personal access token to your GitLab account](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) which you can create under "Edit Profile > "Access Tokens" > .
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
