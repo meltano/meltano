@@ -137,6 +137,7 @@ By default, Meltano will instruct extractors to extract all supported entities a
    ```bash
    meltano select tap-gitlab --list --all
    ```
+
   ![Meltano Version](images/part1/gif_meltano_select_all.gif)
 
 
