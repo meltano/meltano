@@ -24,7 +24,7 @@ $ meltano --version
  meltano, version 2.6.0
  ```
 </div>
-
+<br />
 This tutorial is written using meltano >= v2.0.0.
 
 If you don't have a GitHub account to follow along, you could either exchange the commands for a differe tap, like GitLab or PostgreSQL, or you can create a free GitHub account. You will also need a [personal access token to your GitHub account](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
@@ -78,7 +78,6 @@ $ meltano init my-new-project
 
   </div>
 <br>
-
    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
 
    ```yml
@@ -106,6 +105,8 @@ Now that you have your very own Meltano project, it's time to add [plugins](/con
 ```bash
 $ meltano add extractor tap-github
 ```
+<br />
+
 <div class="termy">
 
 ```console
@@ -140,7 +141,7 @@ extractors:
 ```bash
 $ meltano invoke tap-github --help
 ```
-
+<br />
 If you see the extractor's help message printed, the plugin was definitely installed successfully.
 
 <div class="termy">
@@ -173,8 +174,6 @@ The GitHub tap requires [configuration](/guide/configuration) before it can star
 $ meltano config tap-github set --interactive
 ```
 2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories, start_date and your private_token.
-
-
 <br>
 <div class="termy">
 
@@ -200,21 +199,17 @@ $
 <[... other 2 values...]
 ```
 </div>
-
-
+<br />
 This will add the configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
   ```yml
-  environments:
-    - name: dev
-      config:
-        plugins:
-          extractors:
-            - name: tap-github
-              config:
-                access_token: YOUR_TOKEN
-                start_date: 2022-01-01
-                repository: sbalnojan/meltano-lightdash
+    plugins:
+      extractors:
+        - name: tap-github
+          config:
+            access_token: YOUR_TOKEN
+            start_date: 2022-01-01
+            repository: sbalnojan/meltano-lightdash
   ```
 
 
@@ -286,8 +281,8 @@ Selected attributes:
 meltano select tap-github commits url
 meltano select tap-github commits sha
 ```
-
-   This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
+<br />
+This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
   ```yml
   version: 1
@@ -325,10 +320,7 @@ meltano select tap-github --list
 ## Add a dummy loader to dump the data into JSON
 To test that the extraction process works, we add a JSON target.
 
-1. Add the JSON targt using ```meltano add loader target-jsonl```.
-
-
-
+1. Add the JSON target using ```meltano add loader target-jsonl```.
 <br>
 <div class="termy">
 
@@ -345,9 +337,7 @@ Installed loader 'target-jsonl'
 To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl
 ```
 </div>
-
-
-
+<br />
 This target requires zero configuration, it just outputs the data into a ```jsonl``` file.
 
 ## Do a test run to verify the extraction process works
@@ -374,8 +364,7 @@ $ meltano run tap-github target-jsonl
 2022-09-19T13:53:43.820467Z [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
 ```
 </div>
-
-
+<br />
 You should see data flowing from your source into the jsonl file.
 You can verify that it worked by looking inside the newly created file called ```output/commits.jsonl```.
 
