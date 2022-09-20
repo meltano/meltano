@@ -634,8 +634,7 @@ class TestExtractLoadUtils:
         project.active_environment = Environment(name="test")
 
         assert (
-            generate_state_id(project, "suffix", block1, block2)
-            == "test:block1-to-block2:suffix"
+            generate_state_id(project, None, block1, block2) == "test:block1-to-block2"
         )
 
         assert (
