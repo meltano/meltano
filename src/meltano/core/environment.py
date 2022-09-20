@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import copy
-import os
-import re
 from typing import Any, Iterable, TypeVar
 
 from meltano.core.behavior import NameEq
@@ -197,29 +195,6 @@ class Environment(NameEq, Canonical):
             return next(env for env in objects if env.name == name)
         except StopIteration as stop:
             raise NotFound(name, cls) from stop
-
-    @classmethod
-    def parse(cls, obj):
-        """Parse an 'Environment' object from a dictionary or return the instance.
-
-        Supports interpolation of environment variables for substrings matching `${ENV_VAR}`.
-
-        Args:
-            obj: Dictionary or instance to parse.
-
-        Returns:
-            Parsed instance.
-        """
-        environment = super().parse(obj)
-
-        if environment.state_id_suffix:
-            environment.state_id_suffix = re.sub(
-                r"\${(\w+)}",
-                lambda m: os.getenv(m.group(1)),
-                environment.state_id_suffix,
-            )
-
-        return environment
 
     def get_plugin_config(
         self,
