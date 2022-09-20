@@ -77,7 +77,7 @@ function createTermynals() {
                         prompt: prompt
                     });
                 } else if (line.startsWith(codeThingy)) {
-                    saveBuffer(); 
+                    saveBuffer();
                 }
                 else {
                     buffer.push(line);
