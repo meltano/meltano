@@ -1,8 +1,8 @@
 ---
-title: Existing dbt Project
+title: Migrate an Existing dbt Project
 description: Learn how to import an existing dbt project into your Meltano project.
 layout: doc
-weight: 9
+weight: 25
 ---
 
 This guide will describe how to bring existing dbt code into the your Meltano project.
