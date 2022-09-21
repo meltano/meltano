@@ -67,7 +67,9 @@ class BookmarkWriter:
         job.payload_flags |= self.payload_flag
         try:
             job.save(self.session)
-            self.state_service.add_state(job, job.payload, job.payload_flags)
+            self.state_service.add_state(
+                job, json.dumps(job.payload), job.payload_flags
+            )
         except Exception:
             logging.warning(
                 "Unable to persist state, or received state is invalid, incremental state has not been updated"
