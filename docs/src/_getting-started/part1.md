@@ -49,31 +49,30 @@ meltano init my-meltano-project
 
 ```console
 $ meltano init my-new-project
-      Created my-new-project
-      Creating project files...
-    my-new-project/
-     |-- .meltano
-     |-- meltano.yml
-     |-- README.md
-     |-- requirements.txt
-     |-- output/.gitignore
-     |-- .gitignore
-     |-- extract/.gitkeep
-     |-- load/.gitkeep
-     |-- transform/.gitkeep
-     |-- analyze/.gitkeep
-     |-- notebook/.gitkeep
-     |-- orchestrate/.gitkeep
- Creating system database...  Done!
-  ... Project my-new-project has been created!
+Created my-new-project
+Creating project files...
+  my-new-project/
+   |-- .meltano
+   |-- meltano.yml
+   |-- README.md
+   |-- requirements.txt
+   |-- output/.gitignore
+   |-- .gitignore
+   |-- extract/.gitkeep
+   |-- load/.gitkeep
+   |-- transform/.gitkeep
+   |-- analyze/.gitkeep
+   |-- notebook/.gitkeep
+   |-- orchestrate/.gitkeep
+Creating system database...  Done!
+... Project my-new-project has been created!
 
-  Meltano Environments initialized with dev, staging, and prod.
-  To learn more about Environments visit: https://docs.meltano.com/concepts/environments
+Meltano Environments initialized with dev, staging, and prod.
+To learn more about Environments visit: https://docs.meltano.com/concepts/environments
 
-  Next steps:
-    cd my-new-project
-    Visit https://docs.meltano.com/getting-started#create-your-meltano-project to learn where to go from here.
-  ```
+Next steps:
+  cd my-new-project
+  Visit https://docs.meltano.com/getting-started#create-your-meltano-project to learn where to go from here.
 
   </div>
 <br>
