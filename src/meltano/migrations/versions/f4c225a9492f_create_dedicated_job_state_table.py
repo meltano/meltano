@@ -384,7 +384,7 @@ def upgrade():
         ),
         sa.Column(
             "updated_at",
-            sa.types.TIMESTAMP,
+            sa.types.DATETIME,
             onupdate=datetime.now,
         ),
         sa.PrimaryKeyConstraint("job_name"),
