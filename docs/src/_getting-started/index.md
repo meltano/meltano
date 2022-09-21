@@ -16,7 +16,7 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 
 Before you can get started with Meltano and the [`meltano` command line interface (CLI)](/reference/command-line-interface), you'll need to install it onto your system.
 
-_To learn more about the different installation methods, refer to the [Installation guide](/guide/installation)._
+_To learn more about the different installation methods, refer to the [Installation guide](/getting-started/installation)._
 
 ### Local Installation
 
@@ -61,7 +61,7 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
    meltano --version
    ```
 
-If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation#local-installation) of the [Installation guide](/guide/installation) for more details.
+If anything's not performing as expected, refer to the ["Local Installation" section](/getting-started/installation#local-installation) of the [Installation guide](/getting-started/installation) for more details.
 
 ## Create Your Meltano Project
 
@@ -908,6 +908,7 @@ schedules:
 Once your raw data has arrived in your data warehouse, its schema will likely need to be transformed to be more appropriate for analysis.
 
 To help you achieve this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
+If you already have an existing dbt project that you'd like to migrate to Meltano, check out the [existing dbt project guide](https://docs.meltano.com/guide/existing-dbt-project) for more details.
 
 To learn about data transformation, refer to the [Data Transformation (T) guide](/guide/transformation).
 `dbt` plugins are adapter specific so you should install the plugin that matches your warehouse (i.e. Postgres = `dbt-postgres`, Snowflow = `dbt-snowflake`, etc.).
