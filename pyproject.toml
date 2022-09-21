@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.5.0"
+version = "2.6.0"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -55,7 +55,7 @@ pymssql = {version = "^2.2.5", optional = true}
 python = ">=3.7,<3.11"
 python-dotenv = "^0.20.0"
 python-gitlab = "^3.5.0"
-pyyaml = "^5.3.1"
+pyyaml = "^6.0.0"
 requests = "^2.23.0"
 "ruamel.yaml" = "^0.17.21"
 smtpapi = "^0.4.1"
@@ -149,7 +149,7 @@ exclude_lines = [
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "2.5.0"
+version = "2.6.0"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
     "pyproject.toml:^version =",
@@ -182,7 +182,6 @@ module = [
   "meltano.core.elt_context",
   "meltano.core.environment",
   "meltano.core.environment_service",
-  "meltano.core.error",
   "meltano.core.extract_utils",
   "meltano.core.extractor",
   "meltano.core.meltano_file",
