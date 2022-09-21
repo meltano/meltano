@@ -225,10 +225,9 @@ $ meltano config tap-github
 2022-09-19T11:26:23.573556Z [info     ] The default environment (dev) will be ignored for `meltano config`. To configure a specific Environment, please use option `--environment=[]`.
 
 {
- "access_token": "[YOUR_TOKEN]",
+  "access_token": "[YOUR_TOKEN]",
   "repository": "sbalnojan/meltano-lightdash",
   "start_date": "2022-01-01"
-
 }
 ```
 
