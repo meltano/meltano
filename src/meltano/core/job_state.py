@@ -1,6 +1,7 @@
 """Defines JobState model class."""
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 from sqlalchemy import Column, func, types
@@ -27,9 +28,7 @@ class JobState(SystemModel):
     __tablename__ = "state"
     job_name = Column(types.String, unique=True, primary_key=True, nullable=False)
 
-    updated_at = Column(
-        types.TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp()
-    )
+    updated_at = Column(types.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
     partial_state = Column(MutableDict.as_mutable(JSONEncodedDict))
     completed_state = Column(MutableDict.as_mutable(JSONEncodedDict))
