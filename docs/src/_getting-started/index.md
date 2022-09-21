@@ -908,6 +908,7 @@ schedules:
 Once your raw data has arrived in your data warehouse, its schema will likely need to be transformed to be more appropriate for analysis.
 
 To help you achieve this, Meltano supports transformation using [`dbt`](https://www.getdbt.com/).
+If you already have an existing dbt project that you'd like to migrate to Meltano, check out the [existing dbt project guide](https://docs.meltano.com/guide/existing-dbt-project) for more details.
 
 To learn about data transformation, refer to the [Data Transformation (T) guide](/guide/transformation).
 `dbt` plugins are adapter specific so you should install the plugin that matches your warehouse (i.e. Postgres = `dbt-postgres`, Snowflow = `dbt-snowflake`, etc.).
