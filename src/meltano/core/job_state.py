@@ -28,7 +28,7 @@ class JobState(SystemModel):
     __tablename__ = "state"
     job_name = Column(types.String, unique=True, primary_key=True, nullable=False)
 
-    updated_at = Column(types.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+    updated_at = Column(types.DATETIME, onupdate=datetime.now)
 
     partial_state = Column(MutableDict.as_mutable(JSONEncodedDict))
     completed_state = Column(MutableDict.as_mutable(JSONEncodedDict))
