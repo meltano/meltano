@@ -8,7 +8,7 @@ hidden: true
 
 ## Unit Tests
 
-Meltano uses [Pytest](https://docs.pytest.org/) as our primary test framework for Python. You can run the tests after [installing the Meltano Python package](/guide/installation#install-meltano) by running the command `pytest` from the root of the repository.
+Meltano uses [Pytest](https://docs.pytest.org/) as our primary test framework for Python. You can run the tests after [installing the Meltano Python package](/getting-started/installation#install-meltano) by running the command `pytest` from the root of the repository.
 
 We recommend you familiarize yourself with [Pytest fixtures](https://docs.pytest.org/en/latest/explanation/fixtures.html), [Pytest parametrization](https://docs.pytest.org/en/latest/how-to/parametrize.html), and [`unittest.mock`](https://docs.python.org/dev/library/unittest.mock.html).
 
