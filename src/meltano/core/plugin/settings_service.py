@@ -78,8 +78,8 @@ class PluginSettingsService(SettingsService):
                 self.project.active_environment.state_id_suffix = expand_env_vars(
                     self.project.active_environment.state_id_suffix,
                     {
-                        **self.env_override,
                         **self.project.dotenv_env,
+                        **self.env_override,
                     },
                     raise_if_missing=strict_env_var_mode,
                 )
