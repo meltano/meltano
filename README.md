@@ -59,7 +59,7 @@ Integrations
 Installation
 ------------
 
-If you're ready to build your ideal data platform and start running data workflows across multiple tools, start by following the [Installation guide](https://docs.meltano.com/guide/installation) to have Meltano up and running in your device.
+If you're ready to build your ideal data platform and start running data workflows across multiple tools, start by following the [Installation guide](https://docs.meltano.com/getting-started/installation) to have Meltano up and running in your device.
 
 Documentation
 -------------
