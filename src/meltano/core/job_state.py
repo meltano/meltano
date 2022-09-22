@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Column, func, types
+from sqlalchemy import Column, types
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Session
 

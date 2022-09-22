@@ -148,6 +148,8 @@ per-file-ignores =
         D102
         D103
         D104
+	D105
+	D107
         # String does contain unindexed parameters
         P103
         # Allow underscored number name pattern (e.g. tap_covid_19)
