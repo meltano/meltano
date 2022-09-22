@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import platform
 import shutil
 from time import perf_counter_ns
 
+import click
 import pytest
 
 import meltano
@@ -165,6 +167,58 @@ class TestCli:
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match="This failed. Try again."):
             handle_meltano_error(exception)
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="Windows terminal support for ANSI escape sequences is limited.",
+)
+class TestCliColors:
+    @pytest.mark.parametrize(
+        "no_color_flag,env,colors_expected",
+        [
+            pytest.param(
+                False,
+                {},
+                True,
+                id="colors-enabled-by-default",
+            ),
+            pytest.param(
+                True,
+                {},
+                False,
+                id="colors-disabled-by-no-color-flag",
+            ),
+            pytest.param(
+                False,
+                {
+                    "NO_COLOR": "1",
+                },
+                False,
+                id="colors-disabled-by-no-color-env",
+            ),
+        ],
+    )
+    def test_no_color(self, cli_runner, no_color_flag, env, colors_expected):
+        text = "This is a test"
+        styled_text = click.style(text, fg="red")
+
+        @cli.command("dummy")
+        @click.pass_context
+        def _dummy_command(ctx):
+            click.echo(styled_text)
+
+        args = ["dummy"]
+        expected_text = styled_text if colors_expected else text
+
+        if no_color_flag:
+            args = ["--no-color"] + args
+
+        with cli_runner.isolated_filesystem():
+            result = cli_runner.invoke(cli, args, color=True, env=env)
+            assert result.exit_code == 0, result.exception
+            assert result.output.strip() == expected_text
+            assert result.exception is None
 
 
 class TestLargeConfigProject:

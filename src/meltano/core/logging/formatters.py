@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence, TextIO
+from typing import Callable, Sequence, TextIO
 
 import click
 import structlog
@@ -22,6 +22,33 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
         TIMESTAMPER,
     )
 )
+
+
+def rich_exception_formatter_factory(
+    color_system: str = "auto",
+    no_color: bool | None = None,
+) -> Callable[[TextIO, structlog.types.ExcInfo], None]:
+    """Create an exception formatter for logging using the rich package.
+
+    Examples:
+    >>> rich_traceback = rich_exception_formatter_factory(color_system="truecolor")
+    >>> plane_rich_traceback = rich_exception_formatter_factory(no_color=True)
+
+    Args:
+        color_system: The color system supported by your terminal.
+        no_color: Enabled no color mode, or None to auto detect. Defaults to None.
+
+    Returns:
+        Exception formatter function.
+    """
+
+    def _traceback(sio, exc_info) -> None:
+        sio.write("\n")
+        Console(file=sio, color_system=color_system, no_color=no_color).print(
+            Traceback.from_exception(*exc_info, show_locals=True)
+        )
+
+    return _traceback
 
 
 def plain_rich_traceback(sio: TextIO, exc_info: structlog.types.ExcInfo) -> None:

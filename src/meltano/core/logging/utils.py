@@ -11,7 +11,11 @@ from logging import config as logging_config
 import structlog
 import yaml
 
-from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
+from meltano.core.logging.formatters import (
+    LEVELED_TIMESTAMPED_PRE_CHAIN,
+    TIMESTAMPER,
+    rich_exception_formatter_factory,
+)
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -60,15 +64,21 @@ def read_config(config_file: str | None = None) -> dict:
         return None
 
 
-def default_config(log_level: str) -> dict:
+def default_config(log_level: str, no_color: bool | None = None) -> dict:
     """Generate a default logging config.
 
     Args:
         log_level: set log levels to provided level.
+        no_color: Enabled no color mode, or None to auto detect. Defaults to None.
 
     Returns:
          dict: logging config suitable for use with logging.config.dictConfig
     """
+    if no_color:
+        formatter = rich_exception_formatter_factory(no_color=True)
+    else:
+        formatter = rich_exception_formatter_factory(color_system="truecolor")
+
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -76,7 +86,8 @@ def default_config(log_level: str) -> dict:
             "colored": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.dev.ConsoleRenderer(
-                    colors=True, exception_formatter=structlog.dev.rich_traceback
+                    colors=no_color is not True,
+                    exception_formatter=formatter,
                 ),
                 "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
             },
@@ -113,7 +124,10 @@ def default_config(log_level: str) -> dict:
     }
 
 
-def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> None:
+def setup_logging(  # noqa: WPS210
+    project: Project = None,
+    log_level: str = DEFAULT_LEVEL,
+) -> None:
     """Configure logging for a meltano project.
 
     Args:

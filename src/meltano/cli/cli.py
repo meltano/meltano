@@ -55,15 +55,23 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.option(
     "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
+@click.option(
+    "--no-color",
+    is_flag=True,
+    default=False,
+    help="Disable colored output.",
+    envvar="NO_COLOR",
+)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(  # noqa: WPS231
-    ctx,
+    ctx: click.Context,
     log_level: str,
     log_config: str,
     verbose: int,
     environment: str,
     no_environment: bool,
+    no_color: bool,
 ):  # noqa: WPS231
     """
     ELT for the DataOps era.
@@ -79,6 +87,8 @@ def cli(  # noqa: WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["verbosity"] = verbose
+    if no_color:
+        ctx.color = False
 
     try:  # noqa: WPS229
         project = Project.find()

@@ -9,6 +9,15 @@ Meltano provides a command line interface (CLI) that makes it easy to manage you
 To quickly find the `meltano` subcommand you're looking for, use the Table of Contents in the sidebar.
 For a better understanding of command line documentation syntax, the [docopt](http://docopt.org/) standard is useful.
 
+## Global Options
+
+The following options are available for all `meltano` subcommands:
+
+* `--enviroment` - The [Meltano Environment](/concepts/environments) to use. Defaults to `dev`. Can also be set with the `MELTANO_ENVIRONMENT` environment variable.
+* `--log-config` - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
+* `--log-level`: Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
+* `--no-color`: Disable colored output. Can also be set with the `NO_COLOR` environment variable.
+
 ## `add`
 
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
