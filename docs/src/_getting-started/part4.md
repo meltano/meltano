@@ -12,7 +12,7 @@ Throughout this tutorial, we’ll walk you through the creation of a end-to-end 
 
 In the previous parts, we set up a E(t)L pipeline, extracting data from GitHub, transforming it inline, and loading it into a local PostgreSQL database.
 
-In this part, we're going to unleash the data-built-tool [dbt](https://www.getdbt.com/) onto our data to transform it into meaningful information. 
+In this part, we're going to unleash the data-built-tool [dbt](https://www.getdbt.com/) onto our data to transform it into meaningful information.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -64,7 +64,7 @@ As you can see, this adds both the transformer as well as a "file bundle" to you
 Configure the dbt-postgres transformer to use the same configuration as our target-postgres loader using `meltano config`:
 
 <div class="termy">
-```console  
+```console
 $ meltano config dbt-postgres set host localhost
 &ensp;&ensp;Transformer 'dbt-postgres' setting 'host' was set in `meltano.yml`: 'localhost'
 $ meltano config dbt-postgres set port 5432
@@ -117,7 +117,7 @@ from {{ source('tap_github', 'commits') }}) {% endraw %}
 select distinct (commit -> 'author' -> 'name') as authors from base
 ```
 
-This model is configured to creating a table via the `materialized='table'` configuration. The keyword `source` is used in dbt to reference the source we just created. The actual model selects the distinct author names from the commits which are wrapped into a JSON blob. 
+This model is configured to creating a table via the `materialized='table'` configuration. The keyword `source` is used in dbt to reference the source we just created. The actual model selects the distinct author names from the commits which are wrapped into a JSON blob.
 
 ## Run the transformation process
 To create the actual table, we run the dbt model via `meltano invoke dbt-postgres:run`:
@@ -125,23 +125,23 @@ To create the actual table, we run the dbt model via `meltano invoke dbt-postgre
 <div class="termy">
 
 ```console
-$ meltano invoke dbt-postgres:run 
+$ meltano invoke dbt-postgres:run
 2022-09-22T12:30:31.842691Z [info     ] Environment 'dev' is active
 12:31:01  Running with dbt=1.1.2
 12:31:02  Found 1 model, 0 tests, 0 snapshots, 0 analyses, 167 macros, 0 operations, 0 seed files, 1 source, 0 exposures, 0 metrics
-12:31:02  
+12:31:02
 12:31:03  Concurrency: 2 threads (target='dev')
-12:31:03  
+12:31:03
 12:31:03  1 of 1 START table model analytics.authors ..................................... [RUN]
 ---> 100%
 12:31:03  1 of 1 OK created table model analytics.authors ................................ [SELECT 2 in 0.59s]
-12:31:03  
+12:31:03
 12:31:03  Finished running 1 table model in 1.56s.
-12:31:03  
+12:31:03
 12:31:03  Completed successfully
-12:31:04  
+12:31:04
 12:31:04  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
-# 
+#
 ```
 
 </div>

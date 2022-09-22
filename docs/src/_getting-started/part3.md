@@ -38,7 +38,7 @@ This will add the following line to your project file:
 You can test that the new data is extracted by using `meltano invoke`:
 
 <div class="termy">
-```console 
+```console
 $ meltano invoke tap-github
 2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
 {"type": "STATE", "value":  [...]}
@@ -48,8 +48,8 @@ INFO Starting sync of repository: sbalnojan/meltano-example-el
 
 INFO METRIC: {"type": "timer", "metric":  [...]
 
-{"type": "RECORD", "stream": "commits", "record": {"sha": "c771a832720c0f87b3ce53ac12bdcbf742df4e3d", "commit": {"author": {"name": "Horst", "email":  
-[...] 
+{"type": "RECORD", "stream": "commits", "record": {"sha": "c771a832720c0f87b3ce53ac12bdcbf742df4e3d", "commit": {"author": {"name": "Horst", "email":
+[...]
 "sbalnojan/meltano-example-el"}, "time_extracted": "2022-09-22T07:37:06.289545Z"}
 
 ...[many more records]...
@@ -108,7 +108,7 @@ mappers:
         transformations:
           [...]
 ```
-These lines define the name "hide-github-mails" as the name of our mapping. We can call the mapping using this name, and ignoring any reference to the actual mapper "transform-field". 
+These lines define the name "hide-github-mails" as the name of our mapping. We can call the mapping using this name, and ignoring any reference to the actual mapper "transform-field".
 
 ```yaml
     [...]
@@ -138,7 +138,7 @@ dev:tap-github-to-target-postgres
 dev:tap-github-to-target-jsonl
 $ meltano state clear dev:tap-github-to-target-postgres
 2022-09-22T07:29:56.033502Z [info     ] Environment 'dev' is active
-This will clear state for the job. Continue? [y/N]: 
+This will clear state for the job. Continue? [y/N]:
 $ y
 ```
 
@@ -156,7 +156,7 @@ $ meltano run tap-github hide-github-mails target-postgres
 ---> 100%
 2022-09-20T13:16:15.933874Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 21,[...]
 2022-09-20T13:16:16.435885Z [info     ] [...] message=Schema 'tap_github' does not exist. Creating... ...
-2022-09-20T13:16:16.632945Z [info     ] ... message=Table '"commits"' does not exist. Creating... 
+2022-09-20T13:16:16.632945Z [info     ] ... message=Table '"commits"' does not exist. Creating...
 2022-09-20T13:16:16.729076Z [info     ] ...message=Loading 21 rows into 'tap_github."commits"' ...
 ---> 100%
 2022-09-20T13:16:16.864812Z [info     ] ...Loading into tap_github."commits": {"inserts": 21, "updates": 0, "size_bytes": 4641} ...

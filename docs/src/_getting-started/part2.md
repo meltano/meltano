@@ -47,7 +47,7 @@ Add the postgres loader using the `meltano add loader target-postgres` command.
 
 <div class="termy">
 
-```console 
+```console
 $ meltano add loader target-postgres
 Added loader 'target-postgres' to your Meltano project
 Variant:        transferwise (default)
@@ -63,16 +63,16 @@ To learn more about loader 'target-postgres', visit https://hub.meltano.com/load
 </div>
 <br />
 
-Use the ```meltano invoke target-postgres --help``` command to test that the installation worked. 
+Use the ```meltano invoke target-postgres --help``` command to test that the installation worked.
 <div class="termy">
 
 ```console
-$ meltano invoke target-postgres --help 
+$ meltano invoke target-postgres --help
 usage: target-postgres [-h] [-c CONFIG]
 
 optional arguments:
 -h, --help            show this help message and exit
--c CONFIG, --config CONFIG Config file 
+-c CONFIG, --config CONFIG Config file
 ```
 </div>
 
@@ -104,12 +104,12 @@ add_metadata_columns [env: TARGET_POSTGRES_ADD_METADATA_COLUMNS] current value: 
 To learn more about loader 'target-postgres' and its settings, visit https://hub.meltano.com/loaders/target-postgres
 ```
 </div>
-<br />   
+<br />
 Fill in the details for these four attributes, and set add_metadata_columns to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
 
  <div class="termy">
 
-```console  
+```console
 $ meltano config target-postgres set user meltano
 &ensp;&ensp;Loader 'target-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config target-postgres set password password
@@ -140,7 +140,7 @@ Sensitive configuration information (such as `password`) will instead be stored 
 You can use `meltano config target-postgres` to check the configuration, including the set default not visible in the project file.
  <div class="termy">
 
-```console  
+```console
 $ meltano config target-postgres
 {
 &ensp;&ensp;&ensp;&ensp;"host": "localhost",
@@ -178,7 +178,7 @@ $ meltano run tap-github target-postgres
 ---> 100%
 2022-09-20T13:16:15.933874Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 21,[...]
 2022-09-20T13:16:16.435885Z [info     ] [...] message=Schema 'tap_github' does not exist. Creating... ...
-2022-09-20T13:16:16.632945Z [info     ] ... message=Table '"commits"' does not exist. Creating... 
+2022-09-20T13:16:16.632945Z [info     ] ... message=Table '"commits"' does not exist. Creating...
 2022-09-20T13:16:16.729076Z [info     ] ...message=Loading 21 rows into 'tap_github."commits"' ...
 ---> 100%
 2022-09-20T13:16:16.864812Z [info     ] ...Loading into tap_github."commits": {"inserts": 21, "updates": 0, "size_bytes": 4641} ...
