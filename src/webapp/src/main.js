@@ -13,7 +13,6 @@ import flaskContext from '@/utils/flask'
 import FontAwesome from '@/utils/font-awesome'
 import router from '@/router/app'
 import setupAnalytics from '@/utils/setupAnalytics'
-import setupToasted from '@/utils/setupToasted'
 import store from '@/store'
 import Upgrade from '@/middleware/upgrade'
 
@@ -23,9 +22,6 @@ Vue.use(VCalendar)
 Vue.use(FontAwesome)
 Vue.use(Router)
 Vue.use(VueIntercom, { appId: 'ir946q00' })
-
-// Toast setup
-setupToasted()
 
 // Middleware setup
 const service = new Service(axios)
