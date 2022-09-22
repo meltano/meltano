@@ -373,7 +373,7 @@ def upgrade():
     max_string_length = max_string_length_for_dialect(dialect_name)
     op.create_table(
         "state",
-        sa.Column("job_name", sa.String(899), nullable=False),
+        sa.Column("job_name", sa.String(900), nullable=False),
         sa.Column(
             "partial_state",
             MutableDict.as_mutable(JSONEncodedDict(max_string_length)),
@@ -384,7 +384,7 @@ def upgrade():
         ),
         sa.Column(
             "updated_at",
-            sa.types.DATETIME,
+            sa.types.TIMESTAMP if dialect_name == "postgresql" else sa.types.DATETIME,
             onupdate=datetime.now,
         ),
         sa.PrimaryKeyConstraint("job_name"),
