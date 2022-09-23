@@ -137,7 +137,7 @@ This will add the non-sensitive configuration to your [`meltano.yml` project fil
 
 Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control.
 
-You can use `meltano config target-postgres` to check the configuration, including the set default not visible in the project file.
+You can use `meltano config target-postgres` to check the configuration, including the default settings not visible in the project file.
  <div class="termy">
 
 ```console
