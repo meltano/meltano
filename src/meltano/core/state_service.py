@@ -16,6 +16,8 @@ import structlog
 from meltano.core.job import Job, JobFinder, Payload, State
 from meltano.core.utils import merge
 
+STATE_ID_COMPONENT_DELIMITER = ":"
+
 logger = structlog.getLogger(__name__)
 
 
