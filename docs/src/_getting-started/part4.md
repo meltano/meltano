@@ -111,10 +111,16 @@ Add a file called `authors.sql` to the folder `transform/models/tap_github` with
 }}
 
 
-with base as (select *
-from {{ source('tap_github', 'commits') }}) {% endraw %}
+WITH base AS (
 
-select distinct (commit -> 'author' -> 'name') as authors from base
+  SELECT *
+  FROM {{ source('tap_github', 'commits') }}
+  
+) {% endraw %}
+
+SELECT 
+  DISTINCT (commit -> 'author' -> 'name') AS authors 
+FROM base
 ```
 
 This model is configured to creating a table via the `materialized='table'` configuration. The keyword `source` is used in dbt to reference the source we just created. The actual model selects the distinct author names from the commits which are wrapped into a JSON blob.
