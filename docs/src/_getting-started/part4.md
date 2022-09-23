@@ -194,7 +194,7 @@ There we have it, a complete E(t)LT pipeline.
 
 ## Next Steps
 
-Next, head over to [Part 5, inside the Getting Started Guide](/getting-started/#add-a-loader-to-send-data-to-a-destination).
+Next, head over to [Part 5, inside the Getting Started Guide](/getting-started/#next-steps).
 
 <script src="/js/termynal.js"></script>
 <script src="/js/termy_custom.js"></script>
