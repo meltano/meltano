@@ -12,7 +12,7 @@ Throughout this tutorial, we’ll walk you through the creation of a end-to-end 
 
 In the previous parts, we set up a E(t)L pipeline, extracting data from GitHub, transforming it inline, and loading it into a local PostgreSQL database.
 
-In this part, we're going to unleash the data-built-tool [dbt](https://www.getdbt.com/) onto our data to transform it into meaningful information.
+In this part, we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
