@@ -26,7 +26,7 @@ $ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password
 <div class="termy">
 
 ```bash
-$ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
+$ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password --name meltano_postgres -d postgres
 
 504e2b416874dd6a5db3fe6dd3ff63f1d42095bbc4e87314f1f708f69c8188de
 $ docker container ls
