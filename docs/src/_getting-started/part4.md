@@ -19,7 +19,7 @@ In this part, we're going to unleash the data-built-tool [dbt](https://www.getdb
 </div>
 
 ## Install and configure the postgres specific dbt transformer
-Dbt transformers come in flavors. Our flavor is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
+Dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano transformers match this pattern; in this case our transformer is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
 <div class="termy">
 
