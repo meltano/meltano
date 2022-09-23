@@ -12,7 +12,7 @@ Throughout this tutorial, we’ll walk you through the creation of a end-to-end 
 
 In parts 1 & 2, we extracted data from GitHub and loaded it into a (local) PostgreSQL database.
 
-Before diving into full-fledged transformations & dbt, we're going to do light-weight, so-called "inline transformations" to clean up some things right before storing them anywhere. We're going to import more information from GitHub, including the author details, then we use an inline transformation to remove the email addresses we from GitHub by default.
+Before diving into full-fledged transformations & dbt, we're going to do light-weight, so-called "inline transformations" to clean up the data before storing them anywhere. We're going to import more information from GitHub, including the author details, then use an inline transformation, also called a stream map, to remove the email addresses we get from GitHub by default.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
