@@ -118,7 +118,7 @@ These lines define the name "hide-github-mails" as the name of our mapping. We c
             field_paths: ["author/email", "committer/email"]
             type: "MASK-HIDDEN"
 ```
-These lines define one transformation. We instruct to target the stream "commits", and therein the field "commit". We then use the field paths to navigate to the two emails we know are contained within this message and set the type to "MASK-HIDDEN" to hide the values.
+These lines define one transformation. We target the stream named `commits`, and within it the field named `commit`. We then use the field paths to navigate to the two emails we know are contained within this message and set the type to `MASK-HIDDEN` to hide the values.
 
 ## Run the data integration (E(t)L) pipeline
 Now we're ready to run the data integration process with these modifications again. To do so, we'll need to clean up first, since we already ran the EL process in part 1. The primary key is still the same and as such the ingestion would fail.
