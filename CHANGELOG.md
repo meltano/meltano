@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.7.0 (2022-09-23)
+
+### ✨ New
+
+- [#6758](https://github.com/meltano/meltano/issues/6758) Support custom state IDs in `meltano run` with `--state-id-suffix` -- _**Thanks @ReubenFrankel!**_
+- [#6756](https://github.com/meltano/meltano/issues/6756) Place `project_id` before `environments` in initial `meltano.yml`
+
+### 🐛 Fixes
+
+- [#6783](https://github.com/meltano/meltano/issues/6783) Remove "disable telemetry" toast from the UI
+- [#6779](https://github.com/meltano/meltano/issues/6779) Use v1.0.1 of the `exit_event` Snowplow telemetry schema
+- [#6745](https://github.com/meltano/meltano/issues/6745) Use random UUID as default `project_id`
+
+### ⚙️ Under the Hood
+
+- [#6748](https://github.com/meltano/meltano/issues/6748) Define and recommend `MeltanoError` exception class for improved CLI error messages
+
+### 📚 Documentation Improvements
+
+- [#6709](https://github.com/meltano/meltano/issues/6709) Add DataHub HowTo
+- [#6764](https://github.com/meltano/meltano/issues/6764) Move installation guide to "Getting Started" add Part 1 tutorial
+- [#6769](https://github.com/meltano/meltano/issues/6769) Guide for existing dbt projects
+- [#6737](https://github.com/meltano/meltano/issues/6737) Add getting started section
+- [#6753](https://github.com/meltano/meltano/issues/6753) Add list of video tuts and demos
+- [#6739](https://github.com/meltano/meltano/issues/6739) Add how to jupyter
+- [#6752](https://github.com/meltano/meltano/issues/6752) Shrink contrib. docs in sidebar to 1p
+- [#6743](https://github.com/meltano/meltano/issues/6743) Describe how `project_id` is hashed
+
 ## v2.6.0 (2022-09-12)
 
 ### ✨ New
