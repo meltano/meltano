@@ -17,7 +17,7 @@ In part 1, we extracted data from GitHub and are now ready to load the data into
 </div>
 
 ## Getting your target ready
-We're going to load our data into a dockerized PostgreSQL database running on your laptop. View the [docker docs](https://docs.docker.com/get-docker/) if you don't yet have docker installed. To launch a local postreSQL container, you just need to run:
+We're going to load our data into a dockerized PostgreSQL database running on your laptop. View the [docker docs](https://docs.docker.com/get-docker/) if you don't yet have docker installed. To launch a local PostgreSQL container, you just need to run:
 
 ```bash
 $ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
