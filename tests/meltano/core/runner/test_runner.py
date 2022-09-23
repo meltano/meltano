@@ -196,8 +196,8 @@ class TestSingerRunner:
                 )
                 await capture_subprocess_output(target_process.stdout, *bookmark_writer)
 
-            assert add_mock.call_count == 3
-            assert commit_mock.call_count == 3
+            assert add_mock.call_count == 9
+            assert commit_mock.call_count == 9
 
             # assert the STATE's `value` was saved
             job = subject.context.job
