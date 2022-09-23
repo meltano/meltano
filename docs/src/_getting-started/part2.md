@@ -35,7 +35,7 @@ $ docker container ls
 ```
 </div>
 <br />
-The container will need a few seconds to initialize. You can test the connection with your favourite SQL tool using connection data:
+The container will need a few seconds to initialize. You can test the connection with your favorite SQL tool using connection data:
 - host: localhost
 - port: 5432
 - database: postgres
