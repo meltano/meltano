@@ -16,6 +16,8 @@ from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import SINGER_STATE_KEY
 from meltano.core.state_store import DBStateStoreManager
 
+STATE_ID_COMPONENT_DELIMITER = ":"
+
 logger = structlog.getLogger(__name__)
 
 
