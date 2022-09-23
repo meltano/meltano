@@ -16,7 +16,7 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 
 Before you can get started with Meltano and the [`meltano` command line interface (CLI)](/reference/command-line-interface), you'll need to install it onto your system.
 
-_To learn more about the different installation methods, refer to the [Installation guide](/guide/installation)._
+_To learn more about the different installation methods, refer to the [Installation guide](/getting-started/installation)._
 
 ### Local Installation
 
@@ -61,7 +61,7 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
    meltano --version
    ```
 
-If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation#local-installation) of the [Installation guide](/guide/installation) for more details.
+If anything's not performing as expected, refer to the ["Local Installation" section](/getting-started/installation#local-installation) of the [Installation guide](/getting-started/installation) for more details.
 
 ## Create Your Meltano Project
 
