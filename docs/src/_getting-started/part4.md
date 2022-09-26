@@ -10,9 +10,9 @@ Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern E(t)LT stack.
 
-In parts 1-3 we built a ELT pipeline. We took all the data from the commits on one repository at GitHub and extracted the authors working on it. However now we realized, we stored a lot of information where we really might want to hide a few of those pieces.
+In parts [1](/getting-started/part1), [2](/getting-started/part2), and [3](/getting-started/part3) we built an ELT pipeline. We took all the data from the commits on one repository at GitHub and extracted the authors working on it. However now we realized, we stored a lot of information where we really might want to hide a few of those pieces.
 
-We're going to do light-weight transformations ("little t or (t)"), so-called **"inline data mappings"** to clean up the data before storing them anywhere. We will use these inline data mappings to hide all emails inside the JSON blob we receive. In the Meltano world, these data mappings are also called a stream maps.
+We're going to do light-weight transformations ("little t or (t)"), also called **"inline data mappings"** to clean up the data before storing them anywhere. We will use these inline data mappings to hide all emails inside the JSON blob we receive. In the Meltano world, these data mappings are also called [stream maps](https://sdk.meltano.com/en/latest/stream_maps.html).
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -35,7 +35,7 @@ Installing mapper 'transform-field'...
 ---> 100%
 Installed mapper 'transform-field'
 
-To learn more about mapper 'transform-field', visit https://hub.meltano.com/mappers/transform-field
+To learn more about mapper 'transform-field', visit https://docs.meltano.com/concepts/plugins#mappers
 </div>
 
 We're now going to add two mapping to this mapper.
