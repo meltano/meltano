@@ -49,8 +49,8 @@ class StateService:
             A dict with state_ids as keys and state payloads as values.
         """
         return {
-            job_name: self.get_state(job_name)
-            for job_name in self.state_store_manager.get_job_names(state_id_pattern)
+            state_id: self.get_state(state_id)
+            for state_id in self.state_store_manager.get_state_ids(state_id_pattern)
         }
 
     def _get_or_create_job(self, job: Job | str) -> Job:
@@ -126,7 +126,7 @@ class StateService:
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
         self.state_store_manager.set(
-            job_name=state_to_add_to.job_name,
+            state_id=state_to_add_to.state_id,
             state=json.dumps(new_state_dict),
             complete=(payload_flags == Payload.STATE),
         )
@@ -140,7 +140,7 @@ class StateService:
         Returns:
             Dict representing state that would be used in the next run.
         """
-        return self.state_store_manager.get(job_name=state_id)
+        return self.state_store_manager.get(state_id=state_id)
 
     def set_state(self, state_id: str, new_state: str | None, validate: bool = True):
         """Set the state for the state_id.
