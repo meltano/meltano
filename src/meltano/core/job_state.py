@@ -6,7 +6,7 @@ from typing import Any
 
 from sqlalchemy import Column, types
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Mapped, Session
 
 from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
@@ -30,8 +30,8 @@ class JobState(SystemModel):
 
     updated_at = Column(types.DATETIME, onupdate=datetime.now)
 
-    partial_state = Column(MutableDict.as_mutable(JSONEncodedDict))
-    completed_state = Column(MutableDict.as_mutable(JSONEncodedDict))
+    partial_state: Mapped[Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
+    completed_state: Mapped[Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
 
     @classmethod
     def from_job_history(cls, session: Session, job_name: str):
