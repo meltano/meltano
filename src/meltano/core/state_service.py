@@ -126,7 +126,7 @@ class StateService:
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
         self.state_store_manager.set(
-            state_id=state_to_add_to.state_id,
+            state_id=state_to_add_to.job_name,
             state=json.dumps(new_state_dict),
             complete=(payload_flags == Payload.STATE),
         )
