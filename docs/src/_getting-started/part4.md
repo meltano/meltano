@@ -12,14 +12,14 @@ Throughout this tutorial, we’ll walk you through the creation of a end-to-end 
 
 In parts 1 & 2, we extracted data from GitHub and loaded it into a (local) PostgreSQL database.
 
-Before diving into full-fledged transformations & dbt, we're going to do light-weight, so-called "inline transformations" to clean up some things right before storing them anywhere. We're going to import more information from GitHub, including the author details, then we use an inline transformation to remove the email addresses we from GitHub by default.
+In this part, we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
 </div>
 
-## Select the author data from GitHub
-Just as in Part 1, you can use the [`meltano select`](/reference/command-line-interface#select) command to select additional data from the source. We're simply going to select all "commits" data:
+## Install and configure the postgres specific dbt transformer
+Dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano transformers match this pattern; in this case our transformer is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
 ```bash
 meltano select tap-github commits "*"

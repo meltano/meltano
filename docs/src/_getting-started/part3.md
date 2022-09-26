@@ -1,6 +1,6 @@
 ---
-title: Part 4 - Transformations, E(t)LT
-description: Part 4 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
+title: Part 3 - Transformations, ELT
+description: Part 3 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
 layout: doc
 weight: 4
 ---
@@ -10,9 +10,9 @@ Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern E(t)LT stack.
 
-In the previous parts, we set up a E(t)L pipeline, extracting data from GitHub, transforming it inline, and loading it into a local PostgreSQL database.
+In parts 1 & 2, we extracted data from GitHub and loaded it into a (local) PostgreSQL database.
 
-In this part, we're going to unleash the data-built-tool [dbt](https://www.getdbt.com/) onto our data to transform it into meaningful information.
+Before diving into full-fledged transformations & dbt, we're going to do light-weight, so-called "inline transformations" to clean up the data before storing them anywhere. We're going to import more information from GitHub, including the author details, then use an inline transformation, also called a stream map, to remove the email addresses we get from GitHub by default.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -87,17 +87,29 @@ The E(t)L pipeline run already added our source data into the schema `tap_github
 mkdir transform/models/tap_github
 ```
 
-Add a file called `source.yml` into this directory with the following content:
+```yaml
+mappers:
+  [...]
+   mappings:
+    - name: hide-github-mails
+      config:
+        transformations:
+          [...]
+```
+These lines define the name "hide-github-mails" as the name of our mapping. We can call the mapping using this name, and ignoring any reference to the actual mapper "transform-field".
 
 ```yaml
-config-version: 2
-version: 2
-sources:
-  - name: tap_github     # the name we want to reference this source by
-    schema: tap_github   # the schema the raw data was loaded into
-    tables:
-      - name: commits
+    [...]
+        transformations:
+          - field_id: "commit"
+            tap_stream_name: "commits"
+            field_paths: ["author/email", "committer/email"]
+            type: "MASK-HIDDEN"
 ```
+These lines define one transformation. We target the stream named `commits`, and within it the field named `commit`. We then use the field paths to navigate to the two emails we know are contained within this message and set the type to `MASK-HIDDEN` to hide the values.
+
+## Run the data integration (E(t)L) pipeline
+Now we're ready to run the data integration process with these modifications again. To do so, we'll need to clean up first, since we already ran the EL process in part 1. The primary key is still the same and as such the ingestion would fail.
 
 ## Add a transformed model
 Add a file called `authors.sql` to the folder `transform/models/tap_github` with the following contents:

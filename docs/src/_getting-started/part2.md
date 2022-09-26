@@ -17,7 +17,7 @@ In part 1, we extracted data from GitHub and are now ready to load the data into
 </div>
 
 ## Getting your target ready
-We're going to load our data into a dockerized PostgreSQL database running on your laptop. View the [docker docs](https://docs.docker.com/get-docker/) if you don't yet have docker installed. To launch a local postreSQL container, you just need to run:
+We're going to load our data into a dockerized PostgreSQL database running on your laptop. View the [docker docs](https://docs.docker.com/get-docker/) if you don't yet have docker installed. To launch a local PostgreSQL container, you just need to run:
 
 ```bash
 $ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
@@ -35,7 +35,7 @@ $ docker container ls
 ```
 </div>
 <br />
-The container will need a few seconds to initialize. You can test the connection with your favourite SQL tool using connection data:
+The container will need a few seconds to initialize. You can test the connection with your favorite SQL tool using connection data:
 - host: localhost
 - port: 5432
 - database: postgres
@@ -137,7 +137,7 @@ This will add the non-sensitive configuration to your [`meltano.yml` project fil
 
 Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control.
 
-You can use `meltano config target-postgres` to check the configuration, including the set default not visible in the project file.
+You can use `meltano config target-postgres` to check the configuration, including the default settings not visible in the project file.
  <div class="termy">
 
 ```console
