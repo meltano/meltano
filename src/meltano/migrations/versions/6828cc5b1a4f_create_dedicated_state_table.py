@@ -334,7 +334,6 @@ def upgrade():
     conn = op.get_bind()
     inspector = Inspector.from_engine(conn)
     if "state" in inspector.get_table_names():
-
         op.drop_table("state")
     op.create_table(
         "state",
