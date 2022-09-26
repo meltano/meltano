@@ -10,7 +10,7 @@ Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern E(t)LT stack.
 
-In part 1, we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
+In  [part 1](/getting-started/part1), we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
