@@ -194,7 +194,7 @@ You can check the data inside the database using your favourite SQL editor. Ther
 
 ## Run the complete pipeline
 
-To check that everything works together as a pipeline, we clean out once more and run the whole ELT pipeline. Drop the tap_github.commits and the analytics.authors tables by running 
+To check that everything works together as a pipeline, we clean out once more and run the whole ELT pipeline. Drop the tap_github.commits and the analytics.authors tables by running
 
 ```bash
 docker exec meltano_postgres psql -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
@@ -207,28 +207,45 @@ Run the final pipeline alltogether using the parameter `--full-refresh` to ignor
 ```console
 $ meltano run --full-refresh tap-github target-postgres dbt-postgres:run
 [warning  ] Performing full refresh, ignoring state left behind by any previous runs.
- [info     ] INFO Starting sync of repository: sbalnojan/meltano-example-el [...]
+
+ [info     ] INFO Starting sync of repository: sbalnojan/meltano-example-el
+ <font color="red">[...]</font>
 [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration",[...]
+
 [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 21 [...]
+
 [info     ] time=2022-09-22 12:42:57 name=target_postgres level=INFO message=Table '"commits"' [...]
+
 [...]
 ---> 100%
 [info     ] Incremental state has been updated at 2022-09-22 12:42:58.260520.
 [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True
 [info     ] 12:43:19  Running with dbt=1.1.2 cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:20  Found 1 model, [...]
+
 [info     ] 12:43:20                       cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:20  Concurrency: 2 threads (target='dev') cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:20                       cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:20  1 of 1 START table model analytics.authors ..................................... [RUN] [...]
 ---> 100%
 [info     ] 12:43:21  1 of 1 OK created table model analytics.authors .........[...]
+
 [info     ] 12:43:21                       cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:21  Finished running 1 table model in 1.34s. cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:21                       cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:21  Completed successfully cmd_type=command name=dbt-postgres stdio=stderr
+
 info     ] 12:43:21                       cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] 12:43:21  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1 cmd_type=command name=dbt-postgres stdio=stderr
+
 [info     ] Block run completed.           block_type=InvokerCommand err=None set_number=1 success=True
 ```
 
