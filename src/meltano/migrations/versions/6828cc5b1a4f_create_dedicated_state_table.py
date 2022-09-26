@@ -1,8 +1,8 @@
-"""Create dedicated job_state table
+"""Create dedicated state table
 
-Revision ID: f4c225a9492f
+Revision ID: 6828cc5b1a4f
 Revises: 5b43800443d1
-Create Date: 2022-09-02 09:44:05.581824
+Create Date: 2022-09-26 12:47:53.512069
 
 """
 from __future__ import annotations
@@ -27,11 +27,10 @@ from meltano.migrations.utils.dialect_typing import (
 )
 
 # revision identifiers, used by Alembic.
-revision = "f4c225a9492f"
-down_revision = "5b43800443d1"
+revision = "6828cc5b1a4f"
+down_revision = ("5b43800443d1", "f4c225a9492f")
 branch_labels = None
 depends_on = None
-
 
 SystemMetadata = MetaData()
 SystemModel = declarative_base(metadata=SystemMetadata)
@@ -47,7 +46,7 @@ class JobState(SystemModel):
     """
 
     __tablename__ = "state"
-    job_name = Column(types.String, unique=True, primary_key=True, nullable=False)
+    state_id = Column(types.String, unique=True, primary_key=True, nullable=False)
 
     updated_at = Column(
         types.TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp()
@@ -57,7 +56,7 @@ class JobState(SystemModel):
     completed_state = Column(MutableDict.as_mutable(JSONEncodedDict))
 
     @classmethod
-    def from_job_history(cls, session: Session, job_name: str):
+    def from_job_history(cls, session: Session, state_id: str):
         """Build JobState from job run history.
 
         Args:
@@ -70,7 +69,7 @@ class JobState(SystemModel):
         completed_state = {}
         partial_state = {}
         incomplete_since = None
-        finder = JobFinder(job_name)
+        finder = JobFinder(state_id)
 
         # Get the state for the most recent completed job.
         # Do not consider dummy jobs create via add_state.
@@ -91,7 +90,7 @@ class JobState(SystemModel):
             if "singer_state" in incomplete_state_job.payload:
                 partial_state = merge(incomplete_state_job.payload, partial_state)
         return cls(
-            job_name=job_name,
+            state_id=state_id,
             partial_state=partial_state,
             completed_state=completed_state,
         )
@@ -327,46 +326,6 @@ class Job(SystemModel):  # noqa: WPS214
     payload_flags = Column(IntFlag, default=0)
     trigger = Column(types.String, default="")
 
-    @classmethod
-    def from_job_history(cls, session: Session, job_name: str):
-        """Build JobState from job run history.
-
-        Args:
-            session: the session to use in finding job history
-            job_name: the name of the job to build JobState for
-
-        Returns:
-            JobState built from job run history
-        """
-        completed_state = {}
-        partial_state = {}
-        incomplete_since = None
-        finder = JobFinder(job_name)
-
-        # Get the state for the most recent completed job.
-        # Do not consider dummy jobs create via add_state.
-        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
-        if state_job:
-            incomplete_since = state_job.ended_at
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload, partial_state)
-
-        # If there have been any incomplete jobs since the most recent completed jobs,
-        # merge the state emitted by those jobs into the state for the most recent
-        # completed job. If there are no completed jobs, get the full history of
-        # incomplete jobs and use the most recent state emitted per stream
-        incomplete_state_jobs = finder.with_payload(
-            session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
-        )
-        for incomplete_state_job in incomplete_state_jobs:
-            if "singer_state" in incomplete_state_job.payload:
-                partial_state = merge(incomplete_state_job.payload, partial_state)
-        return cls(
-            job_name=job_name,
-            partial_state=partial_state,
-            completed_state=completed_state,
-        )
-
 
 def upgrade():
     # Create state table
@@ -375,10 +334,11 @@ def upgrade():
     conn = op.get_bind()
     inspector = Inspector.from_engine(conn)
     if "state" in inspector.get_table_names():
-        return
+
+        op.drop_table("state")
     op.create_table(
         "state",
-        sa.Column("job_name", sa.String(900), nullable=False),
+        sa.Column("state_id", sa.String(900), nullable=False),
         sa.Column(
             "partial_state",
             MutableDict.as_mutable(JSONEncodedDict(max_string_length)),
@@ -392,13 +352,12 @@ def upgrade():
             sa.types.TIMESTAMP if dialect_name == "postgresql" else sa.types.DATETIME,
             onupdate=datetime.now,
         ),
-        sa.PrimaryKeyConstraint("job_name"),
-        sa.UniqueConstraint("job_name"),
+        sa.PrimaryKeyConstraint("state_id"),
+        sa.UniqueConstraint("state_id"),
     )
-
-    session = Session(bind=op.get_bind())
-    for job_run in set(session.query(Job).all()):
-        session.add(JobState.from_job_history(session, job_run.job_name))
+    session = Session(bind=conn)
+    for state_id in set([job_run.job_name for job_run in session.query(Job).all()]):
+        session.add(JobState.from_job_history(session, state_id))
     session.commit()
 
 
