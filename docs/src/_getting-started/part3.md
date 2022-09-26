@@ -10,16 +10,58 @@ Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern E(t)LT stack.
 
-In parts 1 & 2, we extracted data from GitHub and loaded it into a (local) PostgreSQL database.
+In parts 1 & 2, we extracted data from GitHub and loaded it into a (local) PostgreSQL database. Now it is time to have more fun. We decide to load all attributes from the data we selected previously, and then build a model listing the different authors of commits to our repository.
 
-Before diving into full-fledged transformations & dbt, we're going to do light-weight, so-called "inline transformations" to clean up the data before storing them anywhere. We're going to import more information from GitHub, including the author details, then use an inline transformation, also called a stream map, to remove the email addresses we get from GitHub by default.
+That means, in this part we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information. Don't worry, you don't need to know anything about dbt, this tutorial is self-contained. You do not need to install dbt yourself, it works as a dbt plugin.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
 </div>
 
+## Select more source data
+To get all the data from the GitHub commits, you can use the `meltano select` command:
+
+```bash
+meltano select tap-github commits "*"
+```
+
+This will add the following line to your project file:
+```yaml
+      extractors:
+      - name: tap-github
+        select:
+        - commits.url # <== technically not necessary anymore, but no need to delete
+        - commits.sha # <== technically not necessary anymore, but no need to delete
+        - commits.* # <== new data.
+```
+
+You can test that the new data is extracted by using `meltano invoke`:
+
+<div class="termy">
+```console
+$ meltano invoke tap-github
+2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
+{"type": "STATE", "value":  [...]}
+INFO Starting sync of repository: sbalnojan/meltano-example-el
+---> 100%
+{"type": "SCHEMA", "stream": "commits", [...]
+
+INFO METRIC: {"type": "timer", "metric":  [...]
+
+{"type": "RECORD", "stream": "commits", "record": {"sha": "c771a832720c0f87b3ce53ac12bdcbf742df4e3d", "commit": {"author": {"name": "Horst", "email":
+[...]
+"sbalnojan/meltano-example-el"}, "time_extracted": "2022-09-22T07:37:06.289545Z"}
+
+...[many more records]...
+
+{"type": "STATE", "value": {"bookmarks": {"sbalnojan/meltano-example-el": {"commits": {"since": "2022-09-22T07:37:06.289545Z"}}}}}
+´´´
+</div>
+
+Next, we add the dbt plugin to transform this data.
+
 ## Install and configure the postgres specific dbt transformer
-Dbt transformers come in flavors. Our flavor is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
+Dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano transformers match this pattern; in this case our transformer is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
 <div class="termy">
 
@@ -80,36 +122,26 @@ $ meltano config dbt-postgres set schema analytics
 ```
 </div>
 
-## Add our source data
-The E(t)L pipeline run already added our source data into the schema `tap_github` as table `commits`. So let's add that to dbt to work with:
+## Add our source data to dbt
+The E(t)L pipeline run already added our source data into the schema `tap_github` as table `commits`. Dbt will need to know where to locate this dataa. Let's add that to dbt to work with:
 
 ```bash
 mkdir transform/models/tap_github
 ```
 
-```yaml
-mappers:
-  [...]
-   mappings:
-    - name: hide-github-mails
-      config:
-        transformations:
-          [...]
-```
-These lines define the name "hide-github-mails" as the name of our mapping. We can call the mapping using this name, and ignoring any reference to the actual mapper "transform-field".
+Add a file called `source.yml` into this directory with the following content:
 
 ```yaml
-    [...]
-        transformations:
-          - field_id: "commit"
-            tap_stream_name: "commits"
-            field_paths: ["author/email", "committer/email"]
-            type: "MASK-HIDDEN"
+config-version: 2
+version: 2
+sources:
+  - name: tap_github     # the name we want to reference this source by
+    schema: tap_github   # the schema the raw data was loaded into
+    tables:
+      - name: commits
 ```
-These lines define one transformation. We target the stream named `commits`, and within it the field named `commit`. We then use the field paths to navigate to the two emails we know are contained within this message and set the type to `MASK-HIDDEN` to hide the values.
 
-## Run the data integration (E(t)L) pipeline
-Now we're ready to run the data integration process with these modifications again. To do so, we'll need to clean up first, since we already ran the EL process in part 1. The primary key is still the same and as such the ingestion would fail.
+Now we're able to reference the table using the keyword "source" as you can see next.
 
 ## Add a transformed model
 Add a file called `authors.sql` to the folder `transform/models/tap_github` with the following contents:
@@ -158,22 +190,22 @@ $ meltano invoke dbt-postgres:run
 
 </div>
 
-You can check the data inside the database. There should now be a table inside the `analytics` schema called `authors` populated with data.
+You can check the data inside the database using your favourite SQL editor. There should now be a table inside the `analytics` schema called `authors` populated with data.
 
 ## Run the complete pipeline
 
-To check that everything works together as a pipeline, we clean out once more and run the whole E(t)LT pipeline. Drop the tap_github.commits and the analytics.authors tables by running 
+To check that everything works together as a pipeline, we clean out once more and run the whole ELT pipeline. Drop the tap_github.commits and the analytics.authors tables by running 
 
 ```bash
 docker exec meltano_postgres psql -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
 ```
 
-and run the final pipeline alltogether using the parameter `--full-refresh` to ignore the stored state:
+Run the final pipeline alltogether using the parameter `--full-refresh` to ignore the stored state:
 
 <div class="termy">
 
 ```console
-$ meltano run --full-refresh tap-github hide-github-mails target-postgres dbt-postgres:run
+$ meltano run --full-refresh tap-github target-postgres dbt-postgres:run
 [warning  ] Performing full refresh, ignoring state left behind by any previous runs.
  [info     ] INFO Starting sync of repository: sbalnojan/meltano-example-el [...]
 [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration",[...]
@@ -202,11 +234,11 @@ info     ] 12:43:21                       cmd_type=command name=dbt-postgres std
 
 </div>
 
-There we have it, a complete E(t)LT pipeline.
+There we have it, a complete ELT pipeline.
 
 ## Next Steps
 
-Next, head over to [Part 5, inside the Getting Started Guide](/getting-started/#add-a-loader-to-send-data-to-a-destination).
+Next, head over to [Part 4, Data Mappings](/getting-started/part4).
 
 <script src="/js/termynal.js"></script>
 <script src="/js/termy_custom.js"></script>
