@@ -161,6 +161,9 @@ version_files = [
 
 [tool.mypy]
 files = "src"
+plugins = [
+  "sqlalchemy.ext.mypy.plugin",
+]
 
 # The following whitelist is used to allow for incremental adoption
 # of MyPy. Modules should be removed from this whitelist as and when
