@@ -21,6 +21,6 @@ meltano --environment=dev state list
 Validate that we can perform an EL task post migration:
 
 ```shell
-meltano --environment=dev run tap-gitlab target-jsonl
+meltano --environment=dev run tap-gitlab target-sqlite
 meltano --environment=dev state list
 ```
