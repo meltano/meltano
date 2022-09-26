@@ -161,6 +161,9 @@ version_files = [
 
 [tool.mypy]
 files = "src"
+plugins = [
+  "sqlalchemy.ext.mypy.plugin",
+]
 
 # The following whitelist is used to allow for incremental adoption
 # of MyPy. Modules should be removed from this whitelist as and when
@@ -170,7 +173,6 @@ files = "src"
 module = [
   "meltano.api.*",
   "meltano.cli.*",
-  "meltano.migrations.*",
   "meltano.oauth.*",
   # Way too many modules at the root of meltano.core to tackle them all at once
   # so listing them individually here.
