@@ -22,7 +22,7 @@ We're going to focus on the Meltano use case for Virtual Environments which is u
 
 Ideally, you don't have to to worry about Virtual Environments while using Meltano,
 we recommend using pipx to install Meltano which manages the creation of venvs for you.
-See our [Installation Guide](/guide/installation) for more details.
+See our [Installation Guide](/getting-started/installation) for more details.
 
 However, if you ever need to customize or build your own production pipeline (or do anything else) you may need to understand
 how to install Meltano in an isolated way so that you don't have a conflict with dependecies within your own Operating System
@@ -79,7 +79,7 @@ pip install meltano
 
 <div class="notification is-info">
   <p>As a reminder, we do generally recommend using `pipx` for installing python packages.
-Ensure you have `pipx` installed by reviewing the <a href="/guide/installation#install-pipx">Install pipx</a> instructions.</p>
+Ensure you have `pipx` installed by reviewing the <a href="/getting-started/installation#install-pipx">Install pipx</a> instructions.</p>
 </div>
 
 # How does meltano use Virtual Environments internally?

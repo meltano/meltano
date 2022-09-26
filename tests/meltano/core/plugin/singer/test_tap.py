@@ -15,6 +15,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
+from meltano.core.state_service import InvalidJobStateError, StateService
 
 
 class TestSingerTap:
@@ -76,13 +77,24 @@ class TestSingerTap:
         )
 
         invoker = plugin_invoker_factory(subject, context=elt_context)
+        state_service = StateService(session)
 
         @contextmanager
         def create_job():
+
             new_job = Job(job_name=job.job_name)
             new_job.start()
             yield new_job
             new_job.save(session)
+            if new_job.payload and not new_job.is_running():
+                try:
+                    state_service.add_state(
+                        new_job.job_name,
+                        json.dumps(new_job.payload),
+                        new_job.payload_flags,
+                    )
+                except InvalidJobStateError:
+                    pass
 
         async def assert_state(state):
             async with invoker.prepared(session):
@@ -107,7 +119,6 @@ class TestSingerTap:
         # Successful jobs without state are not considered
         with create_job() as job:
             job.success()
-
         await assert_state(None)
 
         # Successful jobs with incomplete state are considered
@@ -123,14 +134,6 @@ class TestSingerTap:
             job.payload["singer_state"] = {"success": True}
             job.payload_flags = Payload.STATE
             job.success()
-
-        await assert_state({"success": True})
-
-        # Running jobs with state are not considered
-        with create_job() as job:
-            job.payload["singer_state"] = {"success": True}
-            job.payload_flags = Payload.STATE
-
         await assert_state({"success": True})
 
         # Failed jobs without state are not considered

@@ -12,8 +12,6 @@ import FatalError from '@/middleware/fatalError'
 import flaskContext from '@/utils/flask'
 import FontAwesome from '@/utils/font-awesome'
 import router from '@/router/app'
-import setupAnalytics from '@/utils/setupAnalytics'
-import setupToasted from '@/utils/setupToasted'
 import store from '@/store'
 import Upgrade from '@/middleware/upgrade'
 
@@ -23,9 +21,6 @@ Vue.use(VCalendar)
 Vue.use(FontAwesome)
 Vue.use(Router)
 Vue.use(VueIntercom, { appId: 'ir946q00' })
-
-// Toast setup
-setupToasted()
 
 // Middleware setup
 const service = new Service(axios)
@@ -49,11 +44,6 @@ axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 
 // Flask context
 Vue.prototype.$flask = Object.freeze(flaskContext())
-
-// Conditional analytics using flask context
-if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
-  setupAnalytics({ id: Vue.prototype.$flask.trackingID, router })
-}
 
 /* eslint-disable no-new */
 new Vue({

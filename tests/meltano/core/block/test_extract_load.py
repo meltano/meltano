@@ -28,6 +28,7 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 
 TEST_STATE_ID = "test_job"
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
@@ -621,8 +622,8 @@ class TestExtractLoadBlocks:
 
 
 class TestExtractLoadUtils:
-    def test_generate_job_name(self):
-        """Verify that the job id is generated correctly when an environment is provided."""
+    def test_generate_state_id(self):
+        """Verify that a state ID is generated correctly given an active environment and optional suffix."""
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"
 
@@ -630,10 +631,41 @@ class TestExtractLoadUtils:
         block2.string_id = "block2"
 
         project = mock.Mock()
-
-        project.active_environment = None
-        with pytest.raises(RunnerError):
-            assert generate_state_id(project, block1, block2) == "block1-to-block2"
-
         project.active_environment = Environment(name="test")
-        assert generate_state_id(project, block1, block2) == "test:block1-to-block2"
+
+        assert (
+            generate_state_id(project, None, block1, block2) == "test:block1-to-block2"
+        )
+
+        assert (
+            generate_state_id(project, "suffix", block1, block2)
+            == "test:block1-to-block2:suffix"
+        )
+
+    def test_generate_state_id_no_environment(self):
+        """Verify an error is raised when attempting to generate a state ID with no active environment."""
+        block1 = mock.Mock(spec=IOBlock)
+        block1.string_id = "block1"
+
+        block2 = mock.Mock(spec=IOBlock)
+        block2.string_id = "block2"
+
+        project = mock.Mock()
+        project.active_environment = None
+
+        with pytest.raises(RunnerError):
+            generate_state_id(project, None, block1, block2)
+
+    def test_generate_state_id_component_contains_delimiter(self):
+        """Verify an error is raised when attempting to generate a state ID with a component that contains the defined delimiter string."""
+        block1 = mock.Mock(spec=IOBlock)
+        block1.string_id = "block1"
+
+        block2 = mock.Mock(spec=IOBlock)
+        block2.string_id = "block2"
+
+        project = mock.Mock()
+        project.active_environment = Environment(name="test")
+
+        with pytest.raises(RunnerError):
+            generate_state_id(project, STATE_ID_COMPONENT_DELIMITER, block1, block2)

@@ -15,25 +15,13 @@ export default {
   created() {
     this.$store.dispatch('system/check')
     this.$store.dispatch('system/fetchIdentity')
-    this.tryAcknowledgeAnalyticsTracking()
   },
   mounted() {
     if (this.isMeltanoDataInstance) {
       this.$intercom.boot()
     }
   },
-  methods: {
-    tryAcknowledgeAnalyticsTracking() {
-      if (this.$flask.isSendAnonymousUsageStats) {
-        const hasAcknowledgedTracking =
-          'hasAcknowledgedTracking' in localStorage &&
-          localStorage.getItem('hasAcknowledgedTracking') === 'true'
-        if (!hasAcknowledgedTracking) {
-          this.$toasted.global.acknowledgeAnalyticsTracking()
-        }
-      }
-    }
-  }
+  methods: {}
 }
 </script>
 
