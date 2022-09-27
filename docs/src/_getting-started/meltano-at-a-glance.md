@@ -23,7 +23,7 @@ Welcome to your Open Source DataOps Infrastructure! With Meltano you can move yo
 - **No lock-in**: It's open source and has a strong community, you'll always be free.. (derisk)
 - **It's extensible from day 1**: It's super easy to add a custom connection using the SDKs/EDKs.
 - **Amazing developer experience**: Developers go from start to finish on new data projects, including extraction, loading, transforming, & orchestrating data within days.
-- **Small surface area**: Features like "inline data mappingsmake " remove unnecessary steps from your data pipelines, and help companies stay compliant to security & GDPR regulations.
+- **Small surface area**: Features like "inline data mappings" make it easy to remove unnecessary information from your data pipelines, and help companies stay compliant to security & GDPR regulations.
 
 ### Key Features of Meltano, developers will love
 - **Start simple**: Meltano is pip-installable and comes in a prepackaged docker container, you can have your first ELT pipeline running within minutes.
