@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.7.1 (2022-09-27)
+
+### 🐛 Fixes
+
+- [#6797](https://github.com/meltano/meltano/issues/6797) Show appropriate UI toasts
+- [#6795](https://github.com/meltano/meltano/issues/6795) Correct migration path for state table
+
+### 📚 Documentation Improvements
+
+- [#6791](https://github.com/meltano/meltano/issues/6791) Remove datahub docs from guide
+
 ## v2.7.0 (2022-09-23)
 
 ### ✨ New
