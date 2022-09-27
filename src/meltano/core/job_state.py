@@ -22,11 +22,11 @@ class JobState(SystemModel):
     Modified during `meltano elt` or `meltano run` runs whenever a
     STATE message is emitted by a Singer target. Also written and read
     by `meltano state` CLI invocations. Only holds the _current_ state
-    for a given job_name. Full job run history is held by the Job model.
+    for a given state_id. Full job run history is held by the Job model.
     """
 
     __tablename__ = "state"
-    job_name = Column(types.String, unique=True, primary_key=True, nullable=False)
+    state_id = Column(types.String, unique=True, primary_key=True, nullable=False)
 
     updated_at = Column(types.DATETIME, onupdate=datetime.now)
 
@@ -34,12 +34,12 @@ class JobState(SystemModel):
     completed_state: Mapped[Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
 
     @classmethod
-    def from_job_history(cls, session: Session, job_name: str):
+    def from_job_history(cls, session: Session, state_id: str):
         """Build JobState from job run history.
 
         Args:
             session: the session to use in finding job history
-            job_name: the name of the job to build JobState for
+            state_id: state_id to build JobState for
 
         Returns:
             JobState built from job run history
@@ -47,7 +47,7 @@ class JobState(SystemModel):
         completed_state: dict[Any, Any] = {}
         partial_state: dict[Any, Any] = {}
         incomplete_since = None
-        finder = JobFinder(job_name)
+        finder = JobFinder(state_id)
 
         # Get the state for the most recent completed job.
         # Do not consider dummy jobs create via add_state.
@@ -69,7 +69,7 @@ class JobState(SystemModel):
                 partial_state = merge(incomplete_state_job.payload, partial_state)
 
         return cls(
-            job_name=job_name,
+            state_id=state_id,
             partial_state=partial_state,
             completed_state=completed_state,
         )

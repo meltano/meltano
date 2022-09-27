@@ -23,11 +23,11 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def set(self, job_name: str, state: str, complete: bool):
-        """Set the job state for the given job_name.
+    def set(self, state_id: str, state: str, complete: bool):
+        """Set the job state for the given state_id.
 
         Args:
-            job_name: the name of the job to set state for.
+            state_id: the name of the job to set state for.
             state: the state to set.
             complete: true if the state being set is for a complete run, false if partial
 
@@ -37,11 +37,11 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def get(self, job_name):
-        """Get the job state for the given job_name.
+    def get(self, state_id):
+        """Get the job state for the given state_id.
 
         Args:
-            job_name: the name of the job to get state for.
+            state_id: the name of the job to get state for.
 
         Raises:
             NotImplementedError: always, this is an abstract method
@@ -49,17 +49,17 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def clear(self, job_name):
-        """Clear state for the given job_name.
+    def clear(self, state_id):
+        """Clear state for the given state_id.
 
         Args:
-            job_name: the job name to clear state for
+            state_id: the state_id to clear state for
         """
         ...
 
     @abstractmethod
-    def get_job_names(self, pattern=None):
-        """Get all job names available in this state store manager.
+    def get_state_ids(self, pattern=None):
+        """Get all state_ids available in this state store manager.
 
         Args:
             pattern: glob-style pattern to filter by
@@ -67,20 +67,20 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def acquire_lock(self, job_name):
+    def acquire_lock(self, state_id):
         """Acquire a naive lock for the given job's state.
 
         Args:
-            job_name: the job name to lock
+            state_id: the state_id to lock
         """
         ...
 
     @abstractmethod
-    def release_lock(self, job_name):
+    def release_lock(self, state_id):
         """Release lock for given job's state.
 
         Args:
-            job_name: the job name to unlock
+            state_id: the state_id to unlock
         """
         ...
 
@@ -99,16 +99,16 @@ class DBStateStoreManager(StateStoreManager):
         super().__init__(*args, **kwargs)
         self.session = session
 
-    def set(self, job_name: str, state: str, complete: bool) -> None:
-        """Set the job state for the given job_name.
+    def set(self, state_id: str, state: str, complete: bool) -> None:
+        """Set the job state for the given state_id.
 
         Args:
-            job_name: the name of the job to set state for.
+            state_id: the name of the job to set state for.
             state: the state to set.
             complete: true if the state being set is for a complete run, false if partial
         """
         existing_job_state = (
-            self.session.query(JobState).filter(JobState.job_name == job_name).first()
+            self.session.query(JobState).filter(JobState.state_id == state_id).first()
         )
         partial_state = {} if complete else json.loads(state)
         completed_state = json.loads(state) if complete else {}
@@ -118,7 +118,7 @@ class DBStateStoreManager(StateStoreManager):
             if not complete:
                 completed_state = existing_job_state.completed_state
         new_job_state = JobState(
-            job_name=job_name,
+            state_id=state_id,
             partial_state=partial_state,
             completed_state=completed_state,
         )
@@ -127,17 +127,17 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
-    def get(self, job_name):
-        """Get the job state for the given job_name.
+    def get(self, state_id):
+        """Get the job state for the given state_id.
 
         Args:
-            job_name: the name of the job to get state for
+            state_id: the name of the job to get state for
 
         Returns:
             The current state for the given job
         """
         job_state: JobState | None = (
-            self.session.query(JobState).filter(JobState.job_name == job_name).first()
+            self.session.query(JobState).filter(JobState.state_id == state_id).first()
         )
         return (
             merge(job_state.partial_state, job_state.completed_state)
@@ -145,21 +145,21 @@ class DBStateStoreManager(StateStoreManager):
             else {}
         )
 
-    def clear(self, job_name):
-        """Clear state for the given job_name.
+    def clear(self, state_id):
+        """Clear state for the given state_id.
 
         Args:
-            job_name: the job name to clear state for
+            state_id: the state_id to clear state for
         """
         job_state: JobState | None = (
-            self.session.query(JobState).filter(JobState.job_name == job_name).first()
+            self.session.query(JobState).filter(JobState.state_id == state_id).first()
         )
         if job_state:
             self.session.delete(job_state)
             self.session.commit()
 
-    def get_job_names(self, pattern: str | None = None):
-        """Get all job names available in this state store manager.
+    def get_state_ids(self, pattern: str | None = None):
+        """Get all state_ids available in this state store manager.
 
         Args:
             pattern: glob-style pattern to filter by
@@ -169,34 +169,34 @@ class DBStateStoreManager(StateStoreManager):
         """
         if pattern:
             return (
-                job_state.job_name
+                job_state.state_id
                 for job_state in self.session.query(JobState)
-                .filter(JobState.job_name.like(pattern.replace("*", "%")))
+                .filter(JobState.state_id.like(pattern.replace("*", "%")))
                 .all()
             )
         return (
             record[0]
-            for record in self.session.execute(select(JobState.job_name)).all()
+            for record in self.session.execute(select(JobState.state_id)).all()
         )
 
-    def acquire_lock(self, job_name):
+    def acquire_lock(self, state_id):
         """Acquire a naive lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
         This does nothing.
 
         Args:
-            job_name: the job name to lock
+            state_id: the state_id to lock
         """
         ...
 
-    def release_lock(self, job_name):
+    def release_lock(self, state_id):
         """Release the lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
         This does nothing.
 
         Args:
-            job_name: the job name to unlock
+            state_id: the state_id to unlock
         """
         ...
