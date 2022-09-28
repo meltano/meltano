@@ -15,15 +15,15 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def test_project_init_directory_exists(tmp_path: Path, pushd):
+def test_project_init_non_empty_directory_exists(tmp_path: Path, pushd):
     project_name = "test_project"
 
     projects_dir = tmp_path.joinpath("exists")
-    projects_dir.joinpath(project_name).mkdir(parents=True)
+    projects_dir.joinpath(project_name, "test").mkdir(parents=True)
     pushd(projects_dir)
     with pytest.raises(
         ProjectInitServiceError,
-        match=f"Directory {project_name!r} already exists",
+        match=f"Directory {project_name!r} not empty",
     ):
         ProjectInitService(project_name).init(activate=False, add_discovery=False)
 

@@ -53,3 +53,26 @@ class TestCliInit:
         meltano_yml = project.root_dir("meltano.yml").read_text()
         assert "send_anonymous_usage_stats: false" in meltano_yml
         assert "project_id:" in meltano_yml
+
+    def test_init_existing_empty_directory(self, cli_runner, tmp_path_factory, pushd):
+        new_project_root = tmp_path_factory.mktemp("new_meltano_root")
+        pushd(new_project_root)
+
+        # create project in empty current working directory
+        result = cli_runner.invoke(cli, ["init", ".", "--no_usage_stats"])
+        assert "cd ." not in result.output
+
+        Project.deactivate()
+
+        new_project_root = tmp_path_factory.mktemp("new_meltano_root")
+        pushd(new_project_root)
+
+        # create project in another empty directory
+        project_dir = new_project_root.joinpath("test_project")
+        project_dir.mkdir()
+        assert project_dir.exists()
+
+        result = cli_runner.invoke(cli, ["init", "test_project", "--no_usage_stats"])
+        assert "cd test_project" in result.output
+
+        Project.deactivate()
