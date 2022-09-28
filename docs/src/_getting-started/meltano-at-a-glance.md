@@ -23,7 +23,7 @@ Welcome to your Open Source DataOps Infrastructure! With Meltano you can move yo
 - **No lock-in**: It's open source and has a strong community, you'll always be free.. (derisk)
 - **It's extensible from day 1**: It's super easy to add a custom connection using the SDKs/EDKs.
 - **Amazing developer experience**: Developers go from start to finish on new data projects, including extraction, loading, transforming, & orchestrating data within days.
-- **Small surface area**: Features like "inline transformations" remove unnecessary steps from your data pipelines, and help companies stay compliant to security & GDPR regulations.
+- **Small surface area**: Features like "inline data mappings" make it easy to remove unnecessary information from your data pipelines, and help companies stay compliant to security & GDPR regulations.
 
 ### Key Features of Meltano, developers will love
 - **Start simple**: Meltano is pip-installable and comes in a prepackaged docker container, you can have your first ELT pipeline running within minutes.
@@ -72,7 +72,7 @@ Need to add additional steps to your data pipeline? Here's a complete setup also
 <iframe width="800" height="632" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Getting Started Resources
-This was just a glance at why you should use Meltano. If you're now as excited to use Meltano as we are, we recommend you head over to the [Getting Started Tutorial](/gettingstarted).
+This was just a glance at why you should use Meltano. If you're now as excited to use Meltano as we are, we recommend you head over to the [Getting Started Tutorial](/getting-started/).
 
 
 If you cannot find an answer to your question, there's always an active [Meltano Slack Community](https://meltano.com/slack) to help you out.
