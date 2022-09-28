@@ -5,7 +5,7 @@ layout: doc
 weight: 2
 ---
 
-Before you can use Meltano, you’ll need to get it installed. We have a complete installation guide that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.
+Before you can use Meltano, you’ll need to get it installed. We have a [complete installation guide](/guide/installation-guide) that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.
 
 
 ## Install Meltano

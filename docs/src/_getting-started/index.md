@@ -1,8 +1,8 @@
 ---
-title: Getting Started
+title: Complete Tutorial
 description: If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
 layout: getting_started
-weight: 3
+weight: 5
 ---
 
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
@@ -16,7 +16,7 @@ with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destinat
 
 Before you can get started with Meltano and the [`meltano` command line interface (CLI)](/reference/command-line-interface), you'll need to install it onto your system.
 
-_To learn more about the different installation methods, refer to the [Installation guide](/getting-started/installation)._
+_To learn more about the different installation methods, refer to the [Installation guide](/guide/installation-guide)._
 
 ### Local Installation
 
@@ -61,7 +61,7 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
    meltano --version
    ```
 
-If anything's not performing as expected, refer to the ["Local Installation" section](/getting-started/installation#local-installation) of the [Installation guide](/getting-started/installation) for more details.
+If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation-guide#local-installation) of the [Installation guide](/guide/installation-guide) for more details.
 
 ## Create Your Meltano Project
 
