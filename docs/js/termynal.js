@@ -112,6 +112,9 @@
                  await this._wait(delay);
              }
 
+             else if (type == 'wait') {
+                await this._wait(delay);
+            }
              else {
                  this.container.appendChild(line);
                  await this._wait(delay);

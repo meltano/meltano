@@ -9,6 +9,8 @@ const promptLiteralStart = "$ ";
 const customPromptLiteralStart = "# ";
 const termynalActivateClass = "termy";
 const codeThingy = "```"
+const waitStart = "<---"
+
 let termynals = [];
 
 function createTermynals() {
@@ -63,6 +65,16 @@ function createTermynals() {
                         class: "termynal-comment",
                         delay: 0
                     });
+
+                } else if (line == waitStart) {
+                    saveBuffer();
+                    useLines.push({
+                        type: "wait",
+                        delay: 1,
+                        value: "<br />"
+
+                    });
+
                 } else if (line.startsWith(customPromptLiteralStart)) {
                     saveBuffer();
                     const promptStart = line.indexOf(promptLiteralStart);
