@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import uuid
+from pathlib import Path
 
 import click
 
@@ -44,9 +45,10 @@ class ProjectInitService:
         try:
             os.mkdir(self.project_name)
         except FileExistsError as ex:
-            raise ProjectInitServiceError(
-                f"Directory {self.project_name!r} already exists."
-            ) from ex
+            if any(Path(self.project_name).iterdir()):
+                raise ProjectInitServiceError(
+                    f"Directory {self.project_name!r} not empty."
+                ) from ex
         except PermissionError as ex:
             raise ProjectInitServiceError(
                 f"Permission denied to create {self.project_name!r}."
@@ -152,8 +154,11 @@ class ProjectInitService:
         )
 
         click.echo("\nNext steps:")
-        click.secho("  cd ", nl=False)
-        click.secho(self.project_name, fg="magenta")
+
+        if not self.project.root.samefile(os.getcwd()):
+            click.secho("  cd ", nl=False)
+            click.secho(self.project_name, fg="magenta")
+
         click.echo("  Visit ", nl=False)
         click.secho(
             "https://docs.meltano.com/getting-started#create-your-meltano-project",
