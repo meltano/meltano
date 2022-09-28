@@ -79,7 +79,7 @@ These lines define the name "hide-github-mails" as the name of our mapping. We c
             field_paths: ["author/email", "committer/email"]
             type: "HASH"
 ```
-These lines define one transformation. We instruct to target the stream "commits", and therein the field "commit". We then use the field paths to navigate to the two emails we know are contained within this message and set the type to "HASH". Using "HASH" means we will still be able to tell whether two emails are the same, but not be able to read the email. They will be replaced with a random hash.
+These lines define one transformation. We instruct to target the stream "commits", and therein the field "commit". We then use the field paths to navigate to the two emails we know are contained within this message and set the type to "HASH". Using "HASH" means we will still be able to tell whether two emails are the same, but not be able to read the email. They will be replaced with a SHA-256 hash of the email.
 
 ## Run the data integration (E(t)LT) pipeline
 Now we're ready to run the data integration process with these modifications again. To do so, we'll need to clean up first, since we already ran the EL process in part 1. The primary key is still the same and as such the ingestion would fail.
