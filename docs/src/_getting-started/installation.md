@@ -87,7 +87,7 @@ successfully installed meltano
 To understand details of the installation, like mounting a docker volume to work long-term with the docker image, view the [detailed installation guide](/guide/installation-guide).
 ## Next Steps
 
-Once you're set up, head over to the tutorial to learn [how to initialize your first project ancd start to import data](/getting-started/part1).
+Once you're set up, head over to the tutorial to learn [how to initialize your first project and start to import data](/getting-started/part1).
 <script src="/js/tabs.js"></script>
 <script src="/js/termynal.js"></script>
 <script src="/js/termy_custom.js"></script>
