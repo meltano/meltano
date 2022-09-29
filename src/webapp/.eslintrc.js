@@ -51,6 +51,7 @@ module.exports = {
         ignores: [
           'Dropdown',
           'Embed',
+          'Logo',
           'Message',
           'Pill',
           'Pipeline',
