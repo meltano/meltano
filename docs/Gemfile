@@ -15,4 +15,5 @@ gem 'jekyll-redirect-from', "~>0.16"
 
 group :jekyll_plugins do
   gem 'jekyll-algolia'
+  gem "jekyll-tabs"
 end
