@@ -19,6 +19,8 @@ from typing import Any, Callable, Iterable, TypeVar
 import flatten_dict
 from requests.auth import HTTPBasicAuth
 
+from meltano.core.error import MeltanoError
+
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
@@ -409,7 +411,7 @@ def set_at_path(d, path, value):
     final[tail] = value
 
 
-class EnvironmentVariableNotSetError(Exception):
+class EnvironmentVariableNotSetError(MeltanoError):
     """Occurs when a referenced environment variable is not set."""
 
     def __init__(self, env_var: str):
@@ -418,12 +420,11 @@ class EnvironmentVariableNotSetError(Exception):
         Args:
             env_var: The unset environment variable name.
         """
-        super().__init__(env_var)
         self.env_var = env_var
 
-    def __str__(self) -> str:
-        """Return the error as a string."""  # noqa: DAR201
-        return f"{self.env_var} referenced but not set."
+        reason = f"Environment variable '{env_var}' referenced but not set"
+        instruction = "Make sure the environment variable is set"
+        super().__init__(reason, instruction)
 
 
 def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):

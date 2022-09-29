@@ -50,7 +50,7 @@ runs:
       shell: bash
       run: |
         docker images
-        echo "::set-output name=id::$(docker images -q ${{ inputs.registry }}/meltano/meltano | head -n 1)"
+        echo "::set-output name=id::$(docker images -q --no-trunc ${{ inputs.registry }}/meltano/meltano | head -n 1)"
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan

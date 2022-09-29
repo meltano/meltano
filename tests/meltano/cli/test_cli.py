@@ -6,8 +6,9 @@ from time import perf_counter_ns
 import pytest
 
 import meltano
-from meltano.cli import cli
-from meltano.core.error import EmptyMeltanoFileException
+from meltano.cli import cli, handle_meltano_error
+from meltano.cli.utils import CliError
+from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.project import PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
@@ -38,6 +39,7 @@ class TestCli:
         finally:
             Project.deactivate()
 
+    @pytest.mark.order(0)
     def test_activate_project(self, project, cli_runner, pushd):
         assert Project._default is None
 
@@ -48,11 +50,13 @@ class TestCli:
         assert Project._default.root == project.root
         assert Project._default.readonly is False
 
+    @pytest.mark.order(1)
     def test_empty_meltano_yml_project(self, empty_project, cli_runner, pushd):
         pushd(empty_project.root)
         with pytest.raises(EmptyMeltanoFileException):
             cli_runner.invoke(cli, ["config"], catch_exceptions=False)
 
+    @pytest.mark.order(2)
     def test_activate_project_readonly_env(
         self, project, cli_runner, pushd, monkeypatch
     ):
@@ -65,6 +69,7 @@ class TestCli:
 
         assert Project._default.readonly
 
+    @pytest.mark.order(2)
     def test_activate_project_readonly_dotenv(
         self, project, cli_runner, pushd, monkeypatch
     ):
@@ -156,6 +161,11 @@ class TestCli:
         )
         assert Project._default.active_environment is None
 
+    def test_handle_meltano_error(self):
+        exception = MeltanoError(reason="This failed", instruction="Try again")
+        with pytest.raises(CliError, match="This failed. Try again."):
+            handle_meltano_error(exception)
+
 
 class TestLargeConfigProject:
     def test_list_config_performance(self, large_config_project: Project, cli_runner):
@@ -167,5 +177,5 @@ class TestLargeConfigProject:
             == 0
         )
         duration_ns = perf_counter_ns() - start
-        # Ensure the large config can be processed in less than 15 seconds
-        assert duration_ns < 15000000000
+        # Ensure the large config can be processed in less than 20 seconds
+        assert duration_ns < 20000000000

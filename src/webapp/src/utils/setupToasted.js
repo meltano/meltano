@@ -43,42 +43,6 @@ export default function setup() {
     ]
   })
 
-  // Register an analytics tracking notification Toast.
-  Vue.toasted.register(
-    'acknowledgeAnalyticsTracking',
-    'Meltano has anonymous usage tracking on.',
-    {
-      type: 'info',
-      action: [
-        {
-          text: 'Learn more',
-          onClick: () => {
-            window.open(
-              'https://docs.meltano.com/reference/settings#send_anonymous_usage_stats'
-            )
-          }
-        },
-        {
-          text: 'Disable',
-          onClick: (e, toastObject) => {
-            toastObject.goAway(0)
-            localStorage.setItem('hasDisabledTracking', true)
-            localStorage.setItem('hasAcknowledgedTracking', true)
-          }
-        },
-        {
-          text: 'Got it',
-          onClick: (e, toastObject) => {
-            toastObject.goAway(0)
-            localStorage.setItem('hasDisabledTracking', false)
-            localStorage.setItem('hasAcknowledgedTracking', true)
-          }
-        }
-      ],
-      duration: null
-    }
-  )
-
   // Register a Global success notification
   Vue.toasted.register(
     'success',

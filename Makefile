@@ -58,6 +58,10 @@ clean: ## Delete build artifacts
 
 docker_images: base_image prod_image ## Build the Meltano Docker images
 
+docs: ## Serve docs
+	cd docs &&\
+	 bundle exec jekyll serve
+
 # Docker Image Related
 # ====================
 #
@@ -65,7 +69,7 @@ docker_images: base_image prod_image ## Build the Meltano Docker images
 # - `make prod_image` builds meltano/meltano which is an all-in-one production
 #   image that includes the static ui artifacts in the image.
 
-.PHONY: base_image prod_image
+.PHONY: base_image prod_image docs
 
 base_image: ## Build the Meltano base image
 	docker build \

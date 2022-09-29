@@ -278,7 +278,7 @@ class Project(Versioned):  # noqa: WPS214
             yield meltano_config
 
             try:
-                meltano_config = self.project_files.update(meltano_config.canonical())
+                self.project_files.update(meltano_config.canonical())
             except Exception as err:
                 logger.critical("Could not update meltano.yml: %s", err)  # noqa: WPS323
                 raise

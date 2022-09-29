@@ -47,14 +47,14 @@ class PluginRepository(metaclass=ABCMeta):
         self,
         plugin_type: PluginType,
         plugin_name: str,
-        **kwargs,
+        variant_name: str | None = None,
     ) -> PluginDefinition:
         """Find a plugin definition.
 
         Args:
             plugin_type: The type of plugin to find.
             plugin_name: The name of the plugin to find.
-            kwargs: Additional arguments to pass to the finder.
+            variant_name: The name of the variant to find.
         """
         ...  # noqa: WPS428
 
@@ -374,13 +374,17 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         )
 
     def find_definition(
-        self, plugin_type: PluginType, plugin_name: str
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
     ) -> PluginDefinition:
         """Find a plugin definition by type and name.
 
         Args:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
+            variant_name: The plugin variant name.
 
         Returns:
             The plugin definition.

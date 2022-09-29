@@ -10,6 +10,7 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
 TEnv = TypeVar("TEnv")
@@ -17,6 +18,20 @@ TEnv = TypeVar("TEnv")
 
 class NoActiveEnvironment(Exception):  # noqa: N818
     """Exception raised when invocation has no active environment."""
+
+
+class EnvironmentNameContainsStateIdDelimiterError(Exception):
+    """Occurs when an environment name contains the state ID component delimiter string."""
+
+    def __init__(self, name: str):
+        """Create a new exception.
+
+        Args:
+            name: The name of the environment.
+        """
+        super().__init__(
+            f"The environment name '{name}' cannot contain the state ID component delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+        )
 
 
 class EnvironmentPluginConfig(PluginRef):
@@ -139,6 +154,7 @@ class Environment(NameEq, Canonical):
         name: str,
         config: dict | None = None,
         env: dict | None = None,
+        state_id_suffix: str | None = None,
     ) -> None:
         """Create a new environment object.
 
@@ -146,12 +162,20 @@ class Environment(NameEq, Canonical):
             name: Environment name. Must be unique.
             config: Dictionary with environment configuration.
             env: Optional override environment values.
+            state_id_suffix: State ID suffix to use.
+
+        Raises:
+            EnvironmentNameContainsStateIdDelimiterError: If the name contains the state ID component delimiter string.
         """
+        if STATE_ID_COMPONENT_DELIMITER in name:
+            raise EnvironmentNameContainsStateIdDelimiterError(name)
+
         super().__init__()
 
         self.name = name
         self.config = EnvironmentConfig(**(config or {}))
         self.env = env or {}
+        self.state_id_suffix = state_id_suffix
 
     @classmethod
     def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:

@@ -57,16 +57,53 @@ repo: https://github.com/apache/airflow
 
 ## `capabilities`
 
-Array of capabilities that the plugin supports.
+Array of capabilities that the plugin supports. For example:
 
 ```yaml
 capabilities:
 - catalog
 - discover
 - state
-- about
-- stream-maps
 ```
+
+The full list of defined capabilities is below:
+
+- [`catalog`](#catalog-capability)
+- [`properties`](#properties-capability)
+- [`discover`](#discover-capability)
+- [`state`](#state-capability)
+- [`about`](#about-capability)
+- [`stream-maps`](#stream-maps-capability)
+
+### `catalog` capability
+
+Declares that the plugin supports stream and property selection using the `--catalog` CLI argument, which is a newer version of the [`--properties` capability](#properties-capability).
+
+Note: The `catalog` capability is a newer version of the [`properties` capability](#properties-capability). Singer taps which support field and stream selection logic should declare the `properties` or `catalog` capability, but not both.
+
+### `properties` capability
+
+Declares that the plugin supports stream and property selection using the `--properties` CLI argument.
+
+Note: The `properties` capability is an older version of the [`--catalog` capability](#catalog-capability). Singer taps which support field and stream selection logic should declare the `properties` or `catalog` capability, but not both.
+
+### `discover` capability
+
+Declares that the plugin can be run with the `--discover` CLI argument, which generates a `catalog.json` file. This is used by Meltano in combination with the `catalog` or `properties` capability to customize the catalog and to apply selection logic.
+
+### `state` capability
+
+Declares that the plugin is able to perform incremental processing using the `--state` CLI option.
+
+Note: This capability must be declared in order to use incremental data replication.
+
+### `about` capability
+
+Declares that the plugin supports a `--about` CLI argument and a paired `--format=json` to optionally print the plugin's metadata in a machine readable format. This capability can be used by users to better understand the capabilities and settings expected by the plugin. It may also be used by Meltano and MeltanoHub codebase to auto-detect behaviors and capabilities.
+
+### `stream-maps` capability
+
+For Singer connectors, declares the ability to perform inline transformations or 'mappings' within the stream. For more details, please see the [Singer SDK Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html) documentation.
 
 ## `pip_url`
 

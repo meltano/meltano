@@ -148,6 +148,8 @@ per-file-ignores =
         D102
         D103
         D104
+	D105
+	D107
         # String does contain unindexed parameters
         P103
         # Allow underscored number name pattern (e.g. tap_covid_19)
@@ -204,6 +206,10 @@ per-file-ignores =
         WPS213
         # Allow many decorators, since `click` uses them to define the CLI
         WPS216
+        # Allow many module members
+        WPS202
+        # Allow 'overuse' of expressions (e.g. ctx.obj["settings"])
+        WPS204
     src/meltano/migrations/versions/*:
         # Don't class docstrings in migrations
         D101
@@ -280,3 +286,6 @@ per-file-ignores =
         # Many of these utility functions are descriptively
 	# name and self-documenting
 	D103
+    src/meltano/core/state_store.py:
+	# Ignore ... in ABC
+	WPS428

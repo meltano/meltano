@@ -1,11 +1,11 @@
 ---
-title: Installation
+title: In-depth Installation
 description: Learn how to install Meltano locally with Linux, macOS, Windows, or Docker.
 layout: doc
-weight: 1
+weight: 2
 ---
 
-If the installation instructions in the [Getting Started guide](/getting-started#install-meltano) did not work on your environment, or if you'd like to learn more about how to manage your Meltano installation, you've come to the right place.
+This document will get you up and running with Meltano in-depth. There is also a [short install guide for first-time Meltano users](/getting-started/installation).
 
 <div class="notification is-success">
     <p><strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!</p>
@@ -209,7 +209,7 @@ Note that wherever you are asked to run the `meltano` command, you will want to 
 # Troubleshooting Installation
 
 <div class="notification is-info">
-  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/">Getting Help</a> on the different ways to get in touch with us.</p>
+  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/#get-help">Getting Help</a> on the different ways to get in touch with us.</p>
 </div>
 
 ## Upgrading Meltano Version

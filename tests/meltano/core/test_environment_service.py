@@ -4,11 +4,15 @@ import platform
 
 import pytest
 
-from meltano.core.environment import Environment
+from meltano.core.environment import (
+    Environment,
+    EnvironmentNameContainsStateIdDelimiterError,
+)
 from meltano.core.environment_service import (
     EnvironmentAlreadyExistsError,
     EnvironmentService,
 )
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
 
@@ -21,6 +25,7 @@ class TestEnvironmentService:
     def environment(self, environment_service: EnvironmentService) -> Environment:
         return environment_service.add("test-environment")
 
+    @pytest.mark.order(0)
     def test_add_environment(self, subject: EnvironmentService):
         count = 10
         environments = [Environment(f"environment_{idx}") for idx in range(count)]
@@ -41,6 +46,7 @@ class TestEnvironmentService:
         ):
             subject.add_environment(environments[3])
 
+    @pytest.mark.order(1)
     def test_remove_environment(
         self,
         subject: EnvironmentService,
@@ -56,6 +62,7 @@ class TestEnvironmentService:
         ):
             subject.remove("i-do-not-exist")
 
+    @pytest.mark.order(2)
     def test_list_environments(
         self,
         subject: EnvironmentService,
@@ -66,3 +73,10 @@ class TestEnvironmentService:
             )
         new_environment = subject.add("new-environment")
         assert subject.list_environments() == [new_environment]
+
+    def test_add_name_contains_state_id_component_delimiter(
+        self,
+        subject: EnvironmentService,
+    ):
+        with pytest.raises(EnvironmentNameContainsStateIdDelimiterError):
+            subject.add(f"test{STATE_ID_COMPONENT_DELIMITER}")

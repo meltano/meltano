@@ -5,11 +5,13 @@ from collections import Counter
 import pytest
 
 from meltano.core.plugin import PluginType, Variant
+from meltano.core.plugin.base import PluginRefNameContainsStateIdDelimiterError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 
 
 class TestProjectAddService:
@@ -24,6 +26,7 @@ class TestProjectAddService:
         assert hub_request_counter["/extractors/index"] == 1
         assert len(hub_request_counter) == 1
 
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(  # noqa: WPS317
         ("plugin_type", "plugin_name", "variant", "default_variant"),
         [
@@ -109,6 +112,7 @@ class TestProjectAddService:
         assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
         assert len(hub_request_counter) == 2
 
+    @pytest.mark.order(after="test_add_inherited")
     def test_lockfile_inherited(
         self,
         subject: ProjectAddService,
@@ -161,3 +165,13 @@ class TestProjectAddService:
         assert hub_request_counter["/extractors/index"] == 1
         assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
         assert len(hub_request_counter) == 2
+
+    def test_add_name_contains_state_id_component_delimiter(
+        self,
+        subject: ProjectAddService,
+    ):
+        with pytest.raises(PluginRefNameContainsStateIdDelimiterError):
+            subject.add(
+                PluginType.EXTRACTORS,
+                f"tap-mock{STATE_ID_COMPONENT_DELIMITER}",
+            )

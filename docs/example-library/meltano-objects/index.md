@@ -31,3 +31,9 @@ meltano job add gitlab_to_jsonl --tasks '["tap-gitlab target-jsonl"]'
 ```shell
 meltano schedule add run_gitlab --job gitlab_to_jsonl --interval "@daily"
 ```
+
+## Remove a plugin
+
+```shell
+meltano remove extractor tap-gitlab
+```

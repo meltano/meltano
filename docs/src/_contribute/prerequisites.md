@@ -3,13 +3,14 @@ title: Prerequisites
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
 weight: 2
+hidden: true
 ---
 
 ## Prerequisites
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.7+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/guide/installation#requirements) of the Installation instructions, that also apply here.
+1. [Python 3.7+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
 2. [Node 8.11.0+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
