@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 
-from sqlalchemy import Column, literal, types
+from sqlalchemy import Column, literal, types, delete, desc
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
 
@@ -332,6 +332,25 @@ class Job(SystemModel):  # noqa: WPS214
         session.commit()
 
         return self
+
+    @staticmethod
+    def vaccum(session, job_name: str, rows_to_keep: int):
+        """Remove old jobs of specific job_name from table, only leaving a few latest ones.
+
+        Args:
+            session: the session to use for writing to the db
+            job_name: the job name
+            rows_to_keep: how many jobs to keep in the table
+        """
+        oldest_job_to_keep = session.query(Job).filter(Job.job_name == job_name).order_by(desc(Job.id)).offset(rows_to_keep - 1).first()
+        if oldest_job_to_keep is not None:
+            id_threshold = oldest_job_to_keep.id
+            delete_count = session.query(Job).filter(Job.job_name == job_name, Job.id < id_threshold).count()
+            session.execute(delete(Job).where(Job.job_name == job_name, Job.id < id_threshold))
+            session.commit()
+            return delete_count
+        else:
+            return 0
 
     def _heartbeat(self):
         """Update last_heartbeat_at for this job in the db."""

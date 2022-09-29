@@ -130,6 +130,7 @@ class StateService:
             state=json.dumps(new_state_dict),
             complete=(payload_flags == Payload.STATE),
         )
+        #self._vacuum_if_necessary()
 
     def get_state(self, state_id: str):
         """Get state for the given state_id.
@@ -200,3 +201,22 @@ class StateService:
         src_state = json.dumps(src_state_dict)
         self.set_state(state_id_dst, src_state)
         self.clear_state(state_id_src)
+
+#    def _vacuum_if_necessary(self):
+#        """Execute vacuuming if configured so
+#        """
+
+    def vacuum(self, state_id_pattern: str | None, rows_to_keep: int | None):
+        """Vacuum table by removing old rows, keeping only a few latest ones for each state_id
+
+        Args:
+            state_id_pattern: An optional glob-style pattern of state_ids to search for
+            rows_to_keep: how many rows to keep for each state_id
+
+        Returns:
+            how many rows are deleted in total
+        """
+        delete_count = 0
+        for state_id in self.state_store_manager.get_state_ids(state_id_pattern):
+            delete_count += Job.vaccum(self.session, state_id, rows_to_keep or 10)
+        return delete_count
