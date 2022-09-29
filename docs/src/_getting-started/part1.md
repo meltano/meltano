@@ -376,7 +376,7 @@ $ cat output/commits.jsonl
 </div>
 ## Next Steps
 
-Next, head over to [Part 2: Loading extracted data into a target (currently inside the large Getting Started Tutorial)](/getting-started/#add-a-loader-to-send-data-to-a-destination).
+Next, head over to [Part 2: Loading extracted data into a target (currently inside the large Getting Started Tutorial)](/getting-started/part2).
 
 
    <script src="/js/termynal.js" data-termynal-container="#termy1|#termy2|#termy3|#termy4|#termy5|#termy6|#termy7|#termy8|#termy9|#termy10"></script>

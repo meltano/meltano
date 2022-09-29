@@ -12,7 +12,7 @@ Throughout this tutorial, we’ll walk you through the creation of a end-to-end 
 
 In parts [1](/getting-started/part1) & [2](/getting-started/part2), we extracted data from GitHub and loaded it into a (local) PostgreSQL database. Now it is time to have more fun. We decide to load all attributes from the data we selected previously, and then build a model listing the different authors of commits to our repository.
 
-That means, in this part we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information. Don't worry, you don't need to know anything about dbt, this tutorial is self-contained. You do not need to install dbt yourself, it works as a dbt plugin.
+That means, in this part we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information. Don't worry, you don't need to know anything about dbt, this tutorial is self-contained. You do not need to install dbt yourself, it works as a Meltano plugin.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -61,7 +61,7 @@ INFO METRIC: {"type": "timer", "metric":  [...]
 Next, we add the dbt plugin to transform this data.
 
 ## Install and configure the postgres specific dbt transformer
-Dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano transformers match this pattern; in this case our transformer is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
+dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano transformers match this pattern; in this case our transformer is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
 <div class="termy">
 
@@ -100,7 +100,7 @@ To learn more about file bundle 'files-dbt-postgres', visit https://hub.meltano.
 </div>
 
 <br />
-As you can see, this adds both the transformer as well as a "file bundle" to your project. You can verify that this worked by viewing the newly populated directory `transform`.
+As you can see, this adds both the transformer as well as a [file bundle](/concepts/plugins#file-bundles) to your project. You can verify that this worked by viewing the newly populated directory `transform`.
 
 ## Configure dbt
 Configure the dbt-postgres transformer to use the same configuration as our target-postgres loader using `meltano config`:
@@ -123,7 +123,7 @@ $ meltano config dbt-postgres set schema analytics
 </div>
 
 ## Add our source data to dbt
-The E(t)L pipeline run already added our source data into the schema `tap_github` as table `commits`. Dbt will need to know where to locate this dataa. Let's add that to dbt to work with:
+The E(t)L pipeline run already added our source data into the schema `tap_github` as table `commits`. dbt will need to know where to locate this data. Let's add that to our dbt project:
 
 ```bash
 mkdir transform/models/tap_github
