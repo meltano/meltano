@@ -4,68 +4,68 @@ import hyphenate from '@/filters/hyphenate'
 export default {
   name: 'Dropdown',
   filters: {
-    hyphenate
+    hyphenate,
   },
   props: {
     buttonClasses: {
       type: String,
-      default: ''
+      default: '',
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     iconClose: {
       type: String,
-      default: 'caret-up'
+      default: 'caret-up',
     },
     iconOpen: {
       type: String,
-      default: 'caret-down'
+      default: 'caret-down',
     },
     isIconRemoved: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isFullWidth: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isRightAligned: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isUp: {
       type: Boolean,
-      default: false
+      default: false,
     },
     label: {
       type: String,
-      default: ''
+      default: '',
     },
     labelClasses: {
       type: String,
-      default: ''
+      default: '',
     },
     menuClasses: {
       type: String,
-      default: ''
+      default: '',
     },
     textIs: {
       type: String,
-      default: ''
+      default: '',
     },
     tooltip: {
       type: Object,
       default: () => {
         return {}
-      }
-    }
+      },
+    },
   },
   data() {
     return {
       isOpen: false,
-      lastDropdownOpen: null
+      lastDropdownOpen: null,
     }
   },
   computed: {
@@ -80,7 +80,7 @@ export default {
     },
     getHyphenatedLabel() {
       return hyphenate(this.label, 'dropdown')
-    }
+    },
   },
   created() {
     document.addEventListener('click', this.onDocumentClick)
@@ -111,8 +111,8 @@ export default {
       if (targetEl !== matchEl) {
         this.close()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -123,7 +123,7 @@ export default {
       'is-active': isOpen,
       'is-right': isRightAligned,
       'is-fullwidth': isFullWidth,
-      'is-up': isUp
+      'is-up': isUp,
     }"
     @click.stop="onBubbleClose"
   >

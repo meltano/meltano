@@ -9,29 +9,29 @@ const READONLY_INFO = {
   project_readonly: {
     label: 'Read-only project',
     tooltip: 'This Meltano project is deployed as read-only',
-    url: 'https://docs.meltano.com/reference/settings#project-readonly'
+    url: 'https://docs.meltano.com/reference/settings#project-readonly',
   },
   'ui.readonly': {
     label: 'Read-only UI',
     tooltip: 'Meltano UI is running in read-only mode',
-    url: 'https://docs.meltano.com/reference/settings#ui-readonly'
+    url: 'https://docs.meltano.com/reference/settings#ui-readonly',
   },
   'ui.anonymous_readonly': {
     label: 'Read-only UI',
     tooltip: 'Meltano UI is running in read-only mode until you sign in',
-    url: 'https://docs.meltano.com/reference/settings#ui-anonymous-readonly'
-  }
+    url: 'https://docs.meltano.com/reference/settings#ui-anonymous-readonly',
+  },
 }
 
 export default {
   name: 'MainNav',
   components: {
     Dropdown,
-    Logo
+    Logo,
   },
   data() {
     return {
-      isMobileMenuOpen: false
+      isMobileMenuOpen: false,
     }
   },
   computed: {
@@ -43,16 +43,16 @@ export default {
       return !!this.$flask.isAnalysisEnabled
     },
     getIconColor() {
-      return parentPath =>
+      return (parentPath) =>
         this.getIsSubRouteOf(parentPath)
           ? 'has-text-interactive-navigation'
           : 'has-text-grey-light'
     },
     getIsCurrentPath() {
-      return path => this.$route.path.includes(path)
+      return (path) => this.$route.path.includes(path)
     },
     getIsSubRouteOf() {
-      return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
+      return (parentPath) => utils.getIsSubRouteOf(parentPath, this.$route.path)
     },
     readonlySetting() {
       return this.$flask.isReadonlyEnabled
@@ -79,14 +79,14 @@ export default {
     },
     logoUrl() {
       return this.$flask.logoUrl
-    }
+    },
   },
   watch: {
     $route() {
       if (this.isMobileMenuOpen) {
         this.closeMobileMenu()
       }
-    }
+    },
   },
   created() {
     this.$store.dispatch('plugins/getPlugins')
@@ -105,8 +105,8 @@ export default {
       this.$store.dispatch('system/upgrade').then(() => {
         document.location.reload()
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -143,7 +143,7 @@ export default {
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/extractors')
+              'has-text-interactive-navigation': getIsSubRouteOf('/extractors'),
             }"
           >
             <span class="icon is-small" :class="getIconColor('/extractors')">
@@ -161,7 +161,7 @@ export default {
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/loaders')
+              'has-text-interactive-navigation': getIsSubRouteOf('/loaders'),
             }"
           >
             <span class="icon is-small" :class="getIconColor('/loaders')">
@@ -179,7 +179,7 @@ export default {
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
+              'has-text-interactive-navigation': getIsSubRouteOf('/pipelines'),
             }"
           >
             <span class="icon is-small" :class="getIconColor('/pipelines')">
@@ -202,9 +202,9 @@ export default {
             <div v-if="updateAvailable" class="level-item">
               <Dropdown
                 label="Update Available"
-                :button-classes="
-                  `is-info is-small ${updating ? 'is-loading' : ''}`
-                "
+                :button-classes="`is-info is-small ${
+                  updating ? 'is-loading' : ''
+                }`"
                 menu-classes="dropdown-menu-600"
                 icon-open="gift"
                 icon-close="caret-up"

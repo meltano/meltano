@@ -11,17 +11,17 @@ export default {
   name: 'Pipeline',
   components: {
     ConnectorLogo,
-    Dropdown
+    Dropdown,
   },
   filters: {
-    capitalize
+    capitalize,
   },
   props: {
-    pipeline: { type: Object, default: () => {} }
+    pipeline: { type: Object, default: () => {} },
   },
   data() {
     return {
-      defaultCronInterval: '*/1 * * * *'
+      defaultCronInterval: '*/1 * * * *',
     }
   },
   computed: {
@@ -33,13 +33,13 @@ export default {
       return TRANSFORM_OPTIONS
     },
     getIsDisabled() {
-      return pipeline => pipeline.isRunning || pipeline.isSaving
+      return (pipeline) => pipeline.isRunning || pipeline.isSaving
     },
     getMomentFormat() {
-      return val => utils.momentFormatlll(val)
+      return (val) => utils.momentFormatlll(val)
     },
     getLastRunLabel() {
-      return pipeline => {
+      return (pipeline) => {
         const label = pipeline.endedAt
           ? utils.momentFromNow(pipeline.endedAt)
           : 'Never'
@@ -47,20 +47,20 @@ export default {
       }
     },
     getMomentFromNow() {
-      return val => utils.momentFromNow(val)
+      return (val) => utils.momentFromNow(val)
     },
     getModalName() {
       return this.$route.name
     },
     isModal() {
       return this.$route.meta.isModal
-    }
+    },
   },
   methods: {
     ...mapActions('orchestration', [
       'deletePipelineSchedule',
       'updatePipelineSchedule',
-      'getPipelineSchedules'
+      'getPipelineSchedules',
     ]),
     goToLog(stateId) {
       this.$router.push({ name: 'runLog', params: { stateId } })
@@ -77,16 +77,17 @@ export default {
           const cronDefault = this.defaultCronInterval
           this.$router.push({
             name: 'cronJobSettings',
-            params: { stateId, cronDefault }
+            params: { stateId, cronDefault },
           })
         } else {
           if (item === 'interval' && newPipelineValue != '@other') {
+            // eslint-disable-next-line vue/no-mutating-props
             this.pipeline.cronExpression = null
           }
           this.updatePipelineSchedule({
             [item]: newPipelineValue,
             pipeline,
-            pluginNamespace
+            pluginNamespace,
           })
             .then(() =>
               Vue.toasted.global.success(
@@ -100,7 +101,7 @@ export default {
     setCRONInterval(stateId, cronInterval) {
       this.$router.push({
         name: 'cronJobSettings',
-        params: { stateId, cronInterval }
+        params: { stateId, cronInterval },
       })
     },
     removePipeline(pipeline) {
@@ -117,8 +118,8 @@ export default {
     },
     runELT(pipeline) {
       this.$store.dispatch('orchestration/run', pipeline)
-    }
-  }
+    },
+  },
 }
 </script>
 <template>
@@ -154,7 +155,7 @@ export default {
             <span
               class="select is-fullwidth is-size-7"
               :class="{
-                'is-loading': getIsDisabled(pipeline)
+                'is-loading': getIsDisabled(pipeline),
               }"
             >
               <select
@@ -166,8 +167,9 @@ export default {
                   v-for="option in transformOptions"
                   :key="option"
                   :value="option"
-                  >{{ option | capitalize }}</option
                 >
+                  {{ option | capitalize }}
+                </option>
               </select>
             </span>
           </div>
@@ -181,7 +183,7 @@ export default {
             <span
               class="select is-fullwidth is-size-7"
               :class="{
-                'is-loading': getIsDisabled(pipeline)
+                'is-loading': getIsDisabled(pipeline),
               }"
             >
               <select
@@ -193,8 +195,9 @@ export default {
                   v-for="(label, value) in intervalOptions"
                   :key="value"
                   :value="value"
-                  >{{ label }}</option
                 >
+                  {{ label }}
+                </option>
               </select>
             </span>
           </div>
@@ -205,7 +208,7 @@ export default {
       <p>
         <span
           :class="{
-            'tooltip is-tooltip-left': pipeline.hasEverSucceeded
+            'tooltip is-tooltip-left': pipeline.hasEverSucceeded,
           }"
           :data-tooltip="getMomentFormat(pipeline.startDate)"
         >
@@ -223,15 +226,13 @@ export default {
           v-if="pipeline.isRunning || pipeline.endedAt"
           class="button is-small is-outlined is-fullwidth h-space-between"
           :class="{
-            'tooltip is-tooltip-top': pipeline.hasEverSucceeded
+            'tooltip is-tooltip-top': pipeline.hasEverSucceeded,
           }"
-          :data-tooltip="
-            `${
-              pipeline.endedAt
-                ? getMomentFormat(pipeline.endedAt)
-                : 'View the last run of this ELT pipeline.'
-            }`
-          "
+          :data-tooltip="`${
+            pipeline.endedAt
+              ? getMomentFormat(pipeline.endedAt)
+              : 'View the last run of this ELT pipeline.'
+          }`"
           @click="goToLog(pipeline.stateId)"
         >
           <span>
@@ -283,11 +284,9 @@ export default {
           </button>
         </div>
         <Dropdown
-          :button-classes="
-            `is-small is-danger is-outlined ${
-              pipeline.isDeleting ? 'is-loading' : ''
-            }`
-          "
+          :button-classes="`is-small is-danger is-outlined ${
+            pipeline.isDeleting ? 'is-loading' : ''
+          }`"
           :disabled="getIsDisabled(pipeline)"
           menu-classes="dropdown-menu-300"
           icon-open="trash-alt"
@@ -305,7 +304,7 @@ export default {
                   >.
                 </p>
               </div>
-              <div class="buttons is-right ">
+              <div class="buttons is-right">
                 <button class="button is-text" data-dropdown-auto-close>
                   Cancel
                 </button>

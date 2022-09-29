@@ -11,7 +11,7 @@ export default function setup() {
     position: 'bottom-right',
     iconPack: 'fontawesome',
     theme: 'outline',
-    duration: 9000
+    duration: 9000,
   }
   Vue.use(Toasted, toastedOptions)
 
@@ -20,7 +20,7 @@ export default function setup() {
     'forbidden',
     "You can't access this resource at this moment.",
     {
-      type: 'error'
+      type: 'error',
     }
   )
 
@@ -32,21 +32,21 @@ export default function setup() {
         text: 'Get Help',
         onClick: () => {
           window.open('https://docs.meltano.com/the-project/community')
-        }
+        },
       },
       {
         text: 'Close',
         onClick: (e, toastObject) => {
           toastObject.goAway(0)
-        }
-      }
-    ]
+        },
+      },
+    ],
   })
 
   // Register a Global success notification
   Vue.toasted.register(
     'success',
-    message => message,
+    (message) => message,
     Object.assign(lodash.cloneDeep(toastedOptions), {
       type: 'success',
       action: [
@@ -54,16 +54,16 @@ export default function setup() {
           text: 'OK',
           onClick: (e, toastObject) => {
             toastObject.goAway(0)
-          }
-        }
-      ]
+          },
+        },
+      ],
     })
   )
 
   // Register a Global error notification
   Vue.toasted.register(
     'error',
-    message => message,
+    (message) => message,
     Object.assign(lodash.cloneDeep(toastedOptions), {
       type: 'error',
       action: [
@@ -71,9 +71,9 @@ export default function setup() {
           text: 'OK',
           onClick: (e, toastObject) => {
             toastObject.goAway(0)
-          }
-        }
-      ]
+          },
+        },
+      ],
     })
   )
 
@@ -85,23 +85,23 @@ export default function setup() {
       action: [
         {
           text: 'Refresh!',
-          onClick: () => document.location.reload()
-        }
+          onClick: () => document.location.reload(),
+        },
       ],
       duration: null,
       closeOnSwipe: false,
       singleton: true,
-      type: 'info'
+      type: 'info',
     }
   )
 
   // Register the `read-only` killswitch notification
   Vue.toasted.register(
     'readonly',
-    message => `The requested action could not be completed: ${message}`,
+    (message) => `The requested action could not be completed: ${message}`,
     {
       type: 'warning',
-      singleton: true
+      singleton: true,
     }
   )
 }
