@@ -342,11 +342,12 @@ class Job(SystemModel):  # noqa: WPS214
             job_name: the job name
             rows_to_keep: how many jobs to keep in the table
         """
-        oldest_job_to_keep = session.query(Job).filter(Job.job_name == job_name).order_by(desc(Job.id)).offset(rows_to_keep - 1).first()
-        if oldest_job_to_keep is not None:
-            id_threshold = oldest_job_to_keep.id
-            delete_count = session.query(Job).filter(Job.job_name == job_name, Job.id < id_threshold).count()
-            session.execute(delete(Job).where(Job.job_name == job_name, Job.id < id_threshold))
+        # get the (n+1)-th latest row, or None if there is less or equal than n rows in the table
+        latest_job_to_delete = session.query(Job).filter(Job.job_name == job_name).order_by(desc(Job.id)).offset(rows_to_keep).first()
+        if latest_job_to_delete is not None:
+            id_threshold = latest_job_to_delete.id
+            delete_count = session.query(Job).filter(Job.job_name == job_name, Job.id <= id_threshold).count()
+            session.execute(delete(Job).where(Job.job_name == job_name, Job.id <= id_threshold))
             session.commit()
             return delete_count
         else:
