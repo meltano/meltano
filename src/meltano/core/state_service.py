@@ -31,13 +31,16 @@ class StateService:
     Currently only manages Singer state for Extract and Load jobs.
     """
 
-    def __init__(self, session: object = None):
+    def __init__(self, session: object = None, settings = None):
         """Create a StateService object.
 
         Args:
             session: the session to use for interacting with the db
         """
         self.session = session
+        self.max_rows_per_job: int | None = settings.get("database_max_rows_per_job") if settings is not None else None
+        if self.max_rows_per_job < 1:
+            self.max_rows_per_job = None
 
     def list_state(self, state_id_pattern: str | None = None):
         """List all state found in the db.
@@ -130,7 +133,7 @@ class StateService:
             state=json.dumps(new_state_dict),
             complete=(payload_flags == Payload.STATE),
         )
-        #self._vacuum_if_necessary()
+        self._vacuum_if_necessary()
 
     def get_state(self, state_id: str):
         """Get state for the given state_id.
@@ -202,9 +205,16 @@ class StateService:
         self.set_state(state_id_dst, src_state)
         self.clear_state(state_id_src)
 
-#    def _vacuum_if_necessary(self):
-#        """Execute vacuuming if configured so
-#        """
+    def _vacuum_if_necessary(self):
+        """Execute vacuuming if configured
+        """
+        try:
+            if self.max_rows_per_job is not None and self.max_rows_per_job > 0:
+                delete_count = self.vacuum(None, self.max_rows_per_job)
+                if delete_count > 0:
+                    logger.debug(f"Delete {delete_count} unused rows for vacuuming")
+        except BaseException:
+            logger.warning(f"Failed to execute vacuuming.")
 
     def vacuum(self, state_id_pattern: str | None, rows_to_keep: int | None):
         """Vacuum table by removing old rows, keeping only a few latest ones for each state_id

@@ -15,6 +15,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 
@@ -77,7 +78,7 @@ class TestSingerTap:
         )
 
         invoker = plugin_invoker_factory(subject, context=elt_context)
-        state_service = StateService(session)
+        state_service = StateService(session, ProjectSettingsService(elt_context.project))
 
         @contextmanager
         def create_job():

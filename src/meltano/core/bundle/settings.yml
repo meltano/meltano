@@ -20,6 +20,9 @@ settings:
 - name: database_retry_timeout
   kind: integer
   value: 5
+- name: database_max_rows_per_job
+  kind: integer
+  value: -1
 - name: project_readonly
   kind: boolean
   value: false

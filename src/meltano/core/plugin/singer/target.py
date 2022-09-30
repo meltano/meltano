@@ -10,8 +10,10 @@ from datetime import datetime
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
+from meltano.core.project import Project
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
 from . import PluginType, SingerPlugin
@@ -25,6 +27,7 @@ class BookmarkWriter:
     def __init__(
         self,
         job: Job,
+        project: Project,
         session: object,
         payload_flag: int = Payload.STATE,
         state_service: StateService | None = None,
@@ -39,7 +42,7 @@ class BookmarkWriter:
         """
         self.job = job
         self.session = session
-        self.state_service = state_service or StateService(session)
+        self.state_service = state_service or StateService(session, ProjectSettingsService(project))
         self.payload_flag = payload_flag
 
     def writeline(self, line: str):
@@ -156,5 +159,5 @@ class SingerTarget(SingerPlugin):
 
         plugin_invoker.add_output_handler(
             plugin_invoker.StdioSource.STDOUT,
-            BookmarkWriter(elt_context.job, elt_context.session, payload_flag),
+            BookmarkWriter(elt_context.job, elt_context.project, elt_context.session, payload_flag),
         )

@@ -15,6 +15,7 @@ from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 from . import cli
@@ -109,7 +110,7 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
+    ctx.obj[STATE_SERVICE_KEY] = StateService(session, ProjectSettingsService(project))  # noqa: WPS204
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")

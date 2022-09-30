@@ -19,6 +19,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
@@ -289,7 +290,7 @@ class SingerTap(SingerPlugin):
 
             return
         # the `state.json` is stored in the database
-        state = StateService(elt_context.session).get_state(elt_context.job.job_name)
+        state = StateService(elt_context.session, ProjectSettingsService(elt_context.project)).get_state(elt_context.job.job_name)
         if state:
             if state.get(SINGER_STATE_KEY):
                 with state_path.open("w") as state_file:

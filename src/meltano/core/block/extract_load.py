@@ -358,7 +358,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         if not self._state_service:
             if self.has_state():
-                self._state_service = StateService(self.context.session)
+                self._state_service = StateService(self.context.session, ProjectSettingsService(self.context.project))
             else:
                 raise BlockSetHasNoStateError()
         return self._state_service
