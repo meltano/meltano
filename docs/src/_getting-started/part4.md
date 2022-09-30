@@ -1,5 +1,5 @@
 ---
-title: Part 4 - Inline Data Mapping, E(t)LT
+title: Part 4 - Inline Data Mapping
 description: Part 4 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
 layout: doc
 weight: 4
@@ -8,11 +8,11 @@ weight: 4
 
 Let’s learn by example.
 
-Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern E(t)LT stack.
+Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
 
 In parts [1](/getting-started/part1), [2](/getting-started/part2), and [3](/getting-started/part3) we built an ELT pipeline. We took all the data from the commits on one repository at GitHub and extracted the authors working on it. However now we realized, we stored a lot of information where we really might want to hide a few of those pieces.
 
-We're going to do light-weight transformations ("little t or (t)"), also called **"inline data mappings"** to clean up the data before storing them anywhere. We will use these inline data mappings to hide all emails inside the JSON blob we receive. In the Meltano world, these data mappings are also called [stream maps](https://sdk.meltano.com/en/latest/stream_maps.html).
+We're going to do light-weight transformations, also called **"inline data mappings"** to clean up the data before storing them anywhere. We will use these inline data mappings to hide all emails inside the JSON blob we receive. In the Meltano world, these data mappings are also called [stream maps](https://sdk.meltano.com/en/latest/stream_maps.html).
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -81,7 +81,7 @@ These lines define the name "hide-github-mails" as the name of our mapping. We c
 ```
 These lines define one transformation. We instruct to target the stream "commits", and therein the field "commit". We then use the field paths to navigate to the two emails we know are contained within this message and set the type to "HASH". Using "HASH" means we will still be able to tell whether two emails are the same, but not be able to read the email. They will be replaced with a SHA-256 hash of the email.
 
-## Run the data integration (E(t)LT) pipeline
+## Run the data integration pipeline
 Now we're ready to run the data integration process with these modifications again. To do so, we'll need to clean up first, since we already ran the EL process in part 1. The primary key is still the same and as such the ingestion would fail.
 
 Drop the table inside your local postgres by running a docker exec:
@@ -90,7 +90,7 @@ Drop the table inside your local postgres by running a docker exec:
 docker exec meltano_postgres psql -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
 ```
 
-Now we can run the E(t)LT process again using the `meltano run`command. We add the parameter --full-refresh to ignore the state Meltano has stored.
+Now we can run the full process again using the `meltano run`command. We add the parameter --full-refresh to ignore the state Meltano has stored.
 
 <div class="termy">
 
@@ -122,7 +122,7 @@ $ meltano run --full-refresh tap-github hide-github-mails target-postgres dbt-po
 If everything was configured correctly, you should now see your data flow from your source into your destination! Take your favourite SQL tool, connect to the database using the connection details set and check the table `commits` inside the schema `tap_github`. The JSON blob inside the column `commit` should now contain no e-mail adresses but rather the hashed values for both fields.
 
 ## Next Steps
-There we have it, a complete E(t)LT pipeline, congratulations!
+There we have it, a complete ELT pipeline with inline data mappings, congratulations!
 
 One last thing for you to do: try to run the following command to celebrate:
 
