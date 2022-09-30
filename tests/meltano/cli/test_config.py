@@ -70,6 +70,22 @@ class TestCliConfig:
             assert json_config["database_uri"] == engine_uri
             assert json_config["cli"]["log_level"] == "info"
 
+    def test_config_meltano_set(
+        self, project: Project, cli_runner, project_plugins_service
+    ):
+        with mock.patch(
+            "meltano.cli.config.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(
+                cli, ["config", "meltano", "set", "cli.log_config", "log_config.yml"]
+            )
+            assert_cli_runner(result)
+            assert (
+                "Meltano setting 'cli.log_config' was set in `meltano.yml`: 'log_config.yml'"
+                in result.stdout
+            )
+
     def test_config_test(
         self, project: Project, cli_runner, tap, project_plugins_service
     ):
