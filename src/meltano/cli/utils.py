@@ -1,10 +1,11 @@
 """Defines helpers for use by the CLI."""
 
+from __future__ import annotations
+
 import logging
 import os
 import signal
 from contextlib import contextmanager
-from typing import List, Optional, Tuple
 
 import click
 from click_default_group import DefaultGroup
@@ -127,7 +128,7 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
     )
 
 
-def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
+def _prompt_plugin_pip_url(plugin_name: str) -> str | None:
     click.echo()
     click.echo(
         f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
@@ -149,7 +150,7 @@ def _prompt_plugin_pip_url(plugin_name: str) -> Optional[str]:
     return None if result == "n" else result
 
 
-def _prompt_plugin_executable(pip_url: Optional[str], plugin_name: str) -> str:
+def _prompt_plugin_executable(pip_url: str | None, plugin_name: str) -> str:
     derived_from = "`pip_url`"
     prompt_request = "executable name"
     if pip_url is None:
@@ -340,7 +341,7 @@ def add_plugin(
             click.echo(f"\tmeltano config {plugin.name} list")
             click.echo()
             click.echo(
-                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#switching-from-one-variant-to-another"
+                "To learn more, visit https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another"
             )
 
             click.echo()
@@ -358,7 +359,7 @@ def add_plugin(
 
             click.echo()
             click.echo(
-                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#multiple-variants"
+                "To learn more, visit https://docs.meltano.com/guide/plugin-management#multiple-variants"
             )
         else:
             click.echo(
@@ -389,7 +390,7 @@ def add_plugin(
 
 def add_required_plugins(
     project: Project,
-    plugins: List[ProjectPlugin],
+    plugins: list[ProjectPlugin],
     add_service: ProjectAddService,
     lock: bool = True,
 ):
@@ -486,8 +487,8 @@ def propagate_stop_signals(proc):
 
 
 def check_dependencies_met(
-    plugin_refs: List[PluginRef], plugins_service: ProjectPluginsService
-) -> Tuple[bool, str]:
+    plugin_refs: list[PluginRef], plugins_service: ProjectPluginsService
+) -> tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
     Args:

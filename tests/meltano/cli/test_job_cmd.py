@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import json
 
 import mock
+import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
@@ -122,6 +125,7 @@ class TestCliJob:
             assert task_sets.name == "job-set-mock"
             assert task_sets.tasks == ["tap2-mock target2-mock"]
 
+    @pytest.mark.order(after="test_job_add")
     def test_job_remove(self, session, project, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(

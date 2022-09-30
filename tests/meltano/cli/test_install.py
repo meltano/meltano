@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+import os
+import shutil
+
 import mock
 import pytest
 
@@ -15,6 +20,7 @@ class TestCliInstall:
         except PluginAlreadyAddedException as err:
             return err.plugin
 
+    @pytest.mark.order(0)
     def test_install(
         self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
     ):
@@ -242,3 +248,22 @@ class TestCliInstall:
 
             mappers = [m for m in commands[0][1] if m == mapper]
             assert len(mappers) == 3
+
+
+# un_engine_uri forces us to create a new project, we must do this before the
+# project fixture creates the project see
+# https://github.com/meltano/meltano/pull/6407#issuecomment-1200516464
+# For more details
+@pytest.mark.order(-1)
+def test_new_folder_should_autocreate_on_install(
+    un_engine_uri, project_function, cli_runner
+):
+    """Be sure .meltano auto creates a db on install by default.
+
+    We had a case https://github.com/meltano/meltano/issues/6383
+    that caused the meltano db to not be recreated.
+    """
+    shutil.rmtree(".meltano")
+    result = cli_runner.invoke(cli, ["install"])
+    assert result
+    assert os.path.exists(".meltano/meltano.db")

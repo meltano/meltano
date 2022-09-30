@@ -9,22 +9,23 @@ import sys
 import threading
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import fasteners
+from cached_property import cached_property
 from dotenv import dotenv_values
 from werkzeug.utils import secure_filename
 
+from meltano.core import yaml
+from meltano.core.behavior.versioned import Versioned
 from meltano.core.environment import Environment
+from meltano.core.error import EmptyMeltanoFileException, Error
 from meltano.core.plugin.base import PluginRef
-
-from .behavior.versioned import Versioned
-from .error import Error
-from .project_files import ProjectFiles
-from .utils import makedirs, truthy
+from meltano.core.project_files import ProjectFiles
+from meltano.core.utils import makedirs, truthy
 
 if TYPE_CHECKING:
-    from .meltano_file import MeltanoFile as MeltanoFileHint
+    from .meltano_file import MeltanoFile as MeltanoFileTypeHint
 
 
 logger = logging.getLogger(__name__)
@@ -82,7 +83,7 @@ class Project(Versioned):  # noqa: WPS214
     _meltano_rw_lock = fasteners.ReaderWriterLock()
     _default = None
 
-    def __init__(self, root: Path | str):
+    def __init__(self, root: os.PathLike):
         """Instantiate a Project from its root directory.
 
         Args:
@@ -90,19 +91,11 @@ class Project(Versioned):  # noqa: WPS214
         """
         self.root = Path(root).resolve()
         self.readonly = False
-        self._project_files = None
-        self.__meltano_ip_lock = None
-
         self.active_environment: Environment | None = None
 
-    @property
-    def _meltano_ip_lock(self):
-        if self.__meltano_ip_lock is None:
-            self.__meltano_ip_lock = fasteners.InterProcessLock(
-                self.run_dir("meltano.yml.lock")
-            )
-
-        return self.__meltano_ip_lock
+    @cached_property
+    def _meltano_interprocess_lock(self):
+        return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
 
     @property
     def env(self):
@@ -210,44 +203,51 @@ class Project(Versioned):  # noqa: WPS214
 
         return project
 
-    @property
-    def project_files(self):
-        """Return a singleton ProjectFiles file manager instance.
+    @cached_property
+    def project_files(self) -> ProjectFiles:
+        """Return a singleton `ProjectFiles` file manager instance.
 
         Returns:
-            ProjectFiles file manager
+            `ProjectFiles` file manager.
         """
-        if self._project_files is None:
-            self._project_files = ProjectFiles(
-                root=self.root, meltano_file_path=self.meltanofile
-            )
-        return self._project_files
+        return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
+
+    def clear_cache(self) -> None:
+        """Clear cached project files (e.g. `meltano.yml`).
+
+        This can be useful if the cached `ProjectFiles` object has been
+        modified in-place, but not updated on-disk, and you need the on-disk
+        version.
+        """
+        try:
+            del self.__dict__["project_files"]
+        except KeyError:
+            pass
 
     @property
-    def meltano(self) -> MeltanoFileHint:
+    def meltano(self) -> MeltanoFileTypeHint:
         """Return a copy of the current meltano config.
 
+        Raises:
+            EmptyMeltanoFileException: The `meltano.yml` file is empty.
+
         Returns:
-            the current meltano config
+            The current meltano config.
         """
-        from .meltano_file import MeltanoFile
-        from .settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
-        from .yaml import configure_yaml
+        from meltano.core.meltano_file import MeltanoFile
+        from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 
-        with open(self.meltanofile) as melt_ff:
-            meltano_ff: dict = configure_yaml().load(melt_ff)
+        conf: dict[str, Any] = yaml.load(self.meltanofile)
+        if conf is None:
+            raise EmptyMeltanoFileException()
 
-        uvicorn_enabled = (
-            meltano_ff.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}")
-            or False
+        lock = (
+            self._meltano_rw_lock.write_lock
+            if conf.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}", False)
+            else self._meltano_rw_lock.read_lock
         )
-
-        if uvicorn_enabled:
-            with self._meltano_rw_lock.write_lock():
-                return MeltanoFile.parse(self.project_files.load())
-        else:
-            with self._meltano_rw_lock.read_lock():
-                return MeltanoFile.parse(self.project_files.load())
+        with lock():
+            return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
     def meltano_update(self):
@@ -259,27 +259,24 @@ class Project(Versioned):  # noqa: WPS214
             the current meltano configuration
 
         Raises:
-            ProjectReadonly: if this project is readonly
-            Exception: if project files could not be updated
+            ProjectReadonly: This project is readonly.
+            Exception: The project files could not be updated.
         """
         if self.readonly:
             raise ProjectReadonly
 
-        from .meltano_file import MeltanoFile
+        from meltano.core.meltano_file import MeltanoFile
 
-        # fmt: off
-        with self._meltano_rw_lock.write_lock(), self._meltano_ip_lock:
+        with self._meltano_rw_lock.write_lock(), self._meltano_interprocess_lock:
 
             meltano_config = MeltanoFile.parse(self.project_files.load())
-
             yield meltano_config
 
             try:
-                meltano_config = self.project_files.update(meltano_config.canonical())
+                self.project_files.update(meltano_config.canonical())
             except Exception as err:
                 logger.critical("Could not update meltano.yml: %s", err)  # noqa: WPS323
                 raise
-        # fmt: on
 
     def root_dir(self, *joinpaths):
         """Return the root directory of this project, optionally joined with path.

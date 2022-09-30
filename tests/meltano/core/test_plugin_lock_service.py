@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 import pytest
@@ -66,6 +68,7 @@ class TestPluginLock:
             "tap-locked--meltano.lock",
         )
 
+    @pytest.mark.order(before="test_load")
     def test_save(self, subject: PluginLock):
         assert not subject.path.exists()
         subject.save()
@@ -104,4 +107,4 @@ class TestPluginLockService:
         with pytest.raises(LockfileAlreadyExistsError) as exc_info:
             subject.save(plugin)
 
-        assert exc_info.value.plugin == plugin  # noqa: WPS441
+        assert exc_info.value.plugin == plugin

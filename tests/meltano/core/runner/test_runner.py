@@ -1,4 +1,5 @@
-import json
+from __future__ import annotations
+
 import os
 from pathlib import Path
 
@@ -6,7 +7,6 @@ import mock
 import pytest
 from mock import AsyncMock
 
-from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -17,14 +17,14 @@ TEST_STATE_ID = "test_job"
 
 
 class AnyInstanceOf:
-    def __init__(self, cls):
-        self._cls = cls
+    def __init__(self, target_cls):
+        self.target_cls = target_cls
 
     def __eq__(self, other):
-        return isinstance(other, self._cls)
+        return isinstance(other, self.target_cls)
 
     def __repr__(self):
-        return f"<Any({self._cls}>"
+        return f"<Any({self.target_cls}>"
 
 
 def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
@@ -86,8 +86,7 @@ class TestSingerRunner:
 
     @pytest.fixture()
     def target_process(self, process_mock_factory, target):
-        target = process_mock_factory(target)
-        return target
+        return process_mock_factory(target)
 
     @pytest.mark.asyncio
     async def test_prepare_job(
@@ -197,8 +196,8 @@ class TestSingerRunner:
                 )
                 await capture_subprocess_output(target_process.stdout, *bookmark_writer)
 
-            assert add_mock.call_count == 3
-            assert commit_mock.call_count == 3
+            assert add_mock.call_count == 9
+            assert commit_mock.call_count == 9
 
             # assert the STATE's `value` was saved
             job = subject.context.job
@@ -220,7 +219,7 @@ class TestSingerRunner:
 
             subject.context.dry_run = False
             await subject.run()
-            AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
+            AnyPluginInvoker = AnyInstanceOf(PluginInvoker)  # noqa: N806
 
             invoke.assert_called_once_with(
                 AnyPluginInvoker,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import json
 from contextlib import contextmanager
@@ -10,17 +12,11 @@ import requests_mock
 from meltano.core import bundle
 from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import (
-    VERSION,
-    DiscoveryFile,
-    PluginNotFoundError,
-)
+from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.yaml import configure_yaml
+from meltano.core.yaml import yaml
 
 HTTP_STATUS_TEAPOT = 418
-
-yaml = configure_yaml()
 
 
 @pytest.fixture(scope="class")
@@ -60,6 +56,7 @@ def tap_covid_19(project_add_service):
 
 @pytest.mark.usefixtures("discovery_url_mock")
 class TestPluginDiscoveryService:
+    @pytest.mark.order(0)
     @pytest.mark.meta
     def test_discovery_url_mock(self, subject):
         assert requests.get(subject.discovery_url).status_code == HTTP_STATUS_TEAPOT
@@ -67,22 +64,24 @@ class TestPluginDiscoveryService:
     @pytest.fixture
     def discovery_yaml(self, subject):
         """Disable the discovery mock."""
-        yaml.register_class(DiscoveryFile)
         with subject.project.root_dir("discovery.yml").open("w") as discovery_yaml:
             yaml.dump(subject._discovery, discovery_yaml)
 
         subject._discovery = None
 
+    @pytest.mark.order(1)
     def test_plugins(self, subject):
         plugins = list(subject.plugins())
 
         assert subject.discovery
         assert len(plugins) >= 6
 
+    @pytest.mark.order(2)
     def test_plugins_unknown(self, subject):
         plugins = list(subject.plugins())
         assert len(plugins) >= 6
 
+    @pytest.mark.order(3)
     def test_definition(self, subject):
         with pytest.raises(PluginNotFoundError):
             subject.find_definition(PluginType.EXTRACTORS, "unknown")
@@ -91,6 +90,7 @@ class TestPluginDiscoveryService:
         assert plugin_def.type == PluginType.EXTRACTORS
         assert plugin_def.name == "tap-mock"
 
+    @pytest.mark.order(4)
     def test_find_base_plugin(self, subject):
         # If no variant is specified,
         # defaults to the first variant
@@ -126,6 +126,7 @@ class TestPluginDiscoveryService:
                 PluginType.EXTRACTORS, "tap-mock", variant="unknown"
             )
 
+    @pytest.mark.order(5)
     def test_get_base_plugin(self, subject):
         # If no variant is set on the project plugin,
         # defaults to the original variant
@@ -182,6 +183,7 @@ class TestPluginDiscoveryService:
         assert base_plugin.name == "tap-mock"
         assert base_plugin.variant == "meltano"
 
+    @pytest.mark.order(6)
     @pytest.mark.usefixtures("discovery_yaml")
     def test_discovery_yaml(self, subject):
         plugins_by_type = subject.plugins_by_type()
@@ -297,16 +299,19 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         with open(bundle.root / "discovery.yml") as bundled_discovery:
             return yaml.load(bundled_discovery)
 
+    @pytest.mark.order(7)
     def test_local_discovery(self, subject, local_discovery):
         self.assert_discovery_yaml(subject, local_discovery)
 
         assert not subject.cached_discovery_file.exists()
 
+    @pytest.mark.order(8)
     def test_incompatible_local_discovery(
         self, subject, incompatible_local_discovery, remote_discovery
     ):
         self.assert_discovery_yaml(subject, remote_discovery)
 
+    @pytest.mark.order(9)
     def test_remote_discovery(self, subject, remote_discovery):
         self.assert_discovery_yaml(subject, remote_discovery)
 
@@ -315,6 +320,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
             cached_discovery_yaml = yaml.load(cached_discovery)
             assert cached_discovery_yaml["version"] == remote_discovery["version"]
 
+    @pytest.mark.order(10)
     @mock.patch("meltano.core.plugin_discovery_service.requests.get")
     def test_remote_discovery_with_valid_auth(
         self,
@@ -337,6 +343,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
         self.assert_discovery_yaml(subject, discovery)
 
+    @pytest.mark.order(11)
     @mock.patch("meltano.core.plugin_discovery_service.requests.get")
     def test_remote_discovery_with_invalid_auth(
         self, mock_discovery_request, subject, enabled_remote_discovery_auth
@@ -356,6 +363,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         assert expected_auth == actual_auth
         assert discovery is None
 
+    @pytest.mark.order(12)
     @mock.patch("meltano.core.plugin_discovery_service.requests.get")
     def test_remote_discovery_with_no_auth(self, mock_discovery_request, subject):
         mock_discovery_request.return_value.status_code = 401
@@ -372,21 +380,25 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         assert actual_auth is None
         assert discovery is None
 
+    @pytest.mark.order(13)
     def test_incompatible_remote_discovery(
         self, subject, incompatible_remote_discovery, cached_discovery
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
+    @pytest.mark.order(14)
     def test_disabled_remote_discovery(
         self, subject, disabled_remote_discovery, cached_discovery
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
+    @pytest.mark.order(15)
     def test_cached_discovery(
         self, subject, incompatible_remote_discovery, cached_discovery
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
+    @pytest.mark.order(16)
     def test_invalid_cached_discovery(
         self,
         subject,
@@ -396,6 +408,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
     ):
         self.assert_discovery_yaml(subject, bundled_discovery)
 
+    @pytest.mark.order(17)
     def test_bundled_discovery(
         self, subject, incompatible_remote_discovery, bundled_discovery
     ):

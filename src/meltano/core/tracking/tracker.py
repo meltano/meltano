@@ -36,7 +36,7 @@ from meltano.core.tracking.schemas import (
     ExitEventSchema,
     TelemetryStateChangeEventSchema,
 )
-from meltano.core.utils import format_exception, hash_sha256
+from meltano.core.utils import format_exception
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -85,13 +85,16 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
     def __init__(
         self,
         project: Project,
-        request_timeout: float | tuple[float, float] | None = None,
+        request_timeout: float | tuple[float, float] | None = 3.5,
     ):
         """Initialize a tracker for the Meltano project.
 
         Args:
             project: The Meltano project.
-            request_timeout: Timeout for the HTTP requests. Can be set either as single float value which applies to both `connect` AND `read` timeout, or as tuple with two float values which specify the `connect` and `read` timeouts separately.
+            request_timeout: Timeout for the HTTP requests. Can be set either
+                as single float value which applies to both `connect` and
+                `read` timeout, or as tuple with two float values which specify
+                the `connect` and `read` timeouts separately.
         """
         self.project = project
         self.settings_service = ProjectSettingsService(project)
@@ -236,34 +239,6 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             True if the tracker can be used, False otherwise.
         """
         return self.snowplow_tracker is not None and self.send_anonymous_usage_stats
-
-    def track_struct_event(self, category: str, action: str) -> None:
-        """Fire a structured tracking event.
-
-        Note: This is a legacy method that will be removed in a future version, once LegacyTracker is no longer used.
-
-        Args:
-            category: The category of the event.
-            action: The event actions.
-        """
-        if not self.can_track():
-            return
-
-        if self.project.active_environment is not None:
-            action = f"{action} --environment={hash_sha256(self.project.active_environment.name)}"
-
-        try:
-            self.snowplow_tracker.track_struct_event(
-                category=category,
-                action=action,
-                label=str(self.project_id),
-                context=self.contexts,
-            )
-        except Exception as err:
-            logger.debug(
-                "Failed to submit struct event to Snowplow",
-                err=format_exception(err),
-            )
 
     def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
         """Fire an unstructured tracking event.

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from mock import Mock
 
@@ -41,6 +43,7 @@ class TestValidationsRunner:
         assert not result
         assert noop_runner.invoker.call_count == 0
 
+    @pytest.mark.order(after="test_run_all")
     def test_collect_tests(self, project: Project):
         collected = MockValidationsRunner.collect(project, select_all=False)
 

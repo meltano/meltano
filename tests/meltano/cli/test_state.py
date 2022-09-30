@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 import platform
@@ -17,9 +19,15 @@ unconventional_state_ids = [
     "staging:",
     "staging:tap-mock-to-",
     "dev:-to-target-mock",
+    "dev:tap-to-target:",
+    "dev:tap-to-target:suffix:",
 ]
 
-conventional_state_ids = ["dev:tap-mock-to-target-mock", "staging:mock-to-mock"]
+conventional_state_ids = [
+    "dev:tap-mock-to-target-mock",
+    "dev:tap-mock-to-target-mock:suffix",
+    "staging:mock-to-mock",
+]
 
 
 class TestCliState:
@@ -85,7 +93,7 @@ class TestCliState:
     ):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for (pattern, expected_result) in patterns_with_expected_results:
-                result = cli_runner.invoke(cli, ["state", "list", pattern])
+                result = cli_runner.invoke(cli, ["state", "list", "--pattern", pattern])
                 assert_cli_runner(result)
                 assert self.get_result_set(result) == expected_result
 

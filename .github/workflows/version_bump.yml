@@ -39,7 +39,7 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v4.1.0
+      uses: actions/setup-python@v4.2.0
       with:
         python-version: "3.10"
         architecture: x64
@@ -53,7 +53,8 @@ jobs:
         commit: "false"
         push: "false"
         changelog: "true"
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
+        extra_requirements: 'git+https://github.com/meltano/commitizen-version-bump@main'
         changelog_increment_filename: _changelog_fragment.md
 
     - env:
@@ -90,5 +91,5 @@ jobs:
       uses: juliangruber/approve-pull-request-action@v1.1.1
       with:
         # https://github.com/juliangruber/approve-pull-request-action
-        github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+        github-token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
         number: ${{ steps.create-pull-request.outputs.pull-request-number }}

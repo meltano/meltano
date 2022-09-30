@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import platform
 from datetime import datetime
 
@@ -8,9 +10,11 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.schedule_service import (
+    BadCronError,
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleNotFoundError,
     SettingMissingError,
 )
 
@@ -65,6 +69,7 @@ class TestScheduleService:
     def subject(self, schedule_service):
         return schedule_service
 
+    @pytest.mark.order(0)
     def test_add_schedules(self, subject, create_elt_schedule, create_job_schedule):
         count = 5
 
@@ -85,6 +90,13 @@ class TestScheduleService:
         # but name must be unique
         with pytest.raises(ScheduleAlreadyExistsError):
             subject.add_schedule(all_schedules[0])
+
+        with pytest.raises(BadCronError) as excinfo:
+            subject.add_schedule(create_elt_schedule("bad-cron", interval="bad_cron"))
+
+        assert "bad_cron" in str(excinfo.value)
+        assert excinfo.value.reason == "Invalid Cron expression or alias: 'bad_cron'"
+        assert excinfo.value.instruction == "Please use a valid cron expression"
 
     def test_remove_schedule(self, subject):
         if platform.system() == "Windows":
@@ -113,14 +125,14 @@ class TestScheduleService:
     def test_schedule_update(self, subject):
         schedule = subject.schedules()[0]
 
-        schedule.interval = "@pytest"
+        schedule.interval = "@yearly"
         subject.update_schedule(schedule)
 
         # there should be only 1 element with the set interval
-        assert sum(sbj.interval == "@pytest" for sbj in subject.schedules()) == 1
+        assert sum(sbj.interval == "@yearly" for sbj in subject.schedules()) == 1
 
         # it should be the first element
-        assert subject.schedules()[0].interval == "@pytest"
+        assert subject.schedules()[0].interval == "@yearly"
 
         # it should be a copy of the original element
         assert schedule is not subject.schedules()[0]
@@ -210,6 +222,7 @@ class TestScheduleService:
             "mock-job-schedule",
             "mock-job",
             "@daily",
+            MOCK_ENV_FROM_SCHED="env_var_value_from_schedule_def",
         )
 
         # It fails because mock-job is not a valid job
@@ -231,7 +244,10 @@ class TestScheduleService:
                     "--dry-run",
                     schedule.job,
                 ],
-                env={"MOCK_ENV_ENTRY": "athing"},
+                env={
+                    "MOCK_ENV_ENTRY": "athing",
+                    "MOCK_ENV_FROM_SCHED": "env_var_value_from_schedule_def",
+                },
             )
 
     def test_find_namespace_schedule(
@@ -257,3 +273,7 @@ class TestScheduleService:
         ):
             found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
             assert found_schedule.extractor == custom_tap.name
+
+    def test_find_namespace_schedule_not_found(self, subject):
+        with pytest.raises(ScheduleNotFoundError):
+            subject.find_namespace_schedule("no-such-namespace")

@@ -1,20 +1,25 @@
+from __future__ import annotations
+
 import datetime
 import itertools
 import logging
 import os
 from collections import defaultdict, namedtuple
+from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 import yaml
 
+from fixtures.utils import tmp_project
 from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.job import Job, Payload, State
+from meltano.core.job_state import JobState
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -37,6 +42,8 @@ from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleSe
 from meltano.core.state_service import StateService
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
+
+current_dir = Path(__file__).parent
 
 
 @pytest.fixture(scope="class")
@@ -450,8 +457,8 @@ def job_logging_service(project):
     return JobLoggingService(project)
 
 
-@pytest.fixture(scope="class")
-def project(test_dir, project_init_service):
+@contextmanager
+def project_directory(test_dir, project_init_service):
     project = project_init_service.init(add_discovery=True)
     logging.debug(f"Created new project at {project.root}")
 
@@ -473,25 +480,25 @@ def project(test_dir, project_init_service):
 
 
 @pytest.fixture(scope="class")
+def project(test_dir, project_init_service):
+    with project_directory(test_dir, project_init_service) as project:
+        yield project
+
+
+@pytest.fixture(scope="function")
+def project_function(test_dir, project_init_service):
+    with project_directory(test_dir, project_init_service) as project:
+        yield project
+
+
+@pytest.fixture(scope="class")
 def project_files(test_dir, compatible_copy_tree):
-    project_init_service = ProjectInitService("a_multifile_meltano_project_core")
-    project = project_init_service.init(add_discovery=False)
-    logging.debug(f"Created new project at {project.root}")
-
-    current_dir = Path(__file__).parent
-    multifile_project_root = current_dir.joinpath("multifile_project/")
-
-    os.remove(project.meltanofile)
-    compatible_copy_tree(multifile_project_root, project.root)
-    # cd into the new project root
-    os.chdir(project.root)
-
-    try:
+    with tmp_project(
+        "a_multifile_meltano_project_core",
+        current_dir / "multifile_project",
+        compatible_copy_tree,
+    ) as project:
         yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-    finally:
-        Project.deactivate()
-        os.chdir(test_dir)
-        logging.debug(f"Cleaned project at {project.root}")
 
 
 @pytest.fixture(scope="class")
@@ -732,8 +739,14 @@ def state_ids_with_expected_states(  # noqa: WPS210
 
 @pytest.fixture
 def job_history_session(jobs, session):
+    job: Job
+    job_names = set()
     for job in jobs:
         job.save(session)
+        job_names.add(job.job_name)
+    for job_name in job_names:
+        job_state = JobState.from_job_history(session, job_name)
+        session.add(job_state)
     yield session
 
 

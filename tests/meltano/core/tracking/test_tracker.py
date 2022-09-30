@@ -1,18 +1,23 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
-import platform
 import subprocess
 import uuid
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
+from http import server as server_lib
+from threading import Thread
+from time import sleep
 from typing import TYPE_CHECKING, Any
 
 import mock
 import pytest
+from snowplow_tracker import Emitter
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
 from meltano.core.tracking.contexts.project import ProjectContext
@@ -41,27 +46,30 @@ def check_analytics_json(project: Project) -> None:
 
 @contextmanager
 def delete_analytics_json(project: Project) -> None:
-    (project.meltano_dir() / "analytics.json").unlink()
+    # After Python 3.7 support is dropped, use `.unlink(missing_ok=True)`
+    # instead of a suppression.
+    with suppress(FileNotFoundError):
+        (project.meltano_dir() / "analytics.json").unlink()
     try:
         yield
     finally:
-        # Recreate `analytics.json`, to avoid causing issues for other tests within the same class
-        # that expect it. Note that `project` is class-scoped.
         Tracker(project)
 
 
-def clear_telemetry_settings(project):
-    ProjectSettingsService.config_override.pop("send_anonymous_usage_stats", None)
-    os.environ.pop("MELTANO_SEND_ANONYMOUS_USAGE_STATS", None)
-    setting_service = ProjectSettingsService(project)
-    config = setting_service.meltano_yml_config
-    config.pop("send_anonymous_usage_stats", None)
-    setting_service.update_meltano_yml_config(config)
-
-
 class TestTracker:
+    @pytest.fixture(autouse=True)
+    def clear_telemetry_settings(self, project):
+        ProjectSettingsService.config_override.pop("send_anonymous_usage_stats", None)
+        os.environ.pop("MELTANO_SEND_ANONYMOUS_USAGE_STATS", None)
+        setting_service = ProjectSettingsService(project)
+        config = setting_service.meltano_yml_config
+        config.pop("send_anonymous_usage_stats", None)
+        setting_service.update_meltano_yml_config(config)
+
     def test_telemetry_state_change_check(self, project: Project):
-        with mock.patch.object(Tracker, "save_telemetry_settings") as mocked:
+        with mock.patch.object(
+            Tracker, "save_telemetry_settings"
+        ) as mocked, delete_analytics_json(project):
             Tracker(project)
             assert mocked.call_count == 1
 
@@ -93,10 +101,6 @@ class TestTracker:
             != analytics_json_post["send_anonymous_usage_stats"]
         )
 
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_restore_project_id_from_analytics_json(self, project: Project):
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
@@ -113,14 +117,15 @@ class TestTracker:
         # Create a new `ProjectSettingsService` because it is what restores the project ID
         restored_project_id = ProjectSettingsService(project).get("project_id")
 
-        assert original_project_id == restored_project_id
+        # Depending on what tests were run before this one, the project ID might have been randomly
+        # generated, or taken from `analytics.json`, so we accept the restored one if it is equal
+        # to the original, or if it is equal after the same transformation that gets applied to the
+        # project ID when it is originally stored in `analytics.json`.
+        assert original_project_id == restored_project_id or (
+            str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id
+        )
 
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
-        clear_telemetry_settings(project)
         setting_service = ProjectSettingsService(project)
         method_name = "track_telemetry_state_change_event"
 
@@ -153,15 +158,12 @@ class TestTracker:
                 assert mocked.call_count == 0
 
     def test_analytics_json_is_created(self, project: Project):
+        Tracker(project)
         check_analytics_json(project)
         with delete_analytics_json(project):
             Tracker(project)
             check_analytics_json(project)
 
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     @pytest.mark.parametrize(
         "analytics_json_content",
         [
@@ -171,7 +173,7 @@ class TestTracker:
             f'["{str(uuid.uuid4())}","{str(uuid.uuid4())}", true]',
             f'client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
         ],
-        ids=lambda param: hash_sha256(param)[:8],
+        ids=(0, 1, 2, 3, 4),
     )
     def test_invalid_analytics_json_is_overwritten(
         self, project: Project, analytics_json_content: str
@@ -189,10 +191,6 @@ class TestTracker:
 
             check_analytics_json(project)
 
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_restore_project_id_and_telemetry_state_change(self, project: Project):
         """
         Test that `project_id` is restored from `analytics.json`, and a telemetry state
@@ -216,7 +214,13 @@ class TestTracker:
         # Create a new `ProjectSettingsService` because it restores the project ID
         restored_project_id = ProjectSettingsService(project).get("project_id")
 
-        assert original_project_id == restored_project_id
+        # Depending on what tests were run before this one, the project ID might have been randomly
+        # generated, or taken from `analytics.json`, so we accept the restored one if it is equal
+        # to the original, or if it is equal after the same transformation that gets applied to the
+        # project ID when it is originally stored in `analytics.json`.
+        assert original_project_id == restored_project_id or (
+            str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id
+        )
 
         with mock.patch.object(Tracker, "track_telemetry_state_change_event") as mocked:
             original_config_override = ProjectSettingsService.config_override
@@ -229,10 +233,6 @@ class TestTracker:
             finally:
                 ProjectSettingsService.config_override = original_config_override
 
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     @pytest.mark.parametrize(
         "snowplow_endpoints,send_stats,expected",
         (
@@ -254,13 +254,7 @@ class TestTracker:
         setting_service.set("send_anonymous_usage_stats", send_stats)
         assert Tracker(project).can_track() is expected
 
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_send_anonymous_usage_stats(self, project: Project, monkeypatch):
-        clear_telemetry_settings(project)
-
         monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
         assert Tracker(project).send_anonymous_usage_stats is True
 
@@ -275,26 +269,16 @@ class TestTracker:
         ProjectSettingsService(project).set("send_anonymous_usage_stats", True)
         assert Tracker(project).send_anonymous_usage_stats is False
 
-        clear_telemetry_settings(project)
-        ProjectSettingsService(project).set("send_anonymous_usage_stats", False)
-        assert Tracker(project).send_anonymous_usage_stats is False
+    @pytest.mark.parametrize("setting_value", (False, True))
+    def test_send_anonymous_usage_stats_no_env(
+        self, project: Project, setting_value: bool
+    ):
+        ProjectSettingsService(project).set("send_anonymous_usage_stats", setting_value)
+        assert Tracker(project).send_anonymous_usage_stats is setting_value
 
-        clear_telemetry_settings(project)
-        ProjectSettingsService(project).set("send_anonymous_usage_stats", True)
-        assert Tracker(project).send_anonymous_usage_stats is True
-
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_default_send_anonymous_usage_stats(self, project: Project):
-        clear_telemetry_settings(project)
         assert Tracker(project).send_anonymous_usage_stats
 
-    @pytest.mark.xfail(
-        platform.system() == "Windows",
-        reason="Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444",
-    )
     def test_exit_event_is_fired(self, project: Project, snowplow: SnowplowMicro):
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
 
@@ -343,3 +327,121 @@ class TestTracker:
             "send_anonymous_usage_stats", False, True
         )
         assert passed
+
+    @pytest.mark.parametrize(  # noqa: WPS317
+        ("sleep_duration", "timeout_should_occur"),
+        ((1.0, False), (5.0, True)),
+        ids=("no_timeout", "timeout"),
+    )
+    def test_timeout_if_endpoint_unavailable(
+        self, project: Project, sleep_duration, timeout_should_occur
+    ):
+        """Test to ensure that the default tracker timeout is respected.
+
+        An HTTP sever is run on another thread, which handles request sent from
+        the Snowplow tracker. When `timeout_should_occur` is `False`, we check
+        that this sever is properly masqerading as a Snowplow endpoint. When
+        `timeout_should_occur` is `True`, we check that when the server takes
+        too long to respond, we timeout and continue without raising an error.
+        """
+        timeout_occured = False
+
+        class HTTPRequestHandler(server_lib.SimpleHTTPRequestHandler):
+            def do_GET(self) -> None:  # noqa: N802
+                sleep(sleep_duration)
+                self.send_response(200, "OK")
+                self.end_headers()
+
+        server = server_lib.HTTPServer(("localhost", 0), HTTPRequestHandler)
+        server_thread = Thread(
+            target=server.serve_forever, kwargs={"poll_interval": 0.1}
+        )
+        server_thread.start()
+
+        ProjectSettingsService(project).set(
+            "snowplow.collector_endpoints",
+            f'["http://localhost:{server.server_port}"]',
+        )
+
+        def emitter_failure_callback(_, failure_events: list):
+            nonlocal timeout_occured
+            # `timeout_occured` is technically a misnomer here, since there are
+            # multiple reasons for failure, but this callback doesn't let us
+            # distinguish. We can rely on the `timeout_should_occur is True`
+            # case to ensure that this callback won't be called for non-timeout
+            # reasons.
+            timeout_occured = True
+
+        tracker = Tracker(project)
+        assert len(tracker.snowplow_tracker.emitters) == 1
+        tracker.snowplow_tracker.emitters[0].on_failure = emitter_failure_callback
+
+        tracker.track_command_event(CliEvent.started)
+
+        server.shutdown()
+        server_thread.join()
+
+        assert timeout_occured is timeout_should_occur
+
+    def test_project_context_send_anonymous_usage_stats_source(
+        self, project: Project, monkeypatch
+    ):
+        settings_service = ProjectSettingsService(project)
+
+        def get_source():
+            return ProjectContext(project, uuid.uuid4()).to_json()["data"][
+                "send_anonymous_usage_stats_source"
+            ]
+
+        assert get_source() == "default"
+
+        settings_service.set(
+            "send_anonymous_usage_stats",
+            not settings_service.get("send_anonymous_usage_stats"),
+        )
+        assert get_source() == "meltano_yml"
+
+        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
+        assert get_source() == "env"
+
+    def test_get_snowplow_tracker_invalid_endpoint(
+        self, project: Project, caplog, monkeypatch
+    ):
+        endpoints = """
+            [
+                "notvalid:8080",
+                "https://valid.endpoint:8080",
+                "file://bad.scheme",
+                "https://other.endpoint/path/to/collector"
+            ]
+        """
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
+        logging.getLogger().setLevel(logging.DEBUG)
+
+        with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
+            tracker = Tracker(project)
+
+        try:
+            assert caplog.records[0].levelname == "WARNING"
+            assert caplog.records[0].msg["event"] == "invalid_snowplow_endpoint"
+            assert caplog.records[0].msg["endpoint"] == "notvalid:8080"
+
+            assert caplog.records[1].levelname == "WARNING"
+            assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
+            assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
+
+            assert len(tracker.snowplow_tracker.emitters) == 2
+            assert isinstance(tracker.snowplow_tracker.emitters[0], Emitter)
+            assert (
+                tracker.snowplow_tracker.emitters[0].endpoint
+                == "https://valid.endpoint:8080/i"
+            )
+
+            assert isinstance(tracker.snowplow_tracker.emitters[1], Emitter)
+            assert (
+                tracker.snowplow_tracker.emitters[1].endpoint
+                == "https://other.endpoint/path/to/collector/i"
+            )
+        finally:
+            # Remove the seemingly valid emitters to prevent a logging error on exit.
+            tracker.snowplow_tracker.emitters = []

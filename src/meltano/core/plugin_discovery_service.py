@@ -9,21 +9,21 @@ from abc import ABCMeta, abstractmethod
 from typing import Iterable
 
 import requests
-import yaml
+from ruamel.yaml import YAMLError
 
 import meltano
 from meltano.core import bundle
+from meltano.core.behavior.versioned import IncompatibleVersionError, Versioned
+from meltano.core.discovery_file import DiscoveryFile
+from meltano.core.plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
 from meltano.core.plugin.base import StandalonePlugin
+from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.factory import base_plugin_factory
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
-
-from .behavior.canonical import Canonical
-from .behavior.versioned import IncompatibleVersionError, Versioned
-from .plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
-from .plugin.error import PluginNotFoundError
-from .plugin.factory import base_plugin_factory
-from .plugin.project_plugin import ProjectPlugin
-from .project_settings_service import ProjectSettingsService
-from .utils import NotFound, find_named
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import NotFound, find_named
+from meltano.core.yaml import yaml
 
 
 class DiscoveryInvalidError(Exception):
@@ -35,46 +35,8 @@ class DiscoveryUnavailableError(Exception):
 
 
 # Increment this version number whenever the schema of discovery.yml is changed.
-# See https://www.meltano.com/docs/contributor-guide.html#discovery-yml-version for more information.
+# See https://docs.meltano.com/contribute/plugins#discoveryyml-version for more information.
 VERSION = 22
-
-
-class DiscoveryFile(Canonical):
-    """A discovery file object."""
-
-    def __init__(self, version=1, **plugins):
-        """Create a new DiscoveryFile.
-
-        Args:
-            version: The version of the discovery file.
-            plugins: The plugins to add to the discovery file.
-        """
-        super().__init__(version=int(version))
-
-        for ptype in PluginType:
-            self[ptype] = []
-
-        for plugin_type, raw_plugins in plugins.items():
-            for raw_plugin in raw_plugins:
-                plugin_def = PluginDefinition(
-                    plugin_type,
-                    raw_plugin.pop("name"),
-                    raw_plugin.pop("namespace"),
-                    **raw_plugin,
-                )
-                self[plugin_type].append(plugin_def)
-
-    @classmethod
-    def file_version(cls, attrs):
-        """Return version of discovery file represented by attrs dictionary.
-
-        Args:
-            attrs: The attributes of the discovery file.
-
-        Returns:
-            The version of the discovery file.
-        """
-        return int(attrs.get("version", 1))
 
 
 class PluginRepository(metaclass=ABCMeta):
@@ -85,14 +47,14 @@ class PluginRepository(metaclass=ABCMeta):
         self,
         plugin_type: PluginType,
         plugin_name: str,
-        **kwargs,
+        variant_name: str | None = None,
     ) -> PluginDefinition:
         """Find a plugin definition.
 
         Args:
             plugin_type: The type of plugin to find.
             plugin_name: The name of the plugin to find.
-            kwargs: Additional arguments to pass to the finder.
+            variant_name: The name of the variant to find.
         """
         ...  # noqa: WPS428
 
@@ -346,7 +308,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             DiscoveryInvalidError: If the discovery file is invalid.
         """
         try:
-            discovery_yaml = yaml.safe_load(discovery_file)
+            discovery_yaml = yaml.load(discovery_file)
 
             self._discovery_version = DiscoveryFile.file_version(discovery_yaml)
             self.ensure_compatible()
@@ -357,7 +319,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
                 self.cache_discovery()
 
             return self._discovery
-        except (yaml.YAMLError, Exception) as err:
+        except (YAMLError, Exception) as err:
             raise DiscoveryInvalidError(str(err))
 
     def cache_discovery(self):
@@ -366,8 +328,6 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             yaml.dump(
                 self._discovery,
                 cached_discovery,
-                default_flow_style=False,
-                sort_keys=False,
             )
 
     @property
@@ -414,13 +374,17 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         )
 
     def find_definition(
-        self, plugin_type: PluginType, plugin_name: str
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
     ) -> PluginDefinition:
         """Find a plugin definition by type and name.
 
         Args:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
+            variant_name: The plugin variant name.
 
         Returns:
             The plugin definition.

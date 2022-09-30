@@ -1,10 +1,12 @@
 """Various utilities for configuring logging in a meltano project."""
+
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
 from contextlib import suppress
 from logging import config as logging_config
-from typing import Dict, Optional
 
 import structlog
 import yaml
@@ -14,9 +16,9 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 try:
-    from typing import Protocol  # noqa:  WPS433
+    from typing import Protocol  # noqa: WPS433
 except ImportError:
-    from typing_extensions import Protocol  # noqa:  WPS433,WPS440
+    from typing_extensions import Protocol  # noqa: WPS433
 
 
 LEVELS = {  # noqa: WPS407
@@ -30,7 +32,7 @@ DEFAULT_LEVEL = "info"
 FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323
 
 
-def parse_log_level(log_level: Dict[str, int]) -> int:
+def parse_log_level(log_level: dict[str, int]) -> int:
     """Parse a level descriptor into an logging level.
 
     Args:
@@ -42,7 +44,7 @@ def parse_log_level(log_level: Dict[str, int]) -> int:
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
 
 
-def read_config(config_file: Optional[str] = None) -> dict:
+def read_config(config_file: str | None = None) -> dict:
     """Read a logging config yaml from disk.
 
     Args:
@@ -73,7 +75,9 @@ def default_config(log_level: str) -> dict:
         "formatters": {
             "colored": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(colors=True),
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=True, exception_formatter=structlog.dev.rich_traceback
+                ),
                 "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
             },
         },
@@ -195,7 +199,7 @@ async def _write_line_writer(writer, line):
 
 
 async def capture_subprocess_output(
-    reader: Optional[asyncio.StreamReader], *line_writers: SubprocessOutputWriter
+    reader: asyncio.StreamReader | None, *line_writers: SubprocessOutputWriter
 ) -> None:
     """Capture in real time the output stream of a suprocess that is run async.
 

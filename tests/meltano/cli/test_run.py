@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 import json
-from typing import List, Optional
+import re
 
 import pytest
 import structlog
@@ -8,11 +10,13 @@ from mock import AsyncMock, mock
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
+from meltano.core.logging.job_logging_service import JobLoggingService
+from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
@@ -148,8 +152,8 @@ def dbt_process(process_mock_factory, dbt):
 class EventMatcher:
     def __init__(self, result_output: str):
         """Build a matcher for the result output of a command."""
-        self.seen_events: List[dict] = []
-        self.seen_raw: List[str] = []
+        self.seen_events: list[dict] = []
+        self.seen_raw: list[str] = []
 
         for line in result_output.splitlines():
             try:
@@ -173,7 +177,7 @@ class EventMatcher:
             if matches:
                 return True
 
-    def find_by_event(self, event: str) -> Optional[List[dict]]:
+    def find_by_event(self, event: str) -> list[dict] | None:
         """Return the first matching event, that matches the given event.
 
         Args:
@@ -192,13 +196,11 @@ class EventMatcher:
 
 class TestCliRunScratchpadOne:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_parsing_failures(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -289,13 +291,11 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0].get("success")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_basic_invocations(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -371,13 +371,133 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0].get("success")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_custom_suffix_command_option(
+        self,
+        default_config,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+        job_logging_service: JobLoggingService,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        # verify that a state ID with custom suffix from command option is generated for an ELB run
+        args = ["run", tap.name, target.name, "--state-id-suffix", "test-suffix"]
+
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.find_by_event("Block run completed.")[0].get("success")
+
+            job_logging_service.get_latest_log(
+                f"dev:{tap.name}-to-{target.name}:test-suffix"
+            )
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.parametrize(
+        "suffix_args",
+        [
+            (
+                "test-suffix",
+                "test-suffix",
+                [],
+            ),
+            (
+                "${TEST_SUFFIX}",
+                "test-suffix-single-env",
+                [
+                    ("TEST_SUFFIX", "test-suffix-single-env"),
+                ],
+            ),
+            (
+                "test-suffix-${TEST_SUFFIX_0}-${TEST_SUFFIX_1}",
+                "test-suffix-multiple-env",
+                [
+                    ("TEST_SUFFIX_0", "multiple"),
+                    ("TEST_SUFFIX_1", "env"),
+                ],
+            ),
+        ],
+        ids=[
+            "static",
+            "dynamic (single env)",
+            "dynamic (multiple env)",
+        ],
+    )
+    @mock.patch(
+        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    )
+    def test_run_custom_suffix_active_environment(
+        self,
+        default_config,
+        suffix_args,
+        cli_runner,
+        project: Project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+        job_logging_service: JobLoggingService,
+    ):
+        state_id_suffix, expected_suffix, suffix_env = suffix_args
+
+        # exit cleanly when everything is fine
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        # verify that a state ID with custom suffix from active environment is generated for an ELB run
+        project.activate_environment("dev")
+        project.active_environment.state_id_suffix = state_id_suffix
+
+        args = ["run", tap.name, target.name]
+
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), pytest.MonkeyPatch().context() as mp:
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            for env in suffix_env:
+                mp.setenv(*env)
+
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.find_by_event("Block run completed.")[0].get("success")
+
+            job_logging_service.get_latest_log(
+                f"dev:{tap.name}-to-{target.name}:${expected_suffix}"
+            )
+
+    @pytest.mark.backend("sqlite")
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_multiple_commands(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -431,13 +551,11 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[1].get("success")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_complex_invocations(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -507,13 +625,11 @@ class TestCliRunScratchpadOne:
             assert dbt_done_event[0].get("stdio") == "stderr"
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_plugin_command_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -586,13 +702,11 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches("dbt failure")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_tap_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -672,13 +786,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_target_failure_before_tap_finished(  # noqa: WPS118
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -781,13 +893,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_target_failure_after_tap_finished(  # noqa: WPS118
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -868,13 +978,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_tap_and_target_failed(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -962,13 +1070,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_tap_line_length_limit_error(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1042,13 +1148,11 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_mapper_config(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1084,6 +1188,64 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 1
             assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
+
+        # test mapper/mapping name collision detection - mapper plugin name no mappings
+        project_add_service.add(
+            PluginType.MAPPERS, "mapper-collision-01", inherit_from=mapper.name
+        )
+        args = ["run", tap.name, "mapper-collision-01", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock2, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            with pytest.raises(
+                Exception,
+                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-01",
+            ):
+                result = cli_runner.invoke(cli, args, catch_exceptions=False)
+                assert result.exit_code == 1
+
+        # test mapper/mapping name collision detection - mappings name same a mapper plugin name
+        project_add_service.add(
+            PluginType.MAPPERS,
+            "mapper-collision-02",
+            inherit_from=mapper.name,
+            mappings=[
+                {
+                    "name": "mapper-collision-02",
+                    "config": {
+                        "transformations": [
+                            {
+                                "field_id": "author_email1",
+                                "tap_stream_name": "commits1",
+                                "type": "MASK-HIDDEN",
+                            }
+                        ]
+                    },
+                }
+            ],
+        )
+        args = ["run", tap.name, "mapper-collision-02", target.name]
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap, "apply_catalog_rules"
+        ), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock2, mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            with pytest.raises(
+                Exception,
+                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-02",
+            ):
+                result = cli_runner.invoke(cli, args, catch_exceptions=False)
+                assert result.exit_code == 1
 
         # create duplicate mapping name - should also fail
         project_add_service.add(
@@ -1144,13 +1306,11 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_elb_mapper_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1232,13 +1392,11 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_run_dry_run(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1286,3 +1444,60 @@ class TestCliRunScratchpadOne:
             assert not matcher.find_by_event("Block run completed.")
             assert create_subprocess_exec.call_count == 0
             assert asyncio_mock.call_count == 0
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.parametrize(
+        "colors",
+        [True, False],
+    )
+    def test_color_console_exception_handler(
+        self,
+        colors,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        project_plugins_service,
+    ):
+        # toggle color in logging configuration
+        logging_config = default_config(log_level="info")
+        if not colors:
+            logging_config["formatters"]["colored"] = {
+                "()": "meltano.core.logging.console_log_formatter",
+                "colors": colors,
+            }
+
+        # in this scenario, the tap fails on the third read. Target should still complete.
+        args = ["run", tap.name, target.name]
+
+        tap_process.wait.return_value = 1
+        tap_process.returncode = 1
+        tap_process.stderr.readline.side_effect = (
+            b"tap starting\n",
+            b"tap running\n",
+            b"tap failure\n",
+        )
+
+        invoke_async = AsyncMock(side_effect=(tap_process, target_process))
+
+        with mock.patch(
+            "meltano.core.logging.utils.default_config", return_value=logging_config
+        ), mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ), mock.patch(
+            "meltano.core.block.parser.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ), mock.patch(
+            "meltano.core.transform_add_service.ProjectPluginsService",
+            return_value=project_plugins_service,
+        ):
+            result = cli_runner.invoke(cli, args)
+
+            ansi_color_escape = re.compile(r"\x1b\[[0-9;]+m")
+            match = ansi_color_escape.search(result.stderr)
+            if colors:
+                assert match
+            else:
+                assert not match

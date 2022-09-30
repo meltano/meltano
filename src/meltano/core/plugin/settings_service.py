@@ -1,6 +1,8 @@
 """Settings manager for Meltano plugins."""
 
-from typing import Any, Dict, List
+from __future__ import annotations
+
+from typing import Any
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
@@ -60,7 +62,7 @@ class PluginSettingsService(SettingsService):
 
         environment_env = {}
         if self.project.active_environment:
-            with self.feature_flag(
+            with project_settings_service.feature_flag(
                 FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
             ) as strict_env_var_mode:
                 environment_env = {
@@ -71,6 +73,17 @@ class PluginSettingsService(SettingsService):
                     )
                     for var, value in self.project.active_environment.env.items()
                 }
+
+                # expand state_id_suffix
+                self.project.active_environment.state_id_suffix = expand_env_vars(
+                    self.project.active_environment.state_id_suffix,
+                    {
+                        **self.project.dotenv_env,
+                        **self.env_override,
+                    },
+                    raise_if_missing=strict_env_var_mode,
+                )
+
             self.env_override.update(
                 environment_env
             )  # active Meltano Environment top level `env:` key
@@ -127,7 +140,7 @@ class PluginSettingsService(SettingsService):
         return ".".join((self.plugin.type, self.plugin.name, "default"))
 
     @property
-    def setting_definitions(self) -> List[SettingDefinition]:
+    def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings.
 
         Returns:
@@ -171,7 +184,7 @@ class PluginSettingsService(SettingsService):
         self.plugin.config_with_extras = config_with_extras
         self.plugins_service.update_plugin(self.plugin)
 
-    def update_meltano_environment_config(self, config_with_extras: Dict[str, Any]):
+    def update_meltano_environment_config(self, config_with_extras: dict[str, Any]):
         """Update environment configuration in `meltano.yml`.
 
         Args:

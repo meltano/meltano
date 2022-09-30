@@ -1,5 +1,7 @@
 """Environment management in CLI."""
 
+from __future__ import annotations
+
 import click
 
 from meltano.cli.params import pass_project

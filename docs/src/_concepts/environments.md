@@ -46,6 +46,7 @@ environments:
               dbname: dev
               warehouse: dev_wh
               batch_size_rows: 1000
+    state_id_suffix: ${CUSTOM_SUFFIX}
 ```
 
 <div class="notification is-info">
@@ -76,6 +77,15 @@ environments:
       MY_ENV_VAR: $MELTANO_PROJECT_ROOT/path/to/a/file.json
 ```
 
+## State ID Suffix
+
+Environments can also define a `state_id_suffix` - a custom suffix used in the generation of a state ID for each extractor/loader pair passed to [`meltano run`]((/reference/command-line-interface#run)).
+The suffix is appended to the generated ID with a colon prefix: `:<state_id_suffix>`.
+
+The full ID when a suffix is present is `<environment_name>:<tap_name>-to-<target_name>:<state_id_suffix>`.
+
+`state_id_suffix` supports interpolation of environment variables to allow for dynamic state IDs (e.g. unique state for multiple `meltano run` invocations using the same environment and EL pair(s)).
+
 ## Activation
 
 To use an environment, you can pass the option `--environment=<ENV>` to the CLI command, or set the `MELTANO_ENVIRONMENT=<ENV>` variable.
@@ -99,6 +109,9 @@ If you have an environment that you'd like to use by default without having to p
 ```yaml
 default_environment: <ENV>
 ```
+
+Note that the default environment does not apply to the [`meltano config`](/reference/command-line-interface#using-config-with-environments) command.
+Default environments are intended for execution related work and not configuration.
 
 ## Example
 

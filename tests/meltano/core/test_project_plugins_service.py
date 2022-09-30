@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import shutil
 from copy import deepcopy
@@ -42,11 +44,13 @@ class TestProjectPluginsService:
     def test_default_init_should_not_fail(self, subject):
         assert subject
 
+    @pytest.mark.order(0)
     def test_plugins(self, subject):
         assert all(
             isinstance(plugin.parent, BasePlugin) for plugin in subject.plugins()
         )
 
+    @pytest.mark.order(1)
     def test_get_plugin(
         self, subject, tap, alternative_tap, inherited_tap, alternative_target
     ):
@@ -87,6 +91,7 @@ class TestProjectPluginsService:
         subject._use_cache = False
         assert subject.get_plugin(tap) is not plugin
 
+    @pytest.mark.order(2)
     def test_get_parent_from_lockfile(
         self,
         subject: ProjectPluginsService,

@@ -7,6 +7,10 @@ weight: 5
 
 Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations. A transform in Meltano is simply a set of dbt models that can be installed as a package. See the [transform plugin](/concepts/plugins#transforms) docs for more details.
 
+<div class="notification is-info">
+  <p>If you already have an existing dbt project that you'd like to migrate to Meltano, check out the <a href="/guide/existing-dbt-project">existing dbt project guide</a> for more details.</p>
+</div>
+
 ## Adapter-Specific dbt Transformation
 
 In alignment with the [dbt documentation](https://docs.getdbt.com/docs/available-adapters), we support adapter-specific installations of `dbt`.
@@ -33,11 +37,11 @@ After dbt is installed you can configure it using `config` CLI commands, [Meltan
 # list available settings
 meltano config dbt-snowflake list
 
-# set the Snowflake user in the `dev` environment
-meltano --environment=dev config dbt-snowflake set user DEV_USER
+# configure the `dev` environment interactively
+meltano --environment=dev config dbt-snowflake set --interactive
 
-# set the Snowflake user in the `prod` environment
-meltano --environment=prod config dbt-snowflake set user PROD_USER
+# configure the `prod` environment interactively
+meltano --environment=prod config dbt-snowflake set --interactive
 ```
 
 More details on [configuring plugins](/guide/configuration), including with [environment variables](/guide/configuration#environment-variables).

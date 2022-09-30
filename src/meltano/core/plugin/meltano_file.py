@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import yaml
@@ -8,7 +10,7 @@ from .file import FilePlugin
 
 
 class MeltanoFilePlugin(FilePlugin):
-    def __init__(self, discovery=False):
+    def __init__(self, discovery: bool = False):
         super().__init__(None, None)
         self._discovery = discovery
 

@@ -1,6 +1,6 @@
 {
   "name": "meltano-webapp",
-  "version": "2.3.0",
+  "version": "2.7.1",
   "private": true,
   "scripts": {
     "dev": "npm run serve",
@@ -55,7 +55,7 @@
     "eslint-plugin-vue": "^5.0.0",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^8.1.5",
-    "node-sass": "^4.14.1",
+    "sass": "^1.54.0",
     "sass-loader": "^8.0.0",
     "sql-formatter": "^2.3.3",
     "ssf": "^0.10.2",

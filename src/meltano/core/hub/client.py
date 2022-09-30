@@ -26,7 +26,7 @@ from .schema import IndexedPlugin, VariantRef
 logger = get_logger(__name__)
 
 
-class HubPluginTypeNotFound(Exception):
+class HubPluginTypeNotFoundError(Exception):
     """Raised when a Hub plugin type is not found."""
 
     def __init__(self, plugin_type: PluginType):
@@ -49,7 +49,7 @@ class HubPluginTypeNotFound(Exception):
         )
 
 
-class HubPluginVariantNotFound(Exception):
+class HubPluginVariantNotFoundError(Exception):
     """Raised when a Hub plugin variant is not found."""
 
     def __init__(
@@ -108,6 +108,9 @@ class MeltanoHubService(PluginRepository):
 
             self.session.headers["X-Project-ID"] = project_id
 
+        if self.hub_url_auth:
+            self.session.headers.update({"Authorization": self.hub_url_auth})
+
     @property
     def hub_api_url(self):
         """Return the URL of the Hub API.
@@ -115,8 +118,19 @@ class MeltanoHubService(PluginRepository):
         Returns:
             The URL of the Hub API.
         """
+        hub_api_root = self.settings_service.get("hub_api_root")
         hub_url = self.settings_service.get("hub_url")
-        return f"{hub_url}/meltano/api/v1"
+
+        return hub_api_root or f"{hub_url}/meltano/api/v1"
+
+    @property
+    def hub_url_auth(self):
+        """Return the `hub_url_auth` setting.
+
+        Returns:
+            The `hub_url_auth` setting.
+        """
+        return self.settings_service.get("hub_url_auth")
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
@@ -169,7 +183,7 @@ class MeltanoHubService(PluginRepository):
 
         Raises:
             PluginNotFoundError: If the plugin definition could not be found.
-            HubPluginVariantNotFound: If the plugin variant could not be found.
+            HubPluginVariantNotFoundError: If the plugin variant could not be found.
         """
         plugins = self.get_plugins_of_type(plugin_type)
 
@@ -180,13 +194,16 @@ class MeltanoHubService(PluginRepository):
                 PluginRef(plugin_type, plugin_name)
             ) from plugins_key_err
 
-        if variant_name is None or variant_name == Variant.DEFAULT_NAME:
+        if variant_name is None or variant_name in {
+            Variant.DEFAULT_NAME,
+            Variant.ORIGINAL_NAME,
+        }:
             variant_name = plugin.default_variant
 
         try:
             url = plugin.variants[variant_name].ref
         except KeyError as variant_key_err:
-            raise HubPluginVariantNotFound(
+            raise HubPluginVariantNotFoundError(
                 plugin_type, plugin, variant_name
             ) from variant_key_err
 
@@ -238,7 +255,7 @@ class MeltanoHubService(PluginRepository):
             The plugin definitions.
 
         Raises:
-            HubPluginTypeNotFound: If the plugin type is not supported.
+            HubPluginTypeNotFoundError: If the plugin type is not supported.
         """
         if not plugin_type.discoverable:
             return {}
@@ -254,7 +271,7 @@ class MeltanoHubService(PluginRepository):
                 status_code=err.response.status_code,
                 error=err,
             )
-            raise HubPluginTypeNotFound(plugin_type) from err
+            raise HubPluginTypeNotFoundError(plugin_type) from err
 
         plugins: dict[str, dict[str, Any]] = response.json()
         return {

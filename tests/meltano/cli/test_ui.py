@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
@@ -15,15 +16,12 @@ class TestCliUi:
             "meltano.cli.ui.APIWorker.start"
         ) as start_api_worker, mock.patch(
             "meltano.cli.ui.UIAvailableWorker.start"
-        ) as start_ui_available_worker, mock.patch.object(
-            LegacyTracker, "track_meltano_ui"
-        ) as track:
+        ) as start_ui_available_worker:
             result = cli_runner.invoke(cli, "ui")
             assert_cli_runner(result)
 
             assert start_api_worker.called
             assert start_ui_available_worker.called
-            assert track.called
 
     def test_ui_setup(self, project, cli_runner, monkeypatch):
         monkeypatch.setenv("MELTANO_UI_SECRET_KEY", "existing_secret_key")

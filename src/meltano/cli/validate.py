@@ -1,9 +1,11 @@
 """Validation command."""
 
+from __future__ import annotations
+
 import asyncio
 import shutil
 import sys
-from typing import Dict, Iterable, Tuple
+from typing import Iterable
 
 import click
 import structlog
@@ -11,7 +13,6 @@ from sqlalchemy.orm.session import sessionmaker
 
 from meltano.cli.utils import InstrumentedCmd, propagate_stop_signals
 from meltano.core.db import project_engine
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
@@ -76,7 +77,7 @@ class CommandLineRunner(ValidationsRunner):
 def test(
     project: Project,
     all_tests: bool,
-    plugin_tests: Tuple[str] = (),
+    plugin_tests: tuple[str] = (),
 ):
     """
     Run validations using plugins' tests.
@@ -100,13 +101,6 @@ def test(
             collected[plugin_name].select_all()
 
     exit_codes = asyncio.run(_run_plugin_tests(session, collected.values()))
-
-    tracker = LegacyTracker(project)
-    tracker.track_meltano_test(
-        plugin_tests=plugin_tests,
-        all_tests=all_tests,
-    )
-
     click.echo()
     _report_and_exit(exit_codes)
 
@@ -114,11 +108,11 @@ def test(
 async def _run_plugin_tests(
     session: sessionmaker,
     runners: Iterable[ValidationsRunner],
-) -> Dict[str, Dict[str, int]]:
+) -> dict[str, dict[str, int]]:
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}
 
 
-def _report_and_exit(results: Dict[str, Dict[str, int]]):
+def _report_and_exit(results: dict[str, dict[str, int]]):
     exit_code = 0
     failed_count = 0
     passed_count = 0

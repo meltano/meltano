@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, closing
 from typing import AsyncIterator
 
 import structlog
@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
-from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -23,7 +23,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.state_service import StateService
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER, StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -49,6 +49,7 @@ class ELBContext:  # noqa: WPS230
         full_refresh: bool | None = False,
         force: bool | None = False,
         update_state: bool | None = True,
+        state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -61,6 +62,7 @@ class ELBContext:  # noqa: WPS230
             full_refresh: Whether this is a full refresh.
             force: Whether to force the execution of the job if it is stale.
             update_state: Whether to update the state of the job.
+            state_id_suffix: The state ID suffix to use.
             base_output_logger: The base logger to use.
         """
         self.project = project
@@ -72,6 +74,7 @@ class ELBContext:  # noqa: WPS230
         self.full_refresh = full_refresh
         self.force = force
         self.update_state = update_state
+        self.state_id_suffix = state_id_suffix
 
         # not yet used but required to satisfy the interface
         self.dry_run = False
@@ -118,6 +121,7 @@ class ELBContextBuilder:
         self._full_refresh = False
         self._state_update = True
         self._force = False
+        self._state_id_suffix = None
         self._env = {}
         self._blocks = []
 
@@ -172,6 +176,18 @@ class ELBContextBuilder:
             self
         """
         self._force = force
+        return self
+
+    def with_state_id_suffix(self, state_id_suffix: str):
+        """Set a state ID suffix for this run.
+
+        Args:
+            state_id_suffix: The suffix value.
+
+        Returns:
+            self
+        """
+        self._state_id_suffix = state_id_suffix
         return self
 
     def make_block(
@@ -271,6 +287,7 @@ class ELBContextBuilder:
             full_refresh=self._full_refresh,
             force=self._force,
             update_state=self._state_update,
+            state_id_suffix=self._state_id_suffix,
             base_output_logger=self._base_output_logger,
         )
 
@@ -302,7 +319,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             self.context.job = None
 
         elif self.context.update_state:
-            state_id = generate_state_id(self.context.project, self.head, self.tail)
+            state_id = generate_state_id(
+                self.context.project, self.context.state_id_suffix, self.head, self.tail
+            )
             self.context.job = Job(job_name=state_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
@@ -450,7 +469,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
         """
         job = self.context.job
-        StaleJobFailer(job.job_name).fail_stale_jobs(self.context.session)
+        fail_stale_jobs(self.context.session, job.job_name)
         if not self.context.force:
             existing = JobFinder(job.job_name).latest_running(self.context.session)
             if existing:
@@ -459,11 +478,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     + "To ignore this check use the '--force' option."
                 )
 
-        try:  # noqa: WPS501
-            async with job.run(self.context.session):
+        with closing(self.context.session) as session:
+            async with job.run(session):
                 await self.execute()
-        finally:
-            self.context.session.close()
 
     async def terminate(self, graceful: bool = False) -> None:
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
@@ -790,11 +807,14 @@ def _check_exit_codes(  # noqa: WPS238
         raise RunnerError("Mappers failed", failed_mappers)
 
 
-def generate_state_id(project: Project, consumer: IOBlock, producer: IOBlock) -> str:
+def generate_state_id(
+    project: Project, state_id_suffix: str | None, consumer: IOBlock, producer: IOBlock
+) -> str:
     """Generate a state id based on a project active environment and consumer and producer names.
 
     Args:
         project: Project to retrieve active environment from.
+        state_id_suffix: State ID suffix value.
         consumer: Consumer block.
         producer: Producer block.
 
@@ -808,4 +828,16 @@ def generate_state_id(project: Project, consumer: IOBlock, producer: IOBlock) ->
         raise RunnerError(
             "No active environment for invocation, but requested state id"
         )
-    return f"{project.active_environment.name}:{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237
+
+    state_id_components = [
+        project.active_environment.name,
+        f"{consumer.string_id}-to-{producer.string_id}",
+        state_id_suffix or project.active_environment.state_id_suffix,
+    ]
+
+    if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
+        raise RunnerError(
+            f"Cannot generate a state ID from components containing the delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+        )
+
+    return STATE_ID_COMPONENT_DELIMITER.join(c for c in state_id_components if c)

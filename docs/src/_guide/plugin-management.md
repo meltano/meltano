@@ -280,9 +280,7 @@ If it's a tap or target you have developed or are developing yourself,
 you'll want to set `pip_url` to either a [Git repository URL](https://pip.pypa.io/en/stable/reference/pip_install/#git) or local directory path.
 If you add the `-e` flag ahead of the local path, the package will be installed in [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs).
 
-To find out what `settings` a tap or target supports, reference the README in the repository and/or documentation.
-If the `capabilities` a tap supports (executable flags like `--discover` and `--state`) are not described there,
-you can try [one of these tricks](/contribute/plugins#how-to-test-a-tap) or refer directly to the source code.
+To find out what `settings` a tap or target supports, reference the README in the repository and/or documentation. To learn more about the available plugin capabilities, please refer to the [plugin capabilities reference](/reference/plugin-definition-syntax#capabilities). If the `capabilities` a tap supports (executable flags like `--discover` and `--state`) are not described in the available documentation, you can try [one of these tricks](/contribute/plugins#how-to-test-a-tap) or refer directly to the source code.
 
 This will add a [custom plugin definition](/concepts/project#custom-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 

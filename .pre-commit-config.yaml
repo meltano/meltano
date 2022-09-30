@@ -38,6 +38,7 @@ repos:
     rev: 22.6.0
     hooks:
       - id: black
+        exclude: ^(src/meltano/migrations/)
 
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1

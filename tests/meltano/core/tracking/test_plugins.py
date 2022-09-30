@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from meltano.core.block.plugin_command import plugin_command_invoker
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.tracking import PluginsTrackingContext

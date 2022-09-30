@@ -1,7 +1,7 @@
-"""SingerTap and supporting classes.
+"""This module contains the SingerTap class as well as a supporting methods."""
 
-This module contains the SingerTap class as well as a supporting methods.
-"""
+from __future__ import annotations
+
 import asyncio
 import json
 import logging
@@ -11,7 +11,6 @@ from asyncio.streams import StreamReader
 from hashlib import sha1
 from io import StringIO
 from pathlib import Path
-from typing import Tuple
 
 import structlog
 from jsonschema import Draft4Validator
@@ -20,7 +19,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
-from meltano.core.state_service import StateService
+from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
 from . import PluginType, SingerPlugin
@@ -216,7 +215,7 @@ class SingerTap(SingerPlugin):
     async def look_up_state_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: Tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),
     ):
         """Look up state before being invoked if in sync mode.
 
@@ -263,7 +262,6 @@ class SingerTap(SingerPlugin):
             state_path.unlink()
         except FileNotFoundError:
             pass
-
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job:
             # Running outside pipeline context: incremental state could not be loaded
@@ -292,10 +290,10 @@ class SingerTap(SingerPlugin):
             return
         # the `state.json` is stored in the database
         state = StateService(elt_context.session).get_state(elt_context.job.job_name)
-
         if state:
-            with state_path.open("w") as state_file:
-                json.dump(state.get("singer_state"), state_file, indent=2)
+            if state.get(SINGER_STATE_KEY):
+                with state_path.open("w") as state_file:
+                    json.dump(state.get(SINGER_STATE_KEY), state_file, indent=2)
         else:
             logger.warning("No state was found, complete import.")
 
@@ -303,7 +301,7 @@ class SingerTap(SingerPlugin):
     async def discover_catalog_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: Tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),
     ):
         """Discover Singer catalog before invoking tap if in sync mode.
 
@@ -377,7 +375,7 @@ class SingerTap(SingerPlugin):
             with catalog_path.open("r") as catalog_file:
                 catalog = json.load(catalog_file)
                 Draft4Validator.check_schema(catalog)
-        except Exception as err:  # noqa: WPS440
+        except Exception as err:
             catalog_path.unlink()
             raise PluginExecutionError(
                 f"Catalog discovery failed: invalid catalog: {err}"
@@ -456,7 +454,7 @@ class SingerTap(SingerPlugin):
 
     @hook("before_invoke")
     async def apply_catalog_rules_hook(
-        self, plugin_invoker: PluginInvoker, exec_args: Tuple[str, ...] = ()
+        self, plugin_invoker: PluginInvoker, exec_args: tuple[str, ...] = ()
     ):
         """Apply catalog rules before invoke if in sync mode.
 
@@ -479,7 +477,7 @@ class SingerTap(SingerPlugin):
     def apply_catalog_rules(  # noqa: WPS213,WPS231
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: Tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),
     ):
         """Apply Singer catalog and schema rules to discovered catalog.
 
@@ -549,7 +547,7 @@ class SingerTap(SingerPlugin):
             raise PluginExecutionError(
                 "Applying catalog rules failed: catalog file is missing."
             ) from err
-        except Exception as err:  # noqa: WPS440
+        except Exception as err:
             catalog_path.unlink()
             raise PluginExecutionError(
                 f"Applying catalog rules failed: catalog file is invalid: {err}"
@@ -592,4 +590,4 @@ class SingerTap(SingerPlugin):
 
         key_json = json.dumps(key_dict)
 
-        return sha1(key_json.encode()).hexdigest()  # noqa: S303
+        return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324

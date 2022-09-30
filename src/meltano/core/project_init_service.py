@@ -1,5 +1,8 @@
 """New Project Initialization Service."""
+from __future__ import annotations
+
 import os
+import uuid
 
 import click
 
@@ -40,10 +43,19 @@ class ProjectInitService:
         """
         try:
             os.mkdir(self.project_name)
-        except Exception as exp:  # noqa: F841
+        except FileExistsError as ex:
             raise ProjectInitServiceError(
-                f"Directory {self.project_name} already exists."
-            )
+                f"Directory {self.project_name!r} already exists."
+            ) from ex
+        except PermissionError as ex:
+            raise ProjectInitServiceError(
+                f"Permission denied to create {self.project_name!r}."
+            ) from ex
+        except Exception as ex:
+            raise ProjectInitServiceError(
+                f"Could not create directory {self.project_name!r}. {ex}"
+            ) from ex
+
         click.secho("Created", fg="blue", nl=False)
         click.echo(f" {self.project_name}")
 
@@ -52,6 +64,11 @@ class ProjectInitService:
         self.create_files(add_discovery=add_discovery)
 
         self.settings_service = ProjectSettingsService(self.project)
+        self.settings_service.set(
+            "project_id",
+            str(uuid.uuid4()),
+            store=SettingValueStore.MELTANO_YML,
+        )
         self.set_send_anonymous_usage_stats()
         if activate:
             Project.activate(self.project)

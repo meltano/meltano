@@ -3,6 +3,134 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.7.1 (2022-09-27)
+
+### 🐛 Fixes
+
+- [#6797](https://github.com/meltano/meltano/issues/6797) Show appropriate UI toasts
+- [#6795](https://github.com/meltano/meltano/issues/6795) Correct migration path for state table
+
+### 📚 Documentation Improvements
+
+- [#6791](https://github.com/meltano/meltano/issues/6791) Remove datahub docs from guide
+
+## v2.7.0 (2022-09-23)
+
+### ✨ New
+
+- [#6758](https://github.com/meltano/meltano/issues/6758) Support custom state IDs in `meltano run` with `--state-id-suffix` -- _**Thanks @ReubenFrankel!**_
+- [#6756](https://github.com/meltano/meltano/issues/6756) Place `project_id` before `environments` in initial `meltano.yml`
+
+### 🐛 Fixes
+
+- [#6783](https://github.com/meltano/meltano/issues/6783) Remove "disable telemetry" toast from the UI
+- [#6779](https://github.com/meltano/meltano/issues/6779) Use v1.0.1 of the `exit_event` Snowplow telemetry schema
+- [#6745](https://github.com/meltano/meltano/issues/6745) Use random UUID as default `project_id`
+
+### ⚙️ Under the Hood
+
+- [#6748](https://github.com/meltano/meltano/issues/6748) Define and recommend `MeltanoError` exception class for improved CLI error messages
+
+### 📚 Documentation Improvements
+
+- [#6709](https://github.com/meltano/meltano/issues/6709) Add DataHub HowTo
+- [#6764](https://github.com/meltano/meltano/issues/6764) Move installation guide to "Getting Started" add Part 1 tutorial
+- [#6769](https://github.com/meltano/meltano/issues/6769) Guide for existing dbt projects
+- [#6737](https://github.com/meltano/meltano/issues/6737) Add getting started section
+- [#6753](https://github.com/meltano/meltano/issues/6753) Add list of video tuts and demos
+- [#6739](https://github.com/meltano/meltano/issues/6739) Add how to jupyter
+- [#6752](https://github.com/meltano/meltano/issues/6752) Shrink contrib. docs in sidebar to 1p
+- [#6743](https://github.com/meltano/meltano/issues/6743) Describe how `project_id` is hashed
+
+## v2.6.0 (2022-09-12)
+
+### ✨ New
+
+- [#5892](https://github.com/meltano/meltano/issues/5892) Add `--interactive` CLI flag in `meltano config set`.
+- [#6640](https://github.com/meltano/meltano/issues/6640) Add rich exception formatting, configurable from `logging.yaml`.
+
+### 🐛 Fixes
+
+- [#6694](https://github.com/meltano/meltano/issues/6694) Regression in `meltano remove` with error stating the plugin is missing the `settings_with_extras` attribute.
+- [#6652](https://github.com/meltano/meltano/issues/6652) Catch permission errors when creating a new project -- _**Thanks @jakegut!**_
+- [#6676](https://github.com/meltano/meltano/issues/6676) Prevent warnings/errors when running `meltano config <plugin> test` -- _**Thanks @ReubenFrankel!**_
+
+### 📚 Documentation Improvements
+
+- [#6706](https://github.com/meltano/meltano/issues/6706) Add troubleshooting page -- _**Thanks @jared-rimmer!**_
+- [#6688](https://github.com/meltano/meltano/issues/6688) Add docs about environment variable expansion.
+- [#6671](https://github.com/meltano/meltano/issues/6671) Add example meltano projects.
+- [#6674](https://github.com/meltano/meltano/issues/6674) Add docs for schedule `env` key.
+- [#6680](https://github.com/meltano/meltano/issues/6680) Fix feature flag name for strict env var mode.
+- [#6672](https://github.com/meltano/meltano/issues/6672) Add tutorial on how to debug a custom extractor -- _**Thanks @jared-rimmer!**_
+
+## v2.5.0 (2022-08-24)
+
+### ✨ New
+
+- [#6596](https://github.com/meltano/meltano/issues/6596) Support glob paths in file plugin `update` extra
+- [#6578](https://github.com/meltano/meltano/issues/6578) Add `--no-install` option to `meltano add`
+
+### 🐛 Fixes
+
+- [#6656](https://github.com/meltano/meltano/issues/6656) Correct STRICT_ENV_VAR_MODE behavior
+- [#6627](https://github.com/meltano/meltano/issues/6627) Raise exception when meltano.yml is empty
+- [#6643](https://github.com/meltano/meltano/issues/6643) Address `alter_column` warning for MSSQL
+- [#6636](https://github.com/meltano/meltano/issues/6636) Use `docs.meltano.com` instead of `meltano.com/docs`
+- [#6601](https://github.com/meltano/meltano/issues/6601) raise error on migration fail
+- [#6609](https://github.com/meltano/meltano/issues/6609) `meltano state list` change pattern from argument to option
+- [#6592](https://github.com/meltano/meltano/issues/6592) Validate CRON expressions
+- [#6543](https://github.com/meltano/meltano/issues/6543) Register legacy `DiscoveryFile` object in Ruamel YAML instance
+- [#6593](https://github.com/meltano/meltano/issues/6593) Docker workflow
+- [#6582](https://github.com/meltano/meltano/issues/6582) Make `default_environment` a top-level setting
+- [#6584](https://github.com/meltano/meltano/issues/6584) Avoid `pyproject.toml` Poetry parsing issue
+
+### ⚙️ Under the Hood
+
+- [#6621](https://github.com/meltano/meltano/issues/6621) Make `ProjectInitService.init` generate/set a `project_id`
+- [#6611](https://github.com/meltano/meltano/issues/6611) Use `closing` for DB sessions & add docstrings to `meltano.core.db`
+- [#6610](https://github.com/meltano/meltano/issues/6610) Replace `StaleJobFailer` class with `fail_stale_jobs` function
+
+### ⚡ Performance Improvements
+
+- [#6644](https://github.com/meltano/meltano/issues/6644) Improve performance when handling large yaml files
+
+### 📚 Documentation Improvements
+
+- [#6663](https://github.com/meltano/meltano/issues/6663) update custom extractor tutorial to use pip_url
+- [#6648](https://github.com/meltano/meltano/issues/6648) logging configuration guide
+- [#6650](https://github.com/meltano/meltano/issues/6650) Update Custom Extractor tutorial to use an editable install
+- [#6631](https://github.com/meltano/meltano/issues/6631) Add "Pytest Best Practices" section to contributing docs
+- [#6602](https://github.com/meltano/meltano/issues/6602) Update `Docker` definition in `glossary.yml`
+
+## v2.4.0 (2022-08-05)
+
+### ✨ New
+
+- [#5983](https://github.com/meltano/meltano/issues/5983) Add support for env var inheritance across config layers
+- [!6167](https://github.com/meltano/meltano/pull/6167) Add systemdb support for MS SQL Server
+- [#6494](https://github.com/meltano/meltano/issues/6494) **core**: Report how `send_anonymous_usage_stats` was configured
+- [#6116](https://github.com/meltano/meltano/issues/6116) Ignore setting values when selecting store location and `store=auto`
+
+### 🐛 Fixes
+
+- [#6383](https://github.com/meltano/meltano/issues/6383) Test DB Creation when meltano install is ran
+- [#6360](https://github.com/meltano/meltano/issues/6360) Lock plugins using the latest Hub definition if plugin has no variant name and no lock file exists
+- [!6557](https://github.com/meltano/meltano/pull/6557) Remove broken unused method `PluginsTrackingContext.append_plugin_context`
+- [#6532](https://github.com/meltano/meltano/issues/6532) **core**: Timeout Snowplow requests
+- [#5982](https://github.com/meltano/meltano/issues/5982) **core**: Update env var tests to be in line with correct reading of spec
+- [#6189](https://github.com/meltano/meltano/issues/6189) Validating Mapper and Mappings names and alerting if necessary
+- [#6240](https://github.com/meltano/meltano/issues/6240) **ui**: When feature flag `enable_uvicorn` is true require write lock when accessing Project.meltano attribute
+- [#6469](https://github.com/meltano/meltano/issues/6469) **deps**: Pin werkzeug to <2.2.0
+
+### 📚 Documentation Improvements
+
+- [!6535](https://github.com/meltano/meltano/pull/6535) Update broken doc link in `meltano.schema.json`
+- [!6456](https://github.com/meltano/meltano/pull/6456) Update for Windows and for using pipx --python version
+- [#6491](https://github.com/meltano/meltano/issues/6491) Update style doc to note that MyPy is not run in CI
+- [#6107](https://github.com/meltano/meltano/issues/6107) Document YAML syntax for Hub plugins
+- [!6465](https://github.com/meltano/meltano/pull/6465) Move 'v2 migration guide' under 'guides'
+
 ## v2.3.0 (2022-07-20)
 
 ### ✨ New

@@ -1,4 +1,8 @@
-import logging  # noqa: D100
+"""Definition of the top-level Click group for the Meltano CLI."""
+
+from __future__ import annotations
+
+import logging
 import sys
 from typing import NoReturn
 
@@ -7,7 +11,6 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -28,7 +31,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     def main(self, *args, **kwargs) -> NoReturn:
         """Invoke the Click CLI with Windows globbing disabled.
 
-        Parameters:
+        Args:
             args: Positional arguments for the Click group.
             kwargs: Keyword arguments for the Click group.
         """
@@ -64,7 +67,7 @@ def cli(  # noqa: WPS231
     """
     ELT for the DataOps era.
 
-    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface
     """
     ctx.ensure_object(dict)
 
@@ -75,11 +78,13 @@ def cli(  # noqa: WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["verbosity"] = verbose
+
     try:  # noqa: WPS229
         project = Project.find()
         setup_logging(project)
+        project_setting_service = ProjectSettingsService(project)
 
-        readonly = ProjectSettingsService(project).get("project_readonly")
+        readonly = project_setting_service.get("project_readonly")
         if readonly:
             project.readonly = True
         if project.readonly:
@@ -92,8 +97,8 @@ def cli(  # noqa: WPS231
             logger.info("No environment is active")
         elif environment:
             selected_environment = environment
-        elif project.meltano.default_environment:
-            selected_environment = project.meltano.default_environment
+        elif project_setting_service.get("default_environment"):
+            selected_environment = project_setting_service.get("default_environment")
             is_default_environment = True
         # activate environment
         if selected_environment:
@@ -107,9 +112,6 @@ def cli(  # noqa: WPS231
         ctx.obj["tracker"].add_contexts(
             CliContext.from_click_context(ctx)
         )  # backfill the `cli` CliContext
-        ctx.obj["legacy_tracker"] = LegacyTracker(
-            project, context_overrides=ctx.obj["tracker"].contexts
-        )
     except ProjectNotFound:
         ctx.obj["project"] = None
     except IncompatibleVersionError:
@@ -118,6 +120,6 @@ def cli(  # noqa: WPS231
             fg="yellow",
         )
         click.echo(
-            "For more details, visit http://meltano.com/docs/installation.html#upgrading-meltano-version"
+            "For more details, visit https://docs.meltano.com/guide/installation#upgrading-meltano-version"
         )
         sys.exit(3)

@@ -38,22 +38,20 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
 
-By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
+By default, Meltano shares anonymous usage data with the Meltano team using Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
 
 We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
-If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
-This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
+If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project. If the project ID is a UUID, then it will be sent unchanged. Otherwise, it will be [hashed](#q-what-is-a-one-way-hash-and-how-is-it-helpful), and its hash will be used to derive a UUID which will be used to uniquely identify your project.
 
-If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
-the Tracking IDs can be configured using the `tracking_ids.*` settings below.
+This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
 the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
 
 Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
 
-See more about our [anonymization standards](/reference/settings#anonymization-standards) and [anonymous usage stats Q&A](/reference/settings#anonymous-usage-stats-qa) below for more details.
+See more about our [anonymization standards](#anonymization-standards) and [anonymous usage stats Q&A](#anonymous-usage-stats-qa) below for more details.
 Also refer to the Meltano data team handbook page for our ["Philosophy of Telemetry"](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry).
 
 With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
@@ -128,14 +126,14 @@ If you still have any concerns about keeping anonymous reporting enabled, we hop
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_ID`
 - Default: None
 
-Used by Meltano to uniquely identify your project in Google Analytics if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
+Used by Meltano to uniquely identify your project if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
 
 #### How to use
 
 ```bash
-meltano config meltano set project_id <randomly-generated-token>
+meltano config meltano set project_id '<unique identifier>'
 
-export MELTANO_PROJECT_ID=<randomly-generated-token>
+export MELTANO_PROJECT_ID='<unique identifier>'
 ```
 
 ### <a name="database-uri"></a>`database_uri`
@@ -237,10 +235,29 @@ meltano config meltano set project_readonly true
 export MELTANO_PROJECT_READONLY=true
 ```
 
+### <a name="hub-api-root"></a>`hub_api_root`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_API_ROOT`
+- Default: None
+
+This sets the value of the root url for the hub api.
+
+If provided, this setting overrides the [`hub_url`](#hub-url).
+
+#### How to use
+
+```bash
+meltano config meltano set hub_api_root "https://mysite.com/my-plugins"
+meltano config meltano set hub_api_root false
+
+export MELTANO_HUB_API_ROOT="https://mysite.com/my-plugins"
+export MELTANO_HUB_API_ROOT=false
+```
+
 ### <a name="hub-url"></a>`hub_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
-- Default: [`https://hub.meltano.com`](https://hub.meltano.com)
+- Default: `https://hub.meltano.com`
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
@@ -252,6 +269,28 @@ This manifest is primarily used by [`meltano discover`](/reference/command-line-
 meltano config meltano set hub_url http://localhost:4000
 
 export MELTANO_HUB_URL=http://localhost:4000
+```
+
+### <a name="hub-url-auth"></a>`hub_url_auth`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL_AUTH`
+- Default: None
+
+The value of the `Authorization` header sent when making a request to [`hub_url`](#hub-url).
+
+No `Authorization` header is applied under the following conditions:
+
+- `hub_url_auth` is not set
+- `hub_url_auth` is set to `false`, `null` or an empty string
+
+#### How to use
+
+```bash
+meltano config meltano set hub_url_auth "Bearer $ACCESS_TOKEN"
+meltano config meltano set hub_url_auth false
+
+export MELTANO_HUB_URL_AUTH="Bearer $ACCESS_TOKEN"
+export MELTANO_HUB_URL_AUTH=false
 ```
 
 ### <a name="discovery-url"></a>`discovery_url`
@@ -972,49 +1011,6 @@ export OAUTH_GITLAB_CLIENT_SECRET=<gitlab-client-secret>
 export OAUTH_GITLAB_SECRET=<gitlab-client-secret>
 ```
 
-## Analytics Tracking IDs (deprecated, will be removed in a future version)
-
-Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
-
-### `tracking_ids.cli`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_CLI`
-- Default: `UA-132758957-3`
-
-Tracking ID for usage of the [`meltano` CLI](/reference/command-line-interface).
-
-```bash
-meltano config meltano set tracking_ids cli UA-123456789-1
-
-export MELTANO_TRACKING_IDS_CLI=UA-123456789-1
-```
-
-### `tracking_ids.ui`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI`
-- Default: `UA-132758957-2`
-
-Tracking ID for usage of [Meltano UI](/reference/ui).
-
-```bash
-meltano config meltano set tracking_ids ui UA-123456789-2
-
-export MELTANO_TRACKING_IDS_UI=UA-123456789-2
-```
-
-### `tracking_ids.ui_embed`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`
-- Default: `UA-132758957-6`
-
-Tracking ID for usage of [Meltano UI](/reference/ui)'s [Embed feature](/guide/analysis#share-reports-and-dashboards).
-
-```bash
-meltano config meltano set tracking_ids ui_embed UA-123456789-3
-
-export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3
-```
-
 ## Snowplow Tracking
 
 ### `snowplow.collector_endpoints`
@@ -1032,9 +1028,9 @@ Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` set
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
 - Default: `False`
 
-### <a name="ff-env-var-strict-mode"></a>`ff.env_var_strict_mode`
+### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENV_VAR_STRICT_MODE`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_STRICT_ENV_VAR_MODE`
 - Default: `False`
 
 Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.

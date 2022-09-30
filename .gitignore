@@ -32,6 +32,7 @@ api/parser
 *.ntvs*
 *.njsproj
 *.sln
+.sourcery.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -152,3 +153,5 @@ src/meltano/api/static/js
 
 # sqlite
 *.db
+# allow integration tests to ship/store/use sqlite
+!docs/example-library/**/.meltano/meltano.db

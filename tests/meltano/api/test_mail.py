@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import json
+
+import pytest
 
 from meltano.api.mail import MailService
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
@@ -7,7 +11,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 
 class TestMailService:
     def test_get_unsubscribe_group(self, project):
-
         default_id = 12751
         custom_id = 42
 
@@ -30,6 +33,7 @@ class TestMailService:
         custom_service = MailService(project)
         assert custom_service.get_unsubscribe_group(sub) == custom_id
 
+    @pytest.mark.order(after="test_get_unsubscribe_group")
     def test_create_message(self, project):
         sub = Subscription()
         sub.event_type = SubscriptionEventType.PIPELINE_MANUAL_RUN

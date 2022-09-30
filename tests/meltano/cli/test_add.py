@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import platform
 import shutil
@@ -14,6 +16,8 @@ from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project import Project
+from meltano.core.project_init_service import ProjectInitService
 
 
 class TestCliAdd:
@@ -25,6 +29,14 @@ class TestCliAdd:
         ):
             yield
 
+    @pytest.fixture
+    def reset_project_context(
+        self, project: Project, project_init_service: ProjectInitService
+    ):
+        shutil.rmtree(".", ignore_errors=True)
+        project_init_service.create_files(project)
+
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "plugin_type,plugin_name,default_variant,required_plugin_refs",
         [
@@ -99,6 +111,7 @@ class TestCliAdd:
 
                 install_plugin_mock.assert_called()
 
+    @pytest.mark.order(1)
     def test_add_multiple(self, project, cli_runner, project_plugins_service):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -136,6 +149,7 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
             )
 
+    @pytest.mark.order(2)
     def test_add_transform(self, project, cli_runner):
         # adding Transforms requires the legacy 'dbt' Transformer
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
@@ -176,6 +190,7 @@ class TestCliAdd:
         shutil.rmtree("plugins/files", ignore_errors=True)
 
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         # Plugin has been added to meltano.yml
@@ -188,7 +203,7 @@ class TestCliAdd:
         assert update_config["orchestrate/dags/meltano.py"] is True
 
         # File has been created
-        assert "Created orchestrate/dags/meltano.py" in result.output
+        assert "Created orchestrate/dags/meltano.py" in output
 
         file_path = project.root_dir("orchestrate/dags/meltano.py")
         assert file_path.is_file()
@@ -202,6 +217,7 @@ class TestCliAdd:
         self, project, cli_runner, project_plugins_service
     ):
         result = cli_runner.invoke(cli, ["add", "files", "docker-compose"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         # Plugin has not been added to meltano.yml
@@ -209,7 +225,7 @@ class TestCliAdd:
             project_plugins_service.find_plugin("docker-compose", PluginType.FILES)
 
         # File has been created
-        assert "Created docker-compose.yml" in result.output
+        assert "Created docker-compose.yml" in output
 
         file_path = project.root_dir("docker-compose.yml")
         assert file_path.is_file()
@@ -228,13 +244,14 @@ class TestCliAdd:
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
         result = cli_runner.invoke(cli, ["add", "files", "dbt"])
+        output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         assert (
-            "File transform/dbt_project.yml already exists, keeping both versions"
-            in result.output
+            "File 'transform/dbt_project.yml' already exists, keeping both versions"
+            in output
         )
-        assert "Created transform/dbt_project (dbt).yml" in result.output
+        assert "Created transform/dbt_project (dbt).yml" in output
         assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
 
     def test_add_missing(self, project, cli_runner, project_plugins_service):
@@ -250,11 +267,12 @@ class TestCliAdd:
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
     def test_add_fails(self, project, cli_runner, project_plugins_service):
-        res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+        result = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+        output = result.stdout + result.stderr
 
-        assert res.exit_code == 1, res.stdout
-        assert "Failed to install plugin 'tap-mock'" in res.stdout
-        assert res.stderr
+        assert result.exit_code == 1, result.stdout
+        assert "Failed to install plugin 'tap-mock'" in output
+        assert result.stderr
 
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
@@ -515,3 +533,89 @@ class TestCliAdd:
             plugin_variant = plugin_def.variants[0]
 
             assert plugin.variant == plugin_variant.name == "personal"
+
+    @pytest.mark.parametrize(
+        "plugin_type,plugin_name,default_variant,required_plugin_refs",
+        [
+            (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
+            (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
+            (PluginType.TRANSFORMS, "tap-carbon-intensity", "meltano", []),
+            (
+                PluginType.ORCHESTRATORS,
+                "airflow",
+                Variant.ORIGINAL_NAME,
+                [PluginRef(PluginType.FILES, "airflow")],
+            ),
+        ],
+        ids=[
+            "single-extractor",
+            "single-loader",
+            "transform-and-related",
+            "orchestrator-and-required",
+        ],
+    )
+    def test_add_no_install(
+        self,
+        plugin_type,
+        plugin_name,
+        default_variant,
+        required_plugin_refs,
+        project,
+        cli_runner,
+        project_plugins_service,
+        reset_project_context,
+    ):
+        # ensure the plugin is not present
+        with pytest.raises(PluginNotFoundError):
+            project_plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
+
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli, ["add", plugin_type.singular, plugin_name, "--no-install"]
+            )
+
+            if plugin_type is PluginType.TRANSFORMS:
+                assert res.exit_code == 1, res.stdout
+                assert isinstance(res.exception, CliError)
+                assert "Dependencies not met:" in str(res.exception)
+            else:
+                assert res.exit_code == 0, res.stdout
+                assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
+
+                plugin = project_plugins_service.find_plugin(plugin_name, plugin_type)
+                assert plugin
+                assert plugin.variant == default_variant
+
+                # check plugin lock file is added
+                plugins_dir = project.root_dir("plugins")
+                assert plugins_dir.joinpath(
+                    f"{plugin_type}/{plugin_name}--{default_variant}.lock"
+                ).exists()
+
+                for required_plugin_ref in required_plugin_refs:
+                    if (required_plugin_ref._type) == PluginType.FILES and (
+                        required_plugin_ref.name == "dbt"
+                    ):
+                        # file bundles with no managed files are added but do not appear in meltano.yml
+                        assert (
+                            f"Adding required file bundle '{required_plugin_ref.name}'"
+                            in res.stdout
+                        )
+                    else:
+                        plugin = project_plugins_service.get_plugin(required_plugin_ref)
+                        assert plugin
+
+                        assert (
+                            f"Added required {plugin.type.descriptor} '{plugin.name}'"
+                            in res.stdout
+                        )
+
+                    # check required plugin lock files are added
+                    assert list(
+                        plugins_dir.glob(
+                            f"{required_plugin_ref._type}/{required_plugin_ref.name}--*.lock"
+                        )
+                    )
+
+                install_plugin_mock.assert_not_called()

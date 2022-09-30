@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from meltano.core.task_sets import TaskSets
@@ -21,6 +23,7 @@ class TestTaskSetsService:
     def subject(self, task_sets_service):
         return task_sets_service
 
+    @pytest.mark.order(0)
     def test_add(self, subject: TaskSetsService, create_task_set):
         count = 10
         jobs = [create_task_set(f"test_job_{idx}") for idx in range(count)]

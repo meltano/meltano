@@ -1,4 +1,6 @@
 """Service to manage meltano.yml."""
+from __future__ import annotations
+
 import logging
 import os
 from contextlib import contextmanager
@@ -6,9 +8,8 @@ from contextlib import contextmanager
 import yaml
 
 from meltano.core import bundle
-
-from .project import Project
-from .setting_definition import SettingDefinition
+from meltano.core.project import Project
+from meltano.core.setting_definition import SettingDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,7 @@ class ConfigService:
             The contents of meltano.yml.
         """
         if self._current_meltano_yml is None or not self._use_cache:
+            self.project.clear_cache()
             self._current_meltano_yml = self.project.meltano
         return self._current_meltano_yml
 
@@ -103,29 +105,11 @@ class ConfigService:
     def update_config(self, config):
         """Update top-level Meltano configuration.
 
-        Parameters:
+        Args:
             config: configuration dict
         """
         with self.update_meltano_yml() as meltano_yml:
             meltano_yml.extras = config
-
-    @property
-    def current_environment_config(self):
-        """Return the current environment configuration.
-
-        Returns:
-            The current environment configuration.
-        """
-        return self.project.active_environment.config.extras
-
-    def update_environment_config(self, config):
-        """Update configuration in an environment.
-
-        Parameters:
-            config: configuration dict
-        """
-        with self.update_active_environment() as environment:
-            environment.config.extras = config
 
     def make_meltano_secret_dir(self):
         """Create the secret directory."""

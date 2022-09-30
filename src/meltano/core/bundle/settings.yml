@@ -1,5 +1,7 @@
 settings:
 # Project
+- name: default_environment
+  value: dev
 - name: send_anonymous_usage_stats
   kind: boolean
   value: true
@@ -24,8 +26,10 @@ settings:
   env_specific: true
 - name: discovery_url
   value: https://discovery.meltano.com/discovery.yml
+- name: hub_api_root
 - name: hub_url
   value: https://hub.meltano.com
+- name: hub_url_auth
 - name: discovery_url_auth
 - name: elt.buffer_size
   kind: integer
@@ -168,14 +172,6 @@ settings:
   kind: password
   env: OAUTH_GITLAB_CLIENT_SECRET
   env_specific: true
-
-# Analytics Tracking IDs
-- name: tracking_ids.cli
-  value: UA-132758957-3
-- name: tracking_ids.ui
-  value: UA-132758957-2
-- name: tracking_ids.ui_embed
-  value: UA-132758957-6
 
 # Snowplow Tracking
 - name: snowplow.collector_endpoints
