@@ -467,7 +467,7 @@ meltano environment remove prod
 
 ## `init`
 
-Used to create a new [Meltano project](/concepts/project) directory inside the current working directory.
+Used to create a new [Meltano project](/concepts/project) at a directory path relative to the current working directory. If the specified directory does not exist, one will be created for the project - otherwise the existing directory will be used if it is empty.
 
 The new project directory will contain:
 
@@ -486,7 +486,7 @@ meltano init [project_name] [--no_usage_stats]
 
 #### Parameters
 
-- **project_name** - This determines the folder name for the project
+- **project_name** - This determines the directory path to create the project at.
 
 #### Options
 
@@ -495,6 +495,9 @@ meltano init [project_name] [--no_usage_stats]
 #### Examples
 
 ```bash
+# Initialize a new Meltano project interactively
+meltano init
+
 # Initialize a new Meltano project in the
 # "demo-project" directory, and...
 # - share anonymous usage data with the Meltano team
@@ -509,6 +512,9 @@ meltano init demo-project --no_usage_stats
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
 echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
 meltano init demo-project # --no_usage_stats is implied
+
+# Initialize a new Meltano project in the current working directory
+meltano init .
 ```
 
 ## `install`
