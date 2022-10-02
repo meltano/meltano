@@ -38,9 +38,9 @@ class StateService:
             session: the session to use for interacting with the db
         """
         self.session = session
-        self.max_rows_per_job: int | None = settings.get("database_max_rows_per_job") if settings is not None else None
-        if self.max_rows_per_job < 1:
-            self.max_rows_per_job = None
+        self.max_rows_per_state: int | None = settings.get("database_max_rows_per_state") if settings is not None else None
+        if self.max_rows_per_state < 1:
+            self.max_rows_per_state = None
 
     def list_state(self, state_id_pattern: str | None = None):
         """List all state found in the db.
@@ -209,8 +209,8 @@ class StateService:
         """Execute vacuuming if configured
         """
         try:
-            if self.max_rows_per_job is not None and self.max_rows_per_job > 0:
-                delete_count = self.vacuum(None, self.max_rows_per_job)
+            if self.max_rows_per_state is not None and self.max_rows_per_state > 0:
+                delete_count = self.vacuum(None, self.max_rows_per_state)
                 if delete_count > 0:
                     logger.debug(f"Delete {delete_count} unused rows for vacuuming")
         except BaseException:
