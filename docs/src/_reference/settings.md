@@ -207,6 +207,21 @@ meltano config meltano set database_retry_timeout 5
 export MELTANO_DATABASE_RETRY_TIMEOUT=5
 ```
 
+### `database_max_rows_per_state`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAX_ROWS_PER_STATE`
+- Default: (unlimited)
+
+The value limits how many old runs for each state Meltano keeps in system DB. By default, Meltano stores the state payload for each run for auditing purpose. If your project has significantly large state sizes and requires housekeeping, the option can limit the maximum rows for each state kept in system DB.
+
+#### How to use
+
+```bash
+meltano config meltano set database_max_rows_per_state 10
+
+export MELTANO_MAX_ROWS_PER_STATE=10
+```
+
 ### <a name="project-readonly"></a>`project_readonly`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_READONLY`

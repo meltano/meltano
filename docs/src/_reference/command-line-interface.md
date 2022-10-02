@@ -1279,6 +1279,41 @@ echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.
 meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
 ```
 
+### vacuum
+
+Delete unused historical records of old runs to release some disk space. The states of jobs are not affected.
+
+#### How to use
+
+```bash
+# Delete some historical records of old runs.
+meltano state vacuum
+
+# Delete some old runs while specifying how many rows to keep per state ID.
+meltano state vacuum --rows-to-keep <row_count>
+
+# Apply vacuuming only to states whose IDs match specified pattern.
+meltano state vacuum --pattern <PATTERN>
+```
+
+#### Parameters
+
+- The `--rows-to-keep` option specifies how many latests rows to keep per state ID. Default value is 10.
+- The `--pattern` option allows filtering returned state IDs by using `*` as a wildcard.
+
+#### Examples
+
+```bash
+# Delete some historical records of old runs, leaving the latest 10 rows per state ID.
+meltano state vacuum
+
+# Delete some historical records of old runs, but leave the latest 5 rows per state ID instead.
+meltano state vacuum --rows-to-keep 5
+
+# Apply vacuuming only to states whose IDs contain "tap-gitlab".
+meltano state vacuum --pattern '*tap-gitlab*'
+```
+
 ## `test`
 
 Run tests for one or more plugins. A test is any [command](/reference/command-line-interface#commands) with a name starting with `test`.
