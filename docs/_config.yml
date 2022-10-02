@@ -27,6 +27,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-algolia
   - jekyll-redirect-from
+  - jekyll-tabs
 
 # Default plugin configuration
 defaults:
