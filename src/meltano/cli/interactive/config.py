@@ -63,7 +63,6 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.project = self.ctx.obj["project"]
         self.settings = self.ctx.obj["settings"]
         self.session = self.ctx.obj["session"]
-        self.plugin = self.ctx.obj["settings"].plugin
         self.tracker = self.ctx.obj["tracker"]
         self.environment_service = EnvironmentService(self.project)
         self.max_width = max_width or 75  # noqa: WPS432
