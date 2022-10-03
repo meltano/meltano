@@ -110,7 +110,9 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session, ProjectSettingsService(project))  # noqa: WPS204
+    ctx.obj[STATE_SERVICE_KEY] = StateService(
+        session, ProjectSettingsService(project)
+    )  # noqa: WPS204
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
@@ -311,15 +313,16 @@ def clear_state(ctx: click.Context, project: Project, state_id: str, force: bool
     )
     state_service.clear_state(state_id)
 
+
 @meltano_state.command(cls=InstrumentedCmd, name="vacuum")
 @click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.option("--rows-to-keep", type=int, help="Rows to keep after vacuuming.")
 @click.pass_context
 @pass_project()
-def vacuum_state(project: Project, ctx: click.Context, pattern: str | None, rows_to_keep: int | None):
+def vacuum_state(
+    project: Project, ctx: click.Context, pattern: str | None, rows_to_keep: int | None
+):
     """Housekeep state storage to free up disk space."""
     state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
     delete_count = state_service.vacuum(pattern, rows_to_keep)
-    logger.info(
-        f"Vacuumed state storage, removing {delete_count} rows from table."
-    )
+    logger.info(f"Vacuumed state storage, removing {delete_count} rows from table.")

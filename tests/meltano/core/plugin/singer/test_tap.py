@@ -78,7 +78,9 @@ class TestSingerTap:
         )
 
         invoker = plugin_invoker_factory(subject, context=elt_context)
-        state_service = StateService(session, ProjectSettingsService(elt_context.project))
+        state_service = StateService(
+            session, ProjectSettingsService(elt_context.project)
+        )
 
         @contextmanager
         def create_job():

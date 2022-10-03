@@ -87,9 +87,13 @@ class TestStateService:
             assert not state_service.get_state(state_id_src)
             assert state_service.get_state(state_id_dst) == state_src
 
-    def test_vacuum(self, state_service, state_ids_with_expected_states, state_ids_with_jobs):
+    def test_vacuum(
+        self, state_service, state_ids_with_expected_states, state_ids_with_jobs
+    ):
         rows_to_keep = 5
-        expected_delete_count = sum([max(len(jobs) - rows_to_keep, 0) for jobs in state_ids_with_jobs.values()])
+        expected_delete_count = sum(
+            max(len(jobs) - rows_to_keep, 0) for jobs in state_ids_with_jobs.values()
+        )
         delete_count = state_service.vacuum(None, rows_to_keep)
         assert state_service.list_state() == {
             state_id: expected_state

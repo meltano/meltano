@@ -31,7 +31,7 @@ class StateService:
     Currently only manages Singer state for Extract and Load jobs.
     """
 
-    def __init__(self, session: object = None, settings = None):
+    def __init__(self, session: object = None, settings=None):
         """Create a StateService object.
 
         Args:
@@ -39,7 +39,11 @@ class StateService:
             settings: a ProjectSettingsService for the current project
         """
         self.session = session
-        self.max_rows_per_state: int | None = settings.get("database_max_rows_per_state") if settings is not None else None
+        self.max_rows_per_state: int | None = (
+            settings.get("database_max_rows_per_state")
+            if settings is not None
+            else None
+        )
         if self.max_rows_per_state is not None and self.max_rows_per_state < 1:
             self.max_rows_per_state = None
 
@@ -207,8 +211,7 @@ class StateService:
         self.clear_state(state_id_src)
 
     def _vacuum_if_necessary(self):
-        """Execute vacuuming if configured.
-        """
+        """Execute vacuuming if configured."""
         try:
             if self.max_rows_per_state is not None and self.max_rows_per_state > 0:
                 delete_count = self.vacuum(None, self.max_rows_per_state)
@@ -227,7 +230,7 @@ class StateService:
         Returns:
             how many rows are deleted in total
         """
-        return sum([
+        return sum(
             Job.vaccum(self.session, state_id, rows_to_keep or 10)
             for state_id in self.state_store_manager.get_state_ids(state_id_pattern)
-        ])
+        )

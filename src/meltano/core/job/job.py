@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 
-from sqlalchemy import Column, literal, types, delete, desc
+from sqlalchemy import Column, delete, desc, literal, types
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
 
@@ -346,15 +346,26 @@ class Job(SystemModel):  # noqa: WPS214
             the number of rows deleted
         """
         # get the (n+1)-th latest row, or None if there is less or equal than n rows in the table
-        latest_job_to_delete = session.query(Job).filter(Job.job_name == job_name).order_by(desc(Job.id)).offset(rows_to_keep).first()
+        latest_job_to_delete = (
+            session.query(Job)
+            .filter(Job.job_name == job_name)
+            .order_by(desc(Job.id))
+            .offset(rows_to_keep)
+            .first()
+        )
         if latest_job_to_delete is not None:
             id_threshold = latest_job_to_delete.id
-            delete_count = session.query(Job).filter(Job.job_name == job_name, Job.id <= id_threshold).count()
-            session.execute(delete(Job).where(Job.job_name == job_name, Job.id <= id_threshold))
+            delete_count = (
+                session.query(Job)
+                .filter(Job.job_name == job_name, Job.id <= id_threshold)
+                .count()
+            )
+            session.execute(
+                delete(Job).where(Job.job_name == job_name, Job.id <= id_threshold)
+            )
             session.commit()
             return delete_count
-        else:
-            return 0
+        return 0
 
     def _heartbeat(self):
         """Update last_heartbeat_at for this job in the db."""
