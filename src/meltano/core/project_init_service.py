@@ -161,7 +161,7 @@ class ProjectInitService:
 
         click.echo("  Visit ", nl=False)
         click.secho(
-            "https://docs.meltano.com/getting-started#create-your-meltano-project",
+            "https://docs.meltano.com/getting-started/part1",
             fg="cyan",
             nl=False,
         )
