@@ -1,6 +1,6 @@
 {
   "name": "meltano-webapp",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "private": true,
   "scripts": {
     "dev": "npm run serve",
