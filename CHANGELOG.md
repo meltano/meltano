@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.7.2 (2022-10-03)
+
+### 🐛 Fixes
+
+- [#6819](https://github.com/meltano/meltano/issues/6819) Fix error on `meltano config meltano set ...`
+- [#6818](https://github.com/meltano/meltano/issues/6818) Avoid SQLAlchemy deprecation warning
+
+### 📚 Documentation Improvements
+
+- [#6822](https://github.com/meltano/meltano/issues/6822) Remove E(t)LT from tutorial
+- [#6800](https://github.com/meltano/meltano/issues/6800) Shorten install quick start, move rest to guide
+- [#6809](https://github.com/meltano/meltano/issues/6809) Tutorial small cleanup
+- [#6781](https://github.com/meltano/meltano/issues/6781) Add parts 2-4 to the tutorial
+- [#6801](https://github.com/meltano/meltano/issues/6801) Fix broken link
+
 ## v2.7.1 (2022-09-27)
 
 ### 🐛 Fixes
