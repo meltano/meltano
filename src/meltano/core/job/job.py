@@ -341,6 +341,9 @@ class Job(SystemModel):  # noqa: WPS214
             session: the session to use for writing to the db
             job_name: the job name
             rows_to_keep: how many jobs to keep in the table
+
+        Returns:
+            the number of rows deleted
         """
         # get the (n+1)-th latest row, or None if there is less or equal than n rows in the table
         latest_job_to_delete = session.query(Job).filter(Job.job_name == job_name).order_by(desc(Job.id)).offset(rows_to_keep).first()

@@ -36,6 +36,7 @@ class BookmarkWriter:
 
         Args:
             job: meltano elt job associated with this invocation and who's state will be updated.
+            project: the associated project of this job
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: a valid payload flag, one of Payload.STATE or Payload.INCOMPLETE_STATE.
             state_service: StateService to use for bookmarking state.
