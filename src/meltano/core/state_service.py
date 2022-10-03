@@ -39,7 +39,7 @@ class StateService:
         """
         self.session = session
         self.max_rows_per_state: int | None = settings.get("database_max_rows_per_state") if settings is not None else None
-        if self.max_rows_per_state < 1:
+        if self.max_rows_per_state is not None and self.max_rows_per_state < 1:
             self.max_rows_per_state = None
 
     def list_state(self, state_id_pattern: str | None = None):
