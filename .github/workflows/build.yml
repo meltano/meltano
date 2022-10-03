@@ -43,7 +43,7 @@ jobs:
         poetry install
 
     - name: Setup Node
-      uses: actions/setup-node@v3.4.1
+      uses: actions/setup-node@v3.5.0
       with:
         node-version: '14'
         cache: 'yarn'
