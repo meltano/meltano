@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 import click
 
@@ -18,16 +19,17 @@ LOADERS = "loaders"
 ALL = "all"
 
 logger = logging.getLogger(__name__)
+path_type = click.Path(file_okay=False, path_type=Path)
 
 
 @cli.command(cls=InstrumentedCmd, short_help="Create a new Meltano project.")
 @click.pass_context
-@click.argument("project_name", required=False)
+@click.argument("project_name", required=False, type=path_type)
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
 @database_uri_option
-def init(ctx, project_name, no_usage_stats):
+def init(ctx, project_name: Path, no_usage_stats):
     """
     Create a new Meltano project.
 
@@ -36,7 +38,9 @@ def init(ctx, project_name, no_usage_stats):
     """
     if not project_name:
         click.echo("We need a project name to get started!")
-        project_name = click.prompt("Enter a name now to create a Meltano project")
+        project_name = click.prompt(
+            "Enter a name now to create a Meltano project", type=path_type
+        )
 
     if ctx.obj["project"]:
         root = ctx.obj["project"].root

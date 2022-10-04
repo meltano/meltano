@@ -21,13 +21,13 @@ class ProjectInitServiceError(Exception):
 class ProjectInitService:
     """New Project Initialization Service."""
 
-    def __init__(self, project_name):
+    def __init__(self, project_directory: os.PathLike):
         """Create a new ProjectInitService instance.
 
         Args:
-            project_name: The name of the project to create
+            project_directory: The directory path to create the project at
         """
-        self.project_name = project_name.lower()
+        self.project_directory = Path(project_directory)
 
     def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
         """Initialise Meltano Project.
@@ -43,22 +43,22 @@ class ProjectInitService:
             ProjectInitServiceError: Directory already exists
         """
         try:
-            os.mkdir(self.project_name)
+            self.project_directory.mkdir()
         except FileExistsError as ex:
-            if any(Path(self.project_name).iterdir()):
+            if any(self.project_directory.iterdir()):
                 raise ProjectInitServiceError(
-                    f"Directory {self.project_name!r} not empty."
+                    f"Directory '{self.project_directory}' not empty."
                 ) from ex
         except PermissionError as ex:
             raise ProjectInitServiceError(
-                f"Permission denied to create {self.project_name!r}."
+                f"Permission denied to create '{self.project_directory}'."
             ) from ex
         except Exception as ex:
             raise ProjectInitServiceError(
-                f"Could not create directory {self.project_name!r}. {ex}"
+                f"Could not create directory '{self.project_directory}'. {ex}"
             ) from ex
 
-        self.project = Project(self.project_name)
+        self.project = Project(self.project_directory)
 
         self.create_files(add_discovery=add_discovery)
 
@@ -150,7 +150,7 @@ class ProjectInitService:
 
         click.echo("\nNext steps:")
 
-        if not self.project.root.samefile(os.getcwd()):
+        if not Path.cwd().samefile(self.project.root):
             click.secho("  cd ", nl=False)
             click.secho(self.project.root, fg="magenta")
 
@@ -171,4 +171,4 @@ class ProjectInitService:
         Returns:
             Joined base path and passed filename
         """
-        return os.path.join(".", self.project_name, filename)
+        return os.path.join(".", self.project_directory, filename)
