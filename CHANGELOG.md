@@ -81,6 +81,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## v2.5.0 (2022-08-24)
 
+### BREAKING CHANGES
+
+- [#6582](https://github.com/meltano/meltano/issues/6582) Make `default_environment` a top-level setting
+
+  Running meltano environment add dev as a one-time fix will resolve the issue, even if no other changes are made and no environment-specific settings are added.
+
 ### ✨ New
 
 - [#6596](https://github.com/meltano/meltano/issues/6596) Support glob paths in file plugin `update` extra
@@ -97,7 +103,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6592](https://github.com/meltano/meltano/issues/6592) Validate CRON expressions
 - [#6543](https://github.com/meltano/meltano/issues/6543) Register legacy `DiscoveryFile` object in Ruamel YAML instance
 - [#6593](https://github.com/meltano/meltano/issues/6593) Docker workflow
-- [#6582](https://github.com/meltano/meltano/issues/6582) Make `default_environment` a top-level setting
 - [#6584](https://github.com/meltano/meltano/issues/6584) Avoid `pyproject.toml` Poetry parsing issue
 
 ### ⚙️ Under the Hood
