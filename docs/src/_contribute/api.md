@@ -18,10 +18,10 @@ After all of your dependencies installed, we recommend opening a new window/tab 
 poetry shell
 
 # Create a new Meltano project
-meltano init $PROJECT_NAME
+meltano init $PROJECT_DIRECTORY
 
 # Change directory into your newly created project
-cd $PROJECT_NAME
+cd $PROJECT_DIRECTORY
 
 # Start a development build of the Meltano API and a production build of Meltano UI
 FLASK_ENV=development meltano ui

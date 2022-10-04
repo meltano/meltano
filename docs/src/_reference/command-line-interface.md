@@ -481,12 +481,12 @@ The new project directory will contain:
 
 ```bash
 # Format
-meltano init [project_name] [--no_usage_stats]
+meltano init [project_directory] [--no_usage_stats]
 ```
 
 #### Parameters
 
-- **project_name** - This determines the directory path to create the project at.
+- **project_directory** - This determines the directory path to create the project at.
 
 #### Options
 
