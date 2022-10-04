@@ -11,5 +11,5 @@ export default {
       utils.apiUrl('sql/get', `${namespace}/${model}/${design}`),
       data
     )
-  }
+  },
 }

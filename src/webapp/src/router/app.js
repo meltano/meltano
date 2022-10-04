@@ -17,12 +17,12 @@ const router = new Router({
       name: '404',
       component: NotFound,
       meta: {
-        title: 'Meltano: Not Found'
-      }
+        title: 'Meltano: Not Found',
+      },
     },
     {
       path: '/',
-      redirect: '/extractors'
+      redirect: '/extractors',
     },
     {
       path: '/extractors/',
@@ -35,15 +35,15 @@ const router = new Router({
           name: 'extractorSettings',
           components: {
             default: Plugins,
-            extractorSettings: PluginSettingsModal
+            extractorSettings: PluginSettingsModal,
           },
           props: { extractorSettings: { pluginType: 'extractors' } },
           meta: {
             isModal: true,
-            title: 'Meltano: Data Extractor Configuration'
-          }
-        }
-      ]
+            title: 'Meltano: Data Extractor Configuration',
+          },
+        },
+      ],
     },
     {
       path: '/loaders/',
@@ -56,15 +56,15 @@ const router = new Router({
           name: 'loaderSettings',
           components: {
             default: Plugins,
-            loaderSettings: PluginSettingsModal
+            loaderSettings: PluginSettingsModal,
           },
           props: { loaderSettings: { pluginType: 'loaders' } },
           meta: {
             isModal: true,
-            title: 'Meltano: Data Loader Configuration'
-          }
-        }
-      ]
+            title: 'Meltano: Data Loader Configuration',
+          },
+        },
+      ],
     },
     {
       path: '/pipelines/',
@@ -76,40 +76,40 @@ const router = new Router({
           name: 'createPipelineSchedule',
           components: {
             default: Pipelines,
-            createPipelineSchedule: CreatePipelineScheduleModal
+            createPipelineSchedule: CreatePipelineScheduleModal,
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Create pipelines'
-          }
+            title: 'Meltano: Create pipelines',
+          },
         },
         {
           path: ':stateId',
           name: 'runLog',
           components: {
             default: Pipelines,
-            runLog: LogModal
+            runLog: LogModal,
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Job Log'
-          }
+            title: 'Meltano: Job Log',
+          },
         },
         {
           path: '/cron-job-settings/:stateId',
           name: 'cronJobSettings',
           components: {
             default: Pipelines,
-            cronJobSettings: CronJobModal
+            cronJobSettings: CronJobModal,
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Cron Job Settings'
-          }
-        }
-      ]
-    }
-  ]
+            title: 'Meltano: Cron Job Settings',
+          },
+        },
+      ],
+    },
+  ],
 })
 
 router.beforeEach((to, from, next) => {

@@ -4,13 +4,13 @@ import MainNav from '@/components/navigation/MainNav'
 export default {
   name: 'App',
   components: {
-    MainNav
+    MainNav,
   },
   computed: {
     isMeltanoDataInstance() {
       const url = new URL(window.location.host)
       return url.hostname.endsWith('meltanodata.com')
-    }
+    },
   },
   created() {
     this.$store.dispatch('system/check')
@@ -21,7 +21,7 @@ export default {
       this.$intercom.boot()
     }
   },
-  methods: {}
+  methods: {},
 }
 </script>
 
