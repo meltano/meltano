@@ -23,7 +23,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
 
     def __init__(
         self,
-        name: str | None = None,
+        name: str,
         extractor: str | None = None,
         loader: str | None = None,
         transform: str | None = None,
