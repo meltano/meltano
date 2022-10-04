@@ -174,7 +174,7 @@ class ScheduleService:
         extractor_plugin = self.plugins_service.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
-        start_date = None
+        start_date: str | datetime | date | None = None
         try:
             settings_service = PluginSettingsService(
                 self.project, extractor_plugin, plugins_service=self.plugins_service
