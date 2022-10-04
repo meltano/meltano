@@ -8,21 +8,21 @@ import VueCronEditorBuefy from 'vue-cron-editor-buefy'
 export default {
   name: 'CronJobModal',
   components: {
-    VueCronEditorBuefy
+    VueCronEditorBuefy,
   },
   data() {
     return {
       isLoaded: false,
       isSaving: false,
-      cronExpression: '*/1 * * * *'
+      cronExpression: '*/1 * * * *',
     }
   },
   computed: {
     ...mapState('orchestration', ['pipelines']),
     ...mapGetters('plugins', ['getInstalledPlugin', 'getPluginLabel']),
     relatedPipeline() {
-      return this.pipelines.find(pipeline => pipeline.name === this.stateId)
-    }
+      return this.pipelines.find((pipeline) => pipeline.name === this.stateId)
+    },
   },
   created() {
     this.stateId = this.$route.params.stateId
@@ -38,7 +38,7 @@ export default {
     close() {
       this.$router.push({
         name: 'pipelines',
-        params: { triggerPipelineRefresh: true }
+        params: { triggerPipelineRefresh: true },
       })
     },
     saveInterval(expression) {
@@ -51,22 +51,22 @@ export default {
       this.updatePipelineSchedule({
         interval: expression,
         pipeline,
-        pluginNamespace
+        pluginNamespace,
       })
         .then(() => {
           Vue.toasted.global.success(
             `Pipeline successfully updated - ${this.pipeline.name}`
           )
         })
-        .catch(error => {
+        .catch((error) => {
           Vue.toasted.global.error(error.response.data.code)
         })
         .finally(() => {
           this.isSaving = false
           this.close()
         })
-    }
-  }
+    },
+  },
 }
 </script>
 

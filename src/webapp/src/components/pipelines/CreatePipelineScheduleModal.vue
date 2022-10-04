@@ -10,10 +10,10 @@ import VueCronEditorBuefy from 'vue-cron-editor-buefy'
 export default {
   name: 'CreatePipelineScheduleModal',
   filters: {
-    capitalize
+    capitalize,
   },
   components: {
-    VueCronEditorBuefy
+    VueCronEditorBuefy,
   },
   data() {
     return {
@@ -25,9 +25,9 @@ export default {
         loader: '',
         transform: 'skip',
         interval: '',
-        isRunning: false
+        isRunning: false,
       },
-      cronExpression: '*/1 * * * *'
+      cronExpression: '*/1 * * * *',
     }
   },
   computed: {
@@ -41,9 +41,9 @@ export default {
     },
     isSaveable() {
       const hasOwns = []
-      _.forOwn(this.pipeline, val => hasOwns.push(val))
+      _.forOwn(this.pipeline, (val) => hasOwns.push(val))
       const isValidPipeline =
-        hasOwns.find(val => val === '' || val === null) === undefined
+        hasOwns.find((val) => val === '' || val === null) === undefined
 
       return isValidPipeline
     },
@@ -53,7 +53,7 @@ export default {
         return true
       }
       const extractor = this.installedPlugins.extractors.find(
-        plugin => plugin.name === pipelineExtractor
+        (plugin) => plugin.name === pipelineExtractor
       )
       return this.getHasDefaultTransforms(extractor.namespace)
     },
@@ -63,7 +63,7 @@ export default {
         (this.pipeline.transform === 'run' ||
           this.pipeline.transform === 'only')
       )
-    }
+    },
   },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
@@ -81,7 +81,7 @@ export default {
   methods: {
     ...mapActions('orchestration', [
       'savePipelineSchedule',
-      'getPipelineSchedules'
+      'getPipelineSchedules',
     ]),
     onExtractorLoaderChange() {
       if (!this.pipeline.extractor || !this.pipeline.loader) {
@@ -99,7 +99,7 @@ export default {
         this.pipeline.interval = this.cronExpression
       }
       this.savePipelineSchedule({
-        pipeline: this.pipeline
+        pipeline: this.pipeline,
       })
         .then(() => {
           this.getPipelineSchedules()
@@ -108,7 +108,7 @@ export default {
           Vue.toasted.global.success(`Pipeline Saved - ${this.pipeline.name}`)
           this.close()
         })
-        .catch(error => {
+        .catch((error) => {
           Vue.toasted.global.error(error.response.data.code)
         })
         .finally(() => {
@@ -117,8 +117,8 @@ export default {
     },
     close() {
       this.$router.push({ name: 'pipelines' })
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -150,7 +150,8 @@ export default {
                     v-for="(extractor, index) in installedPlugins.extractors"
                     :key="`${extractor.name}-${index}`"
                     :value="extractor.name"
-                    >{{ getPluginLabel('extractors', extractor.name) }}
+                  >
+                    {{ getPluginLabel('extractors', extractor.name) }}
                   </option>
                 </select>
               </span>
@@ -216,8 +217,9 @@ export default {
                     v-for="(interval, label) in intervalOptions"
                     :key="label"
                     :value="label"
-                    >{{ interval }}</option
                   >
+                    {{ interval }}
+                  </option>
                 </select>
               </span>
             </div>

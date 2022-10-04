@@ -11,11 +11,11 @@ export default {
   name: 'Pipelines',
   components: {
     PipelineSchedules,
-    RouterViewLayout
+    RouterViewLayout,
   },
   data() {
     return {
-      isLoading: true
+      isLoading: true,
     }
   },
   computed: {
@@ -40,7 +40,7 @@ export default {
       return this.$route.meta.isModal
     },
     cloneDeepPipelines() {
-      return _.cloneDeep(this.getSortedPipelines).map(pipeline => {
+      return _.cloneDeep(this.getSortedPipelines).map((pipeline) => {
         if (!pipeline.interval) {
           pipeline.interval = '@once'
           return pipeline
@@ -52,7 +52,7 @@ export default {
           return pipeline
         }
       })
-    }
+    },
   },
   created() {
     Promise.all([this.getPipelineSchedules(), this.getInstalledPlugins()]).then(
@@ -64,10 +64,10 @@ export default {
   methods: {
     ...mapActions('orchestration', [
       'getPipelineSchedules',
-      'updatePipelineSchedule'
+      'updatePipelineSchedule',
     ]),
-    ...mapActions('plugins', ['getInstalledPlugins'])
-  }
+    ...mapActions('plugins', ['getInstalledPlugins']),
+  },
 }
 </script>
 
@@ -81,7 +81,7 @@ export default {
         <div class="column is-one-quarter has-text-right">
           <router-link
             :to="{
-              name: 'createPipelineSchedule'
+              name: 'createPipelineSchedule',
             }"
             class="button is-interactive-primary"
           >
@@ -105,7 +105,7 @@ export default {
                 <router-link
                   v-if="hasExtractors && hasLoaders"
                   :to="{
-                    name: 'createPipelineSchedule'
+                    name: 'createPipelineSchedule',
                   }"
                 >
                   Create one now
@@ -117,9 +117,7 @@ export default {
                     <router-link to="extractors">extractor</router-link>
                   </span>
                   <span v-if="!hasLoaders">
-                    <span v-if="!hasExtractors">
-                      and
-                    </span>
+                    <span v-if="!hasExtractors"> and </span>
                     a
                     <router-link to="loaders">loader</router-link>
                   </span>
