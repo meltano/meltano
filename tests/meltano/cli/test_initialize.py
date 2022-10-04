@@ -7,7 +7,7 @@ from meltano.core.project import Project, ProjectNotFound
 
 
 class TestCliInit:
-    def test_init(self, cli_runner, tmp_path_factory, pushd):
+    def test_init(self, cli_runner, tmp_path_factory, pushd):  # noqa: WPS210
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
 
