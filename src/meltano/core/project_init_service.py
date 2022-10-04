@@ -161,14 +161,3 @@ class ProjectInitService:
             nl=False,
         )
         click.echo(" to learn where to go from here")
-
-    def join_with_project_base(self, filename):
-        """Join Path to Project base.
-
-        Args:
-            filename: File name to join with project base
-
-        Returns:
-            Joined base path and passed filename
-        """
-        return os.path.join(".", self.project_directory, filename)
