@@ -85,7 +85,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#6582](https://github.com/meltano/meltano/issues/6582) Make `default_environment` a top-level setting
 
-  Running meltano environment add dev as a one-time fix will resolve the issue, even if no other changes are made and no environment-specific settings are added.
+  Running `meltano environment add dev` as a one-time fix will resolve the issue, even if no other changes are made and no environment-specific settings are added.
+  
+  _Note: This breaking change was added inadvertently in this version. We do not intend to release breaking changes in minor versions and have added this notice retroactively. _
 
 ### ✨ New
 
