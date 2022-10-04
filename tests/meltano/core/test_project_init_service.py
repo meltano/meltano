@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+import shutil
 import stat
 from typing import TYPE_CHECKING
 
@@ -15,7 +16,42 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def test_project_init_non_empty_directory_exists(tmp_path: Path, pushd):
+@pytest.mark.parametrize(
+    "create_project_dir",
+    (
+        False,
+        True,
+    ),
+    ids=(
+        "new directory",
+        "empty directory",
+    ),
+)
+def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
+    project_name = "test_project"
+
+    projects_dir = tmp_path.joinpath("success")
+    projects_dir.mkdir()
+    pushd(projects_dir)
+
+    project_dir = projects_dir.joinpath(project_name)
+
+    if create_project_dir:
+        project_dir.mkdir()
+
+    ProjectInitService(project_name).init(activate=False, add_discovery=False)
+
+    shutil.rmtree(project_dir)
+
+    if create_project_dir:
+        project_dir.mkdir()
+
+    ProjectInitService(f"{project_dir.absolute()}").init(
+        activate=False, add_discovery=False
+    )
+
+
+def test_project_init_non_empty_directory(tmp_path: Path, pushd):
     project_name = "test_project"
 
     projects_dir = tmp_path.joinpath("exists")

@@ -467,7 +467,7 @@ meltano environment remove prod
 
 ## `init`
 
-Used to create a new [Meltano project](/concepts/project) at a directory path relative to the current working directory. If the specified directory does not exist, one will be created for the project - otherwise the existing directory will be used if it is empty.
+Used to create a new [Meltano project](/concepts/project) at the given directory path. If the specified directory does not exist, one will be created for the project - otherwise the existing directory will be used if it is empty.
 
 The new project directory will contain:
 
