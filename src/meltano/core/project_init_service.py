@@ -58,9 +58,6 @@ class ProjectInitService:
                 f"Could not create directory {self.project_name!r}. {ex}"
             ) from ex
 
-        click.secho("Created", fg="blue", nl=False)
-        click.echo(f" {self.project_name}")
-
         self.project = Project(self.project_name)
 
         self.create_files(add_discovery=add_discovery)
@@ -93,7 +90,7 @@ class ProjectInitService:
             add_discovery: Add discovery.yml file to created project
         """
         click.secho("Creating project files...", fg="blue")
-        click.echo(f"  {self.project_name}/")
+        click.echo(f"  {self.project.root}/")
 
         self.create_dot_meltano_dir()
 
@@ -136,9 +133,7 @@ class ProjectInitService:
     def echo_instructions(self):
         """Echo Next Steps to Click CLI."""
         click.secho(GREETING, nl=False)
-        click.secho("\nProject ", nl=False)
-        click.secho(self.project_name, fg="magenta", nl=False)
-        click.echo(" has been created!\n")
+        click.echo("Your project has been created!\n")
 
         click.echo("Meltano Environments initialized with ", nl=False)
         click.secho("dev", fg="bright_green", nl=False)
@@ -157,7 +152,7 @@ class ProjectInitService:
 
         if not self.project.root.samefile(os.getcwd()):
             click.secho("  cd ", nl=False)
-            click.secho(self.project_name, fg="magenta")
+            click.secho(self.project.root, fg="magenta")
 
         click.echo("  Visit ", nl=False)
         click.secho(
