@@ -1,1 +1,0 @@
-This image include a pre-built binaries of Caddy which is released under the Apache License 2.0, which is available at caddy.LICENSE
