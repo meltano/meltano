@@ -1,6 +1,6 @@
 
 <h1 align="center">Meltano</h1>
-<h3 align="center">Your Open Source DataOps Infrastructure</h3>
+<h3 align="center">Open Source ELT for Data Engineers</h3>
 
 ---
 

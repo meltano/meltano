@@ -10,19 +10,7 @@ export default {
 
   components: {
     RoleMembers,
-    RolePermissions
-  },
-
-  data() {
-    return {
-      permissions: [
-        { name: 'View designs', type: 'view:design' },
-        { name: 'View reports', type: 'view:reports' }
-      ],
-      model: {
-        role: null
-      }
-    }
+    RolePermissions,
   },
 
   beforeRouteEnter(to, from, next) {
@@ -34,12 +22,24 @@ export default {
       })
   },
 
+  data() {
+    return {
+      permissions: [
+        { name: 'View designs', type: 'view:design' },
+        { name: 'View reports', type: 'view:reports' },
+      ],
+      model: {
+        role: null,
+      },
+    }
+  },
+
   computed: {
     has() {
       return _.negate(_.isEmpty)
     },
     ...mapState('settings', ['acl']),
-    ...mapGetters('settings', ['rolesName', 'rolesContexts'])
+    ...mapGetters('settings', ['rolesName', 'rolesContexts']),
   },
 
   methods: {
@@ -49,9 +49,9 @@ export default {
       'unassignRoleUser',
       'assignRoleUser',
       'addRolePermission',
-      'removeRolePermission'
-    ])
-  }
+      'removeRolePermission',
+    ]),
+  },
 }
 </script>
 
@@ -93,9 +93,7 @@ export default {
       </form>
     </div>
 
-    <h2 class="title is-4">
-      Permissions
-    </h2>
+    <h2 class="title is-4">Permissions</h2>
     <div class="segment">
       <role-permissions
         v-for="perm in permissions"

@@ -59,12 +59,12 @@ import {
   faThList,
   faTrashAlt,
   faUser,
-  faWrench
+  faWrench,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
-  FontAwesomeLayersText
+  FontAwesomeLayersText,
 } from '@fortawesome/vue-fontawesome'
 
 export default {
@@ -130,8 +130,8 @@ export default {
     library.add(faUser)
     library.add(faWrench)
 
-    Vue.component('font-awesome-icon', FontAwesomeIcon)
-    Vue.component('font-awesome-layers', FontAwesomeLayers)
-    Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
-  }
+    Vue.component('FontAwesomeIcon', FontAwesomeIcon)
+    Vue.component('FontAwesomeLayers', FontAwesomeLayers)
+    Vue.component('FontAwesomeLayersText', FontAwesomeLayersText)
+  },
 }

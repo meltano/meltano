@@ -1,6 +1,6 @@
 {
   "name": "meltano-webapp",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "private": true,
   "scripts": {
     "dev": "npm run serve",
@@ -42,7 +42,7 @@
     "@vue/cli-plugin-eslint": "^3.9.0",
     "@vue/cli-plugin-unit-jest": "^3.9.0",
     "@vue/cli-service": "^3.9.0",
-    "@vue/eslint-config-prettier": "^4.0.1",
+    "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/test-utils": "1.0.0-beta.29",
     "axios": "^0.19.0",
     "axios-middleware": "^0.3.1",
@@ -51,8 +51,8 @@
     "babel-jest": "^23.6.0",
     "chart.js": "^2.8.0",
     "cypress": "^3.4.1",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
+    "eslint": "^8.24.0",
+    "eslint-plugin-vue": "^9.5.1",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^8.1.5",
     "sass": "^1.54.0",

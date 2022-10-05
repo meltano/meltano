@@ -31,16 +31,16 @@ const service = new Service(axios)
 Vue.use(Upgrade, {
   service,
   router,
-  toasted: Vue.toasted
+  toasted: Vue.toasted,
 })
 Vue.use(FatalError, {
   service,
   router,
-  toasted: Vue.toasted
+  toasted: Vue.toasted,
 })
 Vue.use(Auth, {
   service,
-  toasted: Vue.toasted
+  toasted: Vue.toasted,
 })
 
 // Axios config
@@ -54,5 +54,5 @@ new Vue({
   el: '#app',
   store,
   router,
-  render: h => h(App)
+  render: (h) => h(App),
 })
