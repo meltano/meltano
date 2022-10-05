@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+import re
 import shutil
 import stat
 from pathlib import Path
@@ -56,7 +57,7 @@ def test_project_init_non_empty_directory(tmp_path: Path, pushd):
 
     with pytest.raises(
         ProjectInitServiceError,
-        match=f"Directory '{project_dir}' not empty",
+        match=re.escape(f"Directory '{project_dir}' not empty"),
     ):
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
 
