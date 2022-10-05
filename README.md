@@ -1,6 +1,6 @@
 
-<h1 align="center">Meltano</h1>
-<h3 align="center">Open Source ELT for Data Engineers</h3>
+<h1 align="center">Meltano - Your CLI for ELT+</h1>
+<h3 align="center">Open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.</h3>
 
 ---
 
@@ -47,7 +47,7 @@
 
 ---
 
-Welcome to your Open Source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
+Welcome to your CLI for ELT+. It's ppen source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.
 
 ![Meltano Speedrun](meltano_superstart.gif)
 
