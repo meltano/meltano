@@ -9,7 +9,7 @@ import utils from '@/utils/utils'
 const defaultState = utils.deepFreeze({
   pluginInFocusConfiguration: {},
   pipelinePollers: [],
-  pipelines: []
+  pipelines: [],
 })
 
 const getters = {
@@ -34,10 +34,10 @@ const getters = {
   },
 
   getHasDefaultValidationConfigSettings() {
-    return configSettings => {
-      const isKindBoolean = setting =>
+    return (configSettings) => {
+      const isKindBoolean = (setting) =>
         setting.kind && setting.kind === 'boolean'
-      const isValid = setting =>
+      const isValid = (setting) =>
         isKindBoolean(setting) || Boolean(configSettings.config[setting.name])
       return (
         configSettings.settings &&
@@ -48,12 +48,12 @@ const getters = {
 
   getHasGroupValidationConfigSettings() {
     return (configSettings, settingsGroupValidation) => {
-      const matchGroup = settingsGroupValidation.find(group => {
+      const matchGroup = settingsGroupValidation.find((group) => {
         if (configSettings.settings) {
-          const groupedSettings = configSettings.settings.filter(setting =>
+          const groupedSettings = configSettings.settings.filter((setting) =>
             group.includes(setting.name)
           )
-          const isValid = setting =>
+          const isValid = (setting) =>
             Boolean(configSettings.config[setting.name])
           return lodash.every(groupedSettings, isValid)
         }
@@ -64,21 +64,21 @@ const getters = {
 
   getPipelineWithPlugin(state) {
     return (pluginType, pluginName) =>
-      state.pipelines.find(pipeline => pipeline[pluginType] === pluginName)
+      state.pipelines.find((pipeline) => pipeline[pluginType] === pluginName)
   },
 
   getPipelinesWithPlugin(state) {
     return (pluginType, pluginName) =>
-      state.pipelines.filter(pipeline => pipeline[pluginType] === pluginName)
+      state.pipelines.filter((pipeline) => pipeline[pluginType] === pluginName)
   },
 
   getRunningPipelines(state) {
-    return state.pipelines.filter(pipeline => pipeline.isRunning)
+    return state.pipelines.filter((pipeline) => pipeline.isRunning)
   },
 
   getRunningPipelinestateIds(state) {
     return state.pipelinePollers.map(
-      pipelinePoller => pipelinePoller.getMetadata().stateId
+      (pipelinePoller) => pipelinePoller.getMetadata().stateId
     )
   },
 
@@ -87,11 +87,11 @@ const getters = {
   },
 
   getSuccessfulPipelines(state) {
-    return state.pipelines.filter(pipeline => pipeline.hasEverSucceeded)
+    return state.pipelines.filter((pipeline) => pipeline.hasEverSucceeded)
   },
 
   lastUpdatedDate(_, getters) {
-    return extractor => {
+    return (extractor) => {
       const pipelineExtractor = getters.getPipelineWithPlugin(
         'extractor',
         extractor
@@ -110,7 +110,7 @@ const getters = {
   },
 
   startDate(_, getters) {
-    return extractor => {
+    return (extractor) => {
       const pipelineExtractor = getters.getPipelineWithPlugin(
         'extractor',
         extractor
@@ -118,7 +118,7 @@ const getters = {
 
       return pipelineExtractor ? pipelineExtractor.startDate : ''
     }
-  }
+  },
 }
 
 const actions = {
@@ -130,7 +130,7 @@ const actions = {
     let status = {
       pipeline,
       ...pipeline,
-      isDeleting: true
+      isDeleting: true,
     }
     commit('setPipelineStatus', status)
     return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
@@ -145,17 +145,17 @@ const actions = {
   getLoaderConfiguration({ commit, dispatch }, loader) {
     return dispatch('getPluginConfiguration', {
       name: loader,
-      type: 'loaders'
-    }).then(response => {
+      type: 'loaders',
+    }).then((response) => {
       commit('setInFocusConfiguration', {
         configuration: response.data,
-        target: 'loaderInFocusConfiguration'
+        target: 'loaderInFocusConfiguration',
       })
     })
   },
 
   getPipelineSchedules({ commit, dispatch }) {
-    return orchestrationsApi.getPipelineSchedules().then(response => {
+    return orchestrationsApi.getPipelineSchedules().then((response) => {
       commit('setPipelines', response.data)
       dispatch('rehydratePollers')
     })
@@ -166,10 +166,10 @@ const actions = {
   },
 
   getAndFocusOnPluginConfiguration({ commit, dispatch, state }, payload) {
-    return dispatch('getPluginConfiguration', payload).then(response => {
+    return dispatch('getPluginConfiguration', payload).then((response) => {
       commit('setInFocusConfiguration', {
         configuration: response.data,
-        target: 'pluginInFocusConfiguration'
+        target: 'pluginInFocusConfiguration',
       })
       return state.pluginInFocusConfiguration
     })
@@ -178,12 +178,12 @@ const actions = {
   getPolledPipelineJobStatus({ commit, getters, state }) {
     return orchestrationsApi
       .getPolledPipelineJobStatus({
-        stateIds: getters.getRunningPipelinestateIds
+        stateIds: getters.getRunningPipelinestateIds,
       })
-      .then(response => {
-        response.data.jobs.forEach(jobStatus => {
+      .then((response) => {
+        response.data.jobs.forEach((jobStatus) => {
           const targetPoller = state.pipelinePollers.find(
-            pipelinePoller =>
+            (pipelinePoller) =>
               pipelinePoller.getMetadata().stateId === jobStatus.stateId
           )
           if (jobStatus.isComplete) {
@@ -191,7 +191,7 @@ const actions = {
           }
 
           const targetPipeline = state.pipelines.find(
-            pipeline => pipeline.name === jobStatus.stateId
+            (pipeline) => pipeline.name === jobStatus.stateId
           )
 
           commit('setPipelineStatus', {
@@ -201,7 +201,7 @@ const actions = {
             hasEverSucceeded: jobStatus.hasEverSucceeded,
             isRunning: !jobStatus.isComplete,
             startedAt: jobStatus.startedAt,
-            endedAt: jobStatus.endedAt
+            endedAt: jobStatus.endedAt,
           })
         })
       })
@@ -216,11 +216,11 @@ const actions = {
 
   rehydratePollers({ dispatch, getters, state }) {
     // Handle page refresh condition resulting in jobs running but no pollers
-    const pollersUponQueued = getters.getRunningPipelines.map(pipeline => {
+    const pollersUponQueued = getters.getRunningPipelines.map((pipeline) => {
       const stateId = pipeline.name
       const isMissingPoller =
         state.pipelinePollers.find(
-          pipelinePoller => pipelinePoller.getMetadata().stateId === stateId
+          (pipelinePoller) => pipelinePoller.getMetadata().stateId === stateId
         ) === undefined
 
       if (isMissingPoller) {
@@ -238,16 +238,16 @@ const actions = {
     commit('setPipelineStatus', {
       pipeline,
       ...pipeline,
-      isRunning: true
+      isRunning: true,
     })
 
-    return orchestrationsApi.run({ name: pipeline.name }).then(response => {
+    return orchestrationsApi.run({ name: pipeline.name }).then((response) => {
       dispatch('queuePipelinePoller', response.data)
     })
   },
 
   savePipelineSchedule({ commit }, { pipeline }) {
-    return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
+    return orchestrationsApi.savePipelineSchedule(pipeline).then((response) => {
       const newPipeline = Object.assign(pipeline, response.data)
       commit('updatePipelines', newPipeline)
     })
@@ -265,21 +265,27 @@ const actions = {
     commit('setPipelineStatus', {
       pipeline: payload.pipeline,
       ...payload.pipeline,
-      isSaving: true
+      isSaving: true,
     })
-    return orchestrationsApi.updatePipelineSchedule(payload).then(response => {
-      const editableItems = {
-        interval: response.data.interval,
-        transform: response.data.transform
-      }
-      const updatedPipeline = Object.assign({}, payload.pipeline, editableItems)
-      commit('setPipelineStatus', {
-        pipeline: updatedPipeline,
-        ...updatedPipeline,
-        isSaving: false
+    return orchestrationsApi
+      .updatePipelineSchedule(payload)
+      .then((response) => {
+        const editableItems = {
+          interval: response.data.interval,
+          transform: response.data.transform,
+        }
+        const updatedPipeline = Object.assign(
+          {},
+          payload.pipeline,
+          editableItems
+        )
+        commit('setPipelineStatus', {
+          pipeline: updatedPipeline,
+          ...updatedPipeline,
+          isSaving: false,
+        })
+        commit('setPipeline', updatedPipeline)
       })
-      commit('setPipeline', updatedPipeline)
-    })
   },
 
   uploadPluginConfigurationFile(_, payload) {
@@ -288,7 +294,7 @@ const actions = {
 
   deleteUploadedPluginConfigurationFile(_, payload) {
     return orchestrationsApi.deleteUploadedPluginConfigurationFile(payload)
-  }
+  },
 }
 
 const mutations = {
@@ -318,7 +324,7 @@ const mutations = {
       configuration.settings,
       configuration.settingsGroupValidation
     )
-    configuration.settings.forEach(setting => {
+    configuration.settings.forEach((setting) => {
       const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
       const isDefaultNeeded =
         configuration.config.hasOwnProperty(setting.name) &&
@@ -332,7 +338,7 @@ const mutations = {
   },
 
   setPipeline(state, pipeline) {
-    const target = state.pipelines.find(p => p.name === pipeline.name)
+    const target = state.pipelines.find((p) => p.name === pipeline.name)
     const idx = state.pipelines.indexOf(target)
     Vue.set(state.pipelines, idx, pipeline)
   },
@@ -347,7 +353,7 @@ const mutations = {
       isRunning,
       isSaving,
       startedAt = null,
-      endedAt = null
+      endedAt = null,
     }
   ) {
     Vue.set(pipeline, 'hasError', hasError || false)
@@ -360,7 +366,7 @@ const mutations = {
   },
 
   setPipelines(state, pipelines) {
-    pipelines.forEach(pipeline => {
+    pipelines.forEach((pipeline) => {
       if (pipeline.startedAt) {
         pipeline.startedAt = utils.dateIso8601Nullable(pipeline.startedAt)
       }
@@ -377,7 +383,7 @@ const mutations = {
 
   updatePipelines(state, pipeline) {
     state.pipelines.push(pipeline)
-  }
+  },
 }
 
 export default {
@@ -385,5 +391,5 @@ export default {
   state: lodash.cloneDeep(defaultState),
   getters,
   actions,
-  mutations
+  mutations,
 }

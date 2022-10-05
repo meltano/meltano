@@ -11,5 +11,5 @@ export default {
       url += `?today=${today}`
     }
     return axios.get(url)
-  }
+  },
 }

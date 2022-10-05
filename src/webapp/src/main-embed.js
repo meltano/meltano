@@ -19,5 +19,5 @@ Vue.prototype.$flask = flaskContext()
 new Vue({
   el: '#app',
   router,
-  render: h => h(Embed)
+  render: (h) => h(Embed),
 })

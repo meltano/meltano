@@ -4,17 +4,17 @@ import Plugin from '@/components/pipelines/Plugin'
 export default {
   name: 'PluginList',
   components: {
-    Plugin
+    Plugin,
   },
   props: {
     items: {
       type: Array,
-      required: true
+      required: true,
     },
     pluginType: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     getColumns() {
@@ -24,8 +24,8 @@ export default {
       const columnOne = this.items.slice(0, columnOneLength)
       const columnTwo = this.items.slice(columnOneLength, length)
       return [columnOne, columnTwo]
-    }
-  }
+    },
+  },
 }
 </script>
 
