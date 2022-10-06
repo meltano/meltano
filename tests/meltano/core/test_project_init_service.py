@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import platform
-import re
 import shutil
 import stat
 from pathlib import Path
@@ -57,7 +56,7 @@ def test_project_init_non_empty_directory(tmp_path: Path, pushd):
 
     with pytest.raises(
         ProjectInitServiceError,
-        match=re.escape(f"Directory '{project_dir}' not empty"),
+        match="Directory 'test_project' not empty",
     ):
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
 
@@ -77,7 +76,7 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
 
     with pytest.raises(
         ProjectInitServiceError,
-        match=f"Permission denied to create '{project_dir}'",
+        match="Permission denied to create 'test_project'",
     ):
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
 
@@ -93,10 +92,12 @@ def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
     pushd(missing_dir)
 
     project_dir = missing_dir.joinpath("test_project")
-    missing_dir.rmdir()  # remove the parent directory
 
     with pytest.raises(
         ProjectInitServiceError,
-        match=f"Could not create directory '{project_dir}'.",
+        match="Could not create directory 'test_project'.",
     ):
-        ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+        project_init_service = ProjectInitService(project_dir)
+        missing_dir.rmdir()  # remove the parent directory
+
+        project_init_service.init(activate=False, add_discovery=False)

@@ -60,7 +60,7 @@ class TestCliInit:
 
         # create project in empty current working directory
         result = cli_runner.invoke(cli, ["init", ".", "--no_usage_stats"])
-        assert f"cd {new_project_root}" not in result.output
+        assert "cd ." not in result.output
 
         Project.deactivate()
 
@@ -73,6 +73,6 @@ class TestCliInit:
         assert project_dir.exists()
 
         result = cli_runner.invoke(cli, ["init", "test_project", "--no_usage_stats"])
-        assert f"cd {project_dir}" in result.output
+        assert "cd test_project" in result.output
 
         Project.deactivate()
