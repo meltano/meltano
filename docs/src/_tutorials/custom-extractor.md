@@ -119,7 +119,7 @@ Select include_cicd_sample_template:
 Choose from 1, 2 [1]:
 ```
 
-The result of the above command is a new directory—tap-jsonplaceholder—that contains boilerplate code for developing your tap and also a meltano.yml file that you can use to test your custom extractor.
+The result of the above command is a new directory `tap-jsonplaceholder` that contains boilerplate code for developing your tap and also a `meltano.yml` file that you can use to test your custom extractor.
 
 You can view the cookiecutter template in [cookiecutter directory in the Meltano SDK repository](https://github.com/meltano/sdk/tree/main/cookiecutter).
 
