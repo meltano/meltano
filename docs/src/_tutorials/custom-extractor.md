@@ -115,9 +115,7 @@ Choose from 1, 2, 3, 4, 5, 6 [1]: 6
 Select include_cicd_sample_template:
 
 1 - GitHub
-
 2 - None (Skip)
-
 Choose from 1, 2 [1]:
 ```
 
