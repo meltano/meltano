@@ -3,7 +3,90 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.7.2 (2022-10-03)
+
+### 🐛 Fixes
+
+- [#6819](https://github.com/meltano/meltano/issues/6819) Fix error on `meltano config meltano set ...`
+- [#6818](https://github.com/meltano/meltano/issues/6818) Avoid SQLAlchemy deprecation warning
+
+### 📚 Documentation Improvements
+
+- [#6822](https://github.com/meltano/meltano/issues/6822) Remove E(t)LT from tutorial
+- [#6800](https://github.com/meltano/meltano/issues/6800) Shorten install quick start, move rest to guide
+- [#6809](https://github.com/meltano/meltano/issues/6809) Tutorial small cleanup
+- [#6781](https://github.com/meltano/meltano/issues/6781) Add parts 2-4 to the tutorial
+- [#6801](https://github.com/meltano/meltano/issues/6801) Fix broken link
+
+## v2.7.1 (2022-09-27)
+
+### 🐛 Fixes
+
+- [#6797](https://github.com/meltano/meltano/issues/6797) Show appropriate UI toasts
+- [#6795](https://github.com/meltano/meltano/issues/6795) Correct migration path for state table
+
+### 📚 Documentation Improvements
+
+- [#6791](https://github.com/meltano/meltano/issues/6791) Remove datahub docs from guide
+
+## v2.7.0 (2022-09-23)
+
+### ✨ New
+
+- [#6758](https://github.com/meltano/meltano/issues/6758) Support custom state IDs in `meltano run` with `--state-id-suffix` -- _**Thanks @ReubenFrankel!**_
+- [#6756](https://github.com/meltano/meltano/issues/6756) Place `project_id` before `environments` in initial `meltano.yml`
+
+### 🐛 Fixes
+
+- [#6783](https://github.com/meltano/meltano/issues/6783) Remove "disable telemetry" toast from the UI
+- [#6779](https://github.com/meltano/meltano/issues/6779) Use v1.0.1 of the `exit_event` Snowplow telemetry schema
+- [#6745](https://github.com/meltano/meltano/issues/6745) Use random UUID as default `project_id`
+
+### ⚙️ Under the Hood
+
+- [#6748](https://github.com/meltano/meltano/issues/6748) Define and recommend `MeltanoError` exception class for improved CLI error messages
+
+### 📚 Documentation Improvements
+
+- [#6709](https://github.com/meltano/meltano/issues/6709) Add DataHub HowTo
+- [#6764](https://github.com/meltano/meltano/issues/6764) Move installation guide to "Getting Started" add Part 1 tutorial
+- [#6769](https://github.com/meltano/meltano/issues/6769) Guide for existing dbt projects
+- [#6737](https://github.com/meltano/meltano/issues/6737) Add getting started section
+- [#6753](https://github.com/meltano/meltano/issues/6753) Add list of video tuts and demos
+- [#6739](https://github.com/meltano/meltano/issues/6739) Add how to jupyter
+- [#6752](https://github.com/meltano/meltano/issues/6752) Shrink contrib. docs in sidebar to 1p
+- [#6743](https://github.com/meltano/meltano/issues/6743) Describe how `project_id` is hashed
+
+## v2.6.0 (2022-09-12)
+
+### ✨ New
+
+- [#5892](https://github.com/meltano/meltano/issues/5892) Add `--interactive` CLI flag in `meltano config set`.
+- [#6640](https://github.com/meltano/meltano/issues/6640) Add rich exception formatting, configurable from `logging.yaml`.
+
+### 🐛 Fixes
+
+- [#6694](https://github.com/meltano/meltano/issues/6694) Regression in `meltano remove` with error stating the plugin is missing the `settings_with_extras` attribute.
+- [#6652](https://github.com/meltano/meltano/issues/6652) Catch permission errors when creating a new project -- _**Thanks @jakegut!**_
+- [#6676](https://github.com/meltano/meltano/issues/6676) Prevent warnings/errors when running `meltano config <plugin> test` -- _**Thanks @ReubenFrankel!**_
+
+### 📚 Documentation Improvements
+
+- [#6706](https://github.com/meltano/meltano/issues/6706) Add troubleshooting page -- _**Thanks @jared-rimmer!**_
+- [#6688](https://github.com/meltano/meltano/issues/6688) Add docs about environment variable expansion.
+- [#6671](https://github.com/meltano/meltano/issues/6671) Add example meltano projects.
+- [#6674](https://github.com/meltano/meltano/issues/6674) Add docs for schedule `env` key.
+- [#6680](https://github.com/meltano/meltano/issues/6680) Fix feature flag name for strict env var mode.
+- [#6672](https://github.com/meltano/meltano/issues/6672) Add tutorial on how to debug a custom extractor -- _**Thanks @jared-rimmer!**_
+
 ## v2.5.0 (2022-08-24)
+
+### BREAKING CHANGES
+
+- [#6582](https://github.com/meltano/meltano/issues/6582) Make `default_environment` a top-level setting
+
+  Running `meltano environment add dev` as a one-time fix will resolve the issue, even if no other changes are made and no environment-specific settings are added.
+  _Note: This breaking change was added inadvertently in this version. We do not intend to release breaking changes in minor versions and have added this notice retroactively. _
 
 ### ✨ New
 
@@ -21,7 +104,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#6592](https://github.com/meltano/meltano/issues/6592) Validate CRON expressions
 - [#6543](https://github.com/meltano/meltano/issues/6543) Register legacy `DiscoveryFile` object in Ruamel YAML instance
 - [#6593](https://github.com/meltano/meltano/issues/6593) Docker workflow
-- [#6582](https://github.com/meltano/meltano/issues/6582) Make `default_environment` a top-level setting
 - [#6584](https://github.com/meltano/meltano/issues/6584) Avoid `pyproject.toml` Poetry parsing issue
 
 ### ⚙️ Under the Hood

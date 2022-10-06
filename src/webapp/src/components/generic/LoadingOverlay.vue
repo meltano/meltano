@@ -2,8 +2,8 @@
 export default {
   name: 'LoadingOverlay',
   props: {
-    isLoading: { type: Boolean, required: true, default: false }
-  }
+    isLoading: { type: Boolean, required: true, default: false },
+  },
 }
 </script>
 

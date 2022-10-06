@@ -88,12 +88,13 @@ def mypy(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    args = session.posargs or ["src/meltano"]
+    args = session.posargs or ["src/meltano", "--exclude", "src/meltano/migrations/"]
 
     session.install(".")
     session.install(
         "mypy",
         "sqlalchemy2-stubs",
+        "types-croniter",
         "types-requests",
     )
     session.run("mypy", *args)

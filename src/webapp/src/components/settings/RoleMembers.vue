@@ -6,32 +6,32 @@ export default {
   name: 'RoleMember',
 
   components: {
-    'role-pill': Pill
+    'role-pill': Pill,
   },
   props: {
     roles: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     users: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
       model: {
         user: null,
-        role: null
-      }
+        role: null,
+      },
     }
   },
 
   computed: {
     enabled() {
       return !(_.isEmpty(this.model.role) || _.isEmpty(this.model.user))
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -68,9 +68,9 @@ export default {
         <div class="select">
           <select v-model="model.user">
             <option :value="null">Select a user</option>
-            <option v-for="user in users" :key="user.username">{{
-              user.username
-            }}</option>
+            <option v-for="user in users" :key="user.username">
+              {{ user.username }}
+            </option>
           </select>
         </div>
       </div>

@@ -9,23 +9,23 @@ export default {
   name: 'Plugins',
   components: {
     PluginList,
-    RouterViewLayout
+    RouterViewLayout,
   },
   props: {
     pluginType: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      isLoading: true
+      isLoading: true,
     }
   },
   computed: {
     ...mapGetters('plugins', [
       'availablePluginsOfType',
-      'installedPluginsOfType'
+      'installedPluginsOfType',
     ]),
     availablePlugins() {
       return this.availablePluginsOfType(this.pluginType)
@@ -44,7 +44,7 @@ export default {
     },
     singularizedType() {
       return utils.singularize(this.pluginType)
-    }
+    },
   },
   created() {
     Promise.all([this.getInstalledPlugins(), this.getPipelineSchedules()]).then(
@@ -55,8 +55,8 @@ export default {
   },
   methods: {
     ...mapActions('orchestration', ['getPipelineSchedules']),
-    ...mapActions('plugins', ['getInstalledPlugins'])
-  }
+    ...mapActions('plugins', ['getInstalledPlugins']),
+  },
 }
 </script>
 
@@ -122,9 +122,7 @@ export default {
                         </p>
                         <div class="buttons">
                           <a
-                            :href="
-                              `https://www.meltano.com/plugins/${pluginType}/`
-                            "
+                            :href="`https://www.meltano.com/plugins/${pluginType}/`"
                             target="_blank"
                             class="button is-interactive-primary"
                             >Learn more</a

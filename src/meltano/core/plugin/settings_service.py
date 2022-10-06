@@ -73,6 +73,17 @@ class PluginSettingsService(SettingsService):
                     )
                     for var, value in self.project.active_environment.env.items()
                 }
+
+                # expand state_id_suffix
+                self.project.active_environment.state_id_suffix = expand_env_vars(
+                    self.project.active_environment.state_id_suffix,
+                    {
+                        **self.project.dotenv_env,
+                        **self.env_override,
+                    },
+                    raise_if_missing=strict_env_var_mode,
+                )
+
             self.env_override.update(
                 environment_env
             )  # active Meltano Environment top level `env:` key

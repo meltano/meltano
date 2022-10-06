@@ -3,13 +3,14 @@ title: Prerequisites
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
 weight: 2
+hidden: true
 ---
 
 ## Prerequisites
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.7+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/guide/installation#requirements) of the Installation instructions, that also apply here.
+1. [Python 3.7+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
 2. [Node 8.11.0+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
@@ -107,37 +108,6 @@ This will kick off a Cypress application that will allow you to run tests as des
   <p><strong>In the near future, all tests can flow automatically; but there are some complications that require manual triggering due to an inability to read pipeline completion.</strong></p>
   <p></p>
 </div>
-
-## Tmuxinator
-
-Tmuxinator is a way for you to efficiently manage multiple services when starting up Meltano.
-
-### Why Tmuxinator?
-
-In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command.
-
-1. Start up Docker
-1. Start Meltano API
-1. Start the web app
-
-It's a game changer for development and it's worth the effort!
-
-### Requirements
-
-1. [tmux](https://github.com/tmux/tmux) - Recommended to install with brew if on macOS
-1. [tmuxinator](https://github.com/tmuxinator/tmuxinator)
-
-This config uses `$MELTANO_VENV` to source the virtual environment from. Set it to the correct directory before running tmuxinator.
-
-### Instructions
-
-1. Make sure you know what directory your virtual environment is. It is normally `.venv` by default.
-1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1.
-
-```bash
-cd path/to/meltano
-MELTANO_VENV=.venv tmuxinator local
-```
 
 ## Resources
 

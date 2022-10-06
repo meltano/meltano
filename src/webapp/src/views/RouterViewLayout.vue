@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'RouterViewLayout'
+  name: 'RouterViewLayout',
 }
 </script>
 

@@ -9,7 +9,7 @@ const defaultState = utils.deepFreeze({
   latestVersion: null,
   updating: false,
   version: null,
-  identity: null
+  identity: null,
 })
 
 const getters = {
@@ -19,12 +19,12 @@ const getters = {
     }
 
     return compareVersions.compare(state.latestVersion, state.version, '>')
-  }
+  },
 }
 
 const actions = {
   check({ commit }) {
-    return systemApi.version({ include_latest: true }).then(response => {
+    return systemApi.version({ include_latest: true }).then((response) => {
       commit('setVersion', response.data.version)
       commit('setLatestVersion', response.data.latestVersion)
     })
@@ -38,7 +38,7 @@ const actions = {
         () => {
           systemApi
             .version()
-            .then(response => {
+            .then((response) => {
               const { version } = response.data
               if (compareVersions.compare(version, state.latestVersion, '>=')) {
                 commit('setVersion', version)
@@ -76,9 +76,9 @@ const actions = {
   fetchIdentity({ commit }) {
     systemApi
       .identity()
-      .then(response => commit('setIdentity', response.data))
+      .then((response) => commit('setIdentity', response.data))
       .catch(() => commit('setIdentity', null))
-  }
+  },
 }
 
 const mutations = {
@@ -96,7 +96,7 @@ const mutations = {
 
   setIdentity(state, identity) {
     state.identity = identity
-  }
+  },
 }
 
 export default {
@@ -104,5 +104,5 @@ export default {
   state: lodash.cloneDeep(defaultState),
   getters,
   actions,
-  mutations
+  mutations,
 }

@@ -21,9 +21,7 @@ describe('Configuration', () => {
     cy.wait('@modelsApi')
     cy.get('[data-test-id="model-carbon-intensity-carbon-model-card"]').within(
       () => {
-        cy.get('.button')
-          .contains('Analyze')
-          .click()
+        cy.get('.button').contains('Analyze').click()
       }
     )
     cy.wait('@reportsApi')

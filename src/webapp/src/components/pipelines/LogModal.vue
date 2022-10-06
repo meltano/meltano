@@ -13,7 +13,7 @@ export default {
   components: {
     ConnectorLogo,
     DownloadButton,
-    SubscribeButton
+    SubscribeButton,
   },
   data() {
     return {
@@ -23,7 +23,7 @@ export default {
       jobLog: null,
       jobPoller: null,
       jobStatus: null,
-      shouldAutoScroll: true
+      shouldAutoScroll: true,
     }
   },
   computed: {
@@ -71,13 +71,13 @@ export default {
       return !!this.$flask['isAnalysisEnabled']
     },
     relatedPipeline() {
-      return this.pipelines.find(pipeline => pipeline.name === this.stateId)
+      return this.pipelines.find((pipeline) => pipeline.name === this.stateId)
     },
     dataSourceLabel() {
       return this.relatedPipeline
         ? this.getPluginLabel('extractors', this.relatedPipeline.extractor)
         : ''
-    }
+    },
   },
   created() {
     this.stateId = this.$route.params.stateId
@@ -97,13 +97,13 @@ export default {
     initJobPoller() {
       const pollFn = () => {
         this.getJobLog(this.stateId)
-          .then(response => {
+          .then((response) => {
             this.jobStatus = response.data
             this.hasError = this.jobStatus.hasError
             this.hasLogExceededMaxSize = this.jobStatus.hasLogExceededMaxSize
             this.jobLog = this.jobStatus.log
           })
-          .catch(error => {
+          .catch((error) => {
             this.jobLog = error.response.data.code
           })
           .finally(() => {
@@ -125,8 +125,8 @@ export default {
     },
     getHelp() {
       window.open('https://docs.meltano.com/the-project/community')
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -142,7 +142,7 @@ export default {
         </figure>
         <p class="modal-card-title">{{ dataSourceLabel }} Pipeline Run Log</p>
         <div
-          class=" tooltip is-tooltip-left"
+          class="tooltip is-tooltip-left"
           data-tooltip="The pipeline still runs when closed"
         >
           <button class="delete" aria-label="close" @click="close"></button>
@@ -154,9 +154,7 @@ export default {
             Your data is being extracted from {{ dataSourceLabel }}.
           </p>
           <div class="message-body content">
-            <p>
-              Please note:
-            </p>
+            <p>Please note:</p>
             <ul>
               <li>
                 Depending on the specific extractor, time period, and amount of
@@ -204,9 +202,7 @@ export default {
         <article v-if="hasLogExceededMaxSize" class="message is-small">
           <div class="message-body">
             <div class="content">
-              <p>
-                The log is too large to display inline. Download it below.
-              </p>
+              <p>The log is too large to display inline. Download it below.</p>
             </div>
           </div>
         </article>

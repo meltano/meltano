@@ -4,36 +4,24 @@ import MainNav from '@/components/navigation/MainNav'
 export default {
   name: 'App',
   components: {
-    MainNav
+    MainNav,
   },
   computed: {
     isMeltanoDataInstance() {
       const url = new URL(window.location.host)
       return url.hostname.endsWith('meltanodata.com')
-    }
+    },
   },
   created() {
     this.$store.dispatch('system/check')
     this.$store.dispatch('system/fetchIdentity')
-    this.tryAcknowledgeAnalyticsTracking()
   },
   mounted() {
     if (this.isMeltanoDataInstance) {
       this.$intercom.boot()
     }
   },
-  methods: {
-    tryAcknowledgeAnalyticsTracking() {
-      if (this.$flask.isSendAnonymousUsageStats) {
-        const hasAcknowledgedTracking =
-          'hasAcknowledgedTracking' in localStorage &&
-          localStorage.getItem('hasAcknowledgedTracking') === 'true'
-        if (!hasAcknowledgedTracking) {
-          this.$toasted.global.acknowledgeAnalyticsTracking()
-        }
-      }
-    }
-  }
+  methods: {},
 }
 </script>
 
