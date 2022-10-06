@@ -97,7 +97,9 @@ class ProjectInitService:
             add_discovery: Add discovery.yml file to created project
         """
         click.secho("Creating project files...", fg="blue")
-        click.echo(f"  {self.project_directory}/")
+
+        if not self.project_directory.samefile(Path.cwd()):
+            click.echo(f"  {self.project_directory}/")
 
         self.create_dot_meltano_dir()
 
