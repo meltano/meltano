@@ -75,7 +75,7 @@ cookiecutter https://github.com/meltano/sdk --directory="cookiecutter/tap-templa
 
 After running the above command, you will be prompted to configure your project.
 
-- Choose jsonplaceholder as your source name
+- Type `jsonplaceholder` as your source name
 - Then input your first name and last name.
 - You can leave the tap_id and library name as the default suggested names.
 - For the stream type, you should select REST, and Custom or N/A for the auth method.
