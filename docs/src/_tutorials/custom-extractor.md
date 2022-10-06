@@ -105,17 +105,11 @@ Choose from 1, 2, 3, 4 [1]: 1
 Select auth_method:
 
 1 - API Key
-
 2 - Bearer Token
-
 3 - Basic Auth
-
 4 - OAuth2
-
 5 - JWT
-
 6 - Custom or N/A
-
 Choose from 1, 2, 3, 4, 5, 6 [1]: 6
 
 Select include_cicd_sample_template:
