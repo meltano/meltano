@@ -100,12 +100,7 @@ def cli(  # noqa: WPS231
         elif project_setting_service.get("default_environment"):
             selected_environment = project_setting_service.get("default_environment")
             is_default_environment = True
-        # activate environment
-        if selected_environment:
-            project.activate_environment(selected_environment)
-            logger.info(
-                "Environment '%s' is active", selected_environment  # noqa: WPS323
-            )
+        ctx.obj["selected_environment"] = selected_environment
         ctx.obj["is_default_environment"] = is_default_environment
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
@@ -123,3 +118,38 @@ def cli(  # noqa: WPS231
             "For more details, visit https://docs.meltano.com/guide/installation#upgrading-meltano-version"
         )
         sys.exit(3)
+
+
+def activate_environment(ctx: click.Context, project: Project) -> None:
+    """Activate the selected environment.
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["selected_environment"]:
+        project.activate_environment(ctx.obj["selected_environment"])
+
+
+def activate_explicitly_provided_environment(
+    ctx: click.Context, project: Project
+) -> None:
+    """Activate the selected environment if it has been explicitly set.
+
+    Some commands (e.g. `config`, `job`, etc.) do not respect the configured
+    `default_environment`, and will only run with an environment active if it
+    has been explicitly set (e.g. with the `--environment` CLI option).
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"The default environment {ctx.obj['selected_environment']!r} will "
+            f"be ignored for `meltano {ctx.command.name}`. To configure a specific "
+            "environment, please use the option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
+    else:
+        activate_environment(ctx, project)

@@ -1,4 +1,5 @@
 """Config management CLI."""
+
 from __future__ import annotations
 
 import asyncio
@@ -10,6 +11,10 @@ from pathlib import Path
 import click
 import dotenv
 
+from meltano.cli import activate_explicitly_provided_environment, cli
+from meltano.cli.interactive import InteractiveConfig
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError, InstrumentedGroup, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -22,11 +27,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliEvent, PluginsTrackingContext
-
-from . import cli
-from .interactive import InteractiveConfig
-from .params import pass_project
-from .utils import CliError, InstrumentedGroup, PartialInstrumentedCmd
 
 logger = logging.getLogger(__name__)
 
@@ -78,19 +78,14 @@ def config(  # noqa: WPS231
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
     """
+    activate_explicitly_provided_environment(ctx, project)
+
     tracker = ctx.obj["tracker"]
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
     except ValueError:
         tracker.track_command_event(CliEvent.aborted)
         raise
-
-    if ctx.obj["is_default_environment"]:
-        logger.info(
-            f"The default environment ({project.active_environment.name}) will be ignored for `meltano config`. "
-            + "To configure a specific Environment, please use option `--environment=<environment name>`."
-        )
-        project.deactivate_environment()
 
     plugins_service = ProjectPluginsService(project)
 
