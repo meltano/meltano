@@ -47,7 +47,7 @@
 
 ---
 
-Welcome to your CLI for ELT+. It's ppen source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.
+Welcome to your CLI for ELT+. It's open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.
 
 
 Integrations
