@@ -14,7 +14,7 @@
 
 [[redirects]]
   from = "http://melta.no/*"
-  to = "http://docs.meltano.com/guide/troubleshooting/:splat"
+  to = "https://docs.meltano.com/guide/troubleshooting/:splat"
   status = 301
   force = true
 
