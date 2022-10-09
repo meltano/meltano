@@ -7,28 +7,26 @@ const defaultState = utils.deepFreeze({
   acl: {
     permissions: [],
     roles: [],
-    users: []
-  }
+    users: [],
+  },
 })
 
 const getters = {
   rolesContexts(state) {
-    return type =>
-      lodash.map(state.acl.roles, r => {
+    return (type) =>
+      lodash.map(state.acl.roles, (r) => {
         // filter out other permission types
-        const perms = lodash(r.permissions)
-          .groupBy('type')
-          .get(type)
+        const perms = lodash(r.permissions).groupBy('type').get(type)
         return {
           name: r.name,
-          contexts: lodash.map(perms, 'context')
+          contexts: lodash.map(perms, 'context'),
         }
       })
   },
 
   rolesName(state) {
     return lodash.map(state.acl.roles, lodash.property('name'))
-  }
+  },
 }
 
 const actions = {
@@ -37,7 +35,7 @@ const actions = {
 
     settingsApi
       .addRolePermission(roleDef, permissionType, context)
-      .then(response => {
+      .then((response) => {
         commit('updateRole', response.data)
       })
   },
@@ -52,7 +50,7 @@ const actions = {
   },
 
   createRole({ commit }, { role }) {
-    settingsApi.createRole({ name: role }).then(response => {
+    settingsApi.createRole({ name: role }).then((response) => {
       commit('addRole', response.data)
     })
   },
@@ -61,20 +59,20 @@ const actions = {
     settingsApi.deleteRole({ name: role }).then(() => {
       commit('removeRole', role)
 
-      state.acl.users.forEach(user => {
+      state.acl.users.forEach((user) => {
         commit('unassignUserRole', { user: user.username, role })
       })
     })
   },
 
   fetchACL({ commit }) {
-    return settingsApi.fetchACL().then(response => {
+    return settingsApi.fetchACL().then((response) => {
       commit('setACL', response.data)
     })
   },
 
   getSettings({ commit }) {
-    return settingsApi.index().then(response => {
+    return settingsApi.index().then((response) => {
       commit('setSettings', response.data.settings)
     })
   },
@@ -84,7 +82,7 @@ const actions = {
 
     settingsApi
       .removeRolePermission(roleDef, permissionType, context)
-      .then(response => {
+      .then((response) => {
         commit('updateRole', response.data)
       })
   },
@@ -98,7 +96,7 @@ const actions = {
     settingsApi.deleteRole(roleDef, user).then(() => {
       commit('unassignUserRole', { user, role })
     })
-  }
+  },
 }
 
 const mutations = {
@@ -128,7 +126,7 @@ const mutations = {
   },
 
   removeRole(state, role) {
-    state.acl.roles = lodash.filter(state.acl.roles, r => r.name !== role)
+    state.acl.roles = lodash.filter(state.acl.roles, (r) => r.name !== role)
   },
 
   removeRolePermission(state, { permissionType, role, context }) {
@@ -152,9 +150,9 @@ const mutations = {
   },
 
   updateRole(state, role) {
-    const update = r => (r.name === role.name ? role : r)
+    const update = (r) => (r.name === role.name ? role : r)
     state.acl.roles = lodash.map(state.acl.roles, update)
-  }
+  },
 }
 
 export default {
@@ -162,5 +160,5 @@ export default {
   state: lodash.cloneDeep(defaultState),
   getters,
   actions,
-  mutations
+  mutations,
 }

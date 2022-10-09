@@ -9,46 +9,46 @@ export default {
   name: 'ConnectorSettings',
   components: {
     ConnectorLogo,
-    InputDateIso8601
+    InputDateIso8601,
   },
   props: {
     configSettings: {
       type: Object,
       required: true,
-      default: () => {}
+      default: () => {},
     },
     fieldClass: {
       type: String,
-      default: ''
+      default: '',
     },
     isShowDocs: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isShowConfigWarning: {
       type: Boolean,
-      default: false
+      default: false,
     },
     plugin: {
       type: Object,
-      required: true
+      required: true,
     },
     requiredSettingsKeys: {
       type: Array,
-      required: true
+      required: true,
     },
     uploadFormData: {
       type: Object,
       required: false,
-      default: () => null
-    }
+      default: () => null,
+    },
   },
   data: () => ({
     source: '',
     docsIframeLoadTimer: null,
     isDocsIframeLoading: true,
     isDocsIframeLoaded: false,
-    isDocsIframeError: false
+    isDocsIframeError: false,
   }),
   computed: {
     computedSettings() {
@@ -57,7 +57,7 @@ export default {
         : this.configSettings.settings
     },
     fileValue() {
-      return setting => {
+      return (setting) => {
         let fullPath = this.configSettings.config[setting.name]
         return fullPath && utils.extractFileNameFromPath(fullPath)
       }
@@ -71,52 +71,52 @@ export default {
               'http://localhost:8081/'
             ),
         params: {
-          embed: true
-        }
+          embed: true,
+        },
       })
     },
     getLabel() {
-      return setting =>
+      return (setting) =>
         setting.label || utils.titleCase(utils.underscoreToSpace(setting.name))
     },
     getFormFieldForId() {
-      return setting => `setting-${setting.name}`
+      return (setting) => `setting-${setting.name}`
     },
     getIsOfKindBoolean() {
-      return kind => kind === 'boolean'
+      return (kind) => kind === 'boolean'
     },
     getIsOfKindDate() {
-      return kind => kind === 'date_iso8601'
+      return (kind) => kind === 'date_iso8601'
     },
     getIsOfKindFile() {
-      return kind => kind === 'file'
+      return (kind) => kind === 'file'
     },
     getIsOfKindHidden() {
-      return kind => kind === 'hidden'
+      return (kind) => kind === 'hidden'
     },
     getIsOfKindUnsupported() {
-      return kind => kind === 'object' || kind === 'array'
+      return (kind) => kind === 'object' || kind === 'array'
     },
     getIsOfKindOAuth() {
-      return kind => this.isOAuthEnabled && kind === 'oauth'
+      return (kind) => this.isOAuthEnabled && kind === 'oauth'
     },
     getIsOfKindOptions() {
-      return kind => kind === 'options'
+      return (kind) => kind === 'options'
     },
     getIsOfKindTextBased() {
-      return kind =>
+      return (kind) =>
         !this.getIsOfKindBoolean(kind) &&
         !this.getIsOfKindDate(kind) &&
         !this.getIsOfKindFile(kind) &&
         !this.getIsOfKindOptions(kind)
     },
     getHasAddons(getters) {
-      return setting =>
+      return (setting) =>
         getters.getIsProtected(setting) ||
         getters.getIsOfKindOAuth(setting.kind)
     },
     getIsProtected() {
-      return setting => {
+      return (setting) => {
         const metadata = this.configSettings.configMetadata[setting.name]
 
         return (
@@ -127,15 +127,15 @@ export default {
       }
     },
     getPlaceholder() {
-      return setting => setting.placeholder || setting.value
+      return (setting) => setting.placeholder || setting.value
     },
     getRequiredLabel() {
-      return setting =>
+      return (setting) =>
         this.requiredSettingsKeys.includes(setting.name) ? '*' : ''
     },
     getTextBasedInputType() {
       let type = 'text'
-      return setting => {
+      return (setting) => {
         switch (setting.kind) {
           case 'password':
             type = 'password'
@@ -153,23 +153,27 @@ export default {
     gitLabSettings() {
       const currentSourceApiLabel = this.source + 's'
       const ignoreList = ['groups', 'projects'].filter(
-        item => item !== currentSourceApiLabel
+        (item) => item !== currentSourceApiLabel
       )
 
       if (this.isTapGitLab) {
         // Copy over currentSettings and add in custom select menu
-        const newSettings = this.configSettings.settings.map(setting => setting)
+        const newSettings = this.configSettings.settings.map(
+          (setting) => setting
+        )
         newSettings.splice(2, 0, {
           name: 'source',
           kind: 'options',
           options: [
             { label: 'Choose Group or Project', value: '' },
             { label: 'Group', value: 'group' },
-            { label: 'Project', value: 'project' }
-          ]
+            { label: 'Project', value: 'project' },
+          ],
         })
 
-        return newSettings.filter(setting => !ignoreList.includes(setting.name))
+        return newSettings.filter(
+          (setting) => !ignoreList.includes(setting.name)
+        )
       }
 
       return []
@@ -180,7 +184,7 @@ export default {
     getIsOAuthProviderEnabled() {
       const providers = this.$flask['oauthServiceProviders']
 
-      return provider =>
+      return (provider) =>
         providers.includes('all') || providers.includes(provider)
     },
     isTapGitLab() {
@@ -190,7 +194,7 @@ export default {
       return this.fieldClass || 'is-normal'
     },
     protectedFieldUrl() {
-      return setting => {
+      return (setting) => {
         if (setting.protected) {
           return 'https://docs.meltano.com/contribute/plugins#protected-settings'
         } else if (this.getIsOfKindUnsupported(setting.kind)) {
@@ -203,7 +207,7 @@ export default {
     protectedFieldMessage() {
       let configMetadata = this.configSettings.configMetadata
 
-      return setting => {
+      return (setting) => {
         const metadata = configMetadata[setting.name]
 
         if (setting.protected) {
@@ -216,8 +220,8 @@ export default {
       }
     },
     successClass() {
-      return setting => (setting ? 'has-text-success' : null)
-    }
+      return (setting) => (setting ? 'has-text-success' : null)
+    },
   },
   mounted() {
     this.focusInputIntelligently()
@@ -237,8 +241,8 @@ export default {
       this.$nextTick(() => {
         const inputs = Array.from(this.$el.getElementsByTagName('input'))
         if (inputs.length) {
-          const firstEmptyInput = inputs.find(el => !el.value)
-          const firstEnabledInput = inputs.find(el => !el.disabled)
+          const firstEmptyInput = inputs.find((el) => !el.value)
+          const firstEnabledInput = inputs.find((el) => !el.disabled)
           const targetInput = firstEmptyInput || firstEnabledInput || inputs[0]
           targetInput.blur()
           targetInput.focus()
@@ -274,10 +278,11 @@ export default {
         // Refactor needed if a setting requires multiple files and/or 2+ settings are `kind: file`
         this.$emit('onChangeUploadFormData', {
           file,
-          setting_name: setting.name
+          setting_name: setting.name,
         })
 
         // Model update as v-model on `<input type="file">` not supported
+        // eslint-disable-next-line vue/no-mutating-props
         this.configSettings.config[setting.name] = file.name
       }
     },
@@ -287,7 +292,7 @@ export default {
         this.$refs.docs.contentWindow.postMessage(
           {
             source: 'meltano',
-            anchor: anchorName.replace('setting-', '').replace(/_/g, '-')
+            anchor: anchorName.replace('setting-', '').replace(/_/g, '-'),
           },
           '*'
         )
@@ -317,8 +322,8 @@ export default {
       } else if (hasGroupSetting) {
         this.source = 'group'
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -328,7 +333,7 @@ export default {
 
     <div class="columns">
       <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
-        <div class="content ">
+        <div class="content">
           <h3 class="is-title">Configuration</h3>
         </div>
       </div>
@@ -360,9 +365,7 @@ export default {
       <div class="column" :class="{ 'is-two-fifths': isShowDocs }">
         <article v-if="isShowConfigWarning" class="message is-warning is-small">
           <div class="message-body content">
-            <p>
-              Please note:
-            </p>
+            <p>Please note:</p>
             <ul>
               <li>
                 Changing these settings does not result in the deletion of data
@@ -389,7 +392,7 @@ export default {
             v-for="setting in computedSettings"
             :key="setting.name"
             :class="{ 'field is-horizontal': !getIsOfKindHidden(setting.kind) }"
-            class=" has-cursor-pointer"
+            class="has-cursor-pointer"
             @click.stop="onFocusInputViaClick"
             @focusin="onFocusInput($event.target)"
           >
@@ -416,9 +419,10 @@ export default {
               <div
                 class="field"
                 :class="{
-                  'has-addons': getHasAddons(setting)
+                  'has-addons': getHasAddons(setting),
                 }"
               >
+                <!-- eslint-disable vue/no-mutating-props -->
                 <div class="control is-expanded">
                   <!-- Hidden -->
                   <input
@@ -540,7 +544,7 @@ export default {
                       :id="getFormFieldForId(setting)"
                       :value="
                         configSettings.config[setting.name] &&
-                          JSON.stringify(configSettings.config[setting.name])
+                        JSON.stringify(configSettings.config[setting.name])
                       "
                       :class="['input', fieldClass, successClass(setting)]"
                       :placeholder="getPlaceholder(setting)"
@@ -563,6 +567,7 @@ export default {
                     @focus="$event.target.select()"
                   />
                 </div>
+                <!-- eslint-enable vue/no-mutating-props -->
 
                 <!-- Visual helpers  -->
                 <template v-if="!getIsOfKindHidden(setting.kind)">
@@ -585,7 +590,7 @@ export default {
                   <div
                     v-if="
                       getIsOfKindOAuth(setting.kind) &&
-                        getIsOAuthProviderEnabled(setting.oauth.provider)
+                      getIsOAuthProviderEnabled(setting.oauth.provider)
                     "
                     class="control"
                   >
@@ -623,9 +628,7 @@ export default {
             @error="onDocsIframeError"
           />
           <div v-if="isDocsIframeError" class="docs-placeholder content">
-            <p>
-              The inline documentation failed to load.
-            </p>
+            <p>The inline documentation failed to load.</p>
             <p v-if="/adwords|ads|analytics/.test(getInlineDocsUrl)">
               If you are using an extension to block ads or tracking tools, it
               may have been triggered accidentally. Consider disabling it for
@@ -638,9 +641,7 @@ export default {
             </p>
           </div>
           <div v-else-if="isDocsIframeLoading" class="docs-placeholder content">
-            <p>
-              Loading inline documentation...
-            </p>
+            <p>Loading inline documentation...</p>
             <p>
               <em>
                 If this is taking too long, you can

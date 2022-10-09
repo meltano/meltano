@@ -20,12 +20,12 @@ function JobPoller(pollFn, pollFnMetadata, delay) {
   return {
     init,
     getMetadata,
-    dispose
+    dispose,
   }
 }
 
 export default {
   create(pollFn, pollFnMetadata, delay) {
     return new JobPoller(pollFn, pollFnMetadata, delay)
-  }
+  },
 }

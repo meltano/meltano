@@ -5,32 +5,32 @@ import Pill from './Pill'
 export default {
   name: 'RolePermissions',
   components: {
-    'context-pill': Pill
+    'context-pill': Pill,
   },
   props: {
     permission: {
       type: Object,
-      required: true
+      required: true,
     },
     roles: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
       model: {
         permissionType: this.permission.type,
         role: null,
-        context: null
-      }
+        context: null,
+      },
     }
   },
 
   computed: {
     enabled() {
       return !(_.isEmpty(this.model.role) || _.isEmpty(this.model.context))
-    }
+    },
   },
 
   methods: {
@@ -42,15 +42,15 @@ export default {
       this.$emit('remove', {
         permissionType: this.permission.type,
         role: role.name,
-        context
+        context,
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <template>
-  <div class="box table-container" style="margin-bottom: 2em;">
+  <div class="box table-container" style="margin-bottom: 2em">
     <p class="is-italic">{{ permission.name }}</p>
     <table class="table is-fullwidth">
       <thead>
@@ -83,9 +83,9 @@ export default {
         <div class="select">
           <select v-model="model.role">
             <option :value="null">Select a role</option>
-            <option v-for="role in roles" :key="role.name">{{
-              role.name
-            }}</option>
+            <option v-for="role in roles" :key="role.name">
+              {{ role.name }}
+            </option>
           </select>
         </div>
       </div>

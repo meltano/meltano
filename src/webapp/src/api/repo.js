@@ -16,5 +16,5 @@ export default {
 
   sync() {
     return axios.get(utils.apiUrl('repos', 'sync'))
-  }
+  },
 }
