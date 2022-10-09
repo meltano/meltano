@@ -27,14 +27,13 @@ class ProjectInitService:
         Args:
             project_directory: The directory path to create the project at
         """
-        project_directory = Path(project_directory).resolve()
+        self.project = Project(project_directory)
+        self.project_directory = self.project.root
 
         try:
-            project_directory = project_directory.relative_to(Path.cwd())
+            self.project_directory = self.project.root.relative_to(Path.cwd())
         except ValueError:
             pass
-
-        self.project_directory = project_directory
 
     def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
         """Initialise Meltano Project.
@@ -64,8 +63,6 @@ class ProjectInitService:
             raise ProjectInitServiceError(
                 f"Could not create directory '{self.project_directory}'. {ex}"
             ) from ex
-
-        self.project = Project(self.project_directory)
 
         self.create_files(add_discovery=add_discovery)
 
@@ -98,7 +95,7 @@ class ProjectInitService:
         """
         click.secho("Creating project files...", fg="blue")
 
-        if not self.project_directory.samefile(Path.cwd()):
+        if self.project.root != Path.cwd():
             click.echo(f"  {self.project_directory}/")
 
         self.create_dot_meltano_dir()
@@ -159,7 +156,7 @@ class ProjectInitService:
 
         click.echo("\nNext steps:")
 
-        if not Path.cwd().samefile(self.project_directory):
+        if self.project.root != Path.cwd():
             click.secho("  cd ", nl=False)
             click.secho(self.project_directory, fg="magenta")
 
