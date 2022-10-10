@@ -7,18 +7,18 @@ export default {
   name: 'ResourceEmbed',
   components: {
     Logo,
-    RouterViewLayout
+    RouterViewLayout,
   },
   props: {
     token: { type: String, default: null },
-    today: { type: String, default: null }
+    today: { type: String, default: null },
   },
   data() {
     return {
       error: null,
       isLoading: true,
       resource: null,
-      resourceType: null
+      resourceType: null,
     }
   },
   created() {
@@ -28,16 +28,16 @@ export default {
     initialize() {
       embedsApi
         .load(this.token, this.today)
-        .then(response => {
+        .then((response) => {
           this.resource = response.data.resource
           this.resourceType = response.data.resourceType
         })
-        .catch(error => {
+        .catch((error) => {
           this.error = error.response.data.code
         })
         .finally(() => (this.isLoading = false))
-    }
-  }
+    },
+  },
 }
 </script>
 

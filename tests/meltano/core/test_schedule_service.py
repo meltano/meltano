@@ -14,6 +14,7 @@ from meltano.core.schedule_service import (
     Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
+    ScheduleNotFoundError,
     SettingMissingError,
 )
 
@@ -94,6 +95,8 @@ class TestScheduleService:
             subject.add_schedule(create_elt_schedule("bad-cron", interval="bad_cron"))
 
         assert "bad_cron" in str(excinfo.value)
+        assert excinfo.value.reason == "Invalid Cron expression or alias: 'bad_cron'"
+        assert excinfo.value.instruction == "Please use a valid cron expression"
 
     def test_remove_schedule(self, subject):
         if platform.system() == "Windows":
@@ -270,3 +273,7 @@ class TestScheduleService:
         ):
             found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
             assert found_schedule.extractor == custom_tap.name
+
+    def test_find_namespace_schedule_not_found(self, subject):
+        with pytest.raises(ScheduleNotFoundError):
+            subject.find_namespace_schedule("no-such-namespace")

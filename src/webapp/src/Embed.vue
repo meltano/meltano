@@ -1,6 +1,7 @@
 <script>
 export default {
-  name: 'Embed'
+  // eslint-disable-next-line vue/no-reserved-component-names
+  name: 'Embed',
 }
 </script>
 
