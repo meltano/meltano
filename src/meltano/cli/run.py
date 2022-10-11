@@ -87,7 +87,7 @@ async def run(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
     """
-    activate_environment(ctx, project)
+    activate_environment(ctx, project, required=True)
 
     if dry_run and not ProjectSettingsService.config_override.get("cli.log_level"):
         logger.info("Setting 'console' handler log level to 'debug' for dry run")

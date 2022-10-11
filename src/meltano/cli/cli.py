@@ -11,6 +11,7 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -120,7 +121,9 @@ def cli(  # noqa: WPS231
         sys.exit(3)
 
 
-def activate_environment(ctx: click.Context, project: Project) -> None:
+def activate_environment(
+    ctx: click.Context, project: Project, required: bool = False
+) -> None:
     """Activate the selected environment.
 
     The selected environment is whatever was selected with the `--environment`
@@ -132,6 +135,12 @@ def activate_environment(ctx: click.Context, project: Project) -> None:
     """
     if ctx.obj["selected_environment"]:
         project.activate_environment(ctx.obj["selected_environment"])
+    elif required:
+        raise MeltanoConfigurationError(
+            reason="A Meltano environment must be specified",
+            instruction="Set the `default_environment` option in "
+            "`meltano.yml`, or the `--environment` CLI option",
+        )
 
 
 def activate_explicitly_provided_environment(
