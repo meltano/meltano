@@ -123,6 +123,9 @@ def cli(  # noqa: WPS231
 def activate_environment(ctx: click.Context, project: Project) -> None:
     """Activate the selected environment.
 
+    The selected environment is whatever was selected with the `--environment`
+    option, or the default environment (set in `meltano.yml`) otherwise.
+
     Args:
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
