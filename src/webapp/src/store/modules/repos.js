@@ -7,14 +7,14 @@ const defaultState = utils.deepFreeze({
   activeView: {
     file: '',
     is_markdown: false,
-    populated: false
+    populated: false,
   },
   errors: [],
   files: {},
   loadingUpdate: false,
   loadingValidation: false,
   models: {},
-  validated: false
+  validated: false,
 })
 
 const getters = {
@@ -42,18 +42,18 @@ const getters = {
     return state.validated && state.errors && !state.errors.length
   },
 
-  urlForModelDesign: () => (model, design) => `/analyze/${model}/${design}`
+  urlForModelDesign: () => (model, design) => `/analyze/${model}/${design}`,
 }
 
 const actions = {
   getModels({ commit }) {
-    repoApi.models().then(response => {
+    repoApi.models().then((response) => {
       commit('setModels', response.data)
     })
   },
 
   getRepo({ state, commit }) {
-    repoApi.index().then(response => {
+    repoApi.index().then((response) => {
       const files = response.data
       commit('setValidatedState', response.data)
       state.loadingValidation = false
@@ -65,7 +65,7 @@ const actions = {
     state.loadingValidation = true
     repoApi
       .lint()
-      .then(response => {
+      .then((response) => {
         commit('setValidatedState', response.data)
         state.loadingValidation = false
       })
@@ -78,7 +78,7 @@ const actions = {
     state.loadingUpdate = true
     repoApi
       .sync()
-      .then(response => {
+      .then((response) => {
         dispatch('getModels')
         commit('setValidatedState', response.data)
         state.loadingUpdate = false
@@ -86,7 +86,7 @@ const actions = {
       .catch(() => {
         state.loadingUpdate = false
       })
-  }
+  },
 }
 
 const mutations = {
@@ -109,7 +109,7 @@ const mutations = {
     if (!validated.result) {
       state.errors = validated.errors
     }
-  }
+  },
 }
 
 export default {
@@ -117,5 +117,5 @@ export default {
   state: lodash.cloneDeep(defaultState),
   getters,
   actions,
-  mutations
+  mutations,
 }

@@ -43,8 +43,8 @@ export default {
   install(Vue, { service, toasted }) {
     service.register(
       new AuthMiddleware({
-        toasted
+        toasted,
       })
     )
-  }
+  },
 }

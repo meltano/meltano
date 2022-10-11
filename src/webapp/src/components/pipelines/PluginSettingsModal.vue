@@ -10,31 +10,31 @@ import utils from '@/utils/utils'
 export default {
   name: 'PluginSettingsModal',
   components: {
-    ConnectorSettings
+    ConnectorSettings,
   },
   props: {
     pluginType: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       isSaving: false,
       isTesting: false,
       localConfiguration: {},
-      uploadFormData: null
+      uploadFormData: null,
     }
   },
   computed: {
     ...mapGetters('plugins', [
       'getInstalledPlugin',
       'getIsPluginInstalled',
-      'getIsInstallingPlugin'
+      'getIsInstallingPlugin',
     ]),
     ...mapGetters('orchestration', [
       'getHasPipelineWithPlugin',
-      'getHasValidConfigSettings'
+      'getHasValidConfigSettings',
     ]),
     ...mapState('orchestration', ['pluginInFocusConfiguration']),
 
@@ -92,7 +92,7 @@ export default {
     },
     singularizedTitledType() {
       return utils.titleCase(this.singularizedType)
-    }
+    },
   },
   created() {
     this.getPluginConfiguration()
@@ -100,7 +100,7 @@ export default {
         this.createEditableConfiguration()
         this.tryAutoAdvance()
       })
-      .catch(err => {
+      .catch((err) => {
         Vue.toasted.global.error(`Plugin ${this.pluginName} is not installed`)
         this.close()
         this.$error.handle(err)
@@ -113,7 +113,7 @@ export default {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     ...mapActions('orchestration', [
       'savePluginConfiguration',
-      'testPluginConfiguration'
+      'testPluginConfiguration',
     ]),
     tryAutoAdvance() {
       if (this.pluginLacksConfigSettings) {
@@ -146,12 +146,12 @@ export default {
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
             type: this.pluginType,
-            payload: this.uploadFormData
+            payload: this.uploadFormData,
           })
         : Promise.resolve()
 
       // 2. Initialize conditional request
-      uponConditionalUpload.then(response => {
+      uponConditionalUpload.then((response) => {
         // 2.a Update setting value with updated and secure file path
         if (response) {
           const payload = response.data
@@ -163,8 +163,8 @@ export default {
           name: this.plugin.name,
           type: this.pluginType,
           payload: {
-            config: this.localConfiguration.config
-          }
+            config: this.localConfiguration.config,
+          },
         })
           .then(() => {
             const message = this.pluginLacksConfigSettings
@@ -173,7 +173,7 @@ export default {
             Vue.toasted.global.success(message)
             this.close()
           })
-          .catch(error => {
+          .catch((error) => {
             this.$error.handle(error)
           })
           .finally(() => (this.isSaving = false))
@@ -187,12 +187,12 @@ export default {
         ? this.$store.dispatch('orchestration/uploadPluginConfigurationFile', {
             name: this.plugin.name,
             type: this.pluginType,
-            payload: { ...this.uploadFormData, tmp: true }
+            payload: { ...this.uploadFormData, tmp: true },
           })
         : Promise.resolve()
 
       // 2. Initialize conditional request
-      uponConditionalUpload.then(response => {
+      uponConditionalUpload.then((response) => {
         // 2.a Update setting value with updated and secure file path
         if (response) {
           const payload = response.data
@@ -204,10 +204,10 @@ export default {
           name: this.plugin.name,
           type: this.pluginType,
           payload: {
-            config: this.localConfiguration.config
-          }
+            config: this.localConfiguration.config,
+          },
         })
-          .then(response => {
+          .then((response) => {
             if (response.data.isSuccess) {
               Vue.toasted.global.success(
                 `Valid ${this.singularizedTitledType} Connection - ${this.plugin.name}`
@@ -228,16 +228,16 @@ export default {
                   payload: {
                     ...this.uploadFormData,
                     file: null,
-                    tmp: true
-                  }
+                    tmp: true,
+                  },
                 }
               )
             }
           })
           .finally(() => (this.isTesting = false))
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -286,7 +286,7 @@ export default {
               :class="{
                 'is-loading': isTesting,
                 tooltip: isLoader,
-                'is-tooltip-top': isLoader
+                'is-tooltip-top': isLoader,
               }"
               :disabled="!isSaveable || isTesting || isSaving || isLoader"
               data-tooltip="Not available for loaders"
@@ -300,7 +300,7 @@ export default {
               class="button is-interactive-primary"
               :class="{
                 'is-loading':
-                  isLoadingConfigSettings || isInstalling || isSaving
+                  isLoadingConfigSettings || isInstalling || isSaving,
               }"
               :disabled="!isSaveable || isTesting || isSaving"
               @click="save"

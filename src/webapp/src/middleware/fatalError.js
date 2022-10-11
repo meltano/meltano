@@ -38,7 +38,7 @@ export default {
   install(Vue, { service, toasted }) {
     service.register(
       new FatalErrorMiddleware({
-        toasted
+        toasted,
       })
     )
 
@@ -54,7 +54,7 @@ export default {
 
         toasted.global.error(err.response.data.code)
         err.handled = true
-      }
+      },
     }
-  }
+  },
 }

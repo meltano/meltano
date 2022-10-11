@@ -12,27 +12,27 @@ describe('designs Vuex store', () => {
       currentNamespace: '',
       currentSQL: '',
       design: {
-        relatedTable: {}
+        relatedTable: {},
       },
       loader: null,
       filterOptions: [],
       filters: {
         aggregates: [],
-        columns: []
+        columns: [],
       },
       hasSQLError: false,
       isLoadingQuery: false,
       limit: 50,
       order: {
         assigned: [],
-        unassigned: []
+        unassigned: [],
       },
       queryAttributes: [],
       reports: [],
       resultAggregates: [],
       results: [],
       saveReportSettings: { name: null },
-      sqlErrorMessage: []
+      sqlErrorMessage: [],
     }
   })
 

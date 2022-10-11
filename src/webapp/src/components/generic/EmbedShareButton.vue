@@ -8,7 +8,7 @@ import utils from '@/utils/utils'
 export default {
   name: 'EmbedShareButton',
   components: {
-    Dropdown
+    Dropdown,
   },
   props: {
     buttonClasses: { type: String, default: '' },
@@ -17,11 +17,11 @@ export default {
     resourceType: {
       type: String,
       required: true,
-      validator: value => Object.values(EMBED_RESOURCE_TYPES).includes(value)
-    }
+      validator: (value) => Object.values(EMBED_RESOURCE_TYPES).includes(value),
+    },
   },
   data: () => ({
-    isAwaitingEmbed: false
+    isAwaitingEmbed: false,
   }),
   methods: {
     copyToClipboard(refName) {
@@ -37,23 +37,23 @@ export default {
         .generate({
           resourceId: resource.id,
           resourceType: this.resourceType,
-          today: utils.formatDateStringYYYYMMDD(new Date())
+          today: utils.formatDateStringYYYYMMDD(new Date()),
         })
-        .then(response => {
+        .then((response) => {
           this.$refs[`link-${resource.id}`].value = response.data.url
           this.$refs[`embed-${resource.id}`].value = response.data.snippet
           if (response.data.isNew) {
             Vue.toasted.global.success(`${resource.name} embed code created`)
           }
         })
-        .catch(error => {
+        .catch((error) => {
           Vue.toasted.global.error(
             `${resource.name} embed error. [Error code: ${error.response.data.code}]`
           )
         })
         .finally(() => (this.isAwaitingEmbed = false))
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -61,7 +61,7 @@ export default {
   <Dropdown
     :tooltip="{
       classes: 'is-tooltip-left',
-      message: 'Create a link or embed to share'
+      message: 'Create a link or embed to share',
     }"
     label="Share"
     :button-classes="`button ${buttonClasses}`"
@@ -77,7 +77,7 @@ export default {
           <p class="control is-expanded">
             <input
               :ref="`link-${resource.id}`"
-              class="input is-small is-family-code has-background-white-ter	has-text-grey-dark	"
+              class="input is-small is-family-code has-background-white-ter has-text-grey-dark"
               type="text"
               placeholder="Generating link..."
               readonly
@@ -101,7 +101,7 @@ export default {
             <p class="control is-expanded">
               <input
                 :ref="`embed-${resource.id}`"
-                class="input is-small is-family-code has-background-white-ter	has-text-grey-dark	"
+                class="input is-small is-family-code has-background-white-ter has-text-grey-dark"
                 type="text"
                 placeholder="Generating snippet..."
                 readonly

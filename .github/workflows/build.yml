@@ -24,7 +24,7 @@ jobs:
         virtualenvs-in-project: true
 
     - name: Set up Python
-      uses: actions/setup-python@v4.2.0
+      uses: actions/setup-python@v4.3.0
       with:
         # https://github.com/actions/setup-python
         python-version: 3.9
@@ -36,14 +36,14 @@ jobs:
       run: |
         version=$(poetry version | awk '{print $2}')
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
-        if [ "v$version" != $tag ]; then echo "Release tag and package version do not match!"; exit 1; fi;
+        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and poetry version ('v$version') do not match!"; exit 1; fi;
 
     - name: Poetry install
       run: |
         poetry install
 
     - name: Setup Node
-      uses: actions/setup-node@v3.4.1
+      uses: actions/setup-node@v3.5.0
       with:
         node-version: '14'
         cache: 'yarn'

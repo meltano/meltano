@@ -10,11 +10,11 @@ const router = new Router({
       name: 'resource-embed',
       component: ResourceEmbed,
       meta: {
-        title: 'Meltano Resource Embed'
+        title: 'Meltano Resource Embed',
       },
-      props: route => ({ ...route.params, today: route.query.today })
-    }
-  ]
+      props: (route) => ({ ...route.params, today: route.query.today }),
+    },
+  ],
 })
 
 export default router
