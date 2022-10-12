@@ -34,7 +34,7 @@ If you have a question about Meltano, are having trouble getting it to work, or 
 
 *Problem: "Why do **incremental runs** produce duplicate data?"* 
 
-View this [Slack discussion](https://meltano.slack.com/archives/C013EKWA2Q1/p1659024288228009). Tl;dr: Singer takes an "at least once" approach to replication, so if you're encounting this, it might be intended behavior.
+Singer takes an "at least once" approach to replication, so if you're encountering this, it might be intended behavior. [This issue](https://github.com/MeltanoLabs/Singer-Working-Group/issues/13) is a good summary of the current state and a proposal to change this behavior.
 
 *Problem: "My **runs take too long**."* 
 
