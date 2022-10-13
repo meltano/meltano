@@ -1,4 +1,5 @@
 """Defines `meltano elt` command."""
+
 from __future__ import annotations
 
 import datetime
@@ -10,6 +11,9 @@ import click
 import structlog
 from structlog import stdlib as structlog_stdlib
 
+from meltano.cli import activate_environment, cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -24,10 +28,6 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 from meltano.core.utils import click_run_async
-
-from . import cli
-from .params import pass_project
-from .utils import CliError, PartialInstrumentedCmd
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -111,6 +111,8 @@ async def elt(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    activate_environment(ctx, project)
+
     if platform.system() == "Windows":
         raise CliError(
             "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"

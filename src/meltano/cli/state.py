@@ -10,15 +10,14 @@ from operator import xor
 import click
 import structlog
 
+from meltano.cli import activate_explicitly_provided_environment, cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd, InstrumentedGroup
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
-
-from . import cli
-from .utils import InstrumentedCmd, InstrumentedGroup
 
 STATE_SERVICE_KEY = "state_service"
 
@@ -107,6 +106,7 @@ def meltano_state(project: Project, ctx: click.Context):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#state
     """
+    activate_explicitly_provided_environment(ctx, project)
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
     ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
