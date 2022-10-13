@@ -11,6 +11,7 @@ from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
 from meltano.core.setting_definition import SettingDefinition, YAMLEnum
+from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound, find_named
 
 from .command import Command
@@ -43,6 +44,20 @@ class VariantNotFoundError(Exception):
             name=self.plugin.name,
             variant=self.variant_name,
             variant_labels=self.plugin.variant_labels,
+        )
+
+
+class PluginRefNameContainsStateIdDelimiterError(Exception):
+    """Occurs when a name in reference to a plugin contains the state ID component delimiter string."""
+
+    def __init__(self, name: str):
+        """Create a new exception.
+
+        Args:
+            name: The name of the plugin.
+        """
+        super().__init__(
+            f"The plugin name '{name}' cannot contain the state ID component delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
         )
 
 
@@ -172,7 +187,13 @@ class PluginRef(Canonical):
             plugin_type: The type of the plugin.
             name: The name of the plugin.
             kwargs: Additional keyword arguments.
+
+        Raises:
+            PluginRefNameContainsStateIdDelimiterError: If the name contains the state ID component delimiter string.
         """
+        if STATE_ID_COMPONENT_DELIMITER in name:
+            raise PluginRefNameContainsStateIdDelimiterError(name)
+
         self._type = (
             plugin_type
             if isinstance(plugin_type, PluginType)

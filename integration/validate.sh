@@ -23,6 +23,7 @@ check_meltano_yaml
 
 # if theres a per test validate.sh, run it as well
 if [ -f "${INTEGRATION_BASE_DIR}/${TEST_NAME}/validate.sh" ]; then
+  export TEST_NAME="$TEST_NAME"
   echo "Running per test validate.sh..."
   bash -xeuo pipefail "${INTEGRATION_BASE_DIR}/${TEST_NAME}/validate.sh"
 fi

@@ -19,6 +19,7 @@ jobs:
         - { integration_test: "meltano-basics", needs_postgres: false }
         - { integration_test: "meltano-run", needs_postgres: true }
         - { integration_test: "meltano-objects", needs_postgres: false }
+        - { integration_test: "meltano-migrations", needs_postgres: false }
       fail-fast: false
 
     runs-on: ubuntu-latest
@@ -34,7 +35,7 @@ jobs:
         poetry --version
 
     - name: Setup Python 3.8
-      uses: actions/setup-python@v4.2.0
+      uses: actions/setup-python@v4.3.0
       with:
         python-version: 3.8
         architecture: x64

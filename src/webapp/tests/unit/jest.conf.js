@@ -5,13 +5,13 @@ module.exports = {
     'src/**/*.{js,vue}',
     '!src/main.js',
     '!src/router/index.js',
-    '!**/node_modules/**'
+    '!**/node_modules/**',
   ],
   coverageDirectory: '<rootDir>/test/unit/coverage',
   mapCoverage: true,
   moduleFileExtensions: ['js', 'json', 'vue'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   rootDir: path.resolve(__dirname, '../../'),
   setupFiles: ['<rootDir>/test/unit/setup'],
@@ -20,6 +20,6 @@ module.exports = {
   testURL: 'http://localhost:8080',
   transform: {
     '.*\\.(vue)$': '<rootDir>/node_modules/vue-jest',
-    '^.+\\.js$': '<rootDir>/node_modules/babel-jest'
-  }
+    '^.+\\.js$': '<rootDir>/node_modules/babel-jest',
+  },
 }

@@ -6,29 +6,29 @@ export default {
   props: {
     fragment: {
       type: String,
-      default: ''
+      default: '',
     },
     page: {
       type: String,
-      default: ''
+      default: '',
     },
     target: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
   data() {
     return {
       linkPage: `/${this.page}`,
-      linkTarget: this.target || '_blank'
+      linkTarget: this.target || '_blank',
     }
   },
 
   computed: {
     url() {
       return utils.docsUrl(this.linkPage, this.fragment)
-    }
-  }
+    },
+  },
 }
 </script>
 

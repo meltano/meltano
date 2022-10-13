@@ -3,6 +3,7 @@ title: CLI Development
 description: Contribute to the Meltano CLI.
 layout: doc
 weight: 10
+hidden: true
 ---
 
 This section of the guide provides guidance on how to work with the Meltano CLI, which serves as the primary UI of Meltano

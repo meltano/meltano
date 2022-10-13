@@ -30,7 +30,17 @@ If you have a question about Meltano, are having trouble getting it to work, or 
     </div>
 </div>
 
-# Common Troubleshooting Issues
+# Common Issues
+
+*Problem: "Why do **incremental runs** produce duplicate data?"*
+
+Singer takes an "at least once" approach to replication, so if you're encountering this, it might be intended behavior. [This issue](https://github.com/MeltanoLabs/Singer-Working-Group/issues/13) is a good summary of the current state and a proposal to change this behavior.
+
+*Problem: "My **runs take too long**."*
+
+This [issue provides a good overview on a strategy to figure out performance issues](https://github.com/meltano/meltano/issues/6613#issuecomment-1215074973).
+
+# How to Debug Problems
 
 ## Log Level Debug
 

@@ -23,7 +23,7 @@ export default {
     const payload = { role, user }
 
     return axios.delete(utils.apiUrl('settings', 'acl/roles'), {
-      data: payload
+      data: payload,
     })
   },
 
@@ -39,11 +39,11 @@ export default {
     const payload = { permissionType, role, context }
 
     return axios.delete(utils.apiUrl('settings', 'acl/roles/permissions'), {
-      data: payload
+      data: payload,
     })
   },
 
   saveConnection(connection) {
     return axios.post(utils.apiUrl('settings', 'save'), connection)
-  }
+  },
 }

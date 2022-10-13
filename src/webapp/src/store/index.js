@@ -15,7 +15,7 @@ export default new Vuex.Store({
     plugins,
     repos,
     settings,
-    system
+    system,
   },
-  strict: process.env.NODE_ENV !== 'production'
+  strict: process.env.NODE_ENV !== 'production',
 })

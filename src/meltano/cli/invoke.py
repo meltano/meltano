@@ -9,7 +9,7 @@ import sys
 import click
 from sqlalchemy.orm import sessionmaker
 
-from meltano.cli import cli
+from meltano.cli import activate_environment, cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd, propagate_stop_signals
 from meltano.core.db import project_engine
@@ -76,6 +76,7 @@ def invoke(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
+    activate_environment(ctx, project)
     tracker: Tracker = ctx.obj["tracker"]
 
     try:

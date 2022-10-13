@@ -1,4 +1,5 @@
 """Job management CLI."""
+
 from __future__ import annotations
 
 import json
@@ -6,6 +7,9 @@ import json
 import click
 import structlog
 
+from meltano.cli import CliError, activate_explicitly_provided_environment, cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedGroup, PartialInstrumentedCmd
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
@@ -15,10 +19,6 @@ from meltano.core.task_sets_service import (
     TaskSetsService,
 )
 from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
-
-from . import CliError, cli
-from .params import pass_project
-from .utils import InstrumentedGroup, PartialInstrumentedCmd
 
 logger = structlog.getLogger(__name__)
 
@@ -115,6 +115,7 @@ def job(project, ctx):
 
     \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
     """
+    activate_explicitly_provided_environment(ctx, project)
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 

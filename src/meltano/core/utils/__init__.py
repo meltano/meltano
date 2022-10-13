@@ -9,15 +9,18 @@ import logging
 import math
 import os
 import re
+import sys
 import traceback
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
 from pathlib import Path
-from typing import Any, Callable, Iterable, TypeVar
+from typing import Any, Callable, Iterable, TypeVar, overload
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
+
+from meltano.core.error import MeltanoError
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -32,6 +35,11 @@ try:
     asyncio_all_tasks = asyncio.all_tasks
 except AttributeError:
     asyncio_all_tasks = asyncio.Task.all_tasks
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 
 class NotFound(Exception):
@@ -288,7 +296,22 @@ def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 
 
-def coerce_datetime(d: date | datetime) -> datetime | None:
+@overload
+def coerce_datetime(d: None) -> None:
+    ...  # noqa: WPS428
+
+
+@overload
+def coerce_datetime(d: datetime) -> datetime:
+    ...  # noqa: WPS428
+
+
+@overload
+def coerce_datetime(d: date) -> datetime:
+    ...  # noqa: WPS428
+
+
+def coerce_datetime(d):
     """Add a `time` component to `d` if it is missing.
 
     Args:
@@ -306,7 +329,17 @@ def coerce_datetime(d: date | datetime) -> datetime | None:
     return datetime.combine(d, time())
 
 
-def iso8601_datetime(d: str) -> datetime | None:
+@overload
+def iso8601_datetime(d: None) -> None:
+    ...  # noqa: WPS428
+
+
+@overload
+def iso8601_datetime(d: str) -> datetime:
+    ...  # noqa: WPS428
+
+
+def iso8601_datetime(d):
     if d is None:
         return None
 
@@ -326,7 +359,15 @@ def iso8601_datetime(d: str) -> datetime | None:
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
-def find_named(xs: Iterable[dict], name: str, obj_type: type = None) -> dict:
+class _GetItemProtocol(Protocol):
+    def __getitem__(self, key: str) -> str:
+        ...  # noqa: WPS428
+
+
+_G = TypeVar("_G", bound=_GetItemProtocol)
+
+
+def find_named(xs: Iterable[_G], name: str, obj_type: type = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:
@@ -409,7 +450,7 @@ def set_at_path(d, path, value):
     final[tail] = value
 
 
-class EnvironmentVariableNotSetError(Exception):
+class EnvironmentVariableNotSetError(MeltanoError):
     """Occurs when a referenced environment variable is not set."""
 
     def __init__(self, env_var: str):
@@ -418,12 +459,11 @@ class EnvironmentVariableNotSetError(Exception):
         Args:
             env_var: The unset environment variable name.
         """
-        super().__init__(env_var)
         self.env_var = env_var
 
-    def __str__(self) -> str:
-        """Return the error as a string."""  # noqa: DAR201
-        return f"{self.env_var} referenced but not set."
+        reason = f"Environment variable '{env_var}' referenced but not set"
+        instruction = "Make sure the environment variable is set"
+        super().__init__(reason, instruction)
 
 
 def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):

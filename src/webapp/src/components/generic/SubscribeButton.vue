@@ -9,21 +9,21 @@ export default {
   props: {
     eventType: { type: String, required: true },
     sourceType: { type: String, default: null },
-    sourceId: { type: String, default: null }
+    sourceId: { type: String, default: null },
   },
 
   data() {
     return {
       model: {
-        recipient: null
-      }
+        recipient: null,
+      },
     }
   },
 
   computed: {
     isValid() {
       return utils.isValidEmail(this.model.recipient)
-    }
+    },
   },
 
   methods: {
@@ -37,9 +37,9 @@ export default {
         eventType: this.eventType,
         sourceType: this.sourceType,
         sourceId: this.sourceId,
-        ...this.model
+        ...this.model,
       })
-        .then(response => {
+        .then((response) => {
           const { recipient } = response.data
           Vue.toasted.global.success(`Subscription created for '${recipient}'.`)
         })
@@ -49,8 +49,8 @@ export default {
 
     reset() {
       this.model.recipient = null
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -79,9 +79,7 @@ export default {
             <span class="icon is-small">
               <font-awesome-icon icon="bell" />
             </span>
-            <span>
-              Notify me
-            </span>
+            <span> Notify me </span>
           </button>
         </div>
       </div>
