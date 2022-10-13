@@ -131,23 +131,23 @@ class Project(Versioned):  # noqa: WPS214
         try:
             # check if running on Windows
             if os.name == "nt":
-                executable = Path(os.path.dirname(sys.executable), "meltano.exe")
-                # See if the user is part of the at leas the local administrator group
-                is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
-                # Only users who have amdin privilages are able to create symlinks
-                if is_admin:
+                executable = Path(sys.executable).parent / "meltano.exe"
+                # Admin privileges are required to create symlinks on Windows
+                if ctypes.windll.shell32.IsUserAnAdmin() != 0:
                     if executable.is_file():
                         project.run_dir().joinpath("bin").symlink_to(executable)
                     else:
                         logger.debug(
-                            f"Could not create symlink: meltano.exe not present in:\n{str(Path(os.path.dirname(sys.executable)))}"
+                            "Could not create symlink: meltano.exe not "
+                            f"present in {str(Path(sys.executable).parent)!r}"
                         )
                 else:
                     logger.debug(
-                        "Could not create symlink: The creation of a symlink requires administrator previlages"
+                        "Failed to create symlink to 'meltano.exe': "
+                        "administrator privilege required"
                     )
             else:
-                executable = Path(os.path.dirname(sys.executable), "meltano")
+                executable = Path(sys.executable).parent / "meltano"
                 if executable.is_file():
                     project.run_dir().joinpath("bin").symlink_to(executable)
         except FileExistsError:
