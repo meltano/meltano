@@ -133,7 +133,7 @@ class Project(Versioned):  # noqa: WPS214
             if os.name == "nt":
                 executable = Path(sys.executable).parent / "meltano.exe"
                 # Admin privileges are required to create symlinks on Windows
-                if ctypes.windll.shell32.IsUserAnAdmin() != 0:
+                if ctypes.windll.shell32.IsUserAnAdmin():
                     if executable.is_file():
                         project.run_dir().joinpath("bin").symlink_to(executable)
                     else:
