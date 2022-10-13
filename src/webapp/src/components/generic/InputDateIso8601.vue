@@ -8,12 +8,12 @@ export default {
     inputClasses: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
     name: { type: String, default: '' },
-    value: { type: String, default: '' }
+    value: { type: String, default: '' },
   },
   computed: {
     getInputDateMeta() {
       return utils.getInputDateMeta()
-    }
+    },
   },
   methods: {
     formatDateStringYYYYMMDD(val) {
@@ -30,8 +30,8 @@ export default {
     updateValue(val) {
       // Val is already formatted as YYYY-MM-DD
       this.$emit('input', val || null)
-    }
-  }
+    },
+  },
 }
 </script>
 

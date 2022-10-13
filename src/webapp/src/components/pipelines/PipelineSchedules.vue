@@ -6,11 +6,11 @@ export default {
   name: 'PipelineSchedules',
   components: {
     ScheduleTableHead,
-    Pipeline
+    Pipeline,
   },
   props: {
-    pipelines: { type: Array, required: true, default: () => [] }
-  }
+    pipelines: { type: Array, required: true, default: () => [] },
+  },
 }
 </script>
 

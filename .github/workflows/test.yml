@@ -66,7 +66,7 @@ jobs:
       uses: actions/checkout@v3.0.2
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4.2.0
+      uses: actions/setup-python@v4.3.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
@@ -223,7 +223,7 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v4.2.0
+      uses: actions/setup-python@v4.3.0
       with:
         python-version: '3.9'
         cache: 'poetry'
@@ -253,7 +253,7 @@ jobs:
         poetry run coverage xml --ignore-errors
 
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3.1.0
+      uses: codecov/codecov-action@v3.1.1
 
   mypy:
     name: "Static type checking"
@@ -266,7 +266,7 @@ jobs:
       uses: actions/checkout@v3.0.2
 
     - name: Setup Python 3.9
-      uses: actions/setup-python@v4.2.0
+      uses: actions/setup-python@v4.3.0
       with:
         python-version: '3.9'
         architecture: x64

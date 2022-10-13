@@ -4,7 +4,7 @@
    or from webpack in development.
 */
 
-export default function() {
+export default function () {
   return (
     window.FLASK || {
       appUrl: process.env.MELTANO_APP_URL,
@@ -19,7 +19,7 @@ export default function() {
       isAnonymousReadonlyEnabled: false,
       isSendAnonymousUsageStats: false,
       projectId: 'none',
-      version: 'source'
+      version: 'source',
     }
   )
 }

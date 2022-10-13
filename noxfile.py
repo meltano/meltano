@@ -94,6 +94,7 @@ def mypy(session: Session) -> None:
     session.install(
         "mypy",
         "sqlalchemy2-stubs",
+        "types-croniter",
         "types-requests",
     )
     session.run("mypy", *args)

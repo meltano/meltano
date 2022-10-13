@@ -13,6 +13,7 @@ from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
+import sqlalchemy
 from sqlalchemy import Column, MetaData, func, types
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.ext.declarative import declarative_base
@@ -332,7 +333,7 @@ def upgrade():
     dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
     conn = op.get_bind()
-    inspector = Inspector.from_engine(conn)
+    inspector = sqlalchemy.inspect(conn)
     if "state" in inspector.get_table_names():
         op.drop_table("state")
     op.create_table(

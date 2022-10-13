@@ -11,3 +11,15 @@
 
 # [build.environment] # not sure if we'll need to specify a version
   # RUBY_VERSION = "some.version.of.ruby"
+
+[[redirects]]
+  from = "http://melta.no/*"
+  to = "https://docs.meltano.com/guide/troubleshooting/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://melta.no/*"
+  to = "https://docs.meltano.com/guide/troubleshooting/:splat"
+  status = 301
+  force = true
