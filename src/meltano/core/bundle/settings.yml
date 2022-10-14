@@ -1,7 +1,7 @@
 settings:
 # Project
 - name: default_environment
-  value: dev
+  value: null
 - name: send_anonymous_usage_stats
   kind: boolean
   value: true

@@ -11,6 +11,7 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -100,12 +101,7 @@ def cli(  # noqa: WPS231
         elif project_setting_service.get("default_environment"):
             selected_environment = project_setting_service.get("default_environment")
             is_default_environment = True
-        # activate environment
-        if selected_environment:
-            project.activate_environment(selected_environment)
-            logger.info(
-                "Environment '%s' is active", selected_environment  # noqa: WPS323
-            )
+        ctx.obj["selected_environment"] = selected_environment
         ctx.obj["is_default_environment"] = is_default_environment
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
@@ -123,3 +119,49 @@ def cli(  # noqa: WPS231
             "For more details, visit https://docs.meltano.com/guide/installation#upgrading-meltano-version"
         )
         sys.exit(3)
+
+
+def activate_environment(
+    ctx: click.Context, project: Project, required: bool = False
+) -> None:
+    """Activate the selected environment.
+
+    The selected environment is whatever was selected with the `--environment`
+    option, or the default environment (set in `meltano.yml`) otherwise.
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["selected_environment"]:
+        project.activate_environment(ctx.obj["selected_environment"])
+    elif required:
+        raise MeltanoConfigurationError(
+            reason="A Meltano environment must be specified",
+            instruction="Set the `default_environment` option in "
+            "`meltano.yml`, or the `--environment` CLI option",
+        )
+
+
+def activate_explicitly_provided_environment(
+    ctx: click.Context, project: Project
+) -> None:
+    """Activate the selected environment if it has been explicitly set.
+
+    Some commands (e.g. `config`, `job`, etc.) do not respect the configured
+    `default_environment`, and will only run with an environment active if it
+    has been explicitly set (e.g. with the `--environment` CLI option).
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"The default environment {ctx.obj['selected_environment']!r} will "
+            f"be ignored for `meltano {ctx.command.name}`. To configure a specific "
+            "environment, please use the option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
+    else:
+        activate_environment(ctx, project)
