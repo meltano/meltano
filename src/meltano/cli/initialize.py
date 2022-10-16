@@ -53,7 +53,7 @@ def init(ctx, project_directory: Path, no_usage_stats):
     init_service = ProjectInitService(project_directory)
 
     project = init_service.init()
-    init_service.echo_instructions()
+    init_service.echo_instructions(project)
 
     # since the project didn't exist, tracking was not initialized in cli.py
     # but now that we've created a project we can set up telemetry and fire events.

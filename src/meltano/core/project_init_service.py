@@ -29,6 +29,11 @@ class ProjectInitService:
         """
         self.project_directory = Path(project_directory)
 
+        try:
+            self.project_directory = self.project_directory.relative_to(Path.cwd())
+        except ValueError:
+            pass
+
     def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
         """Initialise Meltano Project.
 
@@ -140,8 +145,12 @@ class ProjectInitService:
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err
 
-    def echo_instructions(self):
-        """Echo Next Steps to Click CLI."""
+    def echo_instructions(self, project: Project):
+        """Echo Next Steps to Click CLI.
+
+        Args:
+            project: Meltano project context
+        """
         click.secho(GREETING, nl=False)
         click.echo("Your project has been created!\n")
 
@@ -160,7 +169,7 @@ class ProjectInitService:
 
         click.echo("\nNext steps:")
 
-        if self.project_directory != Path.cwd():
+        if project.root != Path.cwd():
             click.secho("  cd ", nl=False)
             click.secho(self.project_directory, fg="magenta")
 
