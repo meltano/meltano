@@ -5,16 +5,15 @@ from contextlib import closing
 
 import click
 
+from meltano.cli import activate_explicitly_provided_environment, cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.project import Project
 from meltano.core.select_service import SelectService
 from meltano.core.utils import click_run_async
-
-from . import cli
-from .params import pass_project
-from .utils import CliError, InstrumentedCmd
 
 
 def selection_color(selection):
@@ -78,6 +77,7 @@ async def select(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#select
     """
+    activate_explicitly_provided_environment(ctx, project)
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])

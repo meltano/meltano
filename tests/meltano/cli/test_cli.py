@@ -94,7 +94,7 @@ class TestCli:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
-            ["discover"],
+            ["test"],
         )
         assert Project._default.active_environment.name == "test-meltano-environment"
 
@@ -104,7 +104,7 @@ class TestCli:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
-            ["--environment", "test-subconfig-2-yml", "discover"],
+            ["--environment", "test-subconfig-2-yml", "test"],
         )
 
         assert Project._default.active_environment.name == "test-subconfig-2-yml"
@@ -117,7 +117,7 @@ class TestCli:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
-            ["discover"],
+            ["test"],
         )
         assert Project._default.active_environment.name == "test-subconfig-2-yml"
 

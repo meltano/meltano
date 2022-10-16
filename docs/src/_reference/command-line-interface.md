@@ -101,6 +101,10 @@ meltano add extractor tap-spotify --no-install
 
 - `--no-install`: Do not install the plugin after adding it to the project.
 
+### Using `add` with Environments
+
+The `add` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 ## `config`
 
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
@@ -217,11 +221,7 @@ meltano config <plugin> set <property>.<deep>.<nesting> <value>
 
 ### Using `config` with Environments
 
-If you have multiple [Meltano Environments](/concepts/environments) you can specify the environment name:
-
-```bash
-meltano --environment=<ENVIRONMENT> config <plugin>
-```
+The `config` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
 
 <br>
 > Note: Unlike other commands like [`meltano run`](#run) and [`meltano invoke`](#invoke), the `meltano config` command ignores any configured [default environment](/concepts/environments#default-environment).
@@ -291,6 +291,11 @@ meltano discover extractors
 meltano discover loaders
 
 ```
+
+### Using `discover` with Environments
+
+The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 
 ## `elt`
 
@@ -372,11 +377,7 @@ meltano elt tap-gitlab target-postgres --state-id=gitlab-to-postgres --dump=stat
 
 ### Using `elt` with Environments
 
-The `--environment` option can be passed to specify a [Meltano Environment](/concepts/environments) context for running.
-
-```bash
-meltano --environment=prod elt tap-gitlab target-postgres --transform=run --state-id=gitlab-to-postgres
-```
+The `elt` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
 ### Debugging
 
@@ -449,6 +450,10 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 If there is a value provided for `default_environment` in your `meltano.yml`, then these commands, with the exception of [`config`](#using-config-with-environments), will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided.
 If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
 
+### Using `discover` with Environments
+
+The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 ### Examples
 
 ```bash
@@ -517,6 +522,10 @@ meltano init demo-project # --no_usage_stats is implied
 meltano init .
 ```
 
+### Using `init` with Environments
+
+The `init` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag will be ignored if set.
+
 ## `install`
 
 Installs dependencies of your project based on the **meltano.yml** file.
@@ -569,6 +578,11 @@ meltano install --parallelism=16
 meltano install --clean
 ```
 
+### Using `install` with Environments
+
+The `install` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
+
 ## `invoke`
 
 Invoke the plugin's executable with specified arguments.
@@ -596,11 +610,7 @@ Like any standard output, the dumped content can be [redirected](<https://en.wik
 
 ### Using `invoke` with Environments
 
-If you have multiple [Meltano Environments](/concepts/environments) you can specify the environment name:
-
-```bash
-meltano --environment=<ENVIRONMENT> invoke <plugin> [PLUGIN]_ARGS...]
-```
+The `invoke` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
 ### Commands
 
@@ -670,6 +680,10 @@ meltano lock <name> <name_two> --plugin-type=<type>
 meltano lock --all --update
 ```
 
+### Using `lock` with Environments
+
+The `lock` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
@@ -687,6 +701,10 @@ Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from 
 meltano remove <type> <name>
 meltano remove <type> <name> <name_two>
 ```
+
+### Using `remove` with Environments
+
+The `remove` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
 ### Examples
 
@@ -731,8 +749,7 @@ meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
 
 #### Parameters
 
-When an active environment is present, `run` will attempt to run incrementally and save state by default.
-However, four top level flags are provided to alter behavior:
+`run` will attempt to run incrementally and save state by default. Four top level flags are provided to alter behavior:
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
   (implicitly enables --log-level=debug for 'console' named handlers).
@@ -762,13 +779,9 @@ meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-s
 
 ### Using `run` with Environments
 
-If you have multiple Meltano Environments you can specify the environment name:
 
-```bash
-meltano --environment=<ENVIRONMENT> run ...
-```
+The `run` command always requires a [Meltano Environment](https://docs.meltano.com/concepts/environments) to be set. The environment name can be provided using the `--environment` flag or with the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file.
 
-Note that if no environment is active, `meltano run` _does not_ generate a state ID and it does not track state.
 
 ## `job`
 
@@ -877,6 +890,10 @@ task 2: "meltano run dbt-postgres:run" , depends on task 1
 task 3: "meltano run custom-utility-plugin", depends on task 2
 ```
 
+### Using `job` with Environments
+
+The `job` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
+
 ### Examples
 
 ```bash
@@ -938,6 +955,10 @@ meltano schedule set <schedule_name> --extractor <new-tap> --interval <new-inter
 meltano schedule run <schedule_name>
 ```
 
+### Using `schedule` with Environments
+
+The `schedule` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
+
 ### Examples
 
 ```bash
@@ -990,11 +1011,7 @@ Use `--rm` or `--remove` to remove previously added select patterns.
 
 ### Using `select` with Environments
 
-If you have multiple [Meltano Environments](/concepts/environments) you can specify the environment name:
-
-```bash
-meltano --environment=<ENVIRONMENT> select <tap_name>
-```
+The `select` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
 
 ### Examples
 
@@ -1285,6 +1302,10 @@ echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.
 meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
 ```
 
+### Using `state` with Environments
+
+The `state` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
+
 ## `test`
 
 Run tests for one or more plugins. A test is any [command](/reference/command-line-interface#commands) with a name starting with `test`.
@@ -1304,6 +1325,10 @@ meltano test <plugin>:<test-name>
 # Run a named test for one or more plugins
 meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
 ```
+
+### Using `test` with Environments
+
+The `test` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
 ## `ui`
 
@@ -1348,6 +1373,10 @@ meltano ui setup [--bits=256] <server_name>
 meltano ui setup meltano.example.com
 ```
 
+### Using `ui` with Environments
+
+The `ui` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 ## `user`
 
 <div class="notification is-info">
@@ -1372,6 +1401,10 @@ Add the user to the role. Meltano ships with two built-in roles: `admin` and `re
 meltano user add admin securepassword --role admin
 ```
 
+### Using `user` with Environments
+
+The `user` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 ## `upgrade`
 
 Upgrade Meltano and your Meltano project to the latest version.
@@ -1392,6 +1425,11 @@ meltano upgrade package # Only upgrade Meltano package
 meltano upgrade files # Only update files managed by file bundles
 meltano upgrade database # Only apply migrations to system database
 ```
+
+### Using `upgrade` with Environments
+
+The `upgrade` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 
 ## `version`
 
