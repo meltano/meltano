@@ -27,13 +27,7 @@ class ProjectInitService:
         Args:
             project_directory: The directory path to create the project at
         """
-        self.project = Project(project_directory)
-        self.project_directory = self.project.root
-
-        try:
-            self.project_directory = self.project.root.relative_to(Path.cwd())
-        except ValueError:
-            pass
+        self.project_directory = Path(project_directory)
 
     def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
         """Initialise Meltano Project.
@@ -64,9 +58,11 @@ class ProjectInitService:
                 f"Could not create directory '{self.project_directory}'. {ex}"
             ) from ex
 
-        self.create_files(add_discovery=add_discovery)
+        project = Project(self.project_directory)
 
-        self.settings_service = ProjectSettingsService(self.project)
+        self.create_files(project, add_discovery=add_discovery)
+
+        self.settings_service = ProjectSettingsService(project)
         self.settings_service.set(
             "project_id",
             str(uuid.uuid4()),
@@ -74,34 +70,39 @@ class ProjectInitService:
         )
         self.set_send_anonymous_usage_stats()
         if activate:
-            Project.activate(self.project)
+            Project.activate(project)
 
-        self.create_system_database()
+        self.create_system_database(project)
 
-        return self.project
+        return project
 
-    def create_dot_meltano_dir(self):
-        """Create .meltano directory."""
+    def create_dot_meltano_dir(self, project: Project):
+        """Create .meltano directory.
+
+        Args:
+            project: Meltano project context
+        """
         # explicitly create the .meltano directory if it doesn't exist
-        os.makedirs(self.project.meltano_dir(), exist_ok=True)
+        os.makedirs(project.meltano_dir(), exist_ok=True)
         click.secho("   |--", fg="blue", nl=False)
-        click.echo(f" {self.project.meltano_dir().name}")
+        click.echo(f" {project.meltano_dir().name}")
 
-    def create_files(self, add_discovery=False):
+    def create_files(self, project: Project, add_discovery=False):
         """Create project files.
 
         Args:
+            project: Meltano project context
             add_discovery: Add discovery.yml file to created project
         """
         click.secho("Creating project files...", fg="blue")
 
-        if self.project.root != Path.cwd():
+        if project.root != Path.cwd():
             click.echo(f"  {self.project_directory}/")
 
-        self.create_dot_meltano_dir()
+        self.create_dot_meltano_dir(project)
 
         plugin = MeltanoFilePlugin(discovery=add_discovery)
-        for path in plugin.create_files(self.project):
+        for path in plugin.create_files(project):
             click.secho("   |--", fg="blue", nl=False)
             click.echo(f" {path}")
 
@@ -115,8 +116,11 @@ class ProjectInitService:
                 store=SettingValueStore.MELTANO_YML,
             )
 
-    def create_system_database(self):
+    def create_system_database(self, project: Project):
         """Create Meltano System DB.
+
+        Args:
+            project: Meltano project context
 
         Raises:
             ProjectInitServiceError: Database initialization failed
@@ -124,14 +128,14 @@ class ProjectInitService:
         click.secho("Creating system database...", fg="blue", nl=False)
 
         # register the system database connection
-        engine, _ = project_engine(self.project, default=True)
+        engine, _ = project_engine(project, default=True)
 
         from meltano.core.migration_service import MigrationError, MigrationService
 
         try:
             migration_service = MigrationService(engine)
             migration_service.upgrade(silent=True)
-            migration_service.seed(self.project)
+            migration_service.seed(project)
             click.secho("  Done!", fg="blue")
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err
@@ -156,7 +160,7 @@ class ProjectInitService:
 
         click.echo("\nNext steps:")
 
-        if self.project.root != Path.cwd():
+        if self.project_directory != Path.cwd():
             click.secho("  cd ", nl=False)
             click.secho(self.project_directory, fg="magenta")
 
