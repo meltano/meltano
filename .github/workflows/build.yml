@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.1.0
 
     - name: Setup Poetry
       uses: snok/install-poetry@v1
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.1.0
 
     - name: Download artifacts
       uses: actions/download-artifact@v3.0.0
