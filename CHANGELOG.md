@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.7.3 (2022-10-17)
+
+### 🐛 Fixes
+
+- [#6877](https://github.com/meltano/meltano/issues/6877) Make default `default_environment` null
+- [#6862](https://github.com/meltano/meltano/issues/6862) Ignore default environment for some commands
+- [#6751](https://github.com/meltano/meltano/issues/6751) Catch ConnectionError in /version endpoint -- _**Thanks @dingobar!**_
+
+### 📚 Documentation Improvements
+
+- [#6875](https://github.com/meltano/meltano/issues/6875) Add common problems
+- [#6703](https://github.com/meltano/meltano/issues/6703) Update custom extractor tutorial -- _**Thanks @jared-rimmer!**_
+- [#6852](https://github.com/meltano/meltano/issues/6852) Add giffy to title
+- [#6844](https://github.com/meltano/meltano/issues/6844) Update `2.5.0` changelog to reflect breaking change
+
 ## v2.7.2 (2022-10-03)
 
 ### 🐛 Fixes
