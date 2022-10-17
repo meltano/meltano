@@ -304,7 +304,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             click.secho(
                 "There are no settings to configure. "
                 "For help, please see https://melta.no#no-plugin-settings-defined",
-                fg="yellow"
+                fg="yellow",
             )
             self.tracker.track_command_event(CliEvent.completed)
             return
