@@ -301,7 +301,11 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         """Configure all settings."""
         numeric_choices = [idx for idx, _, _ in self.setting_choices]
         if not numeric_choices:
-            click.secho("There are no settings to configure.", fg="yellow")
+            click.secho(
+                "There are no settings to configure. "
+                "For help, please see https://melta.no#no-plugin-settings-defined",
+                fg="yellow"
+            )
             self.tracker.track_command_event(CliEvent.completed)
             return
 
