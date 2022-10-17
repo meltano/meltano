@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#6877](https://github.com/meltano/meltano/issues/6877) Make default `default_environment` null
 - [#6862](https://github.com/meltano/meltano/issues/6862) Ignore default environment for some commands
-- [#6751](https://github.com/meltano/meltano/issues/6751) Catch ConnectionError in /version endpoint -- _**Thanks @dingobar!**_
+- [#6751](https://github.com/meltano/meltano/issues/6751) Catch `ConnectionError` in `/version` endpoint -- _**Thanks @dingobar!**_
 
 ### 📚 Documentation Improvements
 
