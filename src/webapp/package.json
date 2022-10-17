@@ -51,7 +51,7 @@
     "babel-jest": "^23.6.0",
     "chart.js": "^2.8.0",
     "cypress": "^3.4.1",
-    "eslint": "^8.24.0",
+    "eslint": "^7.32.0",
     "eslint-plugin-vue": "^9.5.1",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^8.1.5",
