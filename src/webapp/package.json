@@ -60,7 +60,8 @@
     "sass-loader": "^8.0.0",
     "sql-formatter": "^2.3.3",
     "ssf": "^0.10.2",
-    "vue-template-compiler": "^2.6.10",
+    "vue-jest": "^3.0.7",
+    "vue-template-compiler": "^2.7.13",
     "vue-toasted": "^1.1.27",
     "vuedraggable": "^2.23.0"
   },
