@@ -28,6 +28,8 @@ Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet 
 <div class="termy">
 
 ```console
+$ pip install --upgrade pip
+Requirement already satisfied.
 $ pip install "meltano"
 ---> 100%
 successfully installed meltano
