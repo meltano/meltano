@@ -6,6 +6,7 @@ Create Date: 2020-02-12 09:29:31.592426
 
 """
 import sqlalchemy as sa
+import sqlalchemy.orm
 from alembic import op
 
 from meltano.migrations.utils.dialect_typing import (
