@@ -137,12 +137,12 @@ class Project(Versioned):  # noqa: WPS214
                     if executable.is_file():
                         project.run_dir().joinpath("bin").symlink_to(executable)
                     else:
-                        logger.debug(
+                        logger.warn(
                             "Could not create symlink: meltano.exe not "
-                            f"present in {str(Path(sys.executable).parent)!r}"
+                            f"present in {str(Path(sys.executable).parent)}"
                         )
                 else:
-                    logger.debug(
+                    logger.warn(
                         "Failed to create symlink to 'meltano.exe': "
                         "administrator privilege required"
                     )
