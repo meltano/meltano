@@ -81,7 +81,7 @@ _To learn more about Meltano projects, refer to the [Projects concept doc](/conc
 1. Initialize a new project in a directory of your choosing using [`meltano init`](/reference/command-line-interface#init):
 
    ```bash
-   meltano init <project directory name>
+   meltano init <project directory path>
 
    # For example:
    meltano init my-meltano-project
