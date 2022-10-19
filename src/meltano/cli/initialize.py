@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 import click
 
@@ -18,25 +19,28 @@ LOADERS = "loaders"
 ALL = "all"
 
 logger = logging.getLogger(__name__)
+path_type = click.Path(file_okay=False, path_type=Path)
 
 
 @cli.command(cls=InstrumentedCmd, short_help="Create a new Meltano project.")
 @click.pass_context
-@click.argument("project_name", required=False)
+@click.argument("project_directory", required=False, type=path_type)
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
 @database_uri_option
-def init(ctx, project_name, no_usage_stats):
+def init(ctx, project_directory: Path, no_usage_stats):
     """
     Create a new Meltano project.
 
     Read more at https://docs.meltano.com/reference/command-line-interface#init
 
     """
-    if not project_name:
+    if not project_directory:
         click.echo("We need a project name to get started!")
-        project_name = click.prompt("Enter a name now to create a Meltano project")
+        project_directory = click.prompt(
+            "Enter a name now to create a Meltano project", type=path_type
+        )
 
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
@@ -46,10 +50,10 @@ def init(ctx, project_name, no_usage_stats):
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
 
-    init_service = ProjectInitService(project_name)
+    init_service = ProjectInitService(project_directory)
 
     project = init_service.init()
-    init_service.echo_instructions()
+    init_service.echo_instructions(project)
 
     # since the project didn't exist, tracking was not initialized in cli.py
     # but now that we've created a project we can set up telemetry and fire events.

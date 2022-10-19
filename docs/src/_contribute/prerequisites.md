@@ -92,8 +92,8 @@ Our end-to-end tests are currently being built with [Cypress](https://www.cypres
 
 #### How to Run Tests
 
-1. Initialize a new meltano project with `meltano init $PROJECT_NAME`
-1. Change directory into `$PROJECT_NAME`
+1. Initialize a new meltano project with `meltano init $PROJECT_DIRECTORY`
+1. Change directory into `$PROJECT_DIRECTORY`
 1. Start up project with `meltano ui`
 1. Clone Meltano repo
 1. Open Meltano repo in Terminal
