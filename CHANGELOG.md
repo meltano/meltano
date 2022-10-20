@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.8.1 (2022-10-20)
+
+### 🐛 Fixes
+
+- [#6468](https://github.com/meltano/meltano/issues/6468) Symbolic link creation for meltano.exe when on windows -- _**Thanks @BuzzCutNorman!**_
+
 ## v2.8.0 (2022-10-17)
 
 ### ✨ New

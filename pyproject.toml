@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.8.0"
+version = "2.8.1"
 description = "Meltano: Your DataOps Platform Infrastructure"
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -170,7 +170,7 @@ exclude_lines = [
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "2.8.0"
+version = "2.8.1"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
     "pyproject.toml:^version =",
