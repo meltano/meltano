@@ -65,6 +65,7 @@ class ProjectInitService:
 
         project = Project(self.project_directory)
 
+        self.create_dot_meltano_dir(project)
         self.create_files(project, add_discovery=add_discovery)
 
         self.settings_service = ProjectSettingsService(project)
@@ -88,9 +89,10 @@ class ProjectInitService:
             project: Meltano project context
         """
         # explicitly create the .meltano directory if it doesn't exist
+        click.secho("Creating .meltano folder", fg="blue")
         os.makedirs(project.meltano_dir(), exist_ok=True)
-        click.secho("   |--", fg="blue", nl=False)
-        click.echo(f" {project.meltano_dir().name}")
+        click.secho("created", fg="blue", nl=False)
+        click.echo(f" .meltano in {project.sys_dir_root}")
 
     def create_files(self, project: Project, add_discovery=False):
         """Create project files.
@@ -103,8 +105,6 @@ class ProjectInitService:
 
         if project.root != Path.cwd():
             click.echo(f"  {self.project_directory}/")
-
-        self.create_dot_meltano_dir(project)
 
         plugin = MeltanoFilePlugin(discovery=add_discovery)
         for path in plugin.create_files(project):

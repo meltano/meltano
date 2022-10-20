@@ -140,7 +140,7 @@ export MELTANO_PROJECT_ID='<unique identifier>'
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DATABASE_URI`
 - `meltano *` CLI option: `--database-uri`
-- Default: `sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db`
+- Default: `sqlite:///$MELTANO_SYS_DIR_ROOT/meltano.db`
 
 Meltano stores various types of metadata in a project-specific [system database](/concepts/project#system-database),
 that takes the shape of a SQLite database stored inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/meltano.db` by default.
