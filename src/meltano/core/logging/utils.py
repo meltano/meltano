@@ -72,7 +72,7 @@ def default_config(log_level: str, no_color: bool | None = None) -> dict:
         no_color: Enabled no color mode, or None to auto detect. Defaults to None.
 
     Returns:
-         dict: logging config suitable for use with logging.config.dictConfig
+         A logging config suitable for use with `logging.config.dictConfig`.
     """
     if no_color:
         formatter = rich_exception_formatter_factory(no_color=True)
