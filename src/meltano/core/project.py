@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
 PROJECT_ENVIRONMENT_ENV = "MELTANO_ENVIRONMENT"
 PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
+PROJECT_SYS_DIR_ROOT = "MELTANO_SYS_DIR_ROOT"
 
 
 class ProjectNotFound(Error):
@@ -90,6 +91,9 @@ class Project(Versioned):  # noqa: WPS214
             root: the root directory for the project
         """
         self.root = Path(root).resolve()
+        self.sys_dir_root = Path(
+            os.getenv(PROJECT_SYS_DIR_ROOT, self.root / ".meltano")
+        ).resolve()
         self.readonly = False
         self.active_environment: Environment | None = None
 
@@ -110,6 +114,7 @@ class Project(Versioned):  # noqa: WPS214
         return {
             PROJECT_ROOT_ENV: str(self.root),
             PROJECT_ENVIRONMENT_ENV: environment_name,
+            PROJECT_SYS_DIR_ROOT: str(self.sys_dir_root),
         }
 
     @classmethod
@@ -123,13 +128,33 @@ class Project(Versioned):  # noqa: WPS214
         Raises:
             OSError: if project cannot be activated due to unsupported OS
         """
+        import ctypes
+
         project.ensure_compatible()
 
         # create a symlink to our current binary
         try:
-            executable = Path(os.path.dirname(sys.executable), "meltano")
-            if executable.is_file():
-                project.run_dir().joinpath("bin").symlink_to(executable)
+            # check if running on Windows
+            if os.name == "nt":
+                executable = Path(sys.executable).parent / "meltano.exe"
+                # Admin privileges are required to create symlinks on Windows
+                if ctypes.windll.shell32.IsUserAnAdmin():
+                    if executable.is_file():
+                        project.run_dir().joinpath("bin").symlink_to(executable)
+                    else:
+                        logger.warn(
+                            "Could not create symlink: meltano.exe not "
+                            f"present in {str(Path(sys.executable).parent)}"
+                        )
+                else:
+                    logger.warn(
+                        "Failed to create symlink to 'meltano.exe': "
+                        "administrator privilege required"
+                    )
+            else:
+                executable = Path(sys.executable).parent / "meltano"
+                if executable.is_file():
+                    project.run_dir().joinpath("bin").symlink_to(executable)
         except FileExistsError:
             pass
         except OSError as error:
@@ -374,7 +399,7 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Resolved path to `.meltano` dir optionally joined to given paths.
         """
-        return self.root.joinpath(".meltano", *joinpaths)
+        return self.sys_dir_root.joinpath(*joinpaths)
 
     @makedirs
     def analyze_dir(self, *joinpaths, make_dirs: bool = True):
