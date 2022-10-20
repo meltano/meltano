@@ -13,7 +13,6 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 The following options are available for all `meltano` subcommands:
 
-* `--enviroment` - The [Meltano Environment](/concepts/environments) to use. Defaults to `dev`. Can also be set with the `MELTANO_ENVIRONMENT` environment variable.
 * `--log-config` - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
 * `--log-level`: Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
 * `--no-color`: Disable colored output. Can also be set by setting the `NO_COLOR` environment variable to `True`.
