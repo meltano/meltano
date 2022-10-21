@@ -246,7 +246,7 @@ Friendly description of the command.
 
 ### `commands.<command_name>.executable`
 
-Optionally, override the default `executable` of the plugin.
+Optionally, override the plugin's default `executable` when running this command.
 
 ### `commands.<command_name>.container_spec`
 
