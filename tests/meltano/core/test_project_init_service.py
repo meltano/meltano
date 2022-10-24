@@ -61,6 +61,19 @@ def test_project_init_non_empty_directory(tmp_path: Path, pushd):
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
 
 
+def test_project_init_non_empty_directory_force(tmp_path: Path, pushd):
+    projects_dir = tmp_path.joinpath("exists")
+    projects_dir.mkdir()
+    pushd(projects_dir)
+
+    project_dir = projects_dir.joinpath("test_project")
+    project_dir.joinpath("test").mkdir(parents=True)
+
+    ProjectInitService(project_dir).init(
+        activate=False, add_discovery=False, force=True
+    )
+
+
 def test_project_init_no_write_permission(tmp_path: Path, pushd):
     if platform.system() == "Windows":
         pytest.xfail(

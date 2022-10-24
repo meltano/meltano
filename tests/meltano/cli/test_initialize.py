@@ -7,10 +7,16 @@ from meltano.core.project import Project, ProjectNotFound
 
 
 class TestCliInit:
-    def test_init(self, cli_runner, tmp_path_factory, pushd):  # noqa: WPS210
+    @pytest.fixture(autouse=True)
+    def new_project_root(self, tmp_path_factory, pushd):
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
 
+        yield new_project_root
+
+        Project.deactivate()
+
+    def test_init(self, cli_runner, pushd):  # noqa: WPS210
         # there are no project actually
         assert Project._default is None
         with pytest.raises(ProjectNotFound):
@@ -22,9 +28,6 @@ class TestCliInit:
         pushd("test_project")
 
         project = Project.find()
-
-        # Deactivate project
-        Project.deactivate()
 
         files = (
             project.root.joinpath(file).resolve()
@@ -54,21 +57,12 @@ class TestCliInit:
         assert "send_anonymous_usage_stats: false" in meltano_yml
         assert "project_id:" in meltano_yml
 
-    def test_init_existing_empty_directory(self, cli_runner, tmp_path_factory, pushd):
-        new_project_root = tmp_path_factory.mktemp("new_meltano_root")
-        pushd(new_project_root)
-
-        # create project in empty current working directory
+    def test_init_empty_current_working_directory(self, cli_runner):
         result = cli_runner.invoke(cli, ["init", ".", "--no_usage_stats"])
         assert "Creating project files...\n  ./" not in result.output
         assert "cd ." not in result.output
 
-        Project.deactivate()
-
-        new_project_root = tmp_path_factory.mktemp("new_meltano_root")
-        pushd(new_project_root)
-
-        # create project in another empty directory
+    def test_init_empty_directory(self, new_project_root, cli_runner):
         project_dir = new_project_root.joinpath("test_project")
         project_dir.mkdir()
         assert project_dir.exists()
@@ -77,4 +71,13 @@ class TestCliInit:
         assert "Creating project files...\n  test_project/" in result.output
         assert "cd test_project" in result.output
 
-        Project.deactivate()
+    def test_init_non_empty_directory_force(self, new_project_root, cli_runner):
+        project_dir = new_project_root.joinpath("test_project")
+        project_dir.mkdir()
+        project_dir.joinpath(".git").mkdir()
+
+        result = cli_runner.invoke(
+            cli, ["init", "test_project", "--force", "--no_usage_stats"]
+        )
+        assert "Creating project files...\n  test_project/" in result.output
+        assert "cd test_project" in result.output

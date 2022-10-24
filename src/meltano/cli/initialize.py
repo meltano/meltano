@@ -26,10 +26,16 @@ path_type = click.Path(file_okay=False, path_type=Path)
 @click.pass_context
 @click.argument("project_directory", required=False, type=path_type)
 @click.option(
+    "-f",
+    "--force",
+    help="Ignore existing files/directories within the project directory, if it exists.",
+    is_flag=True,
+)
+@click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
 @database_uri_option
-def init(ctx, project_directory: Path, no_usage_stats):
+def init(ctx, project_directory: Path, force: bool, no_usage_stats):
     """
     Create a new Meltano project.
 
@@ -52,7 +58,7 @@ def init(ctx, project_directory: Path, no_usage_stats):
 
     init_service = ProjectInitService(project_directory)
 
-    project = init_service.init()
+    project = init_service.init(force=force)
     init_service.echo_instructions(project)
 
     # since the project didn't exist, tracking was not initialized in cli.py

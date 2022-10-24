@@ -34,12 +34,15 @@ class ProjectInitService:
         except ValueError:
             pass
 
-    def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
+    def init(
+        self, activate: bool = True, add_discovery: bool = False, force: bool = False
+    ) -> Project:
         """Initialise Meltano Project.
 
         Args:
             activate: Activate newly created project
             add_discovery: Add discovery.yml file to created project
+            force: Ignore existing files/directories within the project directory, if it exists
 
         Returns:
             A new Project instance
@@ -50,7 +53,7 @@ class ProjectInitService:
         try:
             self.project_directory.mkdir()
         except FileExistsError as ex:
-            if any(self.project_directory.iterdir()):
+            if not force and any(self.project_directory.iterdir()):
                 raise ProjectInitServiceError(
                     f"Directory '{self.project_directory}' not empty."
                 ) from ex
