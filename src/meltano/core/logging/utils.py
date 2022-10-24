@@ -18,6 +18,7 @@ from meltano.core.logging.formatters import (
 )
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import get_no_color_flag
 
 try:
     from typing import Protocol  # noqa: WPS433
@@ -64,16 +65,17 @@ def read_config(config_file: str | None = None) -> dict:
         return None
 
 
-def default_config(log_level: str, no_color: bool | None = None) -> dict:
+def default_config(log_level: str) -> dict:
     """Generate a default logging config.
 
     Args:
         log_level: set log levels to provided level.
-        no_color: Enabled no color mode, or None to auto detect. Defaults to None.
 
     Returns:
          A logging config suitable for use with `logging.config.dictConfig`.
     """
+    no_color = get_no_color_flag()
+
     if no_color:
         formatter = rich_exception_formatter_factory(no_color=True)
     else:
@@ -86,7 +88,7 @@ def default_config(log_level: str, no_color: bool | None = None) -> dict:
             "colored": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.dev.ConsoleRenderer(
-                    colors=no_color is not True,
+                    colors=not no_color,
                     exception_formatter=formatter,
                 ),
                 "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
@@ -142,7 +144,7 @@ def setup_logging(  # noqa: WPS210
         root.removeHandler(handler)
         handler.close()
 
-    log_level = DEFAULT_LEVEL.upper()
+    log_level = log_level.upper()
     log_config = None
 
     if project:

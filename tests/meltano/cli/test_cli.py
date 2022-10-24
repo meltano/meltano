@@ -175,22 +175,14 @@ class TestCli:
 )
 class TestCliColors:
     @pytest.mark.parametrize(
-        "no_color_flag,env,colors_expected",
+        "env,colors_expected",
         [
             pytest.param(
-                False,
                 {},
                 True,
                 id="colors-enabled-by-default",
             ),
             pytest.param(
-                True,
-                {},
-                False,
-                id="colors-disabled-by-no-color-flag",
-            ),
-            pytest.param(
-                False,
                 {
                     "NO_COLOR": "1",
                 },
@@ -199,7 +191,7 @@ class TestCliColors:
             ),
         ],
     )
-    def test_no_color(self, cli_runner, no_color_flag, env, colors_expected):
+    def test_no_color(self, cli_runner, env, colors_expected):
         text = "This is a test"
         styled_text = click.style(text, fg="red")
 
@@ -210,9 +202,6 @@ class TestCliColors:
 
         args = ["dummy"]
         expected_text = styled_text if colors_expected else text
-
-        if no_color_flag:
-            args = ["--no-color"] + args
 
         with cli_runner.isolated_filesystem():
             result = cli_runner.invoke(cli, args, color=True, env=env)

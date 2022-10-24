@@ -16,6 +16,7 @@ from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import CliContext, Tracker
+from meltano.core.utils import get_no_color_flag
 
 logger = logging.getLogger(__name__)
 
@@ -55,13 +56,6 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.option(
     "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
-@click.option(
-    "--no-color",
-    is_flag=True,
-    default=False,
-    help="Disable colored output.",
-    envvar="NO_COLOR",
-)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(  # noqa: WPS231
@@ -71,7 +65,6 @@ def cli(  # noqa: WPS231
     verbose: int,
     environment: str,
     no_environment: bool,
-    no_color: bool,
 ):  # noqa: WPS231
     """
     ELT for the DataOps era.
@@ -87,6 +80,8 @@ def cli(  # noqa: WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["verbosity"] = verbose
+
+    no_color = get_no_color_flag()
     if no_color:
         ctx.color = False
 

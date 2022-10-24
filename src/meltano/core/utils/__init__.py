@@ -14,6 +14,7 @@ import traceback
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
+from distutils.util import strtobool
 from pathlib import Path
 from typing import Any, Callable, Iterable, TypeVar, overload
 
@@ -591,3 +592,28 @@ def safe_hasattr(obj: Any, name: str) -> bool:
     except AttributeError:
         return False
     return True
+
+
+def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
+    """Get the value of an environment variable as a boolean.
+
+    Args:
+        env_var: The name of the environment variable.
+        default: The default value to return if the environment variable is not set.
+
+    Returns:
+        The value of the environment variable as a boolean.
+    """
+    try:
+        return strtobool(os.getenv(env_var, str(default)))
+    except ValueError:
+        return default
+
+
+def get_no_color_flag() -> bool:
+    """Get the value of the NO_COLOR environment variable.
+
+    Returns:
+        True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
+    """
+    return get_boolean_env_var("NO_COLOR")
