@@ -14,7 +14,6 @@ import traceback
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
-from distutils.util import strtobool
 from pathlib import Path
 from typing import Any, Callable, Iterable, TypeVar, overload
 
@@ -592,6 +591,33 @@ def safe_hasattr(obj: Any, name: str) -> bool:
     except AttributeError:
         return False
     return True
+
+
+def strtobool(val: str) -> bool:
+    """Convert a string representation of truth to true (1) or false (0).
+
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+
+    Re-implemented from distutils.util.strtobool to avoid importing distutils.
+
+    Args:
+        val: The string to convert to a boolean.
+
+    Returns:
+        True if the string represents a truthy value, False otherwise.
+
+    Raises:
+        ValueError: If the string is not a valid representation of a boolean.
+    """
+    val = val.lower()
+    if val in {"y", "yes", "t", "true", "on", "1"}:
+        return True
+    elif val in {"n", "no", "f", "false", "off", "0"}:
+        return False
+
+    raise ValueError(f"invalid truth value {val!r}")
 
 
 def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
