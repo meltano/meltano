@@ -10,6 +10,8 @@ from rich.console import Console
 from rich.traceback import Traceback, install
 from structlog.types import Processor
 
+from meltano.core.utils import get_no_color_flag
+
 install(suppress=[click])
 
 TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
@@ -91,9 +93,13 @@ def console_log_formatter(colors: bool = False) -> structlog.stdlib.ProcessorFor
     Returns:
         A configured console log formatter.
     """
-    exception_formatter = (
-        structlog.dev.rich_traceback if colors else plain_rich_traceback
-    )
+    colors = colors and not get_no_color_flag()
+
+    if colors:
+        exception_formatter = rich_exception_formatter_factory(color_system="truecolor")
+    else:
+        exception_formatter = rich_exception_formatter_factory(no_color=True)
+
     return _process_formatter(
         structlog.dev.ConsoleRenderer(
             colors=colors, exception_formatter=exception_formatter
