@@ -1,18 +1,23 @@
 from __future__ import annotations
 
 import platform
+import re
 import shutil
 from time import perf_counter_ns
 
 import click
 import pytest
+from structlog.stdlib import get_logger
 
 import meltano
 from meltano.cli import cli, handle_meltano_error
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
+from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
+
+ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 
 class TestCli:
@@ -187,7 +192,42 @@ class TestCliColors:
                     "NO_COLOR": "1",
                 },
                 False,
-                id="colors-disabled-by-no-color-env",
+                id="colors-disabled-by-1-no-color-env",
+            ),
+            pytest.param(
+                {
+                    "NO_COLOR": "TRUE",
+                },
+                False,
+                id="colors-disabled-by-TRUE-no-color-env",
+            ),
+            pytest.param(
+                {
+                    "NO_COLOR": "t",
+                },
+                False,
+                id="colors-disabled-by-t-no-color-env",
+            ),
+            pytest.param(
+                {
+                    "NO_COLOR": "f",
+                },
+                True,
+                id="colors-not-disabled-by-f-no-color-env",
+            ),
+            pytest.param(
+                {
+                    "NO_COLOR": "FALSE",
+                },
+                True,
+                id="colors-not-disabled-by-FALSE-no-color-env",
+            ),
+            pytest.param(
+                {
+                    "NO_COLOR": "NOT_A_BOOLEAN",
+                },
+                True,
+                id="colors-not-disabled-by-invalid-no-color-env",
             ),
         ],
     )
@@ -198,15 +238,18 @@ class TestCliColors:
         @cli.command("dummy")
         @click.pass_context
         def _dummy_command(ctx):
+            setup_logging(None, "DEBUG")
+            logger = get_logger("meltano.cli.dummy")
+            logger.info(text)
             click.echo(styled_text)
 
-        args = ["dummy"]
         expected_text = styled_text if colors_expected else text
 
         with cli_runner.isolated_filesystem():
-            result = cli_runner.invoke(cli, args, color=True, env=env)
+            result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
             assert result.exit_code == 0, result.exception
             assert result.output.strip() == expected_text
+            assert bool(ANSI_RE.match(result.stderr)) is colors_expected
             assert result.exception is None
 
 
