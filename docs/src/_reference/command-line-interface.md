@@ -15,7 +15,10 @@ The following options are available for all `meltano` subcommands:
 
 * `--log-config` - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
 * `--log-level`: Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
-* `--no-color`: Disable colored output. Can also be set by setting the `NO_COLOR` environment variable to `True`.
+
+## Environment Variables
+
+If the `NO_COLOR` environment variable is set, Meltano will disable colored output. See [`no_color`](https://no-color.org/) for more information.
 
 ## `add`
 
