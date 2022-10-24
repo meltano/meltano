@@ -600,6 +600,8 @@ def strtobool(val: str) -> bool:
     are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
     'val' is anything else.
 
+    Case is ignored in string comparisons.
+
     Re-implemented from distutils.util.strtobool to avoid importing distutils.
 
     Args:
