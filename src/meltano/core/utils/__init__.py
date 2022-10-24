@@ -171,7 +171,7 @@ def merge(src, dest):
     return dest
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
+def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -416,7 +416,7 @@ def is_email_valid(value: str):
     return re.match(REGEX_EMAIL, value)
 
 
-def pop_at_path(d, path, default=None):
+def pop_at_path(d, path, default=None):  # noqa: WPS210
     if isinstance(path, str):
         path = path.split(".")
 
