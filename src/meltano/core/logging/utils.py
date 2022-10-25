@@ -129,12 +129,14 @@ def default_config(log_level: str) -> dict:
 def setup_logging(  # noqa: WPS210
     project: Project = None,
     log_level: str = DEFAULT_LEVEL,
+    log_config: dict | None = None,
 ) -> None:
     """Configure logging for a meltano project.
 
     Args:
         project: the meltano project
         log_level: set log levels to provided level.
+        log_config: a logging config suitable for use with `logging.config.dictConfig`.
     """
     # Mimick Python 3.8's `force=True` kwarg to override any
     # existing logger handlers
@@ -145,11 +147,10 @@ def setup_logging(  # noqa: WPS210
         handler.close()
 
     log_level = log_level.upper()
-    log_config = None
 
     if project:
         settings_service = ProjectSettingsService(project)
-        log_config = settings_service.get("cli.log_config")
+        log_config = log_config or settings_service.get("cli.log_config")
         log_level = settings_service.get("cli.log_level")
 
     config = read_config(log_config) or default_config(log_level)

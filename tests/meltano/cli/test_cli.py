@@ -7,6 +7,7 @@ from time import perf_counter_ns
 
 import click
 import pytest
+import yaml
 from structlog.stdlib import get_logger
 
 import meltano
@@ -174,16 +175,45 @@ class TestCli:
             handle_meltano_error(exception)
 
 
+def _get_dummy_logging_config(colors=True):
+    return {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "default": {
+                "()": "meltano.core.logging.console_log_formatter",
+                "colors": colors,
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "default",
+            },
+        },
+        "loggers": {
+            "meltano.cli.dummy": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            },
+        },
+    }
+
+
 @pytest.mark.skipif(
     platform.system() == "Windows",
     reason="Windows terminal support for ANSI escape sequences is limited.",
 )
 class TestCliColors:
+    TEST_TEXT = "This is a test"
+
     @pytest.mark.parametrize(
-        "env,colors_expected",
+        "env,log_config,cli_colors_expected,log_colors_expected",
         [
             pytest.param(
                 {},
+                None,
+                True,
                 True,
                 id="colors-enabled-by-default",
             ),
@@ -191,6 +221,24 @@ class TestCliColors:
                 {
                     "NO_COLOR": "1",
                 },
+                _get_dummy_logging_config(colors=True),
+                False,
+                False,
+                id="all-colors-disabled--no-color-precedence",
+            ),
+            pytest.param(
+                {},
+                _get_dummy_logging_config(colors=False),
+                True,
+                False,
+                id="cli-colors-enabled-log-colors-disabled",
+            ),
+            pytest.param(
+                {
+                    "NO_COLOR": "1",
+                },
+                None,
+                False,
                 False,
                 id="colors-disabled-by-1-no-color-env",
             ),
@@ -198,6 +246,8 @@ class TestCliColors:
                 {
                     "NO_COLOR": "TRUE",
                 },
+                None,
+                False,
                 False,
                 id="colors-disabled-by-TRUE-no-color-env",
             ),
@@ -205,6 +255,8 @@ class TestCliColors:
                 {
                     "NO_COLOR": "t",
                 },
+                None,
+                False,
                 False,
                 id="colors-disabled-by-t-no-color-env",
             ),
@@ -212,6 +264,8 @@ class TestCliColors:
                 {
                     "NO_COLOR": "f",
                 },
+                None,
+                True,
                 True,
                 id="colors-not-disabled-by-f-no-color-env",
             ),
@@ -219,6 +273,8 @@ class TestCliColors:
                 {
                     "NO_COLOR": "FALSE",
                 },
+                None,
+                True,
                 True,
                 id="colors-not-disabled-by-FALSE-no-color-env",
             ),
@@ -226,30 +282,45 @@ class TestCliColors:
                 {
                     "NO_COLOR": "NOT_A_BOOLEAN",
                 },
+                None,
+                True,
                 True,
                 id="colors-not-disabled-by-invalid-no-color-env",
             ),
         ],
     )
-    def test_no_color(self, cli_runner, env, colors_expected):
-        text = "This is a test"
-        styled_text = click.style(text, fg="red")
+    def test_no_color(
+        self,
+        cli_runner,
+        env,
+        log_config,
+        cli_colors_expected,
+        log_colors_expected,
+        tmp_path,
+    ):
+        styled_text = click.style(self.TEST_TEXT, fg="red")
+
+        if log_config:
+            log_config_path = tmp_path / "logging.yml"
+            log_config_path.write_text(yaml.dump(log_config))
+        else:
+            log_config_path = None
 
         @cli.command("dummy")
         @click.pass_context
         def _dummy_command(ctx):
-            setup_logging(None, "DEBUG")
+            setup_logging(None, "DEBUG", log_config_path)
             logger = get_logger("meltano.cli.dummy")
-            logger.info(text)
+            logger.info(self.TEST_TEXT)
             click.echo(styled_text)
 
-        expected_text = styled_text if colors_expected else text
+        expected_text = styled_text if cli_colors_expected else self.TEST_TEXT
 
         with cli_runner.isolated_filesystem():
             result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
             assert result.exit_code == 0, result.exception
             assert result.output.strip() == expected_text
-            assert bool(ANSI_RE.match(result.stderr)) is colors_expected
+            assert bool(ANSI_RE.match(result.stderr)) is log_colors_expected
             assert result.exception is None
 
 
