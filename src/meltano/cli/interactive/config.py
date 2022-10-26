@@ -16,7 +16,13 @@ from rich.text import Text
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.cli.utils import CliError
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
+from meltano.core.project import Project
+from meltano.core.settings_service import (
+    REDACTED_VALUE,
+    SettingKind,
+    SettingsService,
+    SettingValueStore,
+)
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliEvent
 
@@ -60,8 +66,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.ctx = ctx
         self.store = store
         self.extras = extras
-        self.project = self.ctx.obj["project"]
-        self.settings = self.ctx.obj["settings"]
+        self.project: Project = self.ctx.obj["project"]
+        self.settings: SettingsService = self.ctx.obj["settings"]
         self.session = self.ctx.obj["session"]
         self.tracker = self.ctx.obj["tracker"]
         self.environment_service = EnvironmentService(self.project)
@@ -205,7 +211,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
     @staticmethod
     def _value_prompt(config_metadata):
-        if config_metadata["setting"].kind != SettingKind.OPTIONS:
+        if (not config_metadata["setting"]) or config_metadata[
+            "setting"
+        ].kind != SettingKind.OPTIONS:
             return (
                 click.prompt(
                     "New value",
@@ -214,7 +222,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     hide_input=True,
                     confirmation_prompt=True,
                 )
-                if config_metadata["setting"].is_redacted
+                if config_metadata["setting"] and config_metadata["setting"].is_redacted
                 else click.prompt("New value", default="", show_default=False)
             )
 
@@ -382,7 +390,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         name = metadata["name"]
         store = metadata["store"]
-        if metadata["setting"].is_redacted:
+        if metadata["setting"] and metadata["setting"].is_redacted:
             value = REDACTED_VALUE
         click.secho(
             f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
@@ -391,7 +399,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
-            if metadata["setting"].is_redacted:
+            if metadata["setting"] and metadata["setting"].is_redacted:
                 current_value = REDACTED_VALUE
             click.secho(
                 f"Current value is still: {current_value!r} (from {source.label})",
