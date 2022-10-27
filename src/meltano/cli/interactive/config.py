@@ -211,9 +211,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
     @staticmethod
     def _value_prompt(config_metadata):
-        if (not config_metadata["setting"]) or config_metadata[
-            "setting"
-        ].kind != SettingKind.OPTIONS:
+        if config_metadata["setting"].kind != SettingKind.OPTIONS:
             return (
                 click.prompt(
                     "New value",
@@ -222,7 +220,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     hide_input=True,
                     confirmation_prompt=True,
                 )
-                if config_metadata["setting"] and config_metadata["setting"].is_redacted
+                if config_metadata["setting"].is_redacted
                 else click.prompt("New value", default="", show_default=False)
             )
 
@@ -390,7 +388,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         name = metadata["name"]
         store = metadata["store"]
-        if metadata["setting"] and metadata["setting"].is_redacted:
+        is_redacted = metadata["setting"] and metadata["setting"].is_redacted
+        if is_redacted:
             value = REDACTED_VALUE
         click.secho(
             f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
@@ -399,7 +398,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
-            if metadata["setting"] and metadata["setting"].is_redacted:
+            if is_redacted:
                 current_value = REDACTED_VALUE
             click.secho(
                 f"Current value is still: {current_value!r} (from {source.label})",
