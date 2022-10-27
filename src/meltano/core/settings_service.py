@@ -142,6 +142,7 @@ class SettingsService(ABC):  # noqa: WPS214
         """Return definitions of supported settings."""
 
     @property
+    @abstractmethod
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
 
