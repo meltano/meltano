@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
 from typing import NoReturn
 
@@ -84,11 +85,18 @@ def cli(  # noqa: WPS231
     no_color = get_no_color_flag()
     if no_color:
         ctx.color = False
+        ProjectSettingsService.config_override["cli.no_color"] = True
 
     try:  # noqa: WPS229
         project = Project.find()
-        setup_logging(project)
         project_setting_service = ProjectSettingsService(project)
+
+        no_color = project_setting_service.get("cli.no_color")
+        if no_color:
+            ctx.color = False
+            os.environ["NO_COLOR"] = "1"
+
+        setup_logging(project)
 
         readonly = project_setting_service.get("project_readonly")
         if readonly:

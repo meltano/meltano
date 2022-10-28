@@ -53,6 +53,9 @@ settings:
   env_specific: true
 - name: cli.log_config
   value: logging.yaml
+- name: cli.no_color
+  kind: boolean
+  value: false
 
 # UI server
 - name: ui.bind_host
