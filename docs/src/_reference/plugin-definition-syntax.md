@@ -49,10 +49,27 @@ docs: https://docs.meltano.com/guide/orchestration
 
 ## `repo`
 
-The URL of the plugin's repository (in GitHub, GitLab, etc.).
+The URL of the plugin's repository (in GitHub, GitLab, etc.). In the case of extensions
+wrapping another application this should point the applications repository, not the extensions.
 
 ```yaml
 repo: https://github.com/apache/airflow
+```
+
+## `repo_ext`
+
+The URL of the plugins extensions repository itself (in GitHub, GitLab, etc.).
+
+```yaml
+repo_ext: https://github.com/meltano/airflow-ext
+```
+
+## `executable`
+
+The default executable to call when invoking plugin commands.
+
+```yaml
+executable: airflow_invoker
 ```
 
 ## `capabilities`
@@ -135,6 +152,14 @@ Path to the plugin's logo in the Meltano Hub repository.
 
 ```yaml
 logo_url: /assets/logos/orchestrators/airflow.png
+```
+
+## `definition`
+
+Markdown formatted text that defines what the plugin is and what it does.
+
+```yaml
+definition: is an [orchestrator](https://docs.meltano.com/concepts/plugins#orchestrators) that allows for workflows to be programmatically authored, scheduled, and monitored via Airflow.
 ```
 
 ## `settings_preamble`
