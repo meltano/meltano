@@ -23,10 +23,20 @@ class TestLogFormatters:
             exc_info=None,
         )
 
-    def test_console_log_formatter_colors(self, record):
-        formatter = console_log_formatter(colors=True)
-        assert ANSI_RE.match(formatter.format(record))
+    def test_console_log_formatter_colors(self, record, monkeypatch):
+        with monkeypatch.context() as m:
+            m.delenv("NO_COLOR", raising=False)
+            formatter = console_log_formatter(colors=True)
+            assert ANSI_RE.match(formatter.format(record))
 
-    def test_console_log_formatter_no_colors(self, record):
-        formatter = console_log_formatter(colors=False)
-        assert not ANSI_RE.match(formatter.format(record))
+    def test_console_log_formatter_no_colors(self, record, monkeypatch):
+        with monkeypatch.context() as m:
+            m.delenv("NO_COLOR", raising=False)
+            formatter = console_log_formatter(colors=False)
+            assert not ANSI_RE.match(formatter.format(record))
+
+    def test_console_log_formatter_no_colors_env_override(self, record, monkeypatch):
+        with monkeypatch.context() as m:
+            m.setenv("NO_COLOR", "1")
+            formatter = console_log_formatter(colors=True)
+            assert not ANSI_RE.match(formatter.format(record))
