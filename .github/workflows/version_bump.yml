@@ -46,7 +46,7 @@ jobs:
 
     - name: Bump version
       id: cz-bump
-      uses: commitizen-tools/commitizen-action@0.15.0
+      uses: commitizen-tools/commitizen-action@0.15.1
       with:
         increment: ${{ github.event.inputs.bump != 'auto' && github.event.inputs.bump || '' }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
@@ -88,7 +88,7 @@ jobs:
 
     - name: Approve Pull Request
       if: ${{ steps.create-pull-request.outputs.pull-request-number != 0 }}
-      uses: juliangruber/approve-pull-request-action@v1.1.1
+      uses: juliangruber/approve-pull-request-action@v2.0.1
       with:
         # https://github.com/juliangruber/approve-pull-request-action
         github-token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
