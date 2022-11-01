@@ -150,6 +150,8 @@ per-file-ignores =
         D102
         D103
         D104
+        # Allow more than 5 local variables in tests
+        WPS210
 	D105
 	D107
         # String does contain unindexed parameters
