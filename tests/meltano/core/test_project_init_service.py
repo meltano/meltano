@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+import re
 import shutil
 import stat
 from pathlib import Path
@@ -21,7 +22,7 @@ from meltano.core.project_init_service import (
     ),
     ids=(
         "new directory",
-        "empty directory",
+        "existing directory",
     ),
 )
 def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
@@ -30,9 +31,6 @@ def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
     pushd(projects_dir)
 
     project_dir = projects_dir.joinpath("test_project")
-
-    if create_project_dir:
-        project_dir.mkdir()
 
     ProjectInitService(project_dir.relative_to(Path.cwd())).init(
         activate=False, add_discovery=False
@@ -46,19 +44,20 @@ def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
     ProjectInitService(project_dir.absolute()).init(activate=False, add_discovery=False)
 
 
-def test_project_init_non_empty_directory(tmp_path: Path, pushd):
-    projects_dir = tmp_path.joinpath("exists")
+def test_project_init_existing_directory_file_conflict(tmp_path: Path, pushd):
+    projects_dir = tmp_path.joinpath("file_conflict")
     projects_dir.mkdir()
     pushd(projects_dir)
 
     project_dir = projects_dir.joinpath("test_project")
-    project_dir.joinpath("test").mkdir(parents=True)
+    project_dir.mkdir()
+    project_dir.joinpath("README.md").write_text("")
 
-    with pytest.raises(
-        ProjectInitServiceError,
-        match="Directory 'test_project' not empty",
-    ):
+    with pytest.raises(ProjectInitServiceError) as e:
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+
+    assert e.match("Could not create project 'test_project'")
+    assert e.match(re.escape("Found 1 conflicting file(s): test_project/README.md"))
 
 
 def test_project_init_no_write_permission(tmp_path: Path, pushd):

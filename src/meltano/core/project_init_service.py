@@ -18,7 +18,7 @@ class ProjectInitServiceError(Exception):
     """Project Initialization Service Exception."""
 
 
-class ProjectInitService:
+class ProjectInitService:  # noqa: WPS214
     """New Project Initialization Service."""
 
     def __init__(self, project_directory: os.PathLike):
@@ -45,15 +45,12 @@ class ProjectInitService:
             A new Project instance
 
         Raises:
-            ProjectInitServiceError: Directory already exists
+            ProjectInitServiceError: Could not create the Meltano project
         """
+        self.check_project_directory()
+
         try:
-            self.project_directory.mkdir()
-        except FileExistsError as ex:
-            if any(self.project_directory.iterdir()):
-                raise ProjectInitServiceError(
-                    f"Directory '{self.project_directory}' not empty."
-                ) from ex
+            self.project_directory.mkdir(exist_ok=True)
         except PermissionError as ex:
             raise ProjectInitServiceError(
                 f"Permission denied to create '{self.project_directory}'."
@@ -81,6 +78,32 @@ class ProjectInitService:
         self.create_system_database(project)
 
         return project
+
+    def check_project_directory(self):
+        """Check if the directory can support a new Meltano project.
+
+        Raises:
+            ProjectInitServiceError: Conflicting files present
+        """
+        project_files = MeltanoFilePlugin().file_contents(None).keys()
+
+        conflicting_files = [
+            str(file)
+            for file in self.project_directory.rglob("*")
+            if file.relative_to(self.project_directory) in project_files
+        ]
+
+        if not conflicting_files:
+            return
+
+        raise ProjectInitServiceError(
+            "\n".join(
+                (
+                    f"Could not create project '{self.project_directory}'",
+                    f"Found {len(conflicting_files)} conflicting file(s): {', '.join(conflicting_files)}",
+                )
+            )
+        )
 
     def create_dot_meltano_dir(self, project: Project):
         """Create .meltano directory.
