@@ -340,6 +340,41 @@ An array of host volumes to mount in the container.
 
 A mapping of environment variables to set in the container.
 
+## `settings_group_validation`
+
+An array of arrays listing the minimal valid group of setttings required to use the connector. A common use case is defining which settings are required for different authorization methods.
+
+An example definition for Redshift where there are 3 types of authorization available:
+
+```yaml
+settings_group_validation:
+- - host
+  - port
+  - user
+  - password
+  - dbname
+  - s3_bucket
+  - default_target_schema
+  - aws_profile
+- - host
+  - port
+  - user
+  - password
+  - dbname
+  - s3_bucket
+  - default_target_schema
+  - aws_access_key_id
+  - aws_secret_access_key
+- - host
+  - port
+  - user
+  - password
+  - dbname
+  - s3_bucket
+  - default_target_schema
+  - aws_session_token
+```
+
 ## `settings`
 
 Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties.
