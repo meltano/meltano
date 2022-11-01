@@ -342,7 +342,7 @@ A mapping of environment variables to set in the container.
 
 ## `settings_group_validation`
 
-An array of arrays listing the minimal valid group of setttings required to use the connector. A common use case is defining which settings are required for different authorization methods.
+An array of arrays listing the minimal valid group of settings required to use the connector. A common use case is defining which settings are required for different authorization methods.
 
 An example definition for Redshift where there are 3 types of authorization available:
 
