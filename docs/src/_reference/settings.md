@@ -369,13 +369,6 @@ meltano --log-level=debug ...
 
 The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_.
 
-### <a name="cli-no-color"></a>`cli.no_color`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_NO_COLOR`, alias: `NO_COLOR`
-- Default: `false`
-
-Disable colored output on the command line. See [`no_color.org`](https://no-color.org/) for more information.
-
 #### How to use
 
 ```bash
@@ -424,6 +417,22 @@ root:
   level: DEBUG
   propagate: yes
   handlers: [console, file]
+```
+
+### <a name="cli-no-color"></a>`cli.no_color`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_NO_COLOR`, alias: `NO_COLOR`
+- Default: `false`
+
+Disable colored output on the command line. See [`no_color.org`](https://no-color.org/) for more information.
+
+#### How to use
+
+```bash
+meltano config meltano set cli no_color debug
+
+export MELTANO_CLI_NO_COLOR=true
+export NO_COLOR=true
 ```
 
 ## `meltano elt`
