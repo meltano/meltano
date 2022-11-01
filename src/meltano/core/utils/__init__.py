@@ -170,7 +170,7 @@ def merge(src, dest):
     return dest
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
+def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -415,7 +415,7 @@ def is_email_valid(value: str):
     return re.match(REGEX_EMAIL, value)
 
 
-def pop_at_path(d, path, default=None):
+def pop_at_path(d, path, default=None):  # noqa: WPS210
     if isinstance(path, str):
         path = path.split(".")
 
@@ -591,3 +591,57 @@ def safe_hasattr(obj: Any, name: str) -> bool:
     except AttributeError:
         return False
     return True
+
+
+def strtobool(val: str) -> bool:
+    """Convert a string representation of truth to true (1) or false (0).
+
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+
+    Case is ignored in string comparisons.
+
+    Re-implemented from distutils.util.strtobool to avoid importing distutils.
+
+    Args:
+        val: The string to convert to a boolean.
+
+    Returns:
+        True if the string represents a truthy value, False otherwise.
+
+    Raises:
+        ValueError: If the string is not a valid representation of a boolean.
+    """
+    val = val.lower()
+    if val in {"y", "yes", "t", "true", "on", "1"}:
+        return True
+    elif val in {"n", "no", "f", "false", "off", "0"}:
+        return False
+
+    raise ValueError(f"invalid truth value {val!r}")
+
+
+def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
+    """Get the value of an environment variable as a boolean.
+
+    Args:
+        env_var: The name of the environment variable.
+        default: The default value to return if the environment variable is not set.
+
+    Returns:
+        The value of the environment variable as a boolean.
+    """
+    try:
+        return strtobool(os.getenv(env_var, str(default)))
+    except ValueError:
+        return default
+
+
+def get_no_color_flag() -> bool:
+    """Get the value of the NO_COLOR environment variable.
+
+    Returns:
+        True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
+    """
+    return get_boolean_env_var("NO_COLOR")

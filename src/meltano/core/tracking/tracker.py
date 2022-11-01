@@ -79,10 +79,10 @@ class TelemetrySettings(NamedTuple):
     send_anonymous_usage_stats: bool | None
 
 
-class Tracker:  # noqa: WPS214 - too many methods 16 > 15
+class Tracker:  # noqa: WPS214 - too many methods
     """Meltano tracker backed by Snowplow."""
 
-    def __init__(
+    def __init__(  # noqa: WPS210 - too many local variables
         self,
         project: Project,
         request_timeout: float | tuple[float, float] | None = 3.5,
@@ -121,7 +121,7 @@ class Tracker:  # noqa: WPS214 - too many methods 16 > 15
             )
 
         if emitters:
-            self.snowplow_tracker = SnowplowTracker(emitters=emitters)
+            self.snowplow_tracker = SnowplowTracker(app_id="meltano", emitters=emitters)
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
             self.setup_exit_event()

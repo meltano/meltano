@@ -16,6 +16,7 @@ from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import CliContext, Tracker
+from meltano.core.utils import get_no_color_flag
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(  # noqa: WPS231
-    ctx,
+    ctx: click.Context,
     log_level: str,
     log_config: str,
     verbose: int,
@@ -79,6 +80,10 @@ def cli(  # noqa: WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["verbosity"] = verbose
+
+    no_color = get_no_color_flag()
+    if no_color:
+        ctx.color = False
 
     try:  # noqa: WPS229
         project = Project.find()

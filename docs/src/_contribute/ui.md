@@ -16,10 +16,10 @@ In the event you are contributing to Meltano UI and want to work with all of the
 poetry shell
 
 # Create a new Meltano project
-meltano init $PROJECT_NAME
+meltano init $PROJECT_DIRECTORY
 
 # Change directory into your newly created project
-cd $PROJECT_NAME
+cd $PROJECT_DIRECTORY
 
 # Start the Meltano API and a production build of Meltano UI that you can ignore
 meltano ui

@@ -9,6 +9,17 @@ Meltano provides a command line interface (CLI) that makes it easy to manage you
 To quickly find the `meltano` subcommand you're looking for, use the Table of Contents in the sidebar.
 For a better understanding of command line documentation syntax, the [docopt](http://docopt.org/) standard is useful.
 
+## Global Configuration
+
+The following options are available for all `meltano` subcommands:
+
+* [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
+* [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
+
+The following configuration is available for all meltano subcommands via an environment variable:
+
+* `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no_color.org`](https://no-color.org/) for more information.
+
 ## `add`
 
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
@@ -472,7 +483,7 @@ meltano environment remove prod
 
 ## `init`
 
-Used to create a new [Meltano project](/concepts/project) directory inside the current working directory.
+Used to create a new [Meltano project](/concepts/project) at the given directory path. If the specified directory does not exist, one will be created for the project - otherwise the existing directory will be used if it is empty.
 
 The new project directory will contain:
 
@@ -486,12 +497,12 @@ The new project directory will contain:
 
 ```bash
 # Format
-meltano init [project_name] [--no_usage_stats]
+meltano init [project_directory] [--no_usage_stats]
 ```
 
 #### Parameters
 
-- **project_name** - This determines the folder name for the project
+- **project_directory** - This determines the directory path to create the project at.
 
 #### Options
 
@@ -500,6 +511,9 @@ meltano init [project_name] [--no_usage_stats]
 #### Examples
 
 ```bash
+# Initialize a new Meltano project interactively
+meltano init
+
 # Initialize a new Meltano project in the
 # "demo-project" directory, and...
 # - share anonymous usage data with the Meltano team
@@ -514,6 +528,9 @@ meltano init demo-project --no_usage_stats
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
 echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
 meltano init demo-project # --no_usage_stats is implied
+
+# Initialize a new Meltano project in the current working directory
+meltano init .
 ```
 
 ### Using `init` with Environments

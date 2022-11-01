@@ -1,6 +1,6 @@
 {
   "name": "meltano",
-  "version": "2.7.2",
+  "version": "2.8.0",
   "private": true,
   "scripts": {
     "build": "yarn build:docs && yarn build:webapp",
@@ -28,7 +28,7 @@
     "@vue/eslint-config-prettier": "^7.0.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
-    "eslint": "^8.24.0",
+    "eslint": "^7.32.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.5.1"
   },

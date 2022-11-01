@@ -324,6 +324,8 @@ In a newly initialized project, this file will be included in [`.gitignore`](#gi
 
 Meltano stores various files for internal use inside a `.meltano` directory inside your project.
 
+**Note**: `$MELTANO_SYS_DIR_ROOT` can be used as a replacement to `$MELTANO_PROJECT_ROOT/.meltano` directory.
+
 These files are specific to the environment Meltano is running in, and should not be checked into version control.
 In a newly initialized project, this directory will be included in [`.gitignore`](#gitignore) by default.
 
@@ -335,6 +337,8 @@ While you would usually not want to modify files in this directory directly, kno
 - `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
+
+If `$MELTANO_SYS_DIR_ROOT` is set, all the above mentioned paths `.meltano/*` will point to `$MELTANO_SYS_DIR_ROOT/*`.
 
 ## System database
 

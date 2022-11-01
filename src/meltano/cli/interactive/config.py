@@ -16,7 +16,13 @@ from rich.text import Text
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.cli.utils import CliError
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
+from meltano.core.project import Project
+from meltano.core.settings_service import (
+    REDACTED_VALUE,
+    SettingKind,
+    SettingsService,
+    SettingValueStore,
+)
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliEvent
 
@@ -60,8 +66,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.ctx = ctx
         self.store = store
         self.extras = extras
-        self.project = self.ctx.obj["project"]
-        self.settings = self.ctx.obj["settings"]
+        self.project: Project = self.ctx.obj["project"]
+        self.settings: SettingsService = self.ctx.obj["settings"]
         self.session = self.ctx.obj["session"]
         self.tracker = self.ctx.obj["tracker"]
         self.environment_service = EnvironmentService(self.project)
@@ -299,17 +305,28 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
     def configure_all(self):
         """Configure all settings."""
+        numeric_choices = [idx for idx, _, _ in self.setting_choices]
+        if not numeric_choices:
+            click.secho(
+                "There are no settings to configure. "
+                "For help, please see https://melta.no#no-plugin-settings-defined",
+                fg="yellow",
+            )
+            self.tracker.track_command_event(CliEvent.completed)
+            return
+
         while True:
             click.clear()
             self._print_home_screen()
-            numeric_choices = [idx for idx, _, _ in self.setting_choices]
-            choices = ["all"] + numeric_choices + ["e"]
+            choices = ["all", *numeric_choices, "e"]
 
             branch = "all"
             try:
                 click.echo()
                 branch = click.prompt(
-                    f"Loop through all settings (all), select a setting by number ({min(int(chs) for chs in numeric_choices)} - {max(int(chs) for chs in numeric_choices)}), or exit (e)?",
+                    "Loop through all settings (all), select a setting by "
+                    f"number ({min(int(chs) for chs in numeric_choices)} - "
+                    f"{max(int(chs) for chs in numeric_choices)}), or exit (e)?",
                     type=click.Choice(choices, case_sensitive=False),
                     default="all",
                     show_choices=False,
@@ -371,7 +388,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         name = metadata["name"]
         store = metadata["store"]
-        if metadata["setting"].is_redacted:
+        is_redacted = metadata["setting"] and metadata["setting"].is_redacted
+        if is_redacted:
             value = REDACTED_VALUE
         click.secho(
             f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
@@ -380,7 +398,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
-            if metadata["setting"].is_redacted:
+            if is_redacted:
                 current_value = REDACTED_VALUE
             click.secho(
                 f"Current value is still: {current_value!r} (from {source.label})",

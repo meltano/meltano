@@ -244,6 +244,10 @@ Command line arguments for the command.
 
 Friendly description of the command.
 
+### `commands.<command_name>.executable`
+
+Optionally, override the plugin's default `executable` when running this command.
+
 ### `commands.<command_name>.container_spec`
 
 The container specification to use for the command.
