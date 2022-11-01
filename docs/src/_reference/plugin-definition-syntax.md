@@ -39,6 +39,16 @@ A human-readable label for the plugin.
 label: Airflow
 ```
 
+## `description`
+
+A brief description of what the tool, API, or file is used for. 
+
+An example description for Salesforce:
+
+```yaml
+description: Customer-relationship management & customer success platform
+```
+
 ## `docs`
 
 The URL of the plugin's documentation.
