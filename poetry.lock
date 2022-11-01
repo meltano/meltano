@@ -399,7 +399,7 @@ PyGithub = "^1.55"
 type = "git"
 url = "https://github.com/meltano/commitizen-version-bump.git"
 reference = "main"
-resolved_reference = "4654518f13cb5a32df1495e3557e0ccb81271793"
+resolved_reference = "108b8ff5c516ba17b5ccbc81236a3f25de60c4ce"
 
 [[package]]
 name = "commonmark"
