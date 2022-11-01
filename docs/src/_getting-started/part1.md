@@ -8,7 +8,7 @@ weight: 4
 
 Let’s learn by example.
 
-Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern E(t)LT stack. In this part, we're going to start with the data extraction process.
+Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack. In this part, we're going to start with the data extraction process.
 
 We're going to take data from a "source", namely GitHub, and extract a list of commits to one repository.
 
@@ -34,7 +34,7 @@ If you don't have a GitHub account to follow along, you could either exchange th
 
 ## Create Your Meltano Project
 Step 1 is to create a new [Meltano project](/concepts/project) that (among other things)
-will hold the [plugins](/concepts/plugins) that implement the details of our E(t)LT pipeline.
+will hold the [plugins](/concepts/plugins) that implement the details of our ELT pipeline.
 
 
 1. Navigate to the directory that you'd like to hold your Meltano projects.
