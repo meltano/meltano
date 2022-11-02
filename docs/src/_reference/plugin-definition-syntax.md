@@ -41,7 +41,7 @@ label: Airflow
 
 ## `description`
 
-A brief description of what the tool, API, or file is used for. 
+A brief description of what the tool, API, or file is used for.
 
 An example description for Salesforce:
 
