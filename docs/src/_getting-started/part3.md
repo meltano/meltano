@@ -8,7 +8,7 @@ weight: 4
 
 Let’s learn by example.
 
-Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern E(t)LT stack.
+Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
 
 In parts [1](/getting-started/part1) & [2](/getting-started/part2), we extracted data from GitHub and loaded it into a (local) PostgreSQL database. Now it is time to have more fun. We decide to load all attributes from the data we selected previously, and then build a model listing the different authors of commits to our repository.
 
@@ -123,7 +123,7 @@ $ meltano config dbt-postgres set schema analytics
 </div>
 
 ## Add our source data to dbt
-The E(t)L pipeline run already added our source data into the schema `tap_github` as table `commits`. dbt will need to know where to locate this data. Let's add that to our dbt project:
+The EL pipeline run already added our source data into the schema `tap_github` as table `commits`. dbt will need to know where to locate this data. Let's add that to our dbt project:
 
 ```bash
 mkdir transform/models/tap_github
