@@ -61,7 +61,7 @@ jobs:
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.1
       with:
         name: python-artifacts
         path: 'dist/*'
@@ -75,7 +75,7 @@ jobs:
       uses: actions/checkout@v3.0.2
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3.0.0
+      uses: actions/download-artifact@v3.0.1
       with:
         name: python-artifacts
         path: dist/
