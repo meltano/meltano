@@ -32,9 +32,6 @@ poetry install
 # Install the pre-commit hook
 poetry run pre-commit install --install-hooks
 
-# Bundle the Meltano UI into the `meltano` package
-make bundle
-
 # Obtain a shell in the poetry created virtual environment
 poetry shell
 ```
@@ -52,7 +49,7 @@ Note that for users who are using pyenv with the [virtualenv plugin](https://git
 likely not need to prefix the commands with `poetry` as poetry will default to using the pyenv activated virtual
 environment.
 
-This means that you're ready to start Meltano CLI development. For API and UI development, read on.
+This means that you're ready to start Meltano CLI development. For API development, read on.
 
 <div class="notification is-warning">
   <p><strong>Metrics (anonymous usage data) tracking</strong></p>

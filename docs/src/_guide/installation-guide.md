@@ -223,15 +223,3 @@ You can update Meltano to the latest version by running the following command in
 ```
 meltano upgrade
 ```
-
-## Using Meltano UI
-
-When an update is available, you will be informed of this automatically through a shiny blue button in the top right corner of Meltano UI:
-
-![Update Available Message](images/installation/update-available.png)
-
-Clicking this button will show more information and give you the option to install the update right away:
-
-![Update Available Popup](images/installation/update-available-popup.png)
-
-The Meltano UI will refresh automatically once installation is complete.

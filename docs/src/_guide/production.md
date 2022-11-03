@@ -19,11 +19,9 @@ This page will help you figure out:
 6. how to [manage your environment-specific and sensitive configuration](#managing-configuration), and finally
 7. how to [run your pipelines](#running-pipelines).
 
-Additionally, you may want to [run Meltano UI and configure it for production](#meltano-ui).
-
 If you're [containerizing your Meltano project](/guide/containerization),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
-We also provide a [Helm Chart](https://github.com/meltano/helm-meltano) for deploying a containerized instance of the Meltano UI to [Kubernetes](https://kubernetes.io).
+We also provide a [Helm Chart](https://github.com/meltano/helm-meltano) for deploying a containerized instance of the Meltano to [Kubernetes](https://kubernetes.io).
 More on that [in the Kubernetes section](#kubernetes).
 
 ## SaaS Hosting Options
@@ -234,37 +232,6 @@ meaning that you can provide `meltano` subcommands and arguments like `elt ...` 
 [`docker run <image-name> ...`](https://docs.docker.com/engine/reference/commandline/run/)
 as trailing arguments.
 
-## Meltano UI
-
-Now that your pipelines are running, you may want to also spin up [Meltano UI](/reference/ui),
-which lets you quickly check the status and most recent logs of your project's [scheduled pipelines](/guide/orchestration) right from your browser.
-
-You can start Meltano UI using [`meltano ui`](/reference/command-line-interface#ui) just like you would locally,
-but there are [a couple of settings](/reference/settings#meltano-ui-server) you'll want to consider changing in production:
-
-- By default, Meltano UI will bind to host `0.0.0.0` and port `5000`.
-
-  This can be changed using the [`ui.bind_host`](/reference/settings#ui-bind-host) and [`ui.bind_port`](/reference/settings#ui-bind-port) settings, and their respective environment variables and CLI options.
-
-- If you'd like to require users to sign in before they can access the Meltano UI, enable the [`ui.authentication` setting](/reference/settings#ui-authentication).
-
-  As described behind that link, this will also require you to set the [`ui.secret_key`](/reference/settings#ui-secret-key) and [`ui.password_salt`](/reference/settings#ui-password-salt) settings, as well as [`ui.server_name`](/reference/settings#ui-server-name) or [`ui.session_cookie_domain`](/reference/settings#ui-session-cookie-domain).
-
-  Users can be added using [`meltano user add`](./command-line-interface.html#user) and will be stored in the configured [system database](#storing-metadata).
-
-- If you will be running Meltano UI behind a front-end (reverse) proxy that will be responsible for SSL termination (HTTPS),
-  it is recommended that you enable the [`ui.session_cookie_secure` setting](/reference/settings#ui-session-cookie-secure) so that session cookies used for authentication are only sent along with secure requests.
-
-  You may also need to change the [`ui.forwarded_allow_ips` setting](/reference/settings#ui-forwarded-allow-ips) to get
-  Meltano UI to realize it should use the `https` URL scheme rather than `http` in the URLs it builds.
-
-  If your reverse proxy uses a health check to determine if Meltano UI is ready to accept traffic, you can use the `/api/v1/health` route, which will always respond with a 200 status code.
-
-- Meltano UI can be used to make changes to your project, like adding plugins and scheduling pipelines,
-  which is very useful locally but may be undesirable in production if you'd prefer for all changes to [go through version control](#off-of-your-local-machine) instead.
-
-  To disallow all modifications to project files through the UI, enable the [`project_readonly` setting](/reference/settings#project-readonly).
-
 ### Containerized Meltano project
 
 If you're [containerizing your Meltano project](/guide/containerization),
@@ -275,7 +242,7 @@ since any changes to your [`meltano.yml` project file](/concepts/project#meltano
 
 ### Kubernetes
 
-Hosting a containerized instance of the Meltano UI on [Kubernetes](https://kubernetes.io) is made easy using the provided [Meltano Helm Chart](https://github.com/meltano/helm-meltano).
+Hosting a containerized instance of the Meltano on [Kubernetes](https://kubernetes.io) is made easy using the provided [Meltano Helm Chart](https://github.com/meltano/helm-meltano).
 Try it out via the [Helm](https://helm.sh) CLI:
 
 ```bash

@@ -120,13 +120,6 @@ This might be a configuration issue with the catalog file that is sent to the ta
 1. Publish PyPI packages of these package (not for now)
 1. We could mirror this repo on GitHub if we want (not for now)
 
-### Transform & Models Development
-
-When you need to expose data to the user through Meltano UI, this often will require updating the transforms and models. At a high level:
-
-- **Transforms** will allow you to create the necessary PostgreSQL tables for users to query against
-- **Models** will determine the structure of what is exposed on the UI side
-
 #### Transforms
 
 You can test local transforms in a project by adding them in a Meltano project's `transform` > `models` > `my_meltano_project` directory.
