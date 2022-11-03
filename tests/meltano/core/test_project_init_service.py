@@ -51,13 +51,19 @@ def test_project_init_existing_directory_file_conflict(tmp_path: Path, pushd):
 
     project_dir = projects_dir.joinpath("test_project")
     project_dir.mkdir()
-    project_dir.joinpath("README.md").write_text("")
+
+    readme_file = project_dir.joinpath("README.md")
+    readme_file.write_text("")
 
     with pytest.raises(ProjectInitServiceError) as e:
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
 
     assert e.match("Could not create project 'test_project'")
-    assert e.match(re.escape("Found 1 conflicting file: test_project/README.md"))
+    assert e.match(
+        re.escape(
+            f"Found 1 conflicting file: {Path(project_dir.name, readme_file.name)}"
+        )
+    )
 
 
 def test_project_init_existing_directory_existing_project_subdirectory_no_write_permissions(
@@ -79,7 +85,9 @@ def test_project_init_existing_directory_existing_project_subdirectory_no_write_
 
     assert e.match("Could not create project 'test_project'")
     assert e.match(
-        re.escape("Found 1 directory with no write permissions: test_project/extract")
+        re.escape(
+            f"Found 1 directory with no write permissions: {Path(project_dir.name, extract_dir.name)}"
+        )
     )
 
 
