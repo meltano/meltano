@@ -167,9 +167,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if an extractor for your data source is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-        ```bash
-        meltano discover extractors
-        ```
+    ```bash
+    meltano discover extractors
+    ```
 
 1.  Depending on the result, pick your next step:
 
