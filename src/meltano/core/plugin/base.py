@@ -64,7 +64,7 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
-class PluginType(YAMLEnum):
+class PluginType(YAMLEnum):  # noqa: WPS214
     """The type of a plugin."""
 
     EXTRACTORS = "extractors"
@@ -603,7 +603,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         return self._variant.settings
 
     @property
-    def extra_settings(self):
+    def extra_settings(self):  # noqa: WPS210
         """Return the extra settings for this plugin.
 
         Returns:
