@@ -146,8 +146,3 @@ meltano invoke airflow dags trigger meltano
 ```
 
 Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano will facade more of these feature to create a seamless experience using this orchestrator. Please refer to the [Airflow documentation](https://airflow.apache.org/) for more in-depth knowledge about Airflow.
-
-## Meltano UI
-
-While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface),
-basic pipeline management functionality is also available in [the UI](/reference/ui#pipelines).

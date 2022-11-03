@@ -495,9 +495,3 @@ The configuration of a plugin can be tested using [`meltano config <plugin> test
 <div class="notification is-danger">
   <p>Configuration testing is only supported for <a href="/concepts/plugins#extractors">extractor</a> plugins currently.</p>
 </div>
-
-## Meltano UI
-
-While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
-and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
-basic plugin configuration functionality is also available in [the UI](/reference/ui#extractor-configuration).
