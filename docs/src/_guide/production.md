@@ -231,25 +231,3 @@ will be [the `meltano` command](/reference/command-line-interface),
 meaning that you can provide `meltano` subcommands and arguments like `elt ...` and `invoke airflow ...` directly to
 [`docker run <image-name> ...`](https://docs.docker.com/engine/reference/commandline/run/)
 as trailing arguments.
-
-### Containerized Meltano project
-
-If you're [containerizing your Meltano project](/guide/containerization),
-the [`project_readonly` setting](/reference/settings#project-readonly) will be
-[enabled by default](https://github.com/meltano/files-docker/blob/main/bundle/Dockerfile#L19)
-using the `MELTANO_PROJECT_READONLY` environment variable,
-since any changes to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) would not be persisted outside the container.
-
-### Kubernetes
-
-Hosting a containerized instance of the Meltano on [Kubernetes](https://kubernetes.io) is made easy using the provided [Meltano Helm Chart](https://github.com/meltano/helm-meltano).
-Try it out via the [Helm](https://helm.sh) CLI:
-
-```bash
-# add the meltano-ui helm repository
-helm repo add meltano https://meltano.gitlab.io/infra/helm-meltano/meltano-ui
-# view available Chart versions
-helm search repo meltano-ui
-# deploy 🚀
-helm install meltano-ui/meltano-ui --generate-name
-```

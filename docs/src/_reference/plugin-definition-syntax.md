@@ -317,7 +317,7 @@ A mapping of environment variables to set in the container.
 
 ## `settings`
 
-Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties.
+Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. To improve the UX of this form, each setting has a number of optional properties.
 
 Example:
 
