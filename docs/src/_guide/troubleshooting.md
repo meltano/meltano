@@ -2,6 +2,8 @@
 title: Troubleshooting
 description: Learn what you can do if you need to troubleshoot
 layout: doc
+redirect_from:
+ - /reference/ui
 weight: 25
 ---
 
@@ -111,3 +113,11 @@ meltano elt tap-gitlab target-postgres --exclude project_members
 
 meltano elt tap-gitlab target-postgres --state-id=gitlab-to-postgres --dump=state > extract/tap-gitlab.state.json
 ```
+
+## Meltano UI
+
+Meltano previously had a simple UI that was used for setting up basic pipelines and viewing basic logs. Due to a refocusing of the product on the command line interface, the UI was deprioritized for continued feature enhancements.
+
+Meltano will eventually have a UI again as the company and community grows. Please let us know your thoughts on what you would like to see in a future Meltano UI in [this GitHub discussion](https://github.com/meltano/meltano/discussions/6957).
+
+To view the previous documentation on the UI, review [this pull request](https://github.com/meltano/meltano/pull/6955) where they were removed.
