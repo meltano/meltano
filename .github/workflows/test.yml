@@ -176,7 +176,7 @@ jobs:
 
     - name: Upload coverage data
       if: always()
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.1
       with:
         name: coverage-data
         path: ".coverage.${{ matrix.id }}"
@@ -234,7 +234,7 @@ jobs:
         pip --version
 
     - name: Download coverage data
-      uses: actions/download-artifact@v3.0.0
+      uses: actions/download-artifact@v3.0.1
       with:
         name: coverage-data
 
