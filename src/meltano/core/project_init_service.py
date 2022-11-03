@@ -90,6 +90,33 @@ class ConflictingFilesCheck(ProjectDirectoryCheck):
         return f"conflicting file{'' if len(self.results) == 1 else 's'}"
 
 
+class NoWritePermissionsDirectoriesCheck(ProjectDirectoryCheck):
+    """Check for directories with no write permissions that would otherwise be created for a new Meltano project."""
+
+    @property
+    def results(self):
+        """Results of the check.
+
+        Returns:
+            Directories with no write permissions, if any
+        """
+        return [
+            directory
+            for directory in map(Path.parent.fget, self.project_files)
+            if directory.exists() and not os.access(directory, os.W_OK)
+        ]
+
+    @property
+    def descriptor(self):
+        """Descriptor of the check used in `message`.
+
+        Returns:
+            Singular or plural descriptor for directories with no write permissions
+        """
+        noun = f"director{'y' if len(self.results) == 1 else 'ies'}"
+        return f"{noun} with no write permissions"
+
+
 class ProjectInitServiceError(Exception):
     """Project Initialization Service Exception."""
 
@@ -161,16 +188,19 @@ class ProjectInitService:  # noqa: WPS214
         Raises:
             ProjectInitServiceError: Conflicting files present
         """
-        check = ConflictingFilesCheck(self.project_directory)
+        checks = (
+            ConflictingFilesCheck(self.project_directory),
+            NoWritePermissionsDirectoriesCheck(self.project_directory),
+        )
 
-        if not check:
+        if not any(checks):
             return
 
         raise ProjectInitServiceError(
             "\n".join(
                 (
                     f"Could not create project '{self.project_directory}'",
-                    str(check),
+                    *(str(check) for check in checks if check),
                 )
             )
         )

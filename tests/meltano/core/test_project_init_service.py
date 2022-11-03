@@ -60,6 +60,62 @@ def test_project_init_existing_directory_file_conflict(tmp_path: Path, pushd):
     assert e.match(re.escape("Found 1 conflicting file: test_project/README.md"))
 
 
+def test_project_init_existing_directory_existing_project_subdirectory_no_write_permissions(
+    tmp_path: Path, pushd
+):
+    projects_dir = tmp_path.joinpath("file_conflict")
+    projects_dir.mkdir()
+    pushd(projects_dir)
+
+    project_dir = projects_dir.joinpath("test_project")
+    project_dir.mkdir()
+
+    extract_dir = project_dir.joinpath("extract")
+    extract_dir.mkdir()
+    extract_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
+
+    with pytest.raises(ProjectInitServiceError) as e:
+        ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+
+    assert e.match("Could not create project 'test_project'")
+    assert e.match(
+        re.escape("Found 1 directory with no write permissions: test_project/extract")
+    )
+
+
+def test_project_init_existing_directory_multiple_check_errors(tmp_path: Path, pushd):
+    projects_dir = tmp_path.joinpath("file_conflict")
+    projects_dir.mkdir()
+    pushd(projects_dir)
+
+    project_dir = projects_dir.joinpath("test_project")
+    project_dir.mkdir()
+    project_dir.joinpath("README.md").write_text("")
+    project_dir.joinpath("requirements.txt").write_text("")
+
+    extract_dir = project_dir.joinpath("extract")
+    extract_dir.mkdir()
+    extract_dir.joinpath(".gitkeep").write_text("")
+    extract_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
+
+    extract_dir = project_dir.joinpath("load")
+    extract_dir.mkdir()
+    extract_dir.joinpath(".gitkeep").write_text("")
+    extract_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
+
+    extract_dir = project_dir.joinpath("transform")
+    extract_dir.mkdir()
+    extract_dir.joinpath(".gitkeep").write_text("")
+    extract_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
+
+    with pytest.raises(ProjectInitServiceError) as e:
+        ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+
+    assert e.match("Could not create project 'test_project'")
+    assert e.match("Found 5 conflicting files: ")
+    assert e.match("Found 3 directories with no write permissions: ")
+
+
 def test_project_init_no_write_permission(tmp_path: Path, pushd):
     if platform.system() == "Windows":
         pytest.xfail(
