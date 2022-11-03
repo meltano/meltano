@@ -57,7 +57,7 @@ def test_project_init_existing_directory_file_conflict(tmp_path: Path, pushd):
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
 
     assert e.match("Could not create project 'test_project'")
-    assert e.match(re.escape("Found 1 conflicting file(s): test_project/README.md"))
+    assert e.match(re.escape("Found 1 conflicting file: test_project/README.md"))
 
 
 def test_project_init_no_write_permission(tmp_path: Path, pushd):

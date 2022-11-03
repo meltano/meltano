@@ -1,9 +1,11 @@
 """New Project Initialization Service."""
 from __future__ import annotations
 
+import abc
 import os
 import uuid
 from pathlib import Path
+from typing import Iterable
 
 import click
 
@@ -12,6 +14,80 @@ from .db import project_engine
 from .plugin.meltano_file import MeltanoFilePlugin
 from .project import Project
 from .project_settings_service import ProjectSettingsService, SettingValueStore
+
+
+class ProjectDirectoryCheck(abc.ABC):
+    """Abstract class for a project directory "check"."""
+
+    def __init__(self, project_directory: Path):
+        """Create a new `ProjectDirectoryCheck` instance.
+
+        Args:
+            project_directory: The target project directory
+        """
+        self.project_directory = project_directory
+        self.project_files = [
+            self.project_directory / file
+            for file in MeltanoFilePlugin().file_contents(None).keys()
+        ]
+
+    @property
+    @abc.abstractmethod
+    def descriptor(self) -> str:
+        """Descriptor of the check used in `message`."""
+
+    @property
+    @abc.abstractmethod
+    def results(self) -> Iterable:
+        """Results of the check.
+
+        Raises:
+            NotImplementedError: Not yet implemented
+        """
+        raise NotImplementedError
+
+    def __str__(self):
+        """Summary message of the check.
+
+        Returns:
+            Summary message, including results overview
+        """
+        results_str = ", ".join(map(str, self.results))
+        return f"Found {len(self.results)} {self.descriptor}: {results_str}"
+
+    def __bool__(self):
+        """Infer truthiness from the results of the check.
+
+        Returns:
+            `False` if `results` is empty, else `True`
+        """
+        return bool(self.results)
+
+
+class ConflictingFilesCheck(ProjectDirectoryCheck):
+    """Check for conflicts between files in the project directory and those that would be created for a new Meltano project."""
+
+    @property
+    def results(self):
+        """Results of the check.
+
+        Returns:
+            Conflicting files, if any
+        """
+        return [
+            file
+            for file in self.project_directory.rglob("*")
+            if file in self.project_files
+        ]
+
+    @property
+    def descriptor(self):
+        """Descriptor of the check used in `message`.
+
+        Returns:
+            Singular or plural descriptor for conflicting files
+        """
+        return f"conflicting file{'' if len(self.results) == 1 else 's'}"
 
 
 class ProjectInitServiceError(Exception):
@@ -85,22 +161,16 @@ class ProjectInitService:  # noqa: WPS214
         Raises:
             ProjectInitServiceError: Conflicting files present
         """
-        project_files = MeltanoFilePlugin().file_contents(None).keys()
+        check = ConflictingFilesCheck(self.project_directory)
 
-        conflicting_files = [
-            str(file)
-            for file in self.project_directory.rglob("*")
-            if file.relative_to(self.project_directory) in project_files
-        ]
-
-        if not conflicting_files:
+        if not check:
             return
 
         raise ProjectInitServiceError(
             "\n".join(
                 (
                     f"Could not create project '{self.project_directory}'",
-                    f"Found {len(conflicting_files)} conflicting file(s): {', '.join(conflicting_files)}",
+                    str(check),
                 )
             )
         )
