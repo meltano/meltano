@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from meltano.cli import cli
 from click.testing import CliRunner
+
 from asserts import assert_cli_runner
+from meltano.cli import cli
 
 
 class TestCliLogin:

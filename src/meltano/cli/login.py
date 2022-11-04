@@ -1,11 +1,12 @@
 """Loging into managed meltano via Github Auth."""
+from __future__ import annotations
+
 import click
 
-from .utils import InstrumentedCmd
+from meltano.core.login_service import GithubLoginService
 
 from . import cli
-
-from meltano.core.login_service import GithubLoginService
+from .utils import InstrumentedCmd
 
 
 @cli.command(cls=InstrumentedCmd, short_help="Login to managed meltano.")
