@@ -32,6 +32,7 @@ from meltano.cli import (  # isort:skip # noqa: WPS235
     install,
     invoke,
     lock,
+    login,
     remove,
     repl,
     schedule,
