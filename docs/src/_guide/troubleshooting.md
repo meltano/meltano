@@ -4,7 +4,6 @@ description: Learn what you can do if you need to troubleshoot
 layout: doc
 redirect_from:
  - /reference/ui
- - /guide/orchestration#meltano-ui
 weight: 25
 ---
 
