@@ -1341,6 +1341,9 @@ meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
 
 The `test` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
+## `ui` (deprecated)
+
+The Metano UI is now deprecated. For more information see our [troubleshooting page](/guide/troubleshooting#meltano-ui).
 ## `user`
 
 <div class="notification is-info">
