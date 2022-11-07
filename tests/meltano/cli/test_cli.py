@@ -3,6 +3,7 @@ from __future__ import annotations
 import platform
 import re
 import shutil
+from pathlib import Path
 from time import perf_counter_ns
 
 import click
@@ -11,6 +12,8 @@ import yaml
 from structlog.stdlib import get_logger
 
 import meltano
+from asserts import assert_cli_runner
+from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
@@ -173,6 +176,37 @@ class TestCli:
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match="This failed. Try again."):
             handle_meltano_error(exception)
+
+    def test_cwd_option(self, cli_runner, project, tmp_path: Path, pushd):
+        with cd(project.root_dir()):
+            assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
+            assert Path().resolve() == project.root_dir()
+
+        with cd(project.root_dir()):
+            assert_cli_runner(
+                cli_runner.invoke(cli, ("--cwd", str(tmp_path), "dragon"))
+            )
+            assert Path().resolve() == tmp_path
+
+        with cd(project.root_dir()):
+            filepath = tmp_path / "file.txt"
+            filepath.touch()
+            with pytest.raises(click.BadParameter, match="is a file"):
+                raise cli_runner.invoke(
+                    cli, ("--cwd", str(filepath), "dragon")
+                ).exception.__context__
+
+        with cd(project.root_dir()):
+            dirpath = tmp_path / "subdir"
+            with pytest.raises(click.BadParameter, match="does not exist"):
+                raise cli_runner.invoke(
+                    cli, ("--cwd", str(dirpath), "dragon")
+                ).exception.__context__
+
+        with cd(project.root_dir()):
+            dirpath.mkdir()
+            assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
+            assert Path().resolve() == dirpath
 
 
 def _get_dummy_logging_config(colors=True):
