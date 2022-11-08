@@ -491,7 +491,7 @@ settings:
 
 ### `settings[*].tooltip`
 
-Optional. Use to provide a tooltip for the setting in the deprecated Meltano UI.
+Optional. Use to provide a tooltip for the setting when rendered within a UI that supports tooltips.
 
 ```yaml
 settings:
