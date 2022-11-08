@@ -123,6 +123,15 @@ class SettingsService(ABC):  # noqa: WPS214
         """
 
     @property
+    @abstractmethod
+    def project_settings_service(self):
+        """Get a project settings service.
+
+        Returns:
+            A ProjectSettingsService
+        """
+
+    @property
     def env_prefixes(self) -> list[str]:
         """Return prefixes for setting environment variables.
 
@@ -344,7 +353,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
-        env_var_strict_mode, _ = manager.get(
+        env_var_strict_mode, _ = source.manager(self.project_settings_service).get(
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
         )
         if expand_env_vars and metadata.get("expandable", False):
