@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
+from pathlib import Path
 from typing import NoReturn
 
 import click
@@ -56,6 +58,11 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.option(
     "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
+@click.option(
+    "--cwd",
+    type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
+    help="Run Meltano as if it had been started in the specified directory.",
+)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(  # noqa: WPS231
@@ -65,6 +72,7 @@ def cli(  # noqa: WPS231
     verbose: int,
     environment: str,
     no_environment: bool,
+    cwd: Path | None,
 ):  # noqa: WPS231
     """
     ELT for the DataOps era.
@@ -84,6 +92,12 @@ def cli(  # noqa: WPS231
     no_color = get_no_color_flag()
     if no_color:
         ctx.color = False
+
+    if cwd:
+        try:
+            os.chdir(cwd)
+        except OSError as ex:
+            raise Exception(f"Unable to run Meltano from {cwd!r}") from ex
 
     try:  # noqa: WPS229
         project = Project.find()
