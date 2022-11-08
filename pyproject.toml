@@ -71,7 +71,6 @@ boto3 = {version = "^1.25.3", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.26.0", optional = true}
-smart-open = {version = "^6.2.0"}
 
 [tool.poetry.extras]
 infra = ["ansible"]
