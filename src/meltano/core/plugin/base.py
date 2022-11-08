@@ -10,8 +10,8 @@ import yaml
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.setting_definition import SettingDefinition, YAMLEnum
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound, find_named
 
 from .command import Command
@@ -64,7 +64,7 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
-class PluginType(YAMLEnum):
+class PluginType(YAMLEnum):  # noqa: WPS214
     """The type of a plugin."""
 
     EXTRACTORS = "extractors"
@@ -594,8 +594,8 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return self._variant.settings
 
-    @property
-    def extra_settings(self):
+    @property  # noqa: WPS210
+    def extra_settings(self):  # noqa: WPS210
         """Return the extra settings for this plugin.
 
         Returns:

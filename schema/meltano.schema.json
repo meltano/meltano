@@ -27,6 +27,63 @@
       "description": "A database URI for the project system database. Defaults to a SQLite file stored at .meltano/meltano.db",
       "default": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db"
     },
+      "state_backend": {
+        "type": "object",
+          "description": "Configuration for state backend.",
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "The URI pointing to the backend to use.",
+              "default": "systemdb"
+              },
+            "lock_timeout_seconds": {
+              "type": "integer",
+              "description": "The number of seconds a lock on a state file is considered valid."
+              },
+            "lock_retry_seconds": {
+              "type": "integer",
+              "description": "The number of seconds to wait between retrying lock acquisition."
+              },
+            "azure": {
+              "type": "object",
+              "description": "Configuration for Azure Blob Storage state backend.",
+              "properties": {
+                "connection_string": {
+                  "type": "string",
+                  "description": "The azure connection string to use for connecting to Azure Blob Storage."
+                }
+              }
+            },
+          "gcs": {
+            "type": "object",
+            "description": "Configuration for Google Cloud Storage state backend.",
+            "properties": {
+              "application_credentials": {
+                "type": "string",
+                "description": "Path to a Google credentials file to use for authenticating to Google Cloud Storage."
+                }
+            }
+        },
+        "s3": {
+          "type": "object",
+          "description": "Configuration for AWS S3 state backend.",
+          "properties": {
+            "aws_access_key_id": {
+              "type": "string",
+              "description": "AWS access key ID to use for authenticating to AWS S3."
+              },
+            "aws_secret_access_key": {
+              "type": "string",
+              "description": "AWS secret access key to use for authenticating to AWS S3."
+              },
+            "endpoint_url": {
+              "type": "string",
+              "description": "S3 endpoint URL to use."
+              }
+            }
+          }
+        }
+      },
     "environments": {
       "type": "array",
       "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",

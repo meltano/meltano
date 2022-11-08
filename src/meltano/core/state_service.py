@@ -11,12 +11,13 @@ import json
 from typing import Any
 
 import structlog
+from sqlalchemy.orm import Session
 
 from meltano.core.job import Job, Payload, State
-from meltano.core.job_state import SINGER_STATE_KEY
-from meltano.core.state_store import DBStateStoreManager
-
-STATE_ID_COMPONENT_DELIMITER = ":"
+from meltano.core.job_state import SINGER_STATE_KEY, JobState
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.state_store import state_store_manager_from_project_settings
 
 logger = structlog.getLogger(__name__)
 
@@ -25,19 +26,23 @@ class InvalidJobStateError(Exception):
     """Occurs when invalid job state is parsed."""
 
 
-class StateService:
+class StateService:  # noqa: WPS214
     """Meltano Service used to manage job state.
 
     Currently only manages Singer state for Extract and Load jobs.
     """
 
-    def __init__(self, session: object = None):
+    def __init__(self, project: Project | None = None, session: Session | None = None):
         """Create a StateService object.
 
         Args:
-            session: the session to use for interacting with the db
+            project: current meltano Project
+            session: the session to use, if using SYSTEMDB state backend
         """
+        self.project = project or Project.find()
+        self.settings_service = ProjectSettingsService(self.project)
         self.session = session
+        self._state_store_manager = None
 
     def list_state(self, state_id_pattern: str | None = None):
         """List all state found in the db.
@@ -76,14 +81,16 @@ class StateService:
 
     @property
     def state_store_manager(self):
-        """Initialize and return the correct StateStoreManager for the given SettingsService.
-
-        Defaults to DBStateStoreManager.
+        """Initialize and return the correct StateStoreManager.
 
         Returns:
             StateStoreManager instance.
         """
-        return DBStateStoreManager(session=self.session)
+        if not self._state_store_manager:
+            self._state_store_manager = state_store_manager_from_project_settings(
+                self.settings_service, self.session
+            )
+        return self._state_store_manager
 
     @staticmethod
     def validate_state(state: dict[str, Any]):
@@ -125,11 +132,16 @@ class StateService:
         logger.debug(
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
-        self.state_store_manager.set(
-            state_id=state_to_add_to.job_name,
-            state=json.dumps(new_state_dict),
-            complete=(payload_flags == Payload.STATE),
+        partial_state = (
+            new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}
         )
+        completed_state = new_state_dict if payload_flags == Payload.STATE else {}
+        job_state = JobState(
+            state_id=state_to_add_to.job_name,
+            partial_state=partial_state,
+            completed_state=completed_state,
+        )
+        self.state_store_manager.set(job_state)
 
     def get_state(self, state_id: str):
         """Get state for the given state_id.
@@ -140,7 +152,10 @@ class StateService:
         Returns:
             Dict representing state that would be used in the next run.
         """
-        return self.state_store_manager.get(state_id=state_id)
+        state = self.state_store_manager.get(state_id=state_id)
+        if state:
+            return json.loads(state.json_merged())
+        return {}
 
     def set_state(self, state_id: str, new_state: str | None, validate: bool = True):
         """Set the state for the state_id.
@@ -164,7 +179,6 @@ class StateService:
             state_id: the state_id to clear state for
             save: whether or not to immediately save the state
         """
-        self.set_state(state_id, json.dumps({}), validate=False)
         self.state_store_manager.clear(state_id)
 
     def merge_state(self, state_id_src: str, state_id_dst: str):

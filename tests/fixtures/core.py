@@ -751,12 +751,12 @@ def job_history_session(jobs, session):
 
 
 @pytest.fixture
-def state_service(job_history_session):
-    return StateService(session=job_history_session)
+def state_service(job_history_session, project):
+    return StateService(project, session=job_history_session)
 
 
 @pytest.fixture
-def project_with_environment(project: Project) -> Project:
+def project_with_environment(project: Project):
     project.activate_environment("dev")
     project.active_environment.env[
         "ENVIRONMENT_ENV_VAR"
