@@ -3,7 +3,7 @@ title: Meltano UI
 description: Learn how to manage and monitor your plugins and pipelines using Meltano UI
 layout: doc
 hidden: true
-toc: false
+toc: true
 ---
 
 <div class="notification is-warning">
