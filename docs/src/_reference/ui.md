@@ -1,6 +1,6 @@
 ---
-title: Meltano UI
-description: Learn how to manage and monitor your plugins and pipelines using Meltano UI
+title: Meltano UI and REST API Server (Deprecated)
+description: Reference page for the deprecated Meltano UI and REST API Server configuration settings.
 layout: doc
 hidden: true
 toc: true
