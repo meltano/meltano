@@ -85,7 +85,7 @@ This locking mechanism utilizes reasonable defaults but you may wish to configur
 You can do this via two additional top-level `state_backend` settings: `state_backend.lock_timeout_seconds` and `state_backend.lock_retry_seconds`.
 
 When Meltano tries to read or write state for a given `state_id`, it will try to acquire a lock on the state data for that `state_id`.
-For example, using the local filesystem state backend with `state_backend.uri` set to `file:///${MELTANO_PROJECT_ROOT}/.meltano/state`, it will check to see if a file exists at the path `${MELTANO_PROJECT_ROOT}/.meltano/state/<state_id>/lock`.
+For example, using the local filesystem state backend with `state_backend.uri` set to `file:///${MELTANO_SYS_DIR_ROOT}/state`, it will check to see if a file exists at the path `file:///${MELTANO_SYS_DIR_ROOT}/state/<state_id>/lock`.
 If no such file exists, Meltano will create it and write the current UTC timestamp into the file.
 If the file _does_ exist, Meltano will check the UTC timestamp written in the file to determine when it was locked by another process.
 Meltano will add the configured value for `state_backend.lock_timeout_seconds` to the timestamp in the file to determine when the lock expires.
