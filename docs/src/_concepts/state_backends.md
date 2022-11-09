@@ -75,7 +75,7 @@ state_backend:
     uri: <URI for desired state backend>
 ```
 For some state backends and in some environments, `uri` is the only setting that needs to be configured in order to use a state backend other than the default `systemdb` backend. For instance, to store state directly on the local filesystem at the path `${MELTANO_SYS_DIR_ROOT}/state`, simply run `meltano config meltano set 'state_backend.uri file:///${MELTANO_SYS_DIR_ROOT}/state'`. Note the single quotes which prevent the early expansion of the environment variable.
-Then Meltano will store the state for a given `state_id` at the path `${MELTANO_PROJECT_ROOT}/.meltano/state/<state_id>/state.json`.
+Then Meltano will store the state for a given `state_id` at the path `file:///${MELTANO_SYS_DIR_ROOT}/state/<state_id>/state.json`.
 
 ### Locking
 
