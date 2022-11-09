@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.9.0 (2022-11-08)
+
+### ✨ New
+
+- [#6964](https://github.com/meltano/meltano/issues/6964) Add `--cwd` CLI option
+- [#6785](https://github.com/meltano/meltano/issues/6785) Use `NO_COLOR` env var to disable colored output
+- [#6628](https://github.com/meltano/meltano/issues/6628) Make `.meltano`  folder path configurable via new `MELTANO_SYS_DIR_ROOT` env var -- _**Thanks @rawwar!**_
+
+### 🐛 Fixes
+
+- [#6938](https://github.com/meltano/meltano/issues/6938) Handle case where setting metadata is `None`
+- [#6468](https://github.com/meltano/meltano/issues/6468) Symbolic link creation for meltano.exe when on windows -- _**Thanks @BuzzCutNorman!**_
+
+### 📚 Documentation Improvements
+
+- [#6961](https://github.com/meltano/meltano/issues/6961) Fix typo "differe" -> "different" -- _**Thanks @kayakr!**_
+- [#6948](https://github.com/meltano/meltano/issues/6948) Add additional plugin definition ref entries -- _**Thanks @pandemicsyn!**_
+- [#6951](https://github.com/meltano/meltano/issues/6951) Reindent code block -- _**Thanks @jx2lee!**_
+- [#6887](https://github.com/meltano/meltano/issues/6887) Exclude little t from docs
+- [#6923](https://github.com/meltano/meltano/issues/6923) Make clear you can override `executable` in `commands`
+
 ## v2.8.0 (2022-10-17)
 
 ### ✨ New
