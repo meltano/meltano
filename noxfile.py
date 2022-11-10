@@ -40,6 +40,7 @@ def tests(session: Session) -> None:
         session.install(".")
 
     session.install(
+        "colorama",  # colored output in Windows
         "freezegun",
         "mock",
         "pytest",

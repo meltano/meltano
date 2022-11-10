@@ -11,9 +11,14 @@ from logging import config as logging_config
 import structlog
 import yaml
 
-from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
+from meltano.core.logging.formatters import (
+    LEVELED_TIMESTAMPED_PRE_CHAIN,
+    TIMESTAMPER,
+    rich_exception_formatter_factory,
+)
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import get_no_color_flag
 
 try:
     from typing import Protocol  # noqa: WPS433
@@ -67,8 +72,15 @@ def default_config(log_level: str) -> dict:
         log_level: set log levels to provided level.
 
     Returns:
-         dict: logging config suitable for use with logging.config.dictConfig
+         A logging config suitable for use with `logging.config.dictConfig`.
     """
+    no_color = get_no_color_flag()
+
+    if no_color:
+        formatter = rich_exception_formatter_factory(no_color=True)
+    else:
+        formatter = rich_exception_formatter_factory(color_system="truecolor")
+
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -76,7 +88,8 @@ def default_config(log_level: str) -> dict:
             "colored": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.dev.ConsoleRenderer(
-                    colors=True, exception_formatter=structlog.dev.rich_traceback
+                    colors=not no_color,
+                    exception_formatter=formatter,
                 ),
                 "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
             },
@@ -113,12 +126,17 @@ def default_config(log_level: str) -> dict:
     }
 
 
-def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> None:
+def setup_logging(  # noqa: WPS210
+    project: Project = None,
+    log_level: str = DEFAULT_LEVEL,
+    log_config: dict | None = None,
+) -> None:
     """Configure logging for a meltano project.
 
     Args:
         project: the meltano project
         log_level: set log levels to provided level.
+        log_config: a logging config suitable for use with `logging.config.dictConfig`.
     """
     # Mimick Python 3.8's `force=True` kwarg to override any
     # existing logger handlers
@@ -128,12 +146,11 @@ def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> No
         root.removeHandler(handler)
         handler.close()
 
-    log_level = DEFAULT_LEVEL.upper()
-    log_config = None
+    log_level = log_level.upper()
 
     if project:
         settings_service = ProjectSettingsService(project)
-        log_config = settings_service.get("cli.log_config")
+        log_config = log_config or settings_service.get("cli.log_config")
         log_level = settings_service.get("cli.log_level")
 
     config = read_config(log_config) or default_config(log_level)

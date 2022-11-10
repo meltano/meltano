@@ -27,8 +27,8 @@ runs:
         CURR_VER="$(bumpversion major --allow-dirty --dry-run --list | grep current_version= | cut -d'=' -f2)"
         RELEASE_VER="${CI_COMMIT_REF_NAME#release/v}"
         echo "Detected current version '$CURR_VER' and release version '$RELEASE_VER'"
-        echo "::set-output name=current-version::$(echo $CURR_VER)"
-        echo "::set-output name=release-version::$(echo $RELEASE_VER)"
+        echo "current-version=$CURR_VER" >> $GITHUB_OUTPUT
+        echo "release-version=$RELEASE_VER" >> $GITHUB_OUTPUT
 
     - name: Get bump type
       id: get-bump-type
@@ -45,7 +45,7 @@ runs:
         [[ $NEW_VER = $MAJOR_BUMP ]] && BUMP_TYPE="major"
         [[ $NEW_VER = $MINOR_BUMP ]] && BUMP_TYPE="minor"
         [[ $NEW_VER = $PATCH_BUMP ]] && BUMP_TYPE="patch"
-        echo "::set-output name=bump-type::$(echo $BUMP_TYPE)"
+        echo "bump-type=$BUMP_TYPE" >> $GITHUB_OUTPUT
 
     - name: Validate version bump
       id: validate-version-bump
