@@ -146,6 +146,22 @@ class TestCliConfigSet:
             )
             assert base_tap_config["config"]["test"] == "base-mock"
 
+            # set base config in `meltano.yml` -- ignore default environment
+            result = cli_runner.invoke(
+                cli,
+                ["config", "tap-mock", "set", "test", "base-mock-no-default"],
+            )
+            assert_cli_runner(result)
+            base_tap_config = next(
+                (
+                    tap
+                    for tap in project.meltano["plugins"]["extractors"]
+                    if tap["name"] == "tap-mock"
+                ),
+                {},
+            )
+            assert base_tap_config["config"]["test"] == "base-mock-no-default"
+
             # set dev environment config in `meltano.yml`
             result = cli_runner.invoke(
                 cli,
