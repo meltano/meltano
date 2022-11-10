@@ -259,6 +259,8 @@ class Variant(NameEq, Canonical):
         repo: str | None = None,
         pip_url: str | None = None,
         executable: str | None = None,
+        description: str | None = None,
+        logo_url: str | None = None,
         capabilities: list | None = None,
         settings_group_validation: list | None = None,
         settings: list | None = None,
@@ -277,6 +279,8 @@ class Variant(NameEq, Canonical):
             repo: The repository URL.
             pip_url: The pip URL.
             executable: The executable name.
+            description: The description of the plugin.
+            logo_url: The logo URL of the plugin.
             capabilities: The capabilities of the variant.
             settings_group_validation: The settings group validation.
             settings: The settings of the variant.
@@ -293,6 +297,8 @@ class Variant(NameEq, Canonical):
             repo=repo,
             pip_url=pip_url,
             executable=executable,
+            description=description,
+            logo_url=logo_url,
             capabilities=list(capabilities or []),
             settings_group_validation=list(settings_group_validation or []),
             settings=list(map(SettingDefinition.parse, settings or [])),
@@ -465,6 +471,8 @@ class PluginDefinition(PluginRef):
             repo=plugin.repo,
             pip_url=plugin.pip_url,
             executable=plugin.executable,
+            description=plugin.description,
+            logo_url=plugin.logo_url,
             capabilities=plugin.capabilities,
             settings_group_validation=plugin.settings_group_validation,
             settings=plugin.settings,
@@ -737,6 +745,8 @@ class StandalonePlugin(Canonical):
         repo: str | None = None,
         pip_url: str | None = None,
         executable: str | None = None,
+        description: str | None = None,
+        logo_url: str | None = None,
         capabilities: list | None = None,
         settings_group_validation: list | None = None,
         settings: list | None = None,
@@ -757,6 +767,8 @@ class StandalonePlugin(Canonical):
             repo: The repository URL of the plugin.
             pip_url: The pip URL of the plugin.
             executable: The executable of the plugin.
+            description: The description of the plugin.
+            logo_url: The logo URL of the plugin.
             capabilities: The capabilities of the plugin.
             settings_group_validation: The settings group validation of the plugin.
             settings: The settings of the plugin.
@@ -775,6 +787,8 @@ class StandalonePlugin(Canonical):
             repo=repo,
             pip_url=pip_url,
             executable=executable,
+            description=description,
+            logo_url=logo_url,
             capabilities=capabilities or [],
             settings_group_validation=settings_group_validation or [],
             settings=list(map(SettingDefinition.parse, settings or [])),
@@ -809,6 +823,8 @@ class StandalonePlugin(Canonical):
             repo=variant.repo,
             pip_url=variant.pip_url,
             executable=variant.executable,
+            description=variant.description,
+            logo_url=variant.logo_url,
             capabilities=variant.capabilities,
             settings_group_validation=variant.settings_group_validation,
             settings=variant.settings,
