@@ -1,5 +1,5 @@
 ---
-title: Run in Production
+title: Deployment in Production
 description: Learn how to deploy your ELT pipelines in production.
 layout: doc
 weight: 9
