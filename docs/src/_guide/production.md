@@ -26,10 +26,13 @@ you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano
 We also provide a [Helm Chart](https://github.com/meltano/helm-meltano) for deploying a containerized instance of the Meltano UI to [Kubernetes](https://kubernetes.io).
 More on that [in the Kubernetes section](#kubernetes).
 
-## SaaS Hosting Options
+## Managed Hosting Options
 
-Meltano currently does not offer project hosting as a paid offering.
-We recommend users look at [Singerly](https://www.singerly.co/), [Astronomer.io](https://www.astronomer.io/), or [Google Cloud Composer](https://cloud.google.com/composer/) as options for hosting and running your Meltano project.
+Would you rather not be responsible for deploying your Meltano project and managing it in production?
+
+[Meltano Cloud](https://meltano.com/cloud) launches in Alpha in late 2022 and opens to the public in early 2023. [Sign up](https://meltano.com/cloud) to receive more information and reduce your self-management burden.
+
+In the mean time, consider running your Meltano pipelines using a managed Airflow service like [Astronomer](https://www.astronomer.io/), [Google Cloud Composer](https://cloud.google.com/composer/), or [Amazon MWAA](https://docs.aws.amazon.com/mwaa).
 
 ## Your Meltano project
 
