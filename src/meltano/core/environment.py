@@ -7,10 +7,10 @@ from typing import Any, Iterable, TypeVar
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
 TEnv = TypeVar("TEnv")

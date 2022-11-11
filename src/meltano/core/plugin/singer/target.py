@@ -39,7 +39,7 @@ class BookmarkWriter:
         """
         self.job = job
         self.session = session
-        self.state_service = state_service or StateService(session)
+        self.state_service = state_service or StateService(session=self.session)
         self.payload_flag = payload_flag
 
     def writeline(self, line: str):
@@ -49,7 +49,7 @@ class BookmarkWriter:
             line: raw json state line to decode/store
         """
         if self.job is None:
-            logging.info(
+            logger.info(
                 "Running outside a Job context: incremental state could not be updated."
             )
             return
@@ -58,7 +58,7 @@ class BookmarkWriter:
         try:
             new_state = json.loads(line)
         except Exception:
-            logging.warning(
+            logger.warning(
                 "Received state is invalid, incremental state has not been updated"
             )
 
@@ -71,12 +71,12 @@ class BookmarkWriter:
                 job, json.dumps(job.payload), job.payload_flags
             )
         except Exception:
-            logging.warning(
+            logger.warning(
                 "Unable to persist state, or received state is invalid, incremental state has not been updated"
             )
         else:
-            logging.info(f"Incremental state has been updated at {datetime.utcnow()}.")
-            logging.debug(f"Incremental state: {new_state}")
+            logger.info(f"Incremental state has been updated at {datetime.utcnow()}.")
+            logger.debug(f"Incremental state: {new_state}")
 
 
 class SingerTarget(SingerPlugin):
