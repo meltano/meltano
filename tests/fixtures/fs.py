@@ -36,6 +36,17 @@ def test_dir(tmp_path_factory) -> Path:
         os.chdir(cwd)
 
 
+@pytest.fixture(scope="function")
+def function_scoped_test_dir(tmp_path_factory) -> Path:
+    tmp_path = tmp_path_factory.mktemp("meltano_root")
+    cwd = os.getcwd()
+    try:
+        os.chdir(tmp_path)
+        yield tmp_path
+    finally:
+        os.chdir(cwd)
+
+
 @pytest.fixture(scope="session")
 def empty_meltano_yml_dir(test_dir):
     meltano_file = test_dir / "meltano.yml"

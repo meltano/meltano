@@ -12,7 +12,7 @@ from meltano.core.environment_service import (
     EnvironmentAlreadyExistsError,
     EnvironmentService,
 )
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
 
