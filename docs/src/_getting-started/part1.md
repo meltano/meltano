@@ -96,19 +96,19 @@ cd my-meltano-project
 
 ## Add an Extractor to Pull Data from a Source
 
-Now that you have your very own Meltano project, it's time to add [plugins](/concepts/plugins) to it. We're going to add an extrator for GitHub to get our data. An [extractor](/concepts/plugins#extractors) is responsible for pulling data out of any data source.
+Now that you have your very own Meltano project, it's time to add [plugins](/concepts/plugins) to it. We're going to add an extrator for GitHub to get our data. An [extractor](/concepts/plugins#extractors) is responsible for pulling data out of any data source. In this case, we choose a specific one with the `--variant` option to make this tutorial easy to work with.
 
 1.  Add the GitHub extractor
 
 ```bash
-$ meltano add extractor tap-github
+$ meltano add extractor tap-github --variant singer-io
 ```
 <br />
 
 <div class="termy">
 
 ```console
-$ meltano add extractor tap-github
+$ meltano add extractor tap-github --variant singer-io
 2022-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
 Added extractor 'tap-github' to your Meltano project
 Variant:        singer-io (default)
