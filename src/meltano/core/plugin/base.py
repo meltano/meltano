@@ -153,9 +153,11 @@ class PluginType(YAMLEnum):  # noqa: WPS214
         Returns:
             The list of plugin types that can be used as CLI arguments.
         """
-        args = [plugin_type.singular for plugin_type in cls]
-        args.extend(list(cls))
-        return args
+        return [
+            getattr(plugin_type, plugin_type_name)
+            for plugin_type in cls
+            for plugin_type_name in ("singular", "value")
+        ]
 
     @classmethod
     def from_cli_argument(cls, value: str) -> PluginType:
