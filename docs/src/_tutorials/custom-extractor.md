@@ -410,7 +410,7 @@ plugins:
 ```
 
 <div class="notification is-info">
-  <p>You can further customize the appearance of your custom extractor in [Meltano UI](/reference/ui) using the following options:</p>
+  <p>You can further customize the appearance of your custom extractor using the following options:</p>
   <ul>
     <li>`label`</li>
     <li>`logo_url`</li>
@@ -453,7 +453,6 @@ You may use any of the following to configure setting values (in order of preced
 
 - Environment variables
 - `config` section in the plugin
-- Meltano UI
 - `value` of the setting's definition
 
 ## Publishing to the world

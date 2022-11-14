@@ -45,7 +45,7 @@ Meltano helps you to create your end-to-end data stack within minutes.  The core
 3. **Orchestrating** the extract/load/transform process.
 4. Adding **additional steps** to the process like testing the data inside transformations with dbt tests, using Great Expectations, running analyses inside Jupyter notebooks, visualizing data with Superset etc.
 
-Meltano allows you to do any combination of these steps inside your Meltano project, controlled by the Meltano CLI and supplemented with the Meltano UI.
+Meltano allows you to do any combination of these steps inside your Meltano project, controlled by the Meltano CLI.
 
 ### Extracting & Loading data
 Here's a complete walk-through pulling data from AWS S3 and dumping it into a PostgreSQL database within 60 secs.

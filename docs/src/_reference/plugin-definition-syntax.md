@@ -387,7 +387,7 @@ settings_group_validation:
 
 ## `settings`
 
-Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties.
+Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. To improve the UX of this form, each setting has a number of optional properties.
 
 Example:
 
@@ -491,7 +491,7 @@ settings:
 
 ### `settings[*].tooltip`
 
-Optional. Use to provide a tooltip for the setting in the Meltano UI.
+Optional. Use to provide a tooltip for the setting when rendered within a UI that supports tooltips.
 
 ```yaml
 settings:

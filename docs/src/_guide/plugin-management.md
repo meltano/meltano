@@ -580,9 +580,3 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 
     Keep doing this until `meltano config <name> list` shows a valid configuration for the new variant,
     without any of the old variant's settings remaining as [custom settings](/guide/configuration#custom-settings).
-
-## Meltano UI
-
-While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
-and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
-basic plugin management functionality is also available in [the UI](/reference/ui#extractors).

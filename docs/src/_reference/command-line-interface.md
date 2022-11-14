@@ -1341,53 +1341,9 @@ meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
 
 The `test` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
-## `ui`
+## `ui` (deprecated)
 
-- `meltano ui`: Start the Meltano UI.
-
-### `start` (default)
-
-Start the Meltano UI.
-
-### `setup`
-
-<div class="notification is-info">
-  <p>This command is only relevant for production-grade setup.</p>
-</div>
-
-Generate secrets for the [`ui.secret_key`](/reference/settings#ui-secret-key)
-and [`ui.password_salt`](/reference/settings#ui-password-salt) settings, that
-will be stored in your project's [`.env` file](/concepts/project#env) along with the
-specified value for the [`ui.server_name` setting](/reference/settings#ui-server-name).
-
-In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default.
-
-<div class="notification is-danger">
-  <p><strong>Regenerating secrets will cause the following:</strong></p>
-  <p>
-    <ul>
-      <li>All passwords will be invalid</li>
-      <li>All sessions will be expired</li>
-    </ul>
-  </p>
-  <p>Use with caution!</p>
-</div>
-
-#### How to use
-
-The `--bits` flag can be used to specify the size of the secrets, default to 256.
-
-```bash
-# Format
-meltano ui setup [--bits=256] <server_name>
-
-meltano ui setup meltano.example.com
-```
-
-### Using `ui` with Environments
-
-The `ui` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
-
+The Metano UI is now deprecated. For more information see our [troubleshooting page](/guide/troubleshooting#meltano-ui).
 ## `user`
 
 <div class="notification is-info">
