@@ -252,7 +252,7 @@ class Variant(NameEq, Canonical):
 
     def __init__(
         self,
-        name: str = None,
+        name: str | None = None,
         original: bool | None = None,
         deprecated: bool | None = None,
         docs: str | None = None,
@@ -396,7 +396,7 @@ class PluginDefinition(PluginRef):
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def find_variant(self, variant_or_name: str | Variant = None):
+    def find_variant(self, variant_or_name: str | Variant | None = None):
         """Find the variant with the given name or variant.
 
         Args:
@@ -739,8 +739,8 @@ class StandalonePlugin(Canonical):
         plugin_type: PluginType,
         name: str,
         namespace: str,
-        variant: str = None,
-        label: str = None,
+        variant: str | None = None,
+        label: str | None = None,
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,

@@ -14,7 +14,7 @@ MELTANO_COMMAND = "meltano"
 class MeltanoInvoker:
     """Class used to find and invoke all commands passed to it."""
 
-    def __init__(self, project, settings_service: ProjectSettingsService = None):
+    def __init__(self, project, settings_service: ProjectSettingsService | None = None):
         """
         Load the class with the project and service settings.
 

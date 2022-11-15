@@ -66,9 +66,9 @@ def add(
     project: Project,
     plugin_type: str,
     plugin_name: str,
-    inherit_from: str = None,
-    variant: str = None,
-    as_name: str = None,
+    inherit_from: str | None = None,
+    variant: str | None = None,
+    as_name: str | None = None,
     **flags,
 ):
     """

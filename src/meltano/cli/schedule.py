@@ -260,7 +260,7 @@ def remove(ctx, name):
 def _update_job_schedule(
     candidate: Schedule,
     job: str | None,
-    interval: str = None,
+    interval: str | None = None,
 ) -> Schedule:
     """Update an existing job schedule.
 

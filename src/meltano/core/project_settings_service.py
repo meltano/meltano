@@ -29,7 +29,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
     config_override = {}
     supports_environments = False
 
-    def __init__(self, *args, config_service: ConfigService = None, **kwargs):
+    def __init__(self, *args, config_service: ConfigService | None = None, **kwargs):
         """Instantiate ProjectSettingsService instance.
 
         Args:
