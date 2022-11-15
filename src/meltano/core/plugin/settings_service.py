@@ -21,7 +21,7 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
         project: Project,
         plugin: ProjectPlugin,
         *args,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
         **kwargs,
     ):
         """Create a new plugin settings manager.

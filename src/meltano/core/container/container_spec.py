@@ -57,7 +57,7 @@ class ContainerSpec(Canonical):
         self.volumes = volumes or []
         self.env = env or {}
 
-    def get_docker_config(self, *, additional_env: dict = None) -> dict:
+    def get_docker_config(self, *, additional_env: dict | None = None) -> dict:
         """Build a container configuration dictionary.
 
         Args:

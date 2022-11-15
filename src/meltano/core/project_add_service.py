@@ -33,7 +33,7 @@ class ProjectAddService:
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
     ):
         """Create a new Project Add Service.
 

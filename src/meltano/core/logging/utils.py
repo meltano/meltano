@@ -127,7 +127,7 @@ def default_config(log_level: str) -> dict:
 
 
 def setup_logging(  # noqa: WPS210
-    project: Project = None,
+    project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
     log_config: dict | None = None,
 ) -> None:

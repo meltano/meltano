@@ -35,7 +35,7 @@ class ContainerService:
         spec: ContainerSpec,
         name: str,
         *,
-        env: dict = None,
+        env: dict | None = None,
         pull: bool = False,
     ) -> dict:
         """Run a Docker container.

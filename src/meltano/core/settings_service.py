@@ -83,8 +83,8 @@ class SettingsService(ABC):  # noqa: WPS214
         self,
         project: Project,
         show_hidden: bool = True,
-        env_override: dict = None,
-        config_override: dict = None,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
     ):
         """Create a new settings service object.
 

@@ -249,7 +249,7 @@ def _prompt_plugin_settings(plugin_type):
     click.echo("Default: no settings")
     click.echo()
 
-    settings: dict = None
+    settings: dict | None = None
     while settings is None:  # noqa:  WPS426  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
