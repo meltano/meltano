@@ -367,7 +367,7 @@ class _GetItemProtocol(Protocol):
 _G = TypeVar("_G", bound=_GetItemProtocol)
 
 
-def find_named(xs: Iterable[_G], name: str, obj_type: type = None) -> _G:
+def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:

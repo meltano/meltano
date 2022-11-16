@@ -1494,7 +1494,6 @@ class TestCliRunScratchpadOne:
             return_value=project_plugins_service,
         ):
             result = cli_runner.invoke(cli, args)
-
             ansi_color_escape = re.compile(r"\x1b\[[0-9;]+m")
             match = ansi_color_escape.search(result.stderr)
             if colors:

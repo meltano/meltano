@@ -29,7 +29,6 @@ meltano --environment=dev config target-postgres set default_target_schema publi
 ```
 
 Note that sensitive config options such as `password` [aren't stored in your `meltano.yml` but in `.env` instead](https://docs.meltano.com/guide/configuration#configuration-layers). Print out the config to make sure it looks as expected:
-
 ## Performing work
 
 We're ready to start getting some work done! Go ahead and run your EL task using `meltano run`:

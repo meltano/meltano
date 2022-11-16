@@ -149,7 +149,7 @@ def plugin_command_invoker(
     project: Project,
     command: str | None,
     command_args: list[str] | None = None,
-    run_dir: str = None,
+    run_dir: str | None = None,
 ) -> InvokerCommand:
     """
     Make an InvokerCommand from a plugin.

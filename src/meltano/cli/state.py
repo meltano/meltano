@@ -109,16 +109,13 @@ def meltano_state(project: Project, ctx: click.Context):
     activate_explicitly_provided_environment(ctx, project)
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
+    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
 @click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
-@pass_project()
-def list_state(
-    project: Project, ctx: click.Context, pattern: str | None
-):  # noqa: WPS125
+def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
     """List all state_ids for this project.
 
     Optionally pass a glob-style pattern to filter state_ids by.

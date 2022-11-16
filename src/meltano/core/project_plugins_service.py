@@ -53,11 +53,11 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def __init__(
         self,
         project: Project,
-        config_service: ConfigService = None,
-        lock_service: PluginLockService = None,
-        discovery_service: PluginDiscoveryService = None,
-        locked_definition_service: LockedDefinitionService = None,
-        hub_service: MeltanoHubService = None,
+        config_service: ConfigService | None = None,
+        lock_service: PluginLockService | None = None,
+        discovery_service: PluginDiscoveryService | None = None,
+        locked_definition_service: LockedDefinitionService | None = None,
+        hub_service: MeltanoHubService | None = None,
         use_cache: bool = True,
     ):
         """Create a new Project Plugins Service.

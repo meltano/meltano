@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from contextlib import asynccontextmanager, closing
+from pathlib import Path
 from typing import AsyncIterator
 
 import structlog
@@ -14,6 +15,7 @@ from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -23,7 +25,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER, StateService
+from meltano.core.state_service import StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -43,8 +45,8 @@ class ELBContext:  # noqa: WPS230
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
-        session: Session = None,
+        plugins_service: ProjectPluginsService | None = None,
+        session: Session | None = None,
         job: Job | None = None,
         full_refresh: bool | None = False,
         force: bool | None = False,
@@ -85,7 +87,7 @@ class ELBContext:  # noqa: WPS230
         self.base_output_logger = base_output_logger
 
     @property
-    def elt_run_dir(self) -> str:
+    def elt_run_dir(self) -> Path | None:
         """Obtain the run directory for the current job.
 
         Returns:
@@ -95,13 +97,13 @@ class ELBContext:  # noqa: WPS230
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
-class ELBContextBuilder:
+class ELBContextBuilder:  # noqa: WPS214
     """Build up ELBContexts for ExtractLoadBlocks."""
 
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
         job: Job | None = None,
     ):
         """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
@@ -264,7 +266,7 @@ class ELBContextBuilder:
         )
 
     @property
-    def elt_run_dir(self) -> str:
+    def elt_run_dir(self) -> Path | None:
         """Get the run directory for the current job.
 
         Returns:
@@ -358,12 +360,14 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         if not self._state_service:
             if self.has_state():
-                self._state_service = StateService(self.context.session)
+                self._state_service = StateService(
+                    project=self.context.project, session=self.context.session
+                )
             else:
                 raise BlockSetHasNoStateError()
         return self._state_service
 
-    def index_last_input_done(self) -> int:
+    def index_last_input_done(self) -> int | None:
         """Return index of the block furthest from the start that has exited and required input.
 
         Returns:
@@ -373,7 +377,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             if block.requires_input and block.proxy_stderr.done():
                 return idx
 
-    def upstream_complete(self, index: int) -> bool:
+    def upstream_complete(self, index: int) -> bool | None:
         """Return whether blocks upstream from a given block index are already done.
 
         Args:
@@ -399,7 +403,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             await block.stop()
 
     async def process_wait(
-        self, output_exception_future: asyncio.Task | None, subset: int = None
+        self, output_exception_future: asyncio.Task | None, subset: int | None = None
     ) -> set[asyncio.Task]:
         """Wait on all process futures in the block set.
 
@@ -665,7 +669,7 @@ class ELBExecutionManager:
         # Wait for all buffered consumer (target) output to be processed
         await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
-    async def _wait_for_process_completion(  # noqa: WPS213 WPS217
+    async def _wait_for_process_completion(  # noqa: WPS213 WPS217 WPS210
         self, current_head: IOBlock
     ) -> tuple[int, int] | None:
         """Wait for the current head block to complete or for an error to occur.

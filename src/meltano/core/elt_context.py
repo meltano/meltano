@@ -95,7 +95,7 @@ class ELTContext:  # noqa: WPS230
         select_filter: list | None = None,
         catalog: str | None = None,
         state: str | None = None,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
         base_output_logger: OutputLogger | None = None,
     ):
         """Initialise ELT Context instance.
@@ -202,7 +202,7 @@ class ELTContextBuilder:  # noqa: WPS214
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
     ):
         """Instantiate new ELTContextBuilder.
 

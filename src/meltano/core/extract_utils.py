@@ -28,7 +28,7 @@ async def get_futures(urls: Iterator[str], timeout=None, headers=None):
 
 
 def fetch_urls(
-    urls: list, headers: dict = None, timeout: aiohttp.ClientTimeout = None
+    urls: list, headers: dict | None = None, timeout: aiohttp.ClientTimeout = None
 ) -> Iterator[str]:
     """Asynchronously fetch multiple urls and return `Iterator` object that contains all of the responses.
 

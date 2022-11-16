@@ -60,7 +60,7 @@ jobs:
         pipx install poetry
         poetry version
         poetry version --short
-        echo "::set-output name=release-version::$(poetry version --short)"
+        echo "release-version=$(poetry version --short)" >> $GITHUB_OUTPUT
 
     - name: Assemble image tags
       id: assemble-tags
@@ -90,18 +90,18 @@ jobs:
 
         echo "If this is not a dry run, the image will be published with the following tags:"
         cat tags
-        echo "::set-output name=tags::$TAGS"
+        echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
     - name: Set registry username and password
       id: user-and-pass
       run: |
         if [[ "${{ env.registry }}" == "ghcr.io" ]]; then
-          echo "::set-output name=username::${{ github.actor }}"
-          echo "::set-output name=password::${{ secrets.GITHUB_TOKEN }}"
+          echo "username=${{ github.actor }}" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
         fi
         if [[ "${{ env.registry }}" == "docker.io" ]]; then
-          echo "::set-output name=username::meltano"
-          echo "::set-output name=password::${{ secrets.DOCKERHUB_TOKEN }}"
+          echo "username=meltano" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_OUTPUT
         fi
 
     - name: Build, scan, then conditionally push the Docker image for a given Python version

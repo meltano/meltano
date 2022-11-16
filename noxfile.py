@@ -35,9 +35,10 @@ def tests(session: Session) -> None:
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
 
     if backend_db == "mssql":
-        session.install(".[mssql]")
+        session.install(".[mssql,azure,gcs,s3]")
+
     else:
-        session.install(".")
+        session.install(".[azure,gcs,s3]")
 
     session.install(
         "colorama",  # colored output in Windows
@@ -97,5 +98,6 @@ def mypy(session: Session) -> None:
         "sqlalchemy2-stubs",
         "types-croniter",
         "types-requests",
+        "boto3-stubs[essential]",
     )
     session.run("mypy", *args)
