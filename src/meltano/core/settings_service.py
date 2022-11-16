@@ -83,8 +83,8 @@ class SettingsService(ABC):  # noqa: WPS214
         self,
         project: Project,
         show_hidden: bool = True,
-        env_override: dict = None,
-        config_override: dict = None,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
     ):
         """Create a new settings service object.
 
@@ -120,6 +120,15 @@ class SettingsService(ABC):  # noqa: WPS214
 
         Returns:
             URL for Meltano doc site.
+        """
+
+    @property
+    @abstractmethod
+    def project_settings_service(self):
+        """Get a project settings service.
+
+        Returns:
+            A ProjectSettingsService
         """
 
     @property
@@ -344,7 +353,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
-        env_var_strict_mode, _ = manager.get(
+        env_var_strict_mode, _ = source.manager(self.project_settings_service).get(
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
         )
         if expand_env_vars and metadata.get("expandable", False):

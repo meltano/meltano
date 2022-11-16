@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.10.0 (2022-11-16)
+
+### ✨ New
+
+- [#6911](https://github.com/meltano/meltano/issues/6911) Remote state backends
+
+### 🐛 Fixes
+
+- [#6971](https://github.com/meltano/meltano/issues/6971) Correct strict_env_var_mode flag check in plugin configs
+- [#6935](https://github.com/meltano/meltano/issues/6935) Persist `description` and `logo_url` to plugin lock files -- _**Thanks @DanielPDWalker!**_
+
+### 📚 Documentation Improvements
+
+- [#6984](https://github.com/meltano/meltano/issues/6984) Fix tap-github
+- [#6955](https://github.com/meltano/meltano/issues/6955) Remove UI docs
+- [#6977](https://github.com/meltano/meltano/issues/6977) Link to Meltano Cloud from Production doc
+
 ## v2.9.0 (2022-11-08)
 
 ### ✨ New

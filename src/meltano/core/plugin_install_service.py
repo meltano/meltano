@@ -50,8 +50,8 @@ class PluginInstallState:
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
         status: PluginInstallStatus,
-        message: str = None,
-        details: str = None,
+        message: str | None = None,
+        details: str | None = None,
     ):
         """Initialize PluginInstallState instance.
 
@@ -156,7 +156,7 @@ class PluginInstallService:
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
         status_cb: Callable[[PluginInstallState], Any] = noop,
         parallelism: int | None = None,
         clean: bool = False,
@@ -406,7 +406,7 @@ class PipPluginInstaller:
         self,
         project,
         plugin: ProjectPlugin,
-        venv_service: VenvService = None,
+        venv_service: VenvService | None = None,
     ):
         """Initialize PipPluginInstaller instance.
 

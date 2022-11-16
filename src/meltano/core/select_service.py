@@ -19,7 +19,7 @@ class SelectService:
         self,
         project: Project,
         extractor: str,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
     ):
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)

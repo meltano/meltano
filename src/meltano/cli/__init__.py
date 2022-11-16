@@ -56,7 +56,7 @@ exit_code: None | int = None
 
 atexit_handler_registered = False
 exit_code_reported = False
-exit_event_tracker: Tracker = None
+exit_event_tracker: Tracker | None = None
 
 setup_logging()
 
