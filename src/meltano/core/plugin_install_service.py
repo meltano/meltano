@@ -1,8 +1,10 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 
+
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import functools
 import logging
 import sys
@@ -12,14 +14,17 @@ from typing import Any, Callable, Iterable
 
 from cached_property import cached_property
 
+from meltano.core.error import (
+    AsyncSubprocessError,
+    PluginInstallError,
+    PluginInstallWarning,
+)
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-
-from .error import AsyncSubprocessError, PluginInstallError, PluginInstallWarning
-from .plugin import PluginType
-from .project import Project
-from .project_plugins_service import ProjectPluginsService
-from .utils import noop
-from .venv_service import VenvService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.utils import noop
+from meltano.core.venv_service import VenvService
 
 logger = logging.getLogger(__name__)
 
@@ -87,24 +92,23 @@ class PluginInstallState:
         """
         return self.status == PluginInstallStatus.SKIPPED
 
-    @property  # noqa: WPS212  # Too many return statements
-    def verb(self):
+    @property
+    def verb(self) -> str:
         """Verb form of status.
 
         Returns:
             Verb form of status.
         """
         if self.status is PluginInstallStatus.RUNNING:
-            if self.reason is PluginInstallReason.UPGRADE:
-                return "Updating"
-            return "Installing"
-
+            return (
+                "Updating"
+                if self.reason is PluginInstallReason.UPGRADE
+                else "Installing"
+            )
         if self.status is PluginInstallStatus.SUCCESS:
-            if self.reason is PluginInstallReason.UPGRADE:
-                return "Updated"
-
-            return "Installed"
-
+            return (
+                "Updated" if self.reason is PluginInstallReason.UPGRADE else "Installed"
+            )
         if self.status is PluginInstallStatus.SKIPPED:
             return "Skipped installing"
 
@@ -124,11 +128,8 @@ def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
         An instantiated plugin installer for the given plugin.
     """
     installer_class = PipPluginInstaller
-    try:
+    with contextlib.suppress(AttributeError):
         installer_class = plugin.installer_class
-    except AttributeError:
-        pass
-
     return installer_class(project, plugin, *args, **kwargs)
 
 
@@ -150,7 +151,7 @@ def with_semaphore(func):
     return wrapper
 
 
-class PluginInstallService:
+class PluginInstallService:  # noqa: WPS214
     """Plugin install service."""
 
     def __init__(
@@ -160,6 +161,7 @@ class PluginInstallService:
         status_cb: Callable[[PluginInstallState], Any] = noop,
         parallelism: int | None = None,
         clean: bool = False,
+        force: bool = False,
     ):
         """Initialize new PluginInstallService instance.
 
@@ -169,6 +171,7 @@ class PluginInstallService:
             status_cb: Status call-back function.
             parallelism: Number of parallel installation processes to use.
             clean: Clean install flag.
+            force: Whether to ignore the Python version required by plugins.
         """
         self.project = project
         self.plugins_service = plugins_service or ProjectPluginsService(project)
@@ -178,9 +181,15 @@ class PluginInstallService:
         elif parallelism < 1:
             self.parallelism = sys.maxsize
         self.clean = clean
+        self.force = force
 
     @cached_property
     def semaphore(self):
+        """An asyncio semaphore with a counter starting at `self.parallelism`.
+
+        Returns:
+            An asyncio semaphore with a counter starting at `self.parallelism`.
+        """  # noqa: D401
         return asyncio.Semaphore(self.parallelism)
 
     @staticmethod
@@ -202,24 +211,25 @@ class PluginInstallService:
             A tuple containing a list of PluginInstallState instance (for skipped plugins)
             and a deduplicated list of plugins to install.
         """
-        states = []
         seen_venvs = set()
         deduped_plugins = []
-        for plugin in list(plugins):
+        states = []
+        for plugin in plugins:
             if (plugin.type, plugin.venv_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
                 seen_venvs.add((plugin.type, plugin.venv_name))
             else:
-                state = PluginInstallState(
-                    plugin=plugin,
-                    reason=reason,
-                    status=PluginInstallStatus.SKIPPED,
-                    message=(
-                        f"Plugin '{plugin.name}' does not require installation: "
-                        + "reusing parent virtualenv"
-                    ),
+                states.append(
+                    PluginInstallState(
+                        plugin=plugin,
+                        reason=reason,
+                        status=PluginInstallStatus.SKIPPED,
+                        message=(
+                            f"Plugin {plugin.name!r} does not require "
+                            "installation: reusing parent virtualenv"
+                        ),
+                    )
                 )
-                states.append(state)
         return states, deduped_plugins
 
     def install_all_plugins(
@@ -341,7 +351,9 @@ class PluginInstallService:
         try:
             async with plugin.trigger_hooks("install", self, plugin, reason):
                 await installer_factory(self.project, plugin).install(
-                    reason, self.clean
+                    reason=reason,
+                    clean=self.clean,
+                    force=self.force,
                 )
                 state = PluginInstallState(
                     plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS
@@ -422,16 +434,20 @@ class PipPluginInstaller:
             name=self.plugin.venv_name,
         )
 
-    async def install(self, reason, clean):
+    async def install(
+        self, reason: PluginInstallReason, clean: bool, force: bool
+    ) -> None:
         """Install the plugin into the virtual environment using pip.
 
         Args:
             reason: Install reason.
             clean: Flag to clean install.
-
-        Returns:
-            None.
+            force: Whether to ignore the Python version required by plugins.
         """
-        return await self.venv_service.install(
-            self.plugin.formatted_pip_url, clean=clean
+        pip_install_args = self.plugin.formatted_pip_url.split(" ")
+        if force:
+            pip_install_args.insert(0, "--ignore-requires-python")
+        await self.venv_service.install(
+            pip_install_args=pip_install_args,
+            clean=clean,
         )

@@ -645,3 +645,31 @@ def get_no_color_flag() -> bool:
         True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
     """
     return get_boolean_env_var("NO_COLOR")
+
+
+# TODO: Replace with `str.removeprefix` once Meltano drops Python 3.8 support
+def remove_prefix(string: str, prefix: str) -> str:
+    """Remove the specified prefix if it is present.
+
+    Args:
+        string: The string from which the prefix will be removed if present.
+        prefix: The prefix to remove from the string.
+
+    Returns:
+        The given string, with the prefix removed if it was present.
+    """
+    return string[len(prefix) :] if string.startswith(prefix) else string
+
+
+# TODO: Replace with `str.removesuffix` once Meltano drops Python 3.8 support
+def remove_suffix(string: str, suffix: str) -> str:
+    """Remove the specified suffix if it is present.
+
+    Args:
+        string: The string from which the suffix will be removed if present.
+        suffix: The suffix to remove from the string.
+
+    Returns:
+        The given string, with the suffix removed if it was present.
+    """
+    return string[: -len(suffix)] if string.endswith(suffix) else string

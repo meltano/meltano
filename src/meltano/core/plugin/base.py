@@ -663,7 +663,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """Return whether the plugin is invokable.
 
         Returns:
-            True if the plugin is invokable, False otherwise.
+            Whether the plugin is invokable.
         """
         return self.is_installable() or self.executable is not None
 
