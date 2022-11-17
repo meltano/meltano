@@ -70,6 +70,7 @@ jobs:
         MELTANO_VERSION_MAJOR="${MELTANO_VERSION_ARRAY[0]}"
         MELTANO_VERSION_MAJOR_MINOR="${MELTANO_VERSION_ARRAY[0]}.${MELTANO_VERSION_ARRAY[1]}"
         MELTANO_VERSION_MAJOR_MINOR_PATCH="${MELTANO_VERSION_ARRAY[0]}.${MELTANO_VERSION_ARRAY[1]}.${MELTANO_VERSION_ARRAY[2]}"
+
         # To save space, only publish the `latest` tag for each images to the GitHub registry
         if [[ "${{ env.registry }}" != "ghcr.io" ]]; then
           echo "v${MELTANO_VERSION_MAJOR}-python${{ matrix.python-version }}" >> tags
@@ -83,14 +84,12 @@ jobs:
         echo "latest-python${{ matrix.python-version }}" >> tags
         [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "latest" >> tags
 
-        TAGS=$(cat tags)
-        TAGS="${TAGS//'%'/'%25'}"
-        TAGS="${TAGS//$'\n'/'%0A'}"
-        TAGS="${TAGS//$'\r'/'%0D'}"
-
         echo "If this is not a dry run, the image will be published with the following tags:"
         cat tags
-        echo "tags=$TAGS" >> $GITHUB_OUTPUT
+
+        echo 'IMAGE_TAGS<<EOF' >> $GITHUB_ENV
+        echo "$(cat tags)" >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
 
     - name: Set registry username and password
       id: user-and-pass
@@ -109,7 +108,7 @@ jobs:
       with:
         push: ${{ env.dry_run == 'false' }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        tags: ${{ steps.assemble-tags.outputs.tags }}
+        tags: ${{ env.IMAGE_TAGS }}
         registry: ${{ env.registry }}
         username: ${{ steps.user-and-pass.outputs.username }}
         password: ${{ steps.user-and-pass.outputs.password }}
