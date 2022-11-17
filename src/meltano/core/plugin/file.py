@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-class FilePlugin(BasePlugin):
+class FilePlugin(BasePlugin):  # noqa: WPS214
     """Meltano file plugin type."""
 
     __plugin_type__ = PluginType.FILES
@@ -42,7 +42,7 @@ class FilePlugin(BasePlugin):
         """Return whether the plugin is invokable.
 
         Returns:
-            True if the plugin is invokable, False otherwise.
+            Whether the plugin is invokable.
         """
         return False
 
@@ -272,33 +272,27 @@ class FilePlugin(BasePlugin):
             plugin: The installed plugin.
             reason: The reason for the installation.
         """
-        project = installer.project
-        plugins_service = installer.plugins_service
-
-        plugin_settings_service = PluginSettingsService(
-            project, plugin, plugins_service=plugins_service
-        )
-        update_config = plugin_settings_service.get("_update")
+        update_config = PluginSettingsService(
+            installer.project, plugin, plugins_service=installer.plugins_service
+        ).get("_update")
         paths_to_update = [
             path for path, to_update in update_config.items() if to_update
         ]
 
         if reason is PluginInstallReason.ADD:
             logger.info(f"Adding '{plugin.name}' files to project...")
-
-            for path in self.create_files(project, paths_to_update):
+            for path in self.create_files(installer.project, paths_to_update):
                 logger.info(f"Created {path}")
         elif reason is PluginInstallReason.UPGRADE:
             logger.info(f"Updating '{plugin.name}' files in project...")
-
-            updated_paths = self.update_files(project, paths_to_update)
+            updated_paths = self.update_files(installer.project, paths_to_update)
             if not updated_paths:
                 logger.info("Nothing to update")
                 return
-
             for path in updated_paths:
                 logger.info(f"Updated {path}")
         else:
             logger.info(
-                f"Run `meltano upgrade files` to update your project's '{plugin.name}' files."
+                "Run `meltano upgrade files` to update your project's "
+                f"{plugin.name!r} files."
             )

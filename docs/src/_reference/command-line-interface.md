@@ -546,9 +546,11 @@ Additionally, plugin names can be provided to only (re)install those specific pl
 
 Use `--include-related` to automatically install transforms related to installed extractor plugins.
 
-Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
+
+If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the `--force` flag to `meltano install`.
 
 <div class="notification is-info">
   <p>If you're using a custom Docker image, make sure `python3-venv` is installed:</p>
@@ -582,11 +584,12 @@ meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
 
-
 meltano install --include-related
 
 meltano install --parallelism=16
 meltano install --clean
+
+meltano install --force
 ```
 
 ### Using `install` with Environments
