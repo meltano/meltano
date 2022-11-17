@@ -8,6 +8,7 @@ import logging
 import tempfile
 from functools import wraps
 from pathlib import Path
+from typing import Any
 
 import click
 import dotenv
@@ -32,7 +33,7 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext
 logger = logging.getLogger(__name__)
 
 
-def _get_ctx_arg(*args):
+def _get_ctx_arg(*args: Any) -> click.core.Context:
     """Get the click.core.Context arg from a set of args.
 
     Args:
@@ -50,7 +51,7 @@ def _get_ctx_arg(*args):
     raise ValueError("No click.core.Context provided in *args")
 
 
-def _get_store_choices():
+def _get_store_choices() -> list[SettingValueStore]:
     """Get a list of valid choices for the --store flag.
 
     Returns:
@@ -81,9 +82,12 @@ def _use_meltano_env(func):
         if store not in {SettingValueStore.MELTANO_YML, SettingValueStore.MELTANO_ENV}:
             return func(*args, **kwargs, store=store)
         ctx = _get_ctx_arg(*args)
-        if ctx.obj["is_default_environment"]:
-            return func(*args, **kwargs, store=SettingValueStore.MELTANO_YML)
-        return func(*args, **kwargs, store=SettingValueStore.MELTANO_ENV)
+        store = (
+            SettingValueStore.MELTANO_YML
+            if ctx.obj["is_default_environment"]
+            else SettingValueStore.MELTANO_ENV
+        )
+        return func(*args, **kwargs, store=store)
 
     return _wrapper
 
