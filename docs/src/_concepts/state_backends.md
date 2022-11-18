@@ -12,11 +12,11 @@ for Meltano projects running in ephemeral environments or in circumstances where
 
 ## Supported Backends
 
-* [System Database](#default-system-databse)
-* [Local Filesystem](#local-filesystem)
-* [Amazon AWS S3](#aws-s3)
-* [Azure Blob Storage](#azure-blob-storage)
-* [Google Cloud Storage](#google-cloud-storage)
+- [System Database](#default-system-databse)
+- [Local Filesystem](#local-filesystem)
+- [Amazon AWS S3](#aws-s3)
+- [Azure Blob Storage](#azure-blob-storage)
+- [Google Cloud Storage](#google-cloud-storage)
 
 ## Installation
 
@@ -27,6 +27,14 @@ To use a cloud storage backend, install Meltano using one of the following [extr
 - `meltano[s3]` to use the AWS S3 state backend.
 - `meltano[azure]` to use the Azure Blob Storage state backend.
 - `meltano[gcs]` to use the Google Cloud Storage state backend.
+
+If the base Meltano distribution is already installed in your environment, install the relevant extra and `pip` will install only the missing requirements.
+
+<div class="notification is-info">
+	<p>
+		State backends are only available in Meltano version 2.10+. If you are using an earlier version, you'll need to upgrade your project via <a href="/reference/command-line-interface#upgrade"> <code>meltano upgrade</code></a> before you using the state backends feature.
+	</p>
+</div>
 
 ## Configuration
 
@@ -63,7 +71,7 @@ The local filesystem state backend will utilize the [locking strategy](#locking)
 
 To store state remotely in Azure Blob Storage, set the `state_backend.uri` setting to `azure://<your container_name>/<prefix for state JSON blobs>`.
 
-To authenticate to Azure, Meltano will also need a [connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string). 
+To authenticate to Azure, Meltano will also need a [connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string).
 You can provide this via the `state_backend.azure.connection_string` setting.
 If no `state_backend.azure.connection_string` setting is configured, Meltano will use the value of the `AZURE_STORAGE_CONNECTION_STRING` environment variable.
 If the connection string is not provided via either of these methods, Meltano will not be able to authenticate to Azure and any state operations will fail.
@@ -93,17 +101,16 @@ If credentials are not provided via these settings, Meltano will use the value t
 
 If GCS credentials are not found via any of the methods described above, Meltano will not be able to authenticate to Google Cloud Storage and state operations will fail.
 
-
 ## Locking
 
 Because the `systemdb` state backend utilizes a transactional database, it can rely on the database's transaction logic to prevent conflicts among multiple runs of the same pipeline.
 
 For some other state backends, Meltano implements its own simple locking mechanism.
 This locking mechanism utilizes reasonable defaults but you may wish to configure the locking settings differently.
-You can do this via two [`state_backend` settings](/reference/settings#state-backends): 
+You can do this via two [`state_backend` settings](/reference/settings#state-backends):
 
-* `state_backend.lock_timeout_seconds`
-* `state_backend.lock_retry_seconds`
+- `state_backend.lock_timeout_seconds`
+- `state_backend.lock_retry_seconds`
 
 When Meltano tries to read or write state for a given `state_id`, it will try to acquire a lock on the state data for that `state_id`.
 For example, using the local filesystem state backend with `state_backend.uri` set to `file:///${MELTANO_SYS_DIR_ROOT}/state`, it will check to see if a file exists at the path `file:///${MELTANO_SYS_DIR_ROOT}/state/<state_id>/lock`.
