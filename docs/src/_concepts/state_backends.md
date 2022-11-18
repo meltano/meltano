@@ -5,16 +5,22 @@ layout: doc
 weight: 3
 ---
 
-Many Meltano pipelines load data incrementally.
-In order for these pipelines to run efficiently and properly without dropping historical data or loading duplicate records, Meltano needs to keep track of the state of a pipeline as part of each run.
+Meltano is capable of running pipelines that load data incrementally.
+In order for these pipelines to run efficiently and properly without losing historical data or loading duplicate records, Meltano needs to keep track of the state of a pipeline as part of each run.
 This state can be stored in Meltano's backend system database, but
 for Meltano projects running in ephemeral environments or in circumstances where administering a dedicated backend database is undesirable, Meltano also supports persisting state in remote state backends backed by cloud storage services.
 
+## Supported Backends
+
+* [System Database](#default-system-databse)
+* [Local Filesystem](#local-filesystem)
+* [Amazon AWS S3](#aws-s3)
+* [Azure Blob Storage](#azure-blob-storage)
+* [Google Cloud Storage](#google-cloud-storage)
+
 ## Installation
 
-To cut down on extraneous dependencies, Meltano imports cloud storage client libraries lazily and these libraries are not included in the base `meltano` package.
-
-Only the default system database state backend _or_ the local filesystem state backend can be used as part of the base `meltano` distribution.
+No extra work is needed to use the default system database or local filesystem as a state backend as they are already part of any base Meltano distribution.
 
 To use a cloud storage backend, install Meltano using one of the following [extras](https://peps.python.org/pep-0508/#extras):
 
@@ -22,25 +28,43 @@ To use a cloud storage backend, install Meltano using one of the following [extr
 - `meltano[azure]` to use the Azure Blob Storage state backend.
 - `meltano[gcs]` to use the Google Cloud Storage state backend.
 
-## Currently Supported Backends
+## Configuration
 
-Depending on the environment where you're running Meltano and the state backend you wish to use, you may also need to configure additional settings. The settings for each currently supported backend are listed below and can also be found in [the Meltano settings reference documentation](/reference/settings#state-backends).
+### Default (System Database)
 
-### System DB
+The state backend settings for your Meltano project can be configured much the same as any other Meltano [setting](/reference/settings).
+The main setting is `state_backend.uri` which is set to the special keyword string `systemdb` by default.
+This will tell Meltano to store state in the same backend database as it stores other project data.
 
-By default, Meltano uses its backend system database.
-If you've configured your project to use an alternative state backend and wish to use the default system database backend instead, just set the `state_backend.uri` setting to the special keyword value `systemdb`.
+It can be changed by running `meltano config meltano set state_backend.uri <URI for desired state backend>` or by directly editing a project's `meltano.yml` to add the following:
 
-### Local Filesystem
+```yaml
+state_backend:
+    uri: <URI for desired state backend>
+```
+
+### Local File System
 
 To store state on the local filesystem, set the `state_backend.uri` setting to `file://<absolute path to the directory where you wish to store state>`.
-The local filesystem state backend will utilize the lock settings described above.
+
+For example, to store state directly on the local filesystem at the path `${MELTANO_SYS_DIR_ROOT}/state`, run:
+
+```bash
+meltano config meltano set 'state_backend.uri file:///${MELTANO_SYS_DIR_ROOT}/state'
+```
+
+Note the single quotes which prevent the early expansion of the environment variable.
+
+Meltano will now store the state for a given `state_id` at the path `file:///${MELTANO_SYS_DIR_ROOT}/state/<state_id>/state.json`.
+
+The local filesystem state backend will utilize the [locking strategy](#locking) described below.
 
 ### Azure Blob Storage
 
 To store state remotely in Azure Blob Storage, set the `state_backend.uri` setting to `azure://<your container_name>/<prefix for state JSON blobs>`.
 
-To authenticate to Azure, Meltano will also need a [connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string). You can provide this via the `state_backend.azure.connection_string` setting.
+To authenticate to Azure, Meltano will also need a [connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string). 
+You can provide this via the `state_backend.azure.connection_string` setting.
 If no `state_backend.azure.connection_string` setting is configured, Meltano will use the value of the `AZURE_STORAGE_CONNECTION_STRING` environment variable.
 If the connection string is not provided via either of these methods, Meltano will not be able to authenticate to Azure and any state operations will fail.
 
@@ -48,13 +72,13 @@ If the connection string is not provided via either of these methods, Meltano wi
 
 To store state remotely in S3, set the `state_backend.uri` setting to `s3://<your bucket name>/<prefix for state JSON blobs>`.
 
-To authenticate to AWS, you can provide an (AWS access key ID and AWS secret access key)[https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys] via either of the following methods:
+To authenticate to AWS, you can provide an [AWS access key ID and AWS secret access key](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) via either of the following methods:
 
 - Configure the `state_backend.s3.aws_access_key_id` and `state_backend.s3.aws_secret_access_key` settings.
 - Pass the access key ID and secret access key directly in the `state_backend.uri` by setting it to `s3://<aws_access_key_id>:<aws_secret_access_key>@<your bucket name>/<prefix for state JSON blobs>`.
 
 If credentials are not provided via either of these methods, Meltano will use the values set in the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
-If these environment variables are not set, it will use the credentials stored in the environment's (AWS credentials file)[https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html].
+If these environment variables are not set, it will use the credentials stored in the environment's [AWS credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
 
 If AWS credentials are not found via any of the methods described above, Meltano will not be able to authenticate to S3 and state operations will fail.
 
@@ -69,27 +93,17 @@ If credentials are not provided via these settings, Meltano will use the value t
 
 If GCS credentials are not found via any of the methods described above, Meltano will not be able to authenticate to Google Cloud Storage and state operations will fail.
 
-## Configuration
 
-The state backend settings for your Meltano project can be configured much the same as any other Meltano setting. For some state backends, the only required setting is `state_backend.uri`.
-By default, `state_backend.uri` is set to the special keyword string `systemdb`, which will tell Meltano to store state in the same backend database as it stores other project data.
-
-It can be changed by running `meltano config meltano set state_backend.uri <URI for desired state backend>` or by directly editing a project's `meltano.yml` to add the following:
-
-```yaml
-state_backend:
-    uri: <URI for desired state backend>
-```
-
-For some state backends and in some environments, `uri` is the only setting that needs to be configured in order to use a state backend other than the default `systemdb` backend. For instance, to store state directly on the local filesystem at the path `${MELTANO_SYS_DIR_ROOT}/state`, simply run `meltano config meltano set 'state_backend.uri file:///${MELTANO_SYS_DIR_ROOT}/state'`. Note the single quotes which prevent the early expansion of the environment variable.
-Then Meltano will store the state for a given `state_id` at the path `file:///${MELTANO_SYS_DIR_ROOT}/state/<state_id>/state.json`.
-
-### Locking
+## Locking
 
 Because the `systemdb` state backend utilizes a transactional database, it can rely on the database's transaction logic to prevent conflicts among multiple runs of the same pipeline.
+
 For some other state backends, Meltano implements its own simple locking mechanism.
 This locking mechanism utilizes reasonable defaults but you may wish to configure the locking settings differently.
-You can do this via two additional top-level `state_backend` settings: `state_backend.lock_timeout_seconds` and `state_backend.lock_retry_seconds`.
+You can do this via two [`state_backend` settings](/reference/settings#state-backends): 
+
+* `state_backend.lock_timeout_seconds`
+* `state_backend.lock_retry_seconds`
 
 When Meltano tries to read or write state for a given `state_id`, it will try to acquire a lock on the state data for that `state_id`.
 For example, using the local filesystem state backend with `state_backend.uri` set to `file:///${MELTANO_SYS_DIR_ROOT}/state`, it will check to see if a file exists at the path `file:///${MELTANO_SYS_DIR_ROOT}/state/<state_id>/lock`.
@@ -110,7 +124,6 @@ For example if you've been storing state in Meltano's system database and would 
 So to migrate state for a job with the state ID `dev:tap-github-to-target-jsonl`, you first need to ensure that your meltano project is configured to use the source state backend that currently holds the job state. For this example, we'll use `systemdb` as our source. To check the current configuration, run `meltano config meltano list` and then find the value for `state_backend.uri`:
 
 ```shell
-
 $ meltano config meltano list | grep state_backend.uri
 
 state_backend.uri [env: MELTANO_STATE_BACKEND_URI] current value: 'systemdb' (default)
@@ -125,7 +138,6 @@ $ meltano state get dev:tap-github-to-target-jsonl > dev:tap-github-to-target-js
 Now we need to reconfigure our meltano project to use the new destination state backend. For this example, we'll use an S3 bucket with the name `meltano` and store state under the prefix `state`.
 
 ```shell
-
 $ meltano config meltano set state_backend.uri "s3://meltano/state"
 Meltano setting 'state_backend.uri' was set in `.env`: 's3://meltano/state'
 
@@ -144,7 +156,7 @@ $ meltano state set dev:tap-github-to-target-jsonl --input-file dev:tap-github-t
 
 Meltano will prompt you to confirm:
 
-```shell
+```
 This will overwrite the state's current value. Continue? [y/N]:
 ```
 
