@@ -6,7 +6,9 @@ import asyncio
 import json
 import logging
 import tempfile
+from functools import wraps
 from pathlib import Path
+from typing import Any
 
 import click
 import dotenv
@@ -29,6 +31,65 @@ from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking import CliEvent, PluginsTrackingContext
 
 logger = logging.getLogger(__name__)
+
+
+def _get_ctx_arg(*args: Any) -> click.core.Context:
+    """Get the click.core.Context arg from a set of args.
+
+    Args:
+        args: the args to get Context from
+
+    Returns:
+        The click.core.Context arg.
+
+    Raises:
+        ValueError: if there is no click.core.Context in the given args.
+    """
+    for arg in args:
+        if isinstance(arg, click.core.Context):
+            return arg
+    raise ValueError("No click.core.Context provided in *args")
+
+
+def _get_store_choices() -> list[SettingValueStore]:
+    """Get a list of valid choices for the --store flag.
+
+    Returns:
+        SettingValueStore.writables(), without meltano_env
+    """
+    writables = SettingValueStore.writables()
+    writables.remove(SettingValueStore.MELTANO_ENV)
+    return writables
+
+
+def _use_meltano_env(func):
+    """Override the 'meltano_yml' choice for a config command's 'store' argument.
+
+    If an --environment flag is passed, the decorated command will use
+    the MELTANO_ENV store instead of MELTANO_YML but _will not_ use MELTANO_ENV
+    store if the active environment is set via the default environment.
+
+    Args:
+       func: the command to override
+
+    Returns:
+       A wrapped function with overridden store argument
+    """
+
+    @wraps(func)
+    def _wrapper(*args, **kwargs):
+        store = kwargs.pop("store")
+        if store not in {SettingValueStore.MELTANO_YML, SettingValueStore.MELTANO_ENV}:
+            return func(*args, **kwargs, store=store)
+        ctx = _get_ctx_arg(*args)
+        store = (
+            SettingValueStore.MELTANO_YML
+            if ctx.obj["is_default_environment"]
+            else SettingValueStore.MELTANO_ENV
+        )
+        return func(*args, **kwargs, store=store)
+
+    return _wrapper
 
 
 def get_label(metadata) -> str:
@@ -149,6 +210,7 @@ def config(  # noqa: WPS231
         session.close()
 
 
+@_use_meltano_env
 @config.command(
     cls=PartialInstrumentedCmd,
     name="list",
@@ -242,10 +304,11 @@ def list_settings(ctx, extras: bool):
 @config.command(cls=PartialInstrumentedCmd)
 @click.option(
     "--store",
-    type=click.Choice(SettingValueStore.writables()),
+    type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
+@_use_meltano_env
 def reset(ctx, store):
     """Clear the configuration (back to defaults)."""
     store = SettingValueStore(store)
@@ -276,10 +339,11 @@ def reset(ctx, store):
 @click.argument("value", required=False)
 @click.option(
     "--store",
-    type=click.Choice(SettingValueStore.writables()),
+    type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
+@_use_meltano_env
 def set_(ctx, setting_name, value, store, interactive):
     """Set the configurations' setting `<name>` to `<value>`."""
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
@@ -324,10 +388,11 @@ def test(ctx):
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",
-    type=click.Choice(SettingValueStore.writables()),
+    type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
+@_use_meltano_env
 def unset(ctx, setting_name, store):
     """Unset the configurations' setting called `<name>`."""
     store = SettingValueStore(store)
