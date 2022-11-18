@@ -86,7 +86,7 @@ If AWS credentials are not found via any of the methods described above, Meltano
 
 To store state remotely in Google Cloud Storage, set the `state_backend.uri` setting to `gs://<your bucket name>/<prefix for state JSON blobs>`.
 
-To authenticate to GCS, you must provide a path to a (service account credentials file)[https://cloud.google.com/iam/docs/creating-managing-service-account-keys]
+To authenticate to GCS, you must provide a path to a [service account credentials file](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
 These can be configured via the `state_backend.gcs.application_credentials` setting.
 
 If credentials are not provided via these settings, Meltano will use the value the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, if it is set.
