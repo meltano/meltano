@@ -6,9 +6,11 @@ import os
 import platform
 import uuid
 from collections import defaultdict
+from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from warnings import warn
 
 import psutil
 from cached_property import cached_property
@@ -25,6 +27,19 @@ logger = get_logger(__name__)
 release_marker_path = Path(__file__).parent / ".release_marker"
 
 
+def _get_environment_context_uuid() -> uuid.UUID:
+    with suppress(KeyError):
+        uuid_str = os.environ["MELTANO_CONTEXT_UUID"]
+        try:
+            return uuid.UUID(uuid_str)
+        except ValueError:
+            warn(
+                f"Invalid telemetry environment context UUID {uuid_str!r} "
+                "from $MELTANO_CONTEXT_UUID - a random UUID will be used"
+            )
+    return uuid.uuid4()
+
+
 class EnvironmentContext(SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
@@ -34,7 +49,7 @@ class EnvironmentContext(SelfDescribingJson):
         super().__init__(
             EnvironmentContextSchema.url,
             {
-                "context_uuid": str(uuid.uuid4()),
+                "context_uuid": str(_get_environment_context_uuid()),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(
