@@ -184,15 +184,18 @@ class VenvService:  # noqa: WPS214
         Returns:
             Whether virtual environment doesn't exist or can't be reused.
         """
-        if self.venv.site_packages_dir.joinpath("meltano_venv.pth").exists():
-            # clean up deprecated feature
-            return True
-        existing_fingerprint = self.read_fingerprint()
-        return (
-            existing_fingerprint != fingerprint(pip_install_args)
-            if existing_fingerprint
-            else True
-        )
+        # A generator function is used to perform the checks lazily
+        def checks():
+            # The Python installation used to create this venv no longer exists
+            yield not self.python_path.exists()
+            # The deprecated `meltano_venv.pth` feature is used by this venv
+            yield self.venv.site_packages_dir.joinpath("meltano_venv.pth").exists()
+            # The fingerprint of the venv does not match the pip install args
+            existing_fingerprint = self.read_fingerprint()
+            yield existing_fingerprint is None
+            yield existing_fingerprint != fingerprint(pip_install_args)
+
+        return any(checks())
 
     def clean_run_files(self) -> None:
         """Destroy cached configuration files, if they exist."""
