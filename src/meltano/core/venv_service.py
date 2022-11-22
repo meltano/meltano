@@ -154,7 +154,8 @@ class VenvService:  # noqa: WPS214
         self.namespace = namespace
         self.name = name
         self.venv = VirtualEnv(self.project.venvs_dir(namespace, name))
-        self.python_path = self.venv.bin_dir / "python"
+
+        self.python_path = self.exec_path("python")
         self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
 
     async def install(self, pip_install_args: list[str], clean: bool = False) -> None:
@@ -282,7 +283,9 @@ class VenvService:  # noqa: WPS214
         Returns:
             The venv bin directory joined to the provided executable.
         """
-        return self.venv.bin_dir / executable
+        return (self.venv.bin_dir / executable).with_suffix(
+            ".exe" if platform.system() == "Windows" else ""
+        )
 
     async def _pip_install(
         self, pip_install_args: list[str], clean: bool = False
