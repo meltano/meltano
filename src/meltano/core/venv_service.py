@@ -154,8 +154,6 @@ class VenvService:  # noqa: WPS214
         self.namespace = namespace
         self.name = name
         self.venv = VirtualEnv(self.project.venvs_dir(namespace, name))
-
-        self.python_path = self.exec_path("python")
         self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
 
     async def install(self, pip_install_args: list[str], clean: bool = False) -> None:
@@ -188,7 +186,7 @@ class VenvService:  # noqa: WPS214
         # A generator function is used to perform the checks lazily
         def checks():
             # The Python installation used to create this venv no longer exists
-            yield not self.python_path.exists()
+            yield not self.exec_path("python").exists()
             # The deprecated `meltano_venv.pth` feature is used by this venv
             yield self.venv.site_packages_dir.joinpath("meltano_venv.pth").exists()
             # The fingerprint of the venv does not match the pip install args
@@ -328,7 +326,7 @@ class VenvService:  # noqa: WPS214
 
         try:
             return await exec_async(
-                str(self.python_path), "-m", "pip", "install", *pip_install_args
+                str(self.exec_path("python")), "-m", "pip", "install", *pip_install_args
             )
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
