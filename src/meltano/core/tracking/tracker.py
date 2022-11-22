@@ -7,11 +7,12 @@ import json
 import locale
 import re
 import uuid
+from collections.abc import Mapping
 from contextlib import contextmanager
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 from urllib.parse import urlparse
 
 import structlog
@@ -23,13 +24,6 @@ from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import (
-    CliEvent,
-    ExceptionContext,
-    ProjectContext,
-    environment_context,
-)
-from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -37,6 +31,13 @@ from meltano.core.tracking.schemas import (
     TelemetryStateChangeEventSchema,
 )
 from meltano.core.utils import format_exception
+
+if TYPE_CHECKING:
+    from meltano.core.tracking.contexts import (  # noqa: F401
+        CliEvent,
+        EnvironmentContext,
+        ProjectContext,
+    )
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -79,7 +80,7 @@ class TelemetrySettings(NamedTuple):
     send_anonymous_usage_stats: bool | None
 
 
-class Tracker:  # noqa: WPS214 - too many methods
+class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
     """Meltano tracker backed by Snowplow."""
 
     def __init__(  # noqa: WPS210 - too many local variables
@@ -96,6 +97,11 @@ class Tracker:  # noqa: WPS214 - too many methods
                 `read` timeout, or as tuple with two float values which specify
                 the `connect` and `read` timeouts separately.
         """
+        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+            ProjectContext,
+            environment_context,
+        )
+
         self.project = project
         self.settings_service = ProjectSettingsService(project)
         self.send_anonymous_usage_stats = self.settings_service.get(
@@ -138,6 +144,11 @@ class Tracker:  # noqa: WPS214 - too many methods
             project_ctx,
         )
 
+        # Environment variables to set in invoked processes for telemetry purposes
+        self.env: Mapping[str, str] = {
+            "MELTANO_PARENT_CONTEXT_UUID": environment_context.data["context_uuid"],
+        }
+
         if all(setting is None for setting in stored_telemetry_settings):
             self.save_telemetry_settings()
         else:
@@ -150,6 +161,8 @@ class Tracker:  # noqa: WPS214 - too many methods
         Returns:
             The contexts that will accompany events fired by this tracker.
         """
+        from meltano.core.tracking.contexts import ExceptionContext
+
         # The `ExceptionContext` is re-created every time this is accessed because it details the
         # exceptions that are being processed when it is created.
         return (*self._contexts, ExceptionContext())
@@ -279,6 +292,11 @@ class Tracker:  # noqa: WPS214 - too many methods
             from_value: the old value
             to_value: the new value
         """
+        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+            EnvironmentContext,
+            ProjectContext,
+        )
+
         # Save the telemetry settings to ensure this is the only telemetry
         # state change event fired for this particular setting change.
         self.save_telemetry_settings()

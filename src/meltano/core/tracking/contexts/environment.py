@@ -41,6 +41,20 @@ def _get_environment_context_uuid() -> uuid.UUID:
     return uuid.uuid4()
 
 
+def _get_parent_context_uuid() -> uuid.UUID | None:
+    with suppress(KeyError):
+        uuid_str = os.environ["MELTANO_PARENT_CONTEXT_UUID"]
+        try:
+            return uuid.UUID(uuid_str)
+        except ValueError:
+            warn(
+                f"Invalid telemetry parent environment context UUID {uuid_str!r} "
+                "from $MELTANO_PARENT_CONTEXT_UUID - Meltano will continue as if "
+                "$MELTANO_PARENT_CONTEXT_UUID had not been set"
+            )
+    return None
+
+
 class EnvironmentContext(SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
@@ -51,6 +65,7 @@ class EnvironmentContext(SelfDescribingJson):
             EnvironmentContextSchema.url,
             {
                 "context_uuid": str(_get_environment_context_uuid()),
+                "parent_context_uuid": str(_get_parent_context_uuid()),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(

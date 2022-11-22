@@ -17,7 +17,8 @@ from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliContext
 from meltano.core.utils import get_no_color_flag
 
 logger = logging.getLogger(__name__)

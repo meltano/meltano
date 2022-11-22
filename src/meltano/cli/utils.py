@@ -29,7 +29,7 @@ from meltano.core.project_add_service import (
 )
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
-from meltano.core.tracking import CliContext, CliEvent
+from meltano.core.tracking.contexts import CliContext, CliEvent
 
 setup_logging()
 

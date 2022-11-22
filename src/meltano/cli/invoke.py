@@ -23,7 +23,8 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 logger = logging.getLogger(__name__)
 

@@ -28,7 +28,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 logger = logging.getLogger(__name__)
 

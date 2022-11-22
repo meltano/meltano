@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from meltano.core.block.plugin_command import plugin_command_invoker
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.tracking import PluginsTrackingContext
+from meltano.core.tracking.contexts import PluginsTrackingContext
 from meltano.core.tracking.schemas import PluginsContextSchema
 from meltano.core.utils import hash_sha256
 
