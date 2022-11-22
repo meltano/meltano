@@ -21,6 +21,22 @@ include = [
   "src/meltano/api/templates/webapp.html",
   "src/meltano/core/tracking/.release_marker",
 ]
+keywords = [
+  "Meltano",
+  "ELT",
+  "Data integration",
+  "singer-io",
+  "dbt",
+]
+documentation = "https://docs.meltano.com"
+homepage = "https://meltano.com"
+
+[tool.poetry.urls]
+"Issue Tracker" = "https://github.com/meltano/meltano/issues"
+"Twitter" = "https://twitter.com/meltanodata/"
+"Changelog" = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
+"Slack" = "https://meltano.com/slack"
+"Youtube" = "https://www.youtube.com/meltano"
 
 [tool.poetry.dependencies]
 aiodocker = "^0.21.0"
