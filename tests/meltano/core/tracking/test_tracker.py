@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 import mock
 import pytest
+from pytest import MonkeyPatch
 from snowplow_tracker import Emitter
 
 from meltano.core.project import Project
@@ -445,3 +446,17 @@ class TestTracker:
         finally:
             # Remove the seemingly valid emitters to prevent a logging error on exit.
             tracker.snowplow_tracker.emitters = []
+
+
+class TestEnvironmentContext:
+    def test_get_environment_context_from_env_var(self, monkeypatch: MonkeyPatch):
+        monkeypatch.setenv("MELTANO_CONTEXT_UUID", "invalid-context-uuid")
+        with pytest.warns(
+            RuntimeWarning, match="Invalid telemetry environment context UUID"
+        ):
+            # Ensure it generated a random UUID
+            uuid.UUID(EnvironmentContext().data["context_uuid"])
+
+        ctx_id = str(uuid.uuid4())
+        monkeypatch.setenv("MELTANO_CONTEXT_UUID", ctx_id)
+        assert EnvironmentContext().data["context_uuid"] == ctx_id

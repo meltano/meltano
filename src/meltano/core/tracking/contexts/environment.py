@@ -35,7 +35,8 @@ def _get_environment_context_uuid() -> uuid.UUID:
         except ValueError:
             warn(
                 f"Invalid telemetry environment context UUID {uuid_str!r} "
-                "from $MELTANO_CONTEXT_UUID - a random UUID will be used"
+                "from $MELTANO_CONTEXT_UUID - a random UUID will be used",
+                RuntimeWarning,
             )
     return uuid.uuid4()
 
