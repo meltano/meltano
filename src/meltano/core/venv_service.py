@@ -283,8 +283,17 @@ class VenvService:  # noqa: WPS214
         Returns:
             The venv bin directory joined to the provided executable.
         """
-        return (self.venv.bin_dir / executable).with_suffix(
-            ".exe" if platform.system() == "Windows" else ""
+        absolute_executable = self.venv.bin_dir / executable
+        if platform.system() != "Windows":
+            return absolute_executable
+
+        # On Windows, try using the '.exe' suffixed version if it exists. Use the
+        # regular executable path as a fallback (and for backwards compatibility).
+        absolute_executable_windows = absolute_executable.with_suffix(".exe")
+        return (
+            absolute_executable_windows
+            if absolute_executable_windows.exists()
+            else absolute_executable
         )
 
     async def _pip_install(
