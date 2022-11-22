@@ -118,17 +118,18 @@ class TestVenvService:
         await subject.install(["example"], clean=True)
 
         if platform.system() != "Windows":
-            original_link_target = os.readlink(subject.python_path)
+            python_path = subject.exec_path("python")
+            original_link_target = os.readlink(python_path)
             try:
                 # Simulate the deletion of the underlying Python executable by
                 # making its symlink point to a file that does not exist
-                subject.python_path.unlink()
-                subject.python_path.symlink_to("./fake/path/to/python/executable")
+                python_path.unlink()
+                python_path.symlink_to("./fake/path/to/python/executable")
                 assert subject.requires_clean_install(["example"])
             finally:
                 # Restore the symlink to the actual Python executable
-                subject.python_path.unlink()
-                subject.python_path.symlink_to(original_link_target)
+                python_path.unlink()
+                python_path.symlink_to(original_link_target)
 
         assert not subject.requires_clean_install(["example"])
         assert subject.requires_clean_install(["example==0.1.0"])
