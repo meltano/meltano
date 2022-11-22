@@ -20,17 +20,17 @@ def recreate_database(engine, db_name):
         engine: The master connection.
         db_name: The name of the database to create.
     """
-    with contextlib.suppress(sa.exc.ProgrammingError):
+    with contextlib.suppress(sa.exc.ProgrammingError), engine.begin() as conn:
         # DROP DATABASE IF EXISTS is not supported by SQL Server 2016 and up
-        engine.execute(
+        conn.execute(
             DDL(
                 "DROP DATABASE IF EXISTS %(db_name)s",  # noqa: WPS323
                 {"db_name": db_name},
             )
         )
 
-    with contextlib.suppress(sa.exc.ProgrammingError):
-        engine.execute(
+    with contextlib.suppress(sa.exc.ProgrammingError), engine.begin() as conn:
+        conn.execute(
             DDL(
                 "CREATE DATABASE %(db_name)s",  # noqa: WPS323
                 {"db_name": db_name},
