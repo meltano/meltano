@@ -117,7 +117,7 @@ class TestVenvService:
         # Make sure the venv exists already
         await subject.install(["example"], clean=True)
 
-        original_link_target = subject.python_path.readlink()
+        original_link_target = os.readlink(subject.python_path)
         try:
             # Simulate the deletion of the underlying Python executable by
             # making its symlink point to a file that does not exist
