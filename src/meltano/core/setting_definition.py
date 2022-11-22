@@ -147,6 +147,13 @@ class SettingKind(YAMLEnum):
 class SettingDefinition(NameEq, Canonical):
     """Meltano SettingDefinition class."""
 
+    name: str
+    kind: SettingKind
+    aliases: list[str]
+    env_aliases: list[str]
+    options: list[str]
+    oauth: dict
+
     def __init__(
         self,
         name: str | None = None,

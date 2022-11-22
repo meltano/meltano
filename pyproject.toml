@@ -310,6 +310,7 @@ pyflakes = [
   "-WPS425", # Found boolean non-keyword argument
   "-WPS118", # Found too long name
   "-WPS342", # Avoid false positive for implicit raw strings
+  "-WPS604", # Allow empty class body with `pass`
 ]
 
 [tool.flakeheaven.exceptions."!tests/*"]

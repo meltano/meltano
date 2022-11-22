@@ -7,8 +7,9 @@ import warnings
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
-from typing import Generator, Iterable
+from typing import Generator
 
+from meltano.core.encryption import EncryptionKey, get_key
 from meltano.core.project import Project
 from meltano.core.utils import EnvVarMissingBehavior
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
@@ -303,8 +304,9 @@ class SettingsService(ABC):  # noqa: WPS214
         redacted=False,
         source=SettingValueStore.AUTO,
         source_manager=None,
-        setting_def=None,
+        setting_def: SettingDefinition | None = None,
         expand_env_vars=True,
+        encryption_key: EncryptionKey | None = None,
         **kwargs,
     ):
         """Get a setting with associated metadata.
@@ -316,7 +318,9 @@ class SettingsService(ABC):  # noqa: WPS214
             source_manager: the SettingsStoreManager to use
             setting_def: get this SettingDefinition instead of name
             expand_env_vars: whether or not to expand nested environment variables
-            **kwargs: additional keyword args to pass during SettingsStoreManager instantiation
+            encryption_key: the encryption key to use
+            **kwargs: additional keyword args to pass during SettingsStoreManage
+                instantiation
 
         Returns:
             a tuple of the setting value and metadata
@@ -408,6 +412,16 @@ class SettingsService(ABC):  # noqa: WPS214
                 metadata["uncast_value"] = value
                 value = cast_value
 
+            # TODO: Implement decryption
+            # Decrypt password values
+            key = get_key("fernet://WOiNWLYnrwaNgRcOs52rKaihx3b8ptXyV9jylf3f8l8=")
+            if (
+                value
+                and setting_def.kind == SettingKind.PASSWORD
+                and key.is_encrypted(value)
+            ):
+                logger.info("%s: %s", value, key.encrypt(value))  # noqa: WPS323
+
             # we don't want to leak secure informations
             # so we redact all `passwords`
             if redacted and value and setting_def.is_redacted:
@@ -423,6 +437,18 @@ class SettingsService(ABC):  # noqa: WPS214
             )
 
         return value, metadata
+
+    def decrypt_password(self, value: str) -> str:
+        """Decrypt a password value.
+
+        Args:
+            value: the value to decrypt
+
+        Returns:
+            the decrypted value
+        """
+        # TODO: Implement decryption
+        return value
 
     def get_with_source(self, *args, **kwargs):
         """Get a setting value along with its source.
@@ -564,7 +590,7 @@ class SettingsService(ABC):  # noqa: WPS214
         self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self, extras=None) -> Iterable[dict]:
+    def definitions(self, extras=None) -> list[SettingDefinition]:
         """Return setting definitions along with extras.
 
         Args:
