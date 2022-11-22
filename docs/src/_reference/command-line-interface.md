@@ -456,7 +456,12 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 - [`config`](#using-config-with-environments)
 - [`elt`](#using-elt-with-environments)
 - [`invoke`](#using-invoke-with-environments)
+- [`job`](#using-job-with-environments)
+- [`run`](#using-run-with-environments)
+- [`schedule`](#using-schedule-with-environments)
 - [`select`](#using-select-with-environments)
+- [`state`](#using-state-with-environments)
+- [`test`](#using-test-with-environments)
 
 If there is a value provided for `default_environment` in your `meltano.yml`, then these commands, with the exception of [`config`](#using-config-with-environments), will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided.
 If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
