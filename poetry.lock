@@ -838,7 +838,7 @@ flake8 = "*"
 
 [[package]]
 name = "flask"
-version = "2.1.3"
+version = "2.2.2"
 description = "A simple framework for building complex web applications."
 category = "main"
 optional = false
@@ -849,7 +849,7 @@ click = ">=8.0"
 importlib-metadata = {version = ">=3.6.0", markers = "python_version < \"3.10\""}
 itsdangerous = ">=2.0"
 Jinja2 = ">=3.0"
-Werkzeug = ">=2.0"
+Werkzeug = ">=2.2.2"
 
 [package.extras]
 async = ["asgiref (>=3.2)"]
@@ -894,7 +894,7 @@ Flask = "*"
 
 [[package]]
 name = "flask-login"
-version = "0.6.1"
+version = "0.6.2"
 description = "User authentication and session management for Flask."
 category = "main"
 optional = false
@@ -947,15 +947,15 @@ docs = ["sphinx"]
 
 [[package]]
 name = "flask-sqlalchemy"
-version = "2.5.1"
-description = "Adds SQLAlchemy support to your Flask application."
+version = "3.0.2"
+description = "Add SQLAlchemy support to your Flask application."
 category = "main"
 optional = false
-python-versions = ">= 2.7, != 3.0.*, != 3.1.*, != 3.2.*, != 3.3.*"
+python-versions = ">=3.7"
 
 [package.dependencies]
-Flask = ">=0.10"
-SQLAlchemy = ">=0.8.0"
+Flask = ">=2.2"
+SQLAlchemy = ">=1.4.18"
 
 [[package]]
 name = "flask-wtf"
@@ -2563,11 +2563,14 @@ typing_extensions = ">=3.6,<5.0"
 
 [[package]]
 name = "werkzeug"
-version = "2.1.2"
+version = "2.2.2"
 description = "The comprehensive WSGI web application library."
 category = "main"
 optional = false
 python-versions = ">=3.7"
+
+[package.dependencies]
+MarkupSafe = ">=2.1.1"
 
 [package.extras]
 watchdog = ["watchdog"]
@@ -2630,7 +2633,7 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "f7fdaeb160703984f1a27a0d290ac4554aa8646782d6b6d6da4ebc0e27d2926a"
+content-hash = "e0da11f25b1f0f6c6a61beb79b940f57fe11ed6cc4e056d0e2f427a49a133df1"
 
 [metadata.files]
 aiodocker = [
@@ -3156,8 +3159,8 @@ flake8-string-format = [
     {file = "flake8_string_format-0.3.0-py2.py3-none-any.whl", hash = "sha256:812ff431f10576a74c89be4e85b8e075a705be39bc40c4b4278b5b13e2afa9af"},
 ]
 flask = [
-    {file = "Flask-2.1.3-py3-none-any.whl", hash = "sha256:9013281a7402ad527f8fd56375164f3aa021ecfaff89bfe3825346c24f87e04c"},
-    {file = "Flask-2.1.3.tar.gz", hash = "sha256:15972e5017df0575c3d6c090ba168b6db90259e620ac8d7ea813a396bad5b6cb"},
+    {file = "Flask-2.2.2-py3-none-any.whl", hash = "sha256:b9c46cc36662a7949f34b52d8ec7bb59c0d74ba08ba6cb9ce9adc1d8676d9526"},
+    {file = "Flask-2.2.2.tar.gz", hash = "sha256:642c450d19c4ad482f96729bd2a8f6d32554aa1e231f4f6b4e7e5264b16cca2b"},
 ]
 flask-babelex = [
     {file = "Flask-BabelEx-0.9.4.tar.gz", hash = "sha256:39a59ccee9386a9d52d80b9101224402036aedc2c7873b11deef6e4e21cace27"},
@@ -3172,8 +3175,8 @@ flask-executor = [
     {file = "Flask_Executor-0.10.0-py3-none-any.whl", hash = "sha256:074885fc6d04764c86ab7f070818ea87dd08ee54767a216a8e7a00c39550bea2"},
 ]
 flask-login = [
-    {file = "Flask-Login-0.6.1.tar.gz", hash = "sha256:1306d474a270a036d6fd14f45640c4d77355e4f1c67ca4331b372d3448997b8c"},
-    {file = "Flask_Login-0.6.1-py3-none-any.whl", hash = "sha256:b9a4287a2d0067a7a482a23e40075e0d670f371974633fe890222dece4e02a74"},
+    {file = "Flask-Login-0.6.2.tar.gz", hash = "sha256:c0a7baa9fdc448cdd3dd6f0939df72eec5177b2f7abe6cb82fc934d29caac9c3"},
+    {file = "Flask_Login-0.6.2-py3-none-any.whl", hash = "sha256:1ef79843f5eddd0f143c2cd994c1b05ac83c0401dc6234c143495af9a939613f"},
 ]
 flask-mail = [
     {file = "Flask-Mail-0.9.1.tar.gz", hash = "sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"},
@@ -3186,8 +3189,8 @@ flask-restful = [
     {file = "Flask_RESTful-0.3.9-py2.py3-none-any.whl", hash = "sha256:4970c49b6488e46c520b325f54833374dc2b98e211f1b272bd4b0c516232afe2"},
 ]
 flask-sqlalchemy = [
-    {file = "Flask-SQLAlchemy-2.5.1.tar.gz", hash = "sha256:2bda44b43e7cacb15d4e05ff3cc1f8bc97936cc464623424102bfc2c35e95912"},
-    {file = "Flask_SQLAlchemy-2.5.1-py2.py3-none-any.whl", hash = "sha256:f12c3d4cc5cc7fdcc148b9527ea05671718c3ea45d50c7e732cceb33f574b390"},
+    {file = "Flask-SQLAlchemy-3.0.2.tar.gz", hash = "sha256:16199f5b3ddfb69e0df2f52ae4c76aedbfec823462349dabb21a1b2e0a2b65e9"},
+    {file = "Flask_SQLAlchemy-3.0.2-py3-none-any.whl", hash = "sha256:7d0cd9cf73e64a996bb881a1ebd01633fc5a6d11c36ea27f7b5e251dc45476e7"},
 ]
 flask-wtf = [
     {file = "Flask-WTF-1.0.1.tar.gz", hash = "sha256:34fe5c6fee0f69b50e30f81a3b7ea16aa1492a771fe9ad0974d164610c09a6c9"},
@@ -4514,8 +4517,8 @@ wemake-python-styleguide = [
     {file = "wemake_python_styleguide-0.16.1-py3-none-any.whl", hash = "sha256:202c22ecfee1f5caf0555048602cd52f2435cd57903e6b0cd46b5aaa3f652140"},
 ]
 werkzeug = [
-    {file = "Werkzeug-2.1.2-py3-none-any.whl", hash = "sha256:72a4b735692dd3135217911cbeaa1be5fa3f62bffb8745c5215420a03dc55255"},
-    {file = "Werkzeug-2.1.2.tar.gz", hash = "sha256:1ce08e8093ed67d638d63879fd1ba3735817f7a80de3674d293f5984f25fb6e6"},
+    {file = "Werkzeug-2.2.2-py3-none-any.whl", hash = "sha256:f979ab81f58d7318e064e99c4506445d60135ac5cd2e177a2de0089bfd4c9bd5"},
+    {file = "Werkzeug-2.2.2.tar.gz", hash = "sha256:7ea2d48322cc7c0f8b3a215ed73eabd7b5d75d0b50e31ab006286ccff9e00b8f"},
 ]
 wrapt = [
     {file = "wrapt-1.14.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:1b376b3f4896e7930f1f772ac4b064ac12598d1c38d04907e696cc4d794b43d3"},

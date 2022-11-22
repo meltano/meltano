@@ -35,4 +35,4 @@ def engine_uri(worker_id: str):
     )
     recreate_database(engine, database)
 
-    return f"postgresql://{user}:{password}@{host}:{port}/{database}"
+    return f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}"
