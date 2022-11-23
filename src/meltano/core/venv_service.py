@@ -154,7 +154,6 @@ class VenvService:  # noqa: WPS214
         self.namespace = namespace
         self.name = name
         self.venv = VirtualEnv(self.project.venvs_dir(namespace, name))
-        self.python_path = self.venv.bin_dir / "python"
         self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
 
     async def install(self, pip_install_args: list[str], clean: bool = False) -> None:
@@ -184,15 +183,18 @@ class VenvService:  # noqa: WPS214
         Returns:
             Whether virtual environment doesn't exist or can't be reused.
         """
-        if self.venv.site_packages_dir.joinpath("meltano_venv.pth").exists():
-            # clean up deprecated feature
-            return True
-        existing_fingerprint = self.read_fingerprint()
-        return (
-            existing_fingerprint != fingerprint(pip_install_args)
-            if existing_fingerprint
-            else True
-        )
+        # A generator function is used to perform the checks lazily
+        def checks():
+            # The Python installation used to create this venv no longer exists
+            yield not self.exec_path("python").exists()
+            # The deprecated `meltano_venv.pth` feature is used by this venv
+            yield self.venv.site_packages_dir.joinpath("meltano_venv.pth").exists()
+            # The fingerprint of the venv does not match the pip install args
+            existing_fingerprint = self.read_fingerprint()
+            yield existing_fingerprint is None
+            yield existing_fingerprint != fingerprint(pip_install_args)
+
+        return any(checks())
 
     def clean_run_files(self) -> None:
         """Destroy cached configuration files, if they exist."""
@@ -279,7 +281,18 @@ class VenvService:  # noqa: WPS214
         Returns:
             The venv bin directory joined to the provided executable.
         """
-        return self.venv.bin_dir / executable
+        absolute_executable = self.venv.bin_dir / executable
+        if platform.system() != "Windows":
+            return absolute_executable
+
+        # On Windows, try using the '.exe' suffixed version if it exists. Use the
+        # regular executable path as a fallback (and for backwards compatibility).
+        absolute_executable_windows = absolute_executable.with_suffix(".exe")
+        return (
+            absolute_executable_windows
+            if absolute_executable_windows.exists()
+            else absolute_executable
+        )
 
     async def _pip_install(
         self, pip_install_args: list[str], clean: bool = False
@@ -313,7 +326,7 @@ class VenvService:  # noqa: WPS214
 
         try:
             return await exec_async(
-                str(self.python_path), "-m", "pip", "install", *pip_install_args
+                str(self.exec_path("python")), "-m", "pip", "install", *pip_install_args
             )
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(

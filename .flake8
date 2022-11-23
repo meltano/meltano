@@ -76,6 +76,8 @@ ignore =
     WPS338
     # Allow `.` at beginning of line to accommodate Black formatting of multiline chained function calls
     WPS348
+    # Allow consecutive yield expressions
+    WPS354
     # Allow "overuse" of noqa comments.
     WPS402
     # Allow metadta variable (__all__)
