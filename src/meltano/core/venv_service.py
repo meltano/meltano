@@ -57,7 +57,7 @@ def venv_platform_specs():
         raise Exception(f"Platform {system!r} not supported.") from ex
 
 
-PIP_PACKAGES = ("pip", "setuptools", "wheel")
+PIP_PACKAGES = ("pip", "setuptools==57.5.0", "wheel")
 
 
 class VirtualEnv:
