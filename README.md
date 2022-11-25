@@ -49,6 +49,9 @@
 
 Welcome to your CLI for ELT+. It's open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.
 
+If you're a fan, star the repo ⭐️.
+
+
 
 Integrations
 ------------
