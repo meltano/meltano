@@ -10,8 +10,12 @@ import os
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
-from typing import Any, Callable, Iterable, Mapping, Protocol
+from typing import Any, Callable, Iterable, Mapping
 
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 from cached_property import cached_property
 
 from meltano.core.error import (
