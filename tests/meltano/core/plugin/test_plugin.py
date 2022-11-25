@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from pytest import MonkeyPatch
 
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
@@ -569,13 +568,6 @@ class TestProjectPlugin:
 
         # Plugin doesn't have any utility requirements
         assert not transformer.all_requires[PluginType.UTILITIES]
-
-    def test_formatted_pip_url(self, monkeypatch: MonkeyPatch):
-        monkeypatch.setenv("PYPI_USER", "username")
-        monkeypatch.setenv("PYPI_PASS", "drowssap")
-        plugin = ProjectPlugin(PluginType.EXTRACTORS, **self.ATTRS["complex_pip_url"])
-        index_arg_with_creds = "-i https://username:drowssap@pypi.example.com/simple"
-        assert index_arg_with_creds in plugin.formatted_pip_url
 
 
 class TestPluginType:

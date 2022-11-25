@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import copy
 import logging
-import os
-import sys
 from typing import Any, Iterable
 
 from meltano.core.plugin.base import PluginDefinition, PluginRef, PluginType, Variant
@@ -13,7 +11,7 @@ from meltano.core.plugin.command import Command
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.utils import expand_env_vars, flatten, uniques_in
+from meltano.core.utils import flatten, uniques_in
 
 logger = logging.getLogger(__name__)
 
@@ -369,26 +367,6 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             'True' if this plugin is shadowing a base plugin with the same name.
         """
         return not self.inherit_from
-
-    @property
-    def formatted_pip_url(self) -> str:
-        """Return the formatted version of the pip_url.
-
-        Expands ${MELTANO__PYTHON_VERSION} to the major.minor version string of
-        the current runtime.
-
-        All other environment variables are expanded as normal.
-
-        Returns:
-            Expanded pip url string.
-        """
-        return expand_env_vars(
-            self.pip_url,
-            {
-                "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}",
-                **os.environ,
-            },
-        )
 
     @property
     def venv_name(self) -> str:

@@ -34,9 +34,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
         if plugin.executable
         else None,
         "variant_name_hash": hash_sha256(plugin.variant) if plugin.variant else None,
-        "pip_url_hash": hash_sha256(plugin.formatted_pip_url)
-        if plugin.formatted_pip_url
-        else None,
+        "pip_url_hash": hash_sha256(plugin.pip_url) if plugin.pip_url else None,
         "parent_name_hash": hash_sha256(plugin.parent.name) if plugin.parent else None,
         "command": cmd,
     }

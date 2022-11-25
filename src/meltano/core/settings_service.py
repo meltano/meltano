@@ -256,7 +256,7 @@ class SettingsService(ABC):  # noqa: WPS214
             **kwargs: additional kwargs to pass to config_with_metadata
 
         Returns:
-            dict of namew-value settings pairs
+            dict of name-value settings pairs
         """
         config_metadata = self.config_with_metadata(*args, **kwargs)
 

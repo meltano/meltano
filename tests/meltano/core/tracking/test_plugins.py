@@ -61,7 +61,7 @@ class TestPluginsTrackingContext:
             ("namespace_hash", "namespace"),
             ("executable_hash", "executable"),
             ("variant_name_hash", "variant"),
-            ("pip_url_hash", "formatted_pip_url"),
+            ("pip_url_hash", "pip_url"),
         ):
             assert plugin_dict.get(dict_key) == hash_sha256(getattr(plugin, plugin_key))
         assert plugin_dict.get("parent_name_hash") == hash_sha256(plugin.parent.name)

@@ -153,5 +153,8 @@ src/meltano/api/static/js
 
 # sqlite
 *.db
-# allow integration tests to ship/store/use sqlite
-!docs/example-library/**/.meltano/meltano.db
+
+# Integration test generated files
+*.jsonl
+**/.meltano/**
+!docs/example-library/meltano-migrations/.meltano/meltano.db
