@@ -28,7 +28,7 @@ To determine the values of settings, Meltano will look in 4 main places (and one
 1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano elt` runtime](/guide/integration#pipeline-specific-configuration), your project's [`.env` file](/concepts/project#env), a [scheduled pipeline's `env` dictionary](/concepts/project#schedules), or any other method.
    - You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
 2. **Your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file)**, under the plugin's `config` key.
-   - Inside values , [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
+   - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
 3. **Your project's [**system database**](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
