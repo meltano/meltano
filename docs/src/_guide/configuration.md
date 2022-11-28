@@ -28,7 +28,7 @@ To determine the values of settings, Meltano will look in 4 main places (and one
 1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano elt` runtime](/guide/integration#pipeline-specific-configuration), your project's [`.env` file](/concepts/project#env), a [scheduled pipeline's `env` dictionary](/concepts/project#schedules), or any other method.
    - You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
 2. **Your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file)**, under the plugin's `config` key.
-   - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
+   - Inside values , [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
 3. **Your project's [**system database**](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
@@ -201,7 +201,24 @@ environments:
 ```
 
 Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the [resolution and inheritance behavior of `config` or `settings` keys](/guide/configuration#configuration-layers).
+
 Because settings and environment variable behavior can become complex when set in multiple places, the [`meltano invoke` command](/reference/command-line-interface#invoke) provides a `--print-var` option which allows you to easily inspect what value is being supplied for a given environment variable within your plugin's invocation environment at runtime.
+
+##### Environment variable expansion within `pip_url`
+
+In addition to affecting the environment variables at runtime, and the `config`/`settings` values, environment variables can be expanded within the value of a plugin's `pip_url`. The environment variable inheritance shown above applies to environment variables expanded within the value of `pip_url`.
+
+This can be useful for using a different `pip_url` for different environments (e.g. to change which git branch of a plugin repository is used):
+
+```yaml
+pip_url: "git+https://github.com/MeltanoLabs/tap-github.git@${TAP_GITHUB_GIT_REV}"
+```
+
+Another use for this is to supply credentials for a private Python package index:
+
+```yaml
+pip_url: "https://${NEXUS_USERNAME}:${NEXUS_PASSWORD}@nexus.example.com/simple"
+```
 
 ### Configuring settings
 
