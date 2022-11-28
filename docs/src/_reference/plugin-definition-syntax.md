@@ -508,3 +508,13 @@ settings:
 - name: setting_name
   value: default_value
 ```
+
+## `env`
+
+Optional. Environment variables that will be used when [expanding environment variables in lower levels within your project's configuration](../guide/configuration#expansion-in-setting-values), and when running the plugin. These environment variables can make use of other environment variables from higher levels [as explained in the configuration guide](../guide/configuration#environment-variable-expansion).
+
+```yaml
+env:
+  ENV_VAR_NAME: env var value
+  PATH: "${PATH}:${MELTANO_PROJECT_ROOT}/bin"
+```
