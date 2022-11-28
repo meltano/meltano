@@ -15,6 +15,12 @@ repos:
         exclude: (^\.bumpversion\.cfg$|cli_messages\.py)
       - id: end-of-file-fixer
       - id: check-yaml
+      - id: check-json
+      - id: pretty-format-json
+        args:
+          - "--autofix"
+          - "--indent=2"
+          - "--no-sort-keys"
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: check-toml
