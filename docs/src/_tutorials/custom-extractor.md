@@ -410,7 +410,7 @@ plugins:
 ```
 
 <div class="notification is-info">
-  <p>You can further customize the appearance of your custom extractor in [Meltano UI](/reference/ui) using the following options:</p>
+  <p>You can further customize the appearance of your custom extractor using the following options:</p>
   <ul>
     <li>`label`</li>
     <li>`logo_url`</li>
@@ -453,7 +453,6 @@ You may use any of the following to configure setting values (in order of preced
 
 - Environment variables
 - `config` section in the plugin
-- Meltano UI
 - `value` of the setting's definition
 
 ## Publishing to the world
@@ -471,8 +470,8 @@ your tap directly to PyPI.
 
 1. Create an account with [PyPI](https://pypi.org).
 2. Create a PyPI API token for use in automated publishing. (Optional but recommended.)
-3. Run `poetry --build publish` from within your repo to build and push your latest version
-   to the PyPI servers.
+3. Run `poetry build` from within your repo to build.
+4. Run `poetry publish` to push your latest version to the PyPI servers.
 
 ### Test a `pip` install
 

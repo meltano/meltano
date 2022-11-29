@@ -21,7 +21,9 @@ from .utils import noop
 class PluginRemoveService:
     """Handle plugin installation removal operations."""
 
-    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
+    def __init__(
+        self, project: Project, plugins_service: ProjectPluginsService | None = None
+    ):
         """Construct a PluginRemoveService instance.
 
         Args:

@@ -32,9 +32,6 @@ poetry install
 # Install the pre-commit hook
 poetry run pre-commit install --install-hooks
 
-# Bundle the Meltano UI into the `meltano` package
-make bundle
-
 # Obtain a shell in the poetry created virtual environment
 poetry shell
 ```
@@ -52,7 +49,7 @@ Note that for users who are using pyenv with the [virtualenv plugin](https://git
 likely not need to prefix the commands with `poetry` as poetry will default to using the pyenv activated virtual
 environment.
 
-This means that you're ready to start Meltano CLI development. For API and UI development, read on.
+This means that you're ready to start Meltano CLI development. For API development, read on.
 
 <div class="notification is-warning">
   <p><strong>Metrics (anonymous usage data) tracking</strong></p>
@@ -92,9 +89,8 @@ Our end-to-end tests are currently being built with [Cypress](https://www.cypres
 
 #### How to Run Tests
 
-1. Initialize a new meltano project with `meltano init $PROJECT_NAME`
-1. Change directory into `$PROJECT_NAME`
-1. Start up project with `meltano ui`
+1. Initialize a new meltano project with `meltano init $PROJECT_DIRECTORY`
+1. Change directory into `$PROJECT_DIRECTORY`
 1. Clone Meltano repo
 1. Open Meltano repo in Terminal
 1. Run `yarn setup`

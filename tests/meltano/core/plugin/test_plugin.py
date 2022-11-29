@@ -22,6 +22,8 @@ class TestPluginDefinition:
             "repo": "https://gitlab.com/meltano/tap-example",
             "foo": "bar",
             "baz": "qux",
+            "description": "tap-example description",
+            "logo_url": "path/to/tap_example_logo.jpg",
             "requires": {
                 "files": [
                     {

@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Sequence, TextIO
+from typing import Callable, Sequence, TextIO
 
 import click
 import structlog
 from rich.console import Console
 from rich.traceback import Traceback, install
 from structlog.types import Processor
+
+from meltano.core.utils import get_no_color_flag
 
 install(suppress=[click])
 
@@ -22,6 +24,33 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
         TIMESTAMPER,
     )
 )
+
+
+def rich_exception_formatter_factory(
+    color_system: str = "auto",
+    no_color: bool | None = None,
+) -> Callable[[TextIO, structlog.types.ExcInfo], None]:
+    """Create an exception formatter for logging using the rich package.
+
+    Examples:
+    >>> rich_traceback = rich_exception_formatter_factory(color_system="truecolor")
+    >>> plane_rich_traceback = rich_exception_formatter_factory(no_color=True)
+
+    Args:
+        color_system: The color system supported by your terminal.
+        no_color: Enabled no color mode, or None to auto detect. Defaults to None.
+
+    Returns:
+        Exception formatter function.
+    """
+
+    def _traceback(sio, exc_info) -> None:
+        sio.write("\n")
+        Console(file=sio, color_system=color_system, no_color=no_color).print(
+            Traceback.from_exception(*exc_info, show_locals=True)
+        )
+
+    return _traceback
 
 
 def plain_rich_traceback(sio: TextIO, exc_info: structlog.types.ExcInfo) -> None:
@@ -64,9 +93,13 @@ def console_log_formatter(colors: bool = False) -> structlog.stdlib.ProcessorFor
     Returns:
         A configured console log formatter.
     """
-    exception_formatter = (
-        structlog.dev.rich_traceback if colors else plain_rich_traceback
-    )
+    colors = colors and not get_no_color_flag()
+
+    if colors:
+        exception_formatter = rich_exception_formatter_factory(color_system="truecolor")
+    else:
+        exception_formatter = rich_exception_formatter_factory(no_color=True)
+
     return _process_formatter(
         structlog.dev.ConsoleRenderer(
             colors=colors, exception_formatter=exception_formatter

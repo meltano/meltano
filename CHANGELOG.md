@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.10.0 (2022-11-16)
+
+### ✨ New
+
+- [#6911](https://github.com/meltano/meltano/issues/6911) Remote state backends
+
+### 🐛 Fixes
+
+- [#6971](https://github.com/meltano/meltano/issues/6971) Correct strict_env_var_mode flag check in plugin configs
+- [#6935](https://github.com/meltano/meltano/issues/6935) Persist `description` and `logo_url` to plugin lock files -- _**Thanks @DanielPDWalker!**_
+
+### 📚 Documentation Improvements
+
+- [#6984](https://github.com/meltano/meltano/issues/6984) Fix tap-github
+- [#6955](https://github.com/meltano/meltano/issues/6955) Remove UI docs
+- [#6977](https://github.com/meltano/meltano/issues/6977) Link to Meltano Cloud from Production doc
+
+## v2.9.0 (2022-11-08)
+
+### ✨ New
+
+- [#6964](https://github.com/meltano/meltano/issues/6964) Add `--cwd` CLI option
+- [#6785](https://github.com/meltano/meltano/issues/6785) Use `NO_COLOR` env var to disable colored output
+- [#6628](https://github.com/meltano/meltano/issues/6628) Make `.meltano`  folder path configurable via new `MELTANO_SYS_DIR_ROOT` env var -- _**Thanks @rawwar!**_
+
+### 🐛 Fixes
+
+- [#6938](https://github.com/meltano/meltano/issues/6938) Handle case where setting metadata is `None`
+- [#6468](https://github.com/meltano/meltano/issues/6468) Symbolic link creation for meltano.exe when on windows -- _**Thanks @BuzzCutNorman!**_
+
+### 📚 Documentation Improvements
+
+- [#6961](https://github.com/meltano/meltano/issues/6961) Fix typo "differe" -> "different" -- _**Thanks @kayakr!**_
+- [#6948](https://github.com/meltano/meltano/issues/6948) Add additional plugin definition ref entries -- _**Thanks @pandemicsyn!**_
+- [#6951](https://github.com/meltano/meltano/issues/6951) Reindent code block -- _**Thanks @jx2lee!**_
+- [#6887](https://github.com/meltano/meltano/issues/6887) Exclude little t from docs
+- [#6923](https://github.com/meltano/meltano/issues/6923) Make clear you can override `executable` in `commands`
+
+## v2.8.0 (2022-10-17)
+
+### ✨ New
+
+- [#6814](https://github.com/meltano/meltano/issues/6814) Support `meltano init` into an empty directory -- _**Thanks @ReubenFrankel!**_
+
+### 🐛 Fixes
+
+- [#6891](https://github.com/meltano/meltano/issues/6891) Interactive config for plugins with no settings
+- [#6877](https://github.com/meltano/meltano/issues/6877) Make default `default_environment` null
+- [#6862](https://github.com/meltano/meltano/issues/6862) Ignore default environment for some commands
+- [#6751](https://github.com/meltano/meltano/issues/6751) Catch ConnectionError in /version endpoint -- _**Thanks @dingobar!**_
+
+### 📚 Documentation Improvements
+
+- [#6880](https://github.com/meltano/meltano/issues/6880) Add update pip to install
+- [#6875](https://github.com/meltano/meltano/issues/6875) Add common problems
+- [#6703](https://github.com/meltano/meltano/issues/6703) Update custom extractor tutorial -- _**Thanks @jared-rimmer!**_
+- [#6852](https://github.com/meltano/meltano/issues/6852) Add giffy to title
+- [#6844](https://github.com/meltano/meltano/issues/6844) Update `2.5.0` changelog to reflect breaking change
+
 ## v2.7.2 (2022-10-03)
 
 ### 🐛 Fixes

@@ -6,6 +6,8 @@ import mock
 import pytest
 
 from meltano.core.environment import Environment
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
@@ -45,6 +47,10 @@ class DummySettingsService(SettingsService):
     @property
     def label(self):
         return "Dummy"
+
+    @property
+    def project_settings_service(self):
+        return ProjectSettingsService(Project.find())
 
     @property
     def docs_url(self):

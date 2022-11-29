@@ -202,7 +202,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             A mapping of file IDs to file names.
         """
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
-
         return {
             _key: self.plugin_config_service.run_dir.joinpath(filename)
             for _key, filename in plugin_files.items()
@@ -224,7 +223,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             extras=True, session=session
         )
         self.plugin_config_env = self.settings_service.as_env(session=session)
-
         async with self.plugin.trigger_hooks("configure", self, session):
             self.plugin_config_service.configure()
             self._prepared = True
@@ -318,7 +316,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
-    def env(self):
+    def env(self):  # noqa: WPS210
         """Environment variable mapping.
 
         Returns:
@@ -454,7 +452,9 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 env=popen_env,
             )
 
-    async def invoke_docker(self, plugin_command: str, *args, **kwargs) -> int:
+    async def invoke_docker(  # noqa: WPS210
+        self, plugin_command: str, *args, **kwargs
+    ) -> int:
         """Invoke a containerized command.
 
         Args:

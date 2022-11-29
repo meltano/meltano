@@ -85,10 +85,12 @@ class BadCronError(MeltanoError):
         super().__init__(reason, instruction)
 
 
-class ScheduleService:
+class ScheduleService:  # noqa: WPS214
     """Service for managing schedules."""
 
-    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
+    def __init__(
+        self, project: Project, plugins_service: ProjectPluginsService | None = None
+    ):
         """Initialize a ScheduleService for a project to manage a projects schedules.
 
         Args:
@@ -316,7 +318,7 @@ class ScheduleService:
             raise ScheduleNotFoundError(name) from err
 
     def run(
-        self, schedule: Schedule, *args, env: dict = None, **kwargs
+        self, schedule: Schedule, *args, env: dict | None = None, **kwargs
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 

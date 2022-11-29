@@ -87,3 +87,7 @@ class PluginInstallWarning(Exception):
 
 class EmptyMeltanoFileException(Exception):
     """Exception for empty meltano.yml file."""
+
+
+class MeltanoConfigurationError(MeltanoError):
+    """Exception for when Meltano is inproperly configured."""

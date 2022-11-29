@@ -10,15 +10,14 @@ from operator import xor
 import click
 import structlog
 
+from meltano.cli import activate_explicitly_provided_environment, cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd, InstrumentedGroup
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
-
-from . import cli
-from .utils import InstrumentedCmd, InstrumentedGroup
 
 STATE_SERVICE_KEY = "state_service"
 
@@ -107,18 +106,16 @@ def meltano_state(project: Project, ctx: click.Context):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#state
     """
+    activate_explicitly_provided_environment(ctx, project)
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
+    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
 @click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
-@pass_project()
-def list_state(
-    project: Project, ctx: click.Context, pattern: str | None
-):  # noqa: WPS125
+def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
     """List all state_ids for this project.
 
     Optionally pass a glob-style pattern to filter state_ids by.

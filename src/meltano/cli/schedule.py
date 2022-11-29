@@ -8,7 +8,7 @@ import sys
 import click
 from sqlalchemy.orm import Session
 
-from meltano.cli import cli
+from meltano.cli import activate_explicitly_provided_environment, cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
 from meltano.core.db import project_engine
@@ -32,6 +32,7 @@ def schedule(project, ctx):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
+    activate_explicitly_provided_environment(ctx, project)
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
     ctx.obj["task_sets_service"] = TaskSetsService(project)
@@ -259,7 +260,7 @@ def remove(ctx, name):
 def _update_job_schedule(
     candidate: Schedule,
     job: str | None,
-    interval: str = None,
+    interval: str | None = None,
 ) -> Schedule:
     """Update an existing job schedule.
 

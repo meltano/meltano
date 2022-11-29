@@ -1,26 +1,27 @@
 """Main entry point for the meltano CLI."""
+
 from __future__ import annotations
 
 import logging
 import os
 import sys
-from textwrap import dedent
 from typing import TYPE_CHECKING, NoReturn
 
+from meltano.cli.utils import CliError
 from meltano.core.error import MeltanoError
 from meltano.core.logging import setup_logging
 from meltano.core.project import ProjectReadonly
-from meltano.core.tracking.contexts.exception import ExceptionContext  # noqa: F401
-
-from .interactive import InteractionStatus, InteractiveConfig  # noqa: F401
-from .utils import CliError
 
 # TODO: Importing the cli.cli module breaks other cli module imports
 # This suggests a cyclic dependency or a poorly structured interface.
 # This should be investigated and resolved to avoid implicit behavior
 # based solely on import order.
-from .cli import cli  # isort:skip
-from . import (  # isort:skip # noqa: F401, WPS235
+from meltano.cli.cli import (  # isort:skip
+    activate_environment,
+    activate_explicitly_provided_environment,
+    cli,
+)
+from meltano.cli import (  # isort:skip # noqa: WPS235
     add,
     config,
     discovery,
@@ -55,7 +56,7 @@ exit_code: None | int = None
 
 atexit_handler_registered = False
 exit_code_reported = False
-exit_event_tracker: Tracker = None
+exit_event_tracker: Tracker | None = None
 
 setup_logging()
 

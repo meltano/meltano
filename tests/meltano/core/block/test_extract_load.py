@@ -21,6 +21,7 @@ from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.singer import SingerBlock
 from meltano.core.environment import Environment
 from meltano.core.job import Job, Payload, State
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -28,7 +29,6 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 
 TEST_STATE_ID = "test_job"
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
@@ -258,7 +258,7 @@ class TestExtractLoadBlocks:
         return target
 
     @pytest.mark.asyncio
-    async def test_link_io(
+    async def test_link_io(  # noqa: WPS210
         self,
         session,
         subject,

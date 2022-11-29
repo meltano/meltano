@@ -83,8 +83,8 @@ class SettingsService(ABC):  # noqa: WPS214
         self,
         project: Project,
         show_hidden: bool = True,
-        env_override: dict = None,
-        config_override: dict = None,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
     ):
         """Create a new settings service object.
 
@@ -123,6 +123,15 @@ class SettingsService(ABC):  # noqa: WPS214
         """
 
     @property
+    @abstractmethod
+    def project_settings_service(self):
+        """Get a project settings service.
+
+        Returns:
+            A ProjectSettingsService
+        """
+
+    @property
     def env_prefixes(self) -> list[str]:
         """Return prefixes for setting environment variables.
 
@@ -141,7 +150,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings."""
 
-    @property
+    @property  # noqa: B027
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
 
@@ -231,11 +240,10 @@ class SettingsService(ABC):  # noqa: WPS214
                 **kwargs,
             )
 
-            name = setting_def.name
-            if prefix:
-                name = name[len(prefix) :]  # noqa: E203
-
-            config[name] = {**metadata, "value": value}
+            config[setting_def.name[len(prefix) :] if prefix else setting_def.name] = {
+                **metadata,
+                "value": value,
+            }
 
         return config
 
@@ -275,10 +283,8 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             settings as environment variables
         """
-        full_config = self.config_with_metadata(*args, **kwargs)
-
         env = {}
-        for _, config in full_config.items():
+        for _, config in self.config_with_metadata(*args, **kwargs).items():
             value = config["value"]
             if value is None:
                 continue
@@ -347,7 +353,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
-        env_var_strict_mode, _ = manager.get(
+        env_var_strict_mode, _ = source.manager(self.project_settings_service).get(
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
         )
         if expand_env_vars and metadata.get("expandable", False):
@@ -442,8 +448,8 @@ class SettingsService(ABC):  # noqa: WPS214
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(  # noqa: WPS615
-        self, path: list[str], value, store=SettingValueStore.AUTO, **kwargs
+    def set_with_metadata(  # noqa: WPS615, WPS210
+        self, path: str | list[str], value, store=SettingValueStore.AUTO, **kwargs
     ):
         """Set the value and metadata for a setting.
 
@@ -466,6 +472,7 @@ class SettingsService(ABC):  # noqa: WPS214
         try:
             setting_def = self.find_setting(name)
         except SettingMissingError:
+            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning)
             setting_def = None
 
         metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
@@ -480,11 +487,13 @@ class SettingsService(ABC):  # noqa: WPS214
                 metadata["uncast_value"] = value
                 value = cast_value
 
-        manager = store.manager(self, **kwargs)
-        set_metadata = manager.set(name, path, value, setting_def=setting_def)
-        metadata.update(set_metadata)
+        metadata.update(
+            store.manager(self, **kwargs).set(
+                name, path, value, setting_def=setting_def
+            )
+        )
 
-        self.log(f"Set setting '{name}' with metadata: {metadata}")
+        self.log(f"Set setting {name!r} with metadata: {metadata}")
         return value, metadata
 
     def set(self, *args, **kwargs):
@@ -523,13 +532,15 @@ class SettingsService(ABC):  # noqa: WPS214
         except SettingMissingError:
             setting_def = None
 
-        metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
+        metadata = {
+            "name": name,
+            "path": path,
+            "store": store,
+            "setting": setting_def,
+            **store.manager(self, **kwargs).unset(name, path, setting_def=setting_def),
+        }
 
-        manager = store.manager(self, **kwargs)
-        unset_metadata = manager.unset(name, path, setting_def=setting_def)
-        metadata.update(unset_metadata)
-
-        self.log(f"Unset setting '{name}' with metadata: {metadata}")
+        self.log(f"Unset setting {name!r} with metadata: {metadata}")
         return metadata
 
     def reset(self, store=SettingValueStore.AUTO, **kwargs):

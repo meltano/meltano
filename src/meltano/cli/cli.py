@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
+from pathlib import Path
 from typing import NoReturn
 
 import click
@@ -11,10 +13,12 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import CliContext, Tracker
+from meltano.core.utils import get_no_color_flag
 
 logger = logging.getLogger(__name__)
 
@@ -54,15 +58,21 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.option(
     "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
+@click.option(
+    "--cwd",
+    type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
+    help="Run Meltano as if it had been started in the specified directory.",
+)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(  # noqa: WPS231
-    ctx,
+    ctx: click.Context,
     log_level: str,
     log_config: str,
     verbose: int,
     environment: str,
     no_environment: bool,
+    cwd: Path | None,
 ):  # noqa: WPS231
     """
     ELT for the DataOps era.
@@ -78,6 +88,16 @@ def cli(  # noqa: WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["verbosity"] = verbose
+
+    no_color = get_no_color_flag()
+    if no_color:
+        ctx.color = False
+
+    if cwd:
+        try:
+            os.chdir(cwd)
+        except OSError as ex:
+            raise Exception(f"Unable to run Meltano from {cwd!r}") from ex
 
     try:  # noqa: WPS229
         project = Project.find()
@@ -100,12 +120,7 @@ def cli(  # noqa: WPS231
         elif project_setting_service.get("default_environment"):
             selected_environment = project_setting_service.get("default_environment")
             is_default_environment = True
-        # activate environment
-        if selected_environment:
-            project.activate_environment(selected_environment)
-            logger.info(
-                "Environment '%s' is active", selected_environment  # noqa: WPS323
-            )
+        ctx.obj["selected_environment"] = selected_environment
         ctx.obj["is_default_environment"] = is_default_environment
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
@@ -123,3 +138,49 @@ def cli(  # noqa: WPS231
             "For more details, visit https://docs.meltano.com/guide/installation#upgrading-meltano-version"
         )
         sys.exit(3)
+
+
+def activate_environment(
+    ctx: click.Context, project: Project, required: bool = False
+) -> None:
+    """Activate the selected environment.
+
+    The selected environment is whatever was selected with the `--environment`
+    option, or the default environment (set in `meltano.yml`) otherwise.
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["selected_environment"]:
+        project.activate_environment(ctx.obj["selected_environment"])
+    elif required:
+        raise MeltanoConfigurationError(
+            reason="A Meltano environment must be specified",
+            instruction="Set the `default_environment` option in "
+            "`meltano.yml`, or the `--environment` CLI option",
+        )
+
+
+def activate_explicitly_provided_environment(
+    ctx: click.Context, project: Project
+) -> None:
+    """Activate the selected environment if it has been explicitly set.
+
+    Some commands (e.g. `config`, `job`, etc.) do not respect the configured
+    `default_environment`, and will only run with an environment active if it
+    has been explicitly set (e.g. with the `--environment` CLI option).
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"The default environment {ctx.obj['selected_environment']!r} will "
+            f"be ignored for `meltano {ctx.command.name}`. To configure a specific "
+            "environment, please use the option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
+    else:
+        activate_environment(ctx, project)

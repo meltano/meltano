@@ -249,7 +249,7 @@ def _prompt_plugin_settings(plugin_type):
     click.echo("Default: no settings")
     click.echo()
 
-    settings: dict = None
+    settings: dict | None = None
     while settings is None:  # noqa:  WPS426  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
@@ -435,11 +435,20 @@ def install_status_update(install_state):
 
 
 def install_plugins(
-    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None, clean=False
+    project,
+    plugins,
+    reason=PluginInstallReason.INSTALL,
+    parallelism=None,
+    clean=False,
+    force=False,
 ):
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
-        project, status_cb=install_status_update, parallelism=parallelism, clean=clean
+        project,
+        status_cb=install_status_update,
+        parallelism=parallelism,
+        clean=clean,
+        force=force,
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
     num_successful = len([status for status in install_results if status.successful])

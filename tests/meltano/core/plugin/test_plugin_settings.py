@@ -926,13 +926,17 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(-1)
     def test_strict_env_var_mode_on_raises_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+        subject.project_settings_service.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+        )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         with pytest.raises(EnvironmentVariableNotSetError):
             subject.get("stacked_env_var")
 
     @pytest.mark.order(-1)
     def test_strict_env_var_mode_off_no_raise_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.project_settings_service.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False
+        )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         assert subject.get("stacked_env_var") is None

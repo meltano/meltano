@@ -13,15 +13,15 @@ from meltano.core.settings_service import FeatureFlags, SettingsService
 from meltano.core.utils import expand_env_vars
 
 
-class PluginSettingsService(SettingsService):
+class PluginSettingsService(SettingsService):  # noqa: WPS214
     """Settings manager for Meltano plugins."""
 
-    def __init__(
+    def __init__(  # noqa: WPS210
         self,
         project: Project,
         plugin: ProjectPlugin,
         *args,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
         **kwargs,
     ):
         """Create a new plugin settings manager.
@@ -48,13 +48,11 @@ class PluginSettingsService(SettingsService):
         else:
             self.environment_plugin_config = None
 
-        project_settings_service = ProjectSettingsService(
-            self.project, config_service=self.plugins_service.config_service
-        )
+        self._project_settings_service = None
 
         self.env_override = {
-            **project_settings_service.env,  # project level environment variables
-            **project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
+            **self.project_settings_service.env,  # project level environment variables
+            **self.project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
             **self.env_override,  # plugin level overrides, passed in as **kwargs and set to self.env_overrides by super().__init__ above
             **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
             **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition
@@ -62,7 +60,7 @@ class PluginSettingsService(SettingsService):
 
         environment_env = {}
         if self.project.active_environment:
-            with project_settings_service.feature_flag(
+            with self.project_settings_service.feature_flag(
                 FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
             ) as strict_env_var_mode:
                 environment_env = {
@@ -73,7 +71,6 @@ class PluginSettingsService(SettingsService):
                     )
                     for var, value in self.project.active_environment.env.items()
                 }
-
                 # expand state_id_suffix
                 self.project.active_environment.state_id_suffix = expand_env_vars(
                     self.project.active_environment.state_id_suffix,
@@ -94,6 +91,19 @@ class PluginSettingsService(SettingsService):
         self.env_override.update(
             environment_plugin_env
         )  # env vars stored under the `env:` key of the plugin definition of the active meltano Environment
+
+    @property
+    def project_settings_service(self):
+        """Get the settings service for the active project.
+
+        Returns:
+            A project settings service for the active project.
+        """
+        if not self._project_settings_service:
+            self._project_settings_service = ProjectSettingsService(
+                self.project, config_service=self.plugins_service.config_service
+            )
+        return self._project_settings_service
 
     @property
     def label(self):
