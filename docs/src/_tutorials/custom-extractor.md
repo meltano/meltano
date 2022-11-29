@@ -470,7 +470,7 @@ your tap directly to PyPI.
 
 1. Create an account with [PyPI](https://pypi.org).
 2. Create a PyPI API token for use in automated publishing. (Optional but recommended.)
-3. Run `poetry build` from within your repo to build 
+3. Run `poetry build` from within your repo to build.
 4. Run `poetry publish` to push your latest version to the PyPI servers.
 
 ### Test a `pip` install
