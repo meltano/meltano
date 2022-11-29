@@ -14,7 +14,21 @@ plugins:
     # Note that `meltano install` runs with no active environment,
     # so 3 and 5 are absent from the expanded string.
     pip_url: -e env-var-in-pip-url-example-${STACKED}  # 'env-var-in-pip-url-example-124'
-    executable: example
+    settings:
+    - name: echo_text
+      env: ECHO_TEXT
+    config:
+      echo_text: ${STACKED}
+    commands:
+      echo-stacked:
+        # Echoed text is 1234 (no environment) or 12345 (in 'prod')
+        executable: echo
+        args: "Stacked env var value is: ${STACKED}"
+      echo-config:
+        # FIXME: Should be same as echo_stacked 1234.
+        #        Currently prints partially resolved: '${STACKED}4'
+        executable: echo
+        args: "Config value is: ${ECHO_TEXT}"
     env:
       # Level 4: plugin-level `env:`
       # Inherits from a environment-level `env:` if an environment is active
