@@ -122,3 +122,18 @@ Early versions of Meltano promoted a simple UI feature that was used for setting
 Meltano will eventually have a UI again as the company and community grows. Please let us know your thoughts on what you would like to see in a future Meltano UI in [this GitHub discussion](https://github.com/meltano/meltano/discussions/6957).
 
 To view the previous documentation on the UI, review [this pull request](https://github.com/meltano/meltano/pull/6955) where they were removed.
+
+### Limitations & Capabilities of the Deprecated UI
+
+If you are still using the UI, please note that it is not compatible with many newer Meltano features.
+
+The UI **does** work with:
+- Schedules based on ELT (`meltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform ...`)
+
+The UI does **not** work with:
+- Schedules based on jobs (`meltano schedule add <schedule_name> --job <job>`)
+- Environments
+
+### Replacing UI functionality
+
+If you're using Airflow as your orchestrator, the Airflow webserver UI should be able to serve as a replacement for many Meltano UI use cases. See the ["Airflow orchestrator" section of the "Deployment in Production" guide](/guide/production#airflow-orchestrator) for more details on how to get the webserver running. From the webserver, you can [view all DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/ui.html#dags-view). You can also access the Meltano logs for a specific task instance by going to the [task instance context menu](https://airflow.apache.org/docs/apache-airflow/1.10.14/ui.html#task-instance-context-menu) and clicking "Log" or "View logs".
