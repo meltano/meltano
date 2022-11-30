@@ -2,6 +2,7 @@
 <h1 align="center">Meltano - Your CLI for ELT+</h1>
 <h3 align="center">Open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.</h3>
 
+[![Try online with GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?template_repository=meltano/meltano-codespace-ready)
 ---
 
 ![Meltano Logo](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
