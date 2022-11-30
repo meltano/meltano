@@ -154,8 +154,8 @@ per-file-ignores =
         D102
         D103
         D104
-	D105
-	D107
+        D105
+        D107
         # String does contain unindexed parameters
         P103
         # Allow underscored number name pattern (e.g. tap_covid_19)
@@ -164,8 +164,8 @@ per-file-ignores =
         WPS204
         # Don't warn on too many arguments in test methods
         WPS211
-	# Don't warn on too many local variables in test methods
-	WPS210
+        # Don't warn on too many local variables in test methods
+        WPS210
         # Don't warn on too many `assert` statements in test methods
         WPS218
         # Found too many expressions
@@ -194,8 +194,8 @@ per-file-ignores =
         WPS425
         # Found too long name
         WPS118
-	# Avoid false positive for implicit raw strings
-	WPS342
+    # Avoid false positive for implicit raw strings
+    WPS342
     !tests/*:
         T
     scripts/*:
@@ -294,11 +294,11 @@ per-file-ignores =
         WPS204
     src/meltano/core/utils/__init__.py:
         # Many of these utility functions are descriptively
-	# name and self-documenting
-	D103
+    # name and self-documenting
+    D103
     src/meltano/core/state_store/*:
-	# Ignore ... in ABC
-	WPS428
+    # Ignore ... in ABC
+    WPS428
     src/meltano/core/state_store/__init__.py:
         # Ignore multi-line function annotations
-	WPS320
+    WPS320

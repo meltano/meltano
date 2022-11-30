@@ -261,19 +261,21 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
     @hook("after_install")
     async def after_install(
         self,
-        installer: PluginInstallService,
+        install_service: PluginInstallService,
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
     ):
         """Trigger after install tasks.
 
         Args:
-            installer: The plugin installer.
+            install_service: The plugin installation service.
             plugin: The installed plugin.
             reason: The reason for the installation.
         """
         update_config = PluginSettingsService(
-            installer.project, plugin, plugins_service=installer.plugins_service
+            install_service.project,
+            plugin,
+            plugins_service=install_service.plugins_service,
         ).get("_update")
         paths_to_update = [
             path for path, to_update in update_config.items() if to_update
@@ -281,11 +283,11 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
 
         if reason is PluginInstallReason.ADD:
             logger.info(f"Adding '{plugin.name}' files to project...")
-            for path in self.create_files(installer.project, paths_to_update):
+            for path in self.create_files(install_service.project, paths_to_update):
                 logger.info(f"Created {path}")
         elif reason is PluginInstallReason.UPGRADE:
             logger.info(f"Updating '{plugin.name}' files in project...")
-            updated_paths = self.update_files(installer.project, paths_to_update)
+            updated_paths = self.update_files(install_service.project, paths_to_update)
             if not updated_paths:
                 logger.info("Nothing to update")
                 return

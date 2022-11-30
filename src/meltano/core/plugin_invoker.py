@@ -14,19 +14,18 @@ from typing import Any, Generator
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
+from meltano.core.error import Error
 from meltano.core.logging.utils import SubprocessOutputWriter
-
-from .error import Error
-from .plugin import PluginRef
-from .plugin.config_service import PluginConfigService
-from .plugin.project_plugin import ProjectPlugin
-from .plugin.settings_service import PluginSettingsService
-from .project import Project
-from .project_plugins_service import ProjectPluginsService
-from .project_settings_service import ProjectSettingsService
-from .settings_service import FeatureFlags
-from .utils import expand_env_vars
-from .venv_service import VenvService, VirtualEnv
+from meltano.core.plugin import PluginRef
+from meltano.core.plugin.config_service import PluginConfigService
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FeatureFlags
+from meltano.core.utils import expand_env_vars
+from meltano.core.venv_service import VenvService, VirtualEnv
 
 logger = get_logger(__name__)
 
@@ -330,18 +329,18 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         ) as strict_env_var_mode:
 
             # Expand root env w/ os.environ
-            expanded_project_env = expand_env_vars(
-                project_settings_service.env,
-                os.environ,
-                raise_if_missing=strict_env_var_mode,
-            )
-            expanded_project_env.update(
-                expand_env_vars(
+            expanded_project_env = {
+                **expand_env_vars(
+                    project_settings_service.env,
+                    os.environ,
+                    raise_if_missing=strict_env_var_mode,
+                ),
+                **expand_env_vars(
                     self.settings_service.project.dotenv_env,
                     os.environ,
                     raise_if_missing=strict_env_var_mode,
-                )
-            )
+                ),
+            }
             # Expand active env w/ expanded root env
             expanded_active_env = (
                 expand_env_vars(
