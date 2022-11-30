@@ -4,7 +4,7 @@
 
 <div align="center">
 <a href="https://github.com/codespaces/new?template_repository=meltano/meltano-codespace-ready">
-<img alt="Try codespaces" src="https://img.shields.io/static/v1?label=&message=Try live demo with Codespaces&color=blueviolet&style=for-the-badge&logo=github"/>
+<img alt="Try codespaces" src="https://img.shields.io/static/v1?label=&message=Try live demo with Codespaces&color=02a5a5&style=for-the-badge&logo=github"/>
 </a>
 </div>
 
