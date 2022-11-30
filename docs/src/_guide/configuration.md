@@ -201,7 +201,24 @@ environments:
 ```
 
 Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the [resolution and inheritance behavior of `config` or `settings` keys](/guide/configuration#configuration-layers).
+
 Because settings and environment variable behavior can become complex when set in multiple places, the [`meltano invoke` command](/reference/command-line-interface#invoke) provides a `--print-var` option which allows you to easily inspect what value is being supplied for a given environment variable within your plugin's invocation environment at runtime.
+
+##### Environment variable expansion within `pip_url`
+
+In addition to affecting the environment variables at runtime, and the `config`/`settings` values, environment variables can be expanded within the value of a plugin's `pip_url`. The environment variable inheritance shown above applies to environment variables expanded within the value of `pip_url`.
+
+This can be useful for using a different `pip_url` for different environments (e.g. to change which git branch of a plugin repository is used):
+
+```yaml
+pip_url: "git+https://github.com/MeltanoLabs/tap-github.git@${TAP_GITHUB_GIT_REV}"
+```
+
+Another use for this is to supply credentials for a private Python package index:
+
+```yaml
+pip_url: "https://${NEXUS_USERNAME}:${NEXUS_PASSWORD}@nexus.example.com/simple"
+```
 
 ### Configuring settings
 
