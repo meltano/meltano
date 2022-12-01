@@ -55,7 +55,7 @@
 
 Welcome to your CLI for ELT+. It's open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.
 
-If you're a fan, star the repo ⭐️.
+If you're a fan, star the repo ⭐️. [Plus this month, every ⭐ on GitHub removes 2 lb/~1 kg of trash from our waterways 🌊](https://meltano.com/blog/extracting-trash-to-transform-our-waterways/)
 
 
 
