@@ -132,7 +132,7 @@ The UI **does** work with:
 
 The UI does **not** work with:
 - Schedules based on [jobs](https://docs.meltano.com/reference/command-line-interface#job) (`meltano schedule add <schedule_name> --job <job>`)
-- Environments
+- [Environments](https://docs.meltano.com/concepts/environments)
 
 ### Replacing UI functionality
 
