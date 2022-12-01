@@ -128,7 +128,7 @@ To view the previous documentation on the UI, review [this pull request](https:/
 If you are still using the UI, please note that it is not compatible with many newer Meltano features.
 
 The UI **does** work with:
-- Schedules based on ELT (`meltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform ...`)
+- Schedules based on [the `elt` command](https://docs.meltano.com/reference/command-line-interface#elt) (`meltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform ...`)
 
 The UI does **not** work with:
 - Schedules based on jobs (`meltano schedule add <schedule_name> --job <job>`)
