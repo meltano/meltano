@@ -247,8 +247,7 @@ class TestEnvVarResolution:
 
         args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():
-            args.append("--print-var")
-            args.append(key)
+            args.extend(("--print-var", key))
         args.append("test-env-var-resolution")
         result = cli_runner.invoke(cli, args)
         assert_cli_runner(result)

@@ -277,6 +277,14 @@ class TestProjectPlugin:
             "inherit_from": "tap-example",
             "variant": "meltano",
         },
+        "complex_pip_url": {
+            "name": "tap-example",
+            "pip_url": (
+                "--only-binary "
+                "-i https://${PYPI_USER}:$PYPI_PASS@pypi.example.com/simple "
+                "tap-example --pre"
+            ),
+        },
     }
 
     def test_init_minimal(self):

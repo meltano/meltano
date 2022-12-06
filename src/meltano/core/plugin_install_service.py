@@ -4,14 +4,18 @@
 from __future__ import annotations
 
 import asyncio
-import contextlib
 import functools
 import logging
+import os
 import sys
 from enum import Enum
 from multiprocessing import cpu_count
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Mapping
 
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 from cached_property import cached_property
 
 from meltano.core.error import (
@@ -21,9 +25,12 @@ from meltano.core.error import (
 )
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.utils import noop
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FeatureFlags
+from meltano.core.utils import expand_env_vars, noop
 from meltano.core.venv_service import VenvService
 
 logger = logging.getLogger(__name__)
@@ -113,24 +120,6 @@ class PluginInstallState:
             return "Skipped installing"
 
         return "Errored"
-
-
-def installer_factory(project, plugin: ProjectPlugin, *args, **kwargs):
-    """Installer Factory.
-
-    Args:
-        project: Meltano Project.
-        plugin: Plugin to be installed.
-        args: Positional arguments to instantiate installer with.
-        kwargs: Keyword arguments to instantiate installer with.
-
-    Returns:
-        An instantiated plugin installer for the given plugin.
-    """
-    installer_class = PipPluginInstaller
-    with contextlib.suppress(AttributeError):
-        installer_class = plugin.installer_class
-    return installer_class(project, plugin, *args, **kwargs)
 
 
 def with_semaphore(func):
@@ -350,10 +339,16 @@ class PluginInstallService:  # noqa: WPS214
 
         try:
             async with plugin.trigger_hooks("install", self, plugin, reason):
-                await installer_factory(self.project, plugin).install(
+                installer: PluginInstaller = getattr(
+                    plugin, "installer", install_pip_plugin
+                )
+                await installer(
+                    project=self.project,
+                    plugin=plugin,
                     reason=reason,
                     clean=self.clean,
                     force=self.force,
+                    env=self.plugin_installation_env(plugin),
                 )
                 state = PluginInstallState(
                     plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS
@@ -410,44 +405,110 @@ class PluginInstallService:  # noqa: WPS214
         """
         return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
 
+    def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
+        """Environment variables to use during plugin installation.
 
-class PipPluginInstaller:
-    """Plugin installer for pip-based plugins."""
+        Args:
+            plugin: The plugin being installed.
 
-    def __init__(
+        Returns:
+            A dictionary of environment variables from the process'
+            environment, `meltano.yml`, the plugin `env` config, et cetera, in
+            accordance with the normal Meltano env precedence hierarchy. See
+            https://docs.meltano.com/guide/configuration#specifying-environment-variables.
+            A special env var (with lowest precedence) `$MELTANO__PYTHON_VERSION`
+            is included, and has the value
+            `<major Python version>.<minor Python version>`.
+        """
+        project_settings_service = ProjectSettingsService(
+            self.project, config_service=self.plugins_service.config_service
+        )
+        plugin_settings_service = PluginSettingsService(
+            self.project, plugin, plugins_service=self.plugins_service
+        )
+        with project_settings_service.feature_flag(
+            FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+        ) as strict_env_var_mode:
+            expanded_project_env = expand_env_vars(
+                project_settings_service.env,
+                os.environ,
+                raise_if_missing=strict_env_var_mode,
+            )
+            return {
+                "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}",
+                **expanded_project_env,
+                **expand_env_vars(
+                    plugin_settings_service.project.dotenv_env,
+                    os.environ,
+                    raise_if_missing=strict_env_var_mode,
+                ),
+                **plugin_settings_service.as_env(),
+                **plugin_settings_service.plugin.info_env,
+                **expand_env_vars(
+                    plugin_settings_service.plugin.env,
+                    expanded_project_env,
+                    raise_if_missing=strict_env_var_mode,
+                ),
+            }
+
+
+class PluginInstaller(Protocol):
+    """Prototype function for plugin installation.
+
+    All plugin installation functions must support at least the specified
+    parameters, and also accept additional unused keyword arguments.
+    """
+
+    async def __call__(
         self,
-        project,
+        *,
+        project: Project,
         plugin: ProjectPlugin,
-        venv_service: VenvService | None = None,
-    ):
-        """Initialize PipPluginInstaller instance.
+        **kwargs,
+    ) -> None:
+        """Install the plugin.
 
         Args:
             project: Meltano Project.
-            plugin: ProjectPlugin to install.
-            venv_service: VenvService instance to use when installing.
+            plugin: `ProjectPlugin` to install.
+            kwargs: Additional arguments for the installation of the plugin.
         """
-        self.plugin = plugin
-        self.venv_service = venv_service or VenvService(
-            project,
-            namespace=self.plugin.type,
-            name=self.plugin.venv_name,
-        )
 
-    async def install(
-        self, reason: PluginInstallReason, clean: bool, force: bool
-    ) -> None:
-        """Install the plugin into the virtual environment using pip.
 
-        Args:
-            reason: Install reason.
-            clean: Flag to clean install.
-            force: Whether to ignore the Python version required by plugins.
-        """
-        pip_install_args = self.plugin.formatted_pip_url.split(" ")
-        if force:
-            pip_install_args.insert(0, "--ignore-requires-python")
-        await self.venv_service.install(
-            pip_install_args=pip_install_args,
-            clean=clean,
-        )
+async def install_pip_plugin(
+    *,
+    project: Project,
+    plugin: ProjectPlugin,
+    clean: bool = False,
+    force: bool = False,
+    venv_service: VenvService | None = None,
+    env: Mapping[str, str] | None = None,
+    **kwargs,
+):
+    """Install the plugin with pip.
+
+    Args:
+        project: Meltano Project.
+        plugin: `ProjectPlugin` to install.
+        clean: Flag to clean install.
+        force: Whether to ignore the Python version required by plugins.
+        venv_service: `VenvService` instance to use when installing.
+        env: Environment variables to use when expanding the pip install args.
+        kwargs: Unused additional arguments for the installation of the plugin.
+    """
+    with ProjectSettingsService(project).feature_flag(
+        FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+    ) as strict_env_var_mode:
+        pip_install_args = expand_env_vars(
+            plugin.pip_url, env, raise_if_missing=strict_env_var_mode
+        ).split(" ")
+
+    venv_service = venv_service or VenvService(
+        project, namespace=plugin.type, name=plugin.venv_name
+    )
+    await venv_service.install(
+        pip_install_args=["--ignore-requires-python", *pip_install_args]
+        if force
+        else pip_install_args,
+        clean=clean,
+    )
