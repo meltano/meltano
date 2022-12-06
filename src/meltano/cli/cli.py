@@ -17,7 +17,7 @@ from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import CliContext, ProjectContext, Tracker
 from meltano.core.utils import get_no_color_flag
 
 logger = logging.getLogger(__name__)
@@ -154,6 +154,14 @@ def activate_environment(
     """
     if ctx.obj["selected_environment"]:
         project.activate_environment(ctx.obj["selected_environment"])
+        # Update the project context being used for telemetry:
+        project_ctx = next(
+            ctx
+            for ctx in ctx.obj["tracker"].contexts
+            if isinstance(ctx, ProjectContext)
+        )
+        project_ctx.environment_name = ctx.obj["selected_environment"]
+
     elif required:
         raise MeltanoConfigurationError(
             reason="A Meltano environment must be specified",
