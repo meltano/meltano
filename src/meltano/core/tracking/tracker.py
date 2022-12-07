@@ -191,12 +191,12 @@ class Tracker:  # noqa: WPS214 - too many methods
         Examples:
             The timezone name as an IANA timezone database name:
 
-                >>> SnowplowTracker(project).timezone_name
+                >>> Tracker(project).timezone_name
                 'Europe/Berlin'
 
             The timezone name as an IANA timezone abbreviation because the full name was not found:
 
-                >>> SnowplowTracker(project).timezone_name
+                >>> Tracker(project).timezone_name
                 'CET'
 
         Returns:

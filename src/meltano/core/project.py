@@ -1,5 +1,6 @@
 """Meltano Projects."""
 
+
 from __future__ import annotations
 
 import errno
@@ -7,7 +8,7 @@ import logging
 import os
 import sys
 import threading
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -244,10 +245,8 @@ class Project(Versioned):  # noqa: WPS214
         modified in-place, but not updated on-disk, and you need the on-disk
         version.
         """
-        try:
+        with suppress(KeyError):
             del self.__dict__["project_files"]
-        except KeyError:
-            pass
 
     @property
     def meltano(self) -> MeltanoFileTypeHint:

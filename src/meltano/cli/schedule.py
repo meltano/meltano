@@ -8,9 +8,13 @@ import sys
 import click
 from sqlalchemy.orm import Session
 
-from meltano.cli import activate_explicitly_provided_environment, cli
+from meltano.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliEnvironmentAction,
+    InstrumentedDefaultGroup,
+    PartialInstrumentedCmd,
+)
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.project import Project
@@ -22,7 +26,10 @@ from meltano.core.utils import coerce_datetime
 
 
 @cli.group(
-    cls=InstrumentedDefaultGroup, default="add", short_help="Manage pipeline schedules."
+    cls=InstrumentedDefaultGroup,
+    default="add",
+    short_help="Manage pipeline schedules.",
+    environment_action=CliEnvironmentAction.activate_explicitly_provided,
 )
 @click.pass_context
 @pass_project(migrate=True)
@@ -32,7 +39,6 @@ def schedule(project, ctx):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
     """
-    activate_explicitly_provided_environment(ctx, project)
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
     ctx.obj["task_sets_service"] = TaskSetsService(project)

@@ -95,13 +95,9 @@ class SettingsService(ABC):  # noqa: WPS214
             config_override:  Optional override configuration values.
         """
         self.project = project
-
         self.show_hidden = show_hidden
-
         self.env_override = env_override or {}
-
         self.config_override = config_override or {}
-
         self._setting_defs = None
 
     @property
