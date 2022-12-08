@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.11.0 (2022-12-08)
+
+### ✨ New
+
+- [#7019](https://github.com/meltano/meltano/issues/7019) Support env vars in plugin `pip_url`
+- [#6995](https://github.com/meltano/meltano/issues/6995) `meltano install --force`
+
+### 🐛 Fixes
+
+- [#6873](https://github.com/meltano/meltano/issues/6873) Correct migration downgrade for 2.7.1 release
+- [#7026](https://github.com/meltano/meltano/issues/7026) Permit `env` under plugins in `meltano.yml` schema
+- [#7022](https://github.com/meltano/meltano/issues/7022) Pin `setuptools==57.5.0` in plugin venvs
+- [#7017](https://github.com/meltano/meltano/issues/7017) Remove premature deserialization of settings in the CLI
+- [#7010](https://github.com/meltano/meltano/issues/7010) Re-create plugin venv if Python executable is missing
+- [#6997](https://github.com/meltano/meltano/issues/6997) Correct meltano config behavior when explicit environment is provided
+- [#6986](https://github.com/meltano/meltano/issues/6986) List strings instead of enum objects as CLI options
+
+### 📚 Documentation Improvements
+
+- [#7046](https://github.com/meltano/meltano/issues/7046) Fix internal links and `meltano config` example code block in state backends page
+- [#7041](https://github.com/meltano/meltano/issues/7041) Expand UI deprecation description -- _**Thanks @qbatten!**_
+- [#7044](https://github.com/meltano/meltano/issues/7044) Add star donation blurb to readme
+- [#7043](https://github.com/meltano/meltano/issues/7043) Add december campaign banner
+- [#7030](https://github.com/meltano/meltano/issues/7030) Env var expansion within `pip_url`
+- [#7035](https://github.com/meltano/meltano/issues/7035) Update custom extractor Poetry instructions -- _**Thanks @EMCP!**_
+- [#7014](https://github.com/meltano/meltano/issues/7014) Add more project links to PyPI page
+- [#7012](https://github.com/meltano/meltano/issues/7012) Complete list of commands that run with environment flag
+- [#7002](https://github.com/meltano/meltano/issues/7002) Add docs for state backend migration
+
 ## v2.10.0 (2022-11-16)
 
 ### ✨ New
