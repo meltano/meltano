@@ -95,7 +95,6 @@ def mypy(session: Session) -> None:
     session.install(".")
     session.install(
         "mypy",
-        "sqlalchemy2-stubs",
         "types-croniter",
         "types-requests",
         "boto3-stubs[essential]",
