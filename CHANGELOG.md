@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.11.1 (2022-12-09)
+
+### 🐛 Fixes
+
+- [#7057](https://github.com/meltano/meltano/issues/7057) Ensure `environment_name_hash` is collected
+- [#7064](https://github.com/meltano/meltano/issues/7064) Misc `meltano.yml` schema fixes
+
 ## v2.11.0 (2022-12-08)
 
 ### ✨ New
