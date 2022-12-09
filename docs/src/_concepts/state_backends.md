@@ -12,8 +12,8 @@ for Meltano projects running in ephemeral environments or in circumstances where
 
 ## Supported Backends
 
-- [System Database](#default-system-databse)
-- [Local Filesystem](#local-filesystem)
+- [System Database](#default-system-database)
+- [Local Filesystem](#local-file-system)
 - [Amazon AWS S3](#aws-s3)
 - [Azure Blob Storage](#azure-blob-storage)
 - [Google Cloud Storage](#google-cloud-storage)
@@ -31,9 +31,9 @@ To use a cloud storage backend, install Meltano using one of the following [extr
 If the base Meltano distribution is already installed in your environment, install the relevant extra and `pip` will install only the missing requirements.
 
 <div class="notification is-info">
-	<p>
-		State backends are only available in Meltano version 2.10+. If you are using an earlier version, you'll need to upgrade your project via <a href="/reference/command-line-interface#upgrade"> <code>meltano upgrade</code></a> before you using the state backends feature.
-	</p>
+    <p>
+        State backends are only available in Meltano version 2.10+. If you are using an earlier version, you'll need to upgrade your project via <a href="/reference/command-line-interface#upgrade"> <code>meltano upgrade</code></a> before you using the state backends feature.
+    </p>
 </div>
 
 ## Configuration
@@ -58,7 +58,7 @@ To store state on the local filesystem, set the `state_backend.uri` setting to `
 For example, to store state directly on the local filesystem at the path `${MELTANO_SYS_DIR_ROOT}/state`, run:
 
 ```bash
-meltano config meltano set 'state_backend.uri file:///${MELTANO_SYS_DIR_ROOT}/state'
+meltano config meltano set state_backend.uri 'file:///${MELTANO_SYS_DIR_ROOT}/state'
 ```
 
 Note the single quotes which prevent the early expansion of the environment variable.

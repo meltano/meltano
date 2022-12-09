@@ -731,10 +731,7 @@ def state_ids_with_expected_states(  # noqa: WPS210
                 or (job.ended_at > latest_job["incomplete"].ended_at)
             ):
                 expectations[state_id] = merge(expectations[state_id], job.payload)
-    return [
-        (test_state_id, expected_state)
-        for test_state_id, expected_state in expectations.items()
-    ]
+    return list(expectations.items())
 
 
 @pytest.fixture

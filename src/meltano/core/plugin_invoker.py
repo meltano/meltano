@@ -331,18 +331,18 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         ) as strict_env_var_mode:
 
             # Expand root env w/ os.environ
-            expanded_project_env = expand_env_vars(
-                project_settings_service.env,
-                os.environ,
-                raise_if_missing=strict_env_var_mode,
-            )
-            expanded_project_env.update(
-                expand_env_vars(
+            expanded_project_env = {
+                **expand_env_vars(
+                    project_settings_service.env,
+                    os.environ,
+                    raise_if_missing=strict_env_var_mode,
+                ),
+                **expand_env_vars(
                     self.settings_service.project.dotenv_env,
                     os.environ,
                     raise_if_missing=strict_env_var_mode,
-                )
-            )
+                ),
+            }
             # Expand active env w/ expanded root env
             expanded_active_env = (
                 expand_env_vars(
