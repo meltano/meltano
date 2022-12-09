@@ -328,7 +328,7 @@ class TestTracker:
         )
         assert passed
 
-    @pytest.mark.parametrize(  # noqa: WPS317
+    @pytest.mark.parametrize(
         ("sleep_duration", "timeout_should_occur"),
         ((1.0, False), (5.0, True)),
         ids=("no_timeout", "timeout"),

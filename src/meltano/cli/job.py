@@ -7,9 +7,13 @@ import json
 import click
 import structlog
 
-from meltano.cli import CliError, activate_explicitly_provided_environment, cli
+from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedGroup, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    InstrumentedGroup,
+    PartialInstrumentedCmd,
+)
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
@@ -66,10 +70,7 @@ def _list_all_jobs(
         task_sets_service: The task sets service to use.
         list_format: The format to use.
     """
-    if list_format == "text":
-        for task_set in task_sets_service.list():
-            click.echo(f"{task_set.name}: {task_set.tasks}")
-    elif list_format == "json":
+    if list_format == "json":
         click.echo(
             json.dumps(
                 {
@@ -81,11 +82,18 @@ def _list_all_jobs(
                 indent=2,
             )
         )
+    elif list_format == "text":
+        for task_set in task_sets_service.list():
+            click.echo(f"{task_set.name}: {task_set.tasks}")
     tracker: Tracker = ctx.obj["tracker"]
     tracker.track_command_event(CliEvent.completed)
 
 
-@cli.group(cls=InstrumentedGroup, short_help="Manage jobs.")
+@cli.group(
+    cls=InstrumentedGroup,
+    short_help="Manage jobs.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
+)
 @click.pass_context
 @pass_project(migrate=True)
 def job(project, ctx):
@@ -115,7 +123,6 @@ def job(project, ctx):
 
     \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
     """
-    activate_explicitly_provided_environment(ctx, project)
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
