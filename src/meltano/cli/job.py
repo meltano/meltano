@@ -10,7 +10,7 @@ import structlog
 from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
-    CliEnvironmentAction,
+    CliEnvironmentBehavior,
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
@@ -92,7 +92,7 @@ def _list_all_jobs(
 @cli.group(
     cls=InstrumentedGroup,
     short_help="Manage jobs.",
-    environment_action=CliEnvironmentAction.activate_explicitly_provided,
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.pass_context
 @pass_project(migrate=True)

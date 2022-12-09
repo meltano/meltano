@@ -7,7 +7,7 @@ import structlog
 
 from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliEnvironmentAction, PartialInstrumentedCmd
+from meltano.cli.utils import CliEnvironmentBehavior, PartialInstrumentedCmd
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -25,7 +25,7 @@ logger = structlog.getLogger(__name__)
 @cli.command(
     cls=PartialInstrumentedCmd,
     short_help="Run a set of plugins in series.",
-    environment_action=CliEnvironmentAction.activate_required,
+    environment_behavior=CliEnvironmentBehavior.environment_required,
 )
 @click.option(
     "--dry-run",

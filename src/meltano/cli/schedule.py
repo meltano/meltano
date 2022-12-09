@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
-    CliEnvironmentAction,
+    CliEnvironmentBehavior,
     InstrumentedDefaultGroup,
     PartialInstrumentedCmd,
 )
@@ -29,7 +29,7 @@ from meltano.core.utils import coerce_datetime
     cls=InstrumentedDefaultGroup,
     default="add",
     short_help="Manage pipeline schedules.",
-    environment_action=CliEnvironmentAction.activate_explicitly_provided,
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.pass_context
 @pass_project(migrate=True)

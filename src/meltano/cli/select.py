@@ -7,7 +7,7 @@ import click
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliEnvironmentAction, CliError, InstrumentedCmd
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
@@ -42,7 +42,7 @@ def selection_mark(selection):
 @cli.command(
     cls=InstrumentedCmd,
     short_help="Manage extractor selection patterns.",
-    environment_action=CliEnvironmentAction.activate_explicitly_provided,
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")

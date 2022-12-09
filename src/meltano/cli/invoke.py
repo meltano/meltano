@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
-    CliEnvironmentAction,
+    CliEnvironmentBehavior,
     CliError,
     PartialInstrumentedCmd,
     propagate_stop_signals,
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
     cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",
-    environment_action=CliEnvironmentAction.activate,
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
 @click.option(
     "--print-var",

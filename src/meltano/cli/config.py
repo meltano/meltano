@@ -17,7 +17,7 @@ from meltano.cli import cli
 from meltano.cli.interactive import InteractiveConfig
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
-    CliEnvironmentAction,
+    CliEnvironmentBehavior,
     CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
@@ -117,7 +117,7 @@ def get_label(metadata) -> str:
     cls=InstrumentedGroup,
     invoke_without_command=True,
     short_help="Display Meltano or plugin configuration.",
-    environment_action=CliEnvironmentAction.activate_explicitly_provided,
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None

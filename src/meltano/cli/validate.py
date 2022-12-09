@@ -14,7 +14,7 @@ from sqlalchemy.orm.session import sessionmaker
 from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
-    CliEnvironmentAction,
+    CliEnvironmentBehavior,
     InstrumentedCmd,
     propagate_stop_signals,
 )
@@ -66,7 +66,7 @@ class CommandLineRunner(ValidationsRunner):
 @cli.command(
     cls=InstrumentedCmd,
     short_help="Run validations using plugins' tests.",
-    environment_action=CliEnvironmentAction.activate,
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
 @click.option(
     "--all",

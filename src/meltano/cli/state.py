@@ -12,7 +12,7 @@ import structlog
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliEnvironmentAction, InstrumentedCmd, InstrumentedGroup
+from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
@@ -105,7 +105,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
     cls=InstrumentedGroup,
     name="state",
     short_help="Manage Singer state.",
-    environment_action=CliEnvironmentAction.activate_explicitly_provided,
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.pass_context
 @pass_project(migrate=True)

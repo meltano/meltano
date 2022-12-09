@@ -584,26 +584,31 @@ def activate_explicitly_provided_environment(
         activate_environment(ctx, project)
 
 
-class CliEnvironmentAction(Enum):
-    """Enum of the different ways in which a Meltano environment can be activated."""
+class CliEnvironmentBehavior(Enum):
+    """Enum of the different Meltano environment activation behaviours."""
 
-    activate = auto()
-    activate_required = auto()
-    activate_explicitly_provided = auto()
+    # Use explicit environment, or `default_environment`, or fail.
+    environment_required = auto()
+
+    # Use explicit environment, or `default_environment`, or no environment.
+    environment_optional_use_default = auto()
+
+    # Use explicit environment, or no environment; ignore `default_environment`.
+    environment_optional_ignore_default = auto()
 
 
-def enact_environment_action(
-    action: CliEnvironmentAction | None,
+def enact_environment_behavior(
+    behavior: CliEnvironmentBehavior | None,
     ctx: click.Context,
 ) -> None:
     """Activate the environment in the specified way."""
-    if action is None:
+    if behavior is None:
         return
-    if action is CliEnvironmentAction.activate:
+    if behavior is CliEnvironmentBehavior.environment_optional_use_default:
         activate_environment(ctx, ctx.obj["project"], required=False)
-    elif action is CliEnvironmentAction.activate_required:
+    elif behavior is CliEnvironmentBehavior.environment_required:
         activate_environment(ctx, ctx.obj["project"], required=True)
-    elif action is CliEnvironmentAction.activate_explicitly_provided:
+    elif behavior is CliEnvironmentBehavior.environment_optional_ignore_default:
         activate_explicitly_provided_environment(ctx, ctx.obj["project"])
 
 
@@ -613,18 +618,18 @@ class InstrumentedCmdMixin:
     def __init__(
         self,
         *args,
-        environment_action: CliEnvironmentAction | None = None,
+        environment_behavior: CliEnvironmentBehavior | None = None,
         **kwargs,
     ):
         """Initialize the `InstrumentedCmdMixin`.
 
         Args:
             args: Arguments to pass to the parent class.
-            environment_action: The action to take regarding the activation of
-                the Meltano environment for this command.
+            environment_behavior: The behavior to use regarding the activation
+                of the Meltano environment for this command.
             kwargs: Keyword arguments to pass to the parent class.
         """
-        self.environment_action = environment_action
+        self.environment_behavior = environment_behavior
         super().__init__(*args, **kwargs)
 
 
@@ -634,7 +639,7 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
     def invoke(self, ctx: click.Context):
         """Update the telemetry context and invoke the group."""
         ctx.ensure_object(dict)
-        enact_environment_action(self.environment_action, ctx)
+        enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
         super().invoke(ctx)
@@ -658,7 +663,7 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
     def invoke(self, ctx: click.Context):
         """Invoke the requested command firing start and events accordingly."""
         ctx.ensure_object(dict)
-        enact_environment_action(self.environment_action, ctx)
+        enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             tracker = ctx.obj["tracker"]
             tracker.add_contexts(CliContext.from_click_context(ctx))
@@ -679,7 +684,7 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
     def invoke(self, ctx):
         """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
-        enact_environment_action(self.environment_action, ctx)
+        enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
