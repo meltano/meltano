@@ -11,15 +11,21 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
+packages = [
+  { include = "meltano", from = "src", format = "wheel" },
+  { include = "src", format = "sdist" },
+  { include = "tests", format = "sdist"},
+  { include = "scripts/build.py", format = "sdist"},
+]
 # Explicitly include non-Python files and gitignored files:
 include = [
   "LICENSE",
-  "*.m5o",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
   "src/meltano/api/templates/embed.html",
   "src/meltano/api/templates/webapp.html",
   "src/meltano/core/tracking/.release_marker",
+  "src/meltano/schema/*",
 ]
 keywords = [
   "Meltano",
@@ -283,5 +289,6 @@ module = [
 ignore_errors = true
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.4.0"]
+build-backend = "build:api"
+backend-path = ["scripts"]
