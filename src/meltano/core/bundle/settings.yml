@@ -58,11 +58,9 @@ settings:
 - name: state_backend.s3.aws_access_key_id
   kind: password
   env_specific: true
-  env_aliases: ["AWS_ACCESS_KEY_ID"]
 - name: state_backend.s3.aws_secret_access_key
   kind: password
   env_specific: true
-  env_aliases: ["AWS_SECRET_ACCESS_KEY"]
 - name: state_backend.s3.endpoint_url
   env_specific: true
 
