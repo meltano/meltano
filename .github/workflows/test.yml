@@ -63,7 +63,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.2.0
 
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4.3.0
@@ -215,7 +215,7 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.2.0
 
     - name: Install Poetry
       run: |
@@ -263,7 +263,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.2.0
 
     - name: Setup Python 3.9
       uses: actions/setup-python@v4.3.0
