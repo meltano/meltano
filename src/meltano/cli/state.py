@@ -10,9 +10,9 @@ from operator import xor
 import click
 import structlog
 
-from meltano.cli import activate_explicitly_provided_environment, cli
+from meltano.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedCmd, InstrumentedGroup
+from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
@@ -80,14 +80,18 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
         try:
             if not project.active_environment:
                 logger.warn(
-                    f"Running state operation for environment '{match.group('env')}' outside of an environment"
+                    "Running state operation for environment "
+                    f"'{match['env']}' outside of an environment"
                 )
-            elif project.active_environment.name != match.group("env"):
+
+            elif project.active_environment.name != match["env"]:
                 logger.warn(
-                    f"Environment '{match.group('env')}' used in state operation does not match current environment '{project.active_environment.name}'."
+                    f"Environment '{match['env']}' used in state operation does "
+                    f"not match current environment '{project.active_environment.name}'."
                 )
-            project.activate_environment(match.group("env"))
-            blocks = [match.group("tap"), match.group("target")]
+
+            project.activate_environment(match["env"])
+            blocks = [match["tap"], match["target"]]
             parser = BlockParser(logger, project, blocks)
             return next(parser.find_blocks()).state_service
         except Exception:
@@ -97,7 +101,12 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
     return None
 
 
-@cli.group(cls=InstrumentedGroup, name="state", short_help="Manage Singer state.")
+@cli.group(
+    cls=InstrumentedGroup,
+    name="state",
+    short_help="Manage Singer state.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
+)
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_state(project: Project, ctx: click.Context):
@@ -106,7 +115,6 @@ def meltano_state(project: Project, ctx: click.Context):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#state
     """
-    activate_explicitly_provided_environment(ctx, project)
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
     ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204

@@ -11,9 +11,13 @@ import click
 import structlog
 from sqlalchemy.orm.session import sessionmaker
 
-from meltano.cli import activate_environment, cli
+from meltano.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedCmd, propagate_stop_signals
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    InstrumentedCmd,
+    propagate_stop_signals,
+)
 from meltano.core.db import project_engine
 from meltano.core.project import Project
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
@@ -59,7 +63,11 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Run validations using plugins' tests.")
+@cli.command(
+    cls=InstrumentedCmd,
+    short_help="Run validations using plugins' tests.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
+)
 @click.option(
     "--all",
     "all_tests",
@@ -85,7 +93,6 @@ def test(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#test
     """
-    activate_environment(ctx, project)
     _, session_maker = project_engine(project)
     session = session_maker()
 

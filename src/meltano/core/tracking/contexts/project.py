@@ -54,17 +54,33 @@ class ProjectContext(SelfDescribingJson):
                 "project_uuid": str(self.project_uuid),
                 "project_uuid_source": self.project_uuid_source.name,
                 "client_uuid": str(client_id),
-                "environment_name_hash": (
-                    hash_sha256(self.project.active_environment.name)
-                    if self.project.active_environment
-                    else None
-                ),
                 "send_anonymous_usage_stats": send_anonymous_usage_stats,
                 "send_anonymous_usage_stats_source": (
                     send_anonymous_usage_stats_metadata["source"].value
                 ),
             },
         )
+
+        self.environment_name = getattr(self.project.active_environment, "name", None)
+
+    @property
+    def environment_name(self) -> str | None:
+        """Get the name of the active environment, or `None` if there is no active environment.
+
+        Only the hash of this value is reported to Snowplow.
+
+        Returns:
+            The name of the active environment, or `None` if there is no active environment.
+        """
+        return self._environment_name
+
+    @environment_name.setter
+    def environment_name(self, value: str | None) -> None:
+        self._environment_name = value
+        if value is None:
+            self.data["environment_name_hash"] = None
+        else:
+            self.data["environment_name_hash"] = hash_sha256(value)
 
     @property
     def project_uuid_source(self) -> ProjectUUIDSource:
