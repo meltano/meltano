@@ -11,9 +11,9 @@ import click
 import structlog
 from structlog import stdlib as structlog_stdlib
 
-from meltano.cli import activate_environment, cli
+from meltano.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -43,6 +43,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @cli.command(
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
 @click.argument("extractor")
 @click.argument("loader")
@@ -112,8 +113,6 @@ async def elt(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
-    activate_environment(ctx, project)
-
     if platform.system() == "Windows":
         raise CliError(
             "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"

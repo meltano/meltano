@@ -5,15 +5,17 @@ from __future__ import annotations
 import atexit
 import json
 import locale
+import os
 import re
 import uuid
 from collections.abc import Mapping
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
 from urllib.parse import urlparse
+from warnings import warn
 
 import structlog
 import tzlocal
@@ -135,7 +137,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             self.snowplow_tracker = None
 
         stored_telemetry_settings = self.load_saved_telemetry_settings()
-        self.client_id = stored_telemetry_settings.client_id or uuid.uuid4()
+
+        self.client_id = self.get_client_id(stored_telemetry_settings)
 
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id: uuid.UUID = project_ctx.project_uuid
@@ -153,6 +156,35 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             self.save_telemetry_settings()
         else:
             self.telemetry_state_change_check(stored_telemetry_settings)
+            if self.client_id != stored_telemetry_settings.client_id:
+                self.save_telemetry_settings()
+
+    def get_client_id(self, stored_telemetry_settings: TelemetrySettings) -> uuid.UUID:
+        """Get the telemetry client ID.
+
+        It can be set using the `$MELTANO_CLIENT_ID` environment variable. If
+        that environment variable has not been set, then the client ID stored
+        on disk will be used if it exists. If the client ID has not been stored
+        on disk, then a new one will be randomly generated.
+
+        Args:
+            stored_telemetry_settings: The telemetry settings stored on disk.
+
+        Returns:
+            The client ID.
+        """
+        with suppress(KeyError):
+            uuid_str = os.environ["MELTANO_CLIENT_ID"]
+            try:
+                return uuid.UUID(uuid_str)
+            except ValueError:
+                warn(
+                    f"Invalid telemetry client UUID {uuid_str!r} from $MELTANO_CLIENT_ID",
+                    RuntimeWarning,
+                )
+        if stored_telemetry_settings.client_id is not None:
+            return stored_telemetry_settings.client_id
+        return uuid.uuid4()
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
@@ -204,12 +236,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         Examples:
             The timezone name as an IANA timezone database name:
 
-                >>> SnowplowTracker(project).timezone_name
+                >>> Tracker(project).timezone_name
                 'Europe/Berlin'
 
             The timezone name as an IANA timezone abbreviation because the full name was not found:
 
-                >>> SnowplowTracker(project).timezone_name
+                >>> Tracker(project).timezone_name
                 'CET'
 
         Returns:
@@ -393,7 +425,11 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         except OSError as err:
             logger.debug("Unable to save 'analytics.json'", err=err)
 
-    def _uuid_from_str(self, from_val: Any | None, warn: bool) -> uuid.UUID | None:
+    def _uuid_from_str(
+        self,
+        from_val: Any | None,
+        warn: bool,  # noqa: WPS442
+    ) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
 
         Args:

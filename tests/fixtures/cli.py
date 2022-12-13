@@ -3,15 +3,18 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pytest
+from click import Command
 from click.testing import CliRunner
 
 from fixtures.utils import tmp_project
 from meltano.core.project_files import ProjectFiles
 
 if TYPE_CHECKING:
+    from click.testing import Result
+
     from fixtures.docker import SnowplowMicro
 
 
@@ -24,8 +27,8 @@ class MeltanoCliRunner(CliRunner):
         self.snowplow = snowplow
         super().__init__(*args, **kwargs)
 
-    def invoke(self, *args, **kwargs) -> Any:
-        results = super().invoke(*args, **kwargs)
+    def invoke(self, cli: Command, *args, **kwargs) -> Result:
+        results = super().invoke(cli, *args, **kwargs)
         if self.snowplow:  # pragma: no cover
             assert self.snowplow.all()["bad"] == 0  # pragma: no cover
             assert not self.snowplow.bad()  # pragma: no cover

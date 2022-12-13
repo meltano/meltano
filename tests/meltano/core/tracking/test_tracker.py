@@ -329,7 +329,7 @@ class TestTracker:
         )
         assert passed
 
-    @pytest.mark.parametrize(  # noqa: WPS317
+    @pytest.mark.parametrize(
         ("sleep_duration", "timeout_should_occur"),
         ((1.0, False), (5.0, True)),
         ids=("no_timeout", "timeout"),
@@ -447,16 +447,27 @@ class TestTracker:
             # Remove the seemingly valid emitters to prevent a logging error on exit.
             tracker.snowplow_tracker.emitters = []
 
+    def test_client_id_from_env_var(self, project: Project, monkeypatch: MonkeyPatch):
+        with delete_analytics_json(project):
+            monkeypatch.setenv("MELTANO_CLIENT_ID", "invalid-context-uuid")
+            with pytest.warns(RuntimeWarning, match="Invalid telemetry client UUID"):
+                # Ensure it generated a random UUID as a fallback
+                uuid.UUID(str(Tracker(project).client_id))
 
-class TestEnvironmentContext:
-    def test_get_environment_context_from_env_var(self, monkeypatch: MonkeyPatch):
-        monkeypatch.setenv("MELTANO_CONTEXT_UUID", "invalid-context-uuid")
-        with pytest.warns(
-            RuntimeWarning, match="Invalid telemetry environment context UUID"
-        ):
-            # Ensure it generated a random UUID
-            uuid.UUID(EnvironmentContext().data["context_uuid"])
+            ctx_id = uuid.uuid4()
+            monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id))
+            # Ensure it takes the client ID from the env var
+            assert Tracker(project).client_id == ctx_id
 
-        ctx_id = str(uuid.uuid4())
-        monkeypatch.setenv("MELTANO_CONTEXT_UUID", ctx_id)
-        assert EnvironmentContext().data["context_uuid"] == ctx_id
+            monkeypatch.delenv("MELTANO_CLIENT_ID")
+            # Ensure it uses the client ID stored in `analytics.json`
+            assert Tracker(project).client_id == ctx_id
+
+            ctx_id_2 = uuid.uuid4()
+            monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id_2))
+            # Ensure the env var takes priority over `analytics.json`
+            assert Tracker(project).client_id == ctx_id_2
+
+            monkeypatch.delenv("MELTANO_CLIENT_ID")
+            # Ensure the new client ID overwrites the old one in `analytics.json`
+            assert Tracker(project).client_id == ctx_id_2

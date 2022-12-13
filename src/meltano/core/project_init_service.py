@@ -1,6 +1,8 @@
 """New Project Initialization Service."""
+
 from __future__ import annotations
 
+import contextlib
 import os
 import uuid
 from pathlib import Path
@@ -29,10 +31,8 @@ class ProjectInitService:
         """
         self.project_directory = Path(project_directory)
 
-        try:
+        with contextlib.suppress(ValueError):
             self.project_directory = self.project_directory.relative_to(Path.cwd())
-        except ValueError:
-            pass
 
     def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
         """Initialise Meltano Project.
