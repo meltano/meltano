@@ -27,20 +27,6 @@ logger = get_logger(__name__)
 release_marker_path = Path(__file__).parent / ".release_marker"
 
 
-def _get_environment_context_uuid() -> uuid.UUID:
-    with suppress(KeyError):
-        uuid_str = os.environ["MELTANO_CONTEXT_UUID"]
-        try:
-            return uuid.UUID(uuid_str)
-        except ValueError:
-            warn(
-                f"Invalid telemetry environment context UUID {uuid_str!r} "
-                "from $MELTANO_CONTEXT_UUID - a random UUID will be used",
-                RuntimeWarning,
-            )
-    return uuid.uuid4()
-
-
 def _get_parent_context_uuid_str() -> str | None:
     with suppress(KeyError):
         uuid_str = os.environ["MELTANO_PARENT_CONTEXT_UUID"]
@@ -64,7 +50,7 @@ class EnvironmentContext(SelfDescribingJson):
         super().__init__(
             EnvironmentContextSchema.url,
             {
-                "context_uuid": str(_get_environment_context_uuid()),
+                "context_uuid": str(uuid.uuid4()),
                 "parent_context_uuid": _get_parent_context_uuid_str(),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
