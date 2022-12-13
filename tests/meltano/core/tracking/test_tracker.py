@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 import mock
 import pytest
+from pytest import MonkeyPatch
 from snowplow_tracker import Emitter
 
 from meltano.core.project import Project
@@ -445,3 +446,28 @@ class TestTracker:
         finally:
             # Remove the seemingly valid emitters to prevent a logging error on exit.
             tracker.snowplow_tracker.emitters = []
+
+    def test_client_id_from_env_var(self, project: Project, monkeypatch: MonkeyPatch):
+        with delete_analytics_json(project):
+            monkeypatch.setenv("MELTANO_CLIENT_ID", "invalid-context-uuid")
+            with pytest.warns(RuntimeWarning, match="Invalid telemetry client UUID"):
+                # Ensure it generated a random UUID as a fallback
+                uuid.UUID(str(Tracker(project).client_id))
+
+            ctx_id = uuid.uuid4()
+            monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id))
+            # Ensure it takes the client ID from the env var
+            assert Tracker(project).client_id == ctx_id
+
+            monkeypatch.delenv("MELTANO_CLIENT_ID")
+            # Ensure it uses the client ID stored in `analytics.json`
+            assert Tracker(project).client_id == ctx_id
+
+            ctx_id_2 = uuid.uuid4()
+            monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id_2))
+            # Ensure the env var takes priority over `analytics.json`
+            assert Tracker(project).client_id == ctx_id_2
+
+            monkeypatch.delenv("MELTANO_CLIENT_ID")
+            # Ensure the new client ID overwrites the old one in `analytics.json`
+            assert Tracker(project).client_id == ctx_id_2
