@@ -61,7 +61,7 @@ class HubConnectionError(Exception):
         Args:
             reason: The reason for the error.
         """
-        message = f"Could not connect to Meltano Hub: {reason}"
+        message = f"Could not connect to Meltano Hub. {reason}"
         super().__init__(message)
 
 
@@ -145,7 +145,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         self.session.mount("https://", adapter)
 
     @property
-    def hub_api_url(self):
+    def hub_api_url(self) -> str:
         """Return the URL of the Hub API.
 
         Returns:
