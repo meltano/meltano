@@ -131,7 +131,7 @@
             "description": "An array of objects detailing each process in the hierarchy from the current one to the init process",
             "type": "array",
             "items": {
-                "description": "",
+                "description": "Details about a process within the process hierarchy",
                 "type": "object",
                 "properties": {
                     "process_name_hash": {
