@@ -24,6 +24,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
+from meltano.core.tracking import Tracker
 from meltano.core.utils import expand_env_vars
 from meltano.core.venv_service import VenvService, VirtualEnv
 
@@ -68,10 +69,10 @@ class ExecutableNotFoundError(InvokerError):
         plugin_type = plugin.type.singular
         super().__init__(
             f"Executable '{executable}' could not be found. "
-            + f"{plugin_type_descriptor} '{plugin.name}' may not have "
-            + "been installed yet using "
-            + f"`meltano install {plugin_type} {plugin.name}`, "
-            + "or the executable name may be incorrect."
+            f"{plugin_type_descriptor} '{plugin.name}' may not have "
+            "been installed yet using "
+            f"`meltano install {plugin_type} {plugin.name}`, "
+            "or the executable name may be incorrect."
         )
 
 
@@ -152,6 +153,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             plugin_settings_service: Plugin Settings manager.
         """
         self.project = project
+        self.tracker = Tracker(project)
         self.plugin = plugin
         self.context = context
         self.output_handlers = output_handlers
@@ -378,6 +380,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             **expanded_root_plugin_env,
             **expanded_active_env,
             **expanded_active_env_plugin_env,
+            **self.tracker.env,
         }
 
         # Ensure Meltano venv is not inherited

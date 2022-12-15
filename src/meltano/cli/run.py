@@ -15,7 +15,8 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, CliEvent, Tracker
+from meltano.core.tracking import BlockEvents, Tracker
+from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
 
