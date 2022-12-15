@@ -49,6 +49,10 @@ jobs:
         cache: 'yarn'
         cache-dependency-path: src/webapp/yarn.lock
 
+    - name: Freeze DB
+      run: |
+        poetry run scripts/alembic_freeze.py
+
     - name: Release Marker
       if: ${{ github.event.release }}
       run: |
@@ -56,7 +60,8 @@ jobs:
 
     - name: Build distribution
       run: |
-        make sdist_public
+        poetry build --format sdist
+        poetry run pip wheel --no-deps . --wheel-dir dist/
 
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
