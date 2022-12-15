@@ -101,20 +101,13 @@ def test_project_init_existing_directory_multiple_check_errors(tmp_path: Path, p
     project_dir.joinpath("README.md").write_text("")
     project_dir.joinpath("requirements.txt").write_text("")
 
-    extract_dir = project_dir.joinpath("extract")
-    extract_dir.mkdir()
-    extract_dir.joinpath(".gitkeep").write_text("")
-    extract_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
-
-    extract_dir = project_dir.joinpath("load")
-    extract_dir.mkdir()
-    extract_dir.joinpath(".gitkeep").write_text("")
-    extract_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
-
-    extract_dir = project_dir.joinpath("transform")
-    extract_dir.mkdir()
-    extract_dir.joinpath(".gitkeep").write_text("")
-    extract_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
+    for subdir_name in "extract", "load", "transform":
+        project_subdir = project_dir.joinpath(subdir_name)
+        project_subdir.mkdir()
+        project_subdir.joinpath(".gitkeep").write_text("")
+        project_subdir.chmod(
+            stat.S_IREAD | stat.S_IEXEC
+        )  # read and execute, but not write
 
     with pytest.raises(ProjectInitServiceError) as e:
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
