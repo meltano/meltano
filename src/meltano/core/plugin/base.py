@@ -178,6 +178,15 @@ class PluginType(YAMLEnum):  # noqa: WPS214
 
         raise ValueError(f"{value} is not a valid {cls.__name__}")
 
+    @classmethod
+    def plurals(cls) -> list[str]:
+        """Return the list of plugin plural names.
+
+        Returns:
+            The list of plugin plurals.
+        """
+        return [plugin_type.value for plugin_type in cls]
+
 
 class PluginRef(Canonical):
     """A reference to a plugin."""
