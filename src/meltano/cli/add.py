@@ -20,7 +20,8 @@ from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 
 @cli.command(  # noqa: WPS238
@@ -61,14 +62,14 @@ from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
 )
 @pass_project()
 @click.pass_context
-def add(
+def add(  # noqa: WPS238
     ctx,
     project: Project,
     plugin_type: str,
     plugin_name: str,
-    inherit_from: str = None,
-    variant: str = None,
-    as_name: str = None,
+    inherit_from: str | None = None,
+    variant: str | None = None,
+    as_name: str | None = None,
     **flags,
 ):
     """

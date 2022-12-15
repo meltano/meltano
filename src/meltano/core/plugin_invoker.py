@@ -14,19 +14,19 @@ from typing import Any, Generator
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
+from meltano.core.error import Error
 from meltano.core.logging.utils import SubprocessOutputWriter
-
-from .error import Error
-from .plugin import PluginRef
-from .plugin.config_service import PluginConfigService
-from .plugin.project_plugin import ProjectPlugin
-from .plugin.settings_service import PluginSettingsService
-from .project import Project
-from .project_plugins_service import ProjectPluginsService
-from .project_settings_service import ProjectSettingsService
-from .settings_service import FeatureFlags
-from .utils import expand_env_vars
-from .venv_service import VenvService, VirtualEnv
+from meltano.core.plugin import PluginRef
+from meltano.core.plugin.config_service import PluginConfigService
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FeatureFlags
+from meltano.core.tracking import Tracker
+from meltano.core.utils import expand_env_vars
+from meltano.core.venv_service import VenvService, VirtualEnv
 
 logger = get_logger(__name__)
 
@@ -69,10 +69,10 @@ class ExecutableNotFoundError(InvokerError):
         plugin_type = plugin.type.singular
         super().__init__(
             f"Executable '{executable}' could not be found. "
-            + f"{plugin_type_descriptor} '{plugin.name}' may not have "
-            + "been installed yet using "
-            + f"`meltano install {plugin_type} {plugin.name}`, "
-            + "or the executable name may be incorrect."
+            f"{plugin_type_descriptor} '{plugin.name}' may not have "
+            "been installed yet using "
+            f"`meltano install {plugin_type} {plugin.name}`, "
+            "or the executable name may be incorrect."
         )
 
 
@@ -153,6 +153,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             plugin_settings_service: Plugin Settings manager.
         """
         self.project = project
+        self.tracker = Tracker(project)
         self.plugin = plugin
         self.context = context
         self.output_handlers = output_handlers
@@ -202,7 +203,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             A mapping of file IDs to file names.
         """
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
-
         return {
             _key: self.plugin_config_service.run_dir.joinpath(filename)
             for _key, filename in plugin_files.items()
@@ -224,7 +224,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             extras=True, session=session
         )
         self.plugin_config_env = self.settings_service.as_env(session=session)
-
         async with self.plugin.trigger_hooks("configure", self, session):
             self.plugin_config_service.configure()
             self._prepared = True
@@ -318,7 +317,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
-    def env(self):
+    def env(self):  # noqa: WPS210
         """Environment variable mapping.
 
         Returns:
@@ -332,18 +331,18 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         ) as strict_env_var_mode:
 
             # Expand root env w/ os.environ
-            expanded_project_env = expand_env_vars(
-                project_settings_service.env,
-                os.environ,
-                raise_if_missing=strict_env_var_mode,
-            )
-            expanded_project_env.update(
-                expand_env_vars(
+            expanded_project_env = {
+                **expand_env_vars(
+                    project_settings_service.env,
+                    os.environ,
+                    raise_if_missing=strict_env_var_mode,
+                ),
+                **expand_env_vars(
                     self.settings_service.project.dotenv_env,
                     os.environ,
                     raise_if_missing=strict_env_var_mode,
-                )
-            )
+                ),
+            }
             # Expand active env w/ expanded root env
             expanded_active_env = (
                 expand_env_vars(
@@ -381,6 +380,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             **expanded_root_plugin_env,
             **expanded_active_env,
             **expanded_active_env_plugin_env,
+            **self.tracker.env,
         }
 
         # Ensure Meltano venv is not inherited
@@ -454,7 +454,9 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 env=popen_env,
             )
 
-    async def invoke_docker(self, plugin_command: str, *args, **kwargs) -> int:
+    async def invoke_docker(  # noqa: WPS210
+        self, plugin_command: str, *args, **kwargs
+    ) -> int:
         """Invoke a containerized command.
 
         Args:

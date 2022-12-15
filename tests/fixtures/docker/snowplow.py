@@ -64,17 +64,13 @@ def snowplow_session(request) -> SnowplowMicro | None:
     try:
         # Getting the `docker_services` fixture essentially causes `docker-compose up` to be run
         request.getfixturevalue("docker_services")
-    except Exception:  # pragma: no cover
-        yield None
-    else:
         args = ("docker", "port", f"pytest{os.getpid()}_snowplow_1")
         proc = subprocess.run(args, capture_output=True, text=True)
         address_and_port = proc.stdout.strip().split(" -> ")[1]
         collector_endpoint = f"http://{address_and_port}"
-        try:  # noqa: WPS505
-            yield SnowplowMicro(collector_endpoint)
-        except Exception:  # pragma: no cover
-            yield None
+        yield SnowplowMicro(collector_endpoint)
+    except Exception:  # pragma: no cover
+        yield None
 
 
 @pytest.fixture

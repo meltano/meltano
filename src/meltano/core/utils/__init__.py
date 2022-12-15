@@ -367,7 +367,7 @@ class _GetItemProtocol(Protocol):
 _G = TypeVar("_G", bound=_GetItemProtocol)
 
 
-def find_named(xs: Iterable[_G], name: str, obj_type: type = None) -> _G:
+def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:
@@ -466,7 +466,24 @@ class EnvironmentVariableNotSetError(MeltanoError):
         super().__init__(reason, instruction)
 
 
-def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
+ENV_VAR_PATTERN = re.compile(
+    r"""
+    \$  # starts with a '$'
+    (?:
+        {(\w+)} # ${VAR}
+        |
+        ([A-Z][A-Z0-9_]*) # $VAR
+    )
+    """,
+    re.VERBOSE,
+)
+
+
+def expand_env_vars(
+    raw_value: dict[str, str] | str,
+    env: dict[str, str],
+    raise_if_missing: bool = False,
+):
     if isinstance(raw_value, dict):
         return {
             key: expand_env_vars(val, env, raise_if_missing)
@@ -474,19 +491,6 @@ def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
         }
     elif not isinstance(raw_value, str):
         return raw_value
-
-    # find viable substitutions
-    var_matcher = re.compile(
-        r"""
-        \$  # starts with a '$'
-        (?:
-            {(\w+)} # ${VAR}
-            |
-            ([A-Z][A-Z0-9_]*) # $VAR
-        )
-        """,
-        re.VERBOSE,
-    )
 
     def subst(match) -> str:
         try:
@@ -505,12 +509,8 @@ def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
             logger.debug(f"Variable '${var}' is missing from the environment.")
             return None
 
-    fullmatch = re.fullmatch(var_matcher, raw_value)
-    if fullmatch:
-        # If the entire value is an env var reference, return None if it isn't set
-        return subst(fullmatch)
-
-    return re.sub(var_matcher, subst, raw_value)
+    fullmatch = ENV_VAR_PATTERN.fullmatch(raw_value)
+    return subst(fullmatch) if fullmatch else ENV_VAR_PATTERN.sub(subst, raw_value)
 
 
 def uniques_in(original):

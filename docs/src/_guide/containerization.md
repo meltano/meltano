@@ -93,8 +93,6 @@ meltano add files files-docker-compose
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-Meltano UI will now be available at <http://localhost:5000>.
-
 For more details and instructions, refer to [README](https://github.com/meltano/files-docker-compose/blob/main/bundle/README.md) contained in the file bundle.
 
 ## GitLab CI/CD

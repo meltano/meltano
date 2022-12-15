@@ -10,8 +10,8 @@ import yaml
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.setting_definition import SettingDefinition, YAMLEnum
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound, find_named
 
 from .command import Command
@@ -153,9 +153,11 @@ class PluginType(YAMLEnum):  # noqa: WPS214
         Returns:
             The list of plugin types that can be used as CLI arguments.
         """
-        args = [plugin_type.singular for plugin_type in cls]
-        args.extend(list(cls))
-        return args
+        return [
+            getattr(plugin_type, plugin_type_name)
+            for plugin_type in cls
+            for plugin_type_name in ("singular", "value")
+        ]
 
     @classmethod
     def from_cli_argument(cls, value: str) -> PluginType:
@@ -175,6 +177,15 @@ class PluginType(YAMLEnum):  # noqa: WPS214
                 return plugin_type
 
         raise ValueError(f"{value} is not a valid {cls.__name__}")
+
+    @classmethod
+    def plurals(cls) -> list[str]:
+        """Return the list of plugin plural names.
+
+        Returns:
+            The list of plugin plurals.
+        """
+        return [plugin_type.value for plugin_type in cls]
 
 
 class PluginRef(Canonical):
@@ -252,7 +263,7 @@ class Variant(NameEq, Canonical):
 
     def __init__(
         self,
-        name: str = None,
+        name: str | None = None,
         original: bool | None = None,
         deprecated: bool | None = None,
         docs: str | None = None,
@@ -396,7 +407,7 @@ class PluginDefinition(PluginRef):
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def find_variant(self, variant_or_name: str | Variant = None):
+    def find_variant(self, variant_or_name: str | Variant | None = None):
         """Find the variant with the given name or variant.
 
         Args:
@@ -602,7 +613,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return self._variant.settings
 
-    @property
+    @property  # noqa: WPS210
     def extra_settings(self):  # noqa: WPS210
         """Return the extra settings for this plugin.
 
@@ -661,7 +672,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """Return whether the plugin is invokable.
 
         Returns:
-            True if the plugin is invokable, False otherwise.
+            Whether the plugin is invokable.
         """
         return self.is_installable() or self.executable is not None
 
@@ -739,8 +750,8 @@ class StandalonePlugin(Canonical):
         plugin_type: PluginType,
         name: str,
         namespace: str,
-        variant: str = None,
-        label: str = None,
+        variant: str | None = None,
+        label: str | None = None,
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,

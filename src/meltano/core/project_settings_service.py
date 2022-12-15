@@ -23,13 +23,13 @@ UI_CFG_SETTINGS = {
 }
 
 
-class ProjectSettingsService(SettingsService):
+class ProjectSettingsService(SettingsService):  # noqa: WPS214
     """Project Settings Service."""
 
     config_override = {}
     supports_environments = False
 
-    def __init__(self, *args, config_service: ConfigService = None, **kwargs):
+    def __init__(self, *args, config_service: ConfigService | None = None, **kwargs):
         """Instantiate ProjectSettingsService instance.
 
         Args:
@@ -59,6 +59,17 @@ class ProjectSettingsService(SettingsService):
             logger.debug(
                 "Cannot update `project_id` in `meltano.yml`: project is read-only."
             )
+
+    @property
+    def project_settings_service(self):
+        """Get the settings service for this project.
+
+        For ProjectSettingsService, just returns self.
+
+        Returns:
+            self
+        """
+        return self
 
     def ensure_project_id(self) -> None:
         """Ensure `project_id` is configured properly.

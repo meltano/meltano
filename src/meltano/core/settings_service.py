@@ -83,8 +83,8 @@ class SettingsService(ABC):  # noqa: WPS214
         self,
         project: Project,
         show_hidden: bool = True,
-        env_override: dict = None,
-        config_override: dict = None,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
     ):
         """Create a new settings service object.
 
@@ -95,13 +95,9 @@ class SettingsService(ABC):  # noqa: WPS214
             config_override:  Optional override configuration values.
         """
         self.project = project
-
         self.show_hidden = show_hidden
-
         self.env_override = env_override or {}
-
         self.config_override = config_override or {}
-
         self._setting_defs = None
 
     @property
@@ -120,6 +116,15 @@ class SettingsService(ABC):  # noqa: WPS214
 
         Returns:
             URL for Meltano doc site.
+        """
+
+    @property
+    @abstractmethod
+    def project_settings_service(self):
+        """Get a project settings service.
+
+        Returns:
+            A ProjectSettingsService
         """
 
     @property
@@ -247,7 +252,7 @@ class SettingsService(ABC):  # noqa: WPS214
             **kwargs: additional kwargs to pass to config_with_metadata
 
         Returns:
-            dict of namew-value settings pairs
+            dict of name-value settings pairs
         """
         config_metadata = self.config_with_metadata(*args, **kwargs)
 
@@ -344,7 +349,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
-        env_var_strict_mode, _ = manager.get(
+        env_var_strict_mode, _ = source.manager(self.project_settings_service).get(
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
         )
         if expand_env_vars and metadata.get("expandable", False):

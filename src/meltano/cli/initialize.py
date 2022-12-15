@@ -1,4 +1,5 @@
 """New Project Initialization CLI."""
+
 from __future__ import annotations
 
 import logging
@@ -6,13 +7,13 @@ from pathlib import Path
 
 import click
 
+from meltano.cli import cli
+from meltano.cli.params import database_uri_option
+from meltano.cli.utils import CliError, InstrumentedCmd
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import CliContext, CliEvent, Tracker
-
-from . import cli
-from .params import database_uri_option
-from .utils import CliError, InstrumentedCmd
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliContext, CliEvent
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"

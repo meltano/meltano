@@ -456,7 +456,12 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 - [`config`](#using-config-with-environments)
 - [`elt`](#using-elt-with-environments)
 - [`invoke`](#using-invoke-with-environments)
+- [`job`](#using-job-with-environments)
+- [`run`](#using-run-with-environments)
+- [`schedule`](#using-schedule-with-environments)
 - [`select`](#using-select-with-environments)
+- [`state`](#using-state-with-environments)
+- [`test`](#using-test-with-environments)
 
 If there is a value provided for `default_environment` in your `meltano.yml`, then these commands, with the exception of [`config`](#using-config-with-environments), will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided.
 If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
@@ -546,9 +551,11 @@ Additionally, plugin names can be provided to only (re)install those specific pl
 
 Use `--include-related` to automatically install transforms related to installed extractor plugins.
 
-Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
+
+If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the `--force` flag to `meltano install`.
 
 <div class="notification is-info">
   <p>If you're using a custom Docker image, make sure `python3-venv` is installed:</p>
@@ -582,11 +589,12 @@ meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
 
-
 meltano install --include-related
 
 meltano install --parallelism=16
 meltano install --clean
+
+meltano install --force
 ```
 
 ### Using `install` with Environments
@@ -1341,53 +1349,9 @@ meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
 
 The `test` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
-## `ui`
+## `ui` (deprecated)
 
-- `meltano ui`: Start the Meltano UI.
-
-### `start` (default)
-
-Start the Meltano UI.
-
-### `setup`
-
-<div class="notification is-info">
-  <p>This command is only relevant for production-grade setup.</p>
-</div>
-
-Generate secrets for the [`ui.secret_key`](/reference/settings#ui-secret-key)
-and [`ui.password_salt`](/reference/settings#ui-password-salt) settings, that
-will be stored in your project's [`.env` file](/concepts/project#env) along with the
-specified value for the [`ui.server_name` setting](/reference/settings#ui-server-name).
-
-In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default.
-
-<div class="notification is-danger">
-  <p><strong>Regenerating secrets will cause the following:</strong></p>
-  <p>
-    <ul>
-      <li>All passwords will be invalid</li>
-      <li>All sessions will be expired</li>
-    </ul>
-  </p>
-  <p>Use with caution!</p>
-</div>
-
-#### How to use
-
-The `--bits` flag can be used to specify the size of the secrets, default to 256.
-
-```bash
-# Format
-meltano ui setup [--bits=256] <server_name>
-
-meltano ui setup meltano.example.com
-```
-
-### Using `ui` with Environments
-
-The `ui` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
-
+The Metano UI is now deprecated. For more information see our [troubleshooting page](/guide/troubleshooting#meltano-ui).
 ## `user`
 
 <div class="notification is-info">

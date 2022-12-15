@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
-import json
-
 import click
 from jinja2 import BaseLoader, Environment
 from rich.console import Console, Group
@@ -24,7 +21,7 @@ from meltano.core.settings_service import (
     SettingValueStore,
 )
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking import CliEvent
+from meltano.core.tracking.contexts import CliEvent
 
 PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"
@@ -368,9 +365,6 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
     def set_value(self, setting_name, value, store, interactive=False):
         """Set value helper function."""
-        with contextlib.suppress(json.JSONDecodeError):
-            value = json.loads(value)
-
         settings = self.settings
         path = list(setting_name)
         try:

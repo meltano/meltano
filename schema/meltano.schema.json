@@ -27,6 +27,63 @@
       "description": "A database URI for the project system database. Defaults to a SQLite file stored at .meltano/meltano.db",
       "default": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db"
     },
+    "state_backend": {
+      "type": "object",
+      "description": "Configuration for state backend.",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The URI pointing to the backend to use.",
+          "default": "systemdb"
+        },
+        "lock_timeout_seconds": {
+          "type": "integer",
+          "description": "The number of seconds a lock on a state file is considered valid."
+        },
+        "lock_retry_seconds": {
+          "type": "integer",
+          "description": "The number of seconds to wait between retrying lock acquisition."
+        },
+        "azure": {
+          "type": "object",
+          "description": "Configuration for Azure Blob Storage state backend.",
+          "properties": {
+            "connection_string": {
+              "type": "string",
+              "description": "The azure connection string to use for connecting to Azure Blob Storage."
+            }
+          }
+        },
+        "gcs": {
+          "type": "object",
+          "description": "Configuration for Google Cloud Storage state backend.",
+          "properties": {
+            "application_credentials": {
+              "type": "string",
+              "description": "Path to a Google credentials file to use for authenticating to Google Cloud Storage."
+            }
+          }
+        },
+        "s3": {
+          "type": "object",
+          "description": "Configuration for AWS S3 state backend.",
+          "properties": {
+            "aws_access_key_id": {
+              "type": "string",
+              "description": "AWS access key ID to use for authenticating to AWS S3."
+            },
+            "aws_secret_access_key": {
+              "type": "string",
+              "description": "AWS secret access key to use for authenticating to AWS S3."
+            },
+            "endpoint_url": {
+              "type": "string",
+              "description": "S3 endpoint URL to use."
+            }
+          }
+        }
+      }
+    },
     "environments": {
       "type": "array",
       "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",
@@ -119,13 +176,17 @@
     "plugins": {
       "plugin_generic": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "additionalProperties": true,
         "properties": {
           "name": {
             "type": "string",
             "description": "The name of the plugin.",
-            "examples": ["target-jsonl"]
+            "examples": [
+              "target-jsonl"
+            ]
           },
           "inherit_from": {
             "type": "string",
@@ -147,7 +208,10 @@
           "namespace": {
             "type": "string",
             "description": "The namespace of this plugin",
-            "examples": ["tap_csv", "target_jsonl"]
+            "examples": [
+              "tap_csv",
+              "target_jsonl"
+            ]
           },
           "config": {
             "type": "object",
@@ -156,7 +220,10 @@
           "label": {
             "type": "string",
             "description": "A user friendly label describing the plugin",
-            "examples": ["Stripe", "Facebook Ads"]
+            "examples": [
+              "Stripe",
+              "Facebook Ads"
+            ]
           },
           "logo_url": {
             "type": "string",
@@ -165,7 +232,10 @@
           "executable": {
             "type": "string",
             "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
-            "examples": ["tap-stripe", "tap-covid-19"]
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ]
           },
           "settings": {
             "type": "array",
@@ -192,7 +262,9 @@
             "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
             "additionalProperties": {
               "type": "object",
-              "required": ["args"],
+              "required": [
+                "args"
+              ],
               "properties": {
                 "args": {
                   "type": "string",
@@ -208,18 +280,26 @@
                 },
                 "container_spec": {
                   "type": "object",
-                  "required": ["image"],
+                  "required": [
+                    "image"
+                  ],
                   "description": "Container specification for this command",
                   "properties": {
                     "image": {
                       "type": "string",
                       "description": "Container image",
-                      "examples": ["ghcr.io/dbt-labs/dbt-postgres:latest"]
+                      "examples": [
+                        "ghcr.io/dbt-labs/dbt-postgres:latest"
+                      ]
                     },
                     "command": {
                       "type": "string",
                       "description": "Container command",
-                      "examples": ["list", "test", "compile"]
+                      "examples": [
+                        "list",
+                        "test",
+                        "compile"
+                      ]
                     },
                     "entrypoint": {
                       "type": "string",
@@ -305,7 +385,9 @@
           },
           "select": {
             "type": "array",
-            "default": ["*.*"],
+            "default": [
+              "*.*"
+            ],
             "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
             "items": {
               "type": "string"
@@ -349,6 +431,7 @@
               "settings_group_validation": {},
               "commands": {},
               "requires": {},
+              "env": {},
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -418,6 +501,7 @@
               "settings_group_validation": {},
               "commands": {},
               "requires": {},
+              "env": {},
               "dialect": {
                 "type": "string",
                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
@@ -453,7 +537,8 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
-              "requires": {}
+              "requires": {},
+              "env": {}
             }
           }
         ]
@@ -481,7 +566,8 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
-              "requires": {}
+              "requires": {},
+              "env": {}
             }
           }
         ]
@@ -542,7 +628,8 @@
               "docs": {},
               "settings_group_validation": {},
               "commands": {},
-              "requires": {}
+              "requires": {},
+              "env": {}
             }
           }
         ]
@@ -571,6 +658,7 @@
               "settings_group_validation": {},
               "commands": {},
               "requires": {},
+              "env": {},
               "vars": {
                 "type": "object",
                 "description": "An object containing dbt model variables"
@@ -601,7 +689,10 @@
                 }
               }
             },
-            "required": ["config", "name"]
+            "required": [
+              "config",
+              "name"
+            ]
           }
         }
       },
@@ -622,6 +713,7 @@
               "inherit_from": {},
               "pip_url": {},
               "repo": {},
+              "variant": {},
               "namespace": {},
               "label": {},
               "description": {},
@@ -631,6 +723,7 @@
               "settings_group_validation": {},
               "commands": {},
               "requires": {},
+              "env": {},
               "mappings": {}
             }
           }
@@ -639,18 +732,25 @@
     },
     "base_setting": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
           "description": "The name of the setting",
-          "examples": ["account_id"]
+          "examples": [
+            "account_id"
+          ]
         },
         "aliases": {
           "type": "array",
           "description": "Alternative setting names that can be used in 'meltano.yml' and 'meltano config set'",
-          "examples": ["accountId", "account_identifier"],
+          "examples": [
+            "accountId",
+            "account_identifier"
+          ],
           "items": {
             "type": "string"
           }
@@ -658,7 +758,9 @@
         "label": {
           "type": "string",
           "description": "A user friendly label for the setting",
-          "examples": ["Account ID"]
+          "examples": [
+            "Account ID"
+          ]
         },
         "value": {
           "description": "The default value of this setting if not otherwise defined"
@@ -666,7 +768,9 @@
         "placeholder": {
           "type": "string",
           "description": "A placeholder value for this setting",
-          "examples": ["Ex. 18161"]
+          "examples": [
+            "Ex. 18161"
+          ]
         },
         "kind": {
           "type": "string",
@@ -689,17 +793,23 @@
         "description": {
           "type": "string",
           "description": "A description for what this setting does",
-          "examples": ["The unique account identifier for your Stripe Account"]
+          "examples": [
+            "The unique account identifier for your Stripe Account"
+          ]
         },
         "tooltip": {
           "type": "string",
           "description": "A phrase to provide additional information on this setting",
-          "examples": ["Here is some additional info..."]
+          "examples": [
+            "Here is some additional info..."
+          ]
         },
         "documentation": {
           "type": "string",
           "description": "A link to documentation on this setting",
-          "examples": ["https://meltano.com/"]
+          "examples": [
+            "https://meltano.com/"
+          ]
         },
         "protected": {
           "type": "boolean",
@@ -709,7 +819,10 @@
         "env": {
           "type": "string",
           "description": "An alternative environment variable name to populate with this settings value in the plugin environment.",
-          "examples": ["GITLAB_API_TOKEN", "FACEBOOK_ADS_ACCESS_TOKEN"]
+          "examples": [
+            "GITLAB_API_TOKEN",
+            "FACEBOOK_ADS_ACCESS_TOKEN"
+          ]
         },
         "value_processor": {
           "const": "nest_object",
@@ -717,12 +830,16 @@
         },
         "oauth": {
           "type": "object",
-          "required": ["provider"],
+          "required": [
+            "provider"
+          ],
           "properties": {
             "provider": {
               "type": "string",
               "description": "The name of a Meltano-supported OAuth provider",
-              "examples": ["google-adwords"]
+              "examples": [
+                "google-adwords"
+              ]
             }
           }
         }
@@ -731,7 +848,13 @@
     "schedules": {
       "type": "object",
       "oneOf": [
-        { "required": ["name", "job", "interval"] },
+        {
+          "required": [
+            "name",
+            "job",
+            "interval"
+          ]
+        },
         {
           "required": [
             "name",
@@ -749,55 +872,79 @@
         "name": {
           "type": "string",
           "description": "The schedule's unique name",
-          "examples": ["gitlab-to-jsonl"]
+          "examples": [
+            "gitlab-to-jsonl"
+          ]
         },
         "job": {
           "type": "string",
           "description": "The name of a meltano job",
-          "examples": ["some-custom-job"]
+          "examples": [
+            "some-custom-job"
+          ]
         },
         "extractor": {
           "type": "string",
           "description": "The name of the extractor plugin",
-          "examples": ["tap-gitlab"]
+          "examples": [
+            "tap-gitlab"
+          ]
         },
-	  "env": {
-	      "$ref": "#/definitions/env"
-	  },
+        "env": {
+          "$ref": "#/definitions/env"
+        },
         "loader": {
           "type": "string",
           "description": "The name of the loader plugin",
-          "examples": ["target-jsonl"]
+          "examples": [
+            "target-jsonl"
+          ]
         },
         "interval": {
           "type": "string",
           "description": "A UNIX cron expression to represent the frequency the scheduled job should execute",
-          "examples": ["@hourly", "@daily", "@weekly", "0 0 * * *"],
+          "examples": [
+            "@hourly",
+            "@daily",
+            "@weekly",
+            "0 0 * * *"
+          ],
           "pattern": "^((@(hourly|daily|weekly|monthly|yearly|once))|((((\\d+,)+\\d+|(\\d+(\\/|-)\\d+)|\\d+|\\*) ?){5,6}))$"
         },
         "transform": {
           "type": "string",
           "description": "Describes if transforms should run, be skipped, or if only transforms should execute (skip extractors and loaders)",
           "default": "skip",
-          "enum": ["run", "skip", "only"]
+          "enum": [
+            "run",
+            "skip",
+            "only"
+          ]
         },
         "start_date": {
           "type": "string",
           "description": "The date when the schedule should first execute",
-          "examples": ["2020-08-06 00:00:00"]
+          "examples": [
+            "2020-08-06 00:00:00"
+          ]
         }
       }
     },
     "jobs": {
       "type": "object",
-      "required": ["name", "tasks"],
+      "required": [
+        "name",
+        "tasks"
+      ],
       "description": "https://docs.meltano.com/reference/command-line-interface#job",
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
           "description": "This jobs unique name",
-          "examples": ["gitlab-to-jsonl"]
+          "examples": [
+            "gitlab-to-jsonl"
+          ]
         },
         "tasks": {
           "oneOf": [
@@ -827,7 +974,9 @@
     "environments": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -854,6 +1003,7 @@
                         "properties": {
                           "name": {},
                           "config": {},
+                          "env": {},
                           "select": {},
                           "select_filter": {},
                           "catalog": {},
@@ -916,14 +1066,15 @@
           }
         },
         "env": {
-          "type": "object",
-          "description": "An object of environment specific variables."
+          "$ref": "#/definitions/env"
         }
       },
       "$defs": {
         "plugins": {
           "type": "object",
-          "required": ["name"],
+          "required": [
+            "name"
+          ],
           "properties": {
             "name": {
               "type": "string"

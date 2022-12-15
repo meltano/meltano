@@ -4,6 +4,7 @@ from collections import Counter
 
 import pytest
 
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType, Variant
 from meltano.core.plugin.base import PluginRefNameContainsStateIdDelimiterError
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -11,7 +12,6 @@ from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 
 
 class TestProjectAddService:
@@ -27,7 +27,7 @@ class TestProjectAddService:
         assert len(hub_request_counter) == 1
 
     @pytest.mark.order(0)
-    @pytest.mark.parametrize(  # noqa: WPS317
+    @pytest.mark.parametrize(
         ("plugin_type", "plugin_name", "variant", "default_variant"),
         [
             (PluginType.EXTRACTORS, "tap-mock", "meltano", "meltano"),

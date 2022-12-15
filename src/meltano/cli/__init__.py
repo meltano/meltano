@@ -16,11 +16,7 @@ from meltano.core.project import ProjectReadonly
 # This suggests a cyclic dependency or a poorly structured interface.
 # This should be investigated and resolved to avoid implicit behavior
 # based solely on import order.
-from meltano.cli.cli import (  # isort:skip
-    activate_environment,
-    activate_explicitly_provided_environment,
-    cli,
-)
+from meltano.cli.cli import cli  # isort:skip
 from meltano.cli import (  # isort:skip # noqa: WPS235
     add,
     config,
@@ -56,7 +52,7 @@ exit_code: None | int = None
 
 atexit_handler_registered = False
 exit_code_reported = False
-exit_event_tracker: Tracker = None
+exit_event_tracker: Tracker | None = None
 
 setup_logging()
 

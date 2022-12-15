@@ -5,9 +5,9 @@ from __future__ import annotations
 import click
 import structlog
 
-from meltano.cli import CliError, activate_environment, cli
+from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import PartialInstrumentedCmd
+from meltano.cli.utils import CliEnvironmentBehavior, PartialInstrumentedCmd
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -15,14 +15,19 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, CliEvent, Tracker
+from meltano.core.tracking import BlockEvents, Tracker
+from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
 
 logger = structlog.getLogger(__name__)
 
 
-@cli.command(cls=PartialInstrumentedCmd, short_help="Run a set of plugins in series.")
+@cli.command(
+    cls=PartialInstrumentedCmd,
+    short_help="Run a set of plugins in series.",
+    environment_behavior=CliEnvironmentBehavior.environment_required,
+)
 @click.option(
     "--dry-run",
     help="Do not run, just parse the invocation, validate it, and explain what would be executed.",
@@ -87,8 +92,6 @@ async def run(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
     """
-    activate_environment(ctx, project, required=True)
-
     if dry_run and not ProjectSettingsService.config_override.get("cli.log_level"):
         logger.info("Setting 'console' handler log level to 'debug' for dry run")
         change_console_log_level()

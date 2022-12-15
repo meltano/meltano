@@ -34,7 +34,7 @@ You can add `.md` and `.html` files to this project to be rendered. Most pages a
 
 #### Front Matter
 
-All pages require [fromt matter](https://jekyllrb.com/docs/front-matter/) to render properly. At a minimum you will need to specify:
+All pages require [front matter](https://jekyllrb.com/docs/front-matter/) to render properly. At a minimum you will need to specify:
 
 - `layout:` The template file to use when rendering the content. For most pages use `doc`. Custom templates can be created and placed in `_layouts`.
 - `title:` The title of the page.

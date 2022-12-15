@@ -12,8 +12,8 @@ from typing import Any
 import pytest
 from jsonschema import ValidationError, validate
 
-from meltano.core.tracking import ExceptionContext
 from meltano.core.tracking import __file__ as tracking_module_path
+from meltano.core.tracking.contexts import ExceptionContext
 from meltano.core.utils import hash_sha256
 
 THIS_FILE_BASENAME = Path(__file__).name

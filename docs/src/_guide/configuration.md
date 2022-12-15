@@ -132,10 +132,10 @@ Environment levels within `meltano.yml` resolve in order of precedence (within a
 ```
 
 <div class="notification is-info">
-	<p>
-	We are considering adding support for the <code>env</code> key to <a href="/concepts/project#jobs">jobs</a> as well as updating the precedence order when we do.
-	We'd love to hear your thoughts in the <a href="https://github.com/meltano/meltano/issues/6386">GitHub issue</a> about this possible change!
-	</p>
+  <p>
+  We are considering adding support for the <code>env</code> key to <a href="/concepts/project#jobs">jobs</a> as well as updating the precedence order when we do.
+  We'd love to hear your thoughts in the <a href="https://github.com/meltano/meltano/issues/6386">GitHub issue</a> about this possible change!
+  </p>
 </div>
 
 This allows you to override environment variables per plugin and per environment, as needed for your use case.
@@ -166,7 +166,7 @@ Environment variables are inherited across layers in the following order, where 
 
 The following example illustrates how values are expanded:
 
-```
+```yaml
 env:
   # Level 2: top-level `env:`
   # Inherits from terminal context
@@ -174,7 +174,7 @@ env:
   STACKED: "${STACKED}2"          # '12'
 plugins:
   extractors:
-    tap-foobar:
+    - name: tap-foobar
       env:
         # Level 4: plugin-level `env:`
         # Inherits from a environment-level `env:` if an environment is active
@@ -182,24 +182,43 @@ plugins:
         LEVEL_NUM: "4"            #    '4'
         STACKED: "${STACKED}4"    # '1234'
 environments:
-  prod:
+  - name: prod
     env:
       # Level 3: environment-level `env:`
       # Inherits from top-level `env:`
       LEVEL_NUM: "3"              #   '3'
       STACKED: "${STACKED}3"      # '123'
-    plugins:
-      extractors:
-        tap-foobar:
-          env:
-            # Level 5: environment-level plugin `env:`
-            # Inherits from (global) plugin-level `env:`
-            LEVEL_NUM: "5"          #     '5'
-            STACKED: "${STACKED}5"  # '12345'
+    config:
+      plugins:
+        extractors:
+          - name: tap-foobar
+            env:
+              # Level 5: environment-level plugin `env:`
+              # Inherits from (global) plugin-level `env:`
+              LEVEL_NUM: "5"          #     '5'
+              STACKED: "${STACKED}5"  # '12345'
+
 ```
 
 Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the [resolution and inheritance behavior of `config` or `settings` keys](/guide/configuration#configuration-layers).
+
 Because settings and environment variable behavior can become complex when set in multiple places, the [`meltano invoke` command](/reference/command-line-interface#invoke) provides a `--print-var` option which allows you to easily inspect what value is being supplied for a given environment variable within your plugin's invocation environment at runtime.
+
+##### Environment variable expansion within `pip_url`
+
+In addition to affecting the environment variables at runtime, and the `config`/`settings` values, environment variables can be expanded within the value of a plugin's `pip_url`. The environment variable inheritance shown above applies to environment variables expanded within the value of `pip_url`.
+
+This can be useful for using a different `pip_url` for different environments (e.g. to change which git branch of a plugin repository is used):
+
+```yaml
+pip_url: "git+https://github.com/MeltanoLabs/tap-github.git@${TAP_GITHUB_GIT_REV}"
+```
+
+Another use for this is to supply credentials for a private Python package index:
+
+```yaml
+pip_url: "https://${NEXUS_USERNAME}:${NEXUS_PASSWORD}@nexus.example.com/simple"
+```
 
 ### Configuring settings
 
@@ -495,9 +514,3 @@ The configuration of a plugin can be tested using [`meltano config <plugin> test
 <div class="notification is-danger">
   <p>Configuration testing is only supported for <a href="/concepts/plugins#extractors">extractor</a> plugins currently.</p>
 </div>
-
-## Meltano UI
-
-While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
-and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
-basic plugin configuration functionality is also available in [the UI](/reference/ui#extractor-configuration).

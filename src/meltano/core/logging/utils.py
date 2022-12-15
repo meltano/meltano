@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import sys
 from contextlib import suppress
 from logging import config as logging_config
 
@@ -20,10 +21,10 @@ from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import get_no_color_flag
 
-try:
-    from typing import Protocol  # noqa: WPS433
-except ImportError:
-    from typing_extensions import Protocol  # noqa: WPS433
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 
 LEVELS = {  # noqa: WPS407
@@ -127,7 +128,7 @@ def default_config(log_level: str) -> dict:
 
 
 def setup_logging(  # noqa: WPS210
-    project: Project = None,
+    project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
     log_config: dict | None = None,
 ) -> None:

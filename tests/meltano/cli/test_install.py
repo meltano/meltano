@@ -34,7 +34,11 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab, target, dbt], parallelism=None, clean=False
+                project,
+                [tap, tap_gitlab, target, dbt],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
     def test_install_type(
@@ -58,7 +62,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False
+                project, [tap, tap_gitlab], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -71,7 +75,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False
+                project, [target], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -115,7 +119,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap], parallelism=None, clean=False
+                project, [tap], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -128,7 +132,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False
+                project, [target], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -166,7 +170,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False
+                project, [tap, tap_gitlab], parallelism=None, clean=False, force=False
             )
 
     def test_install_parallel(

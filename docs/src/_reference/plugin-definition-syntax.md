@@ -387,7 +387,7 @@ settings_group_validation:
 
 ## `settings`
 
-Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties.
+Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. To improve the UX of this form, each setting has a number of optional properties.
 
 Example:
 
@@ -491,7 +491,7 @@ settings:
 
 ### `settings[*].tooltip`
 
-Optional. Use to provide a tooltip for the setting in the Meltano UI.
+Optional. Use to provide a tooltip for the setting when rendered within a UI that supports tooltips.
 
 ```yaml
 settings:
@@ -507,4 +507,14 @@ Optional. Use to set a default value for the setting
 settings:
 - name: setting_name
   value: default_value
+```
+
+## `env`
+
+Optional. Environment variables that will be used when [expanding environment variables in lower levels within your project's configuration](../guide/configuration#expansion-in-setting-values), and when running the plugin. These environment variables can make use of other environment variables from higher levels [as explained in the configuration guide](../guide/configuration#environment-variable-expansion).
+
+```yaml
+env:
+  ENV_VAR_NAME: env var value
+  PATH: "${PATH}:${MELTANO_PROJECT_ROOT}/bin"
 ```
