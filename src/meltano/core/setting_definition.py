@@ -144,7 +144,7 @@ class SettingKind(YAMLEnum):
     HIDDEN = "hidden"
 
 
-class SettingDefinition(NameEq, Canonical):
+class SettingDefinition(NameEq, Canonical):  # noqa: WPS214
     """Meltano SettingDefinition class."""
 
     def __init__(
@@ -167,6 +167,7 @@ class SettingDefinition(NameEq, Canonical):
         custom: bool = False,
         value_processor=None,
         value_post_processor=None,
+        annotations: dict[str, dict[Any, Any]] | None = None,  # noqa: WPS442
         **attrs,
     ):
         """Instantiate new SettingDefinition.
@@ -190,6 +191,7 @@ class SettingDefinition(NameEq, Canonical):
             custom: Custom setting flag.
             value_processor: Used with `kind: object` to pre-process the keys in a particular way.
             value_post_processor: Used with `kind: object` to post-process the keys in a particular way.
+            annotations: Annotations for external tools/vendors - do not access.
             attrs: Keyword arguments to pass to parent class.
         """
         aliases = aliases or []
@@ -217,6 +219,7 @@ class SettingDefinition(NameEq, Canonical):
             value_processor=value_processor,
             value_post_processor=value_post_processor,
             _custom=custom,
+            annotations=annotations,
             **attrs,
         )
 

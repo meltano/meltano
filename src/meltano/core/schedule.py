@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import Any
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -31,6 +32,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         start_date: datetime.datetime | None = None,
         job: str | None = None,
         env: dict[str, str] | None = None,
+        annotations: dict[str, dict[Any, Any]] | None = None,  # noqa: WPS442
     ):
         """Initialize a Schedule.
 
@@ -43,6 +45,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
             start_date: The start date of the schedule.
             job: The name of the job.
             env: The env for this schedule.
+            annotations: Annotations for external tools/vendors - do not access.
         """
         if not env:
             env = {}
@@ -66,6 +69,8 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
             self.loader = loader
             self.transform = transform
             self.start_date = start_date
+
+        self.annotations = annotations
 
     @property
     def cron_interval(self) -> str:

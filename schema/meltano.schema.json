@@ -9,6 +9,9 @@
     "version": {
       "const": 1
     },
+    "annotations": {
+      "$ref": "#/definitions/annotations"
+    },
     "default_environment": {
       "type": "string",
       "description": "A default environment to be used when one is not present as an argument or as an environment variable."
@@ -104,6 +107,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
         "extractors": {
           "type": "array",
           "items": {
@@ -173,6 +179,16 @@
     }
   },
   "definitions": {
+    "annotations": {
+      "type": "object",
+      "description": "Arbitrary annotations keyed by tool/vendor name - not processed by the core Meltano library or CLI",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
     "plugins": {
       "plugin_generic": {
         "type": "object",
@@ -181,6 +197,9 @@
         ],
         "additionalProperties": true,
         "properties": {
+          "annotations": {
+            "$ref": "#/definitions/annotations"
+          },
           "name": {
             "type": "string",
             "description": "The name of the plugin.",
@@ -417,6 +436,7 @@
             "additionalProperties": false,
             "type": "object",
             "properties": {
+              "annotations": {},
               "name": {},
               "inherit_from": {},
               "pip_url": {},
@@ -471,6 +491,7 @@
           {
             "additionalProperties": false,
             "properties": {
+              "annotations": {},
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -524,6 +545,7 @@
           {
             "additionalProperties": false,
             "properties": {
+              "annotations": {},
               "name": {},
               "inherit_from": {},
               "pip_url": {},
@@ -553,6 +575,7 @@
           {
             "additionalProperties": false,
             "properties": {
+              "annotations": {},
               "name": {},
               "inherit_from": {},
               "pip_url": {},
@@ -582,6 +605,7 @@
           {
             "additionalProperties": false,
             "properties": {
+              "annotations": {},
               "name": {},
               "inherit_from": {},
               "pip_url": {},
@@ -615,6 +639,7 @@
           {
             "additionalProperties": false,
             "properties": {
+              "annotations": {},
               "name": {},
               "inherit_from": {},
               "pip_url": {},
@@ -644,6 +669,7 @@
           {
             "additionalProperties": false,
             "properties": {
+              "annotations": {},
               "name": {},
               "inherit_from": {},
               "pip_url": {},
@@ -709,6 +735,7 @@
           {
             "additionalProperties": false,
             "properties": {
+              "annotations": {},
               "name": {},
               "inherit_from": {},
               "pip_url": {},
@@ -737,6 +764,9 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The name of the setting",
@@ -869,6 +899,9 @@
       "description": "https://docs.meltano.com/guide/orchestration",
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The schedule's unique name",
@@ -939,6 +972,9 @@
       "description": "https://docs.meltano.com/reference/command-line-interface#job",
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
         "name": {
           "type": "string",
           "description": "This jobs unique name",
@@ -978,6 +1014,9 @@
         "name"
       ],
       "properties": {
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The name of the environment."
@@ -987,6 +1026,9 @@
           "description": "An object of environment specific configurations.",
           "additionalProperties": false,
           "properties": {
+            "annotations": {
+              "$ref": "#/definitions/annotations"
+            },
             "plugins": {
               "type": "object",
               "description": "An object of environment specific plugin configurations.",
@@ -1001,6 +1043,7 @@
                       {
                         "additionalProperties": false,
                         "properties": {
+                          "annotations": {},
                           "name": {},
                           "config": {},
                           "env": {},
@@ -1076,6 +1119,9 @@
             "name"
           ],
           "properties": {
+            "annotations": {
+              "$ref": "#/definitions/annotations"
+            },
             "name": {
               "type": "string"
             },
@@ -1090,6 +1136,11 @@
       "type": "object",
       "description": "A set of plugin requirements.",
       "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        }
+      },
       "patternProperties": {
         "^(extractors|loaders|transforms|orchestrators|transformers|files|utilities|mappers)$": {
           "type": "array",
@@ -1104,6 +1155,9 @@
       "description": "A single plugin requirement",
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The name of the required plugin"

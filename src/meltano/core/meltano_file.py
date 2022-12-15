@@ -1,8 +1,10 @@
 """Module for working with meltano.yml files."""
+
 from __future__ import annotations
 
+import contextlib
 import copy
-from typing import Iterable
+from typing import Any, Iterable
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
@@ -25,6 +27,7 @@ class MeltanoFile(Canonical):
         environments: list[dict] = None,
         jobs: list[dict] = None,
         env: dict[str, str] = None,
+        annotations: dict[str, dict[Any, Any]] | None = None,  # noqa: WPS442
         **extras,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
@@ -36,6 +39,7 @@ class MeltanoFile(Canonical):
             environments: Environment configuration for this project.
             jobs: Job configuration for this project.
             env: Environment variables for this project.
+            annotations: Annotations for external tools/vendors - do not access.
             extras: Additional configuration for this project.
         """
         super().__init__(
@@ -47,9 +51,10 @@ class MeltanoFile(Canonical):
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
             env=env or {},
+            annotations=annotations,
         )
 
-    def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
+    def load_plugins(self, plugins: dict[str, dict]) -> Canonical:  # noqa: WPS210
         """Parse the `meltano.yml` file and return it as `ProjectPlugin` instances.
 
         Args:
@@ -66,7 +71,9 @@ class MeltanoFile(Canonical):
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         for plugin_type, raw_plugins in plugins.items():
-            if plugin_type == PluginType.MAPPERS:
+            if plugin_type == "annotations":
+                continue  # Meltano ignores annotations in the project files
+            elif plugin_type == PluginType.MAPPERS:
                 for mapper in raw_plugins:
                     plugin_type_plugins[PluginType.MAPPERS].append(
                         ProjectPlugin(PluginType.MAPPERS, **mapper)
@@ -78,6 +85,9 @@ class MeltanoFile(Canonical):
                 for raw_plugin in raw_plugins:
                     plugin = ProjectPlugin(PluginType(plugin_type), **raw_plugin)
                     plugin_type_plugins[plugin.type].append(plugin)
+
+        with contextlib.suppress(KeyError):
+            plugin_type_plugins["annotations"] = plugins["annotations"]
 
         return plugin_type_plugins
 

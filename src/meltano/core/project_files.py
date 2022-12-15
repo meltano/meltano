@@ -274,20 +274,34 @@ class ProjectFiles:  # noqa: WPS214
             file = self._plugin_file_map.get(file_key, str(self._meltano_file_path))
             self._add_mapping_entry(file_dicts, file, key, elem)
 
-    def _add_plugin(self, file_dicts, file, plugin_type, plugin):
+    @staticmethod
+    def _get_plugin_name(plugin_type: str, plugin: str | dict[str, Any]) -> str:
+        # If `plugin_type` is `"annotations"` then `plugin` is the annotation
+        # category, i.e. a tool/vendor name.
+        return plugin if plugin_type == "annotations" else plugin["name"]
+
+    def _add_plugin(self, file_dicts, file, plugin_type, plugin) -> None:
         file_dict = file_dicts.setdefault(file, CommentedMap())
         plugins_dict = file_dict.setdefault("plugins", CommentedMap())
         plugins = plugins_dict.setdefault(plugin_type, CommentedSeq())
-        if plugin["name"] not in {plg["name"] for plg in plugins}:
+        name = self._get_plugin_name(plugin_type, plugin)
+        if name not in {self._get_plugin_name(plugin_type, plg) for plg in plugins}:
             plugins.append(plugin)
 
-    def _add_plugins(self, file_dicts, all_plugins):
+    def _add_plugins(self, file_dicts, all_plugins) -> None:
         for plugin_type, plugins in all_plugins.items():
             plugin_type = str(plugin_type)
             for plugin in plugins:
-                key = ("plugins", plugin_type, plugin.get("name"))
-                file = self._plugin_file_map.get(key, str(self._meltano_file_path))
-                self._add_plugin(file_dicts, file, plugin_type, plugin)
+                name = self._get_plugin_name(plugin_type, plugin)
+                self._add_plugin(
+                    file_dicts=file_dicts,
+                    file=self._plugin_file_map.get(
+                        ("plugins", plugin_type, name),
+                        str(self._meltano_file_path),
+                    ),
+                    plugin_type=plugin_type,
+                    plugin=plugin,
+                )
 
     def _split_config_dict(self, config: CommentedMap):
         file_dicts: dict[str, CommentedMap] = {}
@@ -299,9 +313,10 @@ class ProjectFiles:  # noqa: WPS214
             elif key in MULTI_FILE_KEYS:
                 self._add_sequence_entry(file_dicts, key, value)
             else:
-                file = str(self._meltano_file_path)
-                file_dict = file_dicts.setdefault(file, CommentedMap())
-                file_dict[key] = value
+                file_dicts.setdefault(
+                    str(self._meltano_file_path),
+                    CommentedMap(),
+                )[key] = value
 
         # Make sure that the top-level keys are in the same order as the original files
         sorted_file_dicts = self._restore_file_key_order(file_dicts)
@@ -326,17 +341,16 @@ class ProjectFiles:  # noqa: WPS214
             if file not in file_dicts:
                 continue
 
-            new_keys = [key for key in file_dicts[file] if key not in contents]
-
             # Restore sorting in project files
             sorted_file_dicts[file] = CommentedMap()
-            for key in contents.keys():
+            for key in contents:
                 if key in file_dicts[file]:
                     sorted_file_dicts[file][key] = file_dicts[file][key]  # noqa: WPS529
 
             # Add the new keys at the end
-            for new_key in new_keys:
-                sorted_file_dicts[file][new_key] = file_dicts[file][new_key]
+            for key, value in file_dicts[file].items():
+                if key not in contents:
+                    sorted_file_dicts[file][key] = value
 
         return sorted_file_dicts
 

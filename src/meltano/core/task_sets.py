@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 import structlog
 import yaml
@@ -48,27 +49,33 @@ def _flat_split(items):
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flat_split(el)
+        elif " " in el:
+            yield from _flat_split(el.split(" "))
         else:
-            if " " in el:
-                yield from _flat_split(el.split(" "))
-            else:
-                yield el
+            yield el
 
 
 class TaskSets(NameEq, Canonical):
     """A job is a named entity that holds one or more Task's that can be executed by meltano."""
 
-    def __init__(self, name: str, tasks: list[str] | list[list[str]]):
+    def __init__(
+        self,
+        name: str,
+        tasks: list[str] | list[list[str]],
+        annotations: dict[str, dict[Any, Any]] | None = None,  # noqa: WPS442
+    ):
         """Initialize a TaskSets.
 
         Args:
             name: The name of the job.
             tasks: The tasks that associated with this job.
+            annotations: Annotations for external tools/vendors - do not access.
         """
         super().__init__()
 
         self.name = name
         self.tasks = tasks
+        self.annotations = annotations
 
     def _as_args(self, preserve_top_level: bool = False) -> list[str] | list[list[str]]:
         """Convert the job's tasks into invocable representations, suitable for passing as a cli args or block names.
@@ -131,15 +138,20 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
         InvalidTasksError: If the yaml string failed to parse or failed to validate against the TASKS_JSON_SCHEMA.
     """
     tasks = []
+
     try:
         tasks = yaml.safe_load(yaml_str)
     except yaml.parser.ParserError as yerr:
-        raise InvalidTasksError(name, f"Failed to parse yaml '{yaml_str}': {yerr}")
+        raise InvalidTasksError(
+            name, f"Failed to parse yaml '{yaml_str}': {yerr}"
+        ) from yerr
 
     try:
         validate(instance=tasks, schema=TASKS_JSON_SCHEMA)
     except ValidationError as verr:
-        raise InvalidTasksError(name, f"Failed to validate task schema: {verr}")
+        raise InvalidTasksError(
+            name, f"Failed to validate task schema: {verr}"
+        ) from verr
 
     # Handle the special case of a single task
     if isinstance(tasks, str):

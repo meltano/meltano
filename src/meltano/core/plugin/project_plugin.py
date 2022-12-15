@@ -69,6 +69,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         config: dict | None = None,
         default_variant=Variant.ORIGINAL_NAME,
         env: dict[str, str] | None = None,
+        annotations: dict[str, dict[Any, Any]] | None = None,  # noqa: WPS442
         **extras,
     ):
         """ProjectPlugin.
@@ -89,6 +90,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             config: Plugin configuration.
             default_variant: Default variant for this plugin.
             env: Environment variables to inject into plugins runtime context.
+            annotations: Annotations for external tools/vendors - do not access.
             extras: Extra keyword arguments.
         """
         super().__init__(plugin_type, name)
@@ -142,6 +144,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self.commands = Command.parse_all(commands)
         self.requires = PluginRequirement.parse_all(requires)
         self.env = env or {}
+        self.annotations = annotations
 
         self._fallbacks.update(
             [
