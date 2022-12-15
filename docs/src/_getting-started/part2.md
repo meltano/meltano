@@ -42,7 +42,7 @@ The container will need a few seconds to initialize. You can test the connection
 - user: meltano
 - password: password
 
-## Add the tap-postgres loader
+## Add the postgres loader
 Add the postgres loader using the `meltano add loader target-postgres` command.
 
 <div class="termy">
