@@ -274,25 +274,26 @@ class ProjectFiles:  # noqa: WPS214
             file = self._plugin_file_map.get(file_key, str(self._meltano_file_path))
             self._add_mapping_entry(file_dicts, file, key, elem)
 
-    @staticmethod
-    def _get_plugin_name(plugin_type: str, plugin: str | dict[str, Any]) -> str:
-        # If `plugin_type` is `"annotations"` then `plugin` is the annotation
-        # category, i.e. a tool/vendor name.
-        return plugin if plugin_type == "annotations" else plugin["name"]
-
-    def _add_plugin(self, file_dicts, file, plugin_type, plugin) -> None:
+    def _add_plugin(
+        self, file_dicts, file, plugin_type, plugin: dict[str, Any]
+    ) -> None:
         file_dict = file_dicts.setdefault(file, CommentedMap())
         plugins_dict = file_dict.setdefault("plugins", CommentedMap())
-        plugins = plugins_dict.setdefault(plugin_type, CommentedSeq())
-        name = self._get_plugin_name(plugin_type, plugin)
-        if name not in {self._get_plugin_name(plugin_type, plg) for plg in plugins}:
+        is_annotation = plugin_type == "annotations"
+        plugins = plugins_dict.setdefault(
+            plugin_type, CommentedMap() if is_annotation else CommentedSeq()
+        )
+        if is_annotation:
+            plugins[plugin["name"]] = plugin["value"]
+        elif plugin["name"] not in {plg["name"] for plg in plugins}:
             plugins.append(plugin)
 
     def _add_plugins(self, file_dicts, all_plugins) -> None:
         for plugin_type, plugins in all_plugins.items():
             plugin_type = str(plugin_type)
-            for plugin in plugins:
-                name = self._get_plugin_name(plugin_type, plugin)
+            is_annotation = plugin_type == "annotations"
+            for plugin in plugins:  # noqa: WPS528
+                name = plugin if is_annotation else plugin["name"]
                 self._add_plugin(
                     file_dicts=file_dicts,
                     file=self._plugin_file_map.get(
@@ -300,7 +301,9 @@ class ProjectFiles:  # noqa: WPS214
                         str(self._meltano_file_path),
                     ),
                     plugin_type=plugin_type,
-                    plugin=plugin,
+                    plugin={"name": name, "value": plugins[plugin]}
+                    if is_annotation
+                    else plugin,
                 )
 
     def _split_config_dict(self, config: CommentedMap):

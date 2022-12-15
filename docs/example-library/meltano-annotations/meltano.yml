@@ -28,7 +28,7 @@ plugins:
     annotations:
       example-annotation-5: {}
   annotations:
-  - example-annotation-2
+    example-annotation-2: {}
 environments:
 - name: dev
   annotations:
