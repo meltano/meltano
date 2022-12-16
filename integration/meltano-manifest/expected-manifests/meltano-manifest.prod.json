@@ -35,6 +35,7 @@
     "MELTANO_EXPERIMENTAL": "false",
     "MELTANO_FF_ENABLE_API_SCHEDULED_JOB_LIST": "false",
     "MELTANO_FF_ENABLE_UVICORN": "false",
+    "MELTANO_FF_PLUGIN_LOCKS_REQUIRED": "false",
     "MELTANO_FF_STRICT_ENV_VAR_MODE": "false",
     "MELTANO_HUB_URL": "https://hub.meltano.com",
     "MELTANO_MAIL_DEBUG": "false",

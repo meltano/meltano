@@ -9,9 +9,9 @@ from meltano.core.plugin import PluginType, Variant
 from meltano.core.plugin.base import PluginRefNameContainsStateIdDelimiterError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_plugins_service import PluginDefinitionNotFoundError
 
 
 class TestProjectAddService:
@@ -20,7 +20,7 @@ class TestProjectAddService:
         return project_add_service
 
     def test_missing_plugin_exception(self, subject, hub_request_counter):
-        with pytest.raises(PluginNotFoundError):
+        with pytest.raises(PluginDefinitionNotFoundError):
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
         assert hub_request_counter["/extractors/index"] == 1

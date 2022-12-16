@@ -239,9 +239,24 @@ def nest_object(flat_object):
     return obj
 
 
-def to_env_var(*xs):
-    xs = [re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x]
-    return "_".join(xs)
+def to_env_var(*xs: str) -> str:
+    """Convert a list of strings to an environment variable name.
+
+    Args:
+        *xs: the strings to convert
+
+    Returns:
+        The environment variable name.
+
+    Examples:
+        >>> to_env_var("foo", "bar")
+        'FOO_BAR'
+        >>> to_env_var("foo", "bar", "baz")
+        'FOO_BAR_BAZ'
+        >>> to_env_var("foo.bar")
+        'FOO_BAR'
+    """
+    return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
 def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):
