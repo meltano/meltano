@@ -84,6 +84,9 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
                 raise InvalidStateBackendConfigurationException(
                     "AWS access key ID configured, but no AWS secret access key."
                 )
+            else:
+                session = Session()
+                self._client = session.client("s3")
         return self._client
 
     @property
