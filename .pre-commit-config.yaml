@@ -55,14 +55,6 @@ repos:
     hooks:
       - id: isort
 
-  - repo: https://github.com/pycqa/flake8
-    rev: 4.0.1
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - wemake-python-styleguide==0.16.1
-        exclude: (src/meltano/migrations/versions/.*\.py)
-
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.34.0
     hooks:
@@ -71,3 +63,9 @@ repos:
           - "--py3-plus"
           - "--py37-plus"
           - "--keep-mock"
+
+  - repo: https://github.com/flakeheaven/flakeheaven
+    rev: 3.2.1
+    hooks:
+      - id: flakeheaven
+        exclude: ^(src/meltano/migrations/)
