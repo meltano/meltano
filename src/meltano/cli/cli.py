@@ -13,6 +13,7 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.error import EmptyMeltanoFileException
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -65,7 +66,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 )
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
-def cli(  # noqa: WPS231
+def cli(  # noqa: C901,WPS231
     ctx: click.Context,
     log_level: str,
     log_config: str,
@@ -128,6 +129,10 @@ def cli(  # noqa: WPS231
             CliContext.from_click_context(ctx)
         )  # backfill the `cli` CliContext
     except ProjectNotFound:
+        ctx.obj["project"] = None
+    except EmptyMeltanoFileException:
+        if ctx.invoked_subcommand != "init":
+            raise
         ctx.obj["project"] = None
     except IncompatibleVersionError:
         click.secho(
