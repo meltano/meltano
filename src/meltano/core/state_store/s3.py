@@ -67,10 +67,10 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
         Raises:
             InvalidStateBackendConfigurationException: when configured AWS settings are invalid.
         """
+        from boto3 import Session
+
         if not self._client:
             if self.aws_secret_access_key and self.aws_access_key_id:
-                from boto3 import Session
-
                 session = Session(
                     aws_access_key_id=self.aws_access_key_id,
                     aws_secret_access_key=self.aws_secret_access_key,
