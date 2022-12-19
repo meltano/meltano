@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from contextlib import contextmanager
 
-from cached_property import cached_property
+from cached_property import cached_property  # type: ignore
 
 from meltano.core.state_store.filesystem import (
     BaseFilesystemStateStoreManager,
