@@ -14,7 +14,7 @@ from meltano.core.state_store.filesystem import (
 try:
     import boto3
 except ImportError:
-    boto3 = None
+    boto3 = None  # type: ignore
 
 
 class MissingBoto3Error(Exception):
