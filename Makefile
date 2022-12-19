@@ -116,16 +116,19 @@ freeze_db: ## Freeze the Meltano database to support DB migration during upgrade
 
 # sdist:
 # Build the source distribution
-# Note: plese use `sdist-public` for the actual release build
+# Note: please use `sdist-public` for the actual release build.
+# Note: despite being called "sdist", this builds both the sdist and wheel.
 sdist: freeze_db bundle ## Build the Meltano sdist for development
-	poetry build
+	poetry build --format sdist
+	poetry run pip wheel --no-deps . --wheel-dir dist/
 
 # sdist_public:
 # Same as sdist, except add release marker before poetry build
 # The release marker differentiates installations 'in the wild' versus inernal dev builds and tests
 sdist_public: freeze_db bundle ## Build the Meltano sdist for release
 	touch src/meltano/core/tracking/.release_marker
-	poetry build
+	poetry build --format sdist
+	poetry run pip wheel --no-deps . --wheel-dir dist/
 	echo "Builds complete. You can now publish to PyPI using 'poetry publish'."
 
 docker_sdist: base_image ## Build an image off of the base image that includes the Meltano sdist
