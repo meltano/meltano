@@ -20,6 +20,14 @@ class MeltanoFilePlugin(FilePlugin):
         self._discovery = discovery
 
     def file_contents(self, project) -> dict[Path, str]:
+        """Get a mapping of paths to contents.
+
+        Args:
+            project: The Meltano project:
+
+        Returns:
+            A mapping.
+        """
         initialize_file = bundle.root / "initialize.yml"
         file_contents = {
             Path(relative_path): content
