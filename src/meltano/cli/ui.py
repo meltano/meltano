@@ -90,6 +90,13 @@ def ui(ctx, project: Project):
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#ui
     """
     ctx.obj["project"] = project
+    click.secho(
+        "\n"
+        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        "┃ The Meltano UI is deprecated, and scheduled for removal in Meltano 3.0 ┃\n"
+        "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n",
+        fg="red",
+    )
 
 
 @ui.command(cls=InstrumentedCmd, short_help="Start the Meltano UI webserver.")
