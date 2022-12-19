@@ -1,9 +1,11 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.ci hooks
 
-# pre-commit.ci cannot be used because it runs on all files, rather than just
-# the files added/modified by the PR. Instead, we use the deprecated pre-commit
-# action with arguments provided to limit it to the added/modified files.
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_commit_msg: 'chore: pre-commit autoupdate'
+  autoupdate_schedule: weekly
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -69,3 +71,20 @@ repos:
     hooks:
       - id: flakeheaven
         exclude: ^(src/meltano/migrations/)
+        additional_dependencies:
+          - flake8==4.0.1
+          - flake8-bandit==3.0.0
+          - flake8-broken-line==0.4.0
+          - flake8-bugbear==22.12.6
+          - flake8-commas==2.1.0
+          - flake8-comprehensions==3.10.1
+          - flake8-debugger==4.1.2
+          - flake8-docstrings==1.6.0
+          - flake8-eradicate==1.4.0
+          - flake8-isort==4.2.0
+          - flake8-polyfill==1.0.2
+          - flake8-quotes==3.3.1
+          - flake8-rst-docstrings==0.2.7
+          - flake8-string-format==0.3.0
+          - pep8-naming==0.12.1
+          - wemake-python-styleguide==0.16.1
