@@ -21,11 +21,7 @@ class MissingBoto3Error(Exception):
     """Raised when boto3 is required but not installed."""
 
     def __init__(self):
-        """Initialize a MissingBoto3Error
-
-        Args:
-            message: The message describing the error.
-        """
+        """Initialize a MissingBoto3Error."""
         super().__init__(
             "boto3 required but not installed. Install meltano[s3] to use S3 as a state backend.",  # noqa: E501
         )
