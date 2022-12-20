@@ -178,21 +178,21 @@ $ meltano config tap-github set --interactive
 ```console
 $ meltano config tap-github set --interactive
 Configuring Extractor 'tap-github'
-[...]                                                            
-Settings                                                                                                                                                                                       
- 1. user_agent:                                                                                                                                                                                   [...] 
+[...]
+Settings
+ 1. user_agent:                                                                                                                                                                                   [...]
  3. auth_token: GitHub token to authenticate ...
-[...] 
- 8. repositories: An array of strings containing the github repos to be ...  
-[...] 
+[...]
+ 8. repositories: An array of strings containing the github repos to be ...
+[...]
  11. start_date:
- [...] 
+ [...]
 To learn more about extractor 'tap-github' and its settings, visit https://hub.meltano.com/extractors/tap-github
 
 Loop through all settings (all), select a setting by number (1 - 11), or exit (e)? [all]:
 $ 3
 [...]Description:
-GitHub token to authenticate with. 
+GitHub token to authenticate with.
 New value:
 $
 Repeat for confirmation:
