@@ -502,16 +502,17 @@ The new project directory will contain:
 
 ```bash
 # Format
-meltano init [project_directory] [--no_usage_stats]
+meltano init [project_directory] [--no_usage_stats] [--force]
 ```
 
 #### Parameters
 
-- **project_directory** - This determines the directory path to create the project at.
+- **project_directory** - This determines the directory path to create the project at. Can be `.` to create a project in the current directory.
 
 #### Options
 
 - **no_usage_stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
+- **force** - This flag overwrites any existing `meltano.yml` in the project directory.
 
 #### Examples
 

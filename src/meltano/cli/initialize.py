@@ -9,7 +9,7 @@ import click
 
 from meltano.cli import cli
 from meltano.cli.params import database_uri_option
-from meltano.cli.utils import CliError, InstrumentedCmd
+from meltano.cli.utils import InstrumentedCmd
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
@@ -29,8 +29,13 @@ path_type = click.Path(file_okay=False, path_type=Path)
 @click.option(
     "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
 )
+@click.option(
+    "--force",
+    help="Overwrite `meltano.yml` if it exists in the project directory.",
+    is_flag=True,
+)
 @database_uri_option
-def init(ctx, project_directory: Path, no_usage_stats):
+def init(ctx, project_directory: Path, no_usage_stats: bool, force: bool):
     """
     Create a new Meltano project.
 
@@ -46,14 +51,13 @@ def init(ctx, project_directory: Path, no_usage_stats):
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
         logging.warning(f"Found meltano project at: {root}")
-        raise CliError("`meltano init` cannot run inside a Meltano project.")
 
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
 
     init_service = ProjectInitService(project_directory)
 
-    project = init_service.init()
+    project = init_service.init(force=force)
     init_service.echo_instructions(project)
 
     # since the project didn't exist, tracking was not initialized in cli.py
