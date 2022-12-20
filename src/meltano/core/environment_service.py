@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from meltano.core.environment import Environment
 from meltano.core.project import Project
-
-from .utils import find_named
+from meltano.core.utils import find_named
 
 
 class EnvironmentAlreadyExistsError(Exception):
