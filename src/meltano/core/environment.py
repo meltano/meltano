@@ -13,7 +13,7 @@ from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound
 
-TEnv = TypeVar("TEnv")
+TEnv = TypeVar("TEnv", bound="Environment")
 
 
 class NoActiveEnvironment(Exception):  # noqa: N818
@@ -21,7 +21,7 @@ class NoActiveEnvironment(Exception):  # noqa: N818
 
 
 class EnvironmentNameContainsStateIdDelimiterError(Exception):
-    """Occurs when an environment name contains the state ID component delimiter string."""
+    """Occurs when an environment name contains the state ID component delimiter."""
 
     def __init__(self, name: str):
         """Create a new exception.
@@ -30,7 +30,8 @@ class EnvironmentNameContainsStateIdDelimiterError(Exception):
             name: The name of the environment.
         """
         super().__init__(
-            f"The environment name '{name}' cannot contain the state ID component delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            f"The environment name '{name}' cannot contain the state ID component "
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
         )
 
 
@@ -113,7 +114,7 @@ class EnvironmentPluginConfig(PluginRef):
 class EnvironmentConfig(Canonical):
     """Meltano environment configuration."""
 
-    def __init__(self, plugins: dict[str, list[dict]] = None, **extras):
+    def __init__(self, plugins: dict[str, list[dict]] | None = None, **extras):
         """Create a new environment configuration.
 
         Args:
@@ -165,7 +166,8 @@ class Environment(NameEq, Canonical):
             state_id_suffix: State ID suffix to use.
 
         Raises:
-            EnvironmentNameContainsStateIdDelimiterError: If the name contains the state ID component delimiter string.
+            EnvironmentNameContainsStateIdDelimiterError: If the name contains the state
+                ID component delimiter string.
         """
         if STATE_ID_COMPONENT_DELIMITER in name:
             raise EnvironmentNameContainsStateIdDelimiterError(name)
