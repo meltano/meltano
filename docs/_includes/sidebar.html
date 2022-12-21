@@ -1,9 +1,5 @@
 <aside class="menu is-fullheight is-narrow-mobile is-hidden-mobile">
-  <ul class="menu-list">
-    <li>
-      <a href="/getting-started" class="{% if page.url == '/getting-started' %}is-active{% endif %}">Getting Started</a>
-    </li>
-  </ul>
+
   {% if site.collections %}
     {% assign collections = site.collections | sort: 'weight' %}
     {% for collection in collections %}

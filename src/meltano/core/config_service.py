@@ -8,9 +8,8 @@ from contextlib import contextmanager
 import yaml
 
 from meltano.core import bundle
-
-from .project import Project
-from .setting_definition import SettingDefinition
+from meltano.core.project import Project
+from meltano.core.setting_definition import SettingDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +20,7 @@ class ConfigService:
     def __init__(self, project: Project, use_cache=True):
         """Create a new project configuration service.
 
-        Parameters:
+        Args:
             project: the project to configure.
             use_cache: whether to use the cache or not.
         """
@@ -53,6 +52,7 @@ class ConfigService:
             The contents of meltano.yml.
         """
         if self._current_meltano_yml is None or not self._use_cache:
+            self.project.clear_cache()
             self._current_meltano_yml = self.project.meltano
         return self._current_meltano_yml
 
@@ -105,7 +105,7 @@ class ConfigService:
     def update_config(self, config):
         """Update top-level Meltano configuration.
 
-        Parameters:
+        Args:
             config: configuration dict
         """
         with self.update_meltano_yml() as meltano_yml:

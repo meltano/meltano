@@ -5,20 +5,26 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import sys
 from contextlib import suppress
 from logging import config as logging_config
 
 import structlog
 import yaml
 
-from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN, TIMESTAMPER
+from meltano.core.logging.formatters import (
+    LEVELED_TIMESTAMPED_PRE_CHAIN,
+    TIMESTAMPER,
+    rich_exception_formatter_factory,
+)
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import get_no_color_flag
 
-try:
-    from typing import Protocol  # noqa: WPS433
-except ImportError:
-    from typing_extensions import Protocol  # noqa: WPS433
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 
 LEVELS = {  # noqa: WPS407
@@ -35,7 +41,7 @@ FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] 
 def parse_log_level(log_level: dict[str, int]) -> int:
     """Parse a level descriptor into an logging level.
 
-    Parameters:
+    Args:
         log_level: level descriptor.
 
     Returns:
@@ -47,7 +53,7 @@ def parse_log_level(log_level: dict[str, int]) -> int:
 def read_config(config_file: str | None = None) -> dict:
     """Read a logging config yaml from disk.
 
-    Parameters:
+    Args:
         config_file: path to the config file to read.
 
     Returns:
@@ -63,19 +69,29 @@ def read_config(config_file: str | None = None) -> dict:
 def default_config(log_level: str) -> dict:
     """Generate a default logging config.
 
-    Parameters:
+    Args:
         log_level: set log levels to provided level.
 
     Returns:
-         dict: logging config suitable for use with logging.config.dictConfig
+         A logging config suitable for use with `logging.config.dictConfig`.
     """
+    no_color = get_no_color_flag()
+
+    if no_color:
+        formatter = rich_exception_formatter_factory(no_color=True)
+    else:
+        formatter = rich_exception_formatter_factory(color_system="truecolor")
+
     return {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
             "colored": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(colors=True),
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=not no_color,
+                    exception_formatter=formatter,
+                ),
                 "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
             },
         },
@@ -111,12 +127,17 @@ def default_config(log_level: str) -> dict:
     }
 
 
-def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> None:
+def setup_logging(  # noqa: WPS210
+    project: Project | None = None,
+    log_level: str = DEFAULT_LEVEL,
+    log_config: dict | None = None,
+) -> None:
     """Configure logging for a meltano project.
 
-    Parameters:
+    Args:
         project: the meltano project
         log_level: set log levels to provided level.
+        log_config: a logging config suitable for use with `logging.config.dictConfig`.
     """
     # Mimick Python 3.8's `force=True` kwarg to override any
     # existing logger handlers
@@ -126,12 +147,11 @@ def setup_logging(project: Project = None, log_level: str = DEFAULT_LEVEL) -> No
         root.removeHandler(handler)
         handler.close()
 
-    log_level = DEFAULT_LEVEL.upper()
-    log_config = None
+    log_level = log_level.upper()
 
     if project:
         settings_service = ProjectSettingsService(project)
-        log_config = settings_service.get("cli.log_config")
+        log_config = log_config or settings_service.get("cli.log_config")
         log_level = settings_service.get("cli.log_level")
 
     config = read_config(log_config) or default_config(log_level)
@@ -158,7 +178,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
     of any potential logging.yaml sourced configs. Note that if a logging.yaml config without a 'console' handler
     is used, this will not override the log level.
 
-    Parameters:
+    Args:
         log_level: set log levels to provided level.
     """
     root_logger = logging.getLogger()
@@ -174,7 +194,7 @@ class SubprocessOutputWriter(Protocol):
     def writelines(self, lines: str):
         """Any type with a writelines method accepting a string could be used as an output writer.
 
-        Parameters:
+        Args:
             lines: string to write
         """
 
@@ -208,7 +228,7 @@ async def capture_subprocess_output(
     This async function should be run with await asyncio.wait() while waiting
     for the subprocess to end.
 
-    Parameters:
+    Args:
         reader: asyncio.StreamReader object that is the output stream of the subprocess.
         line_writers: any object thats a StreamWriter or has a writelines method accepting a string.
     """

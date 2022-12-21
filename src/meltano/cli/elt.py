@@ -1,4 +1,5 @@
 """Defines `meltano elt` command."""
+
 from __future__ import annotations
 
 import datetime
@@ -10,10 +11,13 @@ import click
 import structlog
 from structlog import stdlib as structlog_stdlib
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
-from meltano.core.job.stale_job_failer import StaleJobFailer
+from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -22,12 +26,9 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import click_run_async
-
-from . import cli
-from .params import pass_project
-from .utils import CliError, PartialInstrumentedCmd
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -42,6 +43,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @cli.command(
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
 @click.argument("extractor")
 @click.argument("loader")
@@ -116,8 +118,7 @@ async def elt(
             "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
         )
 
-    tracker = ctx.obj["tracker"]
-    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
     # if transform is None we still need manually default to skip after firing the tracking event above.
@@ -160,9 +161,6 @@ async def elt(
         session.close()
 
     tracker.track_command_event(CliEvent.completed)
-    legacy_tracker.track_meltano_elt(
-        extractor=extractor, loader=loader, transform=transform
-    )
 
 
 def _elt_context_builder(
@@ -221,7 +219,7 @@ async def dump_file(context_builder, dumpable):
 
 
 async def _run_job(tracker, project, job, session, context_builder, force=False):
-    StaleJobFailer(job.job_name).fail_stale_jobs(session)
+    fail_stale_jobs(session, job.job_name)
 
     if not force:
         existing = JobFinder(job.job_name).latest_running(session)

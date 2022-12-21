@@ -9,9 +9,16 @@ import sys
 import click
 from sqlalchemy.orm import sessionmaker
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    CliError,
+    PartialInstrumentedCmd,
+    propagate_stop_signals,
+)
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_invoker import (
@@ -21,11 +28,8 @@ from meltano.core.plugin_invoker import (
 )
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
-
-from . import cli
-from .params import pass_project
-from .utils import CliError, PartialInstrumentedCmd, propagate_stop_signals
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +38,7 @@ logger = logging.getLogger(__name__)
     cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
 @click.option(
     "--print-var",
@@ -78,8 +83,7 @@ def invoke(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
-    tracker = ctx.obj["tracker"]
-    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -120,7 +124,6 @@ def invoke(
                 command_name,
                 containers,
                 print_var=print_var,
-                legacy_tracker=legacy_tracker,
             )
         )
     except Exception as invoke_err:
@@ -144,7 +147,6 @@ async def _invoke(
     command_name: str,
     containers: bool,
     print_var: list | None = None,
-    legacy_tracker: LegacyTracker = None,
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
@@ -180,10 +182,6 @@ async def _invoke(
         raise
     finally:
         session.close()
-
-    legacy_tracker.track_meltano_invoke(
-        plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
-    )
 
     return exit_code
 

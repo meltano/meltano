@@ -3,14 +3,14 @@ export default function FilterModel({
   attribute,
   expression = '',
   value = '',
-  isActive = true
+  isActive = true,
 }) {
   const filter = {
     filterType,
     attribute,
     expression,
     value,
-    isActive
+    isActive,
   }
   return filter
 }

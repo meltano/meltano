@@ -30,7 +30,7 @@ logger = logging.getLogger("meltano.api")
 def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     """Create flask app for the current project.
 
-    Parameters:
+    Args:
         config: app configuration
 
     Returns:
@@ -113,8 +113,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     else:
         logger.debug("Notifications are disabled.")
 
-    # Google Analytics setup
-
     @app.before_request
     def setup_js_context():
         # setup the appUrl
@@ -126,8 +124,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         setting_map = {
             "isSendAnonymousUsageStats": "send_anonymous_usage_stats",
             "projectId": "project_id",
-            "trackingID": "tracking_ids.ui",
-            "embedTrackingID": "tracking_ids.ui_embed",
             "isProjectReadonlyEnabled": "project_readonly",
             "isReadonlyEnabled": "ui.readonly",
             "isAnonymousReadonlyEnabled": "ui.anonymous_readonly",

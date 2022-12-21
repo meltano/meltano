@@ -6,7 +6,8 @@ import { namer } from '@/utils/mappers'
 
 const regExpPrivateInput = /(password|private|secret|token)/
 // matches the W3C regex for `type=email` inputs
-const regExpEmailInput = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+const regExpEmailInput =
+  /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 
 const FLASK = flaskContext()
 
@@ -35,7 +36,7 @@ export default {
   docsUrl(path = '/', fragment) {
     fragment = fragment ? `#${fragment}` : ''
 
-    return `https://meltano.com/docs${path}.html${fragment}`
+    return `https://docs.meltano.com/${path}${fragment}`
   },
 
   downloadBlobAsFile(blob, fileName) {
@@ -72,7 +73,7 @@ export default {
       'rgba(255, 206, 86, 0.2)',
       'rgba(75, 192, 192, 0.2)',
       'rgba(153, 102, 255, 0.2)',
-      'rgba(255, 159, 64, 0.2)'
+      'rgba(255, 159, 64, 0.2)',
     ],
     borderColor: [
       'rgba(255,99,132,1)',
@@ -80,8 +81,8 @@ export default {
       'rgba(255, 206, 86, 1)',
       'rgba(75, 192, 192, 1)',
       'rgba(153, 102, 255, 1)',
-      'rgba(255, 159, 64, 1)'
-    ]
+      'rgba(255, 159, 64, 1)',
+    ],
   },
 
   getColor(i) {
@@ -89,15 +90,15 @@ export default {
     const colorLength = this.colors.backgroundColor.length
     return {
       backgroundColor: this.colors.backgroundColor[i % colorLength],
-      borderColor: this.colors.borderColor[i % colorLength]
+      borderColor: this.colors.borderColor[i % colorLength],
     }
   },
 
   // Collection Utils
   difference(arr1, arr2) {
     return arr1
-      .filter(x => !arr2.includes(x))
-      .concat(arr2.filter(x => !arr1.includes(x)))
+      .filter((x) => !arr2.includes(x))
+      .concat(arr2.filter((x) => !arr1.includes(x)))
   },
 
   deepFreeze(object) {
@@ -145,7 +146,7 @@ export default {
     return this.hyphenate(name, `js-${type.toLowerCase()}`)
   },
   key(...attrs) {
-    const extractKey = obj => obj['name'] || String(obj)
+    const extractKey = (obj) => obj['name'] || String(obj)
     return attrs.map(extractKey).join(':')
   },
   pretty(value) {
@@ -195,7 +196,7 @@ export default {
   titleCase(value) {
     return value.replace(
       /\w\S*/g,
-      txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     )
   },
   truncate(string, max = 50) {
@@ -227,7 +228,7 @@ export default {
     return {
       min: '2000-01-01',
       pattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}',
-      today: this.formatDateStringYYYYMMDD(new Date())
+      today: this.formatDateStringYYYYMMDD(new Date()),
     }
   },
 
@@ -299,5 +300,5 @@ export default {
       document.getSelection().removeAllRanges()
     }
     return isSuccess
-  }
+  },
 }

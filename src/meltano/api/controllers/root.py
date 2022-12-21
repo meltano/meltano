@@ -76,9 +76,17 @@ def version():
     response_payload = {"version": meltano.__version__}
 
     if truthy(request.args.get("include_latest")):
-        res = requests.get("https://pypi.org/pypi/meltano/json")
-        pypi_payload = res.json()
-        response_payload["latest_version"] = pypi_payload["info"]["version"]
+        try:
+            res = requests.get("https://pypi.org/pypi/meltano/json")
+            pypi_payload = res.json()
+            response_payload["latest_version"] = pypi_payload["info"]["version"]
+        except requests.exceptions.ConnectionError as e:
+            logger.warning(
+                "%s failed with error %s getting latest_version from pypi.org",
+                request,
+                repr(e),
+            )
+            response_payload["latest_version"] = None
 
     return jsonify(response_payload)
 

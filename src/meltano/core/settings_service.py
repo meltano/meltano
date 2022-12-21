@@ -58,7 +58,7 @@ class FeatureNotAllowedException(Exception):
     def __init__(self, feature):
         """Instantiate the error.
 
-        Parameters:
+        Args:
             feature: the feature flag to check
         """
         super().__init__(feature)
@@ -83,25 +83,21 @@ class SettingsService(ABC):  # noqa: WPS214
         self,
         project: Project,
         show_hidden: bool = True,
-        env_override: dict = None,
-        config_override: dict = None,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
     ):
         """Create a new settings service object.
 
-        Parameters:
+        Args:
             project: Meltano project object.
             show_hidden: Whether to display secret setting values.
             env_override: Optional override environment values.
             config_override:  Optional override configuration values.
         """
         self.project = project
-
         self.show_hidden = show_hidden
-
         self.env_override = env_override or {}
-
         self.config_override = config_override or {}
-
         self._setting_defs = None
 
     @property
@@ -123,6 +119,15 @@ class SettingsService(ABC):  # noqa: WPS214
         """
 
     @property
+    @abstractmethod
+    def project_settings_service(self):
+        """Get a project settings service.
+
+        Returns:
+            A ProjectSettingsService
+        """
+
+    @property
     def env_prefixes(self) -> list[str]:
         """Return prefixes for setting environment variables.
 
@@ -141,7 +146,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings."""
 
-    @property
+    @property  # noqa: B027
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
 
@@ -154,7 +159,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
 
-        Parameters:
+        Args:
             config: updated config
         """
 
@@ -185,7 +190,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def unredact(cls, values: dict) -> dict:
         """Remove any redacted values in a dictionary.
 
-        Parameters:
+        Args:
             values: the dictionary to remove redacted values from
 
         Returns:
@@ -203,7 +208,7 @@ class SettingsService(ABC):  # noqa: WPS214
     ):
         """Return all config values with associated metadata.
 
-        Parameters:
+        Args:
             prefix: the prefix for setting names
             extras: extra setting definitions to include
             source: the SettingsStore to use
@@ -231,24 +236,23 @@ class SettingsService(ABC):  # noqa: WPS214
                 **kwargs,
             )
 
-            name = setting_def.name
-            if prefix:
-                name = name[len(prefix) :]  # noqa: E203
-
-            config[name] = {**metadata, "value": value}
+            config[setting_def.name[len(prefix) :] if prefix else setting_def.name] = {
+                **metadata,
+                "value": value,
+            }
 
         return config
 
     def as_dict(self, *args, process=False, **kwargs) -> dict:
         """Return settings without associated metadata.
 
-        Parameters:
+        Args:
             *args: args to pass to config_with_metadata
             process: whether or not to process the config
             **kwargs: additional kwargs to pass to config_with_metadata
 
         Returns:
-            dict of namew-value settings pairs
+            dict of name-value settings pairs
         """
         config_metadata = self.config_with_metadata(*args, **kwargs)
 
@@ -268,17 +272,15 @@ class SettingsService(ABC):  # noqa: WPS214
     def as_env(self, *args, **kwargs) -> dict[str, str]:
         """Return settings as an dictionary of environment variables.
 
-        Parameters:
+        Args:
             *args: args to pass to config_with_metadata
             **kwargs: additional kwargs to pass to config_with_metadata
 
         Returns:
             settings as environment variables
         """
-        full_config = self.config_with_metadata(*args, **kwargs)
-
         env = {}
-        for _, config in full_config.items():
+        for _, config in self.config_with_metadata(*args, **kwargs).items():
             value = config["value"]
             if value is None:
                 continue
@@ -306,7 +308,7 @@ class SettingsService(ABC):  # noqa: WPS214
     ):
         """Get a setting with associated metadata.
 
-        Parameters:
+        Args:
             name: the name of the setting to get
             redacted: whether or not the setting is redacted
             source: the SettingsStore to use
@@ -347,7 +349,7 @@ class SettingsService(ABC):  # noqa: WPS214
 
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
-        env_var_strict_mode, _ = manager.get(
+        env_var_strict_mode, _ = source.manager(self.project_settings_service).get(
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
         )
         if expand_env_vars and metadata.get("expandable", False):
@@ -419,7 +421,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def get_with_source(self, *args, **kwargs):
         """Get a setting value along with its source.
 
-        Parameters:
+        Args:
             *args: args to pass to get_with_metadata
             **kwargs: kwargs to pass to get_with_metadata
 
@@ -432,7 +434,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def get(self, *args, **kwargs):
         """Get a setting value.
 
-        Parameters:
+        Args:
             *args: args to pass to get_with_metadata
             **kwargs: kwargs to pass to get_with_metadata
 
@@ -442,12 +444,12 @@ class SettingsService(ABC):  # noqa: WPS214
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(  # noqa: WPS615
-        self, path: list[str], value, store=SettingValueStore.AUTO, **kwargs
+    def set_with_metadata(  # noqa: WPS615, WPS210
+        self, path: str | list[str], value, store=SettingValueStore.AUTO, **kwargs
     ):
         """Set the value and metadata for a setting.
 
-        Parameters:
+        Args:
             path: the key for the setting
             value: the value to set the setting to
             store: the store to set the value in
@@ -466,6 +468,7 @@ class SettingsService(ABC):  # noqa: WPS214
         try:
             setting_def = self.find_setting(name)
         except SettingMissingError:
+            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning)
             setting_def = None
 
         metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
@@ -480,17 +483,19 @@ class SettingsService(ABC):  # noqa: WPS214
                 metadata["uncast_value"] = value
                 value = cast_value
 
-        manager = store.manager(self, **kwargs)
-        set_metadata = manager.set(name, path, value, setting_def=setting_def)
-        metadata.update(set_metadata)
+        metadata.update(
+            store.manager(self, **kwargs).set(
+                name, path, value, setting_def=setting_def
+            )
+        )
 
-        self.log(f"Set setting '{name}' with metadata: {metadata}")
+        self.log(f"Set setting {name!r} with metadata: {metadata}")
         return value, metadata
 
     def set(self, *args, **kwargs):
         """Set the value for a setting.
 
-        Parameters:
+        Args:
             *args: args to pass to set_with_metadata
             **kwargs: kwargs to pass to set_with_metadata
 
@@ -503,7 +508,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def unset(self, path: list[str], store=SettingValueStore.AUTO, **kwargs):
         """Unset a setting.
 
-        Parameters:
+        Args:
             path: the key for the setting
             store: the store to set the value in
             **kwargs: additional keyword args to pass during SettingsStoreManager instantiation
@@ -523,19 +528,21 @@ class SettingsService(ABC):  # noqa: WPS214
         except SettingMissingError:
             setting_def = None
 
-        metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
+        metadata = {
+            "name": name,
+            "path": path,
+            "store": store,
+            "setting": setting_def,
+            **store.manager(self, **kwargs).unset(name, path, setting_def=setting_def),
+        }
 
-        manager = store.manager(self, **kwargs)
-        unset_metadata = manager.unset(name, path, setting_def=setting_def)
-        metadata.update(unset_metadata)
-
-        self.log(f"Unset setting '{name}' with metadata: {metadata}")
+        self.log(f"Unset setting {name!r} with metadata: {metadata}")
         return metadata
 
     def reset(self, store=SettingValueStore.AUTO, **kwargs):
         """Reset a setting.
 
-        Parameters:
+        Args:
             store: the store to set the value in
             **kwargs: additional keyword args to pass during SettingsStoreManager instantiation
 
@@ -554,7 +561,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def definitions(self, extras=None) -> Iterable[dict]:
         """Return setting definitions along with extras.
 
-        Parameters:
+        Args:
             extras: additional settings to return
 
         Returns:
@@ -580,7 +587,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def find_setting(self, name: str) -> SettingDefinition:
         """Find a setting by name.
 
-        Parameters:
+        Args:
             name:the name or alias of the setting to return
 
         Returns:
@@ -602,7 +609,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def setting_env_vars(self, setting_def, for_writing=False):
         """Get environment variables for the given setting definition.
 
-        Parameters:
+        Args:
             setting_def: the setting definition to get env vars for
             for_writing: unused but referenced elsewhere # TODO: clean up refs at some point
 
@@ -614,7 +621,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def setting_env(self, setting_def):
         """Get a single environment variable for the given setting definition.
 
-        Parameters:
+        Args:
             setting_def: the setting definition to get env vars for
 
         Returns:
@@ -625,7 +632,7 @@ class SettingsService(ABC):  # noqa: WPS214
     def log(self, message):
         """Log the given message.
 
-        Parameters:
+        Args:
             message: the message to log
         """
         if self.LOGGING:
@@ -637,7 +644,7 @@ class SettingsService(ABC):  # noqa: WPS214
     ) -> Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 
-        Parameters:
+        Args:
             feature: the feature flag to check
             raise_error: indicates whether error should be raised
 

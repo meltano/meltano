@@ -11,7 +11,7 @@ export default {
 
   deletePipelineSchedule(schedulePayload) {
     return axios.delete(utils.apiUrl('orchestrations', 'pipeline-schedules'), {
-      data: schedulePayload
+      data: schedulePayload,
     })
   },
 
@@ -96,8 +96,8 @@ export default {
       formData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       }
     )
   },
@@ -110,5 +110,5 @@ export default {
       ),
       payload
     )
-  }
+  },
 }

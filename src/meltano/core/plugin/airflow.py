@@ -52,7 +52,7 @@ class Airflow(BasePlugin):
     def process_config(self, flat_config):
         """Unflatten the config.
 
-        Parameters:
+        Args:
             flat_config: the flat config
 
         Returns:
@@ -67,7 +67,7 @@ class Airflow(BasePlugin):
     def update_config_file(invoker: AirflowInvoker) -> None:
         """Update airflow.cfg with plugin configuration.
 
-        Parameters:
+        Args:
             invoker: the active PluginInvoker
         """
         airflow_cfg_path = invoker.files["config"]
@@ -94,7 +94,7 @@ class Airflow(BasePlugin):
     async def setup_env(self, *args, **kwargs):
         """Configure the env to make airflow installable without GPL deps.
 
-        Parameters:
+        Args:
             args: Arbitrary args
             kwargs: Arbitrary kwargs
         """
@@ -104,7 +104,7 @@ class Airflow(BasePlugin):
     async def before_configure(self, invoker: AirflowInvoker, session):
         """Generate config file and keep metadata database up-to-date.
 
-        Parameters:
+        Args:
             invoker: the active PluginInvoker
             session: metadata database session
 
@@ -171,7 +171,7 @@ class Airflow(BasePlugin):
     async def before_cleanup(self, invoker: PluginInvoker):
         """Delete the config file.
 
-        Parameters:
+        Args:
             invoker: the active PluginInvoker
         """
         config_file = invoker.files["config"]

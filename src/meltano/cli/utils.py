@@ -6,10 +6,12 @@ import logging
 import os
 import signal
 from contextlib import contextmanager
+from enum import Enum, auto
 
 import click
 from click_default_group import DefaultGroup
 
+from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
@@ -29,7 +31,7 @@ from meltano.core.project_add_service import (
 )
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
-from meltano.core.tracking import CliContext, CliEvent
+from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
 setup_logging()
 
@@ -249,7 +251,7 @@ def _prompt_plugin_settings(plugin_type):
     click.echo("Default: no settings")
     click.echo()
 
-    settings: dict = None
+    settings: dict | None = None
     while settings is None:  # noqa:  WPS426  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
@@ -341,7 +343,7 @@ def add_plugin(
             click.echo(f"\tmeltano config {plugin.name} list")
             click.echo()
             click.echo(
-                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#switching-from-one-variant-to-another"
+                "To learn more, visit https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another"
             )
 
             click.echo()
@@ -359,7 +361,7 @@ def add_plugin(
 
             click.echo()
             click.echo(
-                "To learn more, visit https://www.meltano.com/docs/plugin-management.html#multiple-variants"
+                "To learn more, visit https://docs.meltano.com/guide/plugin-management#multiple-variants"
             )
         else:
             click.echo(
@@ -435,11 +437,20 @@ def install_status_update(install_state):
 
 
 def install_plugins(
-    project, plugins, reason=PluginInstallReason.INSTALL, parallelism=None, clean=False
+    project,
+    plugins,
+    reason=PluginInstallReason.INSTALL,
+    parallelism=None,
+    clean=False,
+    force=False,
 ):
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
-        project, status_cb=install_status_update, parallelism=parallelism, clean=clean
+        project,
+        status_cb=install_status_update,
+        parallelism=parallelism,
+        clean=clean,
+        force=force,
     )
     install_results = install_service.install_plugins(plugins, reason=reason)
     num_successful = len([status for status in install_results if status.successful])
@@ -491,7 +502,7 @@ def check_dependencies_met(
 ) -> tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
-    Parameters:
+    Args:
         plugins: List of plugins to be added.
         plugin_service: Plugin service to use when checking for dependencies.
 
@@ -519,44 +530,146 @@ def check_dependencies_met(
     return passed, message
 
 
-class InstrumentedDefaultGroup(DefaultGroup):
-    """A variation of a DefaultGroup that instruments its invocation by updating the telemetry context."""
+def activate_environment(
+    ctx: click.Context, project: Project, required: bool = False
+) -> None:
+    """Activate the selected environment.
 
-    def invoke(self, ctx):
+    The selected environment is whatever was selected with the `--environment`
+    option, or the default environment (set in `meltano.yml`) otherwise.
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["selected_environment"]:
+        project.activate_environment(ctx.obj["selected_environment"])
+        # Update the project context being used for telemetry:
+        project_ctx = next(
+            ctx
+            for ctx in ctx.obj["tracker"].contexts
+            if isinstance(ctx, ProjectContext)
+        )
+        project_ctx.environment_name = ctx.obj["selected_environment"]
+
+    elif required:
+        raise MeltanoConfigurationError(
+            reason="A Meltano environment must be specified",
+            instruction="Set the `default_environment` option in "
+            "`meltano.yml`, or the `--environment` CLI option",
+        )
+
+
+def activate_explicitly_provided_environment(
+    ctx: click.Context, project: Project
+) -> None:
+    """Activate the selected environment if it has been explicitly set.
+
+    Some commands (e.g. `config`, `job`, etc.) do not respect the configured
+    `default_environment`, and will only run with an environment active if it
+    has been explicitly set (e.g. with the `--environment` CLI option).
+
+    Args:
+        ctx: The Click context, used to determine the selected environment.
+        project: The project for which the environment will be activated.
+    """
+    if ctx.obj["is_default_environment"]:
+        logger.info(
+            f"The default environment {ctx.obj['selected_environment']!r} will "
+            f"be ignored for `meltano {ctx.command.name}`. To configure a specific "
+            "environment, please use the option `--environment=<environment name>`."
+        )
+        project.deactivate_environment()
+    else:
+        activate_environment(ctx, project)
+
+
+class CliEnvironmentBehavior(Enum):
+    """Enum of the different Meltano environment activation behaviours."""
+
+    # Use explicit environment, or `default_environment`, or fail.
+    environment_required = auto()
+
+    # Use explicit environment, or `default_environment`, or no environment.
+    environment_optional_use_default = auto()
+
+    # Use explicit environment, or no environment; ignore `default_environment`.
+    environment_optional_ignore_default = auto()
+
+
+def enact_environment_behavior(
+    behavior: CliEnvironmentBehavior | None,
+    ctx: click.Context,
+) -> None:
+    """Activate the environment in the specified way."""
+    if behavior is None:
+        return
+    if behavior is CliEnvironmentBehavior.environment_optional_use_default:
+        activate_environment(ctx, ctx.obj["project"], required=False)
+    elif behavior is CliEnvironmentBehavior.environment_required:
+        activate_environment(ctx, ctx.obj["project"], required=True)
+    elif behavior is CliEnvironmentBehavior.environment_optional_ignore_default:
+        activate_explicitly_provided_environment(ctx, ctx.obj["project"])
+
+
+class InstrumentedCmdMixin:
+    """Shared functionality for all instrumented commands."""
+
+    def __init__(
+        self,
+        *args,
+        environment_behavior: CliEnvironmentBehavior | None = None,
+        **kwargs,
+    ):
+        """Initialize the `InstrumentedCmdMixin`.
+
+        Args:
+            args: Arguments to pass to the parent class.
+            environment_behavior: The behavior to use regarding the activation
+                of the Meltano environment for this command.
+            kwargs: Keyword arguments to pass to the parent class.
+        """
+        self.environment_behavior = environment_behavior
+        super().__init__(*args, **kwargs)
+
+
+class InstrumentedGroupMixin(InstrumentedCmdMixin):
+    """Shared functionality for all instrumented groups."""
+
+    def invoke(self, ctx: click.Context):
         """Update the telemetry context and invoke the group."""
         ctx.ensure_object(dict)
+        enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
-        super().invoke(ctx)  # noqa: WPS608
+        super().invoke(ctx)
 
 
-class InstrumentedGroup(click.Group):
-    """A click.Group that instruments its invocation by updating the telemetry context."""
-
-    def invoke(self, ctx):
-        """Update the telemetry context and invoke the group."""
-        ctx.ensure_object(dict)
-        if ctx.obj.get("tracker"):
-            ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
-        super().invoke(ctx)  # noqa: WPS608
+class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup):
+    """A variation of a `DefaultGroup` that instruments its invocation by updating the telemetry context."""
 
 
-class InstrumentedCmd(click.Command):
-    """A click.Command that automatically fires telemetry events when invoked.
+class InstrumentedGroup(InstrumentedGroupMixin, click.Group):
+    """A `click.Group` that instruments its invocation by updating the telemetry context."""
+
+
+class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
+    """A `click.Command` that automatically fires telemetry events when invoked.
 
     Both starting and ending events are fired. The ending event fired is dependent on whether invocation of the command
     resulted in an Exception.
     """
 
-    def invoke(self, ctx):
+    def invoke(self, ctx: click.Context):
         """Invoke the requested command firing start and events accordingly."""
         ctx.ensure_object(dict)
+        enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             tracker = ctx.obj["tracker"]
             tracker.add_contexts(CliContext.from_click_context(ctx))
             tracker.track_command_event(CliEvent.started)
             try:
-                super().invoke(ctx)  # noqa: WPS608
+                super().invoke(ctx)
             except Exception:
                 tracker.track_command_event(CliEvent.failed)
                 raise
@@ -565,13 +678,14 @@ class InstrumentedCmd(click.Command):
             super().invoke(ctx)
 
 
-class PartialInstrumentedCmd(click.Command):
-    """A click.Command that automatically fires an instrumentation 'start' event, if a tracker is available."""
+class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
+    """A `click.Command` that automatically fires an instrumentation 'start' event, if a tracker is available."""
 
     def invoke(self, ctx):
         """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
+        enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
-        super().invoke(ctx)  # noqa: WPS608
+        super().invoke(ctx)

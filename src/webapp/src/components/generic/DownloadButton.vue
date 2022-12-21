@@ -7,22 +7,22 @@ export default {
     fileName: { type: String, required: true },
     label: { type: String, required: false, default: 'Download' },
     triggerPromise: { type: Function, required: true },
-    triggerPayload: { type: Object, required: true }
+    triggerPayload: { type: Object, required: true },
   },
   data() {
     return {
-      isLoading: false
+      isLoading: false,
     }
   },
   methods: {
     download() {
       this.isLoading = true
-      this.triggerPromise(this.triggerPayload).then(response => {
+      this.triggerPromise(this.triggerPayload).then((response) => {
         utils.downloadBlobAsFile(response.data, this.fileName)
         this.isLoading = false
       })
-    }
-  }
+    },
+  },
 }
 </script>
 

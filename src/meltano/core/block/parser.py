@@ -22,7 +22,7 @@ from .singer import CONSUMERS, SingerBlock
 def is_command_block(plugin: ProjectPlugin) -> bool:
     """Check if a plugin is a command block.
 
-    Parameters:
+    Args:
         plugin: Plugin to check.
 
     Returns:
@@ -40,7 +40,7 @@ def validate_block_sets(
 ) -> bool:
     """Perform validation of all blocks in a list that implement the BlockSet interface.
 
-    Parameters:
+    Args:
         log: Logger to use in the event of a validation error.
         blocks: A list of blocks.
 
@@ -67,17 +67,19 @@ class BlockParser:  # noqa: D101
         full_refresh: bool | None = False,
         no_state_update: bool | None = False,
         force: bool | None = False,
+        state_id_suffix: str | None = None,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
 
-        Parameters:
+        Args:
             log: Logger to use.
             project: Project to use.
             blocks: List of block names to parse.
             full_refresh: Whether to perform a full refresh (applies to all found sets).
             no_state_update: Whether to run with or without state updates.
             force: Whether to force a run if a job is already running (applies to all found sets).
+            state_id_suffix: State ID suffix to use.
 
         Raises:
             ClickException: If a block name is not found.
@@ -88,6 +90,7 @@ class BlockParser:  # noqa: D101
         self._full_refresh = full_refresh
         self._no_state_update = no_state_update
         self._force = force
+        self._state_id_suffix = state_id_suffix
 
         self._plugins_service = ProjectPluginsService(project)
         self._plugins: list[ProjectPlugin] = []
@@ -138,7 +141,7 @@ class BlockParser:  # noqa: D101
             Given a job named "somejob" which consists of a single task of "tap target":
             ["somejob", "dbt:run"] -> ["tap", "target", "dbt:run"]
 
-        Parameters:
+        Args:
             blocks: List of block names to parse.
             task_sets: TaskSetsService to use.
 
@@ -164,7 +167,7 @@ class BlockParser:  # noqa: D101
         """
         Find all blocks in the invocation.
 
-        Parameters:
+        Args:
             offset: Offset to start from.
 
         Yields:
@@ -201,7 +204,7 @@ class BlockParser:  # noqa: D101
     def _find_plugin_or_mapping(self, name: str) -> ProjectPlugin | None:
         """Find a plugin by name OR by mapping name.
 
-        Parameters:
+        Args:
             name: Name of the plugin or mapping.
 
         Returns:
@@ -237,7 +240,7 @@ class BlockParser:  # noqa: D101
         """
         Search a list of project plugins trying to find an extract ExtractLoad block set.
 
-        Parameters:
+        Args:
             offset: Optional starting offset for search.
 
         Returns:
@@ -256,6 +259,7 @@ class BlockParser:  # noqa: D101
             base_builder.with_force(self._force)
             .with_full_refresh(self._full_refresh)
             .with_no_state_update(self._no_state_update)
+            .with_state_id_suffix(self._state_id_suffix)
         )
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:

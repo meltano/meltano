@@ -15,7 +15,7 @@ class JobAlreadyExistsError(Exception):
     def __init__(self, name: str):
         """Initialize a JobAlreadyExistsError.
 
-        Parameters:
+        Args:
             name: Name of the TaskSet (aka job) that already exists.
         """
         self.name = name
@@ -27,7 +27,7 @@ class JobNotFoundError(Exception):
     def __init__(self, name: str):
         """Initialize a JobNotFoundError.
 
-        Parameters:
+        Args:
             name: Name of the TaskSet (aka job) that wasn't found.
         """
         self.name = name
@@ -40,7 +40,7 @@ class TaskSetsService:
     def __init__(self, project: Project):
         """Initialize a TaskSetsService.
 
-        Parameters:
+        Args:
             project: The active project.
         """
         self.project = project
@@ -48,7 +48,7 @@ class TaskSetsService:
     def add(self, task_sets: TaskSets) -> None:
         """Add a TaskSet to the project.
 
-        Parameters:
+        Args:
             task_sets: The TaskSets to add.
 
         Raises:
@@ -64,7 +64,7 @@ class TaskSetsService:
     def remove(self, name: str) -> TaskSets:
         """Remove a TaskSet from the project.
 
-        Parameters:
+        Args:
             name: The name of the TaskSet to remove.
 
         Returns:
@@ -73,7 +73,7 @@ class TaskSetsService:
         Raises:
             JobNotFoundError: If the TaskSet with the given name does not exist.
         """
-        for job in self.project.meltano.jobs:
+        for job in self.list():
             if job.name == name:
                 with self.project.meltano_update() as meltano:
                     logger.debug("removing job", name=job.name)
@@ -84,13 +84,13 @@ class TaskSetsService:
     def update(self, task_sets: TaskSets) -> None:
         """Update a tasks.
 
-        Parameters:
+        Args:
             task_sets: The TaskSets to update.
 
         Raises:
             JobNotFoundError: If the TaskSet with the given name does not exist.
         """
-        for idx, job in enumerate(self.project.meltano.jobs):
+        for idx, job in enumerate(self.list()):
             if job.name == task_sets.name:
                 with self.project.meltano_update() as meltano:
                     logger.debug("updating job", name=job.name)
@@ -101,7 +101,7 @@ class TaskSetsService:
     def get(self, name: str) -> TaskSets:
         """Get a TaskSet by name.
 
-        Parameters:
+        Args:
             name: The name of the TaskSet.
 
         Returns:
@@ -121,12 +121,12 @@ class TaskSetsService:
         Returns:
             A list of all TaskSets in the project.
         """
-        return self.project.meltano.jobs
+        return self.project.meltano.jobs.copy()
 
     def exists(self, name: str) -> bool:
         """Check if a TaskSet with the given name exists.
 
-        Parameters:
+        Args:
             name: The name of the TaskSet.
 
         Returns:

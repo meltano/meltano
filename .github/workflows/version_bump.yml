@@ -34,26 +34,27 @@ jobs:
       pull-requests: write  # to create and update PRs
 
     steps:
-    - uses: actions/checkout@v3.0.2
+    - uses: actions/checkout@v3.2.0
       with:
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v4.1.0
+      uses: actions/setup-python@v4.3.1
       with:
         python-version: "3.10"
         architecture: x64
 
     - name: Bump version
       id: cz-bump
-      uses: commitizen-tools/commitizen-action@0.14.1
+      uses: commitizen-tools/commitizen-action@0.15.1
       with:
         increment: ${{ github.event.inputs.bump != 'auto' && github.event.inputs.bump || '' }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
         commit: "false"
         push: "false"
         changelog: "true"
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
+        extra_requirements: 'git+https://github.com/meltano/commitizen-version-bump@main'
         changelog_increment_filename: _changelog_fragment.md
 
     - env:
@@ -87,8 +88,8 @@ jobs:
 
     - name: Approve Pull Request
       if: ${{ steps.create-pull-request.outputs.pull-request-number != 0 }}
-      uses: juliangruber/approve-pull-request-action@v1.1.1
+      uses: juliangruber/approve-pull-request-action@v2.0.3
       with:
         # https://github.com/juliangruber/approve-pull-request-action
-        github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+        github-token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
         number: ${{ steps.create-pull-request.outputs.pull-request-number }}

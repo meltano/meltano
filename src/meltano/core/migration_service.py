@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import closing
 
 import click
 import sqlalchemy
@@ -34,7 +35,7 @@ class MigrationService:
     def __init__(self, engine: Engine) -> None:
         """Initialize the migration service.
 
-        Parameters:
+        Args:
             engine: The sqlalchemy engine to use for the migration and checks.
         """
         self.engine = engine
@@ -44,7 +45,7 @@ class MigrationService:
     ) -> None:
         """Ensure that a migration of the system database is actually needed.
 
-        Parameters:
+        Args:
             script: The alembic script directory.
             context: The migration context.
             target_revision: The desired target revision.
@@ -63,7 +64,7 @@ class MigrationService:
     ) -> None:
         """Upgrade to the latest revision.
 
-        Parameters:
+        Args:
             silent: If true, don't print anything.
 
         Raises:
@@ -105,10 +106,8 @@ class MigrationService:
                 click.secho("System database up-to-date.")
         except Exception as err:
             logging.exception(str(err))
-            click.secho(
-                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)",
-                fg="yellow",
-                err=True,
+            raise MigrationError(
+                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)"
             )
         finally:
             conn.close()
@@ -116,21 +115,18 @@ class MigrationService:
     def seed(self, project: Project) -> None:
         """Seed the database with the default roles and permissions.
 
-        Parameters:
+        Args:
             project: The project to seed the database for.
         """
         _, session_maker = project_engine(project)
-        session = session_maker()
-        try:  # noqa: WPS501, WPS229 Found too long try body length and finally without except
+        with closing(session_maker()) as session:
             self._create_user_role(session)
             session.commit()
-        finally:
-            session.close()
 
     def _create_user_role(self, session: Session) -> None:
         """Actually perform the database seeding creating users/roles.
 
-        Parameters:
+        Args:
             session: The session to use.
         """
         if not session.query(Role).filter_by(name="admin").first():

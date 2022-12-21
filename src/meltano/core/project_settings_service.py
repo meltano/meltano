@@ -23,16 +23,16 @@ UI_CFG_SETTINGS = {
 }
 
 
-class ProjectSettingsService(SettingsService):
+class ProjectSettingsService(SettingsService):  # noqa: WPS214
     """Project Settings Service."""
 
     config_override = {}
     supports_environments = False
 
-    def __init__(self, *args, config_service: ConfigService = None, **kwargs):
+    def __init__(self, *args, config_service: ConfigService | None = None, **kwargs):
         """Instantiate ProjectSettingsService instance.
 
-        Parameters:
+        Args:
             args: Positional arguments to pass to the superclass.
             config_service: Project configuration service instance.
             kwargs: Keyword arguments to pass to the superclass.
@@ -60,6 +60,17 @@ class ProjectSettingsService(SettingsService):
                 "Cannot update `project_id` in `meltano.yml`: project is read-only."
             )
 
+    @property
+    def project_settings_service(self):
+        """Get the settings service for this project.
+
+        For ProjectSettingsService, just returns self.
+
+        Returns:
+            self
+        """
+        return self
+
     def ensure_project_id(self) -> None:
         """Ensure `project_id` is configured properly.
 
@@ -84,10 +95,7 @@ class ProjectSettingsService(SettingsService):
                     "Unable to restore 'project_id' from 'analytics.json'", err=err
                 )
             else:
-                self.update_meltano_yml_config(
-                    {"project_id": project_id, **self.meltano_yml_config}
-                )
-                self.set("project_id", project_id)
+                self.set("project_id", project_id, store=SettingValueStore.MELTANO_YML)
                 logger.debug("Restored 'project_id' from 'analytics.json'")
 
     @property
@@ -138,7 +146,7 @@ class ProjectSettingsService(SettingsService):
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
 
-        Parameters:
+        Args:
             config: Updated config.
         """
         self.config_service.update_config(config)
@@ -146,7 +154,7 @@ class ProjectSettingsService(SettingsService):
     def process_config(self, config) -> dict:
         """Process configuration dictionary for presentation in `meltano config meltano`.
 
-        Parameters:
+        Args:
             config: Config to process.
 
         Returns:
@@ -157,7 +165,7 @@ class ProjectSettingsService(SettingsService):
     def get_with_metadata(self, name: str, *args, **kwargs):
         """Return setting value with metadata.
 
-        Parameters:
+        Args:
             name: Name of setting to get.
             args: Positional arguments to pass to the superclass method.
             kwargs: Keyword arguments to pass to the superclass method.
@@ -179,7 +187,7 @@ class ProjectSettingsService(SettingsService):
     def get_from_ui_cfg(self, name: str):
         """Return setting value from UI config.
 
-        Parameters:
+        Args:
             name: Name of setting to get.
 
         Returns:

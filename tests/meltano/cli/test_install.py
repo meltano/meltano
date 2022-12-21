@@ -20,6 +20,7 @@ class TestCliInstall:
         except PluginAlreadyAddedException as err:
             return err.plugin
 
+    @pytest.mark.order(0)
     def test_install(
         self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
     ):
@@ -33,7 +34,11 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab, target, dbt], parallelism=None, clean=False
+                project,
+                [tap, tap_gitlab, target, dbt],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
     def test_install_type(
@@ -57,7 +62,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False
+                project, [tap, tap_gitlab], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -70,7 +75,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False
+                project, [target], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -114,7 +119,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap], parallelism=None, clean=False
+                project, [tap], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -127,7 +132,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False
+                project, [target], parallelism=None, clean=False, force=False
             )
 
         with mock.patch(
@@ -165,7 +170,7 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False
+                project, [tap, tap_gitlab], parallelism=None, clean=False, force=False
             )
 
     def test_install_parallel(
@@ -253,6 +258,7 @@ class TestCliInstall:
 # project fixture creates the project see
 # https://github.com/meltano/meltano/pull/6407#issuecomment-1200516464
 # For more details
+@pytest.mark.order(-1)
 def test_new_folder_should_autocreate_on_install(
     un_engine_uri, project_function, cli_runner
 ):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import warnings
+from contextlib import closing
 from typing import Generator
 
 import pytest
@@ -9,6 +10,9 @@ from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
+from sqlalchemy.pool import NullPool
+
+from meltano.core.project import Project
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -48,11 +52,8 @@ def vacuum_db(engine_sessionmaker):
 
 @pytest.fixture(scope="class")
 def engine_sessionmaker(engine_uri):
-    # create the engine
-    engine = create_engine(engine_uri)
-    create_session = sessionmaker(bind=engine)
-
-    return (engine, create_session)
+    engine = create_engine(engine_uri, poolclass=NullPool)
+    return (engine, sessionmaker(bind=engine))
 
 
 @pytest.fixture()
@@ -74,12 +75,17 @@ def connection(engine_sessionmaker):  # noqa: WPS442
 
 
 @pytest.fixture()
-def session(project, engine_sessionmaker, connection):  # noqa: WPS442
-    """Create a new database session for a test."""
-    _, create_session = engine_sessionmaker
+def session(project: Project, engine_sessionmaker, connection):  # noqa: WPS442
+    """Create a new database session for a test.
 
-    session = create_session(bind=connection)  # noqa: WPS442
-    try:
-        yield session
-    finally:
-        session.close()
+    Args:
+        project: The `project` fixture.
+        engine_sessionmaker: The `engine_sessionmaker` fixture.
+        connection: The `connection` fixture.
+
+    Yields:
+        An ORM DB session for the given project, bound to the given connection.
+    """
+    _, create_session = engine_sessionmaker
+    with closing(create_session(bind=connection)) as fixture_session:
+        yield fixture_session

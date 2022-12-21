@@ -12,7 +12,7 @@ const defaultState = utils.deepFreeze({
     extractors: [],
     loaders: [],
     models: [],
-    orchestrators: []
+    orchestrators: [],
   },
   installedPlugins: {},
   installingPlugins: {
@@ -20,38 +20,38 @@ const defaultState = utils.deepFreeze({
     extractors: [],
     loaders: [],
     models: [],
-    orchestrators: []
+    orchestrators: [],
   },
-  plugins: {}
+  plugins: {},
 })
 
 const getters = {
   availablePluginsOfType(state) {
-    return pluginType =>
+    return (pluginType) =>
       pluginUtils.filterAvailablePlugins({
         installedPlugins: state.installedPlugins[pluginType],
-        pluginList: state.plugins[pluginType]
+        pluginList: state.plugins[pluginType],
       })
   },
 
   getHasDefaultTransforms(state) {
-    return namespace =>
+    return (namespace) =>
       state.plugins.transforms.find(
-        transform => transform.namespace === namespace
+        (transform) => transform.namespace === namespace
       )
   },
   getHasDefaultDashboards(state) {
-    return namespace =>
+    return (namespace) =>
       state.plugins.dashboards &&
       state.plugins.dashboards.find(
-        dashboard => dashboard.namespace === namespace
+        (dashboard) => dashboard.namespace === namespace
       )
   },
 
   getHasInstalledPluginsOfType(state) {
-    return pluginType => {
+    return (pluginType) => {
       const hasOwns = []
-      lodash.forOwn(state.installedPlugins[pluginType], val =>
+      lodash.forOwn(state.installedPlugins[pluginType], (val) =>
         hasOwns.push(val)
       )
       return hasOwns.length > 0
@@ -62,7 +62,7 @@ const getters = {
     return (pluginType, pluginName) => {
       const targetPlugin = state.installedPlugins[pluginType]
         ? state.installedPlugins[pluginType].find(
-            plugin => plugin.name === pluginName
+            (plugin) => plugin.name === pluginName
           )
         : null
       return targetPlugin || {}
@@ -80,7 +80,7 @@ const getters = {
   },
 
   getIsLoadingPluginsOfType(state) {
-    return pluginType => {
+    return (pluginType) => {
       const plugins = state.plugins[pluginType]
       return plugins === undefined || plugins.length === 0
     }
@@ -91,7 +91,7 @@ const getters = {
       state.installedPlugins[pluginType] &&
       Boolean(
         state.installedPlugins[pluginType].find(
-          item => item.name === pluginName
+          (item) => item.name === pluginName
         )
       )
   },
@@ -100,7 +100,7 @@ const getters = {
     return (type, name) => {
       const pluginList = state.installedPlugins[type]
       const targetPlugin = pluginList
-        ? pluginList.find(plugin => plugin.name === name)
+        ? pluginList.find((plugin) => plugin.name === name)
         : {}
 
       return targetPlugin ? targetPlugin.label || targetPlugin.name : 'Unknown'
@@ -111,7 +111,7 @@ const getters = {
     return (type, name) => {
       const pluginList = state.installedPlugins[type]
       const targetPlugin = pluginList
-        ? pluginList.find(plugin => plugin.name === name)
+        ? pluginList.find((plugin) => plugin.name === name)
         : {}
 
       return targetPlugin && targetPlugin.logoUrl
@@ -119,8 +119,8 @@ const getters = {
   },
 
   installedPluginsOfType(state) {
-    return type => state.installedPlugins[type] || []
-  }
+    return (type) => state.installedPlugins[type] || []
+  },
 }
 
 const actions = {
@@ -132,13 +132,13 @@ const actions = {
   },
 
   getInstalledPlugins({ commit }) {
-    return pluginsApi.getInstalledPlugins().then(response => {
+    return pluginsApi.getInstalledPlugins().then((response) => {
       commit('setInstalledPlugins', response.data)
     })
   },
 
   getPlugins({ commit }) {
-    pluginsApi.getPlugins().then(response => {
+    pluginsApi.getPlugins().then((response) => {
       commit('setAllPlugins', response.data)
     })
   },
@@ -164,7 +164,7 @@ const actions = {
       dispatch('reports/getReports', null, { root: true })
       dispatch('repos/getModels', null, { root: true })
     })
-  }
+  },
 }
 
 const mutations = {
@@ -196,7 +196,7 @@ const mutations = {
 
   setInstalledPlugins(state, plugins) {
     state.installedPlugins = plugins
-  }
+  },
 }
 
 export default {
@@ -204,5 +204,5 @@ export default {
   state: lodash.cloneDeep(defaultState),
   getters,
   actions,
-  mutations
+  mutations,
 }

@@ -3,13 +3,22 @@ title: Tests
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
 weight: 10
+hidden: true
 ---
 
 ## Unit Tests
 
-Meltano uses [Pytest](https://docs.pytest.org/) as our primary test framework for Python. You can run the tests after [installing the Meltano Python package](/guide/installation#install-meltano) by running the command `pytest` from the root of the repository.
+Meltano uses [Pytest](https://docs.pytest.org/) as our primary test framework for Python. You can run the tests after [installing the Meltano Python package](/getting-started/installation#install-meltano) by running the command `pytest` from the root of the repository.
 
 We recommend you familiarize yourself with [Pytest fixtures](https://docs.pytest.org/en/latest/explanation/fixtures.html), [Pytest parametrization](https://docs.pytest.org/en/latest/how-to/parametrize.html), and [`unittest.mock`](https://docs.python.org/dev/library/unittest.mock.html).
+
+### Pytest Best Practices
+
+When possible, ensure Pytest is reporting no errors, failures, warnings, xpasses (i.e. tests that we expected would fail passing instead), or unexpected skips. Additionally, the execution time should be consistent and short. Consider gating a test behind an optional `slow` or similar Pytest marker if it is slow or resource-hungry.
+
+After running Pytest in CI, a table summarizing all of the runs for every supported platform can be viewed by going to `https://github.com/meltano/meltano/actions/workflows/test.yml?query=branch:<your-branch-name>`, and selecting the top (i.e. most recent) result.
+
+If a test needs a particular environment in which to execute, do not rely on other tests to establish it. Tests that need a particular environment should either explicitly depend on other tests (via a Pytest plugin), use a fixture to establish it, or establish it themselves. It should be possible to execute the tests in a random order, and have them all (or any subset of them) consistently pass.
 
 ### Using Docker under Pytest
 

@@ -4,16 +4,14 @@ from __future__ import annotations
 
 import copy
 import logging
-import sys
 from typing import Any, Iterable
 
+from meltano.core.plugin.base import PluginDefinition, PluginRef, PluginType, Variant
+from meltano.core.plugin.command import Command
+from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.utils import expand_env_vars, flatten, uniques_in
-
-from .base import PluginDefinition, PluginRef, PluginType, Variant
-from .command import Command
-from .factory import base_plugin_factory
+from meltano.core.utils import flatten, uniques_in
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +22,7 @@ class CyclicInheritanceError(Exception):
     def __init__(self, plugin: ProjectPlugin, ancestor: ProjectPlugin):
         """Initialize cyclic inheritance error.
 
-        Parameters:
+        Args:
             plugin: A ProjectPlugin
             ancestor: The given ProjectPlugins' ancestor.
         """
@@ -41,7 +39,7 @@ class CyclicInheritanceError(Exception):
         """
         return (
             "{type} '{name}' cannot inherit from '{ancestor}', "
-            + "which itself inherits from '{name}'"
+            "which itself inherits from '{name}'"
         ).format(
             type=self.plugin.type.descriptor.capitalize(),
             name=self.plugin.name,
@@ -75,7 +73,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
     ):
         """ProjectPlugin.
 
-        Parameters:
+        Args:
             plugin_type: PluginType instance.
             name: Plugin name.
             inherit_from: Name of plugin to inherit from.
@@ -181,7 +179,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         if "profiles" in extras:
             logger.warning(
                 "Plugin configuration profiles are no longer supported, ignoring "
-                + f"`profiles` in '{name}' {plugin_type.descriptor} definition."
+                f"`profiles` in '{name}' {plugin_type.descriptor} definition."
             )
 
     @property
@@ -267,7 +265,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
     def env_prefixes(self, for_writing=False) -> list[str]:
         """Return environment variable prefixes.
 
-        Parameters:
+        Args:
             for_writing: Include parent prefix (used when writing to env vars)
 
         Returns:
@@ -371,22 +369,6 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return not self.inherit_from
 
     @property
-    def formatted_pip_url(self) -> str:
-        """Return the formatted version of the pip_url.
-
-        Expands ${MELTANO__PYTHON_VERSION} to the major.minor version string of the current runtime.
-
-        Returns:
-            Expanded pip url string.
-        """
-        return expand_env_vars(
-            self.pip_url,
-            {
-                "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}"
-            },
-        )
-
-    @property
     def venv_name(self) -> str:
         """Return the venv name this plugin should use.
 
@@ -407,23 +389,21 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
     ) -> dict[PluginType, list[PluginRequirement]]:
         """Return the requirements for this plugin.
 
-        Parameters:
+        Args:
             plugin_types: The plugin types to include.
 
         Returns:
-            A list of requirements for this plugin, optionally filtered for specified
-            plugin types.
+            A list of requirements for this plugin, optionally filtered for
+            specified plugin types.
         """
         plugin_types = plugin_types or list(PluginType)
-        plugins: dict[PluginType, list[PluginRequirement]] = {}
-
-        for plugin_type in plugin_types:
-            plugins[plugin_type] = [
+        return {
+            plugin_type: [
                 *self._parent.all_requires.get(plugin_type, []),
                 *self.requires.get(plugin_type, []),
             ]
-
-        return plugins
+            for plugin_type in plugin_types
+        }
 
     @property
     def all_requires(self) -> dict[PluginType, list]:

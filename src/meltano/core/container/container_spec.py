@@ -13,7 +13,7 @@ from meltano.core.utils import expand_env_vars
 def env_mapping_to_docker(mapping: dict[str, Any]) -> list[str]:
     """Convert a dictionary of environment variables to the <ENVVAR>=<VALUE> form.
 
-    Parameters:
+    Args:
         mapping: Dictionary of environment variables.
 
     Returns:
@@ -40,7 +40,7 @@ class ContainerSpec(Canonical):
     ):
         """Create a new container specification.
 
-        Parameters:
+        Args:
             image: Container image.
             command: Command to run the container with.
             entrypoint: Overwrite the default `ENTRYPOINT` of the image.
@@ -57,10 +57,10 @@ class ContainerSpec(Canonical):
         self.volumes = volumes or []
         self.env = env or {}
 
-    def get_docker_config(self, *, additional_env: dict = None) -> dict:
+    def get_docker_config(self, *, additional_env: dict | None = None) -> dict:
         """Build a container configuration dictionary.
 
-        Parameters:
+        Args:
             additional_env: Extend container environment with this mapping.
 
         Returns:

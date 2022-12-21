@@ -7,16 +7,32 @@ from typing import Any, Iterable, TypeVar
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound
 
-TEnv = TypeVar("TEnv")
+TEnv = TypeVar("TEnv", bound="Environment")
 
 
 class NoActiveEnvironment(Exception):  # noqa: N818
     """Exception raised when invocation has no active environment."""
+
+
+class EnvironmentNameContainsStateIdDelimiterError(Exception):
+    """Occurs when an environment name contains the state ID component delimiter."""
+
+    def __init__(self, name: str):
+        """Create a new exception.
+
+        Args:
+            name: The name of the environment.
+        """
+        super().__init__(
+            f"The environment name '{name}' cannot contain the state ID component "
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+        )
 
 
 class EnvironmentPluginConfig(PluginRef):
@@ -32,7 +48,7 @@ class EnvironmentPluginConfig(PluginRef):
     ):
         """Create a new plugin configuration object.
 
-        Parameters:
+        Args:
             plugin_type: Extractor, loader, etc.
             name: Name of the plugin.
             config: Plugin configuration.
@@ -66,7 +82,7 @@ class EnvironmentPluginConfig(PluginRef):
     def config_with_extras(self, new_config_with_extras: dict[str, Any]):
         """Set plugin configuration values from the Meltano environment.
 
-        Parameters:
+        Args:
             new_config_with_extras: New plugin configuration with extra values.
         """
         self.config.clear()
@@ -86,7 +102,7 @@ class EnvironmentPluginConfig(PluginRef):
         Orphan settings are `config` entries that do not have a
         matching parent entry within `settings`.
 
-        Parameters:
+        Args:
             existing: Existing settings.
 
         Returns:
@@ -98,10 +114,10 @@ class EnvironmentPluginConfig(PluginRef):
 class EnvironmentConfig(Canonical):
     """Meltano environment configuration."""
 
-    def __init__(self, plugins: dict[str, list[dict]] = None, **extras):
+    def __init__(self, plugins: dict[str, list[dict]] | None = None, **extras):
         """Create a new environment configuration.
 
-        Parameters:
+        Args:
             plugins: Mapping of plugin types to arrays of plugin configurations.
             extras: Environment extras.
         """
@@ -114,7 +130,7 @@ class EnvironmentConfig(Canonical):
     ) -> dict[PluginType, list[EnvironmentPluginConfig]]:
         """Create plugin configurations from raw dictionary.
 
-        Parameters:
+        Args:
             plugins: Plugin configurations.
 
         Returns:
@@ -139,25 +155,35 @@ class Environment(NameEq, Canonical):
         name: str,
         config: dict | None = None,
         env: dict | None = None,
+        state_id_suffix: str | None = None,
     ) -> None:
         """Create a new environment object.
 
-        Parameters:
+        Args:
             name: Environment name. Must be unique.
             config: Dictionary with environment configuration.
             env: Optional override environment values.
+            state_id_suffix: State ID suffix to use.
+
+        Raises:
+            EnvironmentNameContainsStateIdDelimiterError: If the name contains the state
+                ID component delimiter string.
         """
+        if STATE_ID_COMPONENT_DELIMITER in name:
+            raise EnvironmentNameContainsStateIdDelimiterError(name)
+
         super().__init__()
 
         self.name = name
         self.config = EnvironmentConfig(**(config or {}))
         self.env = env or {}
+        self.state_id_suffix = state_id_suffix
 
     @classmethod
     def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
         """Lookup an environment by name from an iterable.
 
-        Parameters:
+        Args:
             objects: Iterable of objects to search.
             name: Environment name.
 
@@ -179,7 +205,7 @@ class Environment(NameEq, Canonical):
     ) -> EnvironmentPluginConfig:
         """Get configuration for a plugin in this environment.
 
-        Parameters:
+        Args:
             plugin_type: Extractor, loader, etc.
             name: Plugin name.
 

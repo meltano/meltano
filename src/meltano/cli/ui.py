@@ -10,19 +10,19 @@ import signal
 import click
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
+from meltano.core.project import Project
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
 
-from . import cli
-from .params import pass_project
-from .utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
-
 logger = logging.getLogger(__name__)
 
 
-def ensure_secure_setup(project):
+def ensure_secure_setup(project: Project):
     """Verify UI security settings."""
     settings_service = ProjectSettingsService(project)
 
@@ -54,7 +54,8 @@ def ensure_secure_setup(project):
         for fact in facts:
             click.echo(fact)
         click.echo(
-            "For more information about these settings and how to set them, visit https://www.meltano.com/docs/settings.html#ui-authentication"
+            "For more information about these settings and how to set them, visit "
+            "https://docs.meltano.com/reference/settings#uiauthentication"
         )
         click.echo()
 
@@ -82,13 +83,20 @@ def start_workers(workers):
 )
 @pass_project(migrate=True)
 @click.pass_context
-def ui(ctx, project):
+def ui(ctx, project: Project):
     """
     Start the Meltano UI webserver.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#ui
     """
     ctx.obj["project"] = project
+    click.secho(
+        "\n"
+        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        "┃ The Meltano UI is deprecated, and scheduled for removal in Meltano 3.0 ┃\n"
+        "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n",
+        fg="red",
+    )
 
 
 @ui.command(cls=InstrumentedCmd, short_help="Start the Meltano UI webserver.")
@@ -103,10 +111,7 @@ def start(ctx, reload, bind, bind_port):
     if bind_port:
         ProjectSettingsService.config_override["ui.bind_port"] = bind_port
 
-    project = ctx.obj["project"]
-    legacy_tracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_ui()
-
+    project: Project = ctx.obj["project"]
     ensure_secure_setup(project)
 
     workers = []

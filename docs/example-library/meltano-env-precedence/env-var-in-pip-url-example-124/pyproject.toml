@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "env-var-in-pip-url-example-124"
+version = "0.1.0"
+description = ""
+authors = ["Meltano <hello@meltano.com>"]
+packages = [{include = "example.py"}]
+
+[tool.poetry.scripts]
+echo = "example:echo"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
