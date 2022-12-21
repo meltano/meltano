@@ -82,9 +82,24 @@ def test_flatten():
 
 
 def test_expand_env_vars():
+    env = {"ENV_VAR": "substituted"}
+    assert expand_env_vars("${ENV_VAR}_suffix", env) == "substituted_suffix"
+    assert expand_env_vars("prefix_${ENV_VAR}", env) == "prefix_substituted"
     assert (
-        expand_env_vars("${ENV_VAR}_suffix", {"ENV_VAR": "substituted"})
-        == "substituted_suffix"
+        expand_env_vars("prefix_${ENV_VAR}_suffix", env) == "prefix_substituted_suffix"
+    )
+    assert expand_env_vars("${ENV_VAR}", env) == "substituted"
+    assert expand_env_vars("$ENV_VAR", env) == "substituted"
+
+    with pytest.raises(ValueError):
+        expand_env_vars("", {}, raise_if_missing=True, ignore_if_missing=True)
+
+    assert expand_env_vars("$ENV_VAR", {}) == ""
+    assert expand_env_vars("$ENV_VAR", {}, ignore_if_missing=True) == "${ENV_VAR}"
+    assert expand_env_vars("${ENV_VAR}", {}, ignore_if_missing=True) == "${ENV_VAR}"
+    assert (
+        expand_env_vars("prefix-${ENV_VAR}-suffix", {}, ignore_if_missing=True)
+        == "prefix-${ENV_VAR}-suffix"
     )
 
 
