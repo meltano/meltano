@@ -544,7 +544,6 @@ module = [
   "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
   "meltano.core.upgrade_service",
-  "meltano.core.validation_service",
   "meltano.core.venv_service",
   "meltano.core.yaml",
   # Meltano Core submodules
