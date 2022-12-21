@@ -550,7 +550,6 @@ module = [
   "meltano.core.block.*",
   "meltano.core.bundle.*",
   "meltano.core.compiler.*",
-  "meltano.core.container.*",
   "meltano.core.job.*",
   "meltano.core.legacy_tracking.*",
   "meltano.core.logging.*",
