@@ -16,6 +16,7 @@ if sys.version_info >= (3, 8):
     from typing import Protocol
 else:
     from typing_extensions import Protocol
+
 from cached_property import cached_property
 
 from meltano.core.error import (
@@ -30,7 +31,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.utils import expand_env_vars, noop
+from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
 from meltano.core.venv_service import VenvService
 
 logger = logging.getLogger(__name__)
@@ -432,7 +433,7 @@ class PluginInstallService:  # noqa: WPS214
             expanded_project_env = expand_env_vars(
                 project_settings_service.env,
                 os.environ,
-                raise_if_missing=strict_env_var_mode,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
             return {
                 "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}",
@@ -440,14 +441,14 @@ class PluginInstallService:  # noqa: WPS214
                 **expand_env_vars(
                     plugin_settings_service.project.dotenv_env,
                     os.environ,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 ),
                 **plugin_settings_service.as_env(),
                 **plugin_settings_service.plugin.info_env,
                 **expand_env_vars(
                     plugin_settings_service.plugin.env,
                     expanded_project_env,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 ),
             }
 
@@ -500,7 +501,9 @@ async def install_pip_plugin(
         FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
     ) as strict_env_var_mode:
         pip_install_args = expand_env_vars(
-            plugin.pip_url, env, raise_if_missing=strict_env_var_mode
+            plugin.pip_url,
+            env,
+            if_missing=EnvVarMissingBehavior(strict_env_var_mode),
         ).split(" ")
 
     venv_service = venv_service or VenvService(
