@@ -32,6 +32,7 @@ This will add the following line to your project file:
         select:
         - commits.url # <== technically not necessary anymore, but no need to delete
         - commits.sha # <== technically not necessary anymore, but no need to delete
+        - commits.commit_timestamp # <== technically not necessary anymore, but no need to delete
         - commits.* # <== new data.
 ```
 
