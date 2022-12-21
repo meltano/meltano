@@ -1,9 +1,11 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.ci hooks
 
-# pre-commit.ci cannot be used because it runs on all files, rather than just
-# the files added/modified by the PR. Instead, we use the deprecated pre-commit
-# action with arguments provided to limit it to the added/modified files.
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_commit_msg: 'chore: pre-commit autoupdate'
+  autoupdate_schedule: weekly
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -27,7 +29,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.24.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.29.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
@@ -38,11 +40,11 @@ repos:
           - "@vue/eslint-config-prettier@7.0.0"
           - "@vue/babel-preset-app@5.0.8"
           - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.24.0" # Keep this in sync with the rev above!
+          - "eslint@8.29.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.5.0"
           - "eslint-plugin-prettier@4.2.1"
-          - "eslint-plugin-vue@9.5.1"
-          - "prettier@2.7.1"
+          - "eslint-plugin-vue@9.8.0"
+          - "prettier@2.8.1"
 
   - repo: https://github.com/psf/black
     rev: 22.6.0
@@ -55,14 +57,6 @@ repos:
     hooks:
       - id: isort
 
-  - repo: https://github.com/pycqa/flake8
-    rev: 4.0.1
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - wemake-python-styleguide==0.16.1
-        exclude: (src/meltano/migrations/versions/.*\.py)
-
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.34.0
     hooks:
@@ -71,3 +65,26 @@ repos:
           - "--py3-plus"
           - "--py37-plus"
           - "--keep-mock"
+
+  - repo: https://github.com/flakeheaven/flakeheaven
+    rev: 3.2.1
+    hooks:
+      - id: flakeheaven
+        exclude: ^(src/meltano/migrations/)
+        additional_dependencies:
+          - flake8==4.0.1
+          - flake8-bandit==3.0.0
+          - flake8-broken-line==0.4.0
+          - flake8-bugbear==22.12.6
+          - flake8-commas==2.1.0
+          - flake8-comprehensions==3.10.1
+          - flake8-debugger==4.1.2
+          - flake8-docstrings==1.6.0
+          - flake8-eradicate==1.4.0
+          - flake8-isort==4.2.0
+          - flake8-polyfill==1.0.2
+          - flake8-quotes==3.3.1
+          - flake8-rst-docstrings==0.2.7
+          - flake8-string-format==0.3.0
+          - pep8-naming==0.12.1
+          - wemake-python-styleguide==0.16.1

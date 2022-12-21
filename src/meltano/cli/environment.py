@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import click
 
+from meltano.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedGroup, PartialInstrumentedCmd
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.project import Project
-from meltano.core.tracking import CliEvent
-
-from . import cli
-from .utils import InstrumentedGroup, PartialInstrumentedCmd
+from meltano.core.tracking.contexts import CliEvent
 
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 

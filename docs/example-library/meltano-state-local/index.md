@@ -1,6 +1,6 @@
 # Using the local filesystem as a state backend
 
-To begin, download or copy the [meltano.yml](/docs/example-library/meltano-s3/meltano.yml) to an empty directory and run:
+To begin, download or copy the [meltano.yml](/docs/example-library/meltano-state-local/meltano.yml) to an empty directory and run:
 
 ```shell
 meltano install

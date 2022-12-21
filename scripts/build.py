@@ -18,7 +18,7 @@ import subprocess
 from warnings import warn
 
 
-def build_webapp() -> None:  # noqa: WPS213
+def build_webapp() -> None:
     """Build the Meltano UI webapp."""
     warning_prefix = "Failed to build Meltano UI webapp:"
 
@@ -45,7 +45,9 @@ def build_webapp() -> None:  # noqa: WPS213
     subprocess.run(("yarn", "install", "--immutable"), cwd="src/webapp")
     subprocess.run(("yarn", "build"), cwd="src/webapp")
 
-    # Copy static files
+
+def include_webapp() -> None:
+    """Copy the built webapp into the source tree."""
     os.makedirs("src/meltano/api/templates", exist_ok=True)
     shutil.copy(
         "src/webapp/dist/index.html",
@@ -64,7 +66,7 @@ def build_webapp() -> None:  # noqa: WPS213
 
 
 def include_schemas() -> None:
-    """Copy Meltano schemas into the wheel."""
+    """Copy Meltano schemas into the source tree."""
     shutil.rmtree("src/meltano/schema/", ignore_errors=True)
     shutil.copytree("schema/", "src/meltano/schema/")
     # TODO: Once Python 3.7 support is dropped, we should use
@@ -88,6 +90,7 @@ def custom_build_wheel(*args, **kwargs) -> str:
         The value returned by `WheelBuilder.build(*args, **kwargs)`.
     """
     build_webapp()
+    include_webapp()
     include_schemas()
     return original_wheel_build(*args, **kwargs)
 

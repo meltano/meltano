@@ -15,7 +15,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 
 EXIT_CODE_OK = 0
 
-T = TypeVar("T")  # noqa: WPS111
+T = TypeVar("T", bound="ValidationsRunner")  # noqa: WPS111
 
 
 class ValidationOutcome(str, Enum):

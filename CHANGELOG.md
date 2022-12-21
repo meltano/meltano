@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.12.0 (2022-12-19)
+
+### 🐛 Fixes
+
+- [#7093](https://github.com/meltano/meltano/issues/7093) Add missing description to environment context schema
+- [#7084](https://github.com/meltano/meltano/issues/7084) Display better errors when failing to connect with the Hub API
+- [#7078](https://github.com/meltano/meltano/issues/7078) Remove explicit aliases for S3 state backend
+
+### ⚡ Performance Improvements
+
+- [#7091](https://github.com/meltano/meltano/issues/7091) Compile env var pattern only once
+
+### 📚 Documentation Improvements
+
+- [#7089](https://github.com/meltano/meltano/issues/7089) Fix typo `tap-postgres` -> `postgres` -- _**Thanks @visch!**_
+- [#7090](https://github.com/meltano/meltano/issues/7090) Fix config name for poetry -- _**Thanks @adherr!**_
+- [#7088](https://github.com/meltano/meltano/issues/7088) Update banner copy & cta
+
 ## v2.11.1 (2022-12-09)
 
 ### 🐛 Fixes

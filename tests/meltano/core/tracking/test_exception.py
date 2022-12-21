@@ -12,8 +12,8 @@ from typing import Any
 import pytest
 from jsonschema import ValidationError, validate
 
-from meltano.core.tracking import ExceptionContext
 from meltano.core.tracking import __file__ as tracking_module_path
+from meltano.core.tracking.contexts import ExceptionContext
 from meltano.core.utils import hash_sha256
 
 THIS_FILE_BASENAME = Path(__file__).name
@@ -99,12 +99,15 @@ def test_complex_exception_context():
         )
 
     line_nums: list[int] = []
+    file_not_found_error = None
 
     def _function_to_deepen_traceback() -> None:
         try:
             line_nums.append(1 + inspect.currentframe().f_lineno)
             Path("/tmp/fake/path/will/not/resolve").resolve(strict=True)  # noqa: S108
         except Exception as ex:
+            nonlocal file_not_found_error
+            file_not_found_error = ex
             line_nums.append(1 + inspect.currentframe().f_lineno)
             raise ValueError("that path was a bad value") from ex
 
@@ -127,14 +130,8 @@ def test_complex_exception_context():
 
     assert cause == context
     assert cause["type"] == "FileNotFoundError"
-    assert (
-        cause["str_hash"]
-        == "8604732e6dd06fbcccf2f97979f6ec308a21b6b253fd42de5cf79a0b758155d0"
-    )
-    assert (
-        cause["repr_hash"]
-        == "b4f0f46612e4904b5c3861b2596331b62edf2b82ba33aba8d8a3bc19741e587e"
-    )
+    assert cause["str_hash"] == hash_sha256(str(file_not_found_error))
+    assert cause["repr_hash"] == hash_sha256(repr(file_not_found_error))
     assert cause["traceback"][0] == {
         "file": f".../{THIS_FILE_BASENAME}",
         "line_number": line_nums[1],

@@ -9,6 +9,9 @@
     "version": {
       "const": 1
     },
+    "annotations": {
+      "$ref": "#/definitions/annotations"
+    },
     "default_environment": {
       "type": "string",
       "description": "A default environment to be used when one is not present as an argument or as an environment variable."
@@ -173,6 +176,16 @@
     }
   },
   "definitions": {
+    "annotations": {
+      "type": "object",
+      "description": "Arbitrary annotations keyed by tool/vendor name - not processed by the core Meltano library or CLI",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
     "plugins": {
       "plugin_generic": {
         "type": "object",

@@ -22,7 +22,8 @@ from meltano.core.task_sets_service import (
     JobNotFoundError,
     TaskSetsService,
 )
-from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 logger = structlog.getLogger(__name__)
 
