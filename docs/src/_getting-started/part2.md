@@ -43,22 +43,23 @@ The container will need a few seconds to initialize. You can test the connection
 - password: password
 
 ## Add the postgres loader
-Add the postgres loader using the `meltano add loader target-postgres` command.
+Add the postgres loader using the `meltano add loader target-postgres --variant=meltanolabs` command.
 
 <div class="termy">
 
 ```console
 $ meltano add loader target-postgres --variant=meltanolabs
 Added loader 'target-postgres' to your Meltano project
-Variant:        transferwise (default)
-Repository:     https://github.com/transferwise/pipelinewise-target-postgres
-Documentation:  https://hub.meltano.com/loaders/target-postgres
+Variant:        meltanolabs (default)
+Repository:     https://github.com/MeltanoLabs/target-postgres
+Documentation:  https://hub.meltano.com/loaders/target-postgres--meltanolabs
 
 Installing loader 'target-postgres'...
 ---> 100%
+
 Installed loader 'target-postgres'
 
-To learn more about loader 'target-postgres', visit https://hub.meltano.com/loaders/target-postgres
+To learn more about loader 'target-postgres', visit https://hub.meltano.com/loaders/target-postgres--meltanolabs
 ```
 </div>
 <br />
