@@ -526,7 +526,6 @@ module = [
   "meltano.core.plugin_invoker",
   "meltano.core.plugin_location_remove",
   "meltano.core.plugin_lock_service",
-  "meltano.core.plugin_remove_service",
   "meltano.core.plugin_test_service",
   "meltano.core.project",
   "meltano.core.project_add_service",
