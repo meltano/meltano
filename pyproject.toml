@@ -540,7 +540,6 @@ module = [
   "meltano.core.settings_service",
   "meltano.core.settings_store",
   "meltano.core.sqlalchemy",
-  "meltano.core.state_service",
   "meltano.core.task_sets",
   "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
