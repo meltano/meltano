@@ -91,6 +91,17 @@ def test_expand_env_vars():
     assert expand_env_vars("${ENV_VAR}", env) == "substituted"
     assert expand_env_vars("$ENV_VAR", env) == "substituted"
 
+    with pytest.raises(ValueError):
+        expand_env_vars("", {}, raise_if_missing=True, ignore_if_missing=True)
+
+    assert expand_env_vars("$ENV_VAR", {}) == ""
+    assert expand_env_vars("$ENV_VAR", {}, ignore_if_missing=True) == "${ENV_VAR}"
+    assert expand_env_vars("${ENV_VAR}", {}, ignore_if_missing=True) == "${ENV_VAR}"
+    assert (
+        expand_env_vars("prefix-${ENV_VAR}-suffix", {}, ignore_if_missing=True)
+        == "prefix-${ENV_VAR}-suffix"
+    )
+
 
 def test_expand_env_vars_nested():
     input_dict = {
