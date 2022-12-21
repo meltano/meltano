@@ -514,7 +514,6 @@ module = [
   "meltano.core.db",
   "meltano.core.discovery_file",
   "meltano.core.elt_context",
-  "meltano.core.environment",
   "meltano.core.environment_service",
   "meltano.core.extract_utils",
   "meltano.core.extractor",
