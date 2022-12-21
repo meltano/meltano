@@ -1,20 +1,12 @@
 """Plugin Add CLI."""
+
 from __future__ import annotations
 
 import click
 
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.base import PluginRef
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project import Project
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
-
-from . import cli
-from .params import pass_project
-from .utils import (
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
     add_plugin,
@@ -22,9 +14,20 @@ from .utils import (
     check_dependencies_met,
     install_plugins,
 )
+from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project import Project
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.project_plugins_service import ProjectPluginsService
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 
-@cli.command(cls=PartialInstrumentedCmd, short_help="Add a plugin to your project.")
+@cli.command(  # noqa: WPS238
+    cls=PartialInstrumentedCmd,
+    short_help="Add a plugin to your project.",
+)
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_name", nargs=-1, required=True)
 @click.option(
@@ -52,6 +55,11 @@ from .utils import (
     is_flag=True,
     help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
 )
+@click.option(
+    "--no-install",
+    is_flag=True,
+    help="Do not install the plugin after adding it to the project.",
+)
 @pass_project()
 @click.pass_context
 def add(  # noqa: WPS238
@@ -59,9 +67,9 @@ def add(  # noqa: WPS238
     project: Project,
     plugin_type: str,
     plugin_name: str,
-    inherit_from: str = None,
-    variant: str = None,
-    as_name: str = None,
+    inherit_from: str | None = None,
+    variant: str | None = None,
+    as_name: str | None = None,
     **flags,
 ):
     """
@@ -69,8 +77,7 @@ def add(  # noqa: WPS238
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
     """
-    tracker = ctx.obj["tracker"]
-    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     plugin_type = PluginType.from_cli_argument(plugin_type)
     plugin_names = plugin_name  # nargs=-1
@@ -126,8 +133,6 @@ def add(  # noqa: WPS238
             tracker.track_command_event(CliEvent.aborted)
             raise
 
-        legacy_tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin)
-
         required_plugins = add_required_plugins(
             project, plugins, add_service=add_service
         )
@@ -137,11 +142,12 @@ def add(  # noqa: WPS238
     )
     tracker.track_command_event(CliEvent.inflight)
 
-    success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
+    if not flags.get("no_install"):
+        success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
 
-    if not success:
-        tracker.track_command_event(CliEvent.failed)
-        raise CliError("Failed to install plugin(s)")
+        if not success:
+            tracker.track_command_event(CliEvent.failed)
+            raise CliError("Failed to install plugin(s)")
 
     _print_plugins(plugins)
     tracker.track_command_event(CliEvent.completed)

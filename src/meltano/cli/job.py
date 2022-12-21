@@ -1,11 +1,20 @@
 """Job management CLI."""
+
+from __future__ import annotations
+
 import json
 
 import click
 import structlog
 
+from meltano.cli import CliError, cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    InstrumentedGroup,
+    PartialInstrumentedCmd,
+)
 from meltano.core.block.parser import BlockParser, validate_block_sets
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
@@ -13,11 +22,8 @@ from meltano.core.task_sets_service import (
     JobNotFoundError,
     TaskSetsService,
 )
-from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
-
-from . import CliError, cli
-from .params import pass_project
-from .utils import InstrumentedGroup, PartialInstrumentedCmd
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 logger = structlog.getLogger(__name__)
 
@@ -50,8 +56,6 @@ def _list_single_job(
         click.echo(
             json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2)
         )
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_job("list", job_name)
     tracker.track_command_event(CliEvent.completed)
 
 
@@ -67,10 +71,7 @@ def _list_all_jobs(
         task_sets_service: The task sets service to use.
         list_format: The format to use.
     """
-    if list_format == "text":
-        for task_set in task_sets_service.list():
-            click.echo(f"{task_set.name}: {task_set.tasks}")
-    elif list_format == "json":
+    if list_format == "json":
         click.echo(
             json.dumps(
                 {
@@ -82,13 +83,18 @@ def _list_all_jobs(
                 indent=2,
             )
         )
+    elif list_format == "text":
+        for task_set in task_sets_service.list():
+            click.echo(f"{task_set.name}: {task_set.tasks}")
     tracker: Tracker = ctx.obj["tracker"]
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_job("list")
     tracker.track_command_event(CliEvent.completed)
 
 
-@cli.group(cls=InstrumentedGroup, short_help="Manage jobs.")
+@cli.group(
+    cls=InstrumentedGroup,
+    short_help="Manage jobs.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
+)
 @click.pass_context
 @pass_project(migrate=True)
 def job(project, ctx):
@@ -195,8 +201,6 @@ def add(ctx, job_name: str, raw_tasks: str):
 
     click.echo(f"Added job {task_sets.name}: {task_sets.tasks}")
 
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_job("add", job_name)
     tracker.track_command_event(CliEvent.completed)
 
 
@@ -231,9 +235,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """
     tracker: Tracker = ctx.obj["tracker"]
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-
-    project = ctx.obj["project"]
+    project: Project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
     task_sets = tasks_from_yaml_str(job_name, raw_tasks)
@@ -252,8 +254,6 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
         return
 
     click.echo(f"Updated job {task_sets.name}: {task_sets.tasks}")
-
-    legacy_tracker.track_meltano_job("set", job_name)
     tracker.track_command_event(CliEvent.completed)
 
 
@@ -270,8 +270,6 @@ def remove(ctx, job_name: str):  # noqa: WPS442
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     task_sets = task_sets_service.remove(job_name)
     click.echo(f"Removed job '{task_sets.name}'.")
-    legacy_tracker: LegacyTracker = ctx.obj["legacy_tracker"]
-    legacy_tracker.track_meltano_job("remove", job_name)
     tracker.track_command_event(CliEvent.completed)
 
 

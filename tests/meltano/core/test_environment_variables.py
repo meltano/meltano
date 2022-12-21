@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import platform
 from typing import NamedTuple
 
@@ -5,13 +7,15 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
+from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 class EnvVarResolutionExpectation(NamedTuple):
     expected_env_values: dict
     meltanofile_updates: dict = {}
     terminal_env: dict = {}
-    xfail: bool = False
 
 
 def _meltanofile_update_dict(
@@ -98,7 +102,7 @@ def _meltanofile_update_dict(
                     }
                 },
                 "env": {
-                    "INDIRECTED_ENV_VAR": "environment_level_plugin_config_indrected"
+                    "INDIRECTED_ENV_VAR": "environment_level_plugin_config_indirected"
                 },
             }
         )
@@ -111,8 +115,6 @@ def _meltanofile_update_dict(
 
 _terminal_env_var = {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"}
 
-# Test cases with xfail=True should be resolved to pass
-# as part of this issue: https://github.com/meltano/meltano/issues/5982
 _env_var_resolution_expectations = {
     # Check that envs at each level override terminal
     "00 Terminal environment": EnvVarResolutionExpectation(
@@ -164,25 +166,22 @@ _env_var_resolution_expectations = {
             environment_level_plugin_env=True,
         ),
     ),
-    # Original xfail'ing tests, as per comment above
     "10 Top-level plugin setting (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "terminal_env"},
         _meltanofile_update_dict(top_level_plugin_setting=True),
         _terminal_env_var,
-        xfail=True,
     ),
     "11 Top-level plugin config (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_config"},
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
             top_level_plugin_config=True,
         ),
         _terminal_env_var,
-        xfail=True,
     ),
     "12 Environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config"},
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
@@ -190,48 +189,32 @@ _env_var_resolution_expectations = {
             environment_level_plugin_config=True,
         ),
         _terminal_env_var,
-        xfail=True,
     ),
-    "13 Set in indirected environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config_indrected"},
-        _meltanofile_update_dict(
-            environment_level_env=True,
-            top_level_plugin_setting=True,
-            top_level_plugin_config=True,
-            environment_level_plugin_config=True,
-            environment_level_plugin_config_indirected=True,
-        ),
-        _terminal_env_var,
-        xfail=True,
-    ),
-    "14 Top-level plugin setting": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_setting"},
+    "13 Top-level plugin setting": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True, top_level_plugin_setting=True
         ),
-        xfail=True,
     ),
-    "15 Set in top-level plugin config": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "top_level_plugin_config"},
+    "14 Set in top-level plugin config": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
             top_level_plugin_config=True,
         ),
-        xfail=True,
     ),
-    "16 Environment-level plugin config": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config"},
+    "15 Environment-level plugin config": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
             top_level_plugin_config=True,
             environment_level_plugin_config=True,
         ),
-        xfail=True,
     ),
-    "17 Set in indirected environment-level plugin config": EnvVarResolutionExpectation(
-        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config_indrected"},
+    "16 Set in indirected environment-level plugin config": EnvVarResolutionExpectation(
+        {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_config_indirected"},
         _meltanofile_update_dict(
             environment_level_env=True,
             top_level_plugin_setting=True,
@@ -262,14 +245,9 @@ class TestEnvVarResolution:
         for key, val in env_var_resolution_expectation.terminal_env.items():
             monkeypatch.setenv(key, val)
 
-        if env_var_resolution_expectation.xfail:
-            pytest.xfail(
-                "This expected environment variable resolution behavior is currently failing."
-            )
         args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():
-            args.append("--print-var")
-            args.append(key)
+            args.extend(("--print-var", key))
         args.append("test-env-var-resolution")
         result = cli_runner.invoke(cli, args)
         assert_cli_runner(result)
@@ -280,90 +258,141 @@ class TestEnvVarResolution:
             ]
         )
 
-    @pytest.mark.xfail
-    def test_environment_variable_inheritance(self, cli_runner, project, monkeypatch):
-        # This test will be resolved to pass as part of
-        # this issue: https://github.com/meltano/meltano/issues/5983
-        monkeypatch.setenv("STACKED", "1")
-        with project.meltano_update() as meltanofile:
-            meltanofile.update(
-                {
-                    "env": "${STACKED}2",
-                    "plugins": {
-                        "utilities": [
-                            {
-                                "name": "test-environment-inheritance",
-                                "namespace": "test_environment_inheritance",
-                                "executable": "pwd",
-                                "env": "${STACKED}4",
-                            }
-                        ],
-                    },
-                    "environments": [
+
+def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
+    # This test will be resolved to pass as part of
+    # this issue: https://github.com/meltano/meltano/issues/5983
+    monkeypatch.setenv("STACKED", "1")
+    with project.meltano_update() as meltanofile:
+        meltanofile.update(
+            {
+                "env": {"STACKED": "${STACKED}2"},
+                "plugins": {
+                    "utilities": [
                         {
-                            "name": "dev",
-                            "env": {"STACKED": "${STACKED}3"},
-                            "config": {
-                                "plugins": {
-                                    "utilities": [
-                                        {
-                                            "name": "test-environment-inheritance",
-                                            "env": {"STACKED": "${STACKED}5"},
-                                        }
-                                    ]
-                                }
-                            },
+                            "name": "test-environment-inheritance",
+                            "namespace": "test_environment_inheritance",
+                            "executable": "pwd",
+                            "env": {"STACKED": "${STACKED}4"},
                         }
                     ],
                 },
-            )
-        result = cli_runner.invoke(
-            cli,
-            [
-                "invoke",
-                "--print-var",
-                "STACKED",
-                "test-environment-inheritance",
-            ],
-        )
-        assert_cli_runner(result)
-        assert result.stdout.strip() == "STACKED=12345"
-
-    @pytest.mark.xfail
-    def test_environment_variable_inheritance_meltano_env_only(
-        self, cli_runner, project, monkeypatch
-    ):
-        # This test will be resolved to pass as part of
-        # this issue: https://github.com/meltano/meltano/issues/5983
-        monkeypatch.setenv("STACKED", "1")
-        with project.meltano_update() as meltanofile:
-            meltanofile.update(
-                {
-                    "plugins": {
-                        "utilities": [
-                            {
-                                "name": "test-environment-inheritance",
-                                "namespace": "test_environment_inheritance",
-                                "executable": "pwd",
+                "environments": [
+                    {
+                        "name": "dev",
+                        "env": {"STACKED": "${STACKED}3"},
+                        "config": {
+                            "plugins": {
+                                "utilities": [
+                                    {
+                                        "name": "test-environment-inheritance",
+                                        "env": {"STACKED": "${STACKED}5"},
+                                    }
+                                ]
                             }
-                        ],
-                    },
-                    "environments": [
-                        {
-                            "name": "dev",
-                            "env": {"STACKED": "${STACKED}2"},
                         },
+                    }
+                ],
+            },
+        )
+    result = cli_runner.invoke(
+        cli,
+        [
+            "invoke",
+            "--print-var",
+            "STACKED",
+            "test-environment-inheritance",
+        ],
+    )
+    assert_cli_runner(result)
+    assert result.stdout.strip() == "STACKED=12345"
+
+
+def test_environment_variable_inheritance_meltano_env_only(
+    cli_runner, project, monkeypatch
+):
+    # This test will be resolved to pass as part of
+    # this issue: https://github.com/meltano/meltano/issues/5983
+    monkeypatch.setenv("STACKED", "1")
+    with project.meltano_update() as meltanofile:
+        meltanofile.update(
+            {
+                "plugins": {
+                    "utilities": [
+                        {
+                            "name": "test-environment-inheritance",
+                            "namespace": "test_environment_inheritance",
+                            "executable": "pwd",
+                        }
                     ],
                 },
-            )
-        result = cli_runner.invoke(
-            cli,
-            [
-                "invoke",
-                "--print-var",
-                "STACKED",
-                "test-environment-inheritance",
-            ],
+                "environments": [
+                    {
+                        "name": "dev",
+                        "env": {"STACKED": "${STACKED}2"},
+                    },
+                ],
+            },
         )
-        assert_cli_runner(result)
-        assert result.stdout.strip() == "STACKED=12"
+    result = cli_runner.invoke(
+        cli,
+        [
+            "invoke",
+            "--print-var",
+            "STACKED",
+            "test-environment-inheritance",
+        ],
+    )
+    assert_cli_runner(result)
+    assert result.stdout.strip() == "STACKED=12"
+
+
+def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
+    project_settings_service = ProjectSettingsService(project)
+    project_settings_service.set(
+        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+    )
+    with project.meltano_update() as meltanofile:
+        meltanofile.update(_meltanofile_update_dict())
+        meltanofile.update({"env": {"some_var": "$NONEXISTENT"}})
+    result = cli_runner.invoke(
+        cli,
+        [
+            "invoke",
+            "--print-var",
+            "STACKED",
+            "test-env-var-resolution",
+        ],
+    )
+    assert isinstance(result.exception, EnvironmentVariableNotSetError)
+    assert (
+        result.exception.reason
+        == "Environment variable 'NONEXISTENT' referenced but not set"
+    )
+    assert result.exception.instruction == "Make sure the environment variable is set"
+
+
+def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
+    project_settings_service = ProjectSettingsService(project)
+    project_settings_service.set(
+        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+    )
+    with project.meltano_update() as meltanofile:
+        meltanofile.update(_meltanofile_update_dict())
+        meltanofile.update({"env": {"some_var": "some_${NONEXISTENT}_value"}})
+    result = cli_runner.invoke(
+        cli,
+        [
+            "invoke",
+            "--print-var",
+            "STACKED",
+            "test-env-var-resolution",
+        ],
+    )
+    exception = result.exception
+    assert isinstance(exception, EnvironmentVariableNotSetError)
+    assert (
+        result.exception.reason
+        == "Environment variable 'NONEXISTENT' referenced but not set"
+    )
+    assert result.exception.instruction == "Make sure the environment variable is set"

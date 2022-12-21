@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from structlog.stdlib import get_logger
 
-from .container_spec import ContainerSpec
+from meltano.core.container.container_spec import ContainerSpec
 
 if TYPE_CHECKING:
     from aiodocker.containers import DockerContainer
@@ -35,7 +35,7 @@ class ContainerService:
         spec: ContainerSpec,
         name: str,
         *,
-        env: dict = None,
+        env: dict | None = None,
         pull: bool = False,
     ) -> dict:
         """Run a Docker container.

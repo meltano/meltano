@@ -27,6 +27,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-algolia
   - jekyll-redirect-from
+  - jekyll-tabs
 
 # Default plugin configuration
 defaults:
@@ -37,26 +38,30 @@ defaults:
 
 # Every top level section is actually a collection. Their files are in a _folder in src/
 collections:
+  getting-started:
+    output: true
+    name: "Getting Started"
+    weight: 1
   guide:
     output: true
     name: "Guides"
-    weight: 1
+    weight: 2
   concepts:
     output: true
     name: "Concepts"
-    weight: 2
+    weight: 3
   tutorials:
     output: true
     name: "Tutorials"
-    weight: 3
+    weight: 4
   reference:
     output: true
     name: "Reference"
-    weight: 4
+    weight: 5
   contribute:
     output: true
     name: "Contribute"
-    weight: 5
+    weight: 6
   posts:
     output: false
 
@@ -83,6 +88,6 @@ algolia:
 # Set display to true/false to toggle announcements on/off
 announcement:
   display: true
-  text: Meltano v2.0 is here!
-  cta: Read about the release on our blog.
-  cta-link: https://meltano.com/blog/meet-meltano-2-0/
+  text: For every star on GitHub, we'll donate $2 to clean up our waterways.
+  cta: Star us now!
+  cta-link: https://github.com/meltano/meltano/

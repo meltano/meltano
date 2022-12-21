@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
@@ -7,6 +9,7 @@ from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import find_named
 
 
+@pytest.mark.order(0)
 class TestPluginDefinition:
     ATTRS = {
         "minimal": {"name": "tap-example", "namespace": "tap_example"},
@@ -19,6 +22,8 @@ class TestPluginDefinition:
             "repo": "https://gitlab.com/meltano/tap-example",
             "foo": "bar",
             "baz": "qux",
+            "description": "tap-example description",
+            "logo_url": "path/to/tap_example_logo.jpg",
             "requires": {
                 "files": [
                     {
@@ -271,6 +276,14 @@ class TestProjectPlugin:
             "name": "tap-example-foo",
             "inherit_from": "tap-example",
             "variant": "meltano",
+        },
+        "complex_pip_url": {
+            "name": "tap-example",
+            "pip_url": (
+                "--only-binary "
+                "-i https://${PYPI_USER}:$PYPI_PASS@pypi.example.com/simple "
+                "tap-example --pre"
+            ),
         },
     }
 

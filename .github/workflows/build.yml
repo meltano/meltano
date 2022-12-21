@@ -13,18 +13,18 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.2.0
 
     - name: Setup Poetry
       uses: snok/install-poetry@v1
       with:
         # Version of Poetry to use
-        version: 1.1.13
+        version: 1.2.2
         virtualenvs-create: true
         virtualenvs-in-project: true
 
     - name: Set up Python
-      uses: actions/setup-python@v4.1.0
+      uses: actions/setup-python@v4.3.1
       with:
         # https://github.com/actions/setup-python
         python-version: 3.9
@@ -36,18 +36,22 @@ jobs:
       run: |
         version=$(poetry version | awk '{print $2}')
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
-        if [ "v$version" != $tag ]; then echo "Release tag and package version do not match!"; exit 1; fi;
+        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and poetry version ('v$version') do not match!"; exit 1; fi;
 
     - name: Poetry install
       run: |
         poetry install
 
     - name: Setup Node
-      uses: actions/setup-node@v3.4.1
+      uses: actions/setup-node@v3.5.1
       with:
-        node-version: '14'
+        node-version: '16'
         cache: 'yarn'
         cache-dependency-path: src/webapp/yarn.lock
+
+    - name: Freeze DB
+      run: |
+        poetry run scripts/alembic_freeze.py
 
     - name: Release Marker
       if: ${{ github.event.release }}
@@ -56,13 +60,13 @@ jobs:
 
     - name: Build distribution
       run: |
-        poetry run scripts/alembic_freeze.py
-        poetry build
+        poetry build --format sdist
+        poetry run pip wheel --no-deps . --wheel-dir dist/
 
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.1
       with:
         name: python-artifacts
         path: 'dist/*'
@@ -73,10 +77,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.2.0
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3.0.0
+      uses: actions/download-artifact@v3.0.1
       with:
         name: python-artifacts
         path: dist/
@@ -97,7 +101,7 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.5.1
+      uses: pypa/gh-action-pypi-publish@v1.6.4
       with:
         user: __token__
         password: ${{ secrets.PYPI_SECRET_TOKEN }}

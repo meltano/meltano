@@ -7,17 +7,16 @@ from typing import TYPE_CHECKING
 import click
 import structlog
 
+from meltano.cli import CliError, cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import PartialInstrumentedCmd
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
     PluginLockService,
 )
 from meltano.core.project_plugins_service import DefinitionSource, ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
-
-from . import CliError, cli
-from .params import pass_project
-from .utils import PartialInstrumentedCmd
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if TYPE_CHECKING:
     from meltano.core.project import Project

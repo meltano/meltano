@@ -32,8 +32,12 @@ if PYTEST_BACKEND == "sqlite":
     pytest_plugins.append("fixtures.db.sqlite")
 elif PYTEST_BACKEND == "postgresql":
     pytest_plugins.append("fixtures.db.postgresql")
+elif PYTEST_BACKEND == "mssql":
+    pytest_plugins.append("fixtures.db.mssql")
 else:
     raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")
+
+BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
 def pytest_runtest_setup(item):
@@ -57,6 +61,10 @@ def concurrency():
 
 
 class MockAdapter(BaseAdapter):
+    RETURN_500 = {
+        "/extractors/this-returns-500--original": {"error": "Server error"},
+    }
+
     def _process_discovery(self, api_url: str, discovery: dict) -> dict:
         hub = {}
         for plugin_type in PluginType:
@@ -133,6 +141,17 @@ class MockAdapter(BaseAdapter):
         self.count = Counter()
         self._mapping = self._process_discovery(api_url, deepcopy(discovery))
 
+        # Special cases
+        self._mapping["/extractors/index"]["this-returns-500"] = {
+            "default_variant": "original",
+            "logo_url": "https://mock.meltano.com/this-returns-500.png",
+            "variants": {
+                "original": {
+                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original"
+                }
+            },
+        }
+
     def send(
         self,
         request: requests.PreparedRequest,
@@ -143,8 +162,17 @@ class MockAdapter(BaseAdapter):
         proxies: Mapping[str, str] | None = None,
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
+
         response = requests.Response()
         response.request = request
+        response.url = request.url
+
+        response_500 = self.RETURN_500.get(endpoint)
+        if response_500:
+            response.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+            response.reason = "Internal Server Error"
+            response._content = json.dumps(response_500).encode()
+            return response
 
         try:
             data = self._mapping[endpoint]

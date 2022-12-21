@@ -1,4 +1,6 @@
 """Flask app for Meltano UI."""
+from __future__ import annotations
+
 import importlib
 import logging
 from urllib.parse import urlsplit
@@ -86,14 +88,14 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
 
     # 3) Register the controllers
 
-    from .controllers.orchestrations import orchestrationsBP
-    from .controllers.plugins import pluginsBP
+    from .controllers.orchestrations import orchestrations_bp
+    from .controllers.plugins import plugins_bp
     from .controllers.root import api_root, root
-    from .controllers.settings import settingsBP
+    from .controllers.settings import settings_bp
 
-    app.register_blueprint(settingsBP)
-    app.register_blueprint(orchestrationsBP)
-    app.register_blueprint(pluginsBP)
+    app.register_blueprint(settings_bp)
+    app.register_blueprint(orchestrations_bp)
+    app.register_blueprint(plugins_bp)
     app.register_blueprint(root)
     app.register_blueprint(api_root)
 
@@ -111,8 +113,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     else:
         logger.debug("Notifications are disabled.")
 
-    # Google Analytics setup
-
     @app.before_request
     def setup_js_context():
         # setup the appUrl
@@ -124,8 +124,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         setting_map = {
             "isSendAnonymousUsageStats": "send_anonymous_usage_stats",
             "projectId": "project_id",
-            "trackingID": "tracking_ids.ui",
-            "embedTrackingID": "tracking_ids.ui_embed",
             "isProjectReadonlyEnabled": "project_readonly",
             "isReadonlyEnabled": "ui.readonly",
             "isAnonymousReadonlyEnabled": "ui.anonymous_readonly",

@@ -28,7 +28,7 @@ class AutomaticPackageUpgradeError(Exception):
     def __init__(self, reason: str, instructions: str):
         """Initialize the `AutomaticPackageUpgradeError`.
 
-        Parameters:
+        Args:
             reason: The reason the exception occured.
             instructions: Instructions for how to manually resolve the exception.
         """
@@ -42,7 +42,7 @@ class UpgradeService:
     def __init__(self, engine: Engine, project: Project):
         """Initialize the Meltano upgrade service.
 
-        Parameters:
+        Args:
             engine: The SQLAlchemy engine to be used for the upgrade.
             project: The Meltano project.
         """
@@ -66,20 +66,28 @@ class UpgradeService:
             logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
     def _upgrade_package(self, pip_url: str | None, force: bool) -> bool:
+        fail_reason = None
+        instructions = ""
+
         meltano_file_path = "/src/meltano/__init__.py"
         editable = meltano.__file__.endswith(meltano_file_path)
         if editable and not force:
             meltano_dir = meltano.__file__[: -len(meltano_file_path)]
-            raise AutomaticPackageUpgradeError(
-                reason="it is installed from source",
-                instructions=f"navigate to `{meltano_dir}` and run `git pull`",
-            )
+            fail_reason = "it is installed from source"
+            instructions = f"navigate to `{meltano_dir}` and run `git pull`"
 
-        in_docker = os.path.exists("/.dockerenv")
-        if in_docker:
+        elif os.path.exists("/.dockerenv"):
+            fail_reason = "it is installed inside Docker"
+            instructions = "pull the latest Docker image using `docker pull meltano/meltano` and recreate any containers you may have created"
+
+        elif os.getenv("NOX_CURRENT_SESSION") == "tests":
+            fail_reason = "it is installed inside a Nox test session"
+            instructions = ""
+
+        if fail_reason:
             raise AutomaticPackageUpgradeError(
-                reason="it is installed inside Docker",
-                instructions="pull the latest Docker image using `docker pull meltano/meltano` and recreate any containers you may have created",
+                reason=fail_reason,
+                instructions=instructions,
             )
 
         pip_url = pip_url or "meltano"
@@ -97,7 +105,7 @@ class UpgradeService:
     def upgrade_package(self, pip_url: str | None = None, force: bool = False) -> bool:
         """Upgrade the Meltano package.
 
-        Parameters:
+        Args:
             pip_url: The pip URL to use when upgrading the Meltano package.
             force: Whether editable installations from source should be overwritten.
 
@@ -112,7 +120,8 @@ class UpgradeService:
             click.echo(
                 f"{click.style('The `meltano` package could not be upgraded automatically', fg='red')} because {err.reason}."
             )
-            click.echo(f"To upgrade manually, {err.instructions}.")
+            if err.instructions:
+                click.echo(f"To upgrade manually, {err.instructions}.")
             return False
 
         click.echo("The `meltano` package has been upgraded.")
@@ -153,7 +162,7 @@ class UpgradeService:
     def upgrade(self, skip_package: bool = False, **kwargs):
         """Upgrade Meltano.
 
-        Parameters:
+        Args:
             skip_package: Whether the Meltano package should be upgraded.
             kwargs: Keyword arguments for `UpgradeService.upgrade_package`.
         """

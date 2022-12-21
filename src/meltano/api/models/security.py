@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 from flask_security import RoleMixin, UserMixin
 
 from . import db
 
+DEFAULT_VARCHAR_LENGTH = 255
+NAME_LENGTH = 80
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True, index=True)
-    email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
+    username = db.Column(db.String(DEFAULT_VARCHAR_LENGTH), unique=True, index=True)
+    email = db.Column(db.String(DEFAULT_VARCHAR_LENGTH), unique=True)
+    password = db.Column(db.String(DEFAULT_VARCHAR_LENGTH))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
     last_login_at = db.Column(db.DateTime(), nullable=True)
@@ -44,7 +49,8 @@ class RolePermissions(db.Model):
     context = db.Column(db.String())
     role = db.relationship("Role", backref="permissions")
 
-    def canonical(self, scopes=[]):
+    def canonical(self, scopes=None):
+        scopes = [] if scopes is None else scopes
         canonical = {
             "role_id": self.role_id,
             "type": self.type,
@@ -59,8 +65,8 @@ class RolePermissions(db.Model):
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
+    name = db.Column(db.String(NAME_LENGTH), unique=True)
+    description = db.Column(db.String(DEFAULT_VARCHAR_LENGTH))
 
     def __eq__(self, other):
         if isinstance(other, Role):

@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'PromoBanner'
+  name: 'PromoBanner',
 }
 </script>
 

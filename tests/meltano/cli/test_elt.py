@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import platform
-from typing import List, Optional
 
 import pytest
 import structlog
@@ -10,7 +11,6 @@ from mock import AsyncMock, mock
 from asserts import assert_cli_runner
 from meltano.cli import CliError, cli
 from meltano.core.job import Job, State
-from meltano.core.legacy_tracking import LegacyTracker
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -23,11 +23,11 @@ from meltano.core.runner.singer import SingerRunner
 class LogEntry:
     def __init__(
         self,
-        name: Optional[str] = None,
-        cmd_type: Optional[str] = None,
-        event: Optional[str] = None,
-        level: Optional[str] = None,
-        stdio: Optional[str] = None,
+        name: str | None = None,
+        cmd_type: str | None = None,
+        event: str | None = None,
+        level: str | None = None,
+        stdio: str | None = None,
     ):
         """Logentries is a simple support class for checking whether a log entry is in a list of dicts.
 
@@ -44,7 +44,7 @@ class LogEntry:
         self.level = level
         self.stdio = stdio
 
-    def matches(self, lines: List[dict]) -> bool:
+    def matches(self, lines: list[dict]) -> bool:
         """Find a matching log line in the provided list of log lines.
 
         It's important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
@@ -86,7 +86,7 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
     Returns:
         bool: Whether or not the exception was found
     """
-    seen_lines: List[dict] = []
+    seen_lines: list[dict] = []
     for line in result_output.splitlines():
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
@@ -98,8 +98,8 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
     return False
 
 
-def assert_log_lines(result_output: str, expected: List[LogEntry]):
-    seen_lines: List[dict] = []
+def assert_log_lines(result_output: str, expected: list[LogEntry]):
+    seen_lines: list[dict] = []
     for line in result_output.splitlines():
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
@@ -224,13 +224,11 @@ class TestWindowsELT:
         reason="Test is only for Windows",
     )
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_windows(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         tap,
@@ -252,13 +250,11 @@ class TestWindowsELT:
 )
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -341,13 +337,11 @@ class TestCliEltScratchpadOne:
             assert "Exception: This is a grave danger." in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_debug_logging(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -453,13 +447,11 @@ class TestCliEltScratchpadOne:
             assert "tap-mock (out)" in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_tap_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -520,13 +512,11 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_target_failure_before_tap_finishes(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -605,13 +595,11 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_target_failure_after_tap_finishes(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -672,13 +660,11 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_tap_and_target_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -748,13 +734,11 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_tap_line_length_limit_error(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -823,13 +807,11 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_output_handler_error(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1045,13 +1027,11 @@ class TestCliEltScratchpadOne:
 )
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_transform_run(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1114,13 +1094,11 @@ class TestCliEltScratchpadTwo:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_transform_run_dbt_failure(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1216,13 +1194,11 @@ class TestCliEltScratchpadTwo:
 )
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_transform_only(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,
@@ -1255,13 +1231,11 @@ class TestCliEltScratchpadThree:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch.object(LegacyTracker, "track_event", return_value=None)
     @mock.patch(
         "meltano.core.logging.utils.default_config", return_value=test_log_config
     )
     def test_elt_transform_only_with_transform(
         self,
-        google_tracker,
         default_config,
         cli_runner,
         project,

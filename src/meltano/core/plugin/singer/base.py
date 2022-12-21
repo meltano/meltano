@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 from uuid import uuid4
@@ -11,7 +13,7 @@ class SingerPlugin(BasePlugin):
     def __init__(self, *args, **kwargs):
         """Canonical class leads to  an error if the UUID is defined here directly. Also, This data attribute must be defined or we'll get errors from Canonical."""
         super().__init__(*args, **kwargs)
-        self._instance_uuid: str = None
+        self._instance_uuid: str | None = None
 
     def process_config(self, flat_config):
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}

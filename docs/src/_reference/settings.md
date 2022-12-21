@@ -38,22 +38,18 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
 
-By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics and Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
+By default, Meltano shares anonymous usage data with the Meltano team using Snowplow. We use this data to learn about the size of our user base and the specific Meltano features they are using, which helps us determine the highest impact changes we can make in each release to make Meltano even more useful for you and others like you.
 
 We also provide some of this data back to the community via [MeltanoHub](https://hub.meltano.com/) to help users understand the overall usage of plugins within Meltano.
 
-If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project in Google Analytics.
-This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
+If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project. If the project ID is a UUID, then it will be sent unchanged. Otherwise, it will be [hashed](#q-what-is-a-one-way-hash-and-how-is-it-helpful), and its hash will be used to derive a UUID which will be used to uniquely identify your project.
 
-If you'd like to send the tracking data to a different Google Analytics account than the one run by the Meltano team,
-the Tracking IDs can be configured using the `tracking_ids.*` settings below.
+This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
 
 If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
 the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
 
-Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
-
-See more about our [anonymization standards](/reference/settings#anonymization-standards) and [anonymous usage stats Q&A](/reference/settings#anonymous-usage-stats-qa) below for more details.
+See more about our [anonymization standards](#anonymization-standards) and [anonymous usage stats Q&A](#anonymous-usage-stats-qa) below for more details.
 Also refer to the Meltano data team handbook page for our ["Philosophy of Telemetry"](https://handbook.meltano.com/data-team/telemetry#philosophy-of-telemetry).
 
 With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
@@ -128,21 +124,21 @@ If you still have any concerns about keeping anonymous reporting enabled, we hop
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_ID`
 - Default: None
 
-Used by Meltano to uniquely identify your project in Google Analytics if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
+Used by Meltano to uniquely identify your project if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
 
 #### How to use
 
 ```bash
-meltano config meltano set project_id <randomly-generated-token>
+meltano config meltano set project_id '<unique identifier>'
 
-export MELTANO_PROJECT_ID=<randomly-generated-token>
+export MELTANO_PROJECT_ID='<unique identifier>'
 ```
 
 ### <a name="database-uri"></a>`database_uri`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DATABASE_URI`
 - `meltano *` CLI option: `--database-uri`
-- Default: `sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db`
+- Default: `sqlite:///$MELTANO_SYS_DIR_ROOT/meltano.db`
 
 Meltano stores various types of metadata in a project-specific [system database](/concepts/project#system-database),
 that takes the shape of a SQLite database stored inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/meltano.db` by default.
@@ -220,14 +216,9 @@ in this environment.
 
 Specifically, this prevents [adding plugins](/reference/command-line-interface#add) or [pipeline schedules](/reference/command-line-interface#schedule) to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), as well as [modifying plugin configuration](/reference/command-line-interface#config) stored in [`meltano.yml`](/concepts/project#meltano-yml-project-file) or [`.env`](/concepts/project#env).
 
-Note that [`meltano config <plugin> set`](/reference/command-line-interface#config) and [the UI](/reference/ui)
+Note that [`meltano config <plugin> set`](/reference/command-line-interface#config)
 can still be used to store configuration in the [system database](/concepts/project#system-database),
 but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
-
-This setting differs from the [`ui.readonly` setting](#ui-readonly) in two ways:
-
-1. it does not block write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
-2. it also affects the [CLI](/reference/command-line-interface).
 
 #### How to use
 
@@ -237,10 +228,29 @@ meltano config meltano set project_readonly true
 export MELTANO_PROJECT_READONLY=true
 ```
 
+### <a name="hub-api-root"></a>`hub_api_root`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_API_ROOT`
+- Default: None
+
+This sets the value of the root url for the hub api.
+
+If provided, this setting overrides the [`hub_url`](#hub-url).
+
+#### How to use
+
+```bash
+meltano config meltano set hub_api_root "https://mysite.com/my-plugins"
+meltano config meltano set hub_api_root false
+
+export MELTANO_HUB_API_ROOT="https://mysite.com/my-plugins"
+export MELTANO_HUB_API_ROOT=false
+```
+
 ### <a name="hub-url"></a>`hub_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
-- Default: [`https://hub.meltano.com`](https://hub.meltano.com)
+- Default: `https://hub.meltano.com`
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
@@ -252,6 +262,28 @@ This manifest is primarily used by [`meltano discover`](/reference/command-line-
 meltano config meltano set hub_url http://localhost:4000
 
 export MELTANO_HUB_URL=http://localhost:4000
+```
+
+### <a name="hub-url-auth"></a>`hub_url_auth`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL_AUTH`
+- Default: None
+
+The value of the `Authorization` header sent when making a request to [`hub_url`](#hub-url).
+
+No `Authorization` header is applied under the following conditions:
+
+- `hub_url_auth` is not set
+- `hub_url_auth` is set to `false`, `null` or an empty string
+
+#### How to use
+
+```bash
+meltano config meltano set hub_url_auth "Bearer $ACCESS_TOKEN"
+meltano config meltano set hub_url_auth false
+
+export MELTANO_HUB_URL_AUTH="Bearer $ACCESS_TOKEN"
+export MELTANO_HUB_URL_AUTH=false
 ```
 
 ### <a name="discovery-url"></a>`discovery_url`
@@ -407,612 +439,135 @@ meltano config meltano set elt.buffer_size 52428800 # 50MiB in bytes
 
 export MELTANO_ELT_BUFFER_SIZE=52428800
 ```
+## State Backends
 
-## Meltano UI server
+### <a name="state-backend-uri"></a>`state_backend.uri`
 
-These settings can be used to configure the [Meltano UI](/reference/ui) server.
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_URI`
+- Default: `systemdb`
 
-[Meltano UI feature settings](#meltano-ui-features) and [customization settings](#meltano-ui-customization) have their own sections.
-
-### <a name="ui-bind-host"></a>`ui.bind_host`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_HOST`
-- [`meltano ui`](/reference/command-line-interface#ui) CLI option: `--bind`
-- Default: `0.0.0.0`
-
-The host to bind to.
-
-Together with the [`ui.bind_port` setting](#ui-bind-port), this setting corresponds to
-[Gunicorn's `bind` setting](https://docs.gunicorn.org/en/stable/settings.html#bind).
+URI for the [state backend](/concepts/state_backends) where you'd like Meltano to store state.
 
 #### How to use
 
 ```bash
-meltano config meltano set ui bind_host 127.0.0.1
+meltano config meltano set state_backend.uri "s3://your_bucket/meltano/state"
 
-export MELTANO_UI_BIND_HOST=127.0.0.1
-
-meltano ui --bind=127.0.0.1
+export MELTANO_STATE_BACKEND_URI="s3://your_bucket/meltano/state"
 ```
 
-### <a name="ui-bind-port"></a>`ui.bind_port`
+### <a name="state-backend-uri"></a>`state_backend.lock_timeout_seconds`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_BIND_PORT`
-- [`meltano ui`](/reference/command-line-interface#ui) CLI option: `--bind-port`
-- Default: `5000`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS`
+- Default: `360`
 
-The port to bind to.
-
-Together with the [`ui.bind_host` setting](#ui-bind-host), this setting corresponds to
-[Gunicorn's `bind` setting](https://docs.gunicorn.org/en/stable/settings.html#bind).
+Number of seconds that a [lock for a state ID](/concepts/state_backends#locking) should be considered valid in a state backend
 
 #### How to use
 
 ```bash
-meltano config meltano set ui bind_port 80
+meltano config meltano set state_backend.lock_timeout_seconds 720
 
-export MELTANO_UI_BIND_PORT=80
-
-meltano ui --bind-port=80
+export MELTANO_STATE_LOCK_TIMEOUT_SECONDS=720
 ```
 
-### <a name="ui-server-name"></a>`ui.server_name`
+### <a name="state-backend-uri"></a>`state_backend.lock_retry_seconds`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_SERVER_NAME`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS`
+- Default: `360`
+
+Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is [locked]((/concepts/state_backends#locking))
+
+#### How to use
+
+```bash
+meltano config meltano set state_backend.lock_retry_seconds 720
+
+export MELTANO_STATE_LOCK_RETRY_SECONDS=720
+```
+
+### Azure-Specific Settings
+-----------------------------
+
+### <a name="state-backend-uri"></a>`state_backend.azure.connection_string`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AZURE_CONNECTION_STRING`
 - Default: None
 
-The host and port Meltano UI is available at, e.g. `<host>:<port>`.
-
-The port will usually match the [`ui.bind_port` setting](#ui-bind-port), and can be omitted when the default port for HTTP (`80`) or HTTPS (`443`) is used.
-
-Unless the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) is set, this setting will be used as the session cookie domain.
-
-If the [`ui.notification` setting](#ui-notification) is enabled, this setting will be used to generate external URLs in notification emails.
-
-When set, Meltano UI will only respond to requests whose hostname (`Host` header) matches this setting.
-If this is undesirable, you can set the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) instead.
-This may be the case when Meltano UI is situated behind a load balancer performing health checks without specifying a hostname.
-
-If the [`ui.authentication` setting](#ui-authentication) is enabled,
-[`meltano ui`](/reference/command-line-interface#ui) will print a
-security warning if neither this setting or the [`ui.session_cookie_domain` setting](#ui-session-cookie-domain) has been set.
-
-This setting corresponds to [Flask's `SERVER_NAME` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SERVER_NAME).
+The [Azure connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string) to use when authenticating to Azure.
 
 #### How to use
 
 ```bash
-meltano config meltano set ui server_name meltano.example.com
+meltano config meltano set state_backend.azure.connection_string "DefaultEndpointsProtocol=https;AccountName=myAccountName;AccountKey=myAccountKey"
 
-export MELTANO_UI_SERVER_NAME=meltano.example.com
+export MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=myAccountName;AccountKey=myAccountKey"
 ```
 
-[`meltano ui setup <server_name>`](/reference/command-line-interface#setup) can be
-used to generate secrets for the [`ui.secret_key`](#ui-secret-key) and
-[`ui.password_salt`](#ui-password-salt) settings, that will be stored in a
-your project's [`.env` file](/concepts/project#env) along with the specified `server_name`.
+### S3-Specific Settings
+--------------------------
 
-```bash
-meltano ui setup meltano.example.com
-```
+### <a name="state-backend-uri"></a>`state_backend.s3.aws_access_key_id`
 
-### <a name="ui-session-cookie-domain"></a>`ui.session_cookie_domain`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_SESSION_COOKIE_DOMAIN`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AWS_ACCESS_KEY_ID`
 - Default: None
 
-The domain match rule that the session cookie will be valid for.
-
-If not set, the cookie will be valid for all subdomains of the configured [`ui.server_name`](#ui-server-name).
-
-If the [`ui.authentication` setting](#ui-authentication) is enabled,
-[`meltano ui`](/reference/command-line-interface#ui) will print a
-security warning if neither this setting or the [`ui.server_name` setting](#ui-server-name) has been set.
-
-This setting corresponds to [Flask's `SESSION_COOKIE_DOMAIN` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_DOMAIN).
+The AWS access key ID to use when authenticating to S3.
 
 #### How to use
 
 ```bash
-meltano config meltano set ui session_cookie_domain meltano.example.com
+meltano config meltano set state_backend.s3.aws_access_key_id "someaccesskeyid"
 
-export MELTANO_UI_SESSION_COOKIE_DOMAIN=meltano.example.com
+export MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID="someaccesskeyid"
 ```
 
-### <a name="ui-session-cookie-secure"></a>`ui.session_cookie_secure`
+### <a name="state-backend-uri"></a>`state_backend.s3.aws_secret_access_key`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_SESSION_COOKIE_SECURE`
-- Default: `false`
-
-Enable the `Secure` flag on the session cookie, so that the client will only send it to the server in HTTPS requests.
-
-The application must be served over HTTPS for this to make sense.
-
-This setting corresponds to [Flask's `SESSION_COOKIE_SECURE` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_SECURE).
-
-#### How to use
-
-```bash
-meltano config meltano set ui session_cookie_secure true
-
-export MELTANO_UI_SESSION_COOKIE_SECURE=true
-```
-
-### <a name="ui-secret-key"></a>`ui.secret_key`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_SECRET_KEY`
-- Default: `thisisnotapropersecretkey`
-
-A secret key that will be used for securely signing the session cookie.
-
-If the [`ui.authentication` setting](#ui-authentication) is enabled,
-[`meltano ui`](/reference/command-line-interface#ui) will print a
-security warning if this setting has not been changed from the default.
-
-This setting corresponds to [Flask's `SECRET_KEY` setting](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY).
-
-#### How to use
-
-```bash
-meltano config meltano set ui secret_key <randomly-generated-secret>
-
-export MELTANO_UI_SECRET_KEY=<randomly-generated-secret>
-```
-
-[`meltano ui setup <server_name>`](/reference/command-line-interface#setup) can be
-used to generate secrets for the this setting and [`ui.password_salt`](#ui-password-salt),
-that will be stored in your project's [`.env` file](/concepts/project#env)
-along with the specified [`ui.server_name`](#ui-server-name).
-
-```bash
-meltano ui setup meltano.example.com
-```
-
-### <a name="ui-password-salt"></a>`ui.password_salt`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_PASSWORD_SALT`
-- Default: `b4c124932584ad6e69f2774a0ae5c138`
-
-The HMAC salt to use when hashing passwords.
-
-If the [`ui.authentication` setting](#ui-authentication) is enabled,
-[`meltano ui`](/reference/command-line-interface#ui) will print a
-security warning if this setting has not been changed from the default.
-
-This setting corresponds to [Flask-Security's `SECURITY_PASSWORD_SALT` setting](https://pythonhosted.org/Flask-Security/configuration.html).
-
-#### How to use
-
-```bash
-meltano config meltano set ui password_salt <randomly-generated-secret>
-
-export MELTANO_UI_PASSWORD_SALT=<randomly-generated-secret>
-```
-
-[`meltano ui setup <server_name>`](/reference/command-line-interface#setup) can be
-used to generate secrets for the this setting and [`ui.secret_key`](#ui-secret-key),
-that will be stored in your project's [`.env` file](/concepts/project#env)
-along with the specified [`ui.server_name`](#ui-server-name).
-
-```bash
-meltano ui setup meltano.example.com
-```
-
-### `ui.workers`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_WORKERS`
-- Default: `4`
-
-The number of worker processes `meltano ui` will use to handle requests.
-
-This setting corresponds to [Gunicorn's `workers` setting](https://docs.gunicorn.org/en/stable/settings.html#workers).
-
-#### How to use
-
-```bash
-meltano config meltano set ui workers 1
-
-export MELTANO_UI_WORKERS=1
-```
-
-### <a name="ui-forwarded-allow-ips"></a>`ui.forwarded_allow_ips`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_FORWARDED_ALLOW_IPS`
-- Default: `127.0.0.1`
-
-Comma-separated front-end (reverse) proxy IPs that are allowed to set secure headers to indicate HTTPS requests.
-
-Set to `*` to disable checking of front-end IPs, which can be useful for setups where you don't know in advance the IP address of front-end, but you still trust the environment.
-
-This setting corresponds to [Gunicorn's `forwarded_allow_ips` setting](https://docs.gunicorn.org/en/stable/settings.html#forwarded-allow-ips).
-
-#### How to use
-
-```bash
-meltano config meltano set ui forwarded_allow_ips "*"
-
-export MELTANO_UI_FORWARDED_ALLOW_IPS="*"
-```
-
-## Meltano UI features
-
-These settings can be used to enable certain features of [Meltano UI](/reference/ui).
-
-[Meltano UI server settings](#meltano-ui-server) and [customization settings](#meltano-ui-customization) have their own sectionss
-
-### <a name="ui-readonly"></a>`ui.readonly`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_READONLY`
-- Default: `false`
-
-To block all write actions in the Meltano UI, you can run it in in _read-only_ mode.
-
-If you're enabling the [`ui.authentication` setting](#ui-authentication) and would
-like to only use read-only mode for anonymous users, enable the [`ui.anonymous_readonly` setting](#ui-anonymous-readonly) instead.
-
-This setting differs from the [`project_readonly` setting](#project-readonly) in two ways:
-
-1. it also blocks write actions in the UI that do not modify project files, like storing settings in the [system database](/concepts/project#system-database), and
-2. it does not affect the [CLI](/reference/command-line-interface).
-
-#### How to use
-
-```bash
-meltano config meltano set ui readonly true
-
-export MELTANO_UI_READONLY=true
-```
-
-### <a name="ui-authentication"></a>`ui.authentication`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_AUTHENTICATION`
-- Default: `false`
-
-Use this setting to enable authentication and disallow anonymous usage of your Meltano instance.
-
-Additionally, you will need to:
-
-1. Ensure your configuration is secure by setting the [`ui.secret_key`](#ui-secret-key) and [`ui.password_salt`](#ui-password-salt) settings, as well as [`ui.server_name`](#ui-server-name) or [`ui.session_cookie_domain`](#ui-session-cookie-domain), manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup).
-
-2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
-
-#### How to use
-
-```bash
-meltano config meltano set ui authentication true
-
-export MELTANO_UI_AUTHENTICATION=true
-```
-
-### <a name="ui-anonymous-readonly"></a>`ui.anonymous_readonly`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_ANONYMOUS_READONLY`
-- Default: `false`
-
-When the [`ui.authentication` setting](#ui-authentication) is enabled,
-enabling this setting will allow anonymous users read-only access to Meltano UI.
-Once a user is authenticated, write actions will be available again.
-
-This setting is especially useful when setting up a publicly available demo
-instance of Meltano UI for anonymous users to interact with.
-These users will not be able to make any changes, but admins will once they sign in.
-
-#### How to use
-
-```bash
-meltano config meltano set ui anonymous_readonly true
-
-export MELTANO_UI_ANONYMOUS_READONLY=true
-```
-
-### <a name="ui-notification"></a>`ui.notification`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_NOTIFICATION`
-- Default: `false`
-
-Meltano can send email notifications upon certain events.
-
-Your outgoing mail server can be configured using the [`mail.*` settings](#mail-server) below.
-
-<div class="notification is-info">
-  <p>To ease the development and testing, Meltano is preconfigured to use a local <a href="https://github.com/mailhog">MailHog</a> instance to trap all the outgoing emails.</p>
-  <p>Use the following docker command to start it:</p>
-<pre>
-docker run --rm -p 1025:1025 -p 8025:8025 --name mailhog mailhog/mailhog
-</pre>
-  <p>All emails sent by Meltano should now be available at <code>http://localhost:8025/</code></p>
-</div>
-
-#### How to use
-
-```bash
-meltano config meltano set ui notification true
-
-export MELTANO_UI_NOTIFICATION=true
-```
-
-## Meltano UI customization
-
-These settings can be used to customize certain aspects of [Meltano UI](/reference/ui).
-
-[Meltano UI server settings](#meltano-ui-server) and [feature settings](#meltano-ui-features) have their own sections.
-
-### `ui.logo_url`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_UI_LOGO_URL`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AWS_SECRET_ACCESS_KEY`
 - Default: None
 
-Customize the logo used by Meltano UI in the navigation bar and on the sign-in page (when the [`ui.authentication` setting](#ui-authentication) is enabled).
+The AWS secret access key to use when authenticating to S3.
 
 #### How to use
 
 ```bash
-meltano config meltano set ui logo_url https://meltano.com/meltano-logo-with-text.svg
+meltano config meltano set state_backend.s3.aws_secret_access_key "somesecretaccesskey""
 
-export MELTANO_UI_LOGO_URL=https://meltano.com/meltano-logo-with-text.svg
+export MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY="somesecretaccesskey"
 ```
 
-## Mail server
+### <a name="state-backend-uri"></a>`state_backend.s3.endpoint_url`
 
-Meltano uses [Flask-Mail](https://pythonhosted.org/Flask-Mail/) to send emails. Take a look at the documentation to properly configure your outgoing email server.
-
-### `mail.server`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_SERVER`
-- Default: `localhost`
-
-```bash
-meltano config meltano set mail server smtp.example.com
-
-export MELTANO_MAIL_SERVER=smtp.example.com
-```
-
-### `mail.port`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_PORT`
-- Default: `1025`
-
-```bash
-meltano config meltano set mail port 25
-
-export MELTANO_MAIL_PORT=25
-```
-
-### `mail.default_sender`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_DEFAULT_SENDER`
-- Default: `"Meltano" <bot@meltano.com>`
-
-```bash
-meltano config meltano set mail default_sender '"Example Meltano" <bot@meltano.example.com>'
-
-export MELTANO_MAIL_DEFAULT_SENDER='"Example Meltano" <bot@meltano.example.com>'
-```
-
-### `mail.use_tls`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_USE_TLS`
-- Default: `false`
-
-```bash
-meltano config meltano set mail use_tls true
-
-export MELTANO_MAIL_USE_TLS=true
-```
-
-### `mail.username`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_USERNAME`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AWS_ENDPOINT_URL`
 - Default: None
 
-```bash
-meltano config meltano set mail username meltano
-
-export MELTANO_MAIL_USERNAME=meltano
-```
-
-### `mail.password`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_PASSWORD`
-- Default: None
-
-```bash
-meltano config meltano set mail password meltano
-
-export MELTANO_MAIL_PASSWORD=meltano
-```
-
-### `mail.debug`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_DEBUG`
-- Default: `false`
-
-```bash
-meltano config meltano set mail debug true
-
-export MELTANO_MAIL_DEBUG=true
-```
-
-### `mail.sendgrid_unsubscribe_group_id`
-
-If you are using the SendGrid SMTP API you may optionally set the [SendGrid unsubscribe group ID](https://docs.sendgrid.com/ui/sending-email/unsubscribe-groups).
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID`
-- Default: `12751`
-
-```bash
-meltano config meltano set mail sendgrid_unsubscribe_group_id 42
-
-export MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
-```
-
-## OAuth Service
-
-Meltano ships with an OAuth Service to handle the OAuth flow in the Extractors' configuration.
-
-<div class="notification is-warning">
-  <p>To run this service, you **must** have a registered OAuth application on the [Authorization server](https://www.oauth.com/oauth2-servers/definitions/#the-authorization-server).</p>
-  <p>Most importantly, the Redirect URI must be set properly so that the OAuth flow can be completed.</p>
-  <p>This process is specific to each Provider.</p>
-</div>
-
-The OAuth Service is bundled within Meltano, and is automatically started with [`meltano ui`](/reference/command-line-interface#ui) and mounted at `/-/oauth` for development purposes.
-
-As it is a Flask application, it can also be run as a standalone using:
-
-```bash
-FLASK_ENV=production FLASK_APP=meltano.oauth python -m flask run --port 9999
-```
-
-### `oauth_service.url`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_OAUTH_SERVICE_URL`
-- Default: None
-
-The local OAuth service for development purposes is available at `/-/oauth`.
+The endpoint URL to use when connecting to S3. Only necessary if using S3-compatible storage _not_ hosted by AWS (e.g. [Minio](https://min.io))
 
 #### How to use
 
 ```bash
-meltano config meltano set oauth_service url https://oauth.svc.meltanodata.com
+meltano config meltano set state_backend.s3.endpoint_url "https://play.min.io:9000""
 
-export MELTANO_OAUTH_SERVICE_URL=https://oauth.svc.meltanodata.com
+export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 ```
 
-### `oauth_service.providers`
+### GCS-Specific Settings
+---------------------------
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_OAUTH_SERVICE_PROVIDERS`
-- Default: `all`
+### <a name="state-backend-uri"></a>`state_backend.gcs.application_credentials`
 
-To enable specific providers, use comma-separated `oauth.provider` names from `discovery.yml`. To enable all providers, use `all`.
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_APPLICATION_CREDENTIALS`
+- Default: None
+
+Path to the [credential file](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) to use in authenticating to Google Cloud Storage
 
 #### How to use
 
 ```bash
-meltano config meltano set oauth_service providers facebook,google_adwords
+meltano config meltano set state_backend.gcs.application_credentials "path/to/creds.json"
 
-export MELTANO_OAUTH_SERVICE_PROVIDERS=facebook,google_adwords
-```
-
-### `oauth_service.facebook.client_id`
-
-- [Environment variable](/guide/configuration#configuring-settings): `OAUTH_FACEBOOK_CLIENT_ID`
-- Default: None
-
-```bash
-meltano config meltano set oauth_service facebook client_id <facebook-client-id>
-
-export OAUTH_FACEBOOK_CLIENT_ID=<facebook-client-id>
-```
-
-### `oauth_service.facebook.client_secret`
-
-- [Environment variable](/guide/configuration#configuring-settings): `OAUTH_FACEBOOK_CLIENT_SECRET`
-- Default: None
-
-```bash
-meltano config meltano set oauth_service facebook client_secret <facebook-client-secret>
-
-export OAUTH_FACEBOOK_CLIENT_SECRET=<facebook-client-secret>
-```
-
-### `oauth_service.google_adwords.client_id`
-
-- [Environment variable](/guide/configuration#configuring-settings): `OAUTH_GOOGLE_ADWORDS_CLIENT_ID`
-- Default: None
-
-```bash
-meltano config meltano set oauth_service google_adwords client_id <google-adwords-client-id>
-
-export OAUTH_GOOGLE_ADWORDS_CLIENT_ID=<google-adwords-client-id>
-```
-
-### `oauth_service.google_adwords.client_secret`
-
-- [Environment variable](/guide/configuration#configuring-settings): `OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET`
-- Default: None
-
-```bash
-meltano config meltano set oauth_service google_adwords client_secret <google-adwords-client-secret>
-
-export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<google-adwords-client-secret>
-```
-
-## OAuth Single-Sign-On
-
-These variables are specific to [Flask-OAuthlib](https://flask-oauthlib.readthedocs.io/en/latest/#) and work with [OAuth authentication with GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html).
-
-<div class="notification is-info">
-  <p>These settings are used for single-sign-on using an external OAuth provider.</p>
-</div>
-
-For more information on how to get these from your GitLab application, check out the [integration docs from GitLab](https://docs.gitlab.com/ee/integration/gitlab.html).
-
-### `oauth.gitlab.client_id`
-
-- [Environment variable](/guide/configuration#configuring-settings): `OAUTH_GITLAB_CLIENT_ID`, alias: `OAUTH_GITLAB_APPLICATION_ID`
-- Default: None
-
-```bash
-meltano config meltano set oauth gitlab client_id <gitlab-client-id>
-
-export OAUTH_GITLAB_CLIENT_ID=<gitlab-client-id>
-export OAUTH_GITLAB_APPLICATION_ID=<gitlab-client-id>
-```
-
-### `oauth.gitlab.client_secret`
-
-- [Environment variable](/guide/configuration#configuring-settings): `OAUTH_GITLAB_CLIENT_SECRET`, alias: `OAUTH_GITLAB_SECRET`
-- Default: None
-
-```bash
-meltano config meltano set oauth gitlab client_secret <gitlab-client-secret>
-
-export OAUTH_GITLAB_CLIENT_SECRET=<gitlab-client-secret>
-export OAUTH_GITLAB_SECRET=<gitlab-client-secret>
-```
-
-## Analytics Tracking IDs (deprecated, will be removed in a future version)
-
-Google Analytics Tracking IDs to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled.
-
-### `tracking_ids.cli`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_CLI`
-- Default: `UA-132758957-3`
-
-Tracking ID for usage of the [`meltano` CLI](/reference/command-line-interface).
-
-```bash
-meltano config meltano set tracking_ids cli UA-123456789-1
-
-export MELTANO_TRACKING_IDS_CLI=UA-123456789-1
-```
-
-### `tracking_ids.ui`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI`
-- Default: `UA-132758957-2`
-
-Tracking ID for usage of [Meltano UI](/reference/ui).
-
-```bash
-meltano config meltano set tracking_ids ui UA-123456789-2
-
-export MELTANO_TRACKING_IDS_UI=UA-123456789-2
-```
-
-### `tracking_ids.ui_embed`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_TRACKING_IDS_UI_EMBED`
-- Default: `UA-132758957-6`
-
-Tracking ID for usage of [Meltano UI](/reference/ui)'s [Embed feature](/guide/analysis#share-reports-and-dashboards).
-
-```bash
-meltano config meltano set tracking_ids ui_embed UA-123456789-3
-
-export MELTANO_TRACKING_IDS_UI_EMBED=UA-123456789-3
+export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS="path/to/creds.json"
 ```
 
 ## Snowplow Tracking
@@ -1032,9 +587,9 @@ Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` set
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
 - Default: `False`
 
-### <a name="ff-env-var-strict-mode"></a>`ff.env_var_strict_mode`
+### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENV_VAR_STRICT_MODE`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_STRICT_ENV_VAR_MODE`
 - Default: `False`
 
 Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.

@@ -1,16 +1,17 @@
 """CLI command `meltano install`."""
+
 from __future__ import annotations
 
 import click
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
-
-from . import cli
-from .params import pass_project
-from .utils import CliError, PartialInstrumentedCmd, install_plugins
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 
 @cli.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
@@ -30,6 +31,12 @@ from .utils import CliError, PartialInstrumentedCmd, install_plugins
     default=None,
     help="Limit the number of plugins to install in parallel. Defaults to the number of cores.",
 )
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    help="Ignore the required Python version declared by the plugins.",
+)
 @click.pass_context
 @pass_project(migrate=True)
 def install(
@@ -39,14 +46,14 @@ def install(
     plugin_name: str,
     clean: bool,
     parallelism: int,
+    force: bool,
 ):
     """
     Install all the dependencies of your project based on the meltano.yml file.
 
-    \b\nRead more at https://www.meltano.com/docs/command-line-interface.html#install
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#install
     """
-    tracker = ctx.obj["tracker"]
-    legacy_tracker = ctx.obj["legacy_tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     plugins_service = ProjectPluginsService(project)
 
@@ -68,10 +75,13 @@ def install(
     )
     tracker.track_command_event(CliEvent.inflight)
 
-    success = install_plugins(project, plugins, parallelism=parallelism, clean=clean)
-
-    legacy_tracker.track_meltano_install()
-
+    success = install_plugins(
+        project,
+        plugins,
+        parallelism=parallelism,
+        clean=clean,
+        force=force,
+    )
     if not success:
         tracker.track_command_event(CliEvent.failed)
         raise CliError("Failed to install plugin(s)")

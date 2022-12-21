@@ -1,5 +1,7 @@
 """Meltano."""
 
 
-# Managed by bumpversion
-__version__ = "2.3.0"
+from __future__ import annotations
+
+# Managed by commitizen
+__version__ = "2.12.0"

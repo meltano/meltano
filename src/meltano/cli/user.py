@@ -1,5 +1,7 @@
 """User account management CLI."""
 
+from __future__ import annotations
+
 import click
 
 from meltano.api.app import create_app

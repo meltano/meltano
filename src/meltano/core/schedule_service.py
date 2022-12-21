@@ -1,10 +1,14 @@
 """Service for managing meltano schedules."""
 
+from __future__ import annotations
+
 import logging
 import subprocess
 from datetime import date, datetime
-from typing import Dict, List, Optional
 
+from croniter import croniter
+
+from meltano.core.error import MeltanoError
 from meltano.core.setting_definition import SettingMissingError
 
 from .meltano_invoker import MeltanoInvoker
@@ -18,7 +22,7 @@ from .task_sets_service import TaskSetsService
 from .utils import NotFound, coerce_datetime, find_named, iso8601_datetime
 
 
-class ScheduleAlreadyExistsError(Exception):
+class ScheduleAlreadyExistsError(MeltanoError):
     """Occurs when a schedule already exists."""
 
     def __init__(self, schedule: Schedule):
@@ -28,9 +32,10 @@ class ScheduleAlreadyExistsError(Exception):
             schedule: The schedule that already exists.
         """
         self.schedule = schedule
+        super().__init__(reason=f"Schedule '{self.schedule.name}' already exists")
 
 
-class ScheduleDoesNotExistError(Exception):
+class ScheduleDoesNotExistError(MeltanoError):
     """Occurs when a schedule does not exist."""
 
     def __init__(self, name: str):
@@ -42,8 +47,13 @@ class ScheduleDoesNotExistError(Exception):
         """
         self.name = name
 
+        super().__init__(
+            reason=f"Schedule '{name}' does not exist",
+            instruction="Use `meltano schedule add` to add a schedule",
+        )
 
-class ScheduleNotFoundError(Exception):
+
+class ScheduleNotFoundError(MeltanoError):
     """Occurs when a schedule for a namespace cannot be found."""
 
     def __init__(self, namespace: str):
@@ -54,11 +64,33 @@ class ScheduleNotFoundError(Exception):
         """
         self.namespace = namespace
 
+        reason = f"No schedule found for namespace {self.namespace}"
+        instruction = "Use `meltano schedule add` to add a schedule"
+        super().__init__(reason, instruction)
 
-class ScheduleService:
+
+class BadCronError(MeltanoError):
+    """Occurs when a cron expression is invalid."""
+
+    def __init__(self, cron: str):
+        """Initialize the exception.
+
+        Args:
+            cron: The cron expression that is invalid.
+        """
+        self.cron = cron
+
+        reason = f"Invalid Cron expression or alias: '{self.cron}'"
+        instruction = "Please use a valid cron expression"
+        super().__init__(reason, instruction)
+
+
+class ScheduleService:  # noqa: WPS214
     """Service for managing schedules."""
 
-    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
+    def __init__(
+        self, project: Project, plugins_service: ProjectPluginsService | None = None
+    ):
         """Initialize a ScheduleService for a project to manage a projects schedules.
 
         Args:
@@ -77,7 +109,7 @@ class ScheduleService:
         loader: str,
         transform: str,
         interval: str,
-        start_date: Optional[datetime] = None,
+        start_date: datetime | None = None,
         **env,
     ) -> Schedule:
         """Add a scheduled legacy elt task.
@@ -141,17 +173,17 @@ class ScheduleService:
         Returns:
             The start_date of the extractor, or now.
         """
-        extractor = self.plugins_service.find_plugin(
+        extractor_plugin = self.plugins_service.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
-        start_date = None
+        start_date: str | datetime | date | None = None
         try:
             settings_service = PluginSettingsService(
-                self.project, extractor, plugins_service=self.plugins_service
+                self.project, extractor_plugin, plugins_service=self.plugins_service
             )
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
-            logging.debug(f"`start_date` not found in {extractor}.")
+            logging.debug(f"`start_date` not found in {extractor_plugin}.")
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting
@@ -173,8 +205,16 @@ class ScheduleService:
             The added schedule.
 
         Raises:
+            BadCronError: If the cron expression is invalid.
             ScheduleAlreadyExistsError: If a schedule with the same name already exists.
         """
+        if (
+            schedule.interval is not None
+            and schedule.interval != "@once"
+            and not croniter.is_valid(schedule.interval)
+        ):
+            raise BadCronError(schedule.interval)
+
         with self.project.meltano_update() as meltano:
             # guard if it already exists
             if schedule in meltano.schedules:
@@ -252,13 +292,13 @@ class ScheduleService:
         except (PluginNotFoundError, StopIteration) as err:
             raise ScheduleNotFoundError(namespace) from err
 
-    def schedules(self) -> List[Schedule]:
+    def schedules(self) -> list[Schedule]:
         """Return all schedules in the project.
 
         Returns:
             The list of schedules.
         """
-        return self.project.meltano.schedules
+        return self.project.meltano.schedules.copy()
 
     def find_schedule(self, name) -> Schedule:
         """Find a schedule by name.
@@ -278,7 +318,7 @@ class ScheduleService:
             raise ScheduleNotFoundError(name) from err
 
     def run(
-        self, schedule: Schedule, *args, env: Dict = None, **kwargs
+        self, schedule: Schedule, *args, env: dict | None = None, **kwargs
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 

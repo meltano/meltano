@@ -238,6 +238,7 @@ jobs:
 ```
 
 You can learn more about how tasks are defined and run in the [`meltano job` documentation](/reference/command-line-interface#job).
+
 ### Schedules
 
 Your project's pipeline schedules,
@@ -284,7 +285,7 @@ To learn more about pipeline schedules and orchestration, refer to the [Orchestr
 
 As your project grows, and your `meltano.yml` with it, you may wish to break your config into multiple `.yml` files and to store those subfiles in various places in your Project folder hierachy.
 
-This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](https://en.wikipedia.org/wiki/Glob_(programming))) to the `include_paths` key of your `meltano.yml`:
+This can be done by creating new `.yml` files and adding them (directly or via a [glob pattern](<https://en.wikipedia.org/wiki/Glob_(programming)>)) to the `include_paths` key of your `meltano.yml`:
 
 ```yaml
 include_paths:
@@ -296,6 +297,23 @@ include_paths:
 Meltano will use these paths or patterns to collect the config from them for use in your Project. Although the creation of subfiles is manual, once created any elements within each subfile can be updated using the `meltano config` CLI. Adding new config elements places them in `meltano.yml`. We are working on ways to direct new config into specific subfiles ([#2985](https://github.com/meltano/meltano/issues/2925)).
 
 Currently supported elements in subfiles are [plugins](/concepts/project#plugins), [schedules](/concepts/project#plugins) and [environments](/concepts/environments).
+
+### Annotations
+
+To better integrate with software other than the core Meltano library and CLI, `meltano.yml` support "annotations", which is a dictionary that map from tool/vendor names to arbitrary dictionaries with whatever that tool/vendor wants to annotate the Meltano config with.
+
+```yaml
+annotations:
+  meltano-cloud: {
+    # Meltano Cloud config
+  }
+  arbitrary-third-party-tool: {
+    # Configuration for the third party tool
+  }
+  # etc.
+```
+
+The core Meltano library and CLI never access the `annotations` field. To access it, one must read `meltano.yml`. Nothing within an `annotations` field should be thought of as part of Meltano's own configuration - it is merely extra data that Meltano permits within its configuration files.
 
 ## `.gitignore`
 
@@ -323,6 +341,8 @@ In a newly initialized project, this file will be included in [`.gitignore`](#gi
 
 Meltano stores various files for internal use inside a `.meltano` directory inside your project.
 
+**Note**: `$MELTANO_SYS_DIR_ROOT` can be used as a replacement to `$MELTANO_PROJECT_ROOT/.meltano` directory.
+
 These files are specific to the environment Meltano is running in, and should not be checked into version control.
 In a newly initialized project, this directory will be included in [`.gitignore`](#gitignore) by default.
 
@@ -335,6 +355,8 @@ While you would usually not want to modify files in this directory directly, kno
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
 
+If `$MELTANO_SYS_DIR_ROOT` is set, all the above mentioned paths `.meltano/*` will point to `$MELTANO_SYS_DIR_ROOT/*`.
+
 ## System database
 
 Meltano stores various types of metadata in a project-specific system database,
@@ -343,8 +365,34 @@ Like all files stored in the `.meltano` directory, the system database is also e
 
 You can choose to use a different system database backend or configuration using the [`database_uri` setting](/reference/settings#database-uri).
 
-While you would usually not want to modify the system database directly, knowing what's in there can aid in debugging:
+While you would usually not want to modify the system database directly, knowing what's in there can aid in debugging.
 
-- `job` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
+Meltano's CLI utilizes the following tables:
+
+- `runs` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
 - `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
-- `user` table: Users for [Meltano UI](/reference/ui) created using [`meltano user add`](/reference/command-line-interface#user).
+- `user` table: Users for [the deprecated Meltano UI](/guide/troubleshooting#meltano-ui) created using [`meltano user add`](/reference/command-line-interface#user).
+
+The remaining tables in the database are used exclusively by [Meltano UI](/guide/troubleshooting#meltano-ui), mostly for authentication and authorization purposes:
+
+- `role`
+- `role_permissions`
+- `oauth`
+- `embed_tokens`
+- `subscriptions`
+
+### Support for other database types
+
+Meltano currently supports the following databases as backends for state and configuration:
+
+* PostgreSQL
+* SQLite
+* MS SQL Server
+
+PostgresSQL and SQLite are supported out of the box, while MS SQL Server requires installing Meltano with the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components).
+
+Support for other databases is planned:
+
+* [MySQL](https://github.com/meltano/meltano/issues/6529)
+
+If you would like to see support for a specific database, please [open an issue](https://github.com/meltano/meltano/issues/new?assignees=meltano%2Fengineering&labels=kind%2FFeature%2Cvaluestream%2FMeltano&template=feature.yml&title=feature%3A+%3Ctitle%3E)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import platform
 
 import dotenv
@@ -5,6 +7,7 @@ import pytest
 
 from meltano.core.plugin.command import UndefinedEnvVarError
 from meltano.core.plugin_invoker import UnknownCommandError
+from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
 
 
@@ -54,6 +57,11 @@ class TestPluginInvoker:
         assert env["PATH"].startswith(str(venv.bin_dir))
         assert "PYTHONPATH" not in env
 
+        assert (
+            env["MELTANO_PARENT_CONTEXT_UUID"]
+            == environment_context.data["context_uuid"]
+        )
+
     @pytest.mark.asyncio
     async def test_environment_env(
         self, project_with_environment, tap, session, plugin_invoker_factory
@@ -89,8 +97,8 @@ class TestPluginInvoker:
         with pytest.raises(UnknownCommandError) as err:
             await plugin_invoker.invoke_async(command="foo")
 
-        assert err.value.command == "foo"  # noqa: WPS441
-        assert "supports the following commands" in str(err.value)  # noqa: WPS441
+        assert err.value.command == "foo"
+        assert "supports the following commands" in str(err.value)
 
     def test_expand_exec_args(self, plugin_invoker):
         exec_args = plugin_invoker.exec_args(
@@ -125,7 +133,7 @@ class TestPluginInvoker:
 
         assert (
             "Command 'cmd' referenced unset environment variable '$ENV_VAR_ARG' in an argument"
-            in str(err.value)  # noqa: WPS441
+            in str(err.value)
         )
 
     def test_alternate_command_executable(self, plugin_invoker):

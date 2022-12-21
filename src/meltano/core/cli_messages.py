@@ -1,5 +1,7 @@
 """Holds formatted CLI messages."""
 
+from __future__ import annotations
+
 GREETING = """
 
 
@@ -12,7 +14,6 @@ GREETING = """
  █████░███ █████░░██████  █████  ░░█████ ░░████████ ████ █████░░██████
 ░░░░░ ░░░ ░░░░░  ░░░░░░  ░░░░░    ░░░░░   ░░░░░░░░ ░░░░ ░░░░░  ░░░░░░
 
-                ~ Your DataOps Platform Infrastructure ~
 
 
 """

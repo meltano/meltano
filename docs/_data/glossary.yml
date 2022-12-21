@@ -24,7 +24,7 @@
   link:
 - docker:
   term: Docker
-  definition: a thing
+  definition: Docker is a tool that packages software into distributable/reproducible units called containers that contain most of what the software needs to run including libraries, system tools, code, and runtime.
   link: https://www.docker.com/
 - docker-image:
   term: Docker Image

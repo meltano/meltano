@@ -1,15 +1,26 @@
+"""Click parameter helper decorators."""
+
+from __future__ import annotations
+
 import functools
 
 import click
-import click.globals
+from click.globals import get_current_context as get_current_click_context
 
 from meltano.core.db import project_engine
+from meltano.core.migration_service import MigrationError
 from meltano.core.project_settings_service import ProjectSettingsService
 
 from .utils import CliError
 
 
 def database_uri_option(func):
+    """Database URI Click option decorator.
+
+    args:
+        func: The function to decorate.
+    """
+
     @click.option("--database-uri", help="System database URI.")
     def decorate(*args, database_uri=None, **kwargs):
         if database_uri:
@@ -26,18 +37,29 @@ class pass_project:  # noqa: N801
     __name__ = "project"
 
     def __init__(self, migrate=False):
+        """Instantiate decorator.
+
+        args:
+            migrate: Flag to perform database migration before passing the project.
+        """
         self.migrate = migrate
 
     def __call__(self, func):
+        """Return decorated function.
+
+        args:
+            func: The function to decorate.
+        """
+
         @database_uri_option
         def decorate(*args, **kwargs):
-            ctx = click.globals.get_current_context()
+            ctx = get_current_click_context()
 
             project = ctx.obj["project"]
             if not project:
                 raise CliError(
-                    f"`{ctx.command_path}` must be run inside a Meltano project."
-                    "\nUse `meltano init <project_name>` to create one."
+                    f"`{ctx.command_path}` must be run inside a Meltano project.\n"
+                    + "Use `meltano init <project_directory>` to create one."
                 )
 
             # register the system database connection
@@ -46,9 +68,12 @@ class pass_project:  # noqa: N801
             if self.migrate:
                 from meltano.core.migration_service import MigrationService
 
-                migration_service = MigrationService(engine)
-                migration_service.upgrade(silent=True)
-                migration_service.seed(project)
+                try:
+                    migration_service = MigrationService(engine)
+                    migration_service.upgrade(silent=True)
+                    migration_service.seed(project)
+                except MigrationError as err:
+                    raise CliError(str(err))
 
             func(project, *args, **kwargs)
 

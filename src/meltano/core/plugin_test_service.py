@@ -1,9 +1,11 @@
 """Defines PluginTestService."""
+
+from __future__ import annotations
+
 import asyncio
 import json
 import logging
 from abc import ABC, abstractmethod
-from typing import Union
 
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotSupportedError
@@ -16,12 +18,24 @@ class PluginTestServiceFactory:
     """Factory class to resolve a plugin test service."""
 
     def __init__(self, plugin_invoker: PluginInvoker):
-        """Construct a PluginTestServiceFactory instance."""
+        """Construct a PluginTestServiceFactory instance.
+
+        Args:
+            plugin_invoker: The invocation instance of the plugin to test.
+        """
         self.plugin_invoker = plugin_invoker
 
     def get_test_service(self):
-        """Resolve a test service instance for a plugin type."""
+        """Resolve a test service instance for a plugin type.
+
+        Returns:
+            The test service instance.
+
+        Raises:
+            PluginNotSupportedError: If the plugin type is not supported for testing.
+        """
         test_services = {PluginType.EXTRACTORS: ExtractorTestService}
+
         try:
             return test_services[self.plugin_invoker.plugin.type](self.plugin_invoker)
         except KeyError as err:
@@ -32,19 +46,27 @@ class PluginTestService(ABC):
     """Abstract base class for plugin test operations."""
 
     def __init__(self, plugin_invoker: PluginInvoker):
-        """Construct a PluginTestService instance."""
+        """Construct a PluginTestService instance.
+
+        Args:
+            plugin_invoker: The invocation instance of the plugin to test
+        """
         self.plugin_invoker = plugin_invoker
 
     @abstractmethod
-    def validate(self) -> Union[bool, str]:
+    async def validate(self) -> tuple[bool, str]:
         """Abstract method to validate plugin configuration."""
 
 
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self) -> Union[bool, str]:
-        """Validate extractor configuration."""
+    async def validate(self) -> tuple[bool, str]:
+        """Validate extractor configuration.
+
+        Returns:
+            The validation result and supporting context message (if applicable).
+        """
         process = None
 
         try:
@@ -69,8 +91,13 @@ class ExtractorTestService(PluginTestService):
 
             if message_type == "RECORD":
                 process.terminate()
-                return True, None
+                break
 
-        await process.wait()
+        returncode = await process.wait()
 
-        return False, last_line if process.returncode else "No RECORD message received"
+        # considered valid if subprocess is terminated (exit status < 0) on RECORD message received
+        # see https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess.returncode
+        return (
+            returncode < 0,
+            last_line if returncode else "No RECORD message received",
+        )

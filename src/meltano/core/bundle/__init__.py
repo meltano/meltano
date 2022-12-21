@@ -1,5 +1,12 @@
 """Bundled yaml files."""
 
-from pathlib import Path
+from __future__ import annotations
 
-root = Path(__file__).parent
+import sys
+
+if sys.version_info < (3, 9):
+    import importlib_resources as resources
+else:
+    from importlib import resources
+
+root = resources.files("meltano.core.bundle")

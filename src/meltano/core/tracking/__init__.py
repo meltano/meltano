@@ -1,11 +1,5 @@
 """Meltano telemetry."""
 
-from .contexts import (
-    CliContext,
-    CliEvent,
-    ExceptionContext,
-    PluginsTrackingContext,
-    ProjectContext,
-    environment_context,
-)
-from .tracker import BlockEvents, Tracker
+from __future__ import annotations
+
+from meltano.core.tracking.tracker import BlockEvents, Tracker

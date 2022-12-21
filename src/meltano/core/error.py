@@ -1,59 +1,54 @@
 """Base Error classes."""
-import functools
-import io
-import logging
-import subprocess
+
+from __future__ import annotations
+
 from asyncio.streams import StreamReader
 from asyncio.subprocess import Process
 from enum import Enum
-from typing import Optional, Union
+from typing import Any
 
 
-class ExitCode(int, Enum):
+class ExitCode(int, Enum):  # noqa: D101
     OK = 0
     FAIL = 1
     NO_RETRY = 2
 
 
+class MeltanoError(Exception):
+    """Base class for all user-facing errors."""
+
+    def __init__(
+        self,
+        reason: str,
+        instruction: str | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize a MeltanoError.
+
+        Args:
+            reason: A short explanation of the error.
+            instruction: A short instruction on how to fix the error.
+            args: Additional arguments to pass to the base exception class.
+            kwargs: Keyword arguments to pass to the base exception class.
+        """
+        self.reason = reason
+        self.instruction = instruction
+        super().__init__(reason, instruction, *args, **kwargs)
+
+
 class Error(Exception):
     """Base exception for ELT errors."""
 
-    def exit_code(self):
+    def exit_code(self):  # noqa: D102
         return ExitCode.FAIL
 
 
 class ExtractError(Error):
     """Error in the extraction process, like API errors."""
 
-    def exit_code(self):
+    def exit_code(self):  # noqa: D102
         return ExitCode.NO_RETRY
-
-
-class SubprocessError(Exception):
-    """Happens when subprocess exits with a resultcode != 0."""
-
-    def __init__(
-        self,
-        message: str,
-        process: subprocess.CompletedProcess,
-        stderr: Optional[Union[str, bytes, io.TextIOBase]] = None,
-    ):
-        """Initialize SubprocessError."""
-        self.process = process
-        self._stderr = stderr or process.stderr
-        super().__init__(message)
-
-    @property
-    def stderr(self) -> Optional[str]:
-        """Return the output of the process to stderr."""
-        if not self._stderr:
-            return None
-        elif isinstance(self._stderr, bytes):
-            self._stderr = self._stderr.decode("utf-8")
-        elif not isinstance(self._stderr, str):
-            self._stderr = self._stderr.read()
-
-        return self._stderr
 
 
 class AsyncSubprocessError(Exception):
@@ -63,17 +58,17 @@ class AsyncSubprocessError(Exception):
         self,
         message: str,
         process: Process,
-        stderr: Optional[str] = None,
-    ):
+        stderr: str | None = None,
+    ):  # noqa: DAR101
         """Initialize AsyncSubprocessError."""
         self.process = process
-        self._stderr: Union[str, StreamReader, None] = stderr or process.stderr
+        self._stderr: str | StreamReader | None = stderr or process.stderr
         super().__init__(message)
 
     @property
-    async def stderr(self) -> Optional[str]:
+    async def stderr(self) -> str | None:
         """Return the output of the process to stderr."""
-        if not self._stderr:
+        if not self._stderr:  # noqa: DAR201
             return None
         elif not isinstance(self._stderr, str):
             stream = await self._stderr.read()
@@ -83,102 +78,16 @@ class AsyncSubprocessError(Exception):
 
 
 class PluginInstallError(Exception):
-    """Happens when a plugin fails to install."""
+    """Exception for when a plugin fails to install."""
 
 
 class PluginInstallWarning(Exception):
-    """Happens when a plugin optional optional step fails to install."""
+    """Exception for when a plugin optional optional step fails to install."""
 
 
-class PluginNotInstallable(Exception):
-    pass
+class EmptyMeltanoFileException(Exception):
+    """Exception for empty meltano.yml file."""
 
 
-def aggregate(error_cls):
-    class Aggregate(error_cls):
-        """Aggregate multiple sub-exceptions."""
-
-        def __init__(self, exceptions: []):
-            self.exceptions = exceptions
-
-        def __str__(self):
-            return "\n".join(str(e) for e in self.exceptions)
-
-    if error_cls != Exception:
-        error_cls.Aggregate = Aggregate
-
-    return error_cls
-
-
-AggregateError = aggregate(Exception)
-
-
-@aggregate
-class ImportError(Error):
-    """
-    Error in the import process, the data cannot be processed.
-    """
-
-    def __init__(self, entry):
-        self.entry = entry
-
-
-@aggregate
-class SchemaError(Error):
-    """Base exception for schema errors."""
-
-
-@aggregate
-class InapplicableChangeError(SchemaError):
-    """Raise for inapplicable schema changes."""
-
-    def exit_code(self):
-        return ExitCode.NO_RETRY
-
-
-# TODO: use as a context manager instead
-class ExceptionAggregator:
-    def __init__(self, etype):
-        self.success = []
-        self.failures = []
-        self.etype = etype
-
-    def recognize_exception(self, e) -> bool:
-        return self.etype == type(e)
-
-    def call(self, callable, *args, **kwargs):
-        params = (args, kwargs)
-        try:
-            ret = callable(*args, **kwargs)
-            self.success.append(params)
-            return ret
-        except Exception as e:
-            if self.recognize_exception(e):
-                self.failures.append((e, params))
-            else:
-                raise e
-
-    def raise_aggregate(self):
-        aggregate_type = AggregateError
-
-        if hasattr(self.etype, "Aggregate"):
-            aggregate_type = self.etype.Aggregate
-
-        if len(self.failures):
-            exceptions = [f[0] for f in self.failures]
-            raise aggregate_type(exceptions)
-
-
-def with_error_exit_code(main):
-    @functools.wraps(main)
-    def f(*args, **kwargs):
-        try:
-            main(*args, **kwargs)
-        except Error as err:
-            logging.error(str(err))
-            exit(err.exit_code())
-        except Exception as e:
-            logging.error(str(e))
-            raise e
-
-    return f
+class MeltanoConfigurationError(MeltanoError):
+    """Exception for when Meltano is inproperly configured."""

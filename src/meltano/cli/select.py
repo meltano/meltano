@@ -1,18 +1,19 @@
 """Extractor selection management CLI."""
 from __future__ import annotations
 
+from contextlib import closing
+
 import click
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.project import Project
 from meltano.core.select_service import SelectService
 from meltano.core.utils import click_run_async
-
-from . import cli
-from .params import pass_project
-from .utils import CliError, InstrumentedCmd
 
 
 def selection_color(selection):
@@ -38,7 +39,11 @@ def selection_mark(selection):
     return f"[{selection:<{colwidth}}]"
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Manage extractor selection patterns.")
+@cli.command(
+    cls=InstrumentedCmd,
+    short_help="Manage extractor selection patterns.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
+)
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")
@@ -88,12 +93,6 @@ async def select(
                 exclude=flags["exclude"],
                 remove=flags["remove"],
             )
-        ctx.obj["legacy_tracker"].track_meltano_select(
-            extractor=extractor,
-            entities_filter=entities_filter,
-            attributes_filter=attributes_filter,
-            flags=flags,
-        )
     except PluginExecutionError as err:
         raise CliError(f"Cannot list the selected attributes: {err}") from err
 
@@ -111,11 +110,8 @@ async def show(project, extractor, show_all=False):
     _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)
 
-    session = Session()
-    try:
+    with closing(Session()) as session:
         list_all = await select_service.list_all(session)
-    finally:
-        session.close()
 
     # legend
     click.secho("Legend:")

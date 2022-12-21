@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import warnings
 
 import pytest
 
+from meltano.core.environment import Environment
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
@@ -31,11 +34,19 @@ def subject(project):
 
 
 class TestProjectSettingsService:
+    @pytest.fixture()
+    def environment(self):
+        return Environment("testing", {})
+
     def test_get_with_source(self, subject, monkeypatch):
+        # A warning is raised because the setting does not exist.
+        with pytest.warns(RuntimeWarning):
+            assert subject.get_with_source(
+                "and_now_for_something_completely_different"
+            ) == (None, SettingValueStore.DEFAULT)
+
         def assert_value_source(value, source):
             assert subject.get_with_source("project_id") == (value, source)
-
-        assert_value_source(None, SettingValueStore.DEFAULT)
 
         subject.set(
             "project_id", "from_meltano_yml", store=SettingValueStore.MELTANO_YML
@@ -165,3 +176,15 @@ class TestProjectSettingsService:
         ):
             with pytest.warns(RuntimeWarning):
                 subject.get(setting)
+
+    def test_meltano_settings_with_active_environment(
+        self, subject, monkeypatch, environment
+    ):
+        # make sure that meltano setting values are written to the root of `meltano.yml`
+        # even if there is an active environment
+        monkeypatch.setattr(subject.project, "active_environment", environment)
+        assert subject.project.active_environment == environment
+        subject.set("database_max_retries", 10000)
+        value, source = subject.get_with_source("database_max_retries")
+        assert source == SettingValueStore.MELTANO_YML
+        assert value == 10000

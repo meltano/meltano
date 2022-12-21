@@ -4,15 +4,20 @@
 'payload' field. This is not to be confused with the Job's 'state' field,
 which refers to a given job run's status, e.g. 'RUNNING' or 'FAILED'.
 """
+from __future__ import annotations
+
 import datetime
 import json
-from collections import defaultdict
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 import structlog
+from sqlalchemy.orm import Session
 
-from meltano.core.job import Job, JobFinder, Payload, State
-from meltano.core.utils import merge
+from meltano.core.job import Job, Payload, State
+from meltano.core.job_state import SINGER_STATE_KEY, JobState
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.state_store import state_store_manager_from_project_settings
 
 logger = structlog.getLogger(__name__)
 
@@ -21,21 +26,25 @@ class InvalidJobStateError(Exception):
     """Occurs when invalid job state is parsed."""
 
 
-class StateService:
+class StateService:  # noqa: WPS214
     """Meltano Service used to manage job state.
 
     Currently only manages Singer state for Extract and Load jobs.
     """
 
-    def __init__(self, session: object = None):
+    def __init__(self, project: Project | None = None, session: Session | None = None):
         """Create a StateService object.
 
         Args:
-            session: the session to use for interacting with the db
+            project: current meltano Project
+            session: the session to use, if using SYSTEMDB state backend
         """
+        self.project = project or Project.find()
+        self.settings_service = ProjectSettingsService(self.project)
         self.session = session
+        self._state_store_manager = None
 
-    def list_state(self, state_id_pattern: Optional[str] = None) -> Dict[str, Dict]:
+    def list_state(self, state_id_pattern: str | None = None):
         """List all state found in the db.
 
         Args:
@@ -44,15 +53,12 @@ class StateService:
         Returns:
             A dict with state_ids as keys and state payloads as values.
         """
-        states = defaultdict(dict)
-        query = self.session.query(Job)
-        if state_id_pattern:
-            query = query.filter(Job.job_name.like(state_id_pattern.replace("*", "%")))
-        for state_id in {job.job_name for job in query}:  # noqa: WPS335
-            states[state_id] = self.get_state(state_id)
-        return states
+        return {
+            state_id: self.get_state(state_id)
+            for state_id in self.state_store_manager.get_state_ids(state_id_pattern)
+        }
 
-    def _get_or_create_job(self, job: Union[Job, str]) -> Job:
+    def _get_or_create_job(self, job: Job | str) -> Job:
         """If Job is passed, return it. If state_id is passed, create new and return.
 
         Args:
@@ -73,8 +79,21 @@ class StateService:
             return job
         raise TypeError("job must be of type Job or of type str")
 
+    @property
+    def state_store_manager(self):
+        """Initialize and return the correct StateStoreManager.
+
+        Returns:
+            StateStoreManager instance.
+        """
+        if not self._state_store_manager:
+            self._state_store_manager = state_store_manager_from_project_settings(
+                self.settings_service, self.session
+            )
+        return self._state_store_manager
+
     @staticmethod
-    def validate_state(state: Dict[str, Any]):
+    def validate_state(state: dict[str, Any]):
         """Check that the given state str is valid.
 
         Args:
@@ -83,15 +102,15 @@ class StateService:
         Raises:
             InvalidJobStateError: if supplied state is not valid singer state
         """
-        if "singer_state" not in state:
+        if SINGER_STATE_KEY not in state:
             raise InvalidJobStateError(
-                "singer_state not found in top level of provided state"
+                f"{SINGER_STATE_KEY} not found in top level of provided state"
             )
 
     def add_state(
         self,
-        job: Union[Job, str],
-        new_state: Optional[str],
+        job: Job | str,
+        new_state: str | None,
         payload_flags: Payload = Payload.STATE,
         validate=True,
     ):
@@ -113,8 +132,18 @@ class StateService:
         logger.debug(
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
         )
+        partial_state = (
+            new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}
+        )
+        completed_state = new_state_dict if payload_flags == Payload.STATE else {}
+        job_state = JobState(
+            state_id=state_to_add_to.job_name,
+            partial_state=partial_state,
+            completed_state=completed_state,
+        )
+        self.state_store_manager.set(job_state)
 
-    def get_state(self, state_id: str) -> Dict:
+    def get_state(self, state_id: str):
         """Get state for the given state_id.
 
         Args:
@@ -123,36 +152,12 @@ class StateService:
         Returns:
             Dict representing state that would be used in the next run.
         """
-        state = {}
-        incomplete_since = None
-        finder = JobFinder(state_id)
+        state = self.state_store_manager.get(state_id=state_id)
+        if state:
+            return json.loads(state.json_merged())
+        return {}
 
-        # Get the state for the most recent completed job.
-        # Do not consider dummy jobs create via add_state.
-        state_job = finder.latest_with_payload(self.session, flags=Payload.STATE)
-        if state_job:
-            logger.info(f"Found state from {state_job.started_at}.")
-            incomplete_since = state_job.ended_at
-            if "singer_state" in state_job.payload:
-                merge(state_job.payload, state)
-
-        # If there have been any incomplete jobs since the most recent completed jobs,
-        # merge the state emitted by those jobs into the state for the most recent
-        # completed job. If there are no completed jobs, get the full history of
-        # incomplete jobs and use the most recent state emitted per stream
-        incomplete_state_jobs = finder.with_payload(
-            self.session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
-        )
-        for incomplete_state_job in incomplete_state_jobs:
-            logger.info(
-                f"Found and merged incomplete state from {incomplete_state_job.started_at}."
-            )
-            if "singer_state" in incomplete_state_job.payload:
-                merge(incomplete_state_job.payload, state)
-
-        return state
-
-    def set_state(self, state_id: str, new_state: Optional[str], validate: bool = True):
+    def set_state(self, state_id: str, new_state: str | None, validate: bool = True):
         """Set the state for the state_id.
 
         Args:
@@ -174,7 +179,7 @@ class StateService:
             state_id: the state_id to clear state for
             save: whether or not to immediately save the state
         """
-        self.set_state(state_id, json.dumps({}), validate=False)
+        self.state_store_manager.clear(state_id)
 
     def merge_state(self, state_id_src: str, state_id_dst: str):
         """Merge state from state_id_src into state_id_dst.

@@ -1,6 +1,7 @@
 """Factory for creating plugins."""
+from __future__ import annotations
+
 import importlib
-from typing import Union
 
 from . import BasePlugin, PluginDefinition, PluginType, Variant
 
@@ -24,7 +25,7 @@ def lazy_import(module: str, classname: str):
     return lazy
 
 
-base_plugin_classes = {  # noqa: WPS317
+base_plugin_classes = {
     PluginType.EXTRACTORS: lazy_import(".singer", "SingerTap"),
     PluginType.LOADERS: lazy_import(".singer", "SingerTarget"),
     PluginType.TRANSFORMS: lazy_import(".dbt", "DbtTransformPlugin"),
@@ -38,7 +39,7 @@ base_plugin_classes = {  # noqa: WPS317
 
 
 def base_plugin_factory(
-    plugin_def: PluginDefinition, variant_or_name: Union[str, Variant]
+    plugin_def: PluginDefinition, variant_or_name: str | Variant
 ) -> BasePlugin:
     """Return a plugin based on the given PluginDefinition and variant.
 
@@ -49,7 +50,7 @@ def base_plugin_factory(
     Returns:
         The created plugin.
     """
-    plugin_cls = base_plugin_classes.get(  # noqa: WPS317
+    plugin_cls = base_plugin_classes.get(
         (plugin_def.type, plugin_def.name),
         base_plugin_classes.get(plugin_def.type, lambda: BasePlugin),
     )()

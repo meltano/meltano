@@ -1,23 +1,23 @@
 """State management in CLI."""
+from __future__ import annotations
+
 import json
 import re
 from datetime import datetime as dt
 from functools import partial, reduce, wraps
 from operator import xor
-from typing import Optional
 
 import click
 import structlog
 
+from meltano.cli import cli
 from meltano.cli.params import pass_project
+from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
-
-from . import cli
-from .utils import InstrumentedCmd, InstrumentedGroup
 
 STATE_SERVICE_KEY = "state_service"
 
@@ -66,11 +66,11 @@ prompt_for_confirmation = partial(
 )
 
 
-def state_service_from_state_id(
-    project: Project, state_id: str
-) -> Optional[StateService]:
+def state_service_from_state_id(project: Project, state_id: str) -> StateService | None:
     """Instantiate by parsing a state_id."""
-    state_id_re = re.compile(r"^(?P<env>.+)\:(?P<tap>.+)-to-(?P<target>.+)$")
+    state_id_re = re.compile(
+        r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$"
+    )
     match = state_id_re.match(state_id)
     if match:
         # If the state_id matches convention (i.e., job has been run via "meltano run"),
@@ -80,14 +80,18 @@ def state_service_from_state_id(
         try:
             if not project.active_environment:
                 logger.warn(
-                    f"Running state operation for environment '{match.group('env')}' outside of an environment"
+                    "Running state operation for environment "
+                    f"'{match['env']}' outside of an environment"
                 )
-            elif project.active_environment.name != match.group("env"):
+
+            elif project.active_environment.name != match["env"]:
                 logger.warn(
-                    f"Environment '{match.group('env')}' used in state operation does not match current environment '{project.active_environment.name}'."
+                    f"Environment '{match['env']}' used in state operation does "
+                    f"not match current environment '{project.active_environment.name}'."
                 )
-            project.activate_environment(match.group("env"))
-            blocks = [match.group("tap"), match.group("target")]
+
+            project.activate_environment(match["env"])
+            blocks = [match["tap"], match["target"]]
             parser = BlockParser(logger, project, blocks)
             return next(parser.find_blocks()).state_service
         except Exception:
@@ -97,7 +101,12 @@ def state_service_from_state_id(
     return None
 
 
-@cli.group(cls=InstrumentedGroup, name="state", short_help="Manage Singer state.")
+@cli.group(
+    cls=InstrumentedGroup,
+    name="state",
+    short_help="Manage Singer state.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
+)
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_state(project: Project, ctx: click.Context):
@@ -108,22 +117,18 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker()
-    ctx.obj[STATE_SERVICE_KEY] = StateService(session)  # noqa: WPS204
+    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
-@click.argument("pattern", required=False)
+@click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
-@pass_project()
-def list_state(
-    project: Project, ctx: click.Context, pattern: Optional[str]
-):  # noqa: WPS125
+def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
     """List all state_ids for this project.
 
     Optionally pass a glob-style pattern to filter state_ids by.
     """
-    state_service = ctx.obj[STATE_SERVICE_KEY]
-    ctx.obj["legacy_tracker"].track_meltano_state("list")
+    state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
     states = state_service.list_state(pattern)
     if states:
         for state_id, state in states.items():
@@ -157,10 +162,9 @@ def copy_state(
 ):
     """Copy state to another job id."""
     # Retrieve state for copying
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, src_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("copy", dst_state_id)
 
     state_service.copy_state(src_state_id, dst_state_id)
 
@@ -186,10 +190,9 @@ def move_state(
 ):
     """Move state to another job id, clearing the original."""
     # Retrieve state for moveing
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("move", dst_state_id)
 
     state_service.move_state(src_state_id, dst_state_id)
 
@@ -217,17 +220,20 @@ def merge_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: Optional[str],
-    input_file: Optional[click.Path],
-    from_state_id: Optional[str],
+    state: str | None,
+    input_file: click.Path | None,
+    from_state_id: str | None,
 ):
     """Add bookmarks to existing state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("merge", state_id)
-    mutually_exclusive_options = ["--input-file", "STATE", "--from-state-id"]
-    if not reduce(xor, map(bool, [state, input_file, from_state_id])):
+    mutually_exclusive_options = {
+        "--input-file": input_file,
+        "STATE": state,
+        "--from-state-id": from_state_id,
+    }
+    if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     elif input_file:
         with open(input_file) as state_f:
@@ -260,17 +266,20 @@ def set_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: Optional[str],
-    input_file: Optional[click.Path],
+    state: str | None,
+    input_file: click.Path | None,
     force: bool,
 ):
     """Set state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("set", state_id)
-    if not reduce(xor, map(bool, [state, input_file])):
-        raise MutuallyExclusiveOptionsError("--input-file", "STATE")
+    mutually_exclusive_options = {
+        "--input-file": input_file,
+        "STATE": state,
+    }
+    if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
+        raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     elif input_file:
         with open(input_file) as state_f:
             state_service.set_state(state_id, state_f.read())
@@ -287,10 +296,9 @@ def set_state(
 @click.pass_context
 def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS463
     """Get state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("get", state_id)
     retrieved_state = state_service.get_state(state_id)
     click.echo(json.dumps(retrieved_state))
 
@@ -302,8 +310,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS
 @click.pass_context
 def clear_state(ctx: click.Context, project: Project, state_id: str, force: bool):
     """Clear state."""
-    state_service = (
+    state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    ctx.obj["legacy_tracker"].track_meltano_state("clear", state_id)
     state_service.clear_state(state_id)

@@ -3,17 +3,22 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pytest
+from click import Command
 from click.testing import CliRunner
 
-from meltano.core.project import Project
+from fixtures.utils import tmp_project
 from meltano.core.project_files import ProjectFiles
-from meltano.core.project_init_service import ProjectInitService
 
 if TYPE_CHECKING:
+    from click.testing import Result
+
     from fixtures.docker import SnowplowMicro
+
+
+current_dir = Path(__file__).parent
 
 
 class MeltanoCliRunner(CliRunner):
@@ -22,8 +27,8 @@ class MeltanoCliRunner(CliRunner):
         self.snowplow = snowplow
         super().__init__(*args, **kwargs)
 
-    def invoke(self, *args, **kwargs) -> Any:
-        results = super().invoke(*args, **kwargs)
+    def invoke(self, cli: Command, *args, **kwargs) -> Result:
+        results = super().invoke(cli, *args, **kwargs)
         if self.snowplow:  # pragma: no cover
             assert self.snowplow.all()["bad"] == 0  # pragma: no cover
             assert not self.snowplow.bad()  # pragma: no cover
@@ -42,22 +47,20 @@ def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
 
 
 @pytest.fixture(scope="class")
+def large_config_project(test_dir, compatible_copy_tree):
+    with tmp_project(
+        "large_config_project",
+        current_dir / "large_config_project",
+        compatible_copy_tree,
+    ) as project:
+        yield project
+
+
+@pytest.fixture(scope="class")
 def project_files_cli(test_dir, compatible_copy_tree):
-    project_init_service = ProjectInitService("a_multifile_meltano_project_cli")
-    project = project_init_service.init(add_discovery=False)
-    logging.debug(f"Created new project at {project.root}")
-
-    current_dir = Path(__file__).parent
-    multifile_project_root = current_dir.joinpath("multifile_project/")
-
-    os.remove(project.meltanofile)
-    compatible_copy_tree(multifile_project_root, project.root)
-    # cd into the new project root
-    os.chdir(project.root)
-
-    try:
+    with tmp_project(
+        "a_multifile_meltano_project_cli",
+        current_dir / "multifile_project",
+        compatible_copy_tree,
+    ) as project:
         yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
-    finally:
-        Project.deactivate()
-        os.chdir(test_dir)
-        logging.debug(f"Cleaned project at {project.root}")

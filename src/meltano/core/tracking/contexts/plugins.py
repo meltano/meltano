@@ -1,4 +1,5 @@
 """Tracking plugin context for the Snowplow tracker."""
+
 from __future__ import annotations
 
 import uuid
@@ -16,7 +17,7 @@ from meltano.core.utils import hash_sha256, safe_hasattr
 logger = get_logger(__name__)
 
 
-def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
+def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
     if not plugin or not safe_hasattr(plugin, "info"):
         # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?), or where passed None.
         # this event will be routed to the "bad" bucket on the snowplow side. That makes it detectable on our end,
@@ -34,9 +35,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
         if plugin.executable
         else None,
         "variant_name_hash": hash_sha256(plugin.variant) if plugin.variant else None,
-        "pip_url_hash": hash_sha256(plugin.formatted_pip_url)
-        if plugin.formatted_pip_url
-        else None,
+        "pip_url_hash": hash_sha256(plugin.pip_url) if plugin.pip_url else None,
         "parent_name_hash": hash_sha256(plugin.parent.name) if plugin.parent else None,
         "command": cmd,
     }
@@ -46,35 +45,25 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str) -> dict:
 class PluginsTrackingContext(SelfDescribingJson):
     """Tracking context for the Meltano plugins."""
 
-    def __init__(self, plugins: list(tuple[ProjectPlugin, str])):
+    def __init__(self, plugins: list(tuple[ProjectPlugin, str | None])):
         """Initialize a meltano tracking plugin context.
 
         Args:
             plugins: The Meltano plugins and the requested command.
         """
-        tracking_context = []
-        for plugin, cmd in plugins:
-            tracking_context.append(_from_plugin(plugin, cmd))
-
         super().__init__(
             PluginsContextSchema.url,
-            {"context_uuid": str(uuid.uuid4()), "plugins": tracking_context},
+            {
+                "context_uuid": str(uuid.uuid4()),
+                "plugins": [_from_plugin(plugin, cmd) for plugin, cmd in plugins],
+            },
         )
-
-    def append_plugin_context(self, plugin: ProjectPlugin, cmd: str):
-        """Append a plugin context to the tracking context.
-
-        Args:
-            plugin: The Meltano plugin.
-            cmd: The command that was executed.
-        """
-        self["plugins"].append({_from_plugin(plugin, cmd)})
 
     @classmethod
     def from_elt_context(cls, elt_context: ELTContext) -> PluginsTrackingContext:
         """Create a PluginsTrackingContext from an ELTContext.
 
-        Parameters:
+        Args:
             elt_context: The ELTContext to use.
 
         Returns:
@@ -82,8 +71,12 @@ class PluginsTrackingContext(SelfDescribingJson):
         """
         plugins = []
         if not elt_context.only_transform:
-            plugins.append((elt_context.extractor.plugin, None))
-            plugins.append((elt_context.loader.plugin, None))
+            plugins.extend(
+                (
+                    (elt_context.extractor.plugin, None),
+                    (elt_context.loader.plugin, None),
+                )
+            )
         if elt_context.transformer:
             plugins.append((elt_context.transformer.plugin, None))
         return cls(plugins)
@@ -92,7 +85,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     def from_block(cls, blk: BlockSet | PluginCommandBlock) -> PluginsTrackingContext:
         """Create a PluginsTrackingContext from a BlockSet or PluginCommandBlock.
 
-        Parameters:
+        Args:
             blk: The block to create the context for.
 
         Raises:
@@ -102,9 +95,11 @@ class PluginsTrackingContext(SelfDescribingJson):
             The PluginsTrackingContext for the given block.
         """
         if isinstance(blk, BlockSet):
-            plugins: list[(ProjectPlugin, str)] = []
-            for plugin_block in blk.blocks:
-                plugins.append((plugin_block.context.plugin, plugin_block.plugin_args))
+            plugins: list[tuple[ProjectPlugin, str]] = [
+                (plugin_block.context.plugin, plugin_block.plugin_args)
+                for plugin_block in blk.blocks
+            ]
+
             return cls(plugins)
         if isinstance(blk, PluginCommandBlock):
             return cls([(blk.context.plugin, blk.command)])
@@ -119,7 +114,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     ) -> PluginsTrackingContext:
         """Create a PluginsTrackingContext from a list of BlockSets or PluginCommandBlocks.
 
-        Parameters:
+        Args:
             parsed_blocks: The blocks to create the context from.
 
         Returns:
@@ -128,10 +123,10 @@ class PluginsTrackingContext(SelfDescribingJson):
         plugins: list[tuple[ProjectPlugin, str]] = []
         for blk in parsed_blocks:
             if isinstance(blk, BlockSet):
-                for plugin_block in blk.blocks:
-                    plugins.append(
-                        (plugin_block.context.plugin, plugin_block.plugin_args)
-                    )
+                plugins.extend(
+                    (plugin_block.context.plugin, plugin_block.plugin_args)
+                    for plugin_block in blk.blocks
+                )
             elif isinstance(blk, PluginCommandBlock):
                 plugins.append((blk.context.plugin, blk.command))
         return PluginsTrackingContext(plugins)

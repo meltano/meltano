@@ -1,13 +1,14 @@
 """Meltano schedule definition."""
+from __future__ import annotations
+
 import datetime
-from typing import List
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.job import Job as StateJob
 from meltano.core.job import JobFinder as StateJobFinder
 
-CRON_INTERVALS = {
+CRON_INTERVALS: dict[str, str | None] = {
     "@once": None,
     "@hourly": "0 * * * *",
     "@daily": "0 0 * * *",
@@ -22,14 +23,14 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
 
     def __init__(
         self,
-        name: str = None,
-        extractor: str = None,
-        loader: str = None,
-        transform: str = None,
-        interval: str = None,
-        start_date: datetime = None,
-        job: str = None,
-        env: dict = None,
+        name: str,
+        extractor: str | None = None,
+        loader: str | None = None,
+        transform: str | None = None,
+        interval: str | None = None,
+        start_date: datetime.datetime | None = None,
+        job: str | None = None,
+        env: dict[str, str] | None = None,
     ):
         """Initialize a Schedule.
 
@@ -67,13 +68,16 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
             self.start_date = start_date
 
     @property
-    def cron_interval(self) -> str:
+    def cron_interval(self) -> str | None:
         """Return the explicit cron interval expression for a cron alias.
 
         Returns:
             The cron expression.
         """
-        return CRON_INTERVALS.get(self.interval, self.interval)
+        if self.interval:
+            return CRON_INTERVALS.get(self.interval, self.interval)
+
+        return None
 
     @property
     def elt_schedule(self) -> bool:
@@ -85,8 +89,10 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         return not self.job
 
     @property
-    def elt_args(self) -> List[str]:
-        """Return the list of arguments to pass to the elt command, if the schedule is an elt schedule.
+    def elt_args(self) -> list[str | None]:
+        """Return the list of arguments to pass to the elt command.
+
+        Only valid if the schedule is an elt schedule.
 
         Returns:
             The list of arguments to pass to the elt command.

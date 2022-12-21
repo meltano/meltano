@@ -1,5 +1,11 @@
 """New Project Initialization Service."""
+
+from __future__ import annotations
+
+import contextlib
 import os
+import uuid
+from pathlib import Path
 
 import click
 
@@ -9,6 +15,8 @@ from .plugin.meltano_file import MeltanoFilePlugin
 from .project import Project
 from .project_settings_service import ProjectSettingsService, SettingValueStore
 
+PROJECT_FILENAME = "meltano.yml"
+
 
 class ProjectInitServiceError(Exception):
     """Project Initialization Service Exception."""
@@ -17,20 +25,31 @@ class ProjectInitServiceError(Exception):
 class ProjectInitService:
     """New Project Initialization Service."""
 
-    def __init__(self, project_name):
+    def __init__(self, project_directory: os.PathLike):
         """Create a new ProjectInitService instance.
 
         Args:
-            project_name: The name of the project to create
+            project_directory: The directory path to create the project at
         """
-        self.project_name = project_name.lower()
+        self.project_directory = Path(project_directory)
 
-    def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
+        with contextlib.suppress(ValueError):
+            self.project_directory = self.project_directory.relative_to(Path.cwd())
+
+    def init(  # noqa: C901
+        self,
+        *,
+        activate: bool = True,
+        add_discovery: bool = False,
+        force: bool = False,
+    ) -> Project:
         """Initialise Meltano Project.
 
         Args:
             activate: Activate newly created project
             add_discovery: Add discovery.yml file to created project
+            force: Whether to overwrite `meltano.yml` in the existing
+                directory.
 
         Returns:
             A new Project instance
@@ -39,49 +58,80 @@ class ProjectInitService:
             ProjectInitServiceError: Directory already exists
         """
         try:
-            os.mkdir(self.project_name)
-        except Exception as exp:  # noqa: F841
+            self.project_directory.mkdir()
+        except FileExistsError as ex:
+            if (
+                os.path.exists(os.path.join(self.project_directory, PROJECT_FILENAME))
+                and not force
+            ):
+                msg = (
+                    "A `meltano.yml` file already exists in the target directory. "
+                    "Use `--force` to overwrite it."
+                )
+                raise ProjectInitServiceError(msg) from ex
+        except PermissionError as ex:
             raise ProjectInitServiceError(
-                f"Directory {self.project_name} already exists."
-            )
-        click.secho("Created", fg="blue", nl=False)
-        click.echo(f" {self.project_name}")
+                f"Permission denied to create '{self.project_directory}'."
+            ) from ex
+        except Exception as ex:
+            raise ProjectInitServiceError(
+                f"Could not create directory '{self.project_directory}'. {ex}"
+            ) from ex
 
-        self.project = Project(self.project_name)
+        project = Project(self.project_directory)
 
-        self.create_files(add_discovery=add_discovery)
+        self.create_dot_meltano_dir(project)
+        self.create_files(project, add_discovery=add_discovery)
 
-        self.settings_service = ProjectSettingsService(self.project)
+        self.settings_service = ProjectSettingsService(project)
+        self.settings_service.set(
+            "project_id",
+            str(uuid.uuid4()),
+            store=SettingValueStore.MELTANO_YML,
+        )
         self.set_send_anonymous_usage_stats()
         if activate:
-            Project.activate(self.project)
+            Project.activate(project)
 
-        self.create_system_database()
+        self.create_system_database(project)
 
-        return self.project
+        return project
 
-    def create_dot_meltano_dir(self):
-        """Create .meltano directory."""
+    def create_dot_meltano_dir(self, project: Project):
+        """Create .meltano directory.
+
+        Args:
+            project: Meltano project context
+        """
         # explicitly create the .meltano directory if it doesn't exist
-        os.makedirs(self.project.meltano_dir(), exist_ok=True)
-        click.secho("   |--", fg="blue", nl=False)
-        click.echo(f" {self.project.meltano_dir().name}")
+        click.secho("Creating .meltano folder", fg="blue")
+        os.makedirs(project.meltano_dir(), exist_ok=True)
+        click.secho("created", fg="blue", nl=False)
+        click.echo(f" .meltano in {project.sys_dir_root}")
 
-    def create_files(self, add_discovery=False):
+    def create_files(self, project: Project, add_discovery=False):
         """Create project files.
 
         Args:
+            project: Meltano project context
             add_discovery: Add discovery.yml file to created project
         """
         click.secho("Creating project files...", fg="blue")
-        click.echo(f"  {self.project_name}/")
 
-        self.create_dot_meltano_dir()
+        if project.root != Path.cwd():
+            click.echo(f"  {self.project_directory}/")
 
         plugin = MeltanoFilePlugin(discovery=add_discovery)
-        for path in plugin.create_files(self.project):
-            click.secho("   |--", fg="blue", nl=False)
-            click.echo(f" {path}")
+
+        expected_files = plugin.files_to_create(project, [])
+        created_files = plugin.create_files(project)
+        for path in expected_files:
+            if path in created_files:
+                click.secho("   |--", fg="blue", nl=False)
+                click.echo(f" {path}")
+            else:
+                click.secho("   |--", fg="yellow", nl=False)
+                click.echo(f" {path} (skipped)")
 
     def set_send_anonymous_usage_stats(self):
         """Set Anonymous Usage Stats flag."""
@@ -93,8 +143,11 @@ class ProjectInitService:
                 store=SettingValueStore.MELTANO_YML,
             )
 
-    def create_system_database(self):
+    def create_system_database(self, project: Project):
         """Create Meltano System DB.
+
+        Args:
+            project: Meltano project context
 
         Raises:
             ProjectInitServiceError: Database initialization failed
@@ -102,24 +155,26 @@ class ProjectInitService:
         click.secho("Creating system database...", fg="blue", nl=False)
 
         # register the system database connection
-        engine, _ = project_engine(self.project, default=True)
+        engine, _ = project_engine(project, default=True)
 
         from meltano.core.migration_service import MigrationError, MigrationService
 
         try:
             migration_service = MigrationService(engine)
             migration_service.upgrade(silent=True)
-            migration_service.seed(self.project)
+            migration_service.seed(project)
             click.secho("  Done!", fg="blue")
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err
 
-    def echo_instructions(self):
-        """Echo Next Steps to Click CLI."""
+    def echo_instructions(self, project: Project):
+        """Echo Next Steps to Click CLI.
+
+        Args:
+            project: Meltano project context
+        """
         click.secho(GREETING, nl=False)
-        click.secho("\nProject ", nl=False)
-        click.secho(self.project_name, fg="magenta", nl=False)
-        click.echo(" has been created!\n")
+        click.echo("Your project has been created!\n")
 
         click.echo("Meltano Environments initialized with ", nl=False)
         click.secho("dev", fg="bright_green", nl=False)
@@ -135,23 +190,15 @@ class ProjectInitService:
         )
 
         click.echo("\nNext steps:")
-        click.secho("  cd ", nl=False)
-        click.secho(self.project_name, fg="magenta")
+
+        if project.root != Path.cwd():
+            click.secho("  cd ", nl=False)
+            click.secho(self.project_directory, fg="magenta")
+
         click.echo("  Visit ", nl=False)
         click.secho(
-            "https://docs.meltano.com/getting-started#create-your-meltano-project",
+            "https://docs.meltano.com/getting-started/part1",
             fg="cyan",
             nl=False,
         )
         click.echo(" to learn where to go from here")
-
-    def join_with_project_base(self, filename):
-        """Join Path to Project base.
-
-        Args:
-            filename: File name to join with project base
-
-        Returns:
-            Joined base path and passed filename
-        """
-        return os.path.join(".", self.project_name, filename)

@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import logging
 from functools import wraps
 
 import requests
-from flask import Blueprint, current_app, g, jsonify, redirect, render_template, request
+from flask import Blueprint, current_app
+from flask import g as global_app_ctx
+from flask import jsonify, redirect, render_template, request
 from flask_login import current_user
 from flask_security import roles_required
 from jinja2 import TemplateNotFound
@@ -33,7 +37,7 @@ def redirect_to_login_if_auth_required(f):
 @root.route("/-/embed/<token>")
 def embed(token):
     try:
-        return render_template("embed.html", jsContext=g.jsContext)
+        return render_template("embed.html", jsContext=global_app_ctx.jsContext)
     except TemplateNotFound:
         return "Please run `make bundle` from src/webapp of the Meltano project."
 
@@ -46,7 +50,7 @@ def embed(token):
 @redirect_to_login_if_auth_required
 def default(path):
     try:
-        return render_template("webapp.html", jsContext=g.jsContext)
+        return render_template("webapp.html", jsContext=global_app_ctx.jsContext)
     except TemplateNotFound:
         return "Please run `make bundle` from src/webapp of the Meltano project."
 
@@ -60,7 +64,7 @@ def bootstrap():
 @root.route("/echo", methods=["POST"])
 def echo():
     payload = request.get_json()
-    print(payload)
+    print(payload)  # noqa: WPS421
     return jsonify(payload)
 
 
@@ -72,9 +76,17 @@ def version():
     response_payload = {"version": meltano.__version__}
 
     if truthy(request.args.get("include_latest")):
-        res = requests.get("https://pypi.org/pypi/meltano/json")
-        pypi_payload = res.json()
-        response_payload["latest_version"] = pypi_payload["info"]["version"]
+        try:
+            res = requests.get("https://pypi.org/pypi/meltano/json")
+            pypi_payload = res.json()
+            response_payload["latest_version"] = pypi_payload["info"]["version"]
+        except requests.exceptions.ConnectionError as e:
+            logger.warning(
+                "%s failed with error %s getting latest_version from pypi.org",
+                request,
+                repr(e),
+            )
+            response_payload["latest_version"] = None
 
     return jsonify(response_payload)
 

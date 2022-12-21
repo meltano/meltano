@@ -7,13 +7,12 @@ import logging
 from collections import OrderedDict
 from os import PathLike
 from pathlib import Path
-from typing import Mapping, MutableMapping, TypeVar
+from typing import Any, Mapping, MutableMapping, Sequence, TypeVar
 
 from atomicwrites import atomic_write
-from ruamel.yaml import YAMLError
-from ruamel.yaml.comments import CommentedMap, CommentedSeq
+from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
-from meltano.core.yaml import configure_yaml
+from meltano.core import yaml
 
 logger = logging.getLogger(__name__)
 TMapping = TypeVar("TMapping", bound=MutableMapping)
@@ -44,14 +43,14 @@ def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
     Returns:
         The merged dict.
     """
-    base = copy.deepcopy(parent)
+    base = copy.copy(parent)
     for child in children:
         for key, value in child.items():
-            if isinstance(value, dict):
+            if isinstance(value, Mapping):
                 # get node or create one
                 node = base.setdefault(key, value.__class__())
                 base[key] = deep_merge(node, [value])
-            elif isinstance(value, list):
+            elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
                 node = base.setdefault(key, value.__class__())
                 node.extend(value)
             else:
@@ -74,23 +73,19 @@ class ProjectFiles:  # noqa: WPS214
             meltano_file_path: The path to the meltano.yml file.
         """
         self.root = root.resolve()
-        self._meltano: CommentedMap | None = None
         self._meltano_file_path = meltano_file_path.resolve()
         self._plugin_file_map = {}
         self._raw_contents_map: dict[str, CommentedMap] = {}
-        self._yaml = configure_yaml()
+        self._cached_loaded: CommentedMap | None = None
 
     @property
     def meltano(self) -> CommentedMap:
-        """Return the contents of this projects `meltano.yml`.
+        """Return the contents of this project's `meltano.yml`.
 
         Returns:
             The contents of this projects `meltano.yml`.
         """
-        if self._meltano is None:
-            with open(self._meltano_file_path) as melt_f:
-                self._meltano = self._yaml.load(melt_f)
-        return self._meltano
+        return yaml.load(self._meltano_file_path)
 
     @property
     def include_paths(self) -> list[Path]:
@@ -108,12 +103,23 @@ class ProjectFiles:  # noqa: WPS214
         Returns:
             A dict representation of all project files.
         """
-        # meltano file may have changed in another process, so reset cache first
-        self.reset_cache()
+        prev_raw_contents_map = self._raw_contents_map.copy()
         self._raw_contents_map.clear()
         self._raw_contents_map[str(self._meltano_file_path)] = self.meltano
         included_file_contents = self._load_included_files()
-        return deep_merge(self.meltano, included_file_contents)
+
+        # If the exact same objects are loaded again, use the cached result:
+        k = TypeVar("k")
+
+        def id_vals(x: dict[k, Any]) -> dict[k, int]:
+            return {k: id(v) for k, v in x.items()}
+
+        if self._cached_loaded is None or id_vals(prev_raw_contents_map) != id_vals(
+            self._raw_contents_map
+        ):
+            self._cached_loaded = deep_merge(self.meltano, included_file_contents)
+
+        return self._cached_loaded
 
     def update(self, meltano_config: dict) -> dict:
         """Update config by overriding current config with new, changed config.
@@ -134,12 +140,7 @@ class ProjectFiles:  # noqa: WPS214
         unused_files = [fl for fl in self.include_paths if str(fl) not in file_dicts]
         for unused_file_path in unused_files:
             self._write_file(unused_file_path, BLANK_SUBFILE)
-        self.reset_cache()
         return meltano_config
-
-    def reset_cache(self) -> None:
-        """Reset cached view of the meltano.yml file."""
-        self._meltano = None
 
     def _is_valid_include_path(self, file_path: Path) -> None:
         """Determine if given path is a valid `include_paths` file.
@@ -250,17 +251,15 @@ class ProjectFiles:  # noqa: WPS214
         included_file_contents = []
         for path in self.include_paths:
             try:
-                with path.open() as file:
-                    contents: CommentedMap = self._yaml.load(file)
-                    self._raw_contents_map[str(path)] = contents
-                    # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
-                    self._index_file(
-                        include_file_path=path, include_file_contents=contents
-                    )
-                    included_file_contents.append(contents)
+                contents: CommentedMap = yaml.load(path)
             except YAMLError as exc:
                 logger.critical(f"Error while parsing YAML file: {path} \n {exc}")
                 raise exc
+            else:
+                self._raw_contents_map[str(path)] = contents
+                # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
+                self._index_file(include_file_path=path, include_file_contents=contents)
+                included_file_contents.append(contents)
         return included_file_contents
 
     def _add_mapping_entry(self, file_dicts, file, key, value):
@@ -381,4 +380,4 @@ class ProjectFiles:  # noqa: WPS214
 
     def _write_file(self, file_path: PathLike, contents: Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
-            self._yaml.dump(contents, fl)
+            yaml.dump(contents, fl)
