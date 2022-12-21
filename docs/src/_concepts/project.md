@@ -298,6 +298,23 @@ Meltano will use these paths or patterns to collect the config from them for use
 
 Currently supported elements in subfiles are [plugins](/concepts/project#plugins), [schedules](/concepts/project#plugins) and [environments](/concepts/environments).
 
+### Annotations
+
+To better integrate with software other than the core Meltano library and CLI, `meltano.yml` support "annotations", which is a dictionary that map from tool/vendor names to arbitrary dictionaries with whatever that tool/vendor wants to annotate the Meltano config with.
+
+```yaml
+annotations:
+  meltano-cloud: {
+    # Meltano Cloud config
+  }
+  arbitrary-third-party-tool: {
+    # Configuration for the third party tool
+  }
+  # etc.
+```
+
+The core Meltano library and CLI never access the `annotations` field. To access it, one must read `meltano.yml`. Nothing within an `annotations` field should be thought of as part of Meltano's own configuration - it is merely extra data that Meltano permits within its configuration files.
+
 ## `.gitignore`
 
 A newly initialized project comes with a [`.gitignore` file](https://git-scm.com/docs/gitignore) to ensure that
