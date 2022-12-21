@@ -32,13 +32,14 @@ def cd_temp_dir():
 
 @pytest.mark.order(0)
 @pytest.mark.parametrize(
-    "parent,children,expected",
-    [
+    ("parent", "children", "expected"),
+    (
         ({"a": 1}, [{"a": 1}], {"a": 1}),
         ({"a": 1}, [{"a": 2}], {"a": 2}),
         ({"a": 1}, [{"a": 2, "b": 2}], {"a": 2, "b": 2}),
         ({"a": [1, 2, 3]}, [{"a": [3, 4, 5]}], {"a": [1, 2, 3, 3, 4, 5]}),
-    ],
+        ({"a": "A", "b": "B"}, [{"a": "Z"}], {"a": "Z", "b": "B"}),
+    ),
 )
 def test_deep_merge(parent, children, expected):
     assert deep_merge(parent, children) == expected
