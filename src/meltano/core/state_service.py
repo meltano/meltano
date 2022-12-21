@@ -111,7 +111,7 @@ class StateService:  # noqa: WPS214
         self,
         job: Job | str,
         new_state: str,
-        payload_flags: int = Payload.STATE,
+        payload_flags: Payload = Payload.STATE,
         validate=True,
     ):
         """Add state for the given Job.
