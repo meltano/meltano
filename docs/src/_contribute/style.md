@@ -22,7 +22,7 @@ Python:
 
 Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code. Notable among these is `wemake-python-styleguide`, which offers an extensive set of opinionated rules that encourage clean and correct code.
 
-To lint your Python code, run `poetry run flake8` from the root of the project. If you only want to lint the files that have changed (and have been staged in git), you can run `pre-commit`. The `pre-commit` check will be run in CI on all PRs. Some lint issues, particularly around documentation, are pre-existing. Over time we are working to address these issues. If your PR is failing the `pre-commit` check because of pre-existing lint issues, feel free to leave them unaddressed.
+To lint your Python code, install the project using `poetry install`, then run `poetry run pre-commit --all-files flakeheaven` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
 
 Javascript:
 
