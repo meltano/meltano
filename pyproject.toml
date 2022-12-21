@@ -534,7 +534,6 @@ module = [
   "meltano.core.project_init_service",
   "meltano.core.project_plugins_service",
   "meltano.core.project_settings_service",
-  "meltano.core.schedule",
   "meltano.core.select_service",
   "meltano.core.setting",
   "meltano.core.setting_definition",
