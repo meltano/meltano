@@ -10,6 +10,7 @@ from enum import Enum
 from typing import Generator, Iterable
 
 from meltano.core.project import Project
+from meltano.core.utils import EnvVarMissingBehavior
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import flatten
 
@@ -349,13 +350,15 @@ class SettingsService(ABC):  # noqa: WPS214
 
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
-        env_var_strict_mode, _ = source.manager(self.project_settings_service).get(
+        strict_env_var_mode, _ = source.manager(self.project_settings_service).get(
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
         )
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
             expanded_value = do_expand_env_vars(
-                value, env=expandable_env, raise_if_missing=env_var_strict_mode
+                value,
+                env=expandable_env,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
 
             if expanded_value != value:

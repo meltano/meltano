@@ -110,7 +110,7 @@ class StateService:  # noqa: WPS214
     def add_state(
         self,
         job: Job | str,
-        new_state: str | None,
+        new_state: str,
         payload_flags: Payload = Payload.STATE,
         validate=True,
     ):
@@ -157,7 +157,7 @@ class StateService:  # noqa: WPS214
             return json.loads(state.json_merged())
         return {}
 
-    def set_state(self, state_id: str, new_state: str | None, validate: bool = True):
+    def set_state(self, state_id: str, new_state: str, validate: bool = True):
         """Set the state for the state_id.
 
         Args:

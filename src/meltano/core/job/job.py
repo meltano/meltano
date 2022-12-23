@@ -8,6 +8,7 @@ import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
+from enum import IntFlag as EnumIntFlag
 
 from sqlalchemy import Column, literal, types
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -80,7 +81,7 @@ def current_trigger():
     return os.getenv("MELTANO_JOB_TRIGGER")
 
 
-class Payload(IntFlag):
+class Payload(EnumIntFlag):
     """Flag indicating whether a Job has state in its payload field."""
 
     STATE = 1
