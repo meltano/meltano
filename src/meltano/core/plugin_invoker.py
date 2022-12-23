@@ -25,7 +25,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
-from meltano.core.utils import expand_env_vars
+from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 from meltano.core.venv_service import VenvService, VirtualEnv
 
 logger = get_logger(__name__)
@@ -335,12 +335,14 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 **expand_env_vars(
                     project_settings_service.env,
                     os.environ,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(  # noqa: WPS204
+                        strict_env_var_mode
+                    ),
                 ),
                 **expand_env_vars(
                     self.settings_service.project.dotenv_env,
                     os.environ,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 ),
             }
             # Expand active env w/ expanded root env
@@ -348,7 +350,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 expand_env_vars(
                     self.settings_service.project.active_environment.env,
                     expanded_project_env,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
                 if self.settings_service.project.active_environment
                 else {}
@@ -358,7 +360,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             expanded_root_plugin_env = expand_env_vars(
                 self.settings_service.plugin.env,
                 expanded_active_env,
-                raise_if_missing=strict_env_var_mode,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
 
             # Expand active env plugin env w/ expanded root plugin env
@@ -366,7 +368,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 expand_env_vars(
                     self.settings_service.environment_plugin_config.env,
                     expanded_root_plugin_env,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
                 if self.settings_service.environment_plugin_config
                 else {}

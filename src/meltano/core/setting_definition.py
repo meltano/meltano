@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from datetime import date, datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Iterable
 
 from ruamel.yaml import Representer
 
@@ -231,7 +231,7 @@ class SettingDefinition(NameEq, Canonical):
         return f"<SettingDefinition {self.name} ({self.kind})>"
 
     @classmethod
-    def from_missing(cls, defs: list[SettingDefinition], config: dict, **kwargs):
+    def from_missing(cls, defs: Iterable[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
 
         Args:

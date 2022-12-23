@@ -10,7 +10,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import FeatureFlags, SettingsService
-from meltano.core.utils import expand_env_vars
+from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 
 
 class PluginSettingsService(SettingsService):  # noqa: WPS214
@@ -67,7 +67,7 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
                     var: expand_env_vars(
                         value,
                         self.env_override,
-                        raise_if_missing=strict_env_var_mode,
+                        if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                     )
                     for var, value in self.project.active_environment.env.items()
                 }
@@ -78,7 +78,7 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
                         **self.project.dotenv_env,
                         **self.env_override,
                     },
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
 
             self.env_override.update(

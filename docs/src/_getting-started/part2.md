@@ -43,22 +43,23 @@ The container will need a few seconds to initialize. You can test the connection
 - password: password
 
 ## Add the postgres loader
-Add the postgres loader using the `meltano add loader target-postgres` command.
+Add the postgres loader using the `meltano add loader target-postgres --variant=meltanolabs` command.
 
 <div class="termy">
 
 ```console
-$ meltano add loader target-postgres
+$ meltano add loader target-postgres --variant=meltanolabs
 Added loader 'target-postgres' to your Meltano project
-Variant:        transferwise (default)
-Repository:     https://github.com/transferwise/pipelinewise-target-postgres
-Documentation:  https://hub.meltano.com/loaders/target-postgres
+Variant:        meltanolabs (default)
+Repository:     https://github.com/MeltanoLabs/target-postgres
+Documentation:  https://hub.meltano.com/loaders/target-postgres--meltanolabs
 
 Installing loader 'target-postgres'...
 ---> 100%
+
 Installed loader 'target-postgres'
 
-To learn more about loader 'target-postgres', visit https://hub.meltano.com/loaders/target-postgres
+To learn more about loader 'target-postgres', visit https://hub.meltano.com/loaders/target-postgres--meltanolabs
 ```
 </div>
 <br />
@@ -86,19 +87,19 @@ To configure the plugin, look at the options by running ```meltano config target
 $ meltano config target-postgres list
 
 [...]
-
-user [env: TARGET_POSTGRES_USER] current value: None (default)
-&ensp;&ensp;User: PostgreSQL user
+host [env: TARGET_POSTGRES_HOST] current value: 'postgres' (from `meltano.yml`)
+&ensp;&ensp;Host: Hostname for postgres instance. Note if sqlalchemy_url is set this will be ignored.
+port [env: TARGET_POSTGRES_PORT] current value: None (default)
+&ensp;&ensp;Port: The port on which postgres is awaiting connection. Note if sqlalchemy_url is set this will be ignored. Defaults to 5432
+user [env: TARGET_POSTGRES_USER] current value: 'meltano' (from `meltano.yml`)
+ &ensp;&ensp;User: User name used to authenticate. Note if sqlalchemy_url is set this will be ignored.
 password [env: TARGET_POSTGRES_PASSWORD] current value: None (default)
-&ensp;&ensp;Password: PostgreSQL password
-dbname [env: TARGET_POSTGRES_DBNAME] current value: None (default)
-&ensp;&ensp;Database Name: PostgreSQL database name
-
+&ensp;&ensp;Password: Password used to authenticate. Note if sqlalchemy_url is set this will be ignored.
+database [env: TARGET_POSTGRES_DATABASE] current value: 'postgres' (from `meltano.yml`)
+&ensp;&ensp;Database: Database name. Note if sqlalchemy_url is set this will be ignored.
 [...]
-
 add_metadata_columns [env: TARGET_POSTGRES_ADD_METADATA_COLUMNS] current value: False (default)
 &ensp;&ensp;Add Metadata Columns: Useful if you want to load multiple streams from one tap to multiple Postgres schemas.
-
 [...]
 
 To learn more about loader 'target-postgres' and its settings, visit https://hub.meltano.com/loaders/target-postgres
@@ -114,10 +115,12 @@ $ meltano config target-postgres set user meltano
 &ensp;&ensp;Loader 'target-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config target-postgres set password password
 &ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: 'password'
-$ meltano config target-postgres set dbname postgres
+$ meltano config target-postgres set database postgres
 &ensp;&ensp;Loader 'target-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
 $ meltano config target-postgres set add_metadata_columns True
 &ensp;&ensp;Loader 'target-postgres' setting 'add_metadata_columns' was set in `meltano.yml`: True
+$ meltano config target-postgres set host localhost
+&ensp;&ensp;Loader 'target-postgres' setting 'host' was set in `meltano.yml`: localhost
 ```
 </div>
 <br />
@@ -127,12 +130,13 @@ This will add the non-sensitive configuration to your [`meltano.yml` project fil
    plugins:
      loaders:
        - name: target-postgres
-         variant: transferwise
-         pip_url: pipelinewise-target-postgres
+         variant: meltanolabs
+         pip_url: git+https://github.com/MeltanoLabs/target-postgres.git
          config:
            user: meltano
-           dbname: postgres
+           database: postgres
            add_metadata_columns: true
+           host: localhost
    ```
 
 Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control.
@@ -143,21 +147,10 @@ You can use `meltano config target-postgres` to check the configuration, includi
 ```console
 $ meltano config target-postgres
 {
-&ensp;&ensp;&ensp;&ensp;"host": "localhost",
-&ensp;&ensp;&ensp;&ensp;"port": 5432,
+&ensp;&ensp;&ensp;&ensp;"host": "postgres",
 &ensp;&ensp;&ensp;&ensp;"user": "meltano",
-&ensp;&ensp;&ensp;&ensp;"password": "password",
-&ensp;&ensp;&ensp;&ensp;"dbname": "postgres",
-&ensp;&ensp;&ensp;&ensp;"ssl": "false",
-&ensp;&ensp;&ensp;&ensp;"batch_size_rows": 100000,
-&ensp;&ensp;&ensp;&ensp;"flush_all_streams": false,
-&ensp;&ensp;&ensp;&ensp;"parallelism": 0,
-&ensp;&ensp;&ensp;&ensp;"parallelism_max": 16,
-&ensp;&ensp;&ensp;&ensp;"add_metadata_columns": true,
-&ensp;&ensp;&ensp;&ensp;"hard_delete": false,
-&ensp;&ensp;&ensp;&ensp;"data_flattening_max_level": 0,
-&ensp;&ensp;&ensp;&ensp;"primary_key_required": true,
-&ensp;&ensp;&ensp;&ensp;"validate_records": false
+&ensp;&ensp;&ensp;&ensp;"database": "postgres",
+&ensp;&ensp;&ensp;&ensp;"add_metadata_columns": "True"
 }
 ```
 </div>

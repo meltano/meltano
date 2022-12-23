@@ -76,7 +76,7 @@ class ContainerSpec(Canonical):
 
         volumes = [expand_env_vars(bind, env) for bind in self.volumes]
 
-        exposed_ports = {}
+        exposed_ports: dict[str, Any] = {}
         port_bindings = defaultdict(list)
 
         for host_port, container_port in self.ports.items():

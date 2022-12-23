@@ -50,7 +50,7 @@ def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
                 # get node or create one
                 node = base.setdefault(key, value.__class__())
                 base[key] = deep_merge(node, [value])
-            elif isinstance(value, Sequence):
+            elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
                 node = base.setdefault(key, value.__class__())
                 node.extend(value)
             else:
