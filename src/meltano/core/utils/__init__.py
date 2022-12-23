@@ -14,8 +14,9 @@ import traceback
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
+from enum import IntEnum
 from pathlib import Path
-from typing import Any, Callable, Iterable, TypeVar, overload
+from typing import Any, Callable, Iterable, Mapping, Sequence, TypeVar, overload
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
@@ -23,7 +24,6 @@ from requests.auth import HTTPBasicAuth
 from meltano.core.error import MeltanoError
 
 logger = logging.getLogger(__name__)
-T = TypeVar("T")
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -478,42 +478,108 @@ ENV_VAR_PATTERN = re.compile(
     re.VERBOSE,
 )
 
+Expandable = TypeVar("Expandable", str, Mapping[str, "Expandable"])
+
+
+class EnvVarMissingBehavior(IntEnum):
+    """The behavior that should be employed when expanding a missing env var."""
+
+    use_empty_str = 0
+    raise_exception = 1
+    ignore = 2
+
 
 def expand_env_vars(
-    raw_value: dict[str, str] | str,
-    env: dict[str, str],
-    raise_if_missing: bool = False,
-):
-    if isinstance(raw_value, dict):
-        return {
-            key: expand_env_vars(val, env, raise_if_missing)
-            for key, val in raw_value.items()
-        }
-    elif not isinstance(raw_value, str):
+    raw_value: Expandable,
+    env: Mapping[str, str],
+    *,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
+    flat: bool = False,
+) -> Expandable:
+    """Expand/interpolate provided env vars into a string or env mapping.
+
+    By default, attempting to expand an env var which is not defined in the
+    provided env dict will result in it being replaced with the empty string.
+
+    Args:
+        raw_value: A string or env mapping in which env vars will be expanded.
+        env: The env vars to use for the expansion of `raw_value`.
+        if_missing: The behavior to employ if an env var in `raw_value` is not
+            set in `env`.
+        flat: Whether the `raw_value` has a flat structure. Ignored if
+            `raw_value` is not a mapping. Otherwise it controls whether this
+            function will process nested levels within `raw_value`. Defaults to
+            `False` for backwards-compatibility. Setting to `True` is recommend
+            for performance, safety, and cleanliness reasons.
+
+    Raises:
+        EnvironmentVariableNotSetError: Attempted to expand an env var that was not
+            defined in the provided env dict, and `if_missing` was
+            `EnvVarMissingBehavior.raise_exception`.
+
+    Returns:
+        The string or env dict with env vars expanded. For backwards
+        compatibility, if anything other than an `str` or mapping is provided
+        as the `raw_value`, it is returned unchanged.
+    """  # noqa: DAR402
+    if_missing = EnvVarMissingBehavior(if_missing)
+
+    if not isinstance(raw_value, (str, Mapping)):
         return raw_value
 
-    def subst(match) -> str:
+    def replacer(match: re.Match) -> str:
+        # The variable can be in either group
+        var = next(var for var in match.groups() if var)
         try:
-            # the variable can be in either group
-            var = next(var for var in match.groups() if var)
             val = str(env[var])
+        except KeyError as ex:
+            logger.debug(
+                f"Variable '${var}' is not set in the provided env dictionary."
+            )
+            if if_missing == EnvVarMissingBehavior.raise_exception:
+                raise EnvironmentVariableNotSetError(var) from ex
+            elif if_missing == EnvVarMissingBehavior.ignore:
+                return f"${{{var}}}"
+            return ""
+        if not val:
+            logger.debug(f"Variable '${var}' is empty.")
+        return val
 
-            if not val:
-                logger.debug(f"Variable '${var}' is empty.")
-                if raise_if_missing:
-                    raise EnvironmentVariableNotSetError(var)
-            return val
-        except KeyError as e:
-            if raise_if_missing:
-                raise EnvironmentVariableNotSetError(e.args[0])
-            logger.debug(f"Variable '${var}' is missing from the environment.")
-            return None
-
-    fullmatch = ENV_VAR_PATTERN.fullmatch(raw_value)
-    return subst(fullmatch) if fullmatch else ENV_VAR_PATTERN.sub(subst, raw_value)
+    return _expand_env_vars(raw_value, replacer, flat)
 
 
-def uniques_in(original):
+# Separate inner-function for `expand_env_vars` for performance reasons. Like
+# this the `replacer` function closure only needs to be created once when
+# `raw_value` is a dict, as opposed to once per key-value pair.
+def _expand_env_vars(
+    raw_value: Expandable,
+    replacer: Callable[[re.Match], str],
+    flat: bool,
+) -> Expandable:
+    if isinstance(raw_value, Mapping):
+        if flat:
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
+        return {
+            k: _expand_env_vars(v, replacer, flat)
+            if isinstance(v, (str, Mapping))
+            else v
+            for k, v in raw_value.items()
+        }
+    return ENV_VAR_PATTERN.sub(replacer, raw_value)
+
+
+T = TypeVar("T")
+
+
+def uniques_in(original: Sequence[T]) -> list[T]:
+    """Get unique elements from an iterable while preserving order.
+
+    Args:
+        original: A sequence from which only the unique values will be returned.
+
+    Returns:
+        A list of unique values from the provided sequence in the order they appeared.
+    """
     return list(OrderedDict.fromkeys(original))
 
 

@@ -2,7 +2,14 @@ from __future__ import annotations
 
 import pytest  # noqa: F401
 
-from meltano.core.utils import expand_env_vars, flatten, nest, pop_at_path, set_at_path
+from meltano.core.utils import (
+    EnvVarMissingBehavior,
+    expand_env_vars,
+    flatten,
+    nest,
+    pop_at_path,
+    set_at_path,
+)
 
 
 def test_nest():
@@ -82,9 +89,29 @@ def test_flatten():
 
 
 def test_expand_env_vars():
+    env = {"ENV_VAR": "substituted"}
+    assert expand_env_vars("${ENV_VAR}_suffix", env) == "substituted_suffix"
+    assert expand_env_vars("prefix_${ENV_VAR}", env) == "prefix_substituted"
     assert (
-        expand_env_vars("${ENV_VAR}_suffix", {"ENV_VAR": "substituted"})
-        == "substituted_suffix"
+        expand_env_vars("prefix_${ENV_VAR}_suffix", env) == "prefix_substituted_suffix"
+    )
+    assert expand_env_vars("${ENV_VAR}", env) == "substituted"
+    assert expand_env_vars("$ENV_VAR", env) == "substituted"
+
+    assert expand_env_vars("$ENV_VAR", {}) == ""
+    assert (
+        expand_env_vars("$ENV_VAR", {}, if_missing=EnvVarMissingBehavior.ignore)
+        == "${ENV_VAR}"
+    )
+    assert (
+        expand_env_vars("${ENV_VAR}", {}, if_missing=EnvVarMissingBehavior.ignore)
+        == "${ENV_VAR}"
+    )
+    assert (
+        expand_env_vars(
+            "prefix-${ENV_VAR}-suffix", {}, if_missing=EnvVarMissingBehavior.ignore
+        )
+        == "prefix-${ENV_VAR}-suffix"
     )
 
 
