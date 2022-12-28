@@ -269,7 +269,7 @@ class VenvService:  # noqa: WPS214
         Args:
             pip_install_args: The arguments being passed to `pip install`.
         """
-        with open(self.plugin_fingerprint_path, "wt") as fingerprint_file:
+        with open(self.plugin_fingerprint_path, "w") as fingerprint_file:
             fingerprint_file.write(fingerprint(pip_install_args))
 
     def exec_path(self, executable: str) -> Path:
