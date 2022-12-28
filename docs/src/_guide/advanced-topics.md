@@ -13,3 +13,5 @@ Most of Meltano's features are available without installing any additional packa
 * `s3` - Support for using S3 as a [state backend](/concepts/state_backends)
 * `gcs` - Support for using Google Cloud Storage as a [state backend](/concepts/state_backends)
 * `azure` - Support for using Azure Blob Storage as a [state backend](/concepts/state_backends)
+
+## Airbyte Connector Integration FAQ
