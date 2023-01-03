@@ -38,18 +38,14 @@ since you'll receive contributions with bug fixes and new features that you will
 
 ### <a name="taps-targets-development"></a>Taps & Targets Development
 
-Watch ["How taps are built"](https://www.youtube.com/watch?v=aImidnW8nsU) for an explanation of how Singer taps (which form the basis for Meltano extractors) work, and what goes into building new ones or verifying and modifying existing ones for various types of APIs.
-
-Then watch ["How transforms are built"](https://www.youtube.com/watch?v=QRaCSKQC_74) for an explanation of how DBT transforms work, and what goes into building new ones for new data sources.
-
 #### For existing taps/targets
 
 We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
 
 1. Fork (using Meltano organization)
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Modify and submits PRs
-1. If there is resistance, fork as our tap (2)
+1. Add a webhook to trigger the `meltano/meltano` pipeline.
+1. Modify and submit PRs
+1. If there is resistance, fork as our tap
 
 ##### How to test a tap?
 
