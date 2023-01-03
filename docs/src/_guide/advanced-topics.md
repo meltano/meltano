@@ -18,7 +18,7 @@ Most of Meltano's features are available without installing any additional packa
 
 ### How do the Singer and Airbyte specifications relate?
 
-The Singer specification was started in 2016 by Stitch Data. It specified a data transfer format that would allow any number of data systems, called taps, to send data to any data destination, called targets. Airbyte was incorporated in 2020 and created their own specification that was heavily inspired by Singer. There are differences but the core of each specification is sending new-line delimited JSON data from STDOUT of a tap to STDIN of a target.
+The Singer specification was started in 2016 by Stitch Data. It specified a data transfer format that would allow any number of data systems, called taps, to send data to any data destinations, called targets. Airbyte was incorporated in 2020 and created their own specification that was heavily inspired by Singer. There are differences, but the core of each specification is sending new-line delimited JSON data from STDOUT of a tap to STDIN of a target.
 
 ### How does the Airbyte Connector with Meltano integration work?
 
@@ -32,9 +32,9 @@ If you still need help we’d recommend either filing an issue in the [Meltano G
 
 We also have [weekly Office Hours](https://www.addevent.com/calendar/Li390615) where you can talk to the Meltano team and ask any questions you have to us!
 
-### Does this wrap the Airbyte UI or API?
+### Do I need to have an Airbyte UI or API instance to use this?
 
-No. This integration only makes it possible to run Airbyte [Source Connectors](https://docs.airbyte.com/category/sources) within your Meltano project.
+No. This integration makes it possible to directly run Airbyte [Source Connectors](https://docs.airbyte.com/category/sources) within your Meltano project. There's no need to run the Airbyte UI or API to use this feature.
 
 ### Does this support Airbyte destination connectors as well?
 
@@ -42,7 +42,7 @@ Airbyte destinations are _not_ supported with tap-airbyte-wrapper. This is a fea
 
 ### What is the recommended way to install and use these connectors?
 
-Any connector that is listed on MeltanoHub as being maintained by `airbyte` can be installed and run as you would any other connector. Use `meltano add extractor &lt;tap>` to add and install.
+Any connector that is listed on MeltanoHub as being maintained by `airbyte` can be installed and run as you would any other connector. Use `meltano add extractor <tap>` to add and install.
 
 ### What are the limitations of running Airbyte-based connectors with Meltano?
 
@@ -84,7 +84,7 @@ To configure your Airbyte connector as a [custom plugin]([https://docs.meltano.c
      kind: string
      label: Airbyte Spec Image
      name: airbyte_spec.image
-     value: airbyte/source-punk-api # REPLACE THIS WITH YOUR IMAGE NAME
+     value: airbyte/source-pokeapi # REPLACE THIS WITH YOUR IMAGE NAME
    - description: Airbyte image tag
      kind: string
      label: Airbyte Spec Tag
