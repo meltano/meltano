@@ -16,6 +16,8 @@ Most of Meltano's features are available without installing any additional packa
 
 ## Airbyte Connector Integration FAQ
 
+This FAQ section is for [tap-airbyte-wrapper](https://github.com/MeltanoLabs/tap-airbyte-wrapper) which is a Singer tap which enables any Airbyte source to be used as a Meltano extractor.
+
 ### How do the Singer and Airbyte specifications relate?
 
 The Singer specification was started in 2016 by Stitch Data. It specified a data transfer format that would allow any number of data systems, called taps, to send data to any data destinations, called targets. Airbyte was incorporated in 2020 and created their own specification that was heavily inspired by Singer. There are differences, but the core of each specification is sending new-line delimited JSON data from STDOUT of a tap to STDIN of a target.
