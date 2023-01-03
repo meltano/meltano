@@ -79,7 +79,7 @@ To configure your Airbyte connector as a [custom plugin]([https://docs.meltano.c
    variant: airbyte
    executable: tap-airbyte
    namespace: tap_airbyte
-   pip_url: git+https://github.com/z3z1ma/tap-airbyte.git
+   pip_url: git+https://github.com/MeltanoLabs/tap-airbyte.git
    capabilities:
    - catalog
    - state
