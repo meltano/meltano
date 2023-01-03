@@ -29,7 +29,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.30.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.31.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
