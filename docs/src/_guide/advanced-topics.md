@@ -58,7 +58,7 @@ It is also possible to run [Meltano on GitHub Actions](https://github.com/brookl
 
 There [are](zhsj.me/blog/view/dind-without-privileged) [several](shisho.dev/blog/posts/docker-in-docker) [articles](docs.docker.com/engine/security/rootless) on the web which discuss docker-in-docker in more detail.
 
-We are interested in exploring this challenge with the community. Please share in **this discussion or connect with us in Slack**about your experiences with attempting to put this into production.
+We are interested in exploring this challenge with the community. Please share in [this discussion](https://github.com/meltano/meltano/discussions/7142) or connect with us in [Slack](https://meltano.com/slack) about your experiences with attempting to put this into production.
 
 ### How does this work with custom connectors made with the Airbyte CDK?
 
