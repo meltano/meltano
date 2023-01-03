@@ -52,13 +52,19 @@ Based on the current implementation and testing, the main challenge is putting t
 
 ### Am I able to put my Meltano project with Airbyte connectors in production?
 
-Yes, assuming you can set up Docker-in-docker. Since each Airbyte connector is itself a Docker image, running inside a dockerized Meltano project would require “docker in docker” which has some possible challenges around privileges and permissions on certain systems.
+Yes you can!
+
+The main potential challenge with putting this into production is if you user Docker to package and deploy your Meltano project. If you're able to set up Docker-in-docker, then a Dockerized Meltano project with tap-airbyte-wrapper will work. Since each Airbyte connector is itself a Docker image, running inside a dockerized Meltano project would require “docker in docker” which has some possible challenges around privileges and permissions on certain systems.
 
 Within Codespaces, adding support for docker-in-docker was as easy as [adding a few lines](https://github.com/meltano/meltano-codespace-ready/commit/5ffb9fb6e3232142c8e2307340c0a4fb66379db4) to the devcontainer.json file.
 
 It is also possible to run [Meltano on GitHub Actions](https://github.com/brooklyn-data/meltano-on-github-actions). It’s likely possible to update this action to supporting docker-in-docker as well.
 
-There [are](zhsj.me/blog/view/dind-without-privileged) [several](shisho.dev/blog/posts/docker-in-docker) [articles](docs.docker.com/engine/security/rootless) on the web which discuss docker-in-docker in more detail.
+There are several articles on the web which discuss docker-in-docker in more detail:
+
+* [Run dind without privileged access](https://zhsj.me/blog/view/dind-without-privileged)
+* [How to Run Docker in Docker](https://shisho.dev/blog/posts/docker-in-docker/)
+* [Run the Docker daemon as a non-root user](https://docs.docker.com/engine/security/rootless/)
 
 We are interested in exploring this challenge with the community. Please share in [this discussion](https://github.com/meltano/meltano/discussions/7142) or connect with us in [Slack](https://meltano.com/slack) about your experiences with attempting to put this into production.
 
