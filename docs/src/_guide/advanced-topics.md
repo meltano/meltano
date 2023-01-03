@@ -133,7 +133,7 @@ Yes! Since the wrapper is based on the Meltano Singer SDK these connectors work 
 
 ### Does this integration support stream maps for PII filtering/hashing?
 
-Yes! This is a unique feature of Meltano that is not found in as comprehensive manner in other modern EL tools. With stream maps users are able to hash, filter, duplicate, and alias any column or table during their extract. Because this Airbyte integration was built using the SDK, streams maps can be defined on the connector itself ([SDK docs](https://sdk.meltano.com/en/latest/stream_maps.html)), or they can be added separately as a mapper in between a tap and target executing using `meltano run`. See [our tutorial](https://docs.meltano.com/getting-started/part4#undefined) for an example.
+Yes! This is a unique feature of Meltano that is not found in a comprehensive manner in other modern EL tools. With stream maps users are able to hash, filter, duplicate, and alias any column or table during their extract. Because this Airbyte integration was built using the SDK, streams maps can be defined on the connector itself ([SDK docs](https://sdk.meltano.com/en/latest/stream_maps.html)), or they can be added separately as a mapper in between a tap and target executing using `meltano run`. See [our tutorial](https://docs.meltano.com/getting-started/part4#undefined) for an example.
 
 ### Does this work with interactive config?
 
