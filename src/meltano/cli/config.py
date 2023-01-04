@@ -350,7 +350,7 @@ def reset(ctx, store):
 @_use_meltano_env
 def set_(
     ctx: click.core.Context,
-    setting_name: tuple,
+    setting_name: tuple[str, ...],
     value: Any,
     store: str,
     interactive: bool,
