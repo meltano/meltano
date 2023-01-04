@@ -146,6 +146,12 @@ that takes the shape of a SQLite database stored inside the [`.meltano` director
 You can choose to use a different system database backend or configuration using the `--database-uri`
 option of [`meltano` subcommands](/reference/command-line-interface), or the `MELTANO_DATABASE_URI` environment variable.
 
+<div class="notification is-warning">
+  Because internal database migrations make of use of the <code>ALTER TABLE table RENAME COLUMN oldname TO newname</code> syntax starting with Meltano `v2.2.0`, the minimum required SQLite version is now [`3.25.1`](https://sqlite.org/releaselog/3_25_1.html).
+
+  Some systems may not have this version available by default. You can run <code>sqlite3 --version</code> to check your version.
+</div>
+
 #### How to use
 
 ```bash
