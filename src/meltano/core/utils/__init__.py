@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import collections
 import functools
 import hashlib
 import logging
@@ -11,7 +12,6 @@ import os
 import re
 import sys
 import traceback
-from collections import OrderedDict, abc
 from copy import deepcopy
 from datetime import date, datetime, time
 from enum import IntEnum
@@ -170,6 +170,14 @@ def merge(src, dest):
     return dest
 
 
+def are_similar_types(left, right):
+    return (
+        issubclass(left.__class__, right.__class__)
+        or issubclass(right.__class__, left.__class__)
+        or type(left) == type(right)  # noqa: WPS516
+    )
+
+
 def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
     """Create a hierarchical dictionary path and return the leaf dict.
 
@@ -209,13 +217,13 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
     # create the list of dicts
     cursor = d
     for key in initial:
-        if key not in cursor or (not isinstance(cursor[key], abc.Mapping) and force):
+        if key not in cursor or (not isinstance(cursor[key], dict) and force):
             cursor[key] = {}
 
         cursor = cursor[key]
 
     if tail not in cursor or (
-        type(cursor[tail]) is not type(value) and force  # noqa: WPS516
+        not are_similar_types(cursor[tail], value) and force  # noqa: WPS516
     ):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
@@ -446,7 +454,7 @@ def set_at_path(d, path, value):
 
     *initial, tail = path
 
-    final = nest(d, initial) if initial else d
+    final = nest(d, initial, force=True) if initial else d
     final[tail] = value
 
 
@@ -580,7 +588,7 @@ def uniques_in(original: Sequence[T]) -> list[T]:
     Returns:
         A list of unique values from the provided sequence in the order they appeared.
     """
-    return list(OrderedDict.fromkeys(original))
+    return list(collections.OrderedDict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
