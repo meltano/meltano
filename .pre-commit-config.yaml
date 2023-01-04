@@ -9,7 +9,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
       - id: trailing-whitespace
         # The `bumpversion` command fails to commit its own changes to
@@ -29,7 +29,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.29.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.31.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
@@ -47,18 +47,18 @@ repos:
           - "prettier@2.8.1"
 
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 22.12.0
     hooks:
       - id: black
         exclude: ^(src/meltano/migrations/)
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
+    rev: 5.11.4
     hooks:
       - id: isort
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
+    rev: v3.3.1
     hooks:
       - id: pyupgrade
         args:

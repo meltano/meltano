@@ -36,6 +36,18 @@ class MeltanoError(Exception):
         self.instruction = instruction
         super().__init__(reason, instruction, *args, **kwargs)
 
+    def __str__(self) -> str:
+        """Return a string representation of the error.
+
+        Returns:
+            A string representation of the error.
+        """
+        return (
+            f"{self.reason}. {self.instruction}."
+            if self.instruction
+            else f"{self.reason}."
+        )
+
 
 class Error(Exception):
     """Base exception for ELT errors."""
