@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import collections
 import functools
 import hashlib
 import logging
@@ -11,7 +12,6 @@ import os
 import re
 import sys
 import traceback
-from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
 from enum import IntEnum
@@ -170,6 +170,10 @@ def merge(src, dest):
     return dest
 
 
+def are_similar_types(left, right):
+    return isinstance(left, type(right)) or isinstance(right, type(left))
+
+
 def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
     """Create a hierarchical dictionary path and return the leaf dict.
 
@@ -215,7 +219,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         cursor = cursor[key]
 
     if tail not in cursor or (
-        type(cursor[tail]) is not type(value) and force  # noqa: WPS516
+        (not are_similar_types(cursor[tail], value)) and force  # noqa: WPS516
     ):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
@@ -580,7 +584,7 @@ def uniques_in(original: Sequence[T]) -> list[T]:
     Returns:
         A list of unique values from the provided sequence in the order they appeared.
     """
-    return list(OrderedDict.fromkeys(original))
+    return list(collections.OrderedDict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
