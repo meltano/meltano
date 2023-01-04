@@ -223,7 +223,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         cursor = cursor[key]
 
     if tail not in cursor or (
-        not are_similar_types(cursor[tail], value) and force  # noqa: WPS516
+        (not are_similar_types(cursor[tail], value)) and force  # noqa: WPS516
     ):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.

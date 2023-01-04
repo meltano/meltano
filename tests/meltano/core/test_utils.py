@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import OrderedDict
+
 import pytest  # noqa: F401
 
 from meltano.core.utils import (
@@ -33,6 +35,21 @@ def test_nest():
     assert isinstance(arr, list)
     # make sure it is a copy
     assert val == start_value and val is not start_value
+
+    new_b = nest(subject, "a.b", "not_a_dict", force=True)
+    assert new_b == "not_a_dict"
+    assert subject == {"a": {"b": "not_a_dict", "list": [], "value": {"value": 1}}}
+
+    # make sure existing values aren't cleared when `value=None` and `force=True`
+    _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)  # noqa: WPS122
+    assert subject == {
+        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}}
+    }
+    similar_b = nest(subject, "a.b", force=True)
+    assert similar_b == OrderedDict({"d": "d_value"})
+    assert subject == {
+        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}}
+    }
 
 
 def test_pop_at_path():
