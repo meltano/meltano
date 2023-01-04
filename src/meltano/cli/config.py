@@ -348,7 +348,13 @@ def reset(ctx, store):
 )
 @click.pass_context
 @_use_meltano_env
-def set_(ctx, setting_name, value, store, interactive):
+def set_(
+    ctx: click.core.Context,
+    setting_name: tuple,
+    value: Any,
+    store: str,
+    interactive: bool,
+):
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
