@@ -199,7 +199,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
     """  # noqa: P102
     if value is None:
-        value = OrderedDict()
+        value = {}
 
     if isinstance(path, str):
         path = path.split(".", maxsplit=maxsplit)
@@ -210,7 +210,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
     cursor = d
     for key in initial:
         if key not in cursor or (not isinstance(cursor[key], abc.Mapping) and force):
-            cursor[key] = OrderedDict()
+            cursor[key] = {}
 
         cursor = cursor[key]
 
