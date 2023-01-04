@@ -336,7 +336,7 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/refere
 
 ### <a name="cli-log-level"></a>`cli.log_level`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`, alias: `MELTANO_LOG_LEVEL`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`.
 - `meltano` CLI option: `--log-level`
 - Options: `debug`, `info`, `warning`, `error`, `critical`
 - Default: `info`
@@ -349,14 +349,13 @@ The granularity of CLI logging. Ignored if a local logging config is found.
 meltano config meltano set cli log_level debug
 
 export MELTANO_CLI_LOG_LEVEL=debug
-export MELTANO_LOG_LEVEL=debug
 
 meltano --log-level=debug ...
 ```
 
 ### `cli.log_config`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_CONFIG`, alias: `MELTANO_LOG_CONFIG`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_CONFIG`.
 - `meltano` CLI option: `--log-config`
 - Default: `logging.yaml`
 
@@ -368,7 +367,6 @@ The path of a valid yaml formatted [python logging dict config file](https://doc
 meltano config meltano set cli log_config /path/to/logging.yaml
 
 export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
-export MELTANO_LOG_CONFIG=/path/to/logging.yaml
 
 meltano --log-config=/path/to/logging.yaml ...
 ```
