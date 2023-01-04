@@ -171,11 +171,7 @@ def merge(src, dest):
 
 
 def are_similar_types(left, right):
-    return (
-        issubclass(left.__class__, right.__class__)
-        or issubclass(right.__class__, left.__class__)
-        or type(left) == type(right)  # noqa: WPS516
-    )
+    return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
 def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
