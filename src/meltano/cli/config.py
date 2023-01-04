@@ -350,6 +350,9 @@ def reset(ctx, store):
 @_use_meltano_env
 def set_(ctx, setting_name, value, store, interactive):
     """Set the configurations' setting `<name>` to `<value>`."""
+    if len(setting_name) == 1:
+        setting_name = tuple(setting_name[0].split("."))
+
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
     if interactive:
         interaction.configure_all()

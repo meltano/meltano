@@ -11,7 +11,7 @@ import os
 import re
 import sys
 import traceback
-from collections import OrderedDict
+from collections import OrderedDict, abc
 from copy import deepcopy
 from datetime import date, datetime, time
 from enum import IntEnum
@@ -199,7 +199,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
     """  # noqa: P102
     if value is None:
-        value = {}
+        value = OrderedDict()
 
     if isinstance(path, str):
         path = path.split(".", maxsplit=maxsplit)
@@ -209,8 +209,8 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
     # create the list of dicts
     cursor = d
     for key in initial:
-        if key not in cursor or (not isinstance(cursor[key], dict) and force):
-            cursor[key] = {}
+        if key not in cursor or (not isinstance(cursor[key], abc.Mapping) and force):
+            cursor[key] = OrderedDict()
 
         cursor = cursor[key]
 
@@ -446,7 +446,7 @@ def set_at_path(d, path, value):
 
     *initial, tail = path
 
-    final = nest(d, initial, force=True) if initial else d
+    final = nest(d, initial) if initial else d
     final[tail] = value
 
 
