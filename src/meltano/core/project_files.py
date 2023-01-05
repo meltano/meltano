@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
+from copy import copy
 from os import PathLike
 from pathlib import Path
 from typing import Any, Mapping, TypeVar
@@ -91,7 +92,11 @@ class ProjectFiles:  # noqa: WPS214
         if self._cached_loaded is None or id_vals(prev_raw_contents_map) != id_vals(
             self._raw_contents_map
         ):
-            self._cached_loaded = deep_merge(self.meltano, *included_file_contents)
+            self._cached_loaded = (
+                deep_merge(self.meltano, *included_file_contents)
+                if included_file_contents
+                else copy(self.meltano)
+            )
 
         return self._cached_loaded
 
