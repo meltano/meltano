@@ -90,15 +90,22 @@ def mypy(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    args = session.posargs or ["src/meltano", "--exclude", "src/meltano/migrations/"]
+    args = session.posargs or [
+        "src/meltano",
+        "--exclude",
+        "src/meltano/migrations/",
+        "--exclude",
+        ".nox/",
+    ]
 
     session.install(".")
     session.install(
+        "boto3-stubs[essential]",
         "mypy",
         "sqlalchemy2-stubs",
         "types-croniter",
         "types-psutil",
+        "types-PyYAML",
         "types-requests",
-        "boto3-stubs[essential]",
     )
     session.run("mypy", *args)

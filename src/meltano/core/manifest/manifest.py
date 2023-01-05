@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from collections import defaultdict
 from collections.abc import Iterable
 from functools import reduce
 from operator import getitem
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Mapping, MutableMapping, cast
 
 import yaml
-from cached_property import cached_property
 from typing_extensions import TypeAlias
 
 from meltano.core.environment import Environment
@@ -29,6 +29,11 @@ from meltano.core.utils import (
     expand_env_vars,
 )
 
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
 # NOTE: We do not use `Project(...).meltano.canonical` for 3 reasons:
 # - It will make it difficult to refactor the rest of the Meltano core to be
 #   based on the manifest if the manifest itself depends on the rest of Meltano
@@ -41,9 +46,9 @@ from meltano.core.utils import (
 
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
 
-Trie: TypeAlias = Dict[str, "Trie"]
-PluginsByType: TypeAlias = Dict[str, List[Dict[str, Any]]]
-PluginsByNameByType: TypeAlias = Dict[str, Dict[str, Dict[str, Any]]]
+Trie: TypeAlias = Dict[str, "Trie"]  # type: ignore
+PluginsByType: TypeAlias = Mapping[str, List[Mapping[str, Any]]]
+PluginsByNameByType: TypeAlias = Mapping[str, Mapping[str, Mapping[str, Any]]]
 
 
 class YamlLimitedSafeLoader(type):
@@ -51,7 +56,7 @@ class YamlLimitedSafeLoader(type):
 
     def __new__(
         cls, name, bases, namespace, do_not_resolve: Iterable[str]
-    ) -> type[yaml.SafeLoader]:
+    ) -> YamlLimitedSafeLoader:
         """Generate a new instance of this metaclass.
 
         Args:
@@ -86,10 +91,10 @@ class YamlNoTimestampSafeLoader(
 
 
 def env_aware_merge_mappings(
-    data: dict[str, Any],
+    data: MutableMapping[str, Any],
     key: str,
     value: Any,
-    _: Any = None,
+    _: tuple[Any, ...] | None = None,
 ) -> None:
     """Merge behavior for `deep_merge` that expands env vars when the key is "env".
 
@@ -103,7 +108,7 @@ def env_aware_merge_mappings(
         `NotImplemented` if the key is not "env"; `None` otherwise.
     """
     if key != "env":
-        return NotImplemented
+        return NotImplemented  # type: ignore
     data[key] = {
         **expand_env_vars(data[key], value, if_missing=EnvVarMissingBehavior.ignore),
         **expand_env_vars(value, data[key], if_missing=EnvVarMissingBehavior.ignore),
@@ -173,13 +178,16 @@ class Manifest:
 
         plugins = self.project_plugins_service.plugins_by_type()
 
-        locked_plugins = {
-            plugin_type.value: [
-                PluginLock(self.project, plugin).load(create=True, loader=json.load)
-                for plugin in plugins
-            ]
-            for (plugin_type, plugins) in plugins.items()
-        }
+        locked_plugins = cast(
+            dict[str, list[Mapping[str, Any]]],
+            {
+                plugin_type.value: [
+                    PluginLock(self.project, plugin).load(create=True, loader=json.load)
+                    for plugin in plugins
+                ]
+                for (plugin_type, plugins) in plugins.items()
+            },
+        )
 
         apply_scaffold(manifest, meltano_config_env_locations())
 

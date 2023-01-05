@@ -21,9 +21,9 @@ from pathlib import Path
 from typing import (  # noqa: WPS235
     Any,
     Callable,
-    Dict,
     Iterable,
     Mapping,
+    MutableMapping,
     NamedTuple,
     Sequence,
     TypeVar,
@@ -730,9 +730,6 @@ def get_no_color_flag() -> bool:
     return get_boolean_env_var("NO_COLOR")
 
 
-TMapping = TypeVar("TMapping", bound=Dict[str, Any])
-
-
 class MergeStrategy(NamedTuple):
     """Strategy to be used when merging a instances of a type.
 
@@ -752,8 +749,10 @@ class MergeStrategy(NamedTuple):
     and later items in the tuple of merge strategies will be tried instead.
     """
 
-    applicable_for_instance_of: type | tuple[type]
-    behavior: Callable[[TMapping, str, Any, tuple[MergeStrategy]], None]
+    applicable_for_instance_of: type | tuple[type, ...]
+    behavior: Callable[
+        [MutableMapping[str, Any], str, Any, tuple[MergeStrategy, ...] | None], None
+    ]
 
 
 @runtime_checkable
@@ -768,7 +767,7 @@ class Extendable(Protocol):
         """
 
 
-default_deep_merge_strategies: tuple[MergeStrategy] = (
+default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
     MergeStrategy(
         Mapping,
         lambda x, k, v, s: setitem(
@@ -782,9 +781,12 @@ default_deep_merge_strategies: tuple[MergeStrategy] = (
 )
 
 
+TMapping = TypeVar("TMapping", bound=Mapping)
+
+
 def deep_merge(
     *data: TMapping,
-    strategies: tuple[MergeStrategy] = default_deep_merge_strategies,
+    strategies: tuple[MergeStrategy, ...] = default_deep_merge_strategies,
 ) -> TMapping:
     """Merge multiple mappings at depth.
 

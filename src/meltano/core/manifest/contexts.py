@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping
 from contextlib import contextmanager, suppress
+from typing import Iterator
 
 from meltano.core.manifest.manifest import Manifest
 from meltano.core.plugin.base import PluginType
@@ -29,7 +30,7 @@ def _get_active_manifest() -> Manifest:
 
 
 @contextmanager
-def _manifest_context(manifest: Manifest) -> None:
+def _manifest_context(manifest: Manifest) -> Iterator[None]:
     _active_manifest.append(manifest)
     try:
         yield
@@ -38,7 +39,7 @@ def _manifest_context(manifest: Manifest) -> None:
 
 
 @contextmanager  # noqa: WPS210
-def _env_context(env: Mapping[str, str]) -> None:
+def _env_context(env: Mapping[str, str]) -> Iterator[None]:
     unique_keys = env.keys() - os.environ.keys()
     shared_keys = env.keys() & os.environ.keys()
     prev = {k: v for k, v in os.environ.items() if k in shared_keys}
@@ -54,7 +55,7 @@ def _env_context(env: Mapping[str, str]) -> None:
 
 
 @contextmanager
-def manifest_context(manifest: Manifest) -> None:
+def manifest_context(manifest: Manifest) -> Iterator[None]:
     """Establish a context within which Meltano can run using a given manifest.
 
     All relevant general (i.e. excluding plugin-specific, schedule-specific,
@@ -70,7 +71,7 @@ def manifest_context(manifest: Manifest) -> None:
     Yields:
         `None`.
     """
-    with _active_manifest(manifest), _env_context(
+    with _manifest_context(manifest), _env_context(
         {
             **ProjectSettingsService(manifest.project).as_env(),
             **manifest.data["env"],
@@ -80,7 +81,7 @@ def manifest_context(manifest: Manifest) -> None:
 
 
 @contextmanager
-def plugin_context(plugin_name: str) -> None:
+def plugin_context(plugin_name: str) -> Iterator[None]:
     """Establish a context within which a plugin can be run.
 
     All relevant env vars for the specified plugin will be set in the process
@@ -101,7 +102,7 @@ def plugin_context(plugin_name: str) -> None:
     try:
         plugin_type, plugin = next(
             (k, x)
-            for k, v in _get_active_manifest()["plugins"].items()
+            for k, v in manifest.data["plugins"].items()
             for x in v
             if x["name"] == plugin_name
         )
@@ -120,7 +121,7 @@ def plugin_context(plugin_name: str) -> None:
 
 
 @contextmanager
-def schedule_context(schedule_name: str) -> None:
+def schedule_context(schedule_name: str) -> Iterator[None]:
     """Establish a context within which a schedule can be run.
 
     All relevant env vars for the specified schedule will be set in the process
@@ -136,10 +137,10 @@ def schedule_context(schedule_name: str) -> None:
     Yields:
         `None`.
     """
-    manifest = _get_active_manifest()
+    schedules = _get_active_manifest().data["schedules"]
 
     try:
-        schedule = next(x for x in manifest["schedules"] if x["name"] == schedule_name)
+        schedule = next(x for x in schedules if x["name"] == schedule_name)
     except StopIteration:
         raise ValueError(f"Schedule {schedule!r} not found in manifest")
 
@@ -148,7 +149,7 @@ def schedule_context(schedule_name: str) -> None:
 
 
 @contextmanager
-def job_context(job_name: str) -> None:
+def job_context(job_name: str) -> Iterator[None]:
     """Establish a context within which a job can be run.
 
     All relevant env vars for the specified job will be set in the process for
@@ -164,10 +165,10 @@ def job_context(job_name: str) -> None:
     Yields:
         `None`.
     """
-    manifest = _get_active_manifest()
+    jobs = _get_active_manifest().data["jobs"]
 
     try:
-        job = next(x for x in manifest["schedules"] if x["name"] == job_name)
+        job = next(x for x in jobs if x["name"] == job_name)
     except StopIteration:
         raise ValueError(f"Job {job!r} not found in manifest")
 
