@@ -120,7 +120,7 @@ class MockAdapter(BaseAdapter):
                     }
 
                     if "dialect" in plugin:
-                        hub[plugin_key]["dialect"] = plugin["dialect"]  # noqa: WPS529
+                        hub[plugin_key]["dialect"] = plugin["dialect"]
 
                 hub[index_key][plugin_name][
                     "logo_url"

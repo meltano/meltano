@@ -12,14 +12,27 @@ import os
 import re
 import sys
 import traceback
-from copy import deepcopy
+from copy import copy, deepcopy
 from datetime import date, datetime, time
 from enum import IntEnum
+from functools import reduce
+from operator import setitem
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, Sequence, TypeVar, overload
+from typing import (  # noqa: WPS235
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Mapping,
+    NamedTuple,
+    Sequence,
+    TypeVar,
+    overload,
+)
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
+from typing_extensions import runtime_checkable
 
 from meltano.core.error import MeltanoError
 
@@ -715,3 +728,91 @@ def get_no_color_flag() -> bool:
         True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
     """
     return get_boolean_env_var("NO_COLOR")
+
+
+TMapping = TypeVar("TMapping", bound=Dict[str, Any])
+
+
+class MergeStrategy(NamedTuple):
+    """Strategy to be used when merging a instances of a type.
+
+    The first value of this tuple, `applicable_for_instance_of`, is a type or
+    tuple of types for which the behavior (see below) should apply. An
+    `isinstance` check is performed on each yet-unprocessed value using these
+    types.
+
+    The second value of this tuple, `behavior`, is a function which is provided
+    the dictionary being merged into, the key into that dictionary that is
+    being affected, the value for which
+    `isinstance(value, applicable_for_instance_of)` was true, and the tuple of
+    merge strategies in use (provided to enable recursion by calling
+    `deep_merge`).
+
+    If the behavior function returns `NotImplemented` then it will be skipped,
+    and later items in the tuple of merge strategies will be tried instead.
+    """
+
+    applicable_for_instance_of: type | tuple[type]
+    behavior: Callable[[TMapping, str, Any, tuple[MergeStrategy]], None]
+
+
+@runtime_checkable
+class Extendable(Protocol):
+    """A type protocol for types which have an `extend` method."""
+
+    def extend(self, x: Any) -> None:
+        """Extend the current instance with another value.
+
+        Args:
+            x: A value to extend this instance with.
+        """
+
+
+default_deep_merge_strategies: tuple[MergeStrategy] = (
+    MergeStrategy(
+        Mapping,
+        lambda x, k, v, s: setitem(
+            x, k, _deep_merge(x.setdefault(k, v.__class__()), v, strategies=s)
+        ),
+    ),
+    MergeStrategy(
+        Extendable, lambda x, k, v, _: x.setdefault(k, v.__class__()).extend(v)
+    ),
+    MergeStrategy(object, lambda x, k, v, _: setitem(x, k, v)),
+)
+
+
+def deep_merge(
+    *data: TMapping,
+    strategies: tuple[MergeStrategy] = default_deep_merge_strategies,
+) -> TMapping:
+    """Merge multiple mappings at depth.
+
+    Args:
+        data: The mappings.
+        strategies: A tuple of merge strategies, which are pairs of
+            `(applicable type, behavior function)`. Each type will be tried in
+            order until one passes an `isinstance` check for the value being
+            merged, then the associated behavior function will be called to
+            perform the merge. Refer to the documentation for `MergeStrategy`
+            for more details. By default, the merge strategies will merge
+            mappings with a recursive deep merge, objects with an `extend`
+            method (e.g. `lists`) using the `extend` method, and all other
+            objects with `setitem(dict_being_merged_into, key, value)`.
+
+    Returns:
+        The merged mapping.
+    """
+    return reduce(lambda a, b: _deep_merge(a, b, strategies), data)
+
+
+def _deep_merge(a, b, strategies):
+    base: TMapping = copy(a)
+    for key, value in b.items():
+        for applicable_types, behavior in strategies:
+            if (
+                isinstance(value, applicable_types)
+                and behavior(base, key, value, strategies) is not NotImplemented
+            ):
+                break
+    return base

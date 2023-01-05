@@ -10,12 +10,15 @@ from enum import Enum
 from typing import Generator, Iterable
 
 from meltano.core.project import Project
+from meltano.core.setting_definition import (
+    SettingDefinition,
+    SettingKind,
+    SettingMissingError,
+)
+from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import flatten
-
-from .setting_definition import SettingDefinition, SettingKind, SettingMissingError
-from .settings_store import SettingValueStore
 
 logger = logging.getLogger(__name__)
 

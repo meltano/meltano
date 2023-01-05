@@ -257,6 +257,9 @@ pyflakes = [
   "-WPS461", # Allow all inline ignores
   "-WPS501",
   "-WPS507",
+  "-WPS509", # Allow "incorrect" ternary expressions
+  "-WPS528", # Allow iterating over keys in a dict, then using them to access values
+  "-WPS529", # Allow use of `dict_object[key]` (i.e. `dict.__getitem__`) instead of `dict.get`
   "-WPS600", # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
   "-WPS602", # Allow using @staticmethod
   "-WPS615", # Allow "unpythonic" getters and setters

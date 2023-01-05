@@ -1,25 +1,28 @@
 """Project plugin service."""
 
+
 from __future__ import annotations
 
 import enum
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from typing import Generator
 
 import structlog
 
+from meltano.core.config_service import ConfigService
 from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.hub import MeltanoHubService
+from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.base import VariantNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_discovery_service import (
+    LockedDefinitionService,
+    PluginDiscoveryService,
+)
 from meltano.core.plugin_lock_service import PluginLockService
+from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-
-from .config_service import ConfigService
-from .plugin import PluginRef, PluginType
-from .plugin.error import PluginNotFoundError, PluginParentNotFoundError
-from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import LockedDefinitionService, PluginDiscoveryService
-from .project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -141,11 +144,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if not plugin.should_add_to_file():
             return plugin
 
-        try:
+        with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
             raise PluginAlreadyAddedException(existing_plugin)
-        except PluginNotFoundError:
-            pass
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:
