@@ -72,7 +72,7 @@ We are interested in exploring this challenge with the community. Please share i
 
 This integration will work with any dockerized Airbyte source, whether it was made with their CDK or not.
 
-To configure your Airbyte connector as a [custom plugin]([https://docs.meltano.com/concepts/project#custom-plugin-definitions](https://docs.meltano.com/concepts/project#custom-plugin-definitions)) in Meltano you can copy the configuration shown below into your meltano.yml file then replace `name`, and the `value` for the airbyte_spec.image to reference your docker image. You can configure your connector without defining all of the settings and their metadata.
+To configure your Airbyte connector as a [custom plugin](https://docs.meltano.com/concepts/project#custom-plugin-definitions) in Meltano you can copy the configuration shown below into your meltano.yml file then replace `name`, and the `value` for the airbyte_spec.image to reference your docker image. You can configure your connector without defining all of the settings and their metadata.
 
 ```yaml
  - name: tap-pokeapi # REPLACE THIS WITH YOUR CONNECTOR NAME
