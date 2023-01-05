@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import collections
 import functools
 import hashlib
 import logging
@@ -11,9 +12,9 @@ import os
 import re
 import sys
 import traceback
-from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
+from enum import IntEnum
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence, TypeVar, overload
 
@@ -169,6 +170,10 @@ def merge(src, dest):
     return dest
 
 
+def are_similar_types(left, right):
+    return isinstance(left, type(right)) or isinstance(right, type(left))
+
+
 def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
     """Create a hierarchical dictionary path and return the leaf dict.
 
@@ -214,7 +219,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         cursor = cursor[key]
 
     if tail not in cursor or (
-        type(cursor[tail]) is not type(value) and force  # noqa: WPS516
+        (not are_similar_types(cursor[tail], value)) and force  # noqa: WPS516
     ):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
@@ -480,12 +485,19 @@ ENV_VAR_PATTERN = re.compile(
 Expandable = TypeVar("Expandable", str, Mapping[str, "Expandable"])
 
 
+class EnvVarMissingBehavior(IntEnum):
+    """The behavior that should be employed when expanding a missing env var."""
+
+    use_empty_str = 0
+    raise_exception = 1
+    ignore = 2
+
+
 def expand_env_vars(
     raw_value: Expandable,
     env: Mapping[str, str],
     *,
-    raise_if_missing: bool = False,
-    ignore_if_missing: bool = False,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
     flat: bool = False,
 ) -> Expandable:
     """Expand/interpolate provided env vars into a string or env mapping.
@@ -496,14 +508,8 @@ def expand_env_vars(
     Args:
         raw_value: A string or env mapping in which env vars will be expanded.
         env: The env vars to use for the expansion of `raw_value`.
-        raise_if_missing: Raise `EnvironmentVariableNotSetError` if an env var
-            in `raw_value` is not found in the provided env dict. The
-            `raise_if_missing` and `ignore_if_missing` parameters cannot both
-            be `True`.
-        ignore_if_missing: Leave an env var unexpanded if an env var in
-            `raw_value` is not found in the provided env dict. The
-            `raise_if_missing` and `ignore_if_missing` parameters cannot both
-            be `True`.
+        if_missing: The behavior to employ if an env var in `raw_value` is not
+            set in `env`.
         flat: Whether the `raw_value` has a flat structure. Ignored if
             `raw_value` is not a mapping. Otherwise it controls whether this
             function will process nested levels within `raw_value`. Defaults to
@@ -511,20 +517,16 @@ def expand_env_vars(
             for performance, safety, and cleanliness reasons.
 
     Raises:
-        ValueError: Both `raise_if_missing` and `ignore_if_missing` are `True`.
         EnvironmentVariableNotSetError: Attempted to expand an env var that was not
-            defined in the provided env dict, and `raise_if_missing` was `True`.
+            defined in the provided env dict, and `if_missing` was
+            `EnvVarMissingBehavior.raise_exception`.
 
     Returns:
         The string or env dict with env vars expanded. For backwards
         compatibility, if anything other than an `str` or mapping is provided
         as the `raw_value`, it is returned unchanged.
     """  # noqa: DAR402
-    if raise_if_missing and ignore_if_missing:
-        raise ValueError(
-            "The `raise_if_missing` and `ignore_if_missing` parameters cannot "
-            "both be `True`"
-        )
+    if_missing = EnvVarMissingBehavior(if_missing)
 
     if not isinstance(raw_value, (str, Mapping)):
         return raw_value
@@ -538,9 +540,9 @@ def expand_env_vars(
             logger.debug(
                 f"Variable '${var}' is not set in the provided env dictionary."
             )
-            if raise_if_missing:
+            if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
-            elif ignore_if_missing:
+            elif if_missing == EnvVarMissingBehavior.ignore:
                 return f"${{{var}}}"
             return ""
         if not val:
@@ -582,7 +584,7 @@ def uniques_in(original: Sequence[T]) -> list[T]:
     Returns:
         A list of unique values from the provided sequence in the order they appeared.
     """
-    return list(OrderedDict.fromkeys(original))
+    return list(collections.OrderedDict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059

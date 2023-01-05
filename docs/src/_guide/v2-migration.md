@@ -133,10 +133,21 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
    </td>
   </tr>
   <tr>
-   <td rowspan="16" >meltano
+   <td rowspan="18" >meltano
    </td>
-   <td rowspan="16" >
+   <td rowspan="18" >
    </td>
+   <td>MELTANO_LOG_LEVEL
+   </td>
+   <td>MELTANO_CLI_LOG_LEVEL
+   </td>
+  </tr>
+   <td>MELTANO_LOG_CONFIG
+   </td>
+   <td>MELTANO_CLI_LOG_CONFIG
+   </td>
+  </tr>
+  <tr>
    <td>MELTANO_API_HOSTNAME
    </td>
    <td>MELTANO_UI_BIND_HOST
