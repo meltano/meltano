@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.13.0 (2023-01-06)
+
+### ✨ New
+
+- [#7105](https://github.com/meltano/meltano/issues/7105) Support `meltano init` in a non-empty dir
+- [#7115](https://github.com/meltano/meltano/issues/7115) Allow top-level annotations in `meltano.yml`
+- [#7123](https://github.com/meltano/meltano/issues/7123) Optionally ignore missing env vars during expansion
+
+### 🐛 Fixes
+
+- [#7145](https://github.com/meltano/meltano/issues/7145) Setting nested setting key no longer clears sibling keys
+- [#7120](https://github.com/meltano/meltano/issues/7120) Support str values when deep-merging config
+- [#7144](https://github.com/meltano/meltano/issues/7144) Check system database version compatibility before migrations
+
+### ⚙️ Under the Hood
+
+- [#7069](https://github.com/meltano/meltano/issues/7069) Use a custom build backend
+
+### 📚 Documentation Improvements
+
+- [#7139](https://github.com/meltano/meltano/issues/7139) Add Airbyte Source Connector FAQ
+- [#7140](https://github.com/meltano/meltano/issues/7140) Remove references to deprecated `MELTANO_CLI_*` aliases
+
 ## v2.12.0 (2022-12-19)
 
 ### 🐛 Fixes
@@ -80,7 +103,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#6964](https://github.com/meltano/meltano/issues/6964) Add `--cwd` CLI option
 - [#6785](https://github.com/meltano/meltano/issues/6785) Use `NO_COLOR` env var to disable colored output
-- [#6628](https://github.com/meltano/meltano/issues/6628) Make `.meltano`  folder path configurable via new `MELTANO_SYS_DIR_ROOT` env var -- _**Thanks @rawwar!**_
+- [#6628](https://github.com/meltano/meltano/issues/6628) Make `.meltano` folder path configurable via new `MELTANO_SYS_DIR_ROOT` env var -- _**Thanks @rawwar!**_
 
 ### 🐛 Fixes
 
