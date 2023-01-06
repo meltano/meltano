@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.13.0 (2023-01-06)
+
+### ✨ New
+
+- [#7123](https://github.com/meltano/meltano/issues/7123) Optionally ignore missing env vars during expansion
+- [#7115](https://github.com/meltano/meltano/issues/7115) Allow top-level annotations in `meltano.yml`
+- [#7105](https://github.com/meltano/meltano/issues/7105) Support `meltano init` in a non-empty dir
+
+### 🐛 Fixes
+
+- [#7145](https://github.com/meltano/meltano/issues/7145) Setting nested setting key no longer clears sibling keys
+- [#7144](https://github.com/meltano/meltano/issues/7144) Check database version compatibility
+- [#7120](https://github.com/meltano/meltano/issues/7120) Support str values when deep-merging
+
+### ⚙️ Under the Hood
+
+- [#7069](https://github.com/meltano/meltano/issues/7069) Use a custom build backend
+
+### 📚 Documentation Improvements
+
+- [#7150](https://github.com/meltano/meltano/issues/7150) Fix FAQ docs link typo
+- [#7139](https://github.com/meltano/meltano/issues/7139) Add Airbyte Source Connector FAQ
+- [#7140](https://github.com/meltano/meltano/issues/7140) Remove references to deprecated `MELTANO_CLI_*` aliases
+- [#7138](https://github.com/meltano/meltano/issues/7138) Remove stale youtube links
+- [#7127](https://github.com/meltano/meltano/issues/7127) Fix another few typos
+- [#7117](https://github.com/meltano/meltano/issues/7117) Change variants to meltanolabs based ones in Getting Started guide
+
 ## v2.12.0 (2022-12-19)
 
 ### 🐛 Fixes
