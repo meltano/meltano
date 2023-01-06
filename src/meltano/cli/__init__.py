@@ -73,11 +73,7 @@ def handle_meltano_error(error: MeltanoError) -> NoReturn:
     Raises:
         CliError: always.
     """
-    raise CliError(
-        f"{error.reason}. {error.instruction}."
-        if error.instruction
-        else f"{error.reason}."
-    ) from error
+    raise CliError(str(error)) from error
 
 
 def _run_cli():

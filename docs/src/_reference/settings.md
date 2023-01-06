@@ -146,6 +146,12 @@ that takes the shape of a SQLite database stored inside the [`.meltano` director
 You can choose to use a different system database backend or configuration using the `--database-uri`
 option of [`meltano` subcommands](/reference/command-line-interface), or the `MELTANO_DATABASE_URI` environment variable.
 
+<div class="notification is-warning">
+  Because internal database migrations make of use of the <code>ALTER TABLE table RENAME COLUMN oldname TO newname</code> syntax starting with Meltano <code>v2.2.0</code>, the minimum required SQLite version is now <a href="https://sqlite.org/releaselog/3_25_1.html"><code>3.25.1</code></a>.
+
+  Some systems may come with an older version by default. You can run <code>sqlite3 --version</code> to check your version.
+</div>
+
 #### How to use
 
 ```bash
@@ -336,7 +342,7 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/refere
 
 ### <a name="cli-log-level"></a>`cli.log_level`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`, alias: `MELTANO_LOG_LEVEL`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`.
 - `meltano` CLI option: `--log-level`
 - Options: `debug`, `info`, `warning`, `error`, `critical`
 - Default: `info`
@@ -349,14 +355,13 @@ The granularity of CLI logging. Ignored if a local logging config is found.
 meltano config meltano set cli log_level debug
 
 export MELTANO_CLI_LOG_LEVEL=debug
-export MELTANO_LOG_LEVEL=debug
 
 meltano --log-level=debug ...
 ```
 
 ### `cli.log_config`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_CONFIG`, alias: `MELTANO_LOG_CONFIG`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_CONFIG`.
 - `meltano` CLI option: `--log-config`
 - Default: `logging.yaml`
 
@@ -368,7 +373,6 @@ The path of a valid yaml formatted [python logging dict config file](https://doc
 meltano config meltano set cli log_config /path/to/logging.yaml
 
 export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
-export MELTANO_LOG_CONFIG=/path/to/logging.yaml
 
 meltano --log-config=/path/to/logging.yaml ...
 ```
