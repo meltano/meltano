@@ -538,7 +538,7 @@ class TestPluginSettingsService:
 
         assert config["var"] == "hello world!"
         assert config["foo"] == "42"
-        assert config["missing"] is None
+        assert config["missing"] == ""
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
 
@@ -939,4 +939,4 @@ class TestPluginSettingsService:
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
-        assert subject.get("stacked_env_var") is None
+        assert subject.get("stacked_env_var") == ""
