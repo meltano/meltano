@@ -28,7 +28,7 @@ jobs:
 
       - name: GitHub dependency vulnerability check
         if: ${{ github.event_name == 'pull_request_target' }}
-        uses: actions/dependency-review-action@v3.0.2
+        uses: actions/dependency-review-action@v3.0.3
 
       - name: FOSSA dependency license check
         run: |
