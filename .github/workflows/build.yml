@@ -66,7 +66,7 @@ jobs:
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: python-artifacts
         path: 'dist/*'
