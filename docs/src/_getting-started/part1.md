@@ -209,7 +209,8 @@ This will add the configuration to your [`meltano.yml` project file](/concepts/p
         - name: tap-github
           config:
             start_date: 2022-01-01
-            repository: sbalnojan/meltano-lightdash
+            repositories:
+              - sbalnojan/meltano-lightdash
   ```
 
 It will also add your secret auth token to the file `.env`:
