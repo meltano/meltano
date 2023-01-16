@@ -2,8 +2,41 @@
 from __future__ import annotations
 
 import re
+from contextlib import contextmanager
+
+from cached_property import cached_property  # type: ignore
 
 from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
+
+try:
+    import google
+except ImportError:
+    google = None  # type: ignore
+
+
+class MissingGoogleError(Exception):
+    """Raised when google is required but not installed."""
+
+    def __init__(self):
+        """Initialize a MissingGoogleError."""
+        super().__init__(
+            "google-cloud-storage required but not installed. Install meltano[gcs] to use GCS as a state backend.",  # noqa: E501
+        )
+
+
+@contextmanager
+def requires_gcs():
+    """Raise MissingGoogleError if gcs is required but missing in context.
+
+    Raises:
+        MissingGoogleError: if google-cloud-storage is not installed.
+
+    Yields:
+        None
+    """
+    if not google:
+        raise MissingGoogleError()
+    yield
 
 
 class GCSStateStoreManager(BaseFilesystemStateStoreManager):
@@ -33,6 +66,7 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         self.application_credentials = application_credentials
 
     @staticmethod
+    @requires_gcs()
     def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
 
@@ -42,30 +76,24 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         Returns:
             True if error represents file not being found, else False
         """
-        from google.api_core.exceptions import NotFound  # type: ignore
-
-        return isinstance(err, NotFound) and (
+        return isinstance(err, google.api_core.exceptions.NotFound) and (
             "No such object:" in err.args[0] or "blob" in err.args[0]
         )
 
-    @property
+    @cached_property
+    @requires_gcs()
     def client(self):
         """Get an authenticated google.cloud.storage.Client.
 
         Returns:
             A google.cloud.storage.Client.
         """
-        if not self._client:
-            from google.cloud.storage import Client  # type: ignore
-
-            if self.application_credentials:
-                self._client = Client.from_service_account_json(
-                    self.application_credentials
-                )
-            else:
-                # Use default authentication in environment
-                self._client = Client()
-        return self._client
+        if self.application_credentials:
+            return google.cloud.storage.Client.from_service_account_json(
+                self.application_credentials
+            )
+        # Use default authentication in environment
+        return google.cloud.storage.Client()
 
     @property
     def state_dir(self) -> str:

@@ -2,8 +2,41 @@
 from __future__ import annotations
 
 import re
+from contextlib import contextmanager
+
+from cached_property import cached_property
 
 from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
+
+try:
+    from azure.storage.blob import BlobServiceClient  # type: ignore
+except ImportError:
+    BlobServiceClient = None
+
+
+class MissingAzureError(Exception):
+    """Raised when azure is required but no installed."""
+
+    def __init__(self):
+        """Initialize a MissingAzureError."""
+        super().__init__(
+            "azure required but not installed. Install meltano[azure] to use Azure Blob Storage as a state backend.",  # noqa: E501
+        )
+
+
+@contextmanager
+def requires_azure():
+    """Raise MissingAzureError if azure is required but missing in context.
+
+    Raises:
+        MissingAzureError: if azure is not installed.
+
+    Yields:
+        None
+    """
+    if not BlobServiceClient:
+        raise MissingAzureError()
+    yield
 
 
 class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
@@ -49,20 +82,17 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
             and "ErrorCode:BlobNotFound" in err.args[0]
         )
 
-    @property
+    @cached_property
+    @requires_azure()
     def client(self):
         """Get an authenticated azure.storage.blob.BlobServiceClient.
 
         Returns:
             An authenticated azure.storage.blob.BlobServiceClient
         """
-        if self.connection_string and not self._client:
-            from azure.storage.blob import BlobServiceClient  # type: ignore
-
-            self._client = BlobServiceClient.from_connection_string(
-                self.connection_string
-            )
-        return self._client
+        if self.connection_string:
+            return BlobServiceClient.from_connection_string(self.connection_string)
+        return BlobServiceClient()  # type: ignore
 
     @property
     def state_dir(self) -> str:
