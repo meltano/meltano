@@ -14,10 +14,6 @@ from contextlib import contextmanager, suppress
 from typing import Iterator
 
 from meltano.core.manifest.manifest import Manifest
-from meltano.core.plugin.base import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project_settings_service import ProjectSettingsService
 
 _active_manifest: list[Manifest] = []
 
@@ -71,12 +67,7 @@ def manifest_context(manifest: Manifest) -> Iterator[None]:
     Yields:
         `None`.
     """
-    with _manifest_context(manifest), _env_context(
-        {
-            **ProjectSettingsService(manifest.project).as_env(),
-            **manifest.data["env"],
-        }
-    ):
+    with _manifest_context(manifest), _env_context(manifest.data["env"]):
         yield
 
 
@@ -100,23 +91,16 @@ def plugin_context(plugin_name: str) -> Iterator[None]:
     manifest = _get_active_manifest()
 
     try:
-        plugin_type, plugin = next(
-            (k, x)
-            for k, v in manifest.data["plugins"].items()
+        plugin = next(
+            x
+            for v in manifest.data["plugins"].values()
             for x in v
             if x["name"] == plugin_name
         )
     except StopIteration:
         raise ValueError(f"Plugin {plugin_name!r} not found in manifest")
 
-    with _env_context(
-        {
-            **PluginSettingsService(
-                manifest.project, ProjectPlugin(PluginType(plugin_type), **plugin)
-            ).as_env(),
-            **plugin["env"],
-        }
-    ):
+    with _env_context(plugin["env"]):
         yield
 
 
