@@ -63,7 +63,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3.3.0
 
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4.4.0
@@ -176,7 +176,7 @@ jobs:
 
     - name: Upload coverage data
       if: always()
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: coverage-data
         path: ".coverage.${{ matrix.id }}"
@@ -215,7 +215,7 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3.3.0
 
     - name: Install Poetry
       run: |
@@ -234,7 +234,7 @@ jobs:
         pip --version
 
     - name: Download coverage data
-      uses: actions/download-artifact@v3.0.1
+      uses: actions/download-artifact@v3.0.2
       with:
         name: coverage-data
 
@@ -263,7 +263,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3.3.0
 
     - name: Setup Python 3.9
       uses: actions/setup-python@v4.4.0

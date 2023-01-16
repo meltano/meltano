@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3.3.0
 
     - name: Setup Poetry
       uses: snok/install-poetry@v1
@@ -55,8 +55,8 @@ jobs:
 
     - name: Release Marker
       if: ${{ github.event.release }}
-      run: |
-        touch src/meltano/core/tracking/.release_marker
+      # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
+      run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
       run: |
@@ -66,7 +66,7 @@ jobs:
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: python-artifacts
         path: 'dist/*'
@@ -77,10 +77,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3.3.0
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3.0.1
+      uses: actions/download-artifact@v3.0.2
       with:
         name: python-artifacts
         path: dist/
