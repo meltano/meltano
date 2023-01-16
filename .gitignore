@@ -155,6 +155,9 @@ src/meltano/api/static/js
 # sqlite
 *.db
 
+# Poetry build artifact
+setup.py
+
 # Integration test generated files
 *.jsonl
 **/.meltano/**
