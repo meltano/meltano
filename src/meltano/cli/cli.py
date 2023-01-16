@@ -76,7 +76,7 @@ def cli(  # noqa: C901,WPS231
     cwd: Path | None,
 ):  # noqa: WPS231
     """
-    ELT for the DataOps era.
+    Your CLI for ELT+
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface
     """

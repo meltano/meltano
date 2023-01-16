@@ -1,6 +1,6 @@
 
 <h1 align="center">Meltano - Your CLI for ELT+</h1>
-<h3 align="center">Open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.</h3>
+<h3 align="center">Open source, Flexible, and Scalable. Move, transform and test your data with confidence using a streamlined data engineering workflow you’ll love.</h3>
 
 <div align="center">
 <a href="https://github.com/codespaces/new?template_repository=meltano/meltano-codespace-ready">
@@ -53,11 +53,9 @@
 
 ---
 
-Welcome to your CLI for ELT+. It's open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.
+Welcome to your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform and test your data with confidence using a streamlined data engineering workflow you’ll love.
 
-If you're a fan, star the repo ⭐️. [Plus this month, every ⭐ on GitHub removes 2 lb/~1 kg of trash from our waterways 🌊](https://meltano.com/blog/extracting-trash-to-transform-our-waterways/)
-
-
+If you're a fan, star the repo ⭐️: [Every ⭐ on GitHub removes 2 lb/~1 kg of trash from our waterways 🌊](https://meltano.com/blog/extracting-trash-to-transform-our-waterways/)
 
 Integrations
 ------------
