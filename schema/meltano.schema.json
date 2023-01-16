@@ -10,7 +10,7 @@
       "const": 1
     },
     "annotations": {
-      "$ref": "#/definitions/annotations"
+      "$ref": "#/$defs/annotations"
     },
     "default_environment": {
       "type": "string",
@@ -91,7 +91,7 @@
       "type": "array",
       "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",
       "items": {
-        "$ref": "#/definitions/environments"
+        "$ref": "#/$defs/environments"
       }
     },
     "discovery_url": {
@@ -110,49 +110,49 @@
         "extractors": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/extractors"
+            "$ref": "#/$defs/plugins/extractors"
           }
         },
         "loaders": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/loaders"
+            "$ref": "#/$defs/plugins/loaders"
           }
         },
         "mappers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/mappers"
+            "$ref": "#/$defs/plugins/mappers"
           }
         },
         "orchestrators": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/orchestrators"
+            "$ref": "#/$defs/plugins/orchestrators"
           }
         },
         "transformers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/transformers"
+            "$ref": "#/$defs/plugins/transformers"
           }
         },
         "files": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/files"
+            "$ref": "#/$defs/plugins/files"
           }
         },
         "utilities": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/utilities"
+            "$ref": "#/$defs/plugins/utilities"
           }
         },
         "transforms": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/transforms"
+            "$ref": "#/$defs/plugins/transforms"
           }
         }
       }
@@ -160,22 +160,22 @@
     "schedules": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/schedules"
+        "$ref": "#/$defs/schedules"
       },
       "description": "Scheduled ELT jobs, added using 'meltano schedule'"
     },
     "env": {
-      "$ref": "#/definitions/env"
+      "$ref": "#/$defs/env"
     },
     "jobs": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/jobs"
+        "$ref": "#/$defs/jobs"
       },
       "description": "Jobs, added using 'meltano job'"
     }
   },
-  "definitions": {
+  "$defs": {
     "annotations": {
       "type": "object",
       "description": "Arbitrary annotations keyed by tool/vendor name - not processed by the core Meltano library or CLI",
@@ -253,7 +253,7 @@
           "settings": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/base_setting"
+              "$ref": "#/$defs/base_setting"
             }
           },
           "docs": {
@@ -364,10 +364,10 @@
             }
           },
           "requires": {
-            "$ref": "#/definitions/requires"
+            "$ref": "#/$defs/requires"
           },
           "env": {
-            "$ref": "#/definitions/env"
+            "$ref": "#/$defs/env"
           }
         }
       },
@@ -421,10 +421,10 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "$ref": "#/definitions/plugins/extractor_shared"
+            "$ref": "#/$defs/plugins/extractor_shared"
           },
           {
             "additionalProperties": false,
@@ -479,7 +479,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
             "additionalProperties": false,
@@ -532,7 +532,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
             "additionalProperties": false,
@@ -561,7 +561,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
             "additionalProperties": false,
@@ -590,7 +590,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
             "additionalProperties": false,
@@ -623,7 +623,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
             "additionalProperties": false,
@@ -652,7 +652,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
             "additionalProperties": false,
@@ -714,10 +714,10 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "$ref": "#/definitions/plugins/mapper_specific"
+            "$ref": "#/$defs/plugins/mapper_specific"
           },
           {
             "additionalProperties": false,
@@ -904,7 +904,7 @@
           ]
         },
         "env": {
-          "$ref": "#/definitions/env"
+          "$ref": "#/$defs/env"
         },
         "loader": {
           "type": "string",
@@ -1009,7 +1009,7 @@
                   "items": {
                     "allOf": [
                       {
-                        "$ref": "#/definitions/environments/$defs/plugins"
+                        "$ref": "#/$defs/environments/$defs/plugins"
                       },
                       {
                         "additionalProperties": false,
@@ -1027,7 +1027,7 @@
                         }
                       },
                       {
-                        "$ref": "#/definitions/plugins/extractor_shared"
+                        "$ref": "#/$defs/plugins/extractor_shared"
                       }
                     ]
                   }
@@ -1036,42 +1036,42 @@
                   "type": "array",
                   "items": {
                     "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "orchestrators": {
                   "type": "array",
                   "items": {
                     "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "transformers": {
                   "type": "array",
                   "items": {
                     "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "files": {
                   "type": "array",
                   "items": {
                     "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "utilities": {
                   "type": "array",
                   "items": {
                     "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "transforms": {
                   "type": "array",
                   "items": {
                     "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 }
               }
@@ -1079,7 +1079,7 @@
           }
         },
         "env": {
-          "$ref": "#/definitions/env"
+          "$ref": "#/$defs/env"
         }
       },
       "$defs": {
@@ -1107,7 +1107,7 @@
         "^(extractors|loaders|transforms|orchestrators|transformers|files|utilities|mappers)$": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugin_requirement"
+            "$ref": "#/$defs/plugin_requirement"
           }
         }
       }
