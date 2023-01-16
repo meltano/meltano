@@ -148,15 +148,16 @@ class Manifest:
         self.environment = environment
         self.project_settings_service = ProjectSettingsService(project)
         self.project_plugins_service = ProjectPluginsService(project)
+
+        with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
+            self.manifest_schema = json.load(manifest_schema_file)
+
         try:
             self.manifest_schema_validator = jsonschema.Draft202012Validator(
                 self.manifest_schema
             )
         except jsonschema.ValidationError as ex:
             raise Exception("Failed to validate Meltano manifest schema") from ex
-
-        with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
-            self.manifest_schema = json.load(manifest_schema_file)
 
     @cached_property
     def _project_files(self) -> dict[str, Any]:
