@@ -9,13 +9,18 @@ from collections import defaultdict
 from collections.abc import Iterable
 from functools import reduce
 from operator import getitem
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, MutableMapping, cast
 
+import jsonschema
 import yaml
 from typing_extensions import TypeAlias
 
+from meltano import __file__ as package_root_path
 from meltano.core.environment import Environment
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
+from meltano.core.plugin.base import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_lock_service import PluginLock
 from meltano.core.project import Project
@@ -45,6 +50,7 @@ else:
 #   care about comment preservation in the manifest.
 
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
+MANIFEST_SCHEMA_PATH = Path(package_root_path).parent / "schema" / "meltano.schema.json"
 
 Trie: TypeAlias = Dict[str, "Trie"]  # type: ignore
 PluginsByType: TypeAlias = Mapping[str, List[Mapping[str, Any]]]
@@ -133,27 +139,30 @@ class Manifest:
             environment: The Meltano environment which this manifest describes.
                 If `None`, then all data under the `environments` key in the
                 project files will be ignored by this manifest.
+
+        Raises:
+            Exception: The Meltano manifest schema is an invalid jsonschema.
         """
         self.project = project
+        self._meltano_file = self.project.meltanofile.read_text()
         self.environment = environment
         self.project_settings_service = ProjectSettingsService(project)
         self.project_plugins_service = ProjectPluginsService(project)
+        try:
+            self.manifest_schema_validator = jsonschema.Draft202012Validator(
+                self.manifest_schema
+            )
+        except jsonschema.ValidationError as ex:
+            raise Exception("Failed to validate Meltano manifest schema") from ex
+
+        with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
+            self.manifest_schema = json.load(manifest_schema_file)
 
     @cached_property
-    def data(self) -> dict[str, Any]:
-        """Generate the manifest data.
-
-        The data is generated when this property is first accessed, then cached
-        in the instance for fast subsequent accesses. This cached result is
-        mutable, because Python lacks a `frozendict` class in its standard
-        library. Please do not alter it in-place.
-
-        Returns:
-            The manifest data.
-        """
-        manifest = deep_merge(
+    def _project_files(self) -> dict[str, Any]:
+        project_files = deep_merge(
             yaml.load(  # noqa: S506
-                self.project.meltanofile.read_text(),
+                self._meltano_file,
                 YamlNoTimestampSafeLoader,
             ),
             *(
@@ -162,22 +171,18 @@ class Manifest:
             ),
         )
 
-        # Remove all environments other than the one this manifest is for:
-        if self.environment is None:
-            # We use a mock environment here because the rest of the code
-            # expects there to be exactly one environment. It is omitted from
-            # the final output, and during processing it only affects things if
-            # it has content, which this mock does not.
-            manifest["environments"] = [{"name": "mock"}]  # noqa: WPS204
-        else:
-            manifest["environments"] = [
-                x
-                for x in manifest["environments"]
-                if x["name"] == self.environment.name
-            ]
+        try:
+            self.manifest_schema_validator.validate(project_files)
+        except jsonschema.ValidationError as ex:
+            raise Exception(
+                "Failed to validate Meltano project files against manifest schema"
+            ) from ex
 
-        plugins = self.project_plugins_service.plugins_by_type()
+        return project_files
 
+    def _merge_plugin_lockfiles(
+        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, Any]
+    ) -> None:
         locked_plugins = cast(
             dict[str, list[Mapping[str, Any]]],
             {
@@ -189,22 +194,15 @@ class Manifest:
             },
         )
 
-        apply_scaffold(manifest, meltano_config_env_locations())
-
-        def plugins_by_name_by_type(
-            plugins_by_type: PluginsByType,
-        ) -> PluginsByNameByType:
-            return {
-                plugin_type: {plugin["name"]: plugin for plugin in plugins}
-                for plugin_type, plugins in plugins_by_type.items()
-            }
-
         # Merge the locked plugins with the root-level plugins from `meltano.yml`:
         manifest["plugins"] = deep_merge(  # noqa: WPS204
-            plugins_by_name_by_type(manifest["plugins"]),
-            plugins_by_name_by_type(locked_plugins),
+            _plugins_by_name_by_type(manifest["plugins"]),
+            _plugins_by_name_by_type(locked_plugins),
         )
 
+    def _merge_env_vars(
+        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, Any]
+    ) -> None:
         # Merge env vars derived from project settings:
         env_aware_merge_mappings(
             manifest,
@@ -217,7 +215,7 @@ class Manifest:
         environment_plugins = environment.setdefault("config", {}).setdefault(
             "plugins", {}
         )
-        environment["config"]["plugins"] = plugins_by_name_by_type(environment_plugins)
+        environment["config"]["plugins"] = _plugins_by_name_by_type(environment_plugins)
 
         merge_strategies = (
             MergeStrategy(dict, env_aware_merge_mappings),
@@ -264,6 +262,50 @@ class Manifest:
         # Merge 'environment level env' into 'root level env':
         env_aware_merge_mappings(manifest, "env", environment["env"])
 
+    @cached_property
+    def data(self) -> dict[str, Any]:
+        """Generate the manifest data.
+
+        The data is generated when this property is first accessed, then cached
+        in the instance for fast subsequent accesses. This cached result is
+        mutable, because Python lacks a `frozendict` class in its standard
+        library. Please do not alter it in-place.
+
+        Raises:
+            Exception: The generated manifest data was not compliant with the
+                Meltano manifest schema.
+
+        Returns:
+            The manifest data.
+        """
+        # The manifest begins as the project files, i.e. `meltano.yml` + included files
+        manifest = self._project_files
+
+        # Remove all environments other than the one this manifest is for:
+        if self.environment is None:
+            # We use a mock environment here because the rest of the code
+            # expects there to be exactly one environment. It is omitted from
+            # the final output, and during processing it only affects things if
+            # it has content, which this mock does not.
+            manifest["environments"] = [{"name": "mock"}]  # noqa: WPS204
+        else:
+            manifest["environments"] = [
+                x
+                for x in manifest["environments"]
+                if x["name"] == self.environment.name
+            ]
+
+        apply_scaffold(manifest, meltano_config_env_locations(self.manifest_schema))
+
+        plugins = self.project_plugins_service.plugins_by_type()
+        # NOTE: `self._merge_plugin_lockfiles` restructures the plugins into a
+        #       map from plugin types to maps of plugin IDs to their values.
+        #       This structure is easier to work with, but is reset to the
+        #       proper structure below, before the manifest is returned.
+        self._merge_plugin_lockfiles(plugins, manifest)
+
+        self._merge_env_vars(plugins, manifest)
+
         # Make each plugin type a list again:
         manifest["plugins"] = {
             plugin_type: list(plugins.values())
@@ -275,7 +317,23 @@ class Manifest:
         # which fields within the manifest should be read.
         del manifest["environments"]
 
+        try:
+            self.manifest_schema_validator.validate(manifest)
+        except jsonschema.ValidationError as ex:
+            raise Exception(
+                "Failed to validate Meltano manifest against manifest schema"
+            ) from ex
+
         return manifest
+
+
+def _plugins_by_name_by_type(
+    plugins_by_type: PluginsByType,
+) -> PluginsByNameByType:
+    return {
+        plugin_type: {plugin["name"]: plugin for plugin in plugins}
+        for plugin_type, plugins in plugins_by_type.items()
+    }
 
 
 def _locations_trie(paths: Iterable[Iterable[str]]) -> Trie:

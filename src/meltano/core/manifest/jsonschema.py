@@ -2,37 +2,26 @@
 
 from __future__ import annotations
 
-import json
-import os
 from collections.abc import Iterable
 from contextlib import suppress
-from pathlib import Path
 from typing import Any
-
-from meltano import __file__ as package_root_path
-
-MANIFEST_SCHEMA_PATH = Path(package_root_path).parent / "schema" / "meltano.schema.json"
 
 
 def meltano_config_env_locations(
-    manifest_schema_path: os.PathLike = MANIFEST_SCHEMA_PATH,
+    manifest_schema: dict[str, Any],
     env_definition_ref: str = "#/definitions/env",
 ) -> set[str]:
     """Find all locations within a Meltano manifest file that can have an env field.
 
     Args:
-        manifest_schema_path: The path to the jsonschema file of the Meltano manifest.
+        manifest_schema: The jsonschema for Meltano manifests.
         env_definition_ref: The jsonschema ref that defines what is being searched for.
 
     Returns:
         The locations within a Meltano manifest file that can have an env
         field, as jq filter strings.
     """
-    with open(manifest_schema_path) as meltano_schema_file:
-        meltano_schema = json.load(meltano_schema_file)
-
-    parser = JsonschemaRefLocationParser(meltano_schema, env_definition_ref)
-    return set(parser.parse())
+    return set(JsonschemaRefLocationParser(manifest_schema, env_definition_ref).parse())
 
 
 class JsonschemaRefLocationParser:
