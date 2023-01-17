@@ -9,7 +9,7 @@ from cached_property import cached_property  # type: ignore
 from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
 
 try:
-    import google
+    import google  # type: ignore
 except ImportError:
     google = None  # type: ignore
 
