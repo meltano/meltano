@@ -9,7 +9,7 @@ from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 from warnings import warn
 
 import psutil
@@ -19,7 +19,7 @@ from structlog.stdlib import get_logger
 
 import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
-from meltano.core.utils import hash_sha256, safe_hasattr
+from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
 
 logger = get_logger(__name__)
 
@@ -44,9 +44,19 @@ def _get_parent_context_uuid_str() -> str | None:
 class EnvironmentContext(SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
+    ci_markers = {"GITHUB_ACTIONS", "CI"}
+    notable_flag_env_vars = {"CODESPACES", *ci_markers}
+
+    @classmethod
+    def _true_notable_flag_env_vars(cls) -> Iterable[str]:
+        for env_var_name in cls.notable_flag_env_vars:
+            env_var_value = os.environ.get(env_var_name, "0")
+            with suppress(ValueError):
+                if strtobool(env_var_value):
+                    yield env_var_name, env_var_value
+
     def __init__(self):
         """Initialize the environment context."""
-        ci_markers = ("GITHUB_ACTIONS", "CI")
         super().__init__(
             EnvironmentContextSchema.url,
             {
@@ -55,10 +65,9 @@ class EnvironmentContext(SelfDescribingJson):
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(
-                    # True if 'true', 'TRUE', 'True', or '1'
-                    os.environ.get(marker, "").lower()[:1] in {"1", "t"}
-                    for marker in ci_markers
+                    get_boolean_env_var(marker) for marker in self.ci_markers
                 ),
+                "notable_flag_env_vars": dict(self._true_notable_flag_env_vars()),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
                 **self.system_info,
@@ -108,7 +117,8 @@ class EnvironmentContext(SelfDescribingJson):
         """Obtain the process information for the current process.
 
         Returns:
-            A dictionary containing the process information. Such as the hashed process name, pid, core counts, etc
+            A dictionary containing the process information. Such as the hashed
+            process name, pid, core counts, etc
         """
         process = psutil.Process()
         with process.oneshot():
@@ -128,10 +138,11 @@ class EnvironmentContext(SelfDescribingJson):
     def num_available_cores(self) -> int:
         """Obtain the number of available CPU cores.
 
-        Uses sched_getaffinity where available, otherwise falls back to cpu_count().
+        Uses `sched_getaffinity` where available, otherwise falls back to
+        `cpu_count`.
 
         Returns:
-            int: The number of available CPU cores.
+            The number of available CPU cores.
         """
         if safe_hasattr(os, "sched_getaffinity"):
             return len(os.sched_getaffinity(0))
