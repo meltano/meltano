@@ -215,7 +215,7 @@ class TestAZStorageStateStoreManager:
     @pytest.fixture(scope="function")
     def mock_client(self):
         with patch(
-            "azure.storage.blob.BlobServiceClient",
+            "meltano.core.state_store.azure.BlobServiceClient",
         ) as mock_client:
             yield mock_client
 
