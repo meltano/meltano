@@ -46,7 +46,9 @@
                 "type": "string"
             },
             "additionalProperties": {
-                "type": "string"
+                "description": "Truthy values of select env vars",
+                "type": "string",
+                "maxLength": 256
             }
         },
         "python_version": {
@@ -172,6 +174,7 @@
         "meltano_version",
         "is_dev_build",
         "is_ci_environment",
+        "notable_flag_env_vars",
         "python_version",
         "python_implementation",
         "system_name",
