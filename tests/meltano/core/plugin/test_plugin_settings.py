@@ -26,6 +26,7 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 
+@pytest.mark.order(0)
 def test_create(session):
     setting = Setting(
         name="api_key.test.test", namespace="gitlab", value="C4F3C4F3", enabled=True
@@ -194,6 +195,7 @@ class TestPluginSettingsService:
         # Expect hidden
         assert "secret" not in setting_defs_by_name
 
+    @pytest.mark.order(1)
     def test_as_dict(self, subject, session, tap):
         expected = {"test": "mock", "start_date": None, "secure": None}
         full_config = subject.as_dict(session=session)
@@ -314,6 +316,7 @@ class TestPluginSettingsService:
         for key, value in custom_tap.config.items():
             assert config.get(env_var(subject, key)) == value
 
+    @pytest.mark.order(4)
     def test_namespace_as_env_prefix(
         self, project, session, target, env_var, plugin_settings_service_factory
     ):
@@ -442,6 +445,7 @@ class TestPluginSettingsService:
             assert "test_a" not in extractor.config
             assert "test_b" not in extractor.config
 
+    @pytest.mark.order(2)
     def test_store_dotenv(self, subject, project, tap):
         store = SettingValueStore.DOTENV
 
@@ -534,7 +538,7 @@ class TestPluginSettingsService:
 
         assert config["var"] == "hello world!"
         assert config["foo"] == "42"
-        assert config["missing"] is None
+        assert config["missing"] == ""
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
 
@@ -554,6 +558,7 @@ class TestPluginSettingsService:
             key: value for key, value in config.items() if key in yml_config
         }
 
+    @pytest.mark.order(3)
     def test_nested_keys(self, session, subject, project, tap):
         def set_config(path, value):
             subject.set(path, value, store=SettingValueStore.MELTANO_YML)
@@ -919,13 +924,19 @@ class TestPluginSettingsService:
         subject.set("aliased_3", "value_3")
         assert subject.get("aliased") == "value_3"
 
+    @pytest.mark.order(-1)
     def test_strict_env_var_mode_on_raises_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+        subject.project_settings_service.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+        )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         with pytest.raises(EnvironmentVariableNotSetError):
             subject.get("stacked_env_var")
 
+    @pytest.mark.order(-1)
     def test_strict_env_var_mode_off_no_raise_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.project_settings_service.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False
+        )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
-        assert subject.get("stacked_env_var") is None
+        assert subject.get("stacked_env_var") == ""

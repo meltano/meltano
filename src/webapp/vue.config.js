@@ -27,7 +27,6 @@ module.exports = {
   },
 
   devServer: {
-    index: process.env.MELTANO_EMBED == '1' ? 'index-embed.html' : 'index.html',
     historyApiFallback: {
       verbose: true,
       index:

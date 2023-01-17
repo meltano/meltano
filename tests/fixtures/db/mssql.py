@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import logging
 import os
@@ -6,6 +8,7 @@ import pytest
 import sqlalchemy as sa
 from sqlalchemy import DDL, create_engine
 from sqlalchemy.engine import URL
+from sqlalchemy.pool import NullPool
 
 
 def recreate_database(engine, db_name):
@@ -61,16 +64,20 @@ def create_connection_url(
 
 
 @pytest.fixture(scope="session")
-def engine_uri():
+def engine_uri(worker_id: str):
     host = os.getenv("MSSQL_ADDRESS")
     port = os.getenv("MSSQL_PORT", 1433)
     user = os.getenv("MSSQL_USER")
     password = os.getenv("MSSQL_PASSWORD")
-    database = os.getenv("MSSQL_DB", "pytest_meltano")
+    database = f"{os.getenv('MSSQL_DB', 'pytest_meltano')}_{worker_id}"
 
     # Recreate the database using the master database
     master_engine_uri = create_connection_url(host, port, user, password, "master")
-    engine = create_engine(master_engine_uri, isolation_level="AUTOCOMMIT")
+    engine = create_engine(
+        master_engine_uri,
+        isolation_level="AUTOCOMMIT",
+        poolclass=NullPool,
+    )
     recreate_database(engine, database)
 
     # Connect to the database where the tests will be run

@@ -1,4 +1,5 @@
 """Storage Managers for Meltano Configuration."""
+
 from __future__ import annotations
 
 import logging
@@ -14,15 +15,15 @@ import dotenv
 import sqlalchemy
 from sqlalchemy.orm import Session
 
-from .environment import NoActiveEnvironment
-from .error import Error
-from .project import ProjectReadonly
-from .setting import Setting
-from .setting_definition import SettingDefinition, SettingMissingError
-from .utils import flatten, pop_at_path, set_at_path
+from meltano.core.environment import NoActiveEnvironment
+from meltano.core.error import Error
+from meltano.core.project import ProjectReadonly
+from meltano.core.setting import Setting
+from meltano.core.setting_definition import SettingDefinition, SettingMissingError
+from meltano.core.utils import flatten, pop_at_path, set_at_path
 
 if TYPE_CHECKING:
-    from .settings_service import SettingsService
+    from meltano.core.settings_service import SettingsService
 
 
 logger = logging.getLogger(__name__)
@@ -588,10 +589,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         Raises:
             ConflictingSettingValueException: if multiple conflicting values for the same setting are provided.
         """
-        keys = [name]
-        if setting_def:
-            keys = [setting_def.name, *setting_def.aliases]
-
+        keys = [setting_def.name, *setting_def.aliases] if setting_def else [name]
         flat_config = self.flat_config
         vals_with_metadata = []
         for key in keys:
@@ -609,6 +607,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             raise ConflictingSettingValueException(
                 metadata["key"] for _, metadata in vals_with_metadata
             )
+
         return vals_with_metadata[0] if vals_with_metadata else (None, {})
 
     def set(
@@ -629,19 +628,16 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
-        keys_to_unset = [name]
-        if setting_def:
-            keys_to_unset = [setting_def.name, *setting_def.aliases]
-
+        keys_to_unset = (
+            [setting_def.name, *setting_def.aliases] if setting_def else [name]
+        )
         paths_to_unset = [key for key in keys_to_unset if "." in key]
 
         if len(path) == 1:
-            # No need to unset `name`,
-            # since it will be overridden anyway
+            # No need to unset `name`, since it will be overridden anyway
             keys_to_unset.remove(name)
         elif name.split(".") == path:
-            # No need to unset `name` as path,
-            # since it will be overridden anyway
+            # No need to unset `name` as path, since it will be overridden anyway
             paths_to_unset.remove(name)
 
         with self.update_config() as config:
@@ -1280,15 +1276,6 @@ class AutoStoreManager(SettingsStoreManager):
             StoreNotSupportedError: exception encountered when attempting to write to store.
         """
         setting_def = setting_def or self.find_setting(name)
-
-        current_value, metadata = self.get(name, setting_def=setting_def)
-
-        if setting_def:
-            if value == setting_def.value:
-                # Unset everything so we fall down on default
-                self.unset(name, path, setting_def=setting_def)
-                return {"store": SettingValueStore.DEFAULT}
-
         store = self.auto_store(name, setting_def=setting_def)
         logger.debug(f"AutoStoreManager returned store '{store}'")
         if store is None:
@@ -1296,16 +1283,7 @@ class AutoStoreManager(SettingsStoreManager):
 
         # May raise StoreNotSupportedError, but that's good.
         manager = self.manager_for(store)
-
-        # Even if the global current value isn't equal,
-        # the value in this store might be
-        current_value, _ = manager.get(name, setting_def=setting_def)
-        if value == current_value:
-            # No need to do anything
-            return {"store": store}
-
         metadata = manager.set(name, path, value, setting_def=setting_def)
-
         metadata["store"] = store
         return metadata
 

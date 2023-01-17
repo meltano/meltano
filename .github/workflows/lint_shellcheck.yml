@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.3.0
 
       - name: Integration test shell lint
         uses: ludeeus/action-shellcheck@master

@@ -26,8 +26,8 @@ export default {
   install(Vue, { service, toasted }) {
     service.register(
       new UpgradeMiddleware({
-        toasted
+        toasted,
       })
     )
-  }
+  },
 }

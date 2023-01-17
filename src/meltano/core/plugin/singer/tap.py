@@ -19,7 +19,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
-from meltano.core.state_service import StateService
+from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
 from . import PluginType, SingerPlugin
@@ -85,7 +85,7 @@ def _debug_logging_handler(
         )
 
 
-def config_metadata_rules(config):
+def config_metadata_rules(config):  # noqa: WPS210
     """Get metadata rules from config.
 
     Args:
@@ -137,7 +137,7 @@ def config_schema_rules(config):
     ]
 
 
-class SingerTap(SingerPlugin):
+class SingerTap(SingerPlugin):  # noqa: WPS 214
     """A Plugin for Singer Taps."""
 
     __plugin_type__ = PluginType.EXTRACTORS
@@ -235,7 +235,7 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    async def look_up_state(  # noqa: WPS231, WPS213
+    async def look_up_state(  # noqa: WPS231, WPS213, WPS210
         self, plugin_invoker: PluginInvoker
     ):
         """Look up state, cleaning up and refreshing as needed.
@@ -262,7 +262,6 @@ class SingerTap(SingerPlugin):
             state_path.unlink()
         except FileNotFoundError:
             pass
-
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job:
             # Running outside pipeline context: incremental state could not be loaded
@@ -290,11 +289,13 @@ class SingerTap(SingerPlugin):
 
             return
         # the `state.json` is stored in the database
-        state = StateService(elt_context.session).get_state(elt_context.job.job_name)
-
+        state = StateService(
+            project=elt_context.project, session=elt_context.session
+        ).get_state(elt_context.job.job_name)
         if state:
-            with state_path.open("w") as state_file:
-                json.dump(state.get("singer_state"), state_file, indent=2)
+            if state.get(SINGER_STATE_KEY):
+                with state_path.open("w") as state_file:
+                    json.dump(state.get(SINGER_STATE_KEY), state_file, indent=2)
         else:
             logger.warning("No state was found, complete import.")
 
@@ -322,7 +323,9 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    async def discover_catalog(self, plugin_invoker: PluginInvoker):  # noqa: WPS231
+    async def discover_catalog(  # noqa: WPS231, WPS210,
+        self, plugin_invoker: PluginInvoker
+    ):
         """Perform catalog discovery.
 
         Args:
@@ -382,7 +385,7 @@ class SingerTap(SingerPlugin):
                 f"Catalog discovery failed: invalid catalog: {err}"
             ) from err
 
-    async def run_discovery(  # noqa: WPS238
+    async def run_discovery(  # noqa: WPS238, WPS210
         self, plugin_invoker: PluginInvoker, catalog_path: Path
     ):  # noqa: DAR401
         """Run tap in discovery mode and store the result.
@@ -475,7 +478,7 @@ class SingerTap(SingerPlugin):
         except PluginLacksCapabilityError:
             pass
 
-    def apply_catalog_rules(  # noqa: WPS213,WPS231
+    def apply_catalog_rules(  # noqa: WPS213, WPS231, WPS210
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),
@@ -591,4 +594,4 @@ class SingerTap(SingerPlugin):
 
         key_json = json.dumps(key_dict)
 
-        return sha1(key_json.encode()).hexdigest()  # noqa: S303
+        return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324

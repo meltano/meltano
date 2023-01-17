@@ -16,15 +16,19 @@ jobs:
     strategy:
       matrix:
         include:
-        - { integration_test: "meltano-basics", needs_postgres: false }
-        - { integration_test: "meltano-run", needs_postgres: true }
-        - { integration_test: "meltano-objects", needs_postgres: false }
+        - { integration_test: "meltano-basics", needs_postgres: false}
+        - { integration_test: "meltano-run", needs_postgres: true}
+        - { integration_test: "meltano-objects", needs_postgres: false}
+        - { integration_test: "meltano-migrations", needs_postgres: false}
+        - { integration_test: "meltano-state-s3", needs_postgres: false}
+        - { integration_test: "meltano-state-local", needs_postgres: false}
+        - { integration_test: "meltano-config", needs_postgres: false}
       fail-fast: false
 
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.3.0
 
     - name: Install Poetry
       env:
@@ -34,7 +38,7 @@ jobs:
         poetry --version
 
     - name: Setup Python 3.8
-      uses: actions/setup-python@v4.2.0
+      uses: actions/setup-python@v4.5.0
       with:
         python-version: 3.8
         architecture: x64
@@ -50,7 +54,7 @@ jobs:
     - name: Install Dependencies
       run: |
         poetry env use "3.8"
-        poetry install
+        poetry install --extras "s3"
 
     - name: Start Postgres Container
       if: always() && (matrix.needs_postgres == true)

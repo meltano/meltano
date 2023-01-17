@@ -9,8 +9,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
 
+from meltano.core.error import MeltanoError
 from meltano.core.project import Project
 
 from .project_settings_service import ProjectSettingsService
@@ -18,6 +20,23 @@ from .project_settings_service import ProjectSettingsService
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = {}
+
+
+class MeltanoDatabaseCompatibilityError(MeltanoError):
+    """Raised when the database is not compatible with Meltano."""
+
+    INSTRUCTION = (
+        "Upgrade your database to be compatible with Meltano or use a different "
+        "database"
+    )
+
+    def __init__(self, reason: str):
+        """Initialize the error with a reason.
+
+        Args:
+            reason: The reason why the database is not compatible.
+        """
+        super().__init__(reason, self.INSTRUCTION)
 
 
 def project_engine(
@@ -41,8 +60,9 @@ def project_engine(
     settings = ProjectSettingsService(project)
 
     engine_uri = settings.get("database_uri")
-    logging.debug(f"Creating engine {project}@{engine_uri}")
-    engine = create_engine(engine_uri, pool_pre_ping=True)
+    logging.debug(f"Creating engine '{project}@{engine_uri}'")
+
+    engine = create_engine(engine_uri, poolclass=NullPool)
 
     # Connect to the database to ensure it is available.
     connect(
@@ -51,6 +71,7 @@ def project_engine(
         retry_timeout=settings.get("database_retry_timeout"),
     )
 
+    check_database_compatibility(engine)
     init_hook(engine)
 
     engine_session = (engine, sessionmaker(bind=engine))
@@ -160,3 +181,25 @@ def ensure_schema_exists(
     logging.info(f"Schema {schema_name} has been created successfully.")
     for role in grant_roles:
         logging.info(f"Usage has been granted for role: {role}.")
+
+
+def check_database_compatibility(engine: Engine) -> None:
+    """Check that the database is compatible with Meltano.
+
+    Args:
+        engine: The DB engine to be used. This should already be connected to
+            the database.
+
+    Raises:
+        MeltanoDatabaseCompatibilityError: The database is not compatible with
+            Meltano.
+    """
+    dialect = engine.dialect.name
+    version = engine.dialect.server_version_info
+
+    if dialect == "sqlite" and version < (3, 25, 1):
+        version_string = ".".join(map(str, version))
+        reason = (
+            f"Detected SQLite {version_string}, but Meltano requires at least 3.25.1"
+        )
+        raise MeltanoDatabaseCompatibilityError(reason)

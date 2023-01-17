@@ -15,22 +15,22 @@ describe('Design.vue', () => {
   let state
   let store
 
-  const createShallowWrapper = use =>
+  const createShallowWrapper = (use) =>
     shallowMount(Design, {
       store,
       localVue,
       router,
-      ...use
+      ...use,
     })
 
-  const createWrapper = use =>
+  const createWrapper = (use) =>
     mount(Design, {
       stubs: ['font-awesome-icon'],
       store,
       localVue,
       router,
       ...use,
-      $route: { params: 'test' }
+      $route: { params: 'test' },
     })
 
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('Design.vue', () => {
       getDesign: jest.fn(),
       getSQL: jest.fn(),
       loadReport: jest.fn(),
-      saveReport: jest.fn()
+      saveReport: jest.fn(),
     }
     store = new Vuex.Store({
       modules: {
@@ -47,17 +47,17 @@ describe('Design.vue', () => {
           namespaced: true,
           state,
           actions,
-          getters: designs.getters
+          getters: designs.getters,
         },
-        plugins
-      }
+        plugins,
+      },
     })
   })
 
   it('calls getDesign() via beforeRouteEnter() router lifecycle hook', () => {
     const params = {
       model: 'model',
-      design: 'design'
+      design: 'design',
     }
     const wrapper = createShallowWrapper()
 

@@ -22,37 +22,29 @@ describe('Configuration', () => {
     cy.wait('@installedApi')
     cy.get('[data-test-id="tap-carbon-intensity-extractor-card"]').within(
       () => {
-        cy.get('.button')
-          .contains('Install')
-          .click()
+        cy.get('.button').contains('Install').click()
       }
     )
     cy.wait('@installedApi')
     cy.wait('@addApi')
     cy.wait('@installApi', {
-      timeout: 60000
+      timeout: 60000,
     })
     cy.wait('@carbonEntitiesApi')
     cy.get('.modal-card-foot').within(() => {
-      cy.get('.button')
-        .contains('Save')
-        .click()
+      cy.get('.button').contains('Save').click()
     })
     cy.wait('@installedApi')
     cy.get('[data-test-id="target-sqlite-loader-card"]').within(() => {
-      cy.get('.button')
-        .contains('Install')
-        .click()
+      cy.get('.button').contains('Install').click()
     })
     cy.wait('@installedApi')
     cy.wait('@addApi')
     cy.wait('@installApi', {
-      timeout: 60000
+      timeout: 60000,
     })
     cy.get('.modal-card-foot').within(() => {
-      cy.get('.button')
-        .contains('Save')
-        .click()
+      cy.get('.button').contains('Save').click()
     })
     cy.wait('@saveConfigurationApi')
     cy.get('[data-test-id="save-transform"]')
@@ -60,9 +52,7 @@ describe('Configuration', () => {
       .click({ force: true })
     cy.wait('@pipelineSchedulesApi')
     cy.get('.modal-card-foot').within(() => {
-      cy.get('.button')
-        .contains('Save')
-        .click()
+      cy.get('.button').contains('Save').click()
     })
     cy.wait('@runApi')
     cy.get('.tag-running-pipelines').should('have.length', 1)

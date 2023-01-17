@@ -3,6 +3,7 @@ title: Code Style Guide
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
 weight: 10
+hidden: true
 ---
 
 ## Code style
@@ -19,10 +20,9 @@ Python:
 - [wemake-python-styleguide](https://wemake-python-stylegui.de/en/latest/)
 - [MyPy](https://mypy.readthedocs.io/en/stable/)
 
-Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code,
-and `wemake-python-styleguide` is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
+Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code. Notable among these is `wemake-python-styleguide`, which offers an extensive set of opinionated rules that encourage clean and correct code.
 
-[MyPy is currently not executed in CI](https://github.com/meltano/meltano/issues/6491). It currently raises many issues when run. We intend to address them over time.
+To lint your Python code, install the project using `poetry install`, then run `poetry run pre-commit --all-files flakeheaven` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
 
 Javascript:
 
@@ -30,7 +30,44 @@ Javascript:
 - [ESLint Vue Plugin](https://github.com/vuejs/eslint-plugin-vue)
 - [Prettier](https://prettier.io/)
 
-You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
+To lint your Javascript code, run `yarn lint` from the root of the project.
+
+### Static typing
+
+[MyPy is being adopted incrementally by this codebase](https://github.com/meltano/meltano/issues/6715). If you are adding new code, please use type hints.
+
+If you are making changes to existing Python modules, you are encouraged to enable type checks. To do so,
+
+- if you are fixing a single `.py` file inside a sub-package, e.g. `meltano.core.plugin.command`, _de-glob_ the sub-package in `pyproject.toml` and enumerate the files you are not touching. This will allow you to run `nox -rs mypy` and catch type errors only in the files you are touching.
+
+  ```diff
+    [[tool.mypy.overrides]]
+    module = [
+      ...
+      "meltano.core.m5o.*",
+  -   "meltano.core.plugin.*",
+  +   "meltano.core.plugin.airflow",
+  +   "meltano.core.plugin.base",
+  +   # Note that meltano.core.plugin.command is not included here
+  +   "meltano.core.plugin.config_service",
+  +   "meltano.core.plugin.dbt.*",
+  +   "meltano.core.plugin.error",
+  +   "meltano.core.plugin.factory",
+  +   "meltano.core.plugin.file",
+  +   "meltano.core.plugin.meltano_file",
+  +   "meltano.core.plugin.model.*",
+  +   "meltano.core.plugin.project_plugin",
+  +   "meltano.core.plugin.requirements",
+  +   "meltano.core.plugin.settings_service",
+  +   "meltano.core.plugin.singer.*",
+  +   "meltano.core.plugin.superset",
+  +   "meltano.core.plugin.utility",
+      "meltano.core.runner.*",
+      ...
+    ]
+  ```
+
+- if you are fixing an entire sub-package, simply remove it from the ignore list.
 
 ### Mantra
 

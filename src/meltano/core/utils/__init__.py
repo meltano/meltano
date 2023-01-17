@@ -3,24 +3,27 @@
 from __future__ import annotations
 
 import asyncio
+import collections
 import functools
 import hashlib
 import logging
 import math
 import os
 import re
+import sys
 import traceback
-from collections import OrderedDict
 from copy import deepcopy
 from datetime import date, datetime, time
+from enum import IntEnum
 from pathlib import Path
-from typing import Any, Callable, Iterable, TypeVar
+from typing import Any, Callable, Iterable, Mapping, Sequence, TypeVar, overload
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
 
+from meltano.core.error import MeltanoError
+
 logger = logging.getLogger(__name__)
-T = TypeVar("T")
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -32,6 +35,11 @@ try:
     asyncio_all_tasks = asyncio.all_tasks
 except AttributeError:
     asyncio_all_tasks = asyncio.Task.all_tasks
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 
 class NotFound(Exception):
@@ -162,7 +170,11 @@ def merge(src, dest):
     return dest
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
+def are_similar_types(left, right):
+    return isinstance(left, type(right)) or isinstance(right, type(left))
+
+
+def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -207,7 +219,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
         cursor = cursor[key]
 
     if tail not in cursor or (
-        type(cursor[tail]) is not type(value) and force  # noqa: WPS516
+        (not are_similar_types(cursor[tail], value)) and force  # noqa: WPS516
     ):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
@@ -288,7 +300,22 @@ def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 
 
-def coerce_datetime(d: date | datetime) -> datetime | None:
+@overload
+def coerce_datetime(d: None) -> None:
+    ...  # noqa: WPS428
+
+
+@overload
+def coerce_datetime(d: datetime) -> datetime:
+    ...  # noqa: WPS428
+
+
+@overload
+def coerce_datetime(d: date) -> datetime:
+    ...  # noqa: WPS428
+
+
+def coerce_datetime(d):
     """Add a `time` component to `d` if it is missing.
 
     Args:
@@ -306,7 +333,17 @@ def coerce_datetime(d: date | datetime) -> datetime | None:
     return datetime.combine(d, time())
 
 
-def iso8601_datetime(d: str) -> datetime | None:
+@overload
+def iso8601_datetime(d: None) -> None:
+    ...  # noqa: WPS428
+
+
+@overload
+def iso8601_datetime(d: str) -> datetime:
+    ...  # noqa: WPS428
+
+
+def iso8601_datetime(d):
     if d is None:
         return None
 
@@ -326,7 +363,15 @@ def iso8601_datetime(d: str) -> datetime | None:
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
-def find_named(xs: Iterable[dict], name: str, obj_type: type = None) -> dict:
+class _GetItemProtocol(Protocol):
+    def __getitem__(self, key: str) -> str:
+        ...  # noqa: WPS428
+
+
+_G = TypeVar("_G", bound=_GetItemProtocol)
+
+
+def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:
@@ -374,7 +419,7 @@ def is_email_valid(value: str):
     return re.match(REGEX_EMAIL, value)
 
 
-def pop_at_path(d, path, default=None):
+def pop_at_path(d, path, default=None):  # noqa: WPS210
     if isinstance(path, str):
         path = path.split(".")
 
@@ -409,7 +454,7 @@ def set_at_path(d, path, value):
     final[tail] = value
 
 
-class EnvironmentVariableNotSetError(Exception):
+class EnvironmentVariableNotSetError(MeltanoError):
     """Occurs when a referenced environment variable is not set."""
 
     def __init__(self, env_var: str):
@@ -418,63 +463,128 @@ class EnvironmentVariableNotSetError(Exception):
         Args:
             env_var: The unset environment variable name.
         """
-        super().__init__(env_var)
         self.env_var = env_var
 
-    def __str__(self) -> str:
-        """Return the error as a string."""  # noqa: DAR201
-        return f"{self.env_var} referenced but not set."
+        reason = f"Environment variable '{env_var}' referenced but not set"
+        instruction = "Make sure the environment variable is set"
+        super().__init__(reason, instruction)
 
 
-def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
-    if isinstance(raw_value, dict):
-        return {
-            key: expand_env_vars(val, env, raise_if_missing)
-            for key, val in raw_value.items()
-        }
-    elif not isinstance(raw_value, str):
+ENV_VAR_PATTERN = re.compile(
+    r"""
+    \$  # starts with a '$'
+    (?:
+        {(\w+)} # ${VAR}
+        |
+        ([A-Z][A-Z0-9_]*) # $VAR
+    )
+    """,
+    re.VERBOSE,
+)
+
+Expandable = TypeVar("Expandable", str, Mapping[str, "Expandable"])
+
+
+class EnvVarMissingBehavior(IntEnum):
+    """The behavior that should be employed when expanding a missing env var."""
+
+    use_empty_str = 0
+    raise_exception = 1
+    ignore = 2
+
+
+def expand_env_vars(
+    raw_value: Expandable,
+    env: Mapping[str, str],
+    *,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
+    flat: bool = False,
+) -> Expandable:
+    """Expand/interpolate provided env vars into a string or env mapping.
+
+    By default, attempting to expand an env var which is not defined in the
+    provided env dict will result in it being replaced with the empty string.
+
+    Args:
+        raw_value: A string or env mapping in which env vars will be expanded.
+        env: The env vars to use for the expansion of `raw_value`.
+        if_missing: The behavior to employ if an env var in `raw_value` is not
+            set in `env`.
+        flat: Whether the `raw_value` has a flat structure. Ignored if
+            `raw_value` is not a mapping. Otherwise it controls whether this
+            function will process nested levels within `raw_value`. Defaults to
+            `False` for backwards-compatibility. Setting to `True` is recommend
+            for performance, safety, and cleanliness reasons.
+
+    Raises:
+        EnvironmentVariableNotSetError: Attempted to expand an env var that was not
+            defined in the provided env dict, and `if_missing` was
+            `EnvVarMissingBehavior.raise_exception`.
+
+    Returns:
+        The string or env dict with env vars expanded. For backwards
+        compatibility, if anything other than an `str` or mapping is provided
+        as the `raw_value`, it is returned unchanged.
+    """  # noqa: DAR402
+    if_missing = EnvVarMissingBehavior(if_missing)
+
+    if not isinstance(raw_value, (str, Mapping)):
         return raw_value
 
-    # find viable substitutions
-    var_matcher = re.compile(
-        r"""
-        \$  # starts with a '$'
-        (?:
-            {(\w+)} # ${VAR}
-            |
-            ([A-Z][A-Z0-9_]*) # $VAR
-        )
-        """,
-        re.VERBOSE,
-    )
-
-    def subst(match) -> str:
+    def replacer(match: re.Match) -> str:
+        # The variable can be in either group
+        var = next(var for var in match.groups() if var)
         try:
-            # the variable can be in either group
-            var = next(var for var in match.groups() if var)
             val = str(env[var])
+        except KeyError as ex:
+            logger.debug(
+                f"Variable '${var}' is not set in the provided env dictionary."
+            )
+            if if_missing == EnvVarMissingBehavior.raise_exception:
+                raise EnvironmentVariableNotSetError(var) from ex
+            elif if_missing == EnvVarMissingBehavior.ignore:
+                return f"${{{var}}}"
+            return ""
+        if not val:
+            logger.debug(f"Variable '${var}' is empty.")
+        return val
 
-            if not val:
-                logger.debug(f"Variable '${var}' is empty.")
-                if raise_if_missing:
-                    raise EnvironmentVariableNotSetError(var)
-            return val
-        except KeyError as e:
-            if raise_if_missing:
-                raise EnvironmentVariableNotSetError(e.args[0])
-            logger.debug(f"Variable '${var}' is missing from the environment.")
-            return None
-
-    fullmatch = re.fullmatch(var_matcher, raw_value)
-    if fullmatch:
-        # If the entire value is an env var reference, return None if it isn't set
-        return subst(fullmatch)
-
-    return re.sub(var_matcher, subst, raw_value)
+    return _expand_env_vars(raw_value, replacer, flat)
 
 
-def uniques_in(original):
-    return list(OrderedDict.fromkeys(original))
+# Separate inner-function for `expand_env_vars` for performance reasons. Like
+# this the `replacer` function closure only needs to be created once when
+# `raw_value` is a dict, as opposed to once per key-value pair.
+def _expand_env_vars(
+    raw_value: Expandable,
+    replacer: Callable[[re.Match], str],
+    flat: bool,
+) -> Expandable:
+    if isinstance(raw_value, Mapping):
+        if flat:
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
+        return {
+            k: _expand_env_vars(v, replacer, flat)
+            if isinstance(v, (str, Mapping))
+            else v
+            for k, v in raw_value.items()
+        }
+    return ENV_VAR_PATTERN.sub(replacer, raw_value)
+
+
+T = TypeVar("T")
+
+
+def uniques_in(original: Sequence[T]) -> list[T]:
+    """Get unique elements from an iterable while preserving order.
+
+    Args:
+        original: A sequence from which only the unique values will be returned.
+
+    Returns:
+        A list of unique values from the provided sequence in the order they appeared.
+    """
+    return list(collections.OrderedDict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
@@ -551,3 +661,57 @@ def safe_hasattr(obj: Any, name: str) -> bool:
     except AttributeError:
         return False
     return True
+
+
+def strtobool(val: str) -> bool:
+    """Convert a string representation of truth to true (1) or false (0).
+
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+
+    Case is ignored in string comparisons.
+
+    Re-implemented from distutils.util.strtobool to avoid importing distutils.
+
+    Args:
+        val: The string to convert to a boolean.
+
+    Returns:
+        True if the string represents a truthy value, False otherwise.
+
+    Raises:
+        ValueError: If the string is not a valid representation of a boolean.
+    """
+    val = val.lower()
+    if val in {"y", "yes", "t", "true", "on", "1"}:
+        return True
+    elif val in {"n", "no", "f", "false", "off", "0"}:
+        return False
+
+    raise ValueError(f"invalid truth value {val!r}")
+
+
+def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
+    """Get the value of an environment variable as a boolean.
+
+    Args:
+        env_var: The name of the environment variable.
+        default: The default value to return if the environment variable is not set.
+
+    Returns:
+        The value of the environment variable as a boolean.
+    """
+    try:
+        return strtobool(os.getenv(env_var, str(default)))
+    except ValueError:
+        return default
+
+
+def get_no_color_flag() -> bool:
+    """Get the value of the NO_COLOR environment variable.
+
+    Returns:
+        True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
+    """
+    return get_boolean_env_var("NO_COLOR")

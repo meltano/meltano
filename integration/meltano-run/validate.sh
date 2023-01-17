@@ -14,3 +14,7 @@ grep "Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1 cmd_type=command name=dbt-postg
 # we could also run psql statements
 # check for the existance of files
 # etc
+source "$(git rev-parse --show-toplevel)/integration/commons.sh"
+cd "${TEST_DOCS_DIR}"
+meltano state list | grep "dev:tap-gitlab-to-target-postgres"
+meltano state get dev:tap-gitlab-to-target-postgres | grep "singer_state"

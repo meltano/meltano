@@ -153,3 +153,14 @@ src/meltano/api/static/js
 
 # sqlite
 *.db
+
+# Poetry build artifact
+setup.py
+
+# Integration test generated files
+*.jsonl
+**/.meltano/**
+!docs/example-library/meltano-migrations/.meltano/meltano.db
+
+# Schemas copied into `src/meltano` by the build process
+src/meltano/schema/*

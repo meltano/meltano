@@ -1,4 +1,5 @@
 """Defines `meltano elt` command."""
+
 from __future__ import annotations
 
 import datetime
@@ -10,6 +11,9 @@ import click
 import structlog
 from structlog import stdlib as structlog_stdlib
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -22,12 +26,9 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import click_run_async
-
-from . import cli
-from .params import pass_project
-from .utils import CliError, PartialInstrumentedCmd
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -42,6 +43,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @cli.command(
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
 @click.argument("extractor")
 @click.argument("loader")

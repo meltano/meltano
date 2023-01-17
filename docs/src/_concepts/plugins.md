@@ -515,8 +515,7 @@ Loaders support the following [extras](/guide/configuration#plugin-extras):
 
 A loader's `dialect` [extra](/guide/configuration#plugin-extras)
 holds the name of the dialect of the target database, so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
-can determine the type of database to connect to.
+[transformers](#transformers) in the same pipeline can determine the type of database to connect to.
 
 The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
 [pipeline environment variable](/guide/integration#pipeline-environment-variables).
@@ -553,8 +552,7 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 
 A loader's `target_schema` [extra](/guide/configuration#plugin-extras)
 holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
-can determine the database schema to load data from.
+[transformers](#transformers) in the same pipeline can determine the database schema to load data from.
 
 The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
 If the name of this setting is not `schema`, its value [can be referenced](/guide/configuration#expansion-in-setting-values) from the extra's value using `$MELTANO_LOAD_<TARGET_SCHEMA_SETTING>`, e.g. `$MELTANO_LOAD_DESTINATION_SCHEMA` for setting `destination_schema`.

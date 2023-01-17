@@ -12,77 +12,88 @@
     "extractors": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/extractors"
+        "$ref": "#/$defs/extractors"
       }
     },
     "loaders": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/loaders"
+        "$ref": "#/$defs/loaders"
       }
     },
     "orchestrators": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/orchestrators"
+        "$ref": "#/$defs/orchestrators"
       }
     },
     "transformers": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/transformers"
+        "$ref": "#/$defs/transformers"
       }
     },
     "files": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/files"
+        "$ref": "#/$defs/files"
       }
     },
     "utilities": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/utilities"
+        "$ref": "#/$defs/utilities"
       }
     },
     "transforms": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/transforms"
+        "$ref": "#/$defs/transforms"
       }
     },
     "mappers": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/mappers"
+        "$ref": "#/$defs/mappers"
       }
     }
   },
-  "definitions": {
+  "$defs": {
     "common": {
       "type": "object",
       "additionalProperties": true,
-      "required": ["name", "namespace"],
+      "required": [
+        "name",
+        "namespace"
+      ],
       "allOf": [
         {
-          "$ref": "#/definitions/variant_base"
+          "$ref": "#/$defs/variant_base"
         },
         {
           "properties": {
             "name": {
               "type": "string",
               "description": "The name of the plugin.",
-              "examples": ["target-jsonl"]
+              "examples": [
+                "target-jsonl"
+              ]
             },
             "namespace": {
               "type": "string",
               "description": "The namespace of this plugin",
-              "examples": ["tap_csv", "target_jsonl"]
+              "examples": [
+                "tap_csv",
+                "target_jsonl"
+              ]
             },
             "label": {
               "type": "string",
               "description": "A user friendly label describing the plugin",
-              "examples": ["Stripe", "Facebook Ads"]
+              "examples": [
+                "Stripe",
+                "Facebook Ads"
+              ]
             },
             "description": {
               "type": "string",
@@ -99,12 +110,17 @@
             "executable": {
               "type": "string",
               "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
-              "examples": ["tap-stripe", "tap-covid-19"]
+              "examples": [
+                "tap-stripe",
+                "tap-covid-19"
+              ]
             },
             "variant": {
               "type": "string",
               "description": "The same of the variant.",
-              "examples": ["singer-io"]
+              "examples": [
+                "singer-io"
+              ]
             },
             "variants": {
               "type": "array",
@@ -112,16 +128,16 @@
                 "type": "object",
                 "allOf": [
                   {
-                    "$ref": "#/definitions/variants_base"
+                    "$ref": "#/$defs/variants_base"
                   },
                   {
-                    "$ref": "#/definitions/variant_base"
+                    "$ref": "#/$defs/variant_base"
                   }
                 ]
               }
             },
             "requires": {
-              "$ref": "#/definitions/requires"
+              "$ref": "#/$defs/requires"
             }
           }
         }
@@ -147,7 +163,10 @@
         "executable": {
           "type": "string",
           "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
-          "examples": ["tap-stripe", "tap-covid-19"]
+          "examples": [
+            "tap-stripe",
+            "tap-covid-19"
+          ]
         },
         "repo": {
           "type": "string",
@@ -156,7 +175,7 @@
         "settings": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/base_setting"
+            "$ref": "#/$defs/base_setting"
           }
         },
         "settings_group_validation": {
@@ -177,12 +196,16 @@
     },
     "variants_base": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string",
           "description": "The name of the variant.",
-          "examples": ["singer-io"]
+          "examples": [
+            "singer-io"
+          ]
         }
       }
     },
@@ -219,7 +242,9 @@
         },
         "select": {
           "type": "array",
-          "default": ["*.*"],
+          "default": [
+            "*.*"
+          ],
           "description": "An array of entity selection rules in the form '<entity|*>.<attribute|*>'",
           "items": {
             "type": "string"
@@ -232,10 +257,10 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
-          "$ref": "#/definitions/extractor_specific"
+          "$ref": "#/$defs/extractor_specific"
         },
         {
           "additionalProperties": false,
@@ -260,7 +285,7 @@
                 "type": "object",
                 "allOf": [
                   {
-                    "$ref": "#/definitions/extractor_specific"
+                    "$ref": "#/$defs/extractor_specific"
                   }
                 ]
               }
@@ -305,10 +330,10 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
-          "$ref": "#/definitions/loader_specific"
+          "$ref": "#/$defs/loader_specific"
         },
         {
           "additionalProperties": false,
@@ -332,7 +357,7 @@
                 "type": "object",
                 "allOf": [
                   {
-                    "$ref": "#/definitions/loader_specific"
+                    "$ref": "#/$defs/loader_specific"
                   }
                 ]
               }
@@ -348,7 +373,7 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
           "additionalProperties": false,
@@ -373,7 +398,7 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
           "additionalProperties": false,
@@ -400,7 +425,7 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
           "additionalProperties": false,
@@ -431,7 +456,7 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
           "additionalProperties": false,
@@ -456,7 +481,7 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
           "additionalProperties": false,
@@ -502,7 +527,10 @@
               }
             }
           },
-          "required": ["config", "name"]
+          "required": [
+            "config",
+            "name"
+          ]
         }
       }
     },
@@ -511,10 +539,10 @@
       "type": "object",
       "allOf": [
         {
-          "$ref": "#/definitions/common"
+          "$ref": "#/$defs/common"
         },
         {
-          "$ref": "#/definitions/mapper_specific"
+          "$ref": "#/$defs/mapper_specific"
         },
         {
           "additionalProperties": false,
@@ -537,10 +565,10 @@
                 "type": "object",
                 "allOf": [
                   {
-                    "$ref": "#/definitions/variants_base"
+                    "$ref": "#/$defs/variants_base"
                   },
                   {
-                    "$ref": "#/definitions/variant_base"
+                    "$ref": "#/$defs/variant_base"
                   }
                 ]
               }
@@ -551,18 +579,25 @@
     },
     "base_setting": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
           "description": "The name of the setting",
-          "examples": ["account_id"]
+          "examples": [
+            "account_id"
+          ]
         },
         "aliases": {
           "type": "array",
           "description": "Alternative setting names that can be used in 'meltano.yml' and 'meltano config set'",
-          "examples": ["accountId", "account_identifier"],
+          "examples": [
+            "accountId",
+            "account_identifier"
+          ],
           "items": {
             "type": "string"
           }
@@ -570,7 +605,9 @@
         "label": {
           "type": "string",
           "description": "A user friendly label for the setting",
-          "examples": ["Account ID"]
+          "examples": [
+            "Account ID"
+          ]
         },
         "value": {
           "description": "The default value of this setting if not otherwise defined"
@@ -578,7 +615,9 @@
         "placeholder": {
           "type": "string",
           "description": "A placeholder value for this setting",
-          "examples": ["Ex. 18161"]
+          "examples": [
+            "Ex. 18161"
+          ]
         },
         "kind": {
           "type": "string",
@@ -601,17 +640,23 @@
         "description": {
           "type": "string",
           "description": "A description for what this setting does",
-          "examples": ["The unique account identifier for your Stripe Account"]
+          "examples": [
+            "The unique account identifier for your Stripe Account"
+          ]
         },
         "tooltip": {
           "type": "string",
           "description": "A phrase to provide additional information on this setting",
-          "examples": ["Here is some additional info..."]
+          "examples": [
+            "Here is some additional info..."
+          ]
         },
         "documentation": {
           "type": "string",
           "description": "A link to documentation on this setting",
-          "examples": ["https://meltano.com/"]
+          "examples": [
+            "https://meltano.com/"
+          ]
         },
         "protected": {
           "type": "boolean",
@@ -621,26 +666,41 @@
         "env": {
           "type": "string",
           "description": "An environment variable that will be initialized with the setting's value whenever the plugin is invoked. This is used to inject environment variables into the plugin's execution context. If the named environment variable is already defined at runtime, Meltano will use the passed value from context instead of the configured value.",
-          "examples": ["DBT_PROFILES_DIR", "GE_HOME"]
+          "examples": [
+            "DBT_PROFILES_DIR",
+            "GE_HOME"
+          ]
         },
         "value_processor": {
           "description": "Used with `kind: object` to process the keys in a particular way.",
           "type": "string",
-          "enum": ["upcase_string", "nest_object", "stringify"]
+          "enum": [
+            "upcase_string",
+            "nest_object",
+            "stringify"
+          ]
         },
         "value_post_processor": {
           "description": "Used with `kind: object` to process the keys in a particular way.",
           "type": "string",
-          "enum": ["upcase_string", "nest_object", "stringify"]
+          "enum": [
+            "upcase_string",
+            "nest_object",
+            "stringify"
+          ]
         },
         "oauth": {
           "type": "object",
-          "required": ["provider"],
+          "required": [
+            "provider"
+          ],
           "properties": {
             "provider": {
               "type": "string",
               "description": "The name of a Meltano-supported OAuth provider",
-              "examples": ["google-adwords"]
+              "examples": [
+                "google-adwords"
+              ]
             }
           }
         },
@@ -674,7 +734,7 @@
         "^(extractors|loaders|transforms|orchestrators|transformers|files|utilities|mappers)$": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugin_requirement"
+            "$ref": "#/$defs/plugin_requirement"
           }
         }
       }

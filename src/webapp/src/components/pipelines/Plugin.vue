@@ -8,28 +8,28 @@ import utils from '@/utils/utils'
 export default {
   name: 'Plugin',
   components: {
-    Dropdown
+    Dropdown,
   },
   props: {
     plugin: {
       type: Object,
-      required: true
+      required: true,
     },
     type: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      isAdding: false
+      isAdding: false,
     }
   },
   computed: {
     ...mapGetters('plugins', ['getIsInstallingPlugin', 'getIsPluginInstalled']),
     ...mapGetters('orchestration', [
       'getHasPipelineWithPlugin',
-      'getPipelinesWithPlugin'
+      'getPipelinesWithPlugin',
     ]),
     description() {
       return this.plugin.description || ''
@@ -55,7 +55,7 @@ export default {
     },
     getPipelinesTooltip() {
       if (this.getHasPipeline) {
-        const pipelineNames = this.getPipelines.map(el => el.name)
+        const pipelineNames = this.getPipelines.map((el) => el.name)
         return pipelineNames.join(', ')
       } else {
         return 'Create a pipeline'
@@ -64,14 +64,14 @@ export default {
     getPipelinesRoute() {
       if (this.getHasPipeline) {
         return {
-          name: 'pipelines'
+          name: 'pipelines',
         }
       }
       return {
         name: 'createPipelineSchedule',
         query: {
-          [this.singularizedType]: this.name
-        }
+          [this.singularizedType]: this.name,
+        },
       }
     },
     isInstalled() {
@@ -82,14 +82,14 @@ export default {
     },
     hasVariants() {
       return this.variants.length > 1
-    }
+    },
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     goToSettings() {
       this.$router.push({
         name: `${this.singularizedType}Settings`,
-        params: { plugin: this.name }
+        params: { plugin: this.name },
       })
     },
     addToProject(variant) {
@@ -97,7 +97,7 @@ export default {
       const addConfig = {
         pluginType: this.type,
         name: this.name,
-        variant: variant && variant.name
+        variant: variant && variant.name,
       }
       this.addPlugin(addConfig)
         .then(() => {
@@ -107,12 +107,12 @@ export default {
           })
           this.installPlugin(addConfig)
         })
-        .catch(err => {
+        .catch((err) => {
           this.$error.handle(err)
           this.isAdding = false
         })
-    }
-  }
+    },
+  },
 }
 </script>
 <template>
@@ -165,7 +165,7 @@ export default {
               <button
                 class="button is-interactive-primary"
                 :class="{
-                  'is-loading': isAdding
+                  'is-loading': isAdding,
                 }"
                 :disabled="isAdding"
                 @click="addToProject()"
@@ -189,9 +189,7 @@ export default {
                   >
                     Add variant '{{ variant.name }}'
 
-                    <template v-if="variant.default">
-                      (default)
-                    </template>
+                    <template v-if="variant.default"> (default) </template>
                     <template v-else-if="variant.deprecated">
                       (deprecated)
                     </template>

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Sequence
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
@@ -21,7 +21,9 @@ from .utils import noop
 class PluginRemoveService:
     """Handle plugin installation removal operations."""
 
-    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
+    def __init__(
+        self, project: Project, plugins_service: ProjectPluginsService | None = None
+    ):
         """Construct a PluginRemoveService instance.
 
         Args:
@@ -33,7 +35,7 @@ class PluginRemoveService:
 
     def remove_plugins(
         self,
-        plugins: Iterable[ProjectPlugin],
+        plugins: Sequence[ProjectPlugin],
         plugin_status_cb=noop,
         removal_manager_status_cb=noop,
     ) -> tuple[int, int]:
@@ -74,7 +76,7 @@ class PluginRemoveService:
 
     def remove_plugin(
         self, plugin: ProjectPlugin
-    ) -> tuple[PluginLocationRemoveManager]:
+    ) -> tuple[PluginLocationRemoveManager, ...]:
         """Remove a plugin.
 
         Removes from `meltano.yml`, its installation in `.meltano`, and its settings in

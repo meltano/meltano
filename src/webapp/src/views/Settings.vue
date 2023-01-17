@@ -4,7 +4,7 @@ import RouterViewLayout from '@/views/RouterViewLayout'
 export default {
   name: 'Settings',
   components: {
-    RouterViewLayout
+    RouterViewLayout,
   },
   data() {
     return {
@@ -14,35 +14,35 @@ export default {
           pages: [
             {
               title: 'Database',
-              href: '/settings/database'
-            }
-          ]
+              href: '/settings/database',
+            },
+          ],
         },
         {
           name: 'Access control',
           pages: [
             {
               title: 'Roles',
-              href: '/settings/roles'
-            }
-          ]
+              href: '/settings/roles',
+            },
+          ],
         },
         {
           name: 'Connectors',
           pages: [
             {
               title: 'Extractors',
-              href: '/settings/connectors#extractors'
+              href: '/settings/connectors#extractors',
             },
             {
               title: 'Loaders',
-              href: '/settings/connectors#loaders'
-            }
-          ]
-        }
-      ]
+              href: '/settings/connectors#loaders',
+            },
+          ],
+        },
+      ],
     }
-  }
+  },
 }
 </script>
 

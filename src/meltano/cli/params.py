@@ -7,11 +7,10 @@ import functools
 import click
 from click.globals import get_current_context as get_current_click_context
 
+from meltano.cli.utils import CliError
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationError
 from meltano.core.project_settings_service import ProjectSettingsService
-
-from .utils import CliError
 
 
 def database_uri_option(func):
@@ -59,7 +58,7 @@ class pass_project:  # noqa: N801
             if not project:
                 raise CliError(
                     f"`{ctx.command_path}` must be run inside a Meltano project.\n"
-                    + "Use `meltano init <project_name>` to create one."
+                    + "Use `meltano init <project_directory>` to create one."
                 )
 
             # register the system database connection

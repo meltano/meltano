@@ -19,6 +19,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.job import Job, Payload, State
+from meltano.core.job_state import JobState
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -730,26 +731,29 @@ def state_ids_with_expected_states(  # noqa: WPS210
                 or (job.ended_at > latest_job["incomplete"].ended_at)
             ):
                 expectations[state_id] = merge(expectations[state_id], job.payload)
-    return [
-        (test_state_id, expected_state)
-        for test_state_id, expected_state in expectations.items()
-    ]
+    return list(expectations.items())
 
 
 @pytest.fixture
 def job_history_session(jobs, session):
+    job: Job
+    job_names = set()
     for job in jobs:
         job.save(session)
+        job_names.add(job.job_name)
+    for job_name in job_names:
+        job_state = JobState.from_job_history(session, job_name)
+        session.add(job_state)
     yield session
 
 
 @pytest.fixture
-def state_service(job_history_session):
-    return StateService(session=job_history_session)
+def state_service(job_history_session, project):
+    return StateService(project, session=job_history_session)
 
 
 @pytest.fixture
-def project_with_environment(project: Project) -> Project:
+def project_with_environment(project: Project):
     project.activate_environment("dev")
     project.active_environment.env[
         "ENVIRONMENT_ENV_VAR"

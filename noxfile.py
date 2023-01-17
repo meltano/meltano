@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from random import randint
 from textwrap import dedent
 
 try:
@@ -34,27 +35,29 @@ def tests(session: Session) -> None:
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
 
     if backend_db == "mssql":
-        session.install(".[mssql]")
+        session.install(".[mssql,azure,gcs,s3]")
+
     else:
-        session.install(".")
+        session.install(".[azure,gcs,s3]")
 
     session.install(
-        "coverage[toml]",
+        "colorama",  # colored output in Windows
         "freezegun",
         "mock",
         "pytest",
         "pytest-asyncio",
+        "pytest-cov",
         "pytest-docker",
+        "pytest-order",
+        "pytest-randomly",
+        "pytest-xdist",
         "requests-mock",
     )
 
     try:
         session.run(
-            "coverage",
-            "run",
-            "--parallel",
-            "-m",
             "pytest",
+            f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
             *session.posargs,
             env={"NOX_CURRENT_SESSION": "tests"},
         )
@@ -78,3 +81,24 @@ def coverage(session: Session) -> None:
         session.run("coverage", "combine")
 
     session.run("coverage", *args)
+
+
+@nox_session(python=main_python_version)
+def mypy(session: Session) -> None:
+    """Run mypy type checking.
+
+    Args:
+        session: Nox session.
+    """
+    args = session.posargs or ["src/meltano", "--exclude", "src/meltano/migrations/"]
+
+    session.install(".")
+    session.install(
+        "mypy",
+        "sqlalchemy2-stubs",
+        "types-croniter",
+        "types-psutil",
+        "types-requests",
+        "boto3-stubs[essential]",
+    )
+    session.run("mypy", *args)

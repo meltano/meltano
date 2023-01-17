@@ -1,6 +1,12 @@
 
-<h1 align="center">Meltano</h1>
-<h3 align="center">Your Open Source DataOps Infrastructure</h3>
+<h1 align="center">Meltano - Your CLI for ELT+</h1>
+<h3 align="center">Open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.</h3>
+
+<div align="center">
+<a href="https://github.com/codespaces/new?template_repository=meltano/meltano-codespace-ready">
+<img alt="Try codespaces" src="https://img.shields.io/static/v1?label=&message=Try live demo with Codespaces&color=02a5a5&style=for-the-badge&logo=github"/>
+</a>
+</div>
 
 ---
 
@@ -47,9 +53,11 @@
 
 ---
 
-Welcome to your Open Source DataOps Infrastructure to manage and centralize all the data tools in your stack and turn them into your ideal end-to-end data platform. With Meltano, you'll be able to collaboratively build and improve your data platform like a software project; spinning up a service or tool (Airflow, dbt, Great Expectations, Snowflake, etc) and easily configuring, deploying and managing it through a single control plane.
+Welcome to your CLI for ELT+. It's open source, flexible, scales to your needs. Confidently move, transform, and test your data using tools you know with a data engineering workflow you’ll love.
 
-![Meltano as a computer chip](https://lh3.googleusercontent.com/1uzR_ETj6Kj1eleSjkbCpi5ZfqxFDm4hd6jzZ7JVxi2ajI9gPyjEyg6bspvha7O8dYpO3s9Y-CN6hfwiY8rvsmh9rsZ4oACh-FhvwfRBJS8oCsE76Twkf_UCHWLSmxEdvSaYyDTIqKVrdpsvsg)
+If you're a fan, star the repo ⭐️. [Plus this month, every ⭐ on GitHub removes 2 lb/~1 kg of trash from our waterways 🌊](https://meltano.com/blog/extracting-trash-to-transform-our-waterways/)
+
+
 
 Integrations
 ------------
@@ -59,7 +67,7 @@ Integrations
 Installation
 ------------
 
-If you're ready to build your ideal data platform and start running data workflows across multiple tools, start by following the [Installation guide](https://docs.meltano.com/guide/installation) to have Meltano up and running in your device.
+If you're ready to build your ideal data platform and start running data workflows across multiple tools, start by following the [Installation guide](https://docs.meltano.com/getting-started/installation) to have Meltano up and running in your device.
 
 Documentation
 -------------

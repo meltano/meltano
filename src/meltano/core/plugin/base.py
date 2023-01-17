@@ -10,6 +10,7 @@ import yaml
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.setting_definition import SettingDefinition, YAMLEnum
 from meltano.core.utils import NotFound, find_named
 
@@ -46,10 +47,24 @@ class VariantNotFoundError(Exception):
         )
 
 
+class PluginRefNameContainsStateIdDelimiterError(Exception):
+    """Occurs when a name in reference to a plugin contains the state ID component delimiter string."""
+
+    def __init__(self, name: str):
+        """Create a new exception.
+
+        Args:
+            name: The name of the plugin.
+        """
+        super().__init__(
+            f"The plugin name '{name}' cannot contain the state ID component delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+        )
+
+
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
-class PluginType(YAMLEnum):
+class PluginType(YAMLEnum):  # noqa: WPS214
     """The type of a plugin."""
 
     EXTRACTORS = "extractors"
@@ -138,9 +153,11 @@ class PluginType(YAMLEnum):
         Returns:
             The list of plugin types that can be used as CLI arguments.
         """
-        args = [plugin_type.singular for plugin_type in cls]
-        args.extend(list(cls))
-        return args
+        return [
+            getattr(plugin_type, plugin_type_name)
+            for plugin_type in cls
+            for plugin_type_name in ("singular", "value")
+        ]
 
     @classmethod
     def from_cli_argument(cls, value: str) -> PluginType:
@@ -161,6 +178,15 @@ class PluginType(YAMLEnum):
 
         raise ValueError(f"{value} is not a valid {cls.__name__}")
 
+    @classmethod
+    def plurals(cls) -> list[str]:
+        """Return the list of plugin plural names.
+
+        Returns:
+            The list of plugin plurals.
+        """
+        return [plugin_type.value for plugin_type in cls]
+
 
 class PluginRef(Canonical):
     """A reference to a plugin."""
@@ -172,7 +198,13 @@ class PluginRef(Canonical):
             plugin_type: The type of the plugin.
             name: The name of the plugin.
             kwargs: Additional keyword arguments.
+
+        Raises:
+            PluginRefNameContainsStateIdDelimiterError: If the name contains the state ID component delimiter string.
         """
+        if STATE_ID_COMPONENT_DELIMITER in name:
+            raise PluginRefNameContainsStateIdDelimiterError(name)
+
         self._type = (
             plugin_type
             if isinstance(plugin_type, PluginType)
@@ -231,13 +263,15 @@ class Variant(NameEq, Canonical):
 
     def __init__(
         self,
-        name: str = None,
+        name: str | None = None,
         original: bool | None = None,
         deprecated: bool | None = None,
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
         executable: str | None = None,
+        description: str | None = None,
+        logo_url: str | None = None,
         capabilities: list | None = None,
         settings_group_validation: list | None = None,
         settings: list | None = None,
@@ -256,6 +290,8 @@ class Variant(NameEq, Canonical):
             repo: The repository URL.
             pip_url: The pip URL.
             executable: The executable name.
+            description: The description of the plugin.
+            logo_url: The logo URL of the plugin.
             capabilities: The capabilities of the variant.
             settings_group_validation: The settings group validation.
             settings: The settings of the variant.
@@ -272,6 +308,8 @@ class Variant(NameEq, Canonical):
             repo=repo,
             pip_url=pip_url,
             executable=executable,
+            description=description,
+            logo_url=logo_url,
             capabilities=list(capabilities or []),
             settings_group_validation=list(settings_group_validation or []),
             settings=list(map(SettingDefinition.parse, settings or [])),
@@ -369,7 +407,7 @@ class PluginDefinition(PluginRef):
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def find_variant(self, variant_or_name: str | Variant = None):
+    def find_variant(self, variant_or_name: str | Variant | None = None):
         """Find the variant with the given name or variant.
 
         Args:
@@ -444,6 +482,8 @@ class PluginDefinition(PluginRef):
             repo=plugin.repo,
             pip_url=plugin.pip_url,
             executable=plugin.executable,
+            description=plugin.description,
+            logo_url=plugin.logo_url,
             capabilities=plugin.capabilities,
             settings_group_validation=plugin.settings_group_validation,
             settings=plugin.settings,
@@ -573,8 +613,8 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return self._variant.settings
 
-    @property
-    def extra_settings(self):
+    @property  # noqa: WPS210
+    def extra_settings(self):  # noqa: WPS210
         """Return the extra settings for this plugin.
 
         Returns:
@@ -632,7 +672,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """Return whether the plugin is invokable.
 
         Returns:
-            True if the plugin is invokable, False otherwise.
+            Whether the plugin is invokable.
         """
         return self.is_installable() or self.executable is not None
 
@@ -710,12 +750,14 @@ class StandalonePlugin(Canonical):
         plugin_type: PluginType,
         name: str,
         namespace: str,
-        variant: str = None,
-        label: str = None,
+        variant: str | None = None,
+        label: str | None = None,
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
         executable: str | None = None,
+        description: str | None = None,
+        logo_url: str | None = None,
         capabilities: list | None = None,
         settings_group_validation: list | None = None,
         settings: list | None = None,
@@ -736,6 +778,8 @@ class StandalonePlugin(Canonical):
             repo: The repository URL of the plugin.
             pip_url: The pip URL of the plugin.
             executable: The executable of the plugin.
+            description: The description of the plugin.
+            logo_url: The logo URL of the plugin.
             capabilities: The capabilities of the plugin.
             settings_group_validation: The settings group validation of the plugin.
             settings: The settings of the plugin.
@@ -754,6 +798,8 @@ class StandalonePlugin(Canonical):
             repo=repo,
             pip_url=pip_url,
             executable=executable,
+            description=description,
+            logo_url=logo_url,
             capabilities=capabilities or [],
             settings_group_validation=settings_group_validation or [],
             settings=list(map(SettingDefinition.parse, settings or [])),
@@ -788,6 +834,8 @@ class StandalonePlugin(Canonical):
             repo=variant.repo,
             pip_url=variant.pip_url,
             executable=variant.executable,
+            description=variant.description,
+            logo_url=variant.logo_url,
             capabilities=variant.capabilities,
             settings_group_validation=variant.settings_group_validation,
             settings=variant.settings,

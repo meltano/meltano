@@ -6,6 +6,8 @@ import mock
 import pytest
 
 from meltano.core.environment import Environment
+from meltano.core.project import Project
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
@@ -13,6 +15,7 @@ from meltano.core.settings_store import (
     InheritedStoreManager,
     MeltanoEnvStoreManager,
     MeltanoYmlStoreManager,
+    SettingsStoreManager,
     SettingValueStore,
     StoreNotSupportedError,
 )
@@ -44,6 +47,10 @@ class DummySettingsService(SettingsService):
     @property
     def label(self):
         return "Dummy"
+
+    @property
+    def project_settings_service(self):
+        return ProjectSettingsService(Project.find())
 
     @property
     def docs_url(self):
@@ -283,7 +290,7 @@ class TestAutoStoreManager:
 
     def test_set(
         self,
-        subject,
+        subject: SettingsStoreManager,
         project,
         unsupported,
         set_value_store,
@@ -294,20 +301,11 @@ class TestAutoStoreManager:
         def set_value(value):
             return subject.set("regular", ["regular"], value)
 
-        # Returns silently when new value matches current value,
-        # even if source is not writable
+        # Allow setting to a default value
         assert_value_source("from_default", Store.DEFAULT)
         metadata = set_value("from_default")
-        assert metadata["store"] == Store.DEFAULT
-        assert_value_source("from_default", Store.DEFAULT)
-
-        set_value_store("from_db", Store.DB)
-        with mock.patch.object(
-            Store.DB.manager, "set", side_effect=StoreNotSupportedError
-        ):
-            metadata = set_value("from_db")
-            assert metadata["store"] == Store.MELTANO_YML
-            assert_value_source("from_db", Store.MELTANO_YML)
+        assert metadata["store"] == Store.MELTANO_YML
+        assert_value_source("from_default", Store.MELTANO_YML)
 
         # Falls back on `meltano.yml` when current source is not writable
         with unsupported(Store.DB):
@@ -315,17 +313,12 @@ class TestAutoStoreManager:
             assert metadata["store"] == Store.MELTANO_YML
             assert_value_source("from_meltano_yml", Store.MELTANO_YML)
 
-        # Unsets in all writable stores when new value matches default value
-        metadata = set_value("from_default")
-        assert metadata["store"] == Store.DEFAULT
-        assert_value_source("from_default", Store.DEFAULT)
-
         # Stores in Meltano Environment if active
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "active_environment", environment)
-            metadata = set_value("from_meltano_env_new")
+            metadata = set_value("from_meltano_env")
             assert metadata["store"] == Store.MELTANO_ENV
-            assert_value_source("from_meltano_env_new", Store.MELTANO_ENV)
+            assert_value_source("from_meltano_env", Store.MELTANO_ENV)
 
         # Stores in `meltano.yml` by default
         metadata = set_value("from_meltano_yml")

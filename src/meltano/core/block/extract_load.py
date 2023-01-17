@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from contextlib import asynccontextmanager, closing
+from pathlib import Path
 from typing import AsyncIterator
 
 import structlog
@@ -14,6 +15,7 @@ from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -43,12 +45,13 @@ class ELBContext:  # noqa: WPS230
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
-        session: Session = None,
+        plugins_service: ProjectPluginsService | None = None,
+        session: Session | None = None,
         job: Job | None = None,
         full_refresh: bool | None = False,
         force: bool | None = False,
         update_state: bool | None = True,
+        state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -61,6 +64,7 @@ class ELBContext:  # noqa: WPS230
             full_refresh: Whether this is a full refresh.
             force: Whether to force the execution of the job if it is stale.
             update_state: Whether to update the state of the job.
+            state_id_suffix: The state ID suffix to use.
             base_output_logger: The base logger to use.
         """
         self.project = project
@@ -72,6 +76,7 @@ class ELBContext:  # noqa: WPS230
         self.full_refresh = full_refresh
         self.force = force
         self.update_state = update_state
+        self.state_id_suffix = state_id_suffix
 
         # not yet used but required to satisfy the interface
         self.dry_run = False
@@ -82,7 +87,7 @@ class ELBContext:  # noqa: WPS230
         self.base_output_logger = base_output_logger
 
     @property
-    def elt_run_dir(self) -> str:
+    def elt_run_dir(self) -> Path | None:
         """Obtain the run directory for the current job.
 
         Returns:
@@ -92,13 +97,13 @@ class ELBContext:  # noqa: WPS230
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
-class ELBContextBuilder:
+class ELBContextBuilder:  # noqa: WPS214
     """Build up ELBContexts for ExtractLoadBlocks."""
 
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
+        plugins_service: ProjectPluginsService | None = None,
         job: Job | None = None,
     ):
         """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
@@ -118,6 +123,7 @@ class ELBContextBuilder:
         self._full_refresh = False
         self._state_update = True
         self._force = False
+        self._state_id_suffix = None
         self._env = {}
         self._blocks = []
 
@@ -172,6 +178,18 @@ class ELBContextBuilder:
             self
         """
         self._force = force
+        return self
+
+    def with_state_id_suffix(self, state_id_suffix: str):
+        """Set a state ID suffix for this run.
+
+        Args:
+            state_id_suffix: The suffix value.
+
+        Returns:
+            self
+        """
+        self._state_id_suffix = state_id_suffix
         return self
 
     def make_block(
@@ -248,7 +266,7 @@ class ELBContextBuilder:
         )
 
     @property
-    def elt_run_dir(self) -> str:
+    def elt_run_dir(self) -> Path | None:
         """Get the run directory for the current job.
 
         Returns:
@@ -271,6 +289,7 @@ class ELBContextBuilder:
             full_refresh=self._full_refresh,
             force=self._force,
             update_state=self._state_update,
+            state_id_suffix=self._state_id_suffix,
             base_output_logger=self._base_output_logger,
         )
 
@@ -302,7 +321,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             self.context.job = None
 
         elif self.context.update_state:
-            state_id = generate_state_id(self.context.project, self.head, self.tail)
+            state_id = generate_state_id(
+                self.context.project, self.context.state_id_suffix, self.head, self.tail
+            )
             self.context.job = Job(job_name=state_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
@@ -339,12 +360,14 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         if not self._state_service:
             if self.has_state():
-                self._state_service = StateService(self.context.session)
+                self._state_service = StateService(
+                    project=self.context.project, session=self.context.session
+                )
             else:
                 raise BlockSetHasNoStateError()
         return self._state_service
 
-    def index_last_input_done(self) -> int:
+    def index_last_input_done(self) -> int | None:
         """Return index of the block furthest from the start that has exited and required input.
 
         Returns:
@@ -354,7 +377,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             if block.requires_input and block.proxy_stderr.done():
                 return idx
 
-    def upstream_complete(self, index: int) -> bool:
+    def upstream_complete(self, index: int) -> bool | None:
         """Return whether blocks upstream from a given block index are already done.
 
         Args:
@@ -380,7 +403,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             await block.stop()
 
     async def process_wait(
-        self, output_exception_future: asyncio.Task | None, subset: int = None
+        self, output_exception_future: asyncio.Task | None, subset: int | None = None
     ) -> set[asyncio.Task]:
         """Wait on all process futures in the block set.
 
@@ -646,7 +669,7 @@ class ELBExecutionManager:
         # Wait for all buffered consumer (target) output to be processed
         await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
-    async def _wait_for_process_completion(  # noqa: WPS213 WPS217
+    async def _wait_for_process_completion(  # noqa: WPS213 WPS217 WPS210
         self, current_head: IOBlock
     ) -> tuple[int, int] | None:
         """Wait for the current head block to complete or for an error to occur.
@@ -788,11 +811,14 @@ def _check_exit_codes(  # noqa: WPS238
         raise RunnerError("Mappers failed", failed_mappers)
 
 
-def generate_state_id(project: Project, consumer: IOBlock, producer: IOBlock) -> str:
+def generate_state_id(
+    project: Project, state_id_suffix: str | None, consumer: IOBlock, producer: IOBlock
+) -> str:
     """Generate a state id based on a project active environment and consumer and producer names.
 
     Args:
         project: Project to retrieve active environment from.
+        state_id_suffix: State ID suffix value.
         consumer: Consumer block.
         producer: Producer block.
 
@@ -806,4 +832,16 @@ def generate_state_id(project: Project, consumer: IOBlock, producer: IOBlock) ->
         raise RunnerError(
             "No active environment for invocation, but requested state id"
         )
-    return f"{project.active_environment.name}:{consumer.string_id}-to-{producer.string_id}"  # noqa: WPS237
+
+    state_id_components = [
+        project.active_environment.name,
+        f"{consumer.string_id}-to-{producer.string_id}",
+        state_id_suffix or project.active_environment.state_id_suffix,
+    ]
+
+    if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
+        raise RunnerError(
+            f"Cannot generate a state ID from components containing the delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+        )
+
+    return STATE_ID_COMPONENT_DELIMITER.join(c for c in state_id_components if c)

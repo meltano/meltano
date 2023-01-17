@@ -7,6 +7,7 @@ import pytest
 
 from meltano.core.plugin.command import UndefinedEnvVarError
 from meltano.core.plugin_invoker import UnknownCommandError
+from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
 
 
@@ -55,6 +56,11 @@ class TestPluginInvoker:
         assert env["VIRTUAL_ENV"] == str(venv.root)
         assert env["PATH"].startswith(str(venv.bin_dir))
         assert "PYTHONPATH" not in env
+
+        assert (
+            env["MELTANO_PARENT_CONTEXT_UUID"]
+            == environment_context.data["context_uuid"]
+        )
 
     @pytest.mark.asyncio
     async def test_environment_env(

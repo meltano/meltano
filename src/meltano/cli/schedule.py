@@ -10,7 +10,11 @@ from sqlalchemy.orm import Session
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedDefaultGroup, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    InstrumentedDefaultGroup,
+    PartialInstrumentedCmd,
+)
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.project import Project
@@ -22,7 +26,10 @@ from meltano.core.utils import coerce_datetime
 
 
 @cli.group(
-    cls=InstrumentedDefaultGroup, default="add", short_help="Manage pipeline schedules."
+    cls=InstrumentedDefaultGroup,
+    default="add",
+    short_help="Manage pipeline schedules.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.pass_context
 @pass_project(migrate=True)
@@ -259,7 +266,7 @@ def remove(ctx, name):
 def _update_job_schedule(
     candidate: Schedule,
     job: str | None,
-    interval: str = None,
+    interval: str | None = None,
 ) -> Schedule:
     """Update an existing job schedule.
 

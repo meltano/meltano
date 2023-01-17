@@ -5,14 +5,14 @@ from __future__ import annotations
 import json
 from datetime import date, datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Iterable
 
 from ruamel.yaml import Representer
 
-from . import utils
-from .behavior import NameEq
-from .behavior.canonical import Canonical
-from .error import Error
+from meltano.core import utils
+from meltano.core.behavior import NameEq
+from meltano.core.behavior.canonical import Canonical
+from meltano.core.error import Error
 
 VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,
@@ -149,21 +149,21 @@ class SettingDefinition(NameEq, Canonical):
 
     def __init__(
         self,
-        name: str = None,
+        name: str | None = None,
         aliases: list[str] = None,
-        env: str = None,
+        env: str | None = None,
         env_aliases: list[str] = None,
-        kind: SettingKind = None,
+        kind: SettingKind | None = None,
         value=None,
-        label: str = None,
-        documentation: str = None,
-        description: str = None,
-        tooltip: str = None,
-        options: list = None,
-        oauth: dict = None,
-        placeholder: str = None,
-        protected: bool = None,
-        env_specific: bool = None,
+        label: str | None = None,
+        documentation: str | None = None,
+        description: str | None = None,
+        tooltip: str | None = None,
+        options: list | None = None,
+        oauth: dict | None = None,
+        placeholder: str | None = None,
+        protected: bool | None = None,
+        env_specific: bool | None = None,
         custom: bool = False,
         value_processor=None,
         value_post_processor=None,
@@ -231,7 +231,7 @@ class SettingDefinition(NameEq, Canonical):
         return f"<SettingDefinition {self.name} ({self.kind})>"
 
     @classmethod
-    def from_missing(cls, defs: list[SettingDefinition], config: dict, **kwargs):
+    def from_missing(cls, defs: Iterable[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
 
         Args:

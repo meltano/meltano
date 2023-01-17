@@ -247,8 +247,7 @@ class TestEnvVarResolution:
 
         args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():
-            args.append("--print-var")
-            args.append(key)
+            args.extend(("--print-var", key))
         args.append("test-env-var-resolution")
         result = cli_runner.invoke(cli, args)
         assert_cli_runner(result)
@@ -366,6 +365,11 @@ def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
         ],
     )
     assert isinstance(result.exception, EnvironmentVariableNotSetError)
+    assert (
+        result.exception.reason
+        == "Environment variable 'NONEXISTENT' referenced but not set"
+    )
+    assert result.exception.instruction == "Make sure the environment variable is set"
 
 
 def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
@@ -385,4 +389,10 @@ def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
             "test-env-var-resolution",
         ],
     )
-    assert isinstance(result.exception, EnvironmentVariableNotSetError)
+    exception = result.exception
+    assert isinstance(exception, EnvironmentVariableNotSetError)
+    assert (
+        result.exception.reason
+        == "Environment variable 'NONEXISTENT' referenced but not set"
+    )
+    assert result.exception.instruction == "Make sure the environment variable is set"

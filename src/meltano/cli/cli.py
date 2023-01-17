@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
+from pathlib import Path
 from typing import NoReturn
 
 import click
@@ -11,10 +13,13 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.error import EmptyMeltanoFileException
 from meltano.core.logging import LEVELS, setup_logging
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliContext
+from meltano.core.utils import get_no_color_flag
 
 logger = logging.getLogger(__name__)
 
@@ -54,15 +59,21 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.option(
     "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
+@click.option(
+    "--cwd",
+    type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
+    help="Run Meltano as if it had been started in the specified directory.",
+)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
-def cli(  # noqa: WPS231
-    ctx,
+def cli(  # noqa: C901,WPS231
+    ctx: click.Context,
     log_level: str,
     log_config: str,
     verbose: int,
     environment: str,
     no_environment: bool,
+    cwd: Path | None,
 ):  # noqa: WPS231
     """
     ELT for the DataOps era.
@@ -78,6 +89,16 @@ def cli(  # noqa: WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["verbosity"] = verbose
+
+    no_color = get_no_color_flag()
+    if no_color:
+        ctx.color = False
+
+    if cwd:
+        try:
+            os.chdir(cwd)
+        except OSError as ex:
+            raise Exception(f"Unable to run Meltano from {cwd!r}") from ex
 
     try:  # noqa: WPS229
         project = Project.find()
@@ -100,12 +121,7 @@ def cli(  # noqa: WPS231
         elif project_setting_service.get("default_environment"):
             selected_environment = project_setting_service.get("default_environment")
             is_default_environment = True
-        # activate environment
-        if selected_environment:
-            project.activate_environment(selected_environment)
-            logger.info(
-                "Environment '%s' is active", selected_environment  # noqa: WPS323
-            )
+        ctx.obj["selected_environment"] = selected_environment
         ctx.obj["is_default_environment"] = is_default_environment
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
@@ -113,6 +129,10 @@ def cli(  # noqa: WPS231
             CliContext.from_click_context(ctx)
         )  # backfill the `cli` CliContext
     except ProjectNotFound:
+        ctx.obj["project"] = None
+    except EmptyMeltanoFileException:
+        if ctx.invoked_subcommand != "init":
+            raise
         ctx.obj["project"] = None
     except IncompatibleVersionError:
         click.secho(
