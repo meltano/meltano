@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "meltano"
 version = "2.13.0"
-description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform and test your data with confidence using a streamlined data engineering workflow you’ll love."
+description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
 readme = "README.md"
