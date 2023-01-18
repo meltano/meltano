@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 import re
+import sys
 from contextlib import contextmanager
 
-from cached_property import cached_property  # type: ignore
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
 
 from meltano.core.state_store.filesystem import (
     BaseFilesystemStateStoreManager,
@@ -90,7 +94,6 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
         )
 
     @cached_property
-    @requires_boto3()
     def client(self):
         """Get an authenticated boto3.Client.
 
@@ -100,22 +103,23 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
         Raises:
             InvalidStateBackendConfigurationException: when configured AWS settings are invalid.
         """
-        if self.aws_secret_access_key and self.aws_access_key_id:
-            session = boto3.Session(
-                aws_access_key_id=self.aws_access_key_id,
-                aws_secret_access_key=self.aws_secret_access_key,
-            )
-            return session.client("s3", endpoint_url=self.endpoint_url)
-        elif self.aws_secret_access_key and not self.aws_access_key_id:
-            raise InvalidStateBackendConfigurationException(
-                "AWS secret access key configured, but not AWS access key ID."
-            )
-        elif self.aws_access_key_id and not self.aws_secret_access_key:
-            raise InvalidStateBackendConfigurationException(
-                "AWS access key ID configured, but no AWS secret access key."
-            )
-        session = boto3.Session()
-        return session.client("s3")
+        with requires_boto3():
+            if self.aws_secret_access_key and self.aws_access_key_id:
+                session = boto3.Session(
+                    aws_access_key_id=self.aws_access_key_id,
+                    aws_secret_access_key=self.aws_secret_access_key,
+                )
+                return session.client("s3", endpoint_url=self.endpoint_url)
+            elif self.aws_secret_access_key and not self.aws_access_key_id:
+                raise InvalidStateBackendConfigurationException(
+                    "AWS secret access key configured, but not AWS access key ID."
+                )
+            elif self.aws_access_key_id and not self.aws_secret_access_key:
+                raise InvalidStateBackendConfigurationException(
+                    "AWS access key ID configured, but no AWS secret access key."
+                )
+            session = boto3.Session()
+            return session.client("s3")
 
     @property
     def state_dir(self) -> str:
