@@ -28,8 +28,19 @@ repos:
       - id: check-toml
       - id: debug-statements
 
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.20.0
+    hooks:
+      - id: check-metaschema
+        files: ^schemas?/.*\.json$
+      - id: check-jsonschema
+        files: .*/meltano.yml$
+        args:
+          - "--schemafile"
+          - "schema/meltano.schema.json"
+
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.31.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.32.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
