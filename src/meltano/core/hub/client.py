@@ -213,9 +213,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         click_context = click.get_current_context(silent=True)
 
         if click_context:
-            request.headers.update(
-                {"X-Meltano-Command": click_context.command_path},
-            )
+            request.headers["X-Meltano-Command"] = click_context.command_path
 
         return self.session.prepare_request(request)
 
