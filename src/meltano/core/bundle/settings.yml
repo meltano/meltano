@@ -52,7 +52,6 @@ settings:
 - name: state_backend.azure.connection_string
   kind: password
   env_specific: true
-  env_aliases: ["AZURE_STORAGE_CONNECTION_STRING"]
 
 ## AWS S3 state backend
 - name: state_backend.s3.aws_access_key_id
@@ -68,7 +67,6 @@ settings:
 - name: state_backend.gcs.application_credentials
   kind: password
   env_specific: true
-  env_aliases: ["GOOGLE_APPLICATION_CREDENTIALS"]
 
 # CLI
 - name: cli.log_level

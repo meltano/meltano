@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://meltano.com/meltano.schema.json",
   "title": "JSON Schema for meltano.yml",
   "description": "Meltano (https://meltano.com) is an open source platform for building, running & orchestrating ELT pipelines",
@@ -192,7 +192,6 @@
         "required": [
           "name"
         ],
-        "additionalProperties": true,
         "properties": {
           "name": {
             "type": "string",
@@ -427,24 +426,8 @@
             "$ref": "#/$defs/plugins/extractor_shared"
           },
           {
-            "additionalProperties": false,
             "type": "object",
             "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -462,17 +445,11 @@
                     "log-based"
                   ]
                 }
-              },
-              "select": {},
-              "select_filter": {},
-              "catalog": {},
-              "load_schema": {},
-              "metadata": {},
-              "schema": {},
-              "state": {}
+              }
             }
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       },
       "loaders": {
         "description": "https://docs.meltano.com/concepts/plugins#loaders",
@@ -482,7 +459,6 @@
             "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "additionalProperties": false,
             "properties": {
               "capabilities": {
                 "type": "array",
@@ -500,21 +476,6 @@
                   ]
                 }
               },
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
               "dialect": {
                 "type": "string",
                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
@@ -525,127 +486,32 @@
               }
             }
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       },
       "orchestrators": {
         "description": "https://docs.meltano.com/concepts/plugins#orchestrators",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/$defs/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {}
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "transformers": {
         "description": "https://docs.meltano.com/concepts/plugins#transforms",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/$defs/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {}
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "files": {
         "description": "https://docs.meltano.com/concepts/plugins#file-bundles",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/$defs/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "update": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "boolean"
-                }
-              }
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "utilities": {
         "description": "https://docs.meltano.com/concepts/plugins#utilities",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/$defs/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {}
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "transforms": {
         "description": "https://docs.meltano.com/concepts/plugins#transforms",
@@ -655,23 +521,7 @@
             "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "additionalProperties": false,
             "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
               "vars": {
                 "type": "object",
                 "description": "An object containing dbt model variables"
@@ -682,7 +532,8 @@
               }
             }
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       },
       "mapper_specific": {
         "type": "object",
@@ -718,29 +569,9 @@
           },
           {
             "$ref": "#/$defs/plugins/mapper_specific"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "repo": {},
-              "variant": {},
-              "namespace": {},
-              "label": {},
-              "description": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
-              "mappings": {}
-            }
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       }
     },
     "base_setting": {
@@ -1012,65 +843,51 @@
                         "$ref": "#/$defs/environments/$defs/plugins"
                       },
                       {
-                        "additionalProperties": false,
-                        "properties": {
-                          "name": {},
-                          "config": {},
-                          "env": {},
-                          "select": {},
-                          "select_filter": {},
-                          "catalog": {},
-                          "load_schema": {},
-                          "metadata": {},
-                          "schema": {},
-                          "state": {}
-                        }
-                      },
-                      {
                         "$ref": "#/$defs/plugins/extractor_shared"
                       }
-                    ]
+                    ],
+                    "unevaluatedProperties": false
                   }
                 },
                 "loaders": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
+                    "unevaluatedProperties": false,
                     "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "orchestrators": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
+                    "unevaluatedProperties": false,
                     "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "transformers": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
+                    "unevaluatedProperties": false,
                     "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "files": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
+                    "unevaluatedProperties": false,
                     "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "utilities": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
+                    "unevaluatedProperties": false,
                     "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "transforms": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
+                    "unevaluatedProperties": false,
                     "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 }
@@ -1094,6 +911,9 @@
             },
             "config": {
               "type": "object"
+            },
+            "env": {
+              "$ref": "#/$defs/env"
             }
           }
         }

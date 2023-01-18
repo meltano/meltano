@@ -5,6 +5,7 @@ from __future__ import annotations
 from http import HTTPStatus
 from typing import Any
 
+import click
 import requests
 from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
@@ -198,6 +199,41 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
 
         return url
 
+    def _build_request(self, method: str, url: str) -> requests.PreparedRequest:
+        """Build a request to the Hub API.
+
+        Args:
+            method: The HTTP method.
+            url: The URL to request.
+
+        Returns:
+            The prepared request.
+        """
+        request = requests.Request(method, url)
+        click_context = click.get_current_context(silent=True)
+
+        if click_context:
+            request.headers["X-Meltano-Command"] = click_context.command_path
+
+        return self.session.prepare_request(request)
+
+    def _get(self, url: str) -> requests.Response:
+        """Make a GET request to the Hub API.
+
+        Args:
+            url: The URL to request.
+
+        Returns:
+            The response.
+
+        Raises:
+            HubConnectionError: If the Hub API could not be reached.
+        """
+        try:
+            return self.session.send(self._build_request("GET", url))
+        except requests.exceptions.ConnectionError as connection_err:
+            raise HubConnectionError("Could not reach Meltano Hub.") from connection_err
+
     def find_definition(
         self,
         plugin_type: PluginType,
@@ -241,7 +277,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
                 plugin_type, plugin, variant_name
             ) from variant_key_err
 
-        response = self.session.get(url)
+        response = self._get(url)
 
         try:
             response.raise_for_status()
@@ -299,7 +335,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             return {}
 
         url = self.plugin_type_endpoint(plugin_type)
-        response = self.session.get(url)
+        response = self._get(url)
 
         try:
             response.raise_for_status()
