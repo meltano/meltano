@@ -192,7 +192,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
     ```yml
     plugins:
-    extractors:
+      extractors:
       - name: tap-gitlab
         variant: meltanolabs
         pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
