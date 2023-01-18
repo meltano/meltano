@@ -188,3 +188,11 @@ class TestProjectSettingsService:
         value, source = subject.get_with_source("database_max_retries")
         assert source == SettingValueStore.MELTANO_YML
         assert value == 10000
+
+    def test_fully_missing_env_var_setting_is_none(
+        self, subject: ProjectSettingsService
+    ):
+        # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
+        with pytest.warns(RuntimeWarning, match="Unknown setting 'port'"):
+            subject.set("port", "${UNSET_PORT_ENV_VAR}")
+        assert subject.get("port") is None
