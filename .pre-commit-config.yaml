@@ -34,10 +34,17 @@ repos:
       - id: check-metaschema
         files: ^schemas?/.*\.json$
       - id: check-jsonschema
+        name: Validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
         args:
           - "--schemafile"
           - "schema/meltano.schema.json"
+      - id: check-jsonschema
+        name: Validate 'discovery.yml' with jsonschema
+        files: ^src/meltano/core/bundle/discovery.yml$
+        args:
+          - "--schemafile"
+          - "schema/discovery.schema.json"
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.32.0 # Keep this in sync with the eslint "additional_dependency" below!
