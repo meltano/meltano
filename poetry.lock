@@ -923,7 +923,7 @@ dev = ["PyTest", "PyTest (<5)", "PyTest-Cov", "PyTest-Cov (<2.6)", "bump2version
 name = "distlib"
 version = "0.3.6"
 description = "Distribution utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -1013,7 +1013,7 @@ files = [
 name = "filelock"
 version = "3.8.2"
 description = "A platform independent file lock."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2215,7 +2215,7 @@ files = [
 name = "platformdirs"
 version = "2.6.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -3679,7 +3679,7 @@ test = ["Cython (>=0.29.32,<0.30.0)", "aiohttp", "flake8 (>=3.9.2,<3.10.0)", "my
 name = "virtualenv"
 version = "20.17.1"
 description = "Virtual Python Environment builder"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -4014,4 +4014,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.11"
-content-hash = "f9339274f381d4c48740da76cd67e8073809573b746f4728bd3ca0648fd739dc"
+content-hash = "0a7dbc830a4a9b12ab6831138b7af76bee42630793c0963ec3c415a68410f1ef"
