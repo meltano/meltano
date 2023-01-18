@@ -67,7 +67,6 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         self.connection_string = connection_string
         self.container_name = container_name or self.parsed.hostname
         self.prefix = prefix or self.parsed.path
-        self._client = None
 
     @staticmethod
     def is_file_not_found_error(err: Exception) -> bool:

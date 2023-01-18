@@ -64,7 +64,6 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
             kwargs: additional keyword args to pass to parent
         """
         super().__init__(**kwargs)
-        self._client = None
         self.bucket = bucket or self.parsed.hostname
         self.prefix = prefix or self.parsed.path
         self.application_credentials = application_credentials
