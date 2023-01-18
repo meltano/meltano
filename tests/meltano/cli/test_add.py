@@ -66,6 +66,7 @@ class TestCliAdd:
         project,
         cli_runner,
         project_plugins_service,
+        meltano_hub_service,
     ):
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
