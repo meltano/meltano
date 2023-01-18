@@ -48,12 +48,14 @@ class EnvironmentContext(SelfDescribingJson):
     notable_flag_env_vars = {"CODESPACES", *ci_markers}
 
     @classmethod
-    def _true_notable_flag_env_vars(cls) -> Iterable[str]:
+    def _notable_flag_env_vars(cls) -> Iterable[str]:
         for env_var_name in cls.notable_flag_env_vars:
-            env_var_value = os.environ.get(env_var_name, "0")
-            with suppress(ValueError):
-                if strtobool(env_var_value):
-                    yield env_var_name, env_var_value
+            with suppress(KeyError):  # Skip unset env vars
+                env_var_value = os.environ[env_var_name]
+                try:
+                    yield env_var_name, strtobool(env_var_value)
+                except ValueError:
+                    yield env_var_name, None
 
     def __init__(self):
         """Initialize the environment context."""
@@ -67,7 +69,7 @@ class EnvironmentContext(SelfDescribingJson):
                 "is_ci_environment": any(
                     get_boolean_env_var(marker) for marker in self.ci_markers
                 ),
-                "notable_flag_env_vars": dict(self._true_notable_flag_env_vars()),
+                "notable_flag_env_vars": dict(self._notable_flag_env_vars()),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
                 **self.system_info,

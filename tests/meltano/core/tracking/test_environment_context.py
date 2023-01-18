@@ -13,10 +13,17 @@ def test_environment_context(monkeypatch: pytest.MonkeyPatch):
 
     assert EnvironmentContext().data["notable_flag_env_vars"] == {}  # noqa: WPS520
 
-    truthy_values = ("Yes", "TRUE", "1", "true", "y", "on", "t")
-    truthy_flags = {}
-    for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
-        truthy_flags[notable_flag_env_var] = random.choice(truthy_values)  # noqa: S311
-        monkeypatch.setenv(notable_flag_env_var, truthy_flags[notable_flag_env_var])
+    def check(env_var_values: tuple[str, ...], expected: bool | None) -> None:
+        for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
+            monkeypatch.setenv(
+                notable_flag_env_var,
+                random.choice(env_var_values),  # noqa: S311
+            )
 
-    assert EnvironmentContext().data["notable_flag_env_vars"] == truthy_flags
+        assert EnvironmentContext().data["notable_flag_env_vars"] == dict.fromkeys(
+            EnvironmentContext.notable_flag_env_vars, expected
+        )
+
+    check(("Yes", "TRUE", "1", "true", "y", "on", "t"), True)
+    check(("No", "FALSE", "0", "false", "n", "off", "f"), False)
+    check(("trew", "Fallse", "nah", "si", "okay", "01"), None)

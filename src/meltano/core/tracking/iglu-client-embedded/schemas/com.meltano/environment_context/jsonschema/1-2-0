@@ -40,15 +40,17 @@
             "type": "boolean"
         },
         "notable_flag_env_vars": {
-            "description": "Select env var name-value pairs which had a truthy value",
+            "description": "Select environment variable flags",
             "type": "object",
             "propertyNames": {
                 "type": "string"
             },
             "additionalProperties": {
-                "description": "Truthy values of select env vars",
-                "type": "string",
-                "maxLength": 256
+                "description": "Boolean values of select env vars, or null if the truth value of the env var could not be determined",
+                "type": [
+                    "boolean",
+                    "null"
+                ]
             }
         },
         "python_version": {
