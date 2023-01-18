@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3.3.0
 
     - name: Setup Poetry
       uses: snok/install-poetry@v1
@@ -24,7 +24,7 @@ jobs:
         virtualenvs-in-project: true
 
     - name: Set up Python
-      uses: actions/setup-python@v4.4.0
+      uses: actions/setup-python@v4.5.0
       with:
         # https://github.com/actions/setup-python
         python-version: 3.9
@@ -43,7 +43,7 @@ jobs:
         poetry install
 
     - name: Setup Node
-      uses: actions/setup-node@v3.5.1
+      uses: actions/setup-node@v3.6.0
       with:
         node-version: '16'
         cache: 'yarn'
@@ -55,8 +55,8 @@ jobs:
 
     - name: Release Marker
       if: ${{ github.event.release }}
-      run: |
-        touch src/meltano/core/tracking/.release_marker
+      # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
+      run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
       run: |
@@ -66,7 +66,7 @@ jobs:
     # This is for temporary testing purposes only,
     # these files should probably be added to a release
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: python-artifacts
         path: 'dist/*'
@@ -77,10 +77,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3.3.0
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3.0.1
+      uses: actions/download-artifact@v3.0.2
       with:
         name: python-artifacts
         path: dist/

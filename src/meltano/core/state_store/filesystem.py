@@ -25,7 +25,7 @@ from meltano.core.state_store.base import StateStoreManager
 logger = logging.getLogger(__name__)
 
 
-class InvalidStateBackendConfigurationException:
+class InvalidStateBackendConfigurationException(Exception):
     """Occurs when state backend configuration is invalid."""
 
 

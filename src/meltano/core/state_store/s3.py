@@ -2,11 +2,44 @@
 from __future__ import annotations
 
 import re
+from contextlib import contextmanager
+
+from cached_property import cached_property  # type: ignore
 
 from meltano.core.state_store.filesystem import (
     BaseFilesystemStateStoreManager,
     InvalidStateBackendConfigurationException,
 )
+
+try:
+    import boto3
+except ImportError:
+    boto3 = None  # type: ignore
+
+
+class MissingBoto3Error(Exception):
+    """Raised when boto3 is required but not installed."""
+
+    def __init__(self):
+        """Initialize a MissingBoto3Error."""
+        super().__init__(
+            "boto3 required but not installed. Install meltano[s3] to use S3 as a state backend.",  # noqa: E501
+        )
+
+
+@contextmanager
+def requires_boto3():
+    """Raise MissingBoto3Error if boto3 is required but missing in context.
+
+    Raises:
+        MissingBoto3Error: if boto3 is not installed.
+
+    Yields:
+        None
+    """
+    if not boto3:
+        raise MissingBoto3Error()
+    yield
 
 
 class S3StateStoreManager(BaseFilesystemStateStoreManager):
@@ -39,7 +72,6 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
         self.bucket = bucket or self.parsed.hostname
         self.prefix = prefix or self.parsed.path
         self.endpoint_url = endpoint_url
-        self._client = None
 
     @staticmethod
     def is_file_not_found_error(err: Exception) -> bool:
@@ -57,7 +89,8 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
             or (isinstance(err, KeyError) and "ActualObjectSize" in err.args[0])
         )
 
-    @property
+    @cached_property
+    @requires_boto3()
     def client(self):
         """Get an authenticated boto3.Client.
 
@@ -67,24 +100,22 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
         Raises:
             InvalidStateBackendConfigurationException: when configured AWS settings are invalid.
         """
-        if not self._client:
-            if self.aws_secret_access_key and self.aws_access_key_id:
-                from boto3 import Session
-
-                session = Session(
-                    aws_access_key_id=self.aws_access_key_id,
-                    aws_secret_access_key=self.aws_secret_access_key,
-                )
-                self._client = session.client("s3", endpoint_url=self.endpoint_url)
-            elif self.aws_secret_access_key and not self.aws_access_key_id:
-                raise InvalidStateBackendConfigurationException(
-                    "AWS secret access key configured, but not AWS access key ID."
-                )
-            elif self.aws_access_key_id and not self.aws_secret_access_key:
-                raise InvalidStateBackendConfigurationException(
-                    "AWS access key ID configured, but no AWS secret access key."
-                )
-        return self._client
+        if self.aws_secret_access_key and self.aws_access_key_id:
+            session = boto3.Session(
+                aws_access_key_id=self.aws_access_key_id,
+                aws_secret_access_key=self.aws_secret_access_key,
+            )
+            return session.client("s3", endpoint_url=self.endpoint_url)
+        elif self.aws_secret_access_key and not self.aws_access_key_id:
+            raise InvalidStateBackendConfigurationException(
+                "AWS secret access key configured, but not AWS access key ID."
+            )
+        elif self.aws_access_key_id and not self.aws_secret_access_key:
+            raise InvalidStateBackendConfigurationException(
+                "AWS access key ID configured, but no AWS secret access key."
+            )
+        session = boto3.Session()
+        return session.client("s3")
 
     @property
     def state_dir(self) -> str:
