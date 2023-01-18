@@ -87,16 +87,16 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         )
 
     @cached_property
-    @requires_azure()
     def client(self):
         """Get an authenticated azure.storage.blob.BlobServiceClient.
 
         Returns:
             An authenticated azure.storage.blob.BlobServiceClient
         """
-        if self.connection_string:
-            return BlobServiceClient.from_connection_string(self.connection_string)
-        return BlobServiceClient()  # type: ignore
+        with requires_azure():
+            if self.connection_string:
+                return BlobServiceClient.from_connection_string(self.connection_string)
+            return BlobServiceClient()  # type: ignore
 
     @property
     def state_dir(self) -> str:

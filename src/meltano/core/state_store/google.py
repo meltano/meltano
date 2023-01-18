@@ -85,19 +85,19 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         )
 
     @cached_property
-    @requires_gcs()
     def client(self):
         """Get an authenticated google.cloud.storage.Client.
 
         Returns:
             A google.cloud.storage.Client.
         """
-        if self.application_credentials:
-            return google.cloud.storage.Client.from_service_account_json(
-                self.application_credentials
-            )
-        # Use default authentication in environment
-        return google.cloud.storage.Client()
+        with requires_gcs():
+            if self.application_credentials:
+                return google.cloud.storage.Client.from_service_account_json(
+                    self.application_credentials
+                )
+            # Use default authentication in environment
+            return google.cloud.storage.Client()
 
     @property
     def state_dir(self) -> str:
