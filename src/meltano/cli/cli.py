@@ -79,7 +79,7 @@ def cli(  # noqa: C901,WPS231
     Your CLI for ELT+
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface
-    """
+    """  # noqa: D400
     ctx.ensure_object(dict)
 
     if log_level:
