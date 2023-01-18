@@ -210,12 +210,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             The prepared request.
         """
         request = requests.Request(method, url)
-
-        try:
-            click_context = click.get_current_context(silent=True)
-        except RuntimeError:
-            logger.debug("Could not get current click context")
-            click_context = None
+        click_context = click.get_current_context(silent=True)
 
         if click_context:
             request.headers.update(
