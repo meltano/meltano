@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from collections import Counter
 
+import click
+import mock
 import pytest
 from requests import HTTPError, Response
 
+from meltano.cli import cli
+from meltano.cli.discovery import discover
 from meltano.core.hub import MeltanoHubService
 from meltano.core.hub.client import HubConnectionError, HubPluginVariantNotFoundError
 from meltano.core.plugin.base import PluginType, Variant
@@ -117,3 +121,18 @@ class TestMeltanoHubService:
             "https://hub.meltano.com/meltano/api/v1/plugins/extractors"
             "/this-returns-500--original"
         )
+
+    def test_request_headers(self, subject: MeltanoHubService):
+        with mock.patch("click.get_current_context") as get_context:
+            get_context.return_value = click.Context(
+                discover,
+                info_name="discover",
+                parent=click.Context(cli, info_name="meltano"),
+            )
+            request = subject._build_request("GET", "https://example.com")
+            assert request.headers["X-Meltano-Command"] == "meltano discover"
+
+        with mock.patch("click.get_current_context") as get_context:
+            get_context.return_value = None
+            request = subject._build_request("GET", "https://example.com")
+            assert "X-Meltano-Command" not in request.headers

@@ -208,14 +208,14 @@ class TestAZStorageStateStoreManager:
     def subject(self, function_scoped_test_dir):
         return AZStorageStateStoreManager(
             uri="azure://meltano/state/",
-            connection_string="testing_connection_string",
+            connection_string="UseDevelopmentStorage=true",
             lock_timeout_seconds=10,
         )
 
     @pytest.fixture(scope="function")
     def mock_client(self):
         with patch(
-            "azure.storage.blob.BlobServiceClient",
+            "meltano.core.state_store.azure.BlobServiceClient",
         ) as mock_client:
             yield mock_client
 
@@ -224,7 +224,7 @@ class TestAZStorageStateStoreManager:
         _ = subject.client  # noqa: F541 WPS122
         _ = subject.client  # noqa: F541 WPS122
         mock_client.from_connection_string.assert_called_once_with(
-            "testing_connection_string"
+            "UseDevelopmentStorage=true"
         )
 
     def test_is_file_not_found_error_true(
