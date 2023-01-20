@@ -2,18 +2,26 @@
 
 from __future__ import annotations
 
+import io
 import json
 import re
 import sys
 from collections import defaultdict
 from collections.abc import Iterable
+from contextlib import redirect_stdout
 from functools import reduce
 from operator import getitem
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Mapping, MutableMapping, cast
 
-import jsonschema
+import structlog
 import yaml
+
+# TODO: Remove the `type: ignore` once
+# https://github.com/python-jsonschema/check-jsonschema/pull/228 has been merged
+from check_jsonschema.cli import ParseResult as check_jsonschema_options  # type: ignore
+from check_jsonschema.cli import build_checker as build_jsonschema_checker
 from typing_extensions import TypeAlias
 
 from meltano import __file__ as package_root_path
@@ -32,6 +40,7 @@ from meltano.core.utils import (
     deep_merge,
     default_deep_merge_strategies,
     expand_env_vars,
+    get_no_color_flag,
 )
 
 if sys.version_info >= (3, 8):
@@ -49,6 +58,8 @@ else:
 #   performance in some cases. No need to eat that cost here, since we don't
 #   care about comment preservation in the manifest.
 
+logger = structlog.getLogger(__name__)
+
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
 MANIFEST_SCHEMA_PATH = Path(package_root_path).parent / "schema" / "meltano.schema.json"
 
@@ -57,6 +68,7 @@ PluginsByType: TypeAlias = Mapping[str, List[Mapping[str, Any]]]
 PluginsByNameByType: TypeAlias = Mapping[str, Mapping[str, Mapping[str, Any]]]
 
 
+# FIXME: We may want to switch over to ruamel for this
 class YamlLimitedSafeLoader(type):
     """Meta YAML loader that skips the resolution of the specified YAML tags."""
 
@@ -139,25 +151,45 @@ class Manifest:
             environment: The Meltano environment which this manifest describes.
                 If `None`, then all data under the `environments` key in the
                 project files will be ignored by this manifest.
-
-        Raises:
-            Exception: The Meltano manifest schema is an invalid jsonschema.
         """
         self.project = project
         self._meltano_file = self.project.meltanofile.read_text()
         self.environment = environment
         self.project_settings_service = ProjectSettingsService(project)
         self.project_plugins_service = ProjectPluginsService(project)
-
         with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
             self.manifest_schema = json.load(manifest_schema_file)
 
-        try:
-            self.manifest_schema_validator = jsonschema.Draft202012Validator(
-                self.manifest_schema
+    @staticmethod
+    def _validate_against_manifest_schema(
+        instance_name: str,
+        intance_data: dict[str, Any],
+    ) -> None:
+        with NamedTemporaryFile(suffix=".json") as schema_instance_file:
+            schema_instance_file.write(json.dumps(intance_data).encode())
+            schema_instance_file.flush()
+            with io.StringIO() as buf, redirect_stdout(buf):
+                opts = check_jsonschema_options()
+                opts.color = not get_no_color_flag()
+                opts.set_schema(
+                    schemafile=str(MANIFEST_SCHEMA_PATH),
+                    builtin_schema=None,
+                    check_metaschema=None,
+                )
+                opts.instancefiles = (schema_instance_file.name,)
+                jsonschema_checker = build_jsonschema_checker(opts)
+                results = jsonschema_checker._build_result()  # noqa: WPS437
+                if results.validation_errors:
+                    results.validation_errors = {
+                        "meltano.yml": v for v in results.validation_errors.values()
+                    }
+                jsonschema_checker._reporter.report_result(results)  # noqa: WPS437
+                buf.seek(0)
+                jsonschema_checker_message = buf.read().strip()
+            logger.warn(
+                f"Failed to validate {instance_name} against Meltano manifest "
+                f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}"
             )
-        except jsonschema.ValidationError as ex:
-            raise Exception("Failed to validate Meltano manifest schema") from ex
 
     @cached_property
     def _project_files(self) -> dict[str, Any]:
@@ -171,14 +203,7 @@ class Manifest:
                 for x in self.project.project_files.include_paths
             ),
         )
-
-        try:
-            self.manifest_schema_validator.validate(project_files)
-        except jsonschema.ValidationError as ex:
-            raise Exception(
-                "Failed to validate Meltano project files against manifest schema"
-            ) from ex
-
+        self._validate_against_manifest_schema("project files", project_files)
         return project_files
 
     def _merge_plugin_lockfiles(
@@ -272,10 +297,6 @@ class Manifest:
         mutable, because Python lacks a `frozendict` class in its standard
         library. Please do not alter it in-place.
 
-        Raises:
-            Exception: The generated manifest data was not compliant with the
-                Meltano manifest schema.
-
         Returns:
             The manifest data.
         """
@@ -318,12 +339,7 @@ class Manifest:
         # which fields within the manifest should be read.
         del manifest["environments"]
 
-        try:
-            self.manifest_schema_validator.validate(manifest)
-        except jsonschema.ValidationError as ex:
-            raise Exception(
-                "Failed to validate Meltano manifest against manifest schema"
-            ) from ex
+        self._validate_against_manifest_schema("newly compiled manifest", manifest)
 
         return manifest
 
