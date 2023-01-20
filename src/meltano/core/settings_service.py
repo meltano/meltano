@@ -363,6 +363,9 @@ class SettingsService(ABC):  # noqa: WPS214
                 env=expandable_env,
                 if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
+            # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
+            if value and not expanded_value:  # The whole string was missing env vars
+                expanded_value = None
 
             if expanded_value != value:
                 metadata["expanded"] = True
