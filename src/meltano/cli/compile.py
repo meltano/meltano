@@ -23,14 +23,15 @@ from meltano.core.tracking.contexts import CliEvent
 @click.option(
     "--directory",
     default=".meltano/manifests",
-    help="Compile an environment-specific manifest.",
+    help="The path of the directory into which the manifest json files will be written",
+    type=click.Path(file_okay=False, resolve_path=True, writable=True, path_type=Path),
 )
 @click.pass_context
 @pass_project(migrate=True)
 def compile(  # noqa: WPS125
     project: Project,
     ctx: click.Context,
-    directory: str,
+    directory: Path,
 ):
     """
     Compile a Meltano project into environment-specific manifest files.
@@ -40,8 +41,7 @@ def compile(  # noqa: WPS125
     tracker: Tracker = ctx.obj["tracker"]
 
     try:
-        directory_path = Path(directory).resolve()
-        directory_path.mkdir(parents=True, exist_ok=True)
+        directory.mkdir(parents=True, exist_ok=True)
     except OSError as ex:
         raise CliError(
             f"Unable to create directory for Meltano manifests {directory}: {ex}"
@@ -54,12 +54,12 @@ def compile(  # noqa: WPS125
         + ", ".join("no environment" if x is None else x.name for x in environments)
     )
     for environment in environments:
-        path = directory_path / (
+        path = directory / (
             "meltano-manifest.json"
             if environment is None
             else f"meltano-manifest.{environment.name}.json"
         )
-        manifest = Manifest(project=project, environment=environment)
+        manifest = Manifest(project=project, environment=environment, path=path)
         try:
             with open(path, "w") as manifest_file:
                 json.dump(manifest.data, manifest_file, indent=4, sort_keys=True)
