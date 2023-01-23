@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.14.0 (2023-01-23)
+
+### ✨ New
+
+- [#7188](https://github.com/meltano/meltano/issues/7188) Add header with Meltano command to Hub request
+
+### 🐛 Fixes
+
+- [#7190](https://github.com/meltano/meltano/issues/7190) Make fully missing env var settings `None`
+- [#7174](https://github.com/meltano/meltano/issues/7174) Support default auth for GCS and Azure state backends
+- [#7104](https://github.com/meltano/meltano/issues/7104) Support default boto3 auth for S3 state backend when AWS creds are unconfigured
+
+### ⚙️ Under the Hood
+
+- [#7182](https://github.com/meltano/meltano/issues/7182) Use JSONschema version `draft-2020-12` for `meltano.yml` & `discovery.yml`
+- [#7169](https://github.com/meltano/meltano/issues/7169) Use `$defs` instead of `definitions` in jsonschemas
+
+### 📚 Documentation Improvements
+
+- [#7187](https://github.com/meltano/meltano/issues/7187) Fix YAML indent on getting started page and fix link to page source in GitHub -- _**Thanks @jx2lee!**_
+- [#6699](https://github.com/meltano/meltano/issues/6699) Update `dbt` x `airflow` example project description
+- [#7177](https://github.com/meltano/meltano/issues/7177) Add codespaces links to nav and ind
+- [#7166](https://github.com/meltano/meltano/issues/7166) Fix typo
+
 ## v2.13.0 (2023-01-06)
 
 ### ✨ New
