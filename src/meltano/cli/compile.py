@@ -26,12 +26,21 @@ from meltano.core.tracking.contexts import CliEvent
     help="The path of the directory into which the manifest json files will be written",
     type=click.Path(file_okay=False, resolve_path=True, writable=True, path_type=Path),
 )
+@click.option(
+    "--indent",
+    default=4,
+    help=(
+        "The number of spaces to use for indentation in the manifest JSON "
+        "files. Set to -1 to remove all non-essential whitespace."
+    ),
+)
 @click.pass_context
 @pass_project(migrate=True)
 def compile(  # noqa: WPS125
     project: Project,
     ctx: click.Context,
     directory: Path,
+    indent: int,
 ):
     """
     Compile a Meltano project into environment-specific manifest files.
@@ -62,7 +71,12 @@ def compile(  # noqa: WPS125
         manifest = Manifest(project=project, environment=environment, path=path)
         try:
             with open(path, "w") as manifest_file:
-                json.dump(manifest.data, manifest_file, indent=4, sort_keys=True)
+                json.dump(
+                    manifest.data,
+                    manifest_file,
+                    indent=indent if indent > 0 else None,
+                    sort_keys=True,
+                )
         except OSError as ex:
             raise CliError(
                 f"Unable to write Meltano manifest {str(path)!r}: {ex}"

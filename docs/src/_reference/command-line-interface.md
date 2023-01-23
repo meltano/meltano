@@ -140,6 +140,19 @@ To save the manifest JSON files to a specific directory:
 meltano compile --directory /some/directory/path
 ```
 
+Use the `--indent` CLI option to control the indentation in the manifest JSON files:
+
+```bash
+# Use 2 spaces of indentation instead of the default 4
+meltano compile --indent 2
+
+# Only use newlines
+meltano compile --indent 0
+
+# Remove all non-essential whitespace
+meltano compile --indent -1
+```
+
 ### Using `compile` with Environments
 
 The `compile` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
