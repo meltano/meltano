@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import io
 import json
 import re
+import subprocess
 import sys
 from collections import defaultdict
 from collections.abc import Iterable
-from contextlib import redirect_stdout
 from functools import reduce
 from operator import getitem
 from pathlib import Path
@@ -17,11 +16,6 @@ from typing import Any, Dict, List, Mapping, MutableMapping, cast
 
 import structlog
 import yaml
-
-# TODO: Remove the `type: ignore` once
-# https://github.com/python-jsonschema/check-jsonschema/pull/228 has been merged
-from check_jsonschema.cli import ParseResult as check_jsonschema_options  # type: ignore
-from check_jsonschema.cli import build_checker as build_jsonschema_checker
 from typing_extensions import TypeAlias
 
 from meltano import __file__ as package_root_path
@@ -68,7 +62,12 @@ PluginsByType: TypeAlias = Mapping[str, List[Mapping[str, Any]]]
 PluginsByNameByType: TypeAlias = Mapping[str, Mapping[str, Mapping[str, Any]]]
 
 
-# FIXME: We may want to switch over to ruamel for this
+# Ruamel doesn't have this problem where YAML tags like timestamps are
+# automatically converted to Python objects that aren't JSON-serializable, but
+# it's not suitable for use here because it doesn't load the YAML file as plain
+# Python data structures like dictionaries and lists. An alternative to using
+# `YamlLimitedSafeLoader` would be to load the YAML files with Ruamel, and then
+# copying the data out at depth into regular dictionaries and lists.
 class YamlLimitedSafeLoader(type):
     """Meta YAML loader that skips the resolution of the specified YAML tags."""
 
@@ -136,7 +135,12 @@ def env_aware_merge_mappings(
 class Manifest:
     """A complete unambiguous static representation of a Meltano project."""
 
-    def __init__(self, project: Project, environment: Environment | None) -> None:
+    def __init__(
+        self,
+        project: Project,
+        environment: Environment | None,
+        path: Path,
+    ) -> None:
         """Initialize the manifest.
 
         This class does not write a manifest file. It merely generates the data
@@ -151,10 +155,13 @@ class Manifest:
             environment: The Meltano environment which this manifest describes.
                 If `None`, then all data under the `environments` key in the
                 project files will be ignored by this manifest.
+            path: The path the Manifest will be saved to - only used for
+                jsonschema validation failure error messages.
         """
         self.project = project
         self._meltano_file = self.project.meltanofile.read_text()
         self.environment = environment
+        self.path = path
         self.project_settings_service = ProjectSettingsService(project)
         self.project_plugins_service = ProjectPluginsService(project)
         with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
@@ -163,33 +170,33 @@ class Manifest:
     @staticmethod
     def _validate_against_manifest_schema(
         instance_name: str,
+        instance_path: Path,
         intance_data: dict[str, Any],
     ) -> None:
         with NamedTemporaryFile(suffix=".json") as schema_instance_file:
             schema_instance_file.write(json.dumps(intance_data).encode())
             schema_instance_file.flush()
-            with io.StringIO() as buf, redirect_stdout(buf):
-                opts = check_jsonschema_options()
-                opts.color = not get_no_color_flag()
-                opts.set_schema(
-                    schemafile=str(MANIFEST_SCHEMA_PATH),
-                    builtin_schema=None,
-                    check_metaschema=None,
-                )
-                opts.instancefiles = (schema_instance_file.name,)
-                jsonschema_checker = build_jsonschema_checker(opts)
-                results = jsonschema_checker._build_result()  # noqa: WPS437
-                if results.validation_errors:
-                    results.validation_errors = {
-                        "meltano.yml": v for v in results.validation_errors.values()
-                    }
-                jsonschema_checker._reporter.report_result(results)  # noqa: WPS437
-                buf.seek(0)
-                jsonschema_checker_message = buf.read().strip()
-            logger.warn(
-                f"Failed to validate {instance_name} against Meltano manifest "
-                f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}"
+            proc = subprocess.run(
+                (
+                    "check-jsonschema",
+                    "--color",
+                    "never" if get_no_color_flag() else "always",
+                    "--schemafile",
+                    str(MANIFEST_SCHEMA_PATH),
+                    schema_instance_file.name,
+                ),
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
             )
+            if proc.returncode:
+                jsonschema_checker_message = proc.stdout.strip().replace(
+                    schema_instance_file.name, str(instance_path)
+                )
+                logger.warn(
+                    f"Failed to validate {instance_name} against Meltano manifest "
+                    f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}"
+                )
 
     @cached_property
     def _project_files(self) -> dict[str, Any]:
@@ -203,7 +210,9 @@ class Manifest:
                 for x in self.project.project_files.include_paths
             ),
         )
-        self._validate_against_manifest_schema("project files", project_files)
+        self._validate_against_manifest_schema(
+            "project files", self.project.meltanofile, project_files
+        )
         return project_files
 
     def _merge_plugin_lockfiles(
@@ -320,6 +329,13 @@ class Manifest:
         apply_scaffold(manifest, meltano_config_env_locations(self.manifest_schema))
 
         plugins = self.project_plugins_service.plugins_by_type()
+
+        # Remove the 'mappings' category of plugins, since those are created
+        # dynamically at run-time, and shouldn't be represented directly in
+        # `meltano.yml` or in manifest files. For more details, refer to:
+        # https://gitlab.com/meltano/meltano/-/merge_requests/2481#note_832478775
+        del plugins["mappings"]
+
         # NOTE: `self._merge_plugin_lockfiles` restructures the plugins into a
         #       map from plugin types to maps of plugin IDs to their values.
         #       This structure is easier to work with, but is reset to the
@@ -339,7 +355,9 @@ class Manifest:
         # which fields within the manifest should be read.
         del manifest["environments"]
 
-        self._validate_against_manifest_schema("newly compiled manifest", manifest)
+        self._validate_against_manifest_schema(
+            "newly compiled manifest", self.path, manifest
+        )
 
         return manifest
 
