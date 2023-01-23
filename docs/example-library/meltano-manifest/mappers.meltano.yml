@@ -1,0 +1,15 @@
+plugins:
+  mappers:
+  - name: meltano-map-transformer
+    variant: meltano
+    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git@v0.0.4
+    mappings:
+    - name: coalesce-gcp-ips
+      config:
+        stream_maps:
+          gcp_ips:
+            ipv4prefix: null
+            ipv6prefix: null
+            ipv4: "record.get('ipv4prefix', '')"
+            ipv6: "record.get('ipv6prefix', '')"
+            id: "md5(record.get('ipv4prefix', record.get('ipv6prefix')))"
