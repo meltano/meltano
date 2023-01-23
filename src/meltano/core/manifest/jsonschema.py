@@ -9,7 +9,7 @@ from typing import Any
 
 def meltano_config_env_locations(
     manifest_schema: dict[str, Any],
-    env_definition_ref: str = "#/definitions/env",
+    env_definition_ref: str = "#/$defs/env",
 ) -> set[str]:
     """Find all locations within a Meltano manifest file that can have an env field.
 
