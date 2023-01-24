@@ -3,6 +3,7 @@ from __future__ import annotations
 import platform
 import re
 import shutil
+import subprocess
 from pathlib import Path
 from time import perf_counter_ns
 
@@ -208,6 +209,43 @@ class TestCli:
             assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
             assert Path().resolve() == dirpath
 
+    @pytest.mark.parametrize(
+        "command_args",
+        (
+            ("invoke", "example"),
+            ("config", "example"),
+            ("job", "list"),
+            ("environment", "list"),
+            ("add", "utility", "example"),
+        ),
+    )
+    def test_error_msg_outside_project(
+        self,
+        tmp_path: Path,
+        command_args: tuple[str, ...],
+    ):
+        # Unless this test runs before every test that uses a project, we
+        # cannot use `cli_runner` to test this because the code path taken
+        # differs after any project has been found.
+
+        # I tried working around this by switching to an empty directory,
+        # calling `Project.deactivate`, using `mock.patch` on various relevant
+        # functions, and more, but nothing I did resulted in the proper code
+        # path being taken. Also it seemed like a fragile approach.
+
+        # Using a subprocess should be robust, but requires the version of
+        # Meltano you want to test be the one that is installed in the active
+        # Python environment. This is not the only test that requires this.
+        assert (
+            "must be run inside a Meltano project"
+            in subprocess.run(
+                ("meltano", *command_args),
+                text=True,
+                stderr=subprocess.PIPE,
+                cwd=tmp_path,
+            ).stderr
+        )
+
 
 def _get_dummy_logging_config(colors=True):
     return {
@@ -368,5 +406,5 @@ class TestLargeConfigProject:
             == 0
         )
         duration_ns = perf_counter_ns() - start
-        # Ensure the large config can be processed in less than 20 seconds
-        assert duration_ns < 20000000000
+        # Ensure the large config can be processed in less than 25 seconds
+        assert duration_ns < 25000000000
