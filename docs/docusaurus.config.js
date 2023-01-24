@@ -29,14 +29,15 @@ const config = {
 
   plugins: [
     [
-      "docusaurus-plugin-remote-content",
+      'docusaurus-plugin-remote-content',
       {
-          // options here
-          name: "latest-changelog", // used by CLI, must be path safe
-          sourceBaseUrl: "https://raw.githubusercontent.com/meltano/meltano/main/", // the base url for the markdown (gets prepended to all of the documents when fetching)
-          outDir: "src/pages/", // the base directory to output to.
-          documents: ["CHANGELOG.md"], // the file names to download
-          performCleanup: false,
+        // options here
+        name: 'latest-changelog', // used by CLI, must be path safe
+        sourceBaseUrl:
+          'https://raw.githubusercontent.com/meltano/meltano/main/', // the base url for the markdown (gets prepended to all of the documents when fetching)
+        outDir: 'src/pages/', // the base directory to output to.
+        documents: ['CHANGELOG.md'], // the file names to download
+        performCleanup: false,
       },
     ],
   ],
@@ -51,8 +52,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/meltano/meltano',
+          editUrl: 'https://github.com/meltano/meltano',
         },
         blog: false,
         theme: {
@@ -72,12 +72,12 @@ const config = {
           src: 'img/meltano-logo-padded.svg',
         },
         items: [
-          {to: '#', label: 'Getting Started', position: 'left'},
-          {to: '#', label: 'Guides', position: 'left'},
-          {to: '#', label: 'Concepts', position: 'left'},
-          {to: '#', label: 'Tutorials', position: 'left'},
-          {to: '#', label: 'Reference', position: 'left'},
-          {to: '#', label: 'Contribute', position: 'left'},
+          { to: '#', label: 'Getting Started', position: 'left' },
+          { to: '#', label: 'Guides', position: 'left' },
+          { to: '#', label: 'Concepts', position: 'left' },
+          { to: '#', label: 'Tutorials', position: 'left' },
+          { to: '#', label: 'Reference', position: 'left' },
+          { to: '#', label: 'Contribute', position: 'left' },
           {
             type: 'docsVersionDropdown',
           },
@@ -191,7 +191,8 @@ const config = {
       },
       announcementBar: {
         id: 'announcementBar',
-        content: "This is an announcement. <a href='#' style='color: #fbbf52; font-weight: bold;'>Call to action!</a>",
+        content:
+          "This is an announcement. <a href='#' style='color: #fbbf52; font-weight: bold;'>Call to action!</a>",
         backgroundColor: '#031d4d',
         textColor: '#ffffff',
         isCloseable: true,

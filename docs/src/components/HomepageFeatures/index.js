@@ -9,11 +9,21 @@ const FeatureList = [
     description: (
       <>
         <ul>
-          <li><a href="#">Part 1</a></li>
-          <li><a href="#">Part 2</a></li>
-          <li><a href="#">Part 3</a></li>
-          <li><a href="#">Part 4</a></li>
-          <li><a href="#">Meltano at a Glance</a></li>
+          <li>
+            <a href="#">Part 1</a>
+          </li>
+          <li>
+            <a href="#">Part 2</a>
+          </li>
+          <li>
+            <a href="#">Part 3</a>
+          </li>
+          <li>
+            <a href="#">Part 4</a>
+          </li>
+          <li>
+            <a href="#">Meltano at a Glance</a>
+          </li>
         </ul>
       </>
     ),
@@ -24,10 +34,18 @@ const FeatureList = [
     description: (
       <>
         <ul>
-          <li><a href="#">Installation Guide</a></li>
-          <li><a href="#">Deploy using GitHub Actions</a></li>
-          <li><a href="#">Deploy using Kubernetes</a></li>
-          <li><a href="#">Meltano Cloud</a></li>
+          <li>
+            <a href="#">Installation Guide</a>
+          </li>
+          <li>
+            <a href="#">Deploy using GitHub Actions</a>
+          </li>
+          <li>
+            <a href="#">Deploy using Kubernetes</a>
+          </li>
+          <li>
+            <a href="#">Meltano Cloud</a>
+          </li>
         </ul>
       </>
     ),
@@ -38,16 +56,22 @@ const FeatureList = [
     description: (
       <>
         <ul>
-          <li><a href="#">CLI Reference</a></li>
-          <li><a href="#">Add a Loader</a></li>
-          <li><a href="#">Add an Extractor</a></li>
+          <li>
+            <a href="#">CLI Reference</a>
+          </li>
+          <li>
+            <a href="#">Add a Loader</a>
+          </li>
+          <li>
+            <a href="#">Add an Extractor</a>
+          </li>
         </ul>
       </>
     ),
   },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({ Svg, title, description }) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
