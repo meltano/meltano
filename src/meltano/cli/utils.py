@@ -542,7 +542,7 @@ def activate_environment(
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
-    if ctx.obj["selected_environment"]:
+    if ctx.obj.get("selected_environment"):
         project.activate_environment(ctx.obj["selected_environment"])
         # Update the project context being used for telemetry:
         project_ctx = next(
@@ -573,7 +573,7 @@ def activate_explicitly_provided_environment(
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
-    if ctx.obj["is_default_environment"]:
+    if ctx.obj.get("is_default_environment"):
         logger.info(
             f"The default environment {ctx.obj['selected_environment']!r} will "
             f"be ignored for `meltano {ctx.command.name}`. To configure a specific "

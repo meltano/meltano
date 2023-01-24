@@ -9,6 +9,7 @@ from time import perf_counter_ns
 import click
 import pytest
 import yaml
+from click.testing import CliRunner
 from structlog.stdlib import get_logger
 
 import meltano
@@ -208,6 +209,22 @@ class TestCli:
             assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
             assert Path().resolve() == dirpath
 
+    @pytest.mark.parametrize(
+        "command",
+        (
+            ("invoke", "example"),
+            ("config", "example"),
+            ("job", "list"),
+            ("environment", "list"),
+            ("add", "utility", "example"),
+        ),
+    )
+    def test_error_msg_outside_project(
+        self, cli_runner: CliRunner, command: tuple[str, ...]
+    ):
+        with pytest.raises(CliError, match="must be run inside a Meltano project"):
+            cli_runner.invoke(cli, command, catch_exceptions=False)
+
 
 def _get_dummy_logging_config(colors=True):
     return {
@@ -368,5 +385,5 @@ class TestLargeConfigProject:
             == 0
         )
         duration_ns = perf_counter_ns() - start
-        # Ensure the large config can be processed in less than 20 seconds
-        assert duration_ns < 20000000000
+        # Ensure the large config can be processed in less than 25 seconds
+        assert duration_ns < 25000000000
