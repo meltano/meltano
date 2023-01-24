@@ -6,13 +6,12 @@ import os
 
 import click
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
-
-from . import cli
-from .params import pass_project
-from .utils import InstrumentedCmd, InstrumentedDefaultGroup
 
 
 @cli.group(
@@ -33,7 +32,7 @@ def upgrade(ctx, project):
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
 
-    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
     engine, _ = project_engine(project)
     upgrade_service = UpgradeService(engine, project)
