@@ -3,13 +3,13 @@ from __future__ import annotations
 import platform
 import re
 import shutil
+import subprocess
 from pathlib import Path
 from time import perf_counter_ns
 
 import click
 import pytest
 import yaml
-from click.testing import CliRunner
 from structlog.stdlib import get_logger
 
 import meltano
@@ -210,7 +210,7 @@ class TestCli:
             assert Path().resolve() == dirpath
 
     @pytest.mark.parametrize(
-        "command",
+        "command_args",
         (
             ("invoke", "example"),
             ("config", "example"),
@@ -220,10 +220,31 @@ class TestCli:
         ),
     )
     def test_error_msg_outside_project(
-        self, cli_runner: CliRunner, command: tuple[str, ...]
+        self,
+        tmp_path: Path,
+        command_args: tuple[str, ...],
     ):
-        with pytest.raises(CliError, match="must be run inside a Meltano project"):
-            cli_runner.invoke(cli, command, catch_exceptions=False)
+        # Unless this test runs before every test that uses a project, we
+        # cannot use `cli_runner` to test this because the code path taken
+        # differs after any project has been found.
+
+        # I tried working around this by switching to an empty directory,
+        # calling `Project.deactivate`, using `mock.patch` on various relevant
+        # functions, and more, but nothing I did resulted in the proper code
+        # path being taken. Also it seemed like a fragile approach.
+
+        # Using a subprocess should be robust, but requires the version of
+        # Meltano you want to test be the one that is installed in the active
+        # Python environment. This is not the only test that requires this.
+        assert (
+            "must be run inside a Meltano project"
+            in subprocess.run(
+                ("meltano", *command_args),
+                text=True,
+                stderr=subprocess.PIPE,
+                cwd=tmp_path,
+            ).stderr
+        )
 
 
 def _get_dummy_logging_config(colors=True):
