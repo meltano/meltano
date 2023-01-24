@@ -227,7 +227,10 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")
         try:
-            return await exec_async(sys.executable, "-m", "venv", str(self.venv))
+            return await exec_async(
+                str(Path(sys.executable).parent / "virtualenv"),
+                str(self.venv),
+            )
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
