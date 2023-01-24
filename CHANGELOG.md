@@ -379,7 +379,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all <jobId> with <stateId> to fix pipeline running bug.
+- [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all `jobId` with `stateId` to fix pipeline running bug.
 
 ## 2.0.3 - (2022-06-15)
 
