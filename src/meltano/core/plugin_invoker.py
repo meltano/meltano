@@ -426,7 +426,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             popen_env = {**self.env(), **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")
-            logging.debug(f"Env: {popen_env}")
 
             try:
                 yield (popen_args, popen_options, popen_env)
