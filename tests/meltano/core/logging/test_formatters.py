@@ -30,7 +30,7 @@ class FakeFrame:
         self.f_locals = f_locals or {}
 
 
-class FakeTraceback:
+class FakeTraceback:  # pragma: no cover
     """A fake traceback that can be used to test log formatters."""
 
     def __init__(self, frames, line_nums):
@@ -45,24 +45,6 @@ class FakeTraceback:
     def tb_next(self):
         if len(self._frames) > 1:
             return FakeTraceback(self._frames[1:], self._line_nums[1:])
-
-
-class FakeException(Exception):
-    def __init__(self, *args, **kwargs):
-        self._tb = None
-        super().__init__(*args, **kwargs)
-
-    @property
-    def __traceback__(self):
-        return self._tb
-
-    @__traceback__.setter
-    def __traceback__(self, value):
-        self._tb = value
-
-    def with_traceback(self, value):
-        self._tb = value
-        return self
 
 
 class TestLogFormatters:
