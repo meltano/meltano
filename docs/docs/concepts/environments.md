@@ -79,7 +79,7 @@ environments:
 
 ## State ID Suffix
 
-Environments can also define a `state_id_suffix` - a custom suffix used in the generation of a state ID for each extractor/loader pair passed to [`meltano run`]((/reference/command-line-interface#run)).
+Environments can also define a `state_id_suffix` - a custom suffix used in the generation of a state ID for each extractor/loader pair passed to [`meltano run`](/reference/command-line-interface#run).
 The suffix is appended to the generated ID with a colon prefix: `:<state_id_suffix>`.
 
 The full ID when a suffix is present is `<environment_name>:<tap_name>-to-<target_name>:<state_id_suffix>`.

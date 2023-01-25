@@ -480,7 +480,7 @@ export MELTANO_STATE_LOCK_TIMEOUT_SECONDS=720
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS`
 - Default: `360`
 
-Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is [locked]((/concepts/state_backends#locking))
+Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is [locked](/concepts/state_backends#locking)
 
 #### How to use
 

@@ -5,16 +5,19 @@ layout: doc
 weight: 2
 ---
 
+<!--
+Allows us to use tabs https://docusaurus.io/docs/markdown-features/tabs
+-->
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Before you can use Meltano, you’ll need to get it installed. We have a [complete installation guide](/guide/installation-guide) that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.
 
 
 ## Install Meltano
 
-
-
-{% tabs log %}
-
-{% tab log Using Pip %}
+<Tabs>
+  <TabItem value="apple" label="log Using Pip" default>
 
 Meltano is pip-installable.
 
@@ -23,6 +26,7 @@ Use the following command to check that you have a supported Python version inst
 ```bash
 python --version
 ```
+
 Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet support Python 3.10.
 
 <div class="termy">
@@ -36,15 +40,15 @@ successfully installed meltano
 ```
 
 </div>
+  </TabItem>
+  <TabItem value="orange" label="log Using Docker">
 
-{% endtab %}
-
-{% tab log Using Docker %}
 We maintain the `meltano/meltano` Docker image on Docker Hub, which comes with Python and Meltano pre-installed.
 
-To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged v<X.Y.Z>, e.g. v1.55.0. Add a `-python<X.Y>` suffix to the image tag to change the python version, e.g. latest-python3.7.
+To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged v`X.Y.Z`, e.g. v1.55.0. Add a `-python<X.Y>` suffix to the image tag to change the python version, e.g. latest-python3.7.
 
 <div class="termy">
+
 ```console
 $ docker pull meltano/meltano
 latest: Pulling from meltano/meltano
@@ -58,9 +62,9 @@ meltano, version 2.7.1
 
 </div>
 
-{% endtab %}
+  </TabItem>
+  <TabItem value="banana" label="log Using PIPX">
 
-{% tab log Using PIPX %}
 Meltano is pip-installable.
 
 Use the following command to check that you have a supported Python version installed:
@@ -81,15 +85,18 @@ successfully installed meltano
 ```
 
 </div>
-{% endtab %}
 
-{% endtabs %}
+  </TabItem>
+</Tabs>
+
 
 ## More Information
+
 To understand details of the installation, like mounting a docker volume to work long-term with the docker image, view the [detailed installation guide](/guide/installation-guide).
+
 ## Next Steps
 
 Once you're set up, head over to the tutorial to learn [how to initialize your first project and start to import data](/getting-started/part1).
-<script src="/js/tabs.js"></script>
+
 <script src="/js/termynal.js"></script>
 <script src="/js/termy_custom.js"></script>

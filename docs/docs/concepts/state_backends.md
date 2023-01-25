@@ -169,7 +169,7 @@ This will overwrite the state's current value. Continue? [y/N]:
 
 Enter `y` and then Meltano will write the job state to S3.
 
-To do this quickly for multiple jobs, you can loop through the output of [`meltano state list`](command-line-interface#state) and use the `--force` flag for `meltano state set` to prevent confirmation prompts:
+To do this quickly for multiple jobs, you can loop through the output of [`meltano state list`](/reference/command-line-interface#state) and use the `--force` flag for `meltano state set` to prevent confirmation prompts:
 
 ```shell
 for job_id in $(meltano state list); do meltano state get $job_id > $job_id-state.json; done

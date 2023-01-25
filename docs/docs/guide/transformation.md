@@ -7,10 +7,6 @@ weight: 5
 
 Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations. A transform in Meltano is simply a set of dbt models that can be installed as a package. See the [transform plugin](/concepts/plugins#transforms) docs for more details.
 
-<div class="notification is-info">
-  <p>If you already have an existing dbt project that you'd like to migrate to Meltano, check out the <a href="/guide/existing-dbt-project">existing dbt project guide</a> for more details.</p>
-</div>
-
 ## Adapter-Specific dbt Transformation
 
 In alignment with the [dbt documentation](https://docs.getdbt.com/docs/available-adapters), we support adapter-specific installations of `dbt`.
@@ -142,7 +138,6 @@ Transform plugins may have additional configuration options in `meltano.yml`. Fo
 finding the tables where raw data has been loaded during the Extract-Load phase:
 
 ```yml
-{% raw %}
 transforms:
 - name: tap-gitlab
   pip_url: https://gitlab.com/meltano/dbt-tap-gitlab.git
@@ -150,7 +145,6 @@ transforms:
     entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
     generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
     region_table: "{{ env_var('PG_SCHEMA') }}.region"
-{% endraw %}
 ```
 
 As an alternative to providing values from environment variables, you can also set values directly in `meltano.yml`:

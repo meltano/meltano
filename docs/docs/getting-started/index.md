@@ -274,22 +274,24 @@ Chances are that the extractor you just added to your project will require some 
 
 _To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/guide/configuration)._
 
-<div class="notification">
-  <p><strong>What if I already have a config file for this extractor?</strong></p>
-  <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
-  <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's `config` key</a>:</p>
+:::note What if I already have a config file for this extractor?
 
-<pre>
+If you've used this Singer tap before without Meltano, you may have a [config file](https://hub.meltano.com/singer/spec#config-files).
+
+If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [meltano.yml](/concepts/project#meltano-yml-project-file) under the [plugin's `config` key](/concepts/project#plugin-configuration):
+
+```
 extractors:
 - name: tap-example
   config: {
     "setting": "value",
     "another_setting": true
   }
-</pre>
+```
 
-  <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
-</div>
+Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572), the object should be indented correctly, but formatting does not need to be changed.
+
+:::
 
 1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
@@ -663,20 +665,24 @@ Chances are that the loader you just added to your project will require some [co
 
 _To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/guide/configuration)._
 
-<div class="notification is-warning">
-  <p><strong>What if I already have a config file for this loader?</strong></p>
-  <p>If you've used this Singer target before without Meltano, you may already have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
-  <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
-<pre>
-loaders:
-- name: target-example
+:::note What if I already have a config file for this loader?
+
+If you've used this Singer tap before without Meltano, you may have a [config file](https://hub.meltano.com/singer/spec#config-files).
+
+If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your [meltano.yml](/concepts/project#meltano-yml-project-file) under the [plugin's `config` key](/concepts/project#plugin-configuration):
+
+```
+extractors:
+- name: tap-example
   config: {
     "setting": "value",
     "another_setting": true
   }
-</pre>
-  <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
-</div>
+```
+
+Since YAML is a [superset of JSON](https://yaml.org/spec/1.2/spec.html#id2759572), the object should be indented correctly, but formatting does not need to be changed.
+
+:::
 
 1. Find out what settings your loader supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
 
@@ -773,7 +779,7 @@ meltano run tap-gitlab target-postgres
 If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
 
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/reference/command-line-interface#debugging) to get some more insight into what's going on behind the scenes.
-If that doesn't get you closer to a solution, learn how to [get help with your issue](/the-project/community).
+If that doesn't get you closer to a solution, learn how to [get help with your issue](https://meltano.com/slack).
 
 If you run `meltano run` at another time, it will automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/guide/integration#incremental-replication-state) and you have an active environment.
 Behind the scenes Meltano is tracking state using a State ID that's auto-generated based on the extractor name, loader name, and active environment name.
@@ -980,7 +986,6 @@ Refer to the [transformers page](https://hub.meltano.com/transformers/) on Melta
    Add the following content to your new `commits_last_7d.sql` file:
 
    ```sql
-   {% raw %}
    {{
      config(
        materialized='table'
@@ -990,7 +995,6 @@ Refer to the [transformers page](https://hub.meltano.com/transformers/) on Melta
    select *
    from {{ source('tap_gitlab', 'commits') }}
    where created_at::date >= current_date - interval '7 days'
-   {% endraw %}
    ```
 
 1. Run your dbt models either using [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke):

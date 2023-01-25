@@ -12,9 +12,3 @@ toc: false
 </div>
 
 Here you will find a series of step-by-step tutorials where we help walk you through various scenarios.
-
-<ul>
-  {% for doc in site.tutorials %}
-    <li><a href="{{ doc.url }}">{{ doc.title }}</a></li>
-  {% endfor %}
-</ul>

@@ -664,18 +664,15 @@ Because these variables are handled by dbt rather than Meltano, [environment var
 Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
 
 ```yaml
-{% raw %}
 transforms:
 - name: tap-gitlab
   vars:
     schema: '{{ env_var(''DBT_SOURCE_SCHEMA'') }}'
-{% endraw %}
 ```
 
 Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
 
 ```bash
-{% raw %}
 meltano config <transform> set _vars <key> <value>
 
 export <TRANSFORM>__VARS='{"<key>": "<value>"}'
@@ -684,7 +681,6 @@ export <TRANSFORM>__VARS='{"<key>": "<value>"}'
 meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('DBT_SOURCE_SCHEMA') }}"
 
 export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
-{% endraw %}
 ```
 ### Orchestrators
 

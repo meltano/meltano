@@ -5,7 +5,6 @@ layout: doc
 weight: 4
 ---
 
-
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
@@ -39,6 +38,7 @@ This will add the following line to your project file:
 You can test that the new data is extracted by using `meltano invoke`:
 
 <div class="termy">
+
 ```console
 $ meltano invoke tap-github
 2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
@@ -56,7 +56,8 @@ INFO METRIC: {"type": "timer", "metric":  [...]
 ...[many more records]...
 
 {"type": "STATE", "value": {"bookmarks": {"sbalnojan/meltano-example-el": {"commits": {"since": "2022-09-22T07:37:06.289545Z"}}}}}
-´´´
+```
+
 </div>
 
 Next, we add the dbt plugin to transform this data.
@@ -148,7 +149,6 @@ Now we're able to reference the table using the keyword "source" as you can see 
 Add a file called `authors.sql` to the folder `transform/models/tap_github` with the following contents:
 
 ```sql
-{% raw %}
 {{
   config(
     materialized='table'
@@ -157,7 +157,7 @@ Add a file called `authors.sql` to the folder `transform/models/tap_github` with
 
 
 with base as (select *
-from {{ source('tap_github', 'commits') }}) {% endraw %}
+from {{ source('tap_github', 'commits') }})
 
 select distinct (commit -> 'author' -> 'name') as authors from base
 ```

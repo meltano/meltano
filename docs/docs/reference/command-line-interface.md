@@ -234,7 +234,7 @@ meltano config <plugin> set <property>.<deep>.<nesting> <value>
 
 The `config` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
 
-<br>
+
 > Note: Unlike other commands like [`meltano run`](#run) and [`meltano invoke`](#invoke), the `meltano config` command ignores any configured [default environment](/concepts/environments#default-environment).
 > This is to make it easier to configure plugins' base configuration before adding environment-specific overrides.
 
@@ -558,9 +558,11 @@ Meltano installs plugins in parallel. The number of plugins to install in parall
 
 If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the `--force` flag to `meltano install`.
 
-<div class="notification is-info">
-  <p>If you're using a custom Docker image, make sure `python3-venv` is installed:</p>
-<pre>
+:::info
+
+If you're using a custom Docker image, make sure `python3-venv` is installed:
+
+```docker
 FROM ubuntu:20.04
 
 RUN apt-get update && \
@@ -577,9 +579,9 @@ RUN pip3 install meltano
 WORKDIR /meltano
 COPY meltano.yml meltano.yml
 RUN mkdir .meltano/ && meltano install
+```
 
-</pre>
-</div>
+:::
 
 ### How to Use
 

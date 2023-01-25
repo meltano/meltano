@@ -24,7 +24,7 @@ The Singer specification was started in 2016 by Stitch Data. It specified a data
 
 ### How does the Airbyte Connector with Meltano integration work?
 
-A community member used the Meltano Singer SDK to write tap-airbyte-wrapper. This wrapper connector calls the Docker image for a given Airbyte Source and translates the messages into a Singer-compatible format. The output of the tap is conformed to the Singer standard and then can be sent to any Singer target, many of which are listed on [MeltanoHub](hub.meltano.com/loaders/).
+A community member used the Meltano Singer SDK to write tap-airbyte-wrapper. This wrapper connector calls the Docker image for a given Airbyte Source and translates the messages into a Singer-compatible format. The output of the tap is conformed to the Singer standard and then can be sent to any Singer target, many of which are listed on [MeltanoHub](https://hub.meltano.com/loaders/).
 
 ### How do I get help if I need it?
 

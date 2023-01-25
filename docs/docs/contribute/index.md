@@ -2,8 +2,6 @@
 title: Contributor Guide
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
-redirect_from:
-  - /the-project/community/
 weight: 1
 ---
 
@@ -19,7 +17,7 @@ There are multiple ways to contribute to Meltano:
 
 - [The Meltano Project](https://github.com/meltano/meltano/) - Suggest new features for Meltano, report bugs, or open Pull Requests to fix issues.
 - [Meltano SDK](https://sdk.meltano.com/en/latest/) for Taps and Targets
-- [Plugins, taps/targets]() or adding taps/targets to [MeltanoHub](https://hub.meltano.com) - If you've made a tap, target, or other plugin, you can add it to the MeltanoHub for others to discover and use.
+- [Plugins, taps/targets](/contribute/plugins) or adding taps/targets to [MeltanoHub](https://hub.meltano.com) - If you've made a tap, target, or other plugin, you can add it to the MeltanoHub for others to discover and use.
 - [Documentation](https://docs.meltano.com/)
 - [Tutorials](https://docs.meltano.com/tutorials/) and [Blog Posts](https://meltano.com/blog)
 - Helping on [Slack](https://meltano.com/slack)
@@ -45,14 +43,3 @@ so that the team and community are aware of your plan and can help you figure ou
   <p><strong>Searching for something to work on?</strong></p>
   <p>Start off by looking at our <a href="https://github.com/meltano/meltano/labels/accepting%20pull%20requests">"Accepting Pull Requests"</a> label. Keep in mind that this is only a suggestion: all improvements are welcome.</p>
 </div>
-
-## Contribution Guides
-
-The following guides have information to help get you up and running and ready to contribute.
-
-<ul>
-  {% assign items = site.contribute | sort: "weight" %}
-  {% for doc in items %}
-    <li><a href="{{ doc.url }}">{{ doc.title }}</a></li>
-  {% endfor %}
-</ul>

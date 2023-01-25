@@ -363,9 +363,9 @@ Use this setting to enable authentication and disallow anonymous usage of your M
 
 Additionally, you will need to:
 
-1. Ensure your configuration is secure by setting the [`ui.secret_key`](#ui-secret-key) and [`ui.password_salt`](#ui-password-salt) settings, as well as [`ui.server_name`](#ui-server-name) or [`ui.session_cookie_domain`](#ui-session-cookie-domain), manually or using [`meltano ui setup <server_name>`](./command-line-interface.html#setup).
+1. Ensure your configuration is secure by setting the [`ui.secret_key`](#ui-secret-key) and [`ui.password_salt`](#ui-password-salt) settings, as well as [`ui.server_name`](#ui-server-name) or [`ui.session_cookie_domain`](#ui-session-cookie-domain), manually or using [`meltano ui setup <server_name>`](./command-line-interface#setup).
 
-2. Create at least one user using [`meltano user add`](./command-line-interface.html#user).
+2. Create at least one user using [`meltano user add`](./command-line-interface#user).
 
 #### How to use
 

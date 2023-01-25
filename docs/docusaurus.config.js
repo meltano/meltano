@@ -27,20 +27,20 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: [
-    [
-      'docusaurus-plugin-remote-content',
-      {
-        // options here
-        name: 'latest-changelog', // used by CLI, must be path safe
-        sourceBaseUrl:
-          'https://raw.githubusercontent.com/meltano/meltano/main/', // the base url for the markdown (gets prepended to all of the documents when fetching)
-        outDir: 'src/pages/', // the base directory to output to.
-        documents: ['CHANGELOG.md'], // the file names to download
-        performCleanup: false,
-      },
-    ],
-  ],
+  // plugins: [
+  //   [
+  //     'docusaurus-plugin-remote-content',
+  //     {
+  //       // options here
+  //       name: 'latest-changelog', // used by CLI, must be path safe
+  //       sourceBaseUrl:
+  //         'https://raw.githubusercontent.com/meltano/meltano/main/', // the base url for the markdown (gets prepended to all of the documents when fetching)
+  //       outDir: 'src/pages/', // the base directory to output to.
+  //       documents: ['CHANGELOG.md'], // the file names to download
+  //       performCleanup: false,
+  //     },
+  //   ],
+  // ],
 
   presets: [
     [
@@ -72,12 +72,12 @@ const config = {
           src: 'img/meltano-logo-padded.svg',
         },
         items: [
-          { to: '#', label: 'Getting Started', position: 'left' },
-          { to: '#', label: 'Guides', position: 'left' },
-          { to: '#', label: 'Concepts', position: 'left' },
-          { to: '#', label: 'Tutorials', position: 'left' },
-          { to: '#', label: 'Reference', position: 'left' },
-          { to: '#', label: 'Contribute', position: 'left' },
+          {to: '/getting-started', label: 'Getting Started', position: 'left'},
+          {to: '/guide', label: 'Guides', position: 'left'},
+          {to: '/concepts', label: 'Concepts', position: 'left'},
+          {to: '/tutorials', label: 'Tutorials', position: 'left'},
+          {to: '/reference', label: 'Reference', position: 'left'},
+          {to: '/contribute', label: 'Contribute', position: 'left'},
           {
             type: 'docsVersionDropdown',
           },
