@@ -72,12 +72,16 @@ const config = {
           src: 'img/meltano-logo-padded.svg',
         },
         items: [
-          {to: '/getting-started', label: 'Getting Started', position: 'left'},
-          {to: '/guide', label: 'Guides', position: 'left'},
-          {to: '/concepts', label: 'Concepts', position: 'left'},
-          {to: '/tutorials', label: 'Tutorials', position: 'left'},
-          {to: '/reference', label: 'Reference', position: 'left'},
-          {to: '/contribute', label: 'Contribute', position: 'left'},
+          {
+            to: '/getting-started',
+            label: 'Getting Started',
+            position: 'left',
+          },
+          { to: '/guide', label: 'Guides', position: 'left' },
+          { to: '/concepts', label: 'Concepts', position: 'left' },
+          { to: '/tutorials', label: 'Tutorials', position: 'left' },
+          { to: '/reference', label: 'Reference', position: 'left' },
+          { to: '/contribute', label: 'Contribute', position: 'left' },
           {
             type: 'docsVersionDropdown',
           },
