@@ -20,7 +20,7 @@ except ImportError:
 
 
 package = "meltano"
-python_versions = ["3.10", "3.9", "3.8", "3.7"]
+python_versions = ["3.11", "3.10", "3.9", "3.8", "3.7"]
 main_python_version = "3.9"
 locations = "src", "tests", "noxfile.py"
 

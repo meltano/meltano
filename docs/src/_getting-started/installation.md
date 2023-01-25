@@ -23,7 +23,7 @@ Use the following command to check that you have a supported Python version inst
 ```bash
 python --version
 ```
-Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet support Python 3.10.
+Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 <div class="termy">
 
@@ -68,7 +68,7 @@ Use the following command to check that you have a supported Python version inst
 ```bash
 python --version
 ```
-Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet support Python 3.10.
+Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 Pip is a package installer that comes automatically with Python 3+. [pipx](https://pypa.github.io/pipx/) is a wrapper around pip which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
 
