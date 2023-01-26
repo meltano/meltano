@@ -208,3 +208,51 @@ If this is the case for a tap, ensure `properties` is set as a [capability](/con
 Then `meltano elt` will accept the catalog file and will pass it to the tap using the appropriate flag.
 
 For more information, please refer to the [plugin capabilities reference](/reference/plugin-definition-syntax#capabilities).
+
+
+### How do I configure a specific pipeline differently?
+
+If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano run`](/reference/command-line-interface#run) execution environment using [environment variables](/guide/configuration#configuring-settings).
+
+This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time, as an alternative to creating [multiple configurations](/guide/configuration#multiple-plugin-configurations) using [plugin inheritance](/concepts/plugins#plugin-inheritance).
+
+On a shell, you can explicitly `export` environment variables, that will be passed along to every following command invocation, or you can specify them in-line with a specific invocation, ahead of the command:
+
+```bash
+export TAP_FOO_BAR=bar
+export TAP_FOO_BAZ=baz
+meltano run ...
+
+TAP_FOO_BAR=bar TAP_FOO_BAZ=baz meltano run ...
+```
+
+To verify that these environment variables will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running `meltano run`.
+
+If you're using [`meltano schedule`](/reference/command-line-interface#schedule) to [schedule your pipelines](/guide/orchestration), you can specify environment variables for each pipeline in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), where each entry in the `schedules` array can have an `env` dictionary:
+
+```yaml{7-9}
+schedules:
+- name: foo-to-bar
+  extractor: tap-foo
+  loader: target-bar
+  transform: skip
+  interval: '@hourly'
+  env:
+    TAP_FOO_BAR: bar
+    TAP_FOO_BAZ: baz
+```
+
+Different runners and execution/orchestration platforms will have their own way of specifying environment variables along with a command invocation.
+
+Airflow's [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html), for example, supports an `env` parameter:
+
+```python
+BashOperator(
+    # ...
+    bash_command="meltano run ...",
+    env={
+        "TAP_FOO_BAR": "bar",
+        "TAP_FOO_BAZ": "baz",
+    },
+)
+```

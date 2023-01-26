@@ -26,52 +26,6 @@ You can use [`meltano config <plugin> list`](/reference/command-line-interface#c
 
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
 
-### Pipeline-specific configuration
-
-If you'd like to specify (or override) the values of certain settings at runtime, on a per-pipeline basis, you can set them in the [`meltano run`](/reference/command-line-interface#run) execution environment using [environment variables](/guide/configuration#configuring-settings).
-
-This lets you use the same extractors and loaders (Singer taps and targets) in multiple pipelines, configured differently each time, as an alternative to creating [multiple configurations](/guide/configuration#multiple-plugin-configurations) using [plugin inheritance](/concepts/plugins#plugin-inheritance).
-
-On a shell, you can explicitly `export` environment variables, that will be passed along to every following command invocation, or you can specify them in-line with a specific invocation, ahead of the command:
-
-```bash
-export TAP_FOO_BAR=bar
-export TAP_FOO_BAZ=baz
-meltano run ...
-
-TAP_FOO_BAR=bar TAP_FOO_BAZ=baz meltano run ...
-```
-
-To verify that these environment variables will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running `meltano run`.
-
-If you're using [`meltano schedule`](/reference/command-line-interface#schedule) to [schedule your pipelines](/guide/orchestration), you can specify environment variables for each pipeline in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), where each entry in the `schedules` array can have an `env` dictionary:
-
-```yaml{7-9}
-schedules:
-- name: foo-to-bar
-  extractor: tap-foo
-  loader: target-bar
-  transform: skip
-  interval: '@hourly'
-  env:
-    TAP_FOO_BAR: bar
-    TAP_FOO_BAZ: baz
-```
-
-Different runners and execution/orchestration platforms will have their own way of specifying environment variables along with a command invocation.
-
-Airflow's [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html), for example, supports an `env` parameter:
-
-```python
-BashOperator(
-    # ...
-    bash_command="meltano run ...",
-    env={
-        "TAP_FOO_BAR": "bar",
-        "TAP_FOO_BAZ": "baz",
-    },
-)
-```
 #### Extractor variables
 
 In addition to [variables available to all plugins](/guide/configuration#available-environment-variables), the following variables describing the [extractor](/concepts/plugins#extractors) are available to loaders _and_ transformers:
@@ -215,8 +169,6 @@ Partial state records can also be inserted manually via [`meltano state merge'](
 
 Unlike [`meltano state merge`](/reference/command-line-interface#state),[`meltano state set`](/reference/command-line-interface#state) will insert a complete record, which causes meltano to ignore any previous state records, whether completed or partial.
 
-Note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano run`](/reference/command-line-interface#run)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
-
 <div class="notification is-info">
   <p><strong>Not seeing state picked up after a failed run?</strong></p>
   <p>Some loaders only emit state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.</p>
@@ -244,17 +196,3 @@ meltano invoke <plugin> [PLUGIN_ARGS...]
 ```
 
 This command can also be run in debug mode for additional information.
-
-### Testing Specific Failing Streams
-
-When extracting several streams with a single tap, it may be challenging to debug a single failing stream.
-In this case, it can be useful to run the tap with just the single stream selected.
-
-Instead of duplicating the extractor in `meltano.yml`, try running `meltano run` with the [`--select` flag](/reference/command-line-interface#parameters-2).
-This will run the pipeline with just that stream selected.
-
-You can also have `meltano invoke` select an individual stream by setting the [`select_filter` extra](/concepts/plugins#select-filter-extra) as an environment variable:
-
-```bash
-export <TAP_NAME>__SELECT_FILTER='["<your_stream>"]'
-```
