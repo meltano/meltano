@@ -32,7 +32,7 @@ export default {
     display: block;
     margin-bottom: 0.5rem;
 
-    @media screen and (min-width: $tablet) {
+    @media screen and (min-width: 1200px) {
       display: inline-block;
       margin-bottom: 0;
       margin-right: 0.75rem;
