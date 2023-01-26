@@ -43,7 +43,7 @@ body {
   justify-content: center;
 }
 
-@media (min-width: 1023px) {
+@media (min-width: 1200px) {
   .navbar a {
     color: #ffffff;
   }
