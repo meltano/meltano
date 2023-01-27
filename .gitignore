@@ -146,10 +146,10 @@ meltano.log.*
 src/webapp/dist/
 
 # packaged webapp
-src/meltano/api/templates/webapp.html
-src/meltano/api/templates/embed.html
-src/meltano/api/static/css
-src/meltano/api/static/js
+src/meltano/meltano/api/templates/webapp.html
+src/meltano/meltano/api/templates/embed.html
+src/meltano/meltano/api/static/css
+src/meltano/meltano/api/static/js
 
 # sqlite
 *.db
@@ -162,5 +162,5 @@ setup.py
 **/.meltano/**
 !docs/example-library/meltano-migrations/.meltano/meltano.db
 
-# Schemas copied into `src/meltano` by the build process
-src/meltano/schema/*
+# Schemas copied into `src/meltano/meltano` by the build process
+src/meltano/meltano/schema/*

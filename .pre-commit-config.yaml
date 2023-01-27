@@ -12,9 +12,7 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        # The `bumpversion` command fails to commit its own changes to
-        # `.bumpversion.cfg` because it leaves some trailing whitespace.
-        exclude: (^\.bumpversion\.cfg$|cli_messages\.py)
+        exclude: (cli_messages\.py)
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
@@ -41,7 +39,7 @@ repos:
           - "schema/meltano.schema.json"
       - id: check-jsonschema
         name: Validate 'discovery.yml' with jsonschema
-        files: ^src/meltano/core/bundle/discovery.yml$
+        files: ^src/meltano/meltano/core/bundle/discovery.yml$
         args:
           - "--schemafile"
           - "schema/discovery.schema.json"
@@ -68,7 +66,7 @@ repos:
     rev: 22.12.0
     hooks:
       - id: black
-        exclude: ^(src/meltano/migrations/)
+        exclude: ^(src/meltano/meltano/migrations/)
 
   - repo: https://github.com/pycqa/isort
     rev: 5.11.4
@@ -88,7 +86,7 @@ repos:
     rev: 3.2.1
     hooks:
       - id: flakeheaven
-        exclude: ^(src/meltano/migrations/)
+        exclude: ^(src/meltano/meltano/migrations/)
         additional_dependencies:
           - flake8==4.0.1
           - flake8-bandit==3.0.0

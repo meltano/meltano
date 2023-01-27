@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf node_modules public",
-    "discovery.yml": "cp ../src/meltano/core/bundle/discovery.yml ./src/.vuepress/public",
+    "discovery.yml": "cp ../src/meltano/meltano/core/bundle/discovery.yml ./src/.vuepress/public",
     "dev": "vuepress dev src",
     "build": "vuepress build src",
     "dev:docs": "npm run discovery.yml && npm run dev",

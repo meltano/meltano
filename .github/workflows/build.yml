@@ -56,7 +56,7 @@ jobs:
     - name: Release Marker
       if: ${{ github.event.release }}
       # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
-      run: touch src/meltano/core/tracking/.release_marker
+      run: touch src/meltano/meltano/core/tracking/.release_marker
 
     - name: Build distribution
       run: |

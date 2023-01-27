@@ -1,136 +1,16 @@
-[tool.poetry]
-name = "meltano"
+# This top-level `pyproject.toml` file is not for any one Python package. It
+# contains configs for tools which apply to the entire repository.
+
+[tool.commitizen]
+name = "cz_version_bump"
+tag_format = "v$major.$minor.$patch$prerelease"
 version = "2.14.0"
-description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
-authors = ["Meltano <hello@meltano.com>"]
-license = "MIT"
-readme = "README.md"
-repository = "https://github.com/meltano/meltano"
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
+version_files = [
+  "src/meltano/pyproject.toml:^version =",
+  "src/meltano/meltano/__init__.py:^__version__ =",
+  'src/webapp/package.json:^  "version":',
+  'docs/package.json:^  "version":',
 ]
-packages = [
-  { include = "meltano", from = "src", format = "wheel" },
-  { include = "src", format = "sdist" },
-  { include = "tests", format = "sdist"},
-  { include = "scripts/build.py", format = "sdist"},
-]
-# Explicitly include non-Python files and gitignored files:
-include = [
-  "LICENSE",
-  "src/meltano/api/static/css/*",
-  "src/meltano/api/static/js/*",
-  "src/meltano/api/templates/embed.html",
-  "src/meltano/api/templates/webapp.html",
-  "src/meltano/core/tracking/.release_marker",
-  "src/meltano/schema/*",
-]
-keywords = [
-  "Meltano",
-  "ELT",
-  "Data integration",
-  "singer-io",
-  "dbt",
-]
-documentation = "https://docs.meltano.com"
-homepage = "https://meltano.com"
-
-[tool.poetry.urls]
-"Changelog" = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
-"Issue Tracker" = "https://github.com/meltano/meltano/issues"
-"Slack" = "https://meltano.com/slack"
-"Twitter" = "https://twitter.com/meltanodata/"
-"Youtube" = "https://www.youtube.com/meltano"
-
-[tool.poetry.dependencies]
-aiodocker = "^0.21.0"
-aiohttp = "^3.4.4"
-alembic = "^1.5.0"
-atomicwrites = "^1.2.1"
-authlib = "^1.0.1"
-azure-common = {version = "^1.1.28", optional = true}
-azure-core = {version = "^1.26.0", optional = true}
-azure-storage-blob = {version = "^12.14.1", optional = true}
-backoff = "^2.1.2"
-bcrypt = "^3.2.0" # Needs to be installed explicitly so it can be used as a backend for passlib
-boto3 = {version = "^1.25.3", optional = true}
-cached-property = "^1" # Remove after Python 3.7 support is dropped
-click = "^8.1"
-click-default-group = "^1.2.1"
-croniter = "^1.3.5"
-email-validator = "^1.1.2"
-fasteners = "^0.17.3"
-flask = "^2.1"
-flask-cors = "^3.0.7"
-flask-executor = "^0.10"
-flask-login = "==0.6.1" # https://github.com/meltano/meltano/issues/6548
-flask-restful = "^0.3.7"
-flask-sqlalchemy = "^2.4.4"
-flatten-dict = "^0"
-google-cloud-storage = {version = ">=1.31.0", optional = true}
-gunicorn = "^20.1.0"
-importlib-resources = {version = "^5.10.1", optional = true, python = "<3.9"}
-jsonschema = "^4.9"
-meltano-flask-security = "^0.1.0"
-packaging = "^21.3"
-psutil = "^5.6.3"
-psycopg2-binary = "^2.8.5"
-pyhumps = "^3.0.0"
-pymssql = {version = "^2.2.5", optional = true}
-python = ">=3.7,<3.12"
-python-dotenv = "^0.20.0"
-python-gitlab = "^3.5.0"
-pyyaml = "^6.0.0"
-requests = "^2.23.0"
-rich = "^12.5.1"
-"ruamel.yaml" = "^0.17.21"
-smart-open = {version = "^6.2.0"}
-smtpapi = "^0.4.1"
-snowplow-tracker = "^0.10.0"
-sqlalchemy = "^1.3.19"
-structlog = "^21.2.0"
-tzlocal = "^4.2.0"
-uvicorn = {extras = ["standard"], version = "^0.17.6"}
-virtualenv = "^20.17.1"
-werkzeug = ">=2.1,<=2.1.3"
-
-[tool.poetry.extras]
-azure = ["azure-storage-blob", "azure-common", "azure-core"]
-gcs = ["google-cloud-storage"]
-infra = ["ansible"]
-mssql = ["pymssql"]
-repl = ["ipython"]
-s3 = ["boto3"]
-
-[tool.poetry.dev-dependencies]
-black = "^22.3.0"
-bumpversion = "^0.6.0"
-changelog-cli = "^0.6.2"
-colorama = "^0.4.4"
-commitizen-version-bump = {git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main"}
-coverage = {extras = ["toml"], version = "^6.4.1"}
-freezegun = "^0.3.12"
-mock = "^4.0.3"
-mypy = "^0.960"
-pre-commit = "^2.9.2"
-pytest = "^7.1.2"
-pytest-asyncio = "^0.18.3"
-pytest-cov = "^3.0.0"
-pytest-docker = "^1.0"
-pytest-order = "^1.0"
-pytest-randomly = "^3.12"
-pytest-xdist = "^2.5"
-requests-mock = "^1.6.0"
-setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
-tox = "^3.24.4"
-types-croniter = "^1.3.2"
-types-psutil = "^5.9.5.5"
-types-requests = "^2.28.9"
-
-[tool.poetry.scripts]
-meltano = "meltano.cli:main"
 
 [tool.isort]
 add_imports = [
@@ -145,29 +25,20 @@ skip_glob = [
   "*.md",
   "*.vue",
   "*.js",
-  "src/meltano/migrations/versions/*",
+  "src/meltano/meltano/migrations/versions/*",
 ]
 src_paths = [
-  "src/",
-  "tests/",
+  "src/meltano/meltano/",
+  "src/meltano/tests/",
 ]
 use_parentheses = true
 
 [tool.flakeheaven]
 accept_encodings = "utf-8"
-baseline = "flakeheaven-baseline"
+# baseline = "flakeheaven-baseline"
 docstring_style = "google"
 doctests = true
 enable_extensions = "G"
-exclude = [
-  ".nox/",
-  ".venv",
-  "venv",
-  "*.md",
-  ".tox",
-  "src/webapp/node_modules/",
-  "src/meltano/migrations/",
-]
 format = "colored"
 inline_quotes = "double"
 max_complexity = 6
@@ -263,7 +134,7 @@ pyflakes = [
   "-WPS615", # Allow "unpythonic" getters and setters
 ]
 
-[tool.flakeheaven.exceptions."tests/*"]
+[tool.flakeheaven.exceptions."src/meltano/tests/*"]
 "flake8-bandit" = [
   "-S101", # Don't warn on use of asserts in tests
 ]
@@ -307,17 +178,17 @@ pyflakes = [
   "-WPS342", # Avoid false positive for implicit raw strings
 ]
 
-[tool.flakeheaven.exceptions."!tests/*"]
+[tool.flakeheaven.exceptions."src/meltano/!tests/*"]
 "flake8-debugger" = [
   "-T100",
 ]
 
-[tool.flakeheaven.exceptions."scripts/*"]
+[tool.flakeheaven.exceptions."src/meltano/scripts/*"]
 "wemake-python-styleguide" = [
   "-WPS421", # Allow for print function calls
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/cli/*"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/cli/*"]
 "flake8-docstrings" = [
   "-D301", # Allow backslashes in dosctrings
 ]
@@ -333,7 +204,7 @@ pyflakes = [
   "-WPS204", # Allow 'overuse' of expressions (e.g. ctx.obj["-settings"])
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/migrations/versions/*"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/migrations/versions/*"]
 "flake8-docstrings" = [
   "-D101", # Don't class docstrings in migrations
   "-D103", # Don't require function docstrings in migrations
@@ -350,29 +221,29 @@ pyflakes = [
   "-WPS432", # Allow "-magic" numbers
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/job/job.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/job/job.py"]
 "wemake-python-styleguide" = [
   "-WPS601", # Class attributes can be used as instance attributes in sqlalchemy.declarative model
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/project_files.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/project_files.py"]
 "wemake-python-styleguide" = [
   "-WPS226", # Dict manipulation requires lots of string constant references
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/project_init_service.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/project_init_service.py"]
 "wemake-python-styleguide" = [
   "-WPS226", # Found string constant over-use: blue > 3
   "-WPS229", # Found too long ``try`` body length: 3 > 1
   "-WPS213", # Found too many expressions: 27 > 9
 ]
 
-[tool.flakeheaven.exceptions."src/**/__init__.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/**/__init__.py"]
 pyflakes = [
   "-F401", # Allow for using __init__.py to promote imports to the module namespace
 ]
 
-[tool.flakeheaven.exceptions."tests/**/__init__.py"]
+[tool.flakeheaven.exceptions."src/meltano/tests/**/__init__.py"]
 pyflakes = [
   "-F401", # Allow for using __init__.py to promote imports to the module namespace
 ]
@@ -390,23 +261,23 @@ pyflakes = [
   "-D104",
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/__init__.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/__init__.py"]
 "wemake-python-styleguide" = [
   "-WPS412", # Found `__init__.py` module with logic
   "-WPS410", # Found wrong metadata variable
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/block/extract_load.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/block/extract_load.py"]
 "wemake-python-styleguide" = [
   "-WPS201", # Found module with too many imports: 21 > 20
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/logging/utils.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/logging/utils.py"]
 "wemake-python-styleguide" = [
   "-WPS100", # Found wrong module name
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/cli_messages.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/cli_messages.py"]
 # Special exceptions for cli magic
 "wemake-python-styleguide" = [
   "-WPS114",
@@ -417,152 +288,22 @@ pycodestyle = [
   "-W293",
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/settings_store.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/settings_store.py"]
 "wemake-python-styleguide" = [
   "-WPS204", # Found overused expression: allow settings store implementations to all return vars with the same names
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/utils/__init__.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/utils/__init__.py"]
 "flake8-docstrings" = [
   "-D103", # Many of these utility functions are descriptively named and self-documenting
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/state_store/*"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/state_store/*"]
 "wemake-python-styleguide" = [
   "-WPS428", # Ignore ... in ABC
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/core/state_store/__init__.py"]
+[tool.flakeheaven.exceptions."src/meltano/meltano/core/state_store/__init__.py"]
 "wemake-python-styleguide" = [
   "-WPS320", # Ignore multi-line function annotations
 ]
-
-[tool.pytest.ini_options]
-addopts = "--cov=meltano --cov=tests --doctest-modules --order-scope=module -ra -n auto --dist=loadfile"
-asyncio_mode = "auto"
-log_cli = 1
-log_cli_format = "%(message)s"
-log_cli_level = "CRITICAL"
-log_file = "pytest.log"
-log_file_date_format = "%Y-%m-%d %H:%M:%S"
-log_file_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
-log_file_level = "DEBUG"
-markers = [
-  "backend(type): backend specific test",
-  "meta: meta test",
-  "concurrent: test requires true concurrency",
-  "slow: slow test",
-]
-testpaths = "tests"
-
-[tool.coverage.run]
-branch = true
-concurrency = [
-  "multiprocessing",
-  "thread",
-]
-parallel = true
-source = ["meltano"]
-
-[tool.coverage.paths]
-source = [
-  "src/meltano",
-  "**/site-packages/meltano",
-  "**/site-packages/meltano*/meltano",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-  "pragma: no cover",
-  "if TYPE_CHECKING:",
-  "\\.\\.\\.",
-]
-precision = 2
-show_missing = true
-skip_covered = true
-
-[tool.commitizen]
-name = "cz_version_bump"
-tag_format = "v$major.$minor.$patch$prerelease"
-version = "2.14.0"
-version_files = [
-  "pyproject.toml:^version =",
-  "src/meltano/__init__.py:^__version__ =",
-  'package.json:^  "version":',
-  'src/webapp/package.json:^  "version":',
-  'docs/package.json:^  "version":',
-]
-
-[tool.mypy]
-files = "src"
-plugins = [
-  "sqlalchemy.ext.mypy.plugin",
-]
-
-# The following whitelist is used to allow for incremental adoption
-# of MyPy. Modules should be removed from this whitelist as and when
-# their respective type errors have been addressed. No new modules
-# should be added to this whitelist.
-[[tool.mypy.overrides]]
-ignore_errors = true
-module = [
-  "meltano.api.*",
-  "meltano.cli.*",
-  "meltano.oauth.*",
-  # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
-  "meltano.core.cli_messages",
-  "meltano.core.config_service",
-  "meltano.core.connection_service",
-  "meltano.core.db",
-  "meltano.core.discovery_file",
-  "meltano.core.elt_context",
-  "meltano.core.environment_service",
-  "meltano.core.extract_utils",
-  "meltano.core.extractor",
-  "meltano.core.meltano_file",
-  "meltano.core.meltano_invoker",
-  "meltano.core.migration_service",
-  "meltano.core.models",
-  "meltano.core.plugin_discovery_service",
-  "meltano.core.plugin_install_service",
-  "meltano.core.plugin_invoker",
-  "meltano.core.plugin_location_remove",
-  "meltano.core.plugin_lock_service",
-  "meltano.core.plugin_test_service",
-  "meltano.core.project",
-  "meltano.core.project_add_service",
-  "meltano.core.project_files",
-  "meltano.core.project_init_service",
-  "meltano.core.project_plugins_service",
-  "meltano.core.project_settings_service",
-  "meltano.core.select_service",
-  "meltano.core.setting",
-  "meltano.core.setting_definition",
-  "meltano.core.settings_service",
-  "meltano.core.settings_store",
-  "meltano.core.sqlalchemy",
-  "meltano.core.task_sets",
-  "meltano.core.task_sets_service",
-  "meltano.core.transform_add_service",
-  "meltano.core.venv_service",
-  "meltano.core.yaml",
-  # Meltano Core submodules
-  "meltano.core.behavior.*",
-  "meltano.core.block.*",
-  "meltano.core.bundle.*",
-  "meltano.core.compiler.*",
-  "meltano.core.job.*",
-  "meltano.core.legacy_tracking.*",
-  "meltano.core.logging.*",
-  "meltano.core.m5o.*",
-  "meltano.core.plugin.*",
-  "meltano.core.runner.*",
-  "meltano.core.sql.*",
-  "meltano.core.tracking.*",
-  "meltano.core.utils.*",
-]
-
-[build-system]
-requires = ["poetry-core==1.4.0"]
-build-backend = "build:api"
-backend-path = ["scripts"]

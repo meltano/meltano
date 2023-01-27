@@ -22,7 +22,7 @@ except ImportError:
 package = "meltano"
 python_versions = ["3.11", "3.10", "3.9", "3.8", "3.7"]
 main_python_version = "3.9"
-locations = "src", "tests", "noxfile.py"
+locations = "src", "noxfile.py"
 
 
 @nox_session(python=python_versions)
@@ -32,6 +32,8 @@ def tests(session: Session) -> None:
     Args:
         session: Nox session.
     """
+    session.cd("src/meltano")
+
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
 
     if backend_db == "mssql":
@@ -41,17 +43,19 @@ def tests(session: Session) -> None:
         session.install(".[azure,gcs,s3]")
 
     session.install(
-        "colorama",  # colored output in Windows
-        "freezegun",
-        "mock",
-        "pytest",
-        "pytest-asyncio",
-        "pytest-cov",
-        "pytest-docker",
-        "pytest-order",
-        "pytest-randomly",
-        "pytest-xdist",
-        "requests-mock",
+        "colorama==0.4.6",  # colored output in Windows
+        "freezegun==1.2.2",
+        "mock==5.0.1",
+        "pytest==7.2.1",
+        "pytest-asyncio==0.20.3",
+        "pytest-cov==4.0.0",
+        "pytest-docker==1.0.1",
+        "pytest-order==1.0.1",
+        "pytest-randomly==3.12.0",
+        "pytest-xdist==3.1.0",
+        "requests-mock==1.10.0",
+        # Used by pytest-xdist to aid with handling resource intensive processes.
+        "setproctitle==1.3.2",
     )
 
     try:
@@ -73,9 +77,13 @@ def coverage(session: Session) -> None:
     Args:
         session: Nox session.
     """
+    session.cd("src/meltano")
+
     args = session.posargs or ["report"]
 
-    session.install("coverage[toml]")
+    session.install(
+        "coverage[toml]==7.1.0",
+    )
 
     if not session.posargs and any(Path().glob(".coverage.*")):
         session.run("coverage", "combine")
@@ -90,15 +98,21 @@ def mypy(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    args = session.posargs or ["src/meltano", "--exclude", "src/meltano/migrations/"]
+    session.cd("src/meltano")
+
+    args = session.posargs or [
+        "src/meltano/meltano",
+        "--exclude",
+        "src/meltano/meltano/migrations/",
+    ]
 
     session.install(".")
     session.install(
-        "mypy",
-        "sqlalchemy2-stubs",
-        "types-croniter",
-        "types-psutil",
-        "types-requests",
-        "boto3-stubs[essential]",
+        "boto3-stubs[essential]==1.26.58",
+        "mypy==0.960",
+        "sqlalchemy2-stubs==0.0.2a32",
+        "types-croniter==1.3.2",
+        "types-psutil==5.9.5.5",
+        "types-requests==2.28.9",
     )
     session.run("mypy", *args)
