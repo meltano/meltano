@@ -79,7 +79,7 @@ psutil = "^5.6.3"
 psycopg2-binary = "^2.8.5"
 pyhumps = "^3.0.0"
 pymssql = {version = "^2.2.5", optional = true}
-python = ">=3.7,<3.11"
+python = ">=3.7,<3.12"
 python-dotenv = "^0.20.0"
 python-gitlab = "^3.5.0"
 pyyaml = "^6.0.0"
