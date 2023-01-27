@@ -816,33 +816,34 @@ To help you achieve this, Meltano supports scheduled pipelines that can be orche
 
 _To learn more about orchestration, refer to the [Orchestration guide](/guide/orchestration)._
 
+
+1. Create a job to be scheduled by using [`meltano job`](/reference/command-line-interface#job):
+
+```bash
+meltano job add tap-gitlab-to-target-postgres --tasks "tap-gitlab target-postgres"
+```
+
+
 1. Schedule a new pipeline to be invoked on an interval using [`meltano schedule`](/reference/command-line-interface#schedule):
 
 ```bash
-meltano schedule add <pipeline name> --extractor <extractor> --loader <loader> --interval <interval>
+meltano schedule add gitlab-schedule --job tap-gitlab-to-target-postgres --interval "@daily"
 
-# For example:
-meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-postgres --interval @daily
 ```
 
-The `pipeline name` argument corresponds to the `--state-id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
-
-To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
-
-This will add the new schedule to your [`meltano.yml` project file](/concepts/project#schedules):
+This will add the new job & schedule to your [`meltano.yml` project file](/concepts/project#schedules):
 
 ```yml
-schedules:
-  - name: gitlab-to-postgres
-    extractor: tap-gitlab
-    loader: target-postgres
-    transform: skip
-    interval: "@daily"
-```
+jobs:
+  - name: tap-gitlab-to-target-postgres
+    tasks:
+      - tap-gitlab target-postgres
 
-<div class="notification is-info">
-  <p>The <code>name</code> setting in schedules acts as the <code>state_id</code> so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. <code>gitlab-to-postgres</code> or <code>gitlab-to-postgres-prod</code> if you have multiple environemnts).</p>
-</div>
+schedules:
+  - name: gitlab-schedule
+    interval: '@daily'
+    job: tap-gitlab-to-target-postgres
+```
 
 1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/reference/command-line-interface#schedule):
 
