@@ -181,7 +181,7 @@ Unlike [`meltano state merge`](/reference/command-line-interface#state),[`meltan
 If you're running into some trouble running a pipeline, the first recommendation is to run the same command in [debug mode](/reference/command-line-interface#debugging) so more information is shared on the command line.
 
 ```bash
-meltano --log-level=debug elt ...
+meltano --log-level=debug run ...
 ```
 
 The output from debug mode will often be the first thing requested if you're asking for help via the <SlackChannelLink>Meltano Slack group</SlackChannelLink>.
