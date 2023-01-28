@@ -97,6 +97,7 @@ jobs:
 
     - name: Configure Poetry
       run: |
+        cd src/meltano
         poetry env use "${{ matrix.python-version }}"
         poetry debug info
 
@@ -250,19 +251,21 @@ jobs:
       with:
         name: coverage-data
 
-    - name: Install Dependencies
+    - name: Install Nox
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
-        poetry env use "3.9"
-        poetry install
+        pipx install nox
+        pipx inject nox nox-poetry
 
     - name: Combine coverage data and display human readable report
       run: |
-        poetry run coverage combine
-        poetry run coverage report --show-missing --ignore-errors
+        nox -rs coverage -- combine
+        nox -rs coverage -- report --show-missing --ignore-errors
 
     - name: Create coverage report
       run: |
-        poetry run coverage xml --ignore-errors
+        nox -rs coverage -- xml --ignore-errors
 
     - name: Upload coverage report
       uses: codecov/codecov-action@v3.1.1
@@ -277,10 +280,10 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.3.0
 
-    - name: Setup Python 3.9
+    - name: Setup Python 3.10
       uses: actions/setup-python@v4.5.0
       with:
-        python-version: '3.9'
+        python-version: '3.10'
         architecture: x64
         cache: 'pip'
         cache-dependency-path: 'src/meltano/poetry.lock'
