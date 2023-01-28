@@ -79,7 +79,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         architecture: x64
         cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+        cache-dependency-path: 'src/meltano/poetry.lock'
 
     - name: Install Poetry
       env:
@@ -283,7 +283,7 @@ jobs:
         python-version: '3.9'
         architecture: x64
         cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+        cache-dependency-path: 'src/meltano/poetry.lock'
 
     - name: Install Poetry
       env:
