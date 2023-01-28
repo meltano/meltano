@@ -35,10 +35,16 @@ use_parentheses = true
 
 [tool.flakeheaven]
 accept_encodings = "utf-8"
-# baseline = "flakeheaven-baseline"
+baseline = "flakeheaven-baseline"
 docstring_style = "google"
 doctests = true
 enable_extensions = "G"
+exclude = [
+  ".nox/",
+  "src/meltano/.nox/",
+  "docs/",
+  "src/meltano/webapp/",
+]
 format = "colored"
 inline_quotes = "double"
 max_complexity = 6
@@ -51,20 +57,20 @@ statistics = true
 "flake8-*" = [
   "+*",
 ]
-"flake8-commas" = [
-  "-*",
-]
 "flake8-bandit" = [
   "+*",
   "-S404", # Allow subprocess module to be used
   "-S310", # Allow `urllib.open`
   "-S603", # Allow `subprocess.run(..., shell=False)`
 ]
-"flake8-string-format" = [
-  "-P101", # Allow format strings with unindex parameters (because the pyupgrade pre-commit hook enforces their usage)
+"flake8-commas" = [
+  "-*",
 ]
 "flake8-rst-docstrings" = [
   "-*",
+]
+"flake8-string-format" = [
+  "-P101", # Allow format strings with unindex parameters (because the pyupgrade pre-commit hook enforces their usage)
 ]
 mccabe = [
   "+*",
@@ -189,11 +195,11 @@ pyflakes = [
 ]
 
 [tool.flakeheaven.exceptions."src/meltano/meltano/cli/*"]
-"flake8-docstrings" = [
-  "-D301", # Allow backslashes in dosctrings
-]
 "flake8-darglint" = [
   "-*", # Don't require docstrings in click commands
+]
+"flake8-docstrings" = [
+  "-D301", # Allow backslashes in dosctrings
 ]
 "wemake-python-styleguide" = [
   "-WPS210", # Allow many local variables, since these aid in string building
@@ -279,13 +285,13 @@ pyflakes = [
 
 [tool.flakeheaven.exceptions."src/meltano/meltano/core/cli_messages.py"]
 # Special exceptions for cli magic
-"wemake-python-styleguide" = [
-  "-WPS114",
-  "-WPS360",
-]
 pycodestyle = [
   "-W291",
   "-W293",
+]
+"wemake-python-styleguide" = [
+  "-WPS114",
+  "-WPS360",
 ]
 
 [tool.flakeheaven.exceptions."src/meltano/meltano/core/settings_store.py"]

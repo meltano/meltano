@@ -43,8 +43,8 @@ def build_webapp() -> None:
         return
 
     # Build static web app
-    subprocess.run(("yarn", "install", "--immutable"), cwd='webapp')
-    subprocess.run(("yarn", "build"), cwd='webapp')
+    subprocess.run(("yarn", "install", "--immutable"), cwd="webapp")
+    subprocess.run(("yarn", "build"), cwd="webapp")
 
 
 def include_webapp() -> None:
