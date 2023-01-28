@@ -26,7 +26,7 @@ branch_labels = None
 depends_on = None
 
 
-# from `src/core/job.py`
+# from `meltano/core/job.py`
 class State(Enum):
     IDLE = (0, ("RUNNING", "FAIL"))
     RUNNING = (1, ("SUCCESS", "FAIL"))

@@ -17,12 +17,6 @@ import shutil
 import subprocess
 from warnings import warn
 
-REPOSITORY_ROOT = subprocess.run(
-    ("git", "rev-parse", "--show-toplevel"),
-    text=True,
-    stdout=subprocess.PIPE,
-).stdout
-
 
 def build_webapp() -> None:
     """Build the Meltano UI webapp."""
@@ -55,30 +49,21 @@ def build_webapp() -> None:
 
 def include_webapp() -> None:
     """Copy the built webapp into the source tree."""
-    os.makedirs("src/api/templates", exist_ok=True)
+    os.makedirs("meltano/api/templates", exist_ok=True)
     shutil.copy(
         "webapp/dist/index.html",
-        "src/api/templates/webapp.html",
+        "meltano/api/templates/webapp.html",
     )
     shutil.copy(
         "webapp/dist/index-embed.html",
-        "src/api/templates/embed.html",
+        "meltano/api/templates/embed.html",
     )
     for dst in ("css", "js"):
-        shutil.rmtree(f"src/api/static/{dst}", ignore_errors=True)
+        shutil.rmtree(f"meltano/api/static/{dst}", ignore_errors=True)
         shutil.copytree(
             f"webapp/dist/static/{dst}",
-            f"src/api/static/{dst}",
+            f"meltano/api/static/{dst}",
         )
-
-
-def include_schemas() -> None:
-    """Copy Meltano schemas into the source tree."""
-    shutil.rmtree("src/schema/", ignore_errors=True)
-    shutil.copytree(f"{REPOSITORY_ROOT}/schema/", "src/schema/")
-    # TODO: Once Python 3.7 support is dropped, we should use
-    #       `shutil.copytree(..., dirs_exist_ok=True)` instead of deleting the
-    #       directory first.
 
 
 from poetry.core.masonry.builders.wheel import WheelBuilder  # noqa: E402
@@ -98,7 +83,6 @@ def custom_build_wheel(*args, **kwargs) -> str:
     """
     build_webapp()
     include_webapp()
-    include_schemas()
     return original_wheel_build(*args, **kwargs)
 
 

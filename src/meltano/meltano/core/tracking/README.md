@@ -7,7 +7,7 @@ See https://www.iglooanalytics.com/blog/understanding-snowplow-analytics-custom-
 To validate/lint a schema use [`iguctl`](https://github.com/snowplow-incubator/igluctl) rather than the Snowcat Cloud UI e.g.:
 
 ```bash
- $ $PATH_TO/igluctl lint ./src/core/tracking
+ $ $PATH_TO/igluctl lint ./meltano/core/tracking
 OK: com.meltano/cli_context/jsonschema/1-0-0
 OK: com.meltano/environment_context/jsonschema/1-0-0
 OK: com.meltano/plugins_context/jsonschema/1-0-0

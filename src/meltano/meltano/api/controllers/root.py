@@ -36,10 +36,7 @@ def redirect_to_login_if_auth_required(f):
 @root.route("/-/embed/", defaults={"token": ""})
 @root.route("/-/embed/<token>")
 def embed(token):
-    try:
-        return render_template("embed.html", jsContext=global_app_ctx.jsContext)
-    except TemplateNotFound:
-        return "Please run `make bundle` from src/webapp of the Meltano project."
+    return render_template("embed.html", jsContext=global_app_ctx.jsContext)
 
 
 # this route is a catch-all route to forward
@@ -49,10 +46,7 @@ def embed(token):
 @root.route("/<path:path>")
 @redirect_to_login_if_auth_required
 def default(path):
-    try:
-        return render_template("webapp.html", jsContext=global_app_ctx.jsContext)
-    except TemplateNotFound:
-        return "Please run `make bundle` from src/webapp of the Meltano project."
+    return render_template("webapp.html", jsContext=global_app_ctx.jsContext)
 
 
 @root.route("/bootstrap")

@@ -12,8 +12,7 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 packages = [
-  { include = "meltano", from = "src", format = "wheel" },
-  { include = "webapp", format = "sdist" },
+  { include = "meltano" },
   { include = "tests", format = "sdist"},
   { include = "scripts/build.py", format = "sdist"},
 ]
@@ -26,6 +25,7 @@ include = [
   "meltano/api/templates/webapp.html",
   "meltano/core/tracking/.release_marker",
   "meltano/schema/*",
+  "webapp/",
 ]
 keywords = [
   "Meltano",
@@ -136,7 +136,7 @@ source = ["meltano"]
 
 [tool.coverage.paths]
 source = [
-  "src",
+  "meltano",
   "**/site-packages/meltano",
   "**/site-packages/meltano*/meltano",
 ]
@@ -152,7 +152,7 @@ show_missing = true
 skip_covered = true
 
 [tool.mypy]
-files = "src"
+files = "meltano"
 plugins = [
   "sqlalchemy.ext.mypy.plugin",
 ]

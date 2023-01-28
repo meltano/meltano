@@ -47,7 +47,7 @@ jobs:
       with:
         node-version: '16'
         cache: 'yarn'
-        cache-dependency-path: src/webapp/yarn.lock
+        cache-dependency-path: src/meltano/webapp/yarn.lock
 
     - name: Freeze DB
       run: |
@@ -60,6 +60,7 @@ jobs:
 
     - name: Build distribution
       run: |
+        cd src/meltano
         poetry build --format sdist
         poetry run pip wheel --no-deps . --wheel-dir dist/
 
@@ -69,7 +70,7 @@ jobs:
       uses: actions/upload-artifact@v3.1.2
       with:
         name: python-artifacts
-        path: 'dist/*'
+        path: 'src/meltano/dist/*'
 
   pypi_release:
     name: Publish to PyPI

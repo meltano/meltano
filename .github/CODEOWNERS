@@ -19,7 +19,7 @@
 
 # Web App and API owners
 
-/src/webapp/ @pandemicsyn @rwfeather @cjohnhanson
+/src/meltano/webapp/ @pandemicsyn @rwfeather @cjohnhanson
 /src/meltano/meltano/api/ @pandemicsyn @rwfeather @cjohnhanson
 
 # Docs (General)
@@ -42,4 +42,4 @@
 /package.json @meltano/engineering
 /pyproject.toml @meltano/engineering
 /src/meltano/meltano/__init__.py @meltano/engineering
-/src/webapp/package.json @meltano/engineering
+/src/meltano/webapp/package.json @meltano/engineering

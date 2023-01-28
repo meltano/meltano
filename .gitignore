@@ -16,7 +16,7 @@ tmp_log.txt
 
 .DS_Store
 node_modules/
-/dist/
+src/meltano/dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -143,7 +143,7 @@ meltano.log.*
 *.m5oc
 
 # webapp builds
-src/webapp/dist/
+src/meltano/webapp/dist/
 
 # packaged webapp
 src/meltano/meltano/api/templates/webapp.html
@@ -164,3 +164,6 @@ setup.py
 
 # Schemas copied into `src/meltano/meltano` by the build process
 src/meltano/meltano/schema/*
+
+# Nox
+.nox

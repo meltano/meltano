@@ -7,4 +7,4 @@ services:
     ports:
       - "127.0.0.1::9090"
     volumes:
-      - ../../../src/core/tracking:/config
+      - ../../../meltano/core/tracking:/config

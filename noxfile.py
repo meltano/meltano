@@ -101,9 +101,9 @@ def mypy(session: Session) -> None:
     session.cd("src/meltano")
 
     args = session.posargs or [
-        "src/meltano/meltano",
+        "meltano/",
         "--exclude",
-        "src/meltano/meltano/migrations/",
+        "meltano/migrations/",
     ]
 
     session.install(".")
