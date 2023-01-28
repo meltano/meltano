@@ -26,6 +26,13 @@ repos:
       - id: check-toml
       - id: debug-statements
 
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.9.0
+    hooks:
+    - id: shellcheck
+      exclude: ^(integration/mdsh)$
+      args: ["--exclude=SC1090,SC1091"]
+
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.20.0
     hooks:
