@@ -727,7 +727,7 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         await subject.run_discovery(invoker, catalog_path)
-        await invoke_async.assert_called_with(
+        invoke_async.assert_called_with(
             "--discover", stdout=-1, stderr=-1, universal_newlines=False
         )
 
