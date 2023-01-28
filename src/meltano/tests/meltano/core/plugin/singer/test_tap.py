@@ -58,8 +58,8 @@ class TestSingerTap:
 
         assert not invoker.files["config"].exists()
 
-    @pytest.mark.asyncio
-    async def test_look_up_state(  # noqa: WPS213, WPS217
+    @pytest.mark.asyncio  # noqa: WPS213, WPS217, C901
+    async def test_look_up_state(
         self,
         subject,
         project,
@@ -338,7 +338,7 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "code"], "selected", True],
             )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio  # noqa: C901
     async def test_apply_catalog_rules(  # noqa: WPS213
         self, session, plugin_invoker_factory, subject, monkeypatch
     ):
@@ -727,7 +727,7 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         await subject.run_discovery(invoker, catalog_path)
-        assert await invoke_async.called_with(["--discover"])
+        await invoke_async.assert_called_with("--discover")
 
         with catalog_path.open("r") as catalog_file:
             resp = json.load(catalog_file)

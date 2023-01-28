@@ -6,7 +6,6 @@ from meltano.core.tracking import schemas
 
 schemas_dir = (
     Path(__file__).parents[4]
-    / "src"
     / "meltano"
     / "core"
     / "tracking"

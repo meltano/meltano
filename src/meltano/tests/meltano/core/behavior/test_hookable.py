@@ -60,7 +60,7 @@ class TestHookable:
             "after_test",
             "after_test_2",
         ]
-        assert process.called_once
+        process.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_trigger_hook_raise(self):
@@ -86,4 +86,4 @@ class TestHookable:
             "after_test",
             "after_test_2",
         ]
-        assert process.called_once
+        process.assert_called_once()
