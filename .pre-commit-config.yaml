@@ -49,14 +49,14 @@ repos:
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
-        entry: bash -c 'cd src/meltano/webapp && ARGS=("$@") && eslint --fix --config=.eslintrc.js "../../$0" "${ARGS[@]/#/../../}"'
+        entry: bash -c 'cd src/meltano/webapp && ARGS=("$@") && eslint --fix --config=.eslintrc.js "../../../$0" "${ARGS[@]/#/../../../}"'
         types: [file]
         require_serial: true
         additional_dependencies:
           - "@vue/eslint-config-prettier@7.0.0"
           - "@vue/babel-preset-app@5.0.8"
           - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.29.0" # Keep this in sync with the rev above!
+          - "eslint@8.32.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.5.0"
           - "eslint-plugin-prettier@4.2.1"
           - "eslint-plugin-vue@9.8.0"
@@ -86,7 +86,7 @@ repos:
     rev: 3.2.1
     hooks:
       - id: flakeheaven
-        exclude: ^(src/meltano/meltano/migrations/)
+        exclude: ^(src/meltano/meltano/migrations/|docs/)
         additional_dependencies:
           - flake8==4.0.1
           - flake8-bandit==3.0.0

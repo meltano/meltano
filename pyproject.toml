@@ -41,8 +41,8 @@ doctests = true
 enable_extensions = "G"
 exclude = [
   ".nox/",
-  "src/meltano/.nox/",
   "docs/",
+  "src/meltano/.nox/",
   "src/meltano/webapp/",
 ]
 format = "colored"
