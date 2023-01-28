@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source "$(git rev-parse --show-toplevel)/src/meltano/integration/commons.sh"
+source "$(git rev-parse --show-toplevel)/integration/commons.sh"
 cd "${TEST_DOCS_DIR}"
 meltano state list | grep "dev:tap-gitlab-to-target-jsonl"
 meltano state get dev:tap-gitlab-to-target-jsonl | grep "singer_state"

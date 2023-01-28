@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BASE_DIR=$(git rev-parse --show-toplevel)
-INTEGRATION_BASE_DIR="${BASE_DIR}/src/meltano/integration"
+INTEGRATION_BASE_DIR="${BASE_DIR}/integration"
 
 # What we'll "compile" the markdown to.
 TEST_SCRIPT_NAME="${TEST_NAME}.sh"
