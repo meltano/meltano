@@ -1,9 +1,23 @@
 name: Tests
 
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - src/**
+      - noxfile.py
+      - flakeheaven-baseline
+      - pyproject.toml
+      - .github/workflows/test.yml
+      - .github/workflows/constraints.txt
   push:
     branches: [main]
+    paths:
+      - src/**
+      - noxfile.py
+      - flakeheaven-baseline
+      - pyproject.toml
+      - .github/workflows/test.yml
+      - .github/workflows/constraints.txt
   workflow_dispatch:
     inputs: {}
 
