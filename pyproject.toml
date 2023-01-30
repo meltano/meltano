@@ -19,7 +19,6 @@ packages = [
 ]
 # Explicitly include non-Python files and gitignored files:
 include = [
-  "LICENSE",
   "src/meltano/api/static/css/*",
   "src/meltano/api/static/js/*",
   "src/meltano/api/templates/embed.html",
