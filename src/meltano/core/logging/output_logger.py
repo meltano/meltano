@@ -202,7 +202,7 @@ class Out:  # noqa: WPS230
         except ignored_errors:  # noqa: WPS329
             raise
         except Exception as err:
-            logger.error(str(err), exc_info=True)
+            logger.error(str(err))
             raise
         finally:
             logger.removeHandler(self.redirect_log_handler)
