@@ -15,6 +15,8 @@ from contextlib import (
 
 import structlog
 
+from meltano.core.runner import RunnerError
+
 from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from .utils import capture_subprocess_output
 
@@ -201,8 +203,11 @@ class Out:  # noqa: WPS230
             yield
         except ignored_errors:  # noqa: WPS329
             raise
-        except Exception as err:
+        except RunnerError as err:
             logger.error(str(err))
+            raise
+        except Exception as err:
+            logger.error(str(err), exc_info=True)
             raise
         finally:
             logger.removeHandler(self.redirect_log_handler)
