@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.15.0 (2023-01-30)
+
+### ✨ New
+
+- [#7210](https://github.com/meltano/meltano/issues/7210) Support Python 3.11
+- [#7198](https://github.com/meltano/meltano/issues/7198) Replace `venv` with `virtualenv`
+
+### 🐛 Fixes
+
+- [#7212](https://github.com/meltano/meltano/issues/7212) Do not log env vars passed to subprocesses
+- [#7203](https://github.com/meltano/meltano/issues/7203) "must be run inside a Meltano project" error
+
+### 📚 Documentation Improvements
+
+- [#7221](https://github.com/meltano/meltano/issues/7221) Ensure search button is always accessible from nav bar/menu
+- [#7216](https://github.com/meltano/meltano/issues/7216) Part 2 is no longer in large Getting Started tutorial
+- [#7204](https://github.com/meltano/meltano/issues/7204) Fix link to CLI reference in `upgrade` command help text
+
 ## v2.14.0 (2023-01-23)
 
 ### 🐛 Fixes
