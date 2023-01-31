@@ -80,6 +80,7 @@ jobs:
         architecture: x64
         # Nox uses pip, so we cache with pip
         cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
 
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql')
@@ -217,6 +218,7 @@ jobs:
         architecture: x64
         # Nox uses pip, so we cache with pip
         cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
 
     - name: Download coverage data
       uses: actions/download-artifact@v3.0.2
@@ -259,6 +261,7 @@ jobs:
         architecture: x64
         # Nox uses pip, so we cache with pip
         cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
 
     - name: Install Nox
       env:
