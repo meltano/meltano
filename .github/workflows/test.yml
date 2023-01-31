@@ -73,19 +73,13 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.3.0
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
-
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4.5.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
-        cache: 'poetry'
+        # Nox uses pip, so we cache with pip
+        cache: 'pip'
 
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql')
@@ -216,18 +210,13 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.3.0
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
-
     - name: Set up Python 3.10
       uses: actions/setup-python@v4.5.0
       with:
         python-version: '3.10'
-        cache: 'poetry'
+        architecture: x64
+        # Nox uses pip, so we cache with pip
+        cache: 'pip'
 
     - name: Download coverage data
       uses: actions/download-artifact@v3.0.2
@@ -263,19 +252,13 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.3.0
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
-
     - name: Setup Python 3.10
       uses: actions/setup-python@v4.5.0
       with:
         python-version: '3.10'
         architecture: x64
-        cache: 'poetry'
+        # Nox uses pip, so we cache with pip
+        cache: 'pip'
 
     - name: Install Nox
       env:
