@@ -73,6 +73,13 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.3.0
 
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install poetry
+        poetry --version
+
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4.5.0
       with:
@@ -211,6 +218,13 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3.3.0
 
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install poetry
+        poetry --version
+
     - name: Set up Python 3.10
       uses: actions/setup-python@v4.5.0
       with:
@@ -253,6 +267,13 @@ jobs:
     steps:
     - name: Check out the repository
       uses: actions/checkout@v3.3.0
+
+    - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+      run: |
+        pipx install poetry
+        poetry --version
 
     - name: Setup Python 3.10
       uses: actions/setup-python@v4.5.0
