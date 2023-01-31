@@ -8,6 +8,19 @@ ci:
   autoupdate_schedule: weekly
 
 repos:
+  - repo: local
+    hooks:
+      - id: check-poetry-lock
+        # `pre-commit autoupdate` will update to older Poetry versions, so we
+        # use a local hook to avoid that bug:
+        # https://github.com/meltano/meltano/pull/7238#issuecomment-1409434351
+        name: check that `poetry.lock` conforms to `pyproject.toml`
+        entry: poetry lock --check
+        language: python
+        pass_filenames: false
+        additional_dependencies:
+          - "poetry==1.3.2"
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
@@ -24,12 +37,6 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: debug-statements
-
-  - repo: https://github.com/python-poetry/poetry
-    rev: 1.3.2
-    hooks:
-      - id: poetry-lock
-        args: ["--check"]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.20.0
