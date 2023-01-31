@@ -39,7 +39,6 @@
 
 /CHANGELOG.md @meltano/engineering
 /docs/package.json @meltano/engineering
-/package.json @meltano/engineering
 /pyproject.toml @meltano/engineering
 /src/meltano/__init__.py @meltano/engineering
 /src/webapp/package.json @meltano/engineering
