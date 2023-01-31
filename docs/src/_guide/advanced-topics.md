@@ -28,9 +28,9 @@ Meltano has traditionally assigned a plugin type to each plugin based on their f
 These plugin types were/are used in the Meltano codebase to activate plugin type specific features (i.e. piping Singer taps and targets together, running dbt deps before each run, or compiling and removing the Airflow config.cfg configuration file to avoid storing sensitive credentials).
 This approach caused some challenges around getting new features implemented and accepted by the entire user base of Meltano because only one implementation was allowed:
 
-* extractor (e.g. tap-github)
-* loader (e.g. target-snowflake)
-* transformer (e.g. dbt-snowflake)
+* extractor (Singer Taps e.g. tap-github)
+* loader (Singer Targets e.g. target-snowflake)
+* transformer (dbt Adapters e.g. dbt-snowflake)
 * orchestrator (e.g. Airflow, Dagster)
 * utility (e.g. SqlFluff)
 
