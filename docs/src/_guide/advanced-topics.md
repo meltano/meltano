@@ -39,7 +39,7 @@ The new approach is to group all non-EL plugins under the `utility` plugin type,
 
 * extractor
 * loader
-* utility - now also including transformers and orchestrators
+* utility - now also including plugins previously called transformers and orchestrators
 
 As part of this new approach the logic for non-EL plugin specific features has been extracted out of the Meltano codebase and into a Meltano extension.
 This allows the community to iterate on plugin features more quickly without relying on merging features into the Meltano core repository.
