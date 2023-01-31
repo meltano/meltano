@@ -1,0 +1,32 @@
+version: "3"
+
+x-uffizzi:
+  ingress:
+    service: application
+    port: 7681
+
+services:
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=testdb
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
+  application:
+    image: "${APP_IMAGE}"
+    entrypoint: ["ttyd"]
+    command: ["zsh", "-c", "/project/uffizzi/entrypoint.sh"]
+    ports:
+    - "7681:7681"
+    deploy:
+      resources:
+        limits:
+          memory: 2000M
