@@ -1,9 +1,23 @@
 name: Integration Tests
 
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - src/**
+      - docs/example-library/**
+      - noxfile.py
+      - pyproject.toml
+      - .github/workflows/integration_tests.yml
+      - .github/workflows/resources/constraints.txt
   push:
     branches: [main]
+    paths:
+      - src/**
+      - docs/example-library/**
+      - noxfile.py
+      - pyproject.toml
+      - .github/workflows/integration_tests.yml
+      - .github/workflows/resources/constraints.txt
   workflow_dispatch:
     inputs: {}
 
@@ -37,10 +51,10 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Setup Python 3.8
+    - name: Setup Python 3.10
       uses: actions/setup-python@v4.5.0
       with:
-        python-version: 3.8
+        python-version: '3.10'
         architecture: x64
         cache: 'poetry'
 
@@ -53,7 +67,7 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        poetry env use "3.8"
+        poetry env use "3.10"
         poetry install --extras "s3"
 
     - name: Start Postgres Container
@@ -72,5 +86,5 @@ jobs:
 
     - name: Run integration tests
       run: |
-        poetry env use "3.8"
+        poetry env use "3.10"
         poetry run bash integration/validate.sh ${{ matrix.integration_test }}
