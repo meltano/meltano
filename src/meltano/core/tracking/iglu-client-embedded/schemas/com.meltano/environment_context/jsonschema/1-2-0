@@ -42,9 +42,6 @@
         "notable_flag_env_vars": {
             "description": "Select environment variable flags",
             "type": "object",
-            "propertyNames": {
-                "type": "string"
-            },
             "additionalProperties": {
                 "description": "Boolean values of select env vars, or null if the truth value of the env var could not be determined",
                 "type": [
