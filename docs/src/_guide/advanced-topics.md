@@ -16,7 +16,7 @@ Most of Meltano's features are available without installing any additional packa
 
 ## Extension Developer Kit (EDK)
 
-Meltano extensions are thin wrappers around applications that allow you to integrate existing data tools with Meltano.
+Meltano extensions are lightweight shims that allow you to integrate existing data tools with Meltano.
 Extensions allow the developer to add additional features like pre and post hooks to run before and after Meltano executes the wrapped application.
 The Meltano [Extension Developer Kit](https://github.com/meltano/edk) (EDK) was created to make it easier for developers to build Meltano extensions.
 The EDK also has functionality to allow the extension to initialize the scaffold of a project directory which was traditionally the job of files bundles, ultimately simplifying the work needed for developers.
