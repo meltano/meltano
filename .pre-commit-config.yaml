@@ -29,7 +29,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.20.0
+    rev: 0.21.0
     hooks:
       - id: check-metaschema
         files: ^schemas?/.*\.json$
@@ -47,7 +47,7 @@ repos:
           - "schema/discovery.schema.json"
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.32.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.33.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
@@ -58,7 +58,7 @@ repos:
           - "@vue/eslint-config-prettier@7.0.0"
           - "@vue/babel-preset-app@5.0.8"
           - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.29.0" # Keep this in sync with the rev above!
+          - "eslint@8.33.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.5.0"
           - "eslint-plugin-prettier@4.2.1"
           - "eslint-plugin-vue@9.8.0"
