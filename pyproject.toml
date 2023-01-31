@@ -568,6 +568,6 @@ module = [
 ]
 
 [build-system]
-requires = ["poetry-core==1.4.0"]
+requires = ["poetry-core==1.5.0"]
 build-backend = "build:api"
 backend-path = ["scripts"]
