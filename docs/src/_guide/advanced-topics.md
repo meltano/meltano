@@ -35,7 +35,7 @@ This approach caused some challenges around getting new features implemented and
 * utility (e.g. SqlFluff)
 
 
-The new approach is to group all non-EL plugins under the utility plugin type, leaving only the following plugin types:
+The new approach is to group all non-EL plugins under the `utility` plugin type, leaving only the following plugin types:
 
 * extractor
 * loader
