@@ -12,9 +12,7 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        # The `bumpversion` command fails to commit its own changes to
-        # `.bumpversion.cfg` because it leaves some trailing whitespace.
-        exclude: (^\.bumpversion\.cfg$|cli_messages\.py)
+        exclude: (cli_messages\.py)
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
@@ -45,6 +43,14 @@ repos:
         args:
           - "--schemafile"
           - "schema/discovery.schema.json"
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.9.0
+    hooks:
+    - id: shellcheck
+      name: shellcheck
+      exclude: ^(integration/mdsh)$
+      args: ["--exclude=SC1090,SC1091"]
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.33.0 # Keep this in sync with the eslint "additional_dependency" below!
