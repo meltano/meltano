@@ -42,6 +42,7 @@ repos:
     rev: 0.20.0
     hooks:
       - id: check-metaschema
+        name: validate JSON schemas against meta schemas
         files: ^schemas?/.*\.json$
       - id: check-jsonschema
         name: validate 'meltano.yml' with jsonschema
