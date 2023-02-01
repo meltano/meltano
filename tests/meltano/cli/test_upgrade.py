@@ -11,6 +11,9 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 
 
+@pytest.mark.skip(
+    reason="The upgrade command is disabled on the 'cloud' feature branch"
+)
 class TestCliUpgrade:
     def test_upgrade(self, project, cli_runner):
         if platform.system() == "Windows":

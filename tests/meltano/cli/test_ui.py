@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import mock
+import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
@@ -10,6 +11,7 @@ from meltano.core.project_settings_service import (
 )
 
 
+@pytest.mark.skip(reason="The UI is disabled on the 'cloud' feature branch")
 class TestCliUi:
     def test_ui(self, project, cli_runner):
         with mock.patch(

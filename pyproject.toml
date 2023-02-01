@@ -12,19 +12,11 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 packages = [
+  { include = "meltano", from = "src/cloud-cli", format = "wheel" },
   { include = "meltano", from = "src", format = "wheel" },
   { include = "src", format = "sdist" },
   { include = "tests", format = "sdist"},
   { include = "scripts/build.py", format = "sdist"},
-]
-# Explicitly include non-Python files and gitignored files:
-include = [
-  "src/meltano/api/static/css/*",
-  "src/meltano/api/static/js/*",
-  "src/meltano/api/templates/embed.html",
-  "src/meltano/api/templates/webapp.html",
-  "src/meltano/core/tracking/.release_marker",
-  "src/meltano/schema/*",
 ]
 keywords = [
   "Meltano",
@@ -70,6 +62,7 @@ flask-sqlalchemy = "^2.4.4"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
 gunicorn = "^20.1.0"
+importlib-metadata = "^6.0.0"
 importlib-resources = {version = "^5.10.1", optional = true, python = "<3.9"}
 jsonschema = "^4.9"
 meltano-flask-security = "^0.1.0"
@@ -82,7 +75,7 @@ python = ">=3.7,<3.12"
 python-dotenv = "^0.20.0"
 python-gitlab = "^3.5.0"
 pyyaml = "^6.0.0"
-requests = "^2.23.0"
+requests = "^2.28.0"
 rich = "^12.5.1"
 "ruamel.yaml" = "^0.17.21"
 smart-open = {version = "^6.2.0"}
@@ -130,6 +123,11 @@ types-requests = "^2.28.9"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
+# The `meltano-cloud` command is equivalent to `meltano cloud`, and is only
+# provided so that if someone uses the Meltano Cloud CLI standalone, then
+# replaces it with an installation of Meltano, their old scripts that call
+# `meltano-cloud` won't break.
+meltano-cloud = "meltano.cloud.cli:main"
 
 [tool.isort]
 add_imports = [
@@ -486,6 +484,7 @@ tag_format = "v$major.$minor.$patch$prerelease"
 version = "2.15.1"
 version_files = [
   "pyproject.toml:^version =",
+  "src/cloud-cli/pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
   'package.json:^  "version":',
   'src/webapp/package.json:^  "version":',
