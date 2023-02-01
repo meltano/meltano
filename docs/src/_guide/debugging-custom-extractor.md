@@ -20,7 +20,7 @@ If you're using Poetry you need to create a venv in your custom tap directory so
 If you have already installed poetry this will involve removing the existing poetry virtual environment. Running the command below and finally reinstalling poetry.
 
 ```bash
-poetry config virtualenv.in-project true
+poetry config virtualenvs.in-project true
 ```
 
 ## What to put in VSCode launch.json
