@@ -45,7 +45,7 @@ formatters:
   structured_locals: # log format for structured plain text logs WITH local variables
     (): meltano.core.logging.console_log_formatter
     colors: True # also enables traceback formatting with `rich`
-    show_locals: True # enables local variable logging in tracebacks (can be very verbose and leak sensitive data) 
+    show_locals: True # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
     sort_keys: False
