@@ -163,13 +163,14 @@ jobs:
       run: |
         nox -t test --python=${{ matrix.python-version }} -- -m "${{ env.PYTEST_MARKERS }}" 2>&1 | \
           tee >( \
-            tail | sed -r "s/[[:cntrl:]]\[([0-9]{1,3};)*[0-9]{1,3}m//g" | grep -E '^=+ [0-9].+ =+$' | \
-            { read pytest_results; echo "pytest_results='${pytest_results}'" >> ${GITHUB_ENV}; } )
+            tail | sed -r "s/[[:cntrl:]]\[([0-9]{1,3};)*[0-9]{1,3}m//g" | grep -E '=+ [0-9].+ in .+[0-9]s.+\) =+' | \
+            { read pytest_results; echo "pytest_results='${pytest_results:2:-2}'" >> ${GITHUB_ENV}; } )
 
     - name: Append row to workflow summary table
       id: append-results
       shell: bash
       run: |
+        echo "pytest_results='${{ env.pytest_results }}'"
         pytest_results_count () { pattern="([0-9]+) $1" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
         echo "pytest-results-row-${{ matrix.id }}=| \
         ${{ matrix.python-version }} | \
