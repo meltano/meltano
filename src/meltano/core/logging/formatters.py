@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Callable, Sequence, TextIO
+from types import TracebackType
+from typing import TYPE_CHECKING, Any, Callable, Sequence, TextIO
 
 import click
 import structlog
@@ -24,13 +25,11 @@ install(suppress=[click])
 
 TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
 
-LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
-    (
-        # Add the log level and a timestamp to the event_dict if the log entry
-        # is not from structlog.
-        structlog.stdlib.add_log_level,
-        TIMESTAMPER,
-    )
+LEVELED_TIMESTAMPED_PRE_CHAIN = (
+    # Add the log level and a timestamp to the event_dict if the log entry
+    # is not from structlog.
+    structlog.stdlib.add_log_level,
+    TIMESTAMPER,
 )
 
 
@@ -54,7 +53,10 @@ def rich_exception_formatter_factory(
         Exception formatter function.
     """
 
-    def _traceback(sio, exc_info) -> None:
+    def _traceback(
+        sio,
+        exc_info: tuple[type[Any], BaseException, TracebackType | None],
+    ) -> None:
         sio.write("\n")
         Console(file=sio, color_system=color_system, no_color=no_color).print(
             Traceback.from_exception(
