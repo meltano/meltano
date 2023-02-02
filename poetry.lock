@@ -3995,6 +3995,18 @@ files = [
 ]
 
 [[package]]
+name = "types-jsonschema"
+version = "4.17.0.3"
+description = "Typing stubs for jsonschema"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-jsonschema-4.17.0.3.tar.gz", hash = "sha256:746aa466ffed9a1acc7bdbd0ac0b5e068f00be2ee008c1d1e14b0944a8c8b24b"},
+    {file = "types_jsonschema-4.17.0.3-py3-none-any.whl", hash = "sha256:c8d5b26b7c8da6a48d7fb1ce029b97e0ff6e74db3727efb968c69f39ad013685"},
+]
+
+[[package]]
 name = "types-psutil"
 version = "5.9.5.6"
 description = "Typing stubs for psutil"
@@ -4004,6 +4016,18 @@ python-versions = "*"
 files = [
     {file = "types-psutil-5.9.5.6.tar.gz", hash = "sha256:65f93589711ca48859602c955c4247c834d96d4d33a9cbe4142d89593ef33b3c"},
     {file = "types_psutil-5.9.5.6-py3-none-any.whl", hash = "sha256:07acd57594ff254285250ef70be0fe4efe0b11a30065b6dce62a856235a8ca10"},
+]
+
+[[package]]
+name = "types-pyyaml"
+version = "6.0.12.3"
+description = "Typing stubs for PyYAML"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-PyYAML-6.0.12.3.tar.gz", hash = "sha256:17ce17b3ead8f06e416a3b1d5b8ddc6cb82a422bb200254dd8b469434b045ffc"},
+    {file = "types_PyYAML-6.0.12.3-py3-none-any.whl", hash = "sha256:879700e9f215afb20ab5f849590418ab500989f83a57e635689e1d50ccc63f0c"},
 ]
 
 [[package]]
@@ -4522,4 +4546,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "b4cb092de5238f17a7e264a6ffcb97eae8dab520b4cf68a3897d2aa40904525d"
+content-hash = "e367ed6a90643be1ff623a25ef5da6debaf33b2cd69f8fad559284c4db4050af"
