@@ -42,11 +42,11 @@ python_versions = ("3.7", "3.8", "3.9", "3.10", "3.11")
 main_python_version = "3.10"
 pytest_deps = (
     "colorama",  # colored output in Windows
-    "coverage",
     "freezegun",
     "mock",
     "pytest",
     "pytest-asyncio",
+    "pytest-cov",
     "pytest-docker",
     "pytest-order",
     "pytest-randomly",
@@ -57,15 +57,16 @@ pytest_deps = (
 
 def _run_pytest(session: Session) -> None:
     try:
+        session.env.update(
+            {
+                "COVERAGE_RCFILE": str(root_path / "pyproject.toml"),
+                "COVERAGE_FILE": str(root_path / f".coverage.{session.name}"),
+            }
+        )
         session.run(
-            "coverage",
-            "run",
-            "--data-file",
-            str(root_path / f".coverage.{session.name}"),
-            "--rcfile",
-            str(root_path / "pyproject.toml"),
-            "-m",
             "pytest",
+            "--cov=meltano",
+            "--cov=tests",
             "tests/",
             f"--randomly-seed={randint(0, 2**32 - 1)}",  # noqa: S311, WPS432
             *session.posargs,
