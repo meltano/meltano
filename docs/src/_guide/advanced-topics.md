@@ -22,7 +22,7 @@ Extensions allow the developer to add additional features like pre/post-hooks to
 The Meltano [Extension Developer Kit](https://github.com/meltano/edk) (EDK) was created to make it easier for developers to build Meltano extensions.
 For more information on how to build your own EDK-based Meltano extension, see [the EDK docs](https://edk.meltano.com/en/latest/).
 
-### EDK Context
+### Meltano Plugin Types
 
 Meltano has traditionally assigned a plugin type to each plugin based on their functionality.
 These plugin types were/are used in the Meltano codebase to activate plugin type specific features (i.e. piping Singer taps and targets together, running dbt deps before each run, or compiling and removing the Airflow config.cfg configuration file to avoid storing sensitive credentials).
