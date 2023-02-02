@@ -8,8 +8,7 @@ import click
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.version_option()
 def cloud() -> None:
-    """Run the Meltano Cloud CLI as a Click command."""
-    click.echo("Meltano Cloud CLI placeholder output")
+    """Interface with Meltano Cloud."""
 
 
 def main() -> int:

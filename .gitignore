@@ -1,9 +1,6 @@
-# CI
-
 _changelog_fragment.md
-
 requirements.txt
-*/__pycache__
+__pycache__/
 *.log
 logs/
 *.pyc
@@ -13,17 +10,9 @@ logs/
 tmp_log.txt
 .vscode/
 /build/
-
 .DS_Store
 node_modules/
-/dist/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-/test/unit/coverage/
-/test/e2e/reports/
-selenium-debug.log
-api/parser
+dist/
 
 # Editor directories and files
 .idea
@@ -143,9 +132,6 @@ venv.bak/
 meltano.log.*
 *.m5oc
 
-# webapp builds
-src/webapp/dist/
-
 # packaged webapp
 src/meltano/api/templates/webapp.html
 src/meltano/api/templates/embed.html
@@ -160,7 +146,7 @@ setup.py
 
 # Integration test generated files
 *.jsonl
-**/.meltano/**
+.meltano/
 !docs/example-library/meltano-migrations/.meltano/meltano.db
 
 # Schemas copied into `src/meltano` by the build process
