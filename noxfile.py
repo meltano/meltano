@@ -99,6 +99,7 @@ def mypy(session: Session) -> None:
         "types-croniter",
         "types-jsonschema",
         "types-psutil",
+        "types-PyYAML",
         "types-requests",
         "boto3-stubs[essential]",
     )
