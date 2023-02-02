@@ -108,14 +108,13 @@ bumpversion = "^0.6.0"
 changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
 commitizen-version-bump = {git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main"}
-coverage = {extras = ["toml"], version = "^6.4.1"}
+coverage = {extras = ["toml"], version = "^7.1.0"}
 freezegun = "^0.3.12"
 mock = "^4.0.3"
 mypy = "^0.960"
 pre-commit = "^2.9.2"
 pytest = "^7.1.2"
 pytest-asyncio = "^0.18.3"
-pytest-cov = "^3.0.0"
 pytest-docker = "^1.0"
 pytest-order = "^1.0"
 pytest-randomly = "^3.12"
@@ -469,13 +468,16 @@ concurrency = [
   "thread",
 ]
 parallel = true
-source = ["meltano"]
+source = [
+  "meltano",
+  "tests",
+]
 
 [tool.coverage.paths]
 source = [
-  "src/meltano",
-  "**/site-packages/meltano",
-  "**/site-packages/meltano*/meltano",
+  "src/meltano/",
+  "**/site-packages/meltano/",
+  "**/site-packages/meltano*/meltano/",
 ]
 
 [tool.coverage.report]

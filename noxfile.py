@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import sys
 from pathlib import Path
 from random import randint
@@ -43,11 +42,11 @@ python_versions = ("3.7", "3.8", "3.9", "3.10", "3.11")
 main_python_version = "3.10"
 pytest_deps = (
     "colorama",  # colored output in Windows
+    "coverage",
     "freezegun",
     "mock",
     "pytest",
     "pytest-asyncio",
-    "pytest-cov",
     "pytest-docker",
     "pytest-order",
     "pytest-randomly",
@@ -56,30 +55,18 @@ pytest_deps = (
 )
 
 
-def _clear_coverage(session: Session) -> None:
-    # `pytest-cov` will combine coverage files after ever pytest run, which
-    # overwrites any old coverage files. We use `--cov-append` to ensure
-    # the results from multiple test runs are properly combined despite
-    # the behavior of `pytest-cov`, but we still want to have a clean slate
-    # between nox runs, so we call `coverage erase` once before the first
-    # test run.
-    for path in (root_path, root_path / "src" / "cloud-cli"):
-        with session.chdir(path):
-            session.run("coverage", "erase")
-    # The following line makes it so that this function can only be run once,
-    # preventing it from erasing coverage data midway through a Nox run.
-    _clear_coverage.__code__ = (lambda _: None).__code__
-
-
 def _run_pytest(session: Session) -> None:
-    _clear_coverage(session)
     try:
         session.run(
+            "coverage",
+            "run",
+            "--data-file",
+            str(root_path / f".coverage.{session.name}"),
+            "--rcfile",
+            str(root_path / "pyproject.toml"),
+            "-m",
             "pytest",
-            "--cov=meltano",
-            "--cov=tests",
-            "--cov-append",
-            "tests",
+            "tests/",
             f"--randomly-seed={randint(0, 2**32 - 1)}",  # noqa: S311, WPS432
             *session.posargs,
         )
@@ -99,10 +86,9 @@ def pytest_cloud_cli(session: Session) -> None:
         session: Nox session.
     """
     session.install("src/cloud-cli", *pytest_deps)
+
     with session.chdir("src/cloud-cli"):
-        session.posargs.append("--cov-config=../../pyproject.toml")
         _run_pytest(session)
-        shutil.move(".coverage", "../../.coverage.cloud-cli")
 
 
 @nox_session(

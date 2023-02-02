@@ -44,7 +44,7 @@ For the duration of the `cloud` feature branch, `meltano upgrade` will be disabl
 
 Typically during development one installs a Python package in editable mode. Poetry does this by default when using `poetry install`, and it can be done with `pip` by using `pip install -e .`.
 
-When a package is installed in editable mode, a [`.pth` file](https://docs.python.org/3/library/site.html) is added to your Python environment's site-packages directory. This file lists directories that are added to Python's `sys.paths`, which is the list of paths where Python will look for modules at import-time.
+When a package is installed in editable mode, a [`.pth` file](https://docs.python.org/3/library/site.html) is added to your Python environment's site-packages directory. This file lists directories that are added to Python's `sys.path`, which is the list of paths where Python will look for modules at import-time.
 
 Because this bypasses the construction of the wheel, when Meltano is installed in editable mode it does not have the Cloud CLI package merged into it. To work around this, as symlink at `src/meltano/cloud` points to `../cloud-cli/meltano/cloud`, which makes it appear to Python at import-time as if the packages had been merged.
 
