@@ -88,6 +88,24 @@ def _run_pytest(session: Session) -> None:
 
 
 @nox_session(
+    name="pytest-cloud-cli",
+    python=python_versions,
+    tags=("test", "pytest"),
+)
+def pytest_cloud_cli(session: Session) -> None:
+    """Run pytest to test the Meltano Cloud CLI.
+
+    Args:
+        session: Nox session.
+    """
+    session.install("src/cloud-cli", *pytest_deps)
+    with session.chdir("src/cloud-cli"):
+        session.posargs.append("--cov-config=../../pyproject.toml")
+        _run_pytest(session)
+        shutil.move(".coverage", "../../.coverage.cloud-cli")
+
+
+@nox_session(
     name="pytest-meltano",
     python=python_versions,
     tags=("test", "pytest"),
@@ -104,24 +122,6 @@ def pytest_meltano(session: Session) -> None:
         *pytest_deps,
     )
     _run_pytest(session)
-
-
-@nox_session(
-    name="pytest-cloud-cli",
-    python=python_versions,
-    tags=("test", "pytest"),
-)
-def pytest_cloud_cli(session: Session) -> None:
-    """Run pytest to test the Meltano Cloud CLI.
-
-    Args:
-        session: Nox session.
-    """
-    with session.chdir("src/cloud-cli"):
-        session.install(".", *pytest_deps)
-        session.posargs.append("--cov-config=../../pyproject.toml")
-        _run_pytest(session)
-        shutil.move(".coverage", "../../.coverage.cloud-cli")
 
 
 @nox_session(python=main_python_version)
