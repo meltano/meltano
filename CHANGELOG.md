@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.15.1 (2023-01-31)
+
+### 🐛 Fixes
+
+- [#7236](https://github.com/meltano/meltano/issues/7236) Invoke `virtualenv` as a module
+- [#7235](https://github.com/meltano/meltano/issues/7235) Avoid adding `LICENSE` file directly in `site-packages`
+
 ## v2.15.0 (2023-01-30)
 
 ### ✨ New
