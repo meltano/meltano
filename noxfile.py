@@ -108,7 +108,13 @@ def pytest_meltano(session: Session) -> None:
         ".[mssql,azure,gcs,s3]" if backend_db == "mssql" else ".[azure,gcs,s3]",
         *pytest_deps,
     )
+    os.system("pwd")
+    os.system("ls -lha")
+    os.system("env")
     _run_pytest(session)
+    os.system("pwd")
+    os.system("ls -lha")
+    os.system("env")
 
 
 @nox_session(python=main_python_version)
@@ -119,11 +125,14 @@ def coverage(session: Session) -> None:
         session: Nox session.
     """
     args = session.posargs or ("report",)
+    os.system("pwd")
+    os.system("ls -lha")
+    os.system("env")
 
     session.install("coverage[toml]")
 
     if not session.posargs and any(Path().glob(".coverage.*")):
-        session.run("coverage", "combine", "--append")
+        session.run("coverage", "combine")
 
     session.run("coverage", *args)
 
