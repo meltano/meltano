@@ -731,7 +731,7 @@ def get_no_color_flag() -> bool:
 
 
 class MergeStrategy(NamedTuple):
-    """Strategy to be used when merging a instances of a type.
+    """Strategy to be used when merging instances of a type.
 
     The first value of this tuple, `applicable_for_instance_of`, is a type or
     tuple of types for which the behavior (see below) should apply. An

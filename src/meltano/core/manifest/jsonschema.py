@@ -42,7 +42,7 @@ class JsonschemaRefLocationParser:
         self,
         schema: dict[str, Any] | None = None,
         path: tuple[str, ...] = (),
-    ) -> Iterable[str]:
+    ) -> Generator[str, None, None]:
         """Parse the jsonschema to find the locations of the target ref.
 
         Args:
