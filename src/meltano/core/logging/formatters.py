@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Callable, Sequence, TextIO
+import sys
+from types import TracebackType
+from typing import TYPE_CHECKING, Any, Callable, Sequence, TextIO
 
 import click
 import structlog
@@ -12,23 +14,29 @@ from structlog.types import Processor
 
 from meltano.core.utils import get_no_color_flag
 
+if TYPE_CHECKING:
+    if sys.version_info >= (3, 8):
+        from typing import Literal
+    else:
+        from typing_extensions import Literal
+
+
 install(suppress=[click])
 
 TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
 
-LEVELED_TIMESTAMPED_PRE_CHAIN = frozenset(
-    (
-        # Add the log level and a timestamp to the event_dict if the log entry
-        # is not from structlog.
-        structlog.stdlib.add_log_level,
-        TIMESTAMPER,
-    )
+LEVELED_TIMESTAMPED_PRE_CHAIN = (
+    # Add the log level and a timestamp to the event_dict if the log entry
+    # is not from structlog.
+    structlog.stdlib.add_log_level,
+    TIMESTAMPER,
 )
 
 
 def rich_exception_formatter_factory(
-    color_system: str = "auto",
+    color_system: Literal["auto", "standard", "256", "truecolor", "windows"] = "auto",
     no_color: bool | None = None,
+    show_locals: bool = False,
 ) -> Callable[[TextIO, structlog.types.ExcInfo], None]:
     """Create an exception formatter for logging using the rich package.
 
@@ -39,33 +47,25 @@ def rich_exception_formatter_factory(
     Args:
         color_system: The color system supported by your terminal.
         no_color: Enabled no color mode, or None to auto detect. Defaults to None.
+        show_locals: Whether to show local variables in the traceback.
 
     Returns:
         Exception formatter function.
     """
 
-    def _traceback(sio, exc_info) -> None:
+    def _traceback(
+        sio,
+        exc_info: tuple[type[Any], BaseException, TracebackType | None],
+    ) -> None:
         sio.write("\n")
         Console(file=sio, color_system=color_system, no_color=no_color).print(
-            Traceback.from_exception(*exc_info, show_locals=True)
+            Traceback.from_exception(
+                *exc_info,
+                show_locals=show_locals,
+            ),
         )
 
     return _traceback
-
-
-def plain_rich_traceback(sio: TextIO, exc_info: structlog.types.ExcInfo) -> None:
-    """Pretty-print `exc_info` to `sio` using the rich package, with colors disabled.
-
-    To be passed into `ConsoleRenderer`'s `exception_formatter` argument.
-
-    Args:
-        sio: Return of open() in text mode.
-        exc_info: Execution info.
-    """
-    sio.write("\n")
-    Console(file=sio, no_color=True).print(
-        Traceback.from_exception(*exc_info, show_locals=True)
-    )
 
 
 def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormatter:
@@ -84,11 +84,15 @@ def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormat
     )
 
 
-def console_log_formatter(colors: bool = False) -> structlog.stdlib.ProcessorFormatter:
+def console_log_formatter(
+    colors: bool = False,
+    show_locals: bool = False,
+) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter for console rendering that supports colorization.
 
     Args:
         colors: Add color to output.
+        show_locals: Whether to show local variables in the traceback.
 
     Returns:
         A configured console log formatter.
@@ -96,9 +100,15 @@ def console_log_formatter(colors: bool = False) -> structlog.stdlib.ProcessorFor
     colors = colors and not get_no_color_flag()
 
     if colors:
-        exception_formatter = rich_exception_formatter_factory(color_system="truecolor")
+        exception_formatter = rich_exception_formatter_factory(
+            color_system="truecolor",
+            show_locals=show_locals,
+        )
     else:
-        exception_formatter = rich_exception_formatter_factory(no_color=True)
+        exception_formatter = rich_exception_formatter_factory(
+            no_color=True,
+            show_locals=show_locals,
+        )
 
     return _process_formatter(
         structlog.dev.ConsoleRenderer(

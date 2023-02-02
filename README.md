@@ -10,7 +10,7 @@
 
 ---
 
-![Meltano Logo](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
+![Meltano Logo](https://user-images.githubusercontent.com/11428666/215905636-073eee14-b368-4e62-89c9-9d3d41bda7fd.png)
 
 <div align="center">
 <a href="https://docs.meltano.com/">
