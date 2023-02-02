@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import sys
 from pathlib import Path
 from random import randint
@@ -57,11 +56,14 @@ pytest_deps = (
 
 
 def _run_pytest(session: Session) -> None:
+    random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
     try:
         session.env.update(
             {
                 "COVERAGE_RCFILE": str(root_path / "pyproject.toml"),
-                "COVERAGE_FILE": str(root_path / f".coverage.{session.name}"),
+                "COVERAGE_FILE": str(
+                    root_path / f".coverage.{random_seed:010}.{session.name}"
+                ),
             }
         )
         session.run(
@@ -69,11 +71,12 @@ def _run_pytest(session: Session) -> None:
             "--cov=meltano",
             "--cov=tests",
             "tests/",
-            f"--randomly-seed={randint(0, 2**32 - 1)}",  # noqa: S311, WPS432
+            f"--randomly-seed={random_seed}",
             *session.posargs,
         )
     finally:
-        session.notify("coverage", posargs=[])
+        if session.interactive:
+            session.notify("coverage", posargs=[])
 
 
 @nox_session(
@@ -124,13 +127,7 @@ def coverage(session: Session) -> None:
     session.install("coverage[toml]")
 
     if not session.posargs and any(Path().glob(".coverage.*")):
-        # Coverage does not combine properly if `$COVERAGE_FILE` is set, so we
-        # remove it from the env, then move the default `.coverage` file to
-        # wherever `$COVERAGE_FILE` says it should go.
-        coverage_file = session.env.pop("COVERAGE_FILE", ".coverage")
         session.run("coverage", "combine")
-        shutil.move(".coverage", coverage_file)
-        session.env["COVERAGE_FILE"] = coverage_file
 
     session.run("coverage", *args)
 
