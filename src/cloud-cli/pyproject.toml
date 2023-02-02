@@ -6,15 +6,18 @@ build-backend = "poetry.core.masonry.api"
 name = "meltano.cloud.cli"
 version = "2.15.1"
 description = "Meltano Cloud CLI"
-license = "Proprietary"
+license = "MIT"
 authors = ["Meltano <hello@meltano.com>"]
 readme = "README.md"
 classifiers = [
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Typing :: Typed",
 ]
 packages = [
