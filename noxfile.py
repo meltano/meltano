@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import sys
 from pathlib import Path
 from random import randint
@@ -108,13 +109,7 @@ def pytest_meltano(session: Session) -> None:
         ".[mssql,azure,gcs,s3]" if backend_db == "mssql" else ".[azure,gcs,s3]",
         *pytest_deps,
     )
-    os.system("pwd")
-    os.system("ls -lha")
-    os.system("env")
     _run_pytest(session)
-    os.system("pwd")
-    os.system("ls -lha")
-    os.system("env")
 
 
 @nox_session(python=main_python_version)
@@ -125,14 +120,16 @@ def coverage(session: Session) -> None:
         session: Nox session.
     """
     args = session.posargs or ("report",)
-    os.system("pwd")
-    os.system("ls -lha")
-    os.system("env")
 
     session.install("coverage[toml]")
 
     if not session.posargs and any(Path().glob(".coverage.*")):
+        # Coverage does not combine properly if `$COVERAGE_FILE` is set, so we
+        # remove it from the env, then move the default `.coverage` file to
+        # wherever `$COVERAGE_FILE` says it should go.
+        coverage_file = session.env.pop("COVERAGE_FILE", ".coverage")
         session.run("coverage", "combine")
+        shutil.move(".coverage", coverage_file)
 
     session.run("coverage", *args)
 
