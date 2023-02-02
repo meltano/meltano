@@ -130,6 +130,7 @@ def coverage(session: Session) -> None:
         coverage_file = session.env.pop("COVERAGE_FILE", ".coverage")
         session.run("coverage", "combine")
         shutil.move(".coverage", coverage_file)
+        session.env["COVERAGE_FILE"] = coverage_file
 
     session.run("coverage", *args)
 
