@@ -173,10 +173,10 @@ class Manifest:
     def _validate_against_manifest_schema(
         instance_name: str,
         instance_path: Path,
-        intance_data: dict[str, Any],
+        instance_data: dict[str, Any],
     ) -> None:
         with NamedTemporaryFile(suffix=".json") as schema_instance_file:
-            schema_instance_file.write(json.dumps(intance_data).encode())
+            schema_instance_file.write(json.dumps(instance_data).encode())
             schema_instance_file.flush()
             proc = subprocess.run(
                 (
