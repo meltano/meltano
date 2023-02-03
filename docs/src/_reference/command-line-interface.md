@@ -140,6 +140,8 @@ To save the manifest JSON files to a specific directory:
 meltano compile --directory /some/directory/path
 ```
 
+By default, the manifest files are saved to `${MELTANO_SYS_DIR_ROOT}/manifests`, which defaults to `${MELTANO_PROJECT_ROOT}/.meltano/manifests`.
+
 Use the `--indent` CLI option to control the indentation in the manifest JSON files:
 
 ```bash
