@@ -1,6 +1,5 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 
-
 from __future__ import annotations
 
 import asyncio
@@ -13,11 +12,11 @@ from multiprocessing import cpu_count
 from typing import Any, Callable, Iterable, Mapping
 
 if sys.version_info >= (3, 8):
+    from functools import cached_property
     from typing import Protocol
 else:
     from typing_extensions import Protocol
-
-from cached_property import cached_property
+    from cached_property import cached_property
 
 from meltano.core.error import (
     AsyncSubprocessError,

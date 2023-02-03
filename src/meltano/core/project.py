@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import fasteners
-from cached_property import cached_property
 from dotenv import dotenv_values
 from werkzeug.utils import secure_filename
 
@@ -27,6 +26,11 @@ from meltano.core.utils import makedirs, truthy
 
 if TYPE_CHECKING:
     from .meltano_file import MeltanoFile as MeltanoFileTypeHint
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
 
 
 logger = logging.getLogger(__name__)
