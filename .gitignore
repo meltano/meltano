@@ -162,4 +162,3 @@ setup.py
 *.jsonl
 **/.meltano/**
 !docs/example-library/meltano-migrations/.meltano/meltano.db
-
