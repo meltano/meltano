@@ -4,12 +4,15 @@ from __future__ import annotations
 import logging
 import os
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
 
 import yaml
 
 from meltano.core import bundle
-from meltano.core.project import Project
 from meltano.core.setting_definition import SettingDefinition
+
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 

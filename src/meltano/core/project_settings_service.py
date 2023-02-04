@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import json
+from typing import TYPE_CHECKING
 
 import structlog
 from dotenv import dotenv_values
 
-from meltano.core.project import ProjectReadonly
+from meltano.core.config_service import ConfigService
+from meltano.core.error import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
-from .config_service import ConfigService
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = structlog.get_logger(__name__)
 
@@ -29,15 +32,29 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
     config_override = {}
     supports_environments = False
 
-    def __init__(self, *args, config_service: ConfigService | None = None, **kwargs):
-        """Instantiate ProjectSettingsService instance.
+    def __init__(
+        self,
+        project: Project,
+        show_hidden: bool = True,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
+        config_service: ConfigService | None = None,
+    ):
+        """Instantiate a `ProjectSettingsService` instance.
 
         Args:
-            args: Positional arguments to pass to the superclass.
+            project: Meltano project instance.
+            show_hidden: Whether to display secret setting values.
+            env_override: Optional override environment values.
+            config_override:  Optional override configuration values.
             config_service: Project configuration service instance.
-            kwargs: Keyword arguments to pass to the superclass.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(
+            project=project,
+            show_hidden=show_hidden,
+            env_override=env_override,
+            config_override=config_override,
+        )
 
         self.config_service = config_service or ConfigService(self.project)
 

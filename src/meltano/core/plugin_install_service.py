@@ -497,7 +497,7 @@ async def install_pip_plugin(
         env: Environment variables to use when expanding the pip install args.
         kwargs: Unused additional arguments for the installation of the plugin.
     """
-    with ProjectSettingsService(project).feature_flag(
+    with project.settings.feature_flag(
         FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
     ) as strict_env_var_mode:
         pip_install_args = expand_env_vars(

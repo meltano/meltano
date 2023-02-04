@@ -7,7 +7,6 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 from meltano.core.utils import EnvironmentVariableNotSetError
 
@@ -260,8 +259,6 @@ class TestEnvVarResolution:
 
 
 def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
-    # This test will be resolved to pass as part of
-    # this issue: https://github.com/meltano/meltano/issues/5983
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
         meltanofile.update(
@@ -311,8 +308,6 @@ def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
 def test_environment_variable_inheritance_meltano_env_only(
     cli_runner, project, monkeypatch
 ):
-    # This test will be resolved to pass as part of
-    # this issue: https://github.com/meltano/meltano/issues/5983
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
         meltanofile.update(
@@ -348,8 +343,7 @@ def test_environment_variable_inheritance_meltano_env_only(
 
 
 def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
-    project_settings_service = ProjectSettingsService(project)
-    project_settings_service.set(
+    project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
     )
     with project.meltano_update() as meltanofile:
@@ -373,8 +367,7 @@ def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
 
 
 def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
-    project_settings_service = ProjectSettingsService(project)
-    project_settings_service.set(
+    project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
     )
     with project.meltano_update() as meltanofile:

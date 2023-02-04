@@ -12,6 +12,7 @@ from structlog.stdlib import get_logger
 from urllib3 import Retry
 
 import meltano
+from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import (
     BasePlugin,
     PluginDefinition,
@@ -23,9 +24,6 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_discovery_service import PluginRepository
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
-
-from .schema import IndexedPlugin, VariantRef
 
 logger = get_logger(__name__)
 
@@ -118,10 +116,8 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             }
         )
 
-        self.settings_service = ProjectSettingsService(self.project)
-
-        if self.settings_service.get("send_anonymous_usage_stats"):
-            project_id = self.settings_service.get("project_id")
+        if self.project.settings.get("send_anonymous_usage_stats"):
+            project_id = self.project.settings.get("project_id")
 
             self.session.headers["X-Project-ID"] = project_id
 
@@ -152,8 +148,8 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         Returns:
             The URL of the Hub API.
         """
-        hub_api_root = self.settings_service.get("hub_api_root")
-        hub_url = self.settings_service.get("hub_url")
+        hub_api_root = self.project.settings.get("hub_api_root")
+        hub_url = self.project.settings.get("hub_url")
 
         return hub_api_root or f"{hub_url}/meltano/api/v1"
 
@@ -164,7 +160,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         Returns:
             The `hub_url_auth` setting.
         """
-        return self.settings_service.get("hub_url_auth")
+        return self.project.settings.get("hub_url_auth")
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.

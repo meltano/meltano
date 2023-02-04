@@ -16,8 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm import Session
 
 from meltano.core.environment import NoActiveEnvironment
-from meltano.core.error import Error
-from meltano.core.project import ProjectReadonly
+from meltano.core.error import Error, ProjectReadonly
 from meltano.core.setting import Setting
 from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path

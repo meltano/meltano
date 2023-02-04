@@ -31,7 +31,6 @@ from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import (
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
@@ -486,7 +485,7 @@ def get_pipeline_schedules():
     schedules = list(map(dict, schedule_service.schedules()))
 
     jobs_in_list = False
-    with ProjectSettingsService(project).feature_flag(
+    with project.settings.feature_flag(
         FeatureFlags.ENABLE_API_SCHEDULED_JOB_LIST, raise_error=False
     ) as allow:
         if allow:

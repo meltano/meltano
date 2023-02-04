@@ -4,7 +4,6 @@ import os
 
 from meltano.api.headers import JSON_SCHEME_HEADER, VERSION_HEADER
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import truthy
 
 # Flask
@@ -88,7 +87,7 @@ class ProjectSettings:
     }
 
     def __init__(self, project: Project):
-        self.settings_service = ProjectSettingsService(project)
+        self.settings_service = project.settings
 
     def as_dict(self):
         return {

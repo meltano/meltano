@@ -11,9 +11,8 @@ from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.runner import Runner, RunnerError
 from meltano.core.utils import human_size
-
-from . import Runner, RunnerError
 
 
 class SingerRunner(Runner):

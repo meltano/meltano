@@ -8,18 +8,19 @@ from typing import Generator
 
 import structlog
 
+from meltano.core.config_service import ConfigService
 from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.hub import MeltanoHubService
+from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.base import VariantNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_discovery_service import (
+    LockedDefinitionService,
+    PluginDiscoveryService,
+)
 from meltano.core.plugin_lock_service import PluginLockService
-from meltano.core.project_settings_service import ProjectSettingsService
-
-from .config_service import ConfigService
-from .plugin import PluginRef, PluginType
-from .plugin.error import PluginNotFoundError, PluginParentNotFoundError
-from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import LockedDefinitionService, PluginDiscoveryService
-from .project import Project
+from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -84,7 +85,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self._current_plugins = None
         self._use_cache = use_cache
 
-        self.settings_service = ProjectSettingsService(project)
+        self.settings_service = project.settings
 
         self._use_discovery_yaml: bool = True
         self._prefer_source = None

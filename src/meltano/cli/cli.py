@@ -13,9 +13,9 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.error import EmptyMeltanoFileException
+from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
 from meltano.core.logging import LEVELS, setup_logging
-from meltano.core.project import Project, ProjectNotFound
+from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
@@ -103,9 +103,7 @@ def cli(  # noqa: C901,WPS231
     try:  # noqa: WPS229
         project = Project.find()
         setup_logging(project)
-        project_setting_service = ProjectSettingsService(project)
-
-        readonly = project_setting_service.get("project_readonly")
+        readonly = project.settings.get("project_readonly")
         if readonly:
             project.readonly = True
         if project.readonly:
@@ -118,8 +116,8 @@ def cli(  # noqa: C901,WPS231
             logger.info("No environment is active")
         elif environment:
             selected_environment = environment
-        elif project_setting_service.get("default_environment"):
-            selected_environment = project_setting_service.get("default_environment")
+        elif project.settings.get("default_environment"):
+            selected_environment = project.settings.get("default_environment")
             is_default_environment = True
         ctx.obj["selected_environment"] = selected_environment
         ctx.obj["is_default_environment"] = is_default_environment

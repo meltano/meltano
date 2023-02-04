@@ -5,7 +5,6 @@ from http import HTTPStatus
 
 import mock
 import pytest
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from flask import url_for
 from flask_login import current_user
 from flask_security import AnonymousUser, login_user
@@ -17,7 +16,6 @@ from meltano.api.models.security import User, db
 from meltano.api.security.identity import FreeUser, users
 from meltano.api.security.oauth import OAuthError, gitlab_token_identity
 from meltano.core.project import PROJECT_READONLY_ENV, Project
-from meltano.core.project_settings_service import ProjectSettingsService
 
 STATUS_READONLY = 499
 
@@ -105,7 +103,7 @@ class TestProjectReadonlyEnabled:
     def project(self, project):
         Project.deactivate()
 
-        monkeypatch = MonkeyPatch()
+        monkeypatch = pytest.MonkeyPatch()
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
 
         yield project
@@ -189,13 +187,9 @@ class TestProjectReadonlyEnabled:
 @pytest.mark.usefixtures("seed_users")
 class TestReadonlyEnabled:
     @pytest.fixture(scope="class")
-    def app(self, create_app):
-        monkeypatch = MonkeyPatch()
-        monkeypatch.setitem(ProjectSettingsService.config_override, "ui.readonly", True)
-
-        yield create_app()
-
-        monkeypatch.undo()
+    def app(self, create_app, project):
+        project.settings.config_override["ui.readonly"] = True
+        return create_app()
 
     def test_current_user(self, app):
         with app.test_request_context("/"):
@@ -244,15 +238,9 @@ class TestReadonlyEnabled:
 @pytest.mark.usefixtures("seed_users")
 class TestAuthenticationEnabled:
     @pytest.fixture(scope="class")
-    def app(self, create_app):
-        monkeypatch = MonkeyPatch()
-        monkeypatch.setitem(
-            ProjectSettingsService.config_override, "ui.authentication", True
-        )
-
-        yield create_app()
-
-        monkeypatch.undo()
+    def app(self, create_app, project):
+        project.settings.config_override["ui.authentication"] = True
+        return create_app()
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     def test_gitlab_token_identity_creates_user(self, gitlab, app):
@@ -404,16 +392,10 @@ class TestAuthenticationEnabled:
 @pytest.mark.usefixtures("seed_users")
 class TestAuthenticationAndReadonlyEnabled:
     @pytest.fixture(scope="class")
-    def app(self, create_app):
-        monkeypatch = MonkeyPatch()
-
-        config_override = ProjectSettingsService.config_override
-        monkeypatch.setitem(config_override, "ui.authentication", True)
-        monkeypatch.setitem(config_override, "ui.readonly", True)
-
-        yield create_app()
-
-        monkeypatch.undo()
+    def app(self, create_app, project):
+        project.settings.config_override["ui.authentication"] = True
+        project.settings.config_override["ui.readonly"] = True
+        return create_app()
 
     def test_current_user(self, app):
         with app.test_request_context("/"):
@@ -506,16 +488,10 @@ class TestAuthenticationAndReadonlyEnabled:
 @pytest.mark.usefixtures("seed_users")
 class TestAuthenticationAndAnonymousReadonlyEnabled:
     @pytest.fixture(scope="class")
-    def app(self, create_app):
-        monkeypatch = MonkeyPatch()
-
-        config_override = ProjectSettingsService.config_override
-        monkeypatch.setitem(config_override, "ui.authentication", True)
-        monkeypatch.setitem(config_override, "ui.anonymous_readonly", True)
-
-        yield create_app()
-
-        monkeypatch.undo()
+    def app(self, create_app, project):
+        project.settings.config_override["ui.authentication"] = True
+        project.settings.config_override["ui.anonymous_readonly"] = True
+        return create_app()
 
     def test_current_user(self, app):
         with app.test_request_context("/"):

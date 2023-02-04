@@ -13,20 +13,30 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import fasteners
-from cached_property import cached_property
 from dotenv import dotenv_values
 from werkzeug.utils import secure_filename
 
 from meltano.core import yaml
 from meltano.core.behavior.versioned import Versioned
+from meltano.core.config_service import ConfigService
 from meltano.core.environment import Environment
-from meltano.core.error import EmptyMeltanoFileException, Error
+from meltano.core.error import (
+    EmptyMeltanoFileException,
+    ProjectNotFound,
+    ProjectReadonly,
+)
 from meltano.core.plugin.base import PluginRef
 from meltano.core.project_files import ProjectFiles
+from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import makedirs, truthy
 
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
 if TYPE_CHECKING:
-    from .meltano_file import MeltanoFile as MeltanoFileTypeHint
+    from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
 
 
 logger = logging.getLogger(__name__)
@@ -36,28 +46,6 @@ PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
 PROJECT_ENVIRONMENT_ENV = "MELTANO_ENVIRONMENT"
 PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 PROJECT_SYS_DIR_ROOT = "MELTANO_SYS_DIR_ROOT"
-
-
-class ProjectNotFound(Error):
-    """Occurs when a Project is instantiated outside of a meltano project structure."""
-
-    def __init__(self, project: Project):
-        """Instantiate the error.
-
-        Args:
-            project: the name of the project which cannot be found
-        """
-        super().__init__(
-            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
-        )
-
-
-class ProjectReadonly(Error):
-    """Occurs when attempting to update a readonly project."""
-
-    def __init__(self):
-        """Instantiate the error."""
-        super().__init__("This Meltano project is deployed as read-only")
 
 
 def walk_parent_directories():
@@ -97,6 +85,16 @@ class Project(Versioned):  # noqa: WPS214
         ).resolve()
         self.readonly = False
         self.active_environment: Environment | None = None
+        self.config_service = ConfigService(self)
+
+    @cached_property
+    def settings(self):
+        """Get the project settings.
+
+        Returns:
+            A `ProjectSettingsService` instance for this project.
+        """
+        return ProjectSettingsService(self, config_service=self.config_service)
 
     @cached_property
     def _meltano_interprocess_lock(self):
@@ -364,6 +362,8 @@ class Project(Versioned):  # noqa: WPS214
             name: Name of the environment.
         """
         self.active_environment = Environment.find(self.meltano.environments, name)
+        with suppress(KeyError):
+            del self.__dict__["settings"]
         logger.info(f"Environment {name!r} is active")
 
     def deactivate_environment(self) -> None:

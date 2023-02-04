@@ -5,19 +5,14 @@ from flask import url_for
 
 from meltano.api.models.security import Role, db
 from meltano.api.security.identity import users
-from meltano.core.project_settings_service import ProjectSettingsService
 
 
 @pytest.mark.usefixtures("seed_users")
 class TestRoles:
-    @pytest.fixture
-    def app(self, create_app):
-        config_override = ProjectSettingsService.config_override
-        original_authentication = config_override.get("ui.authentication", None)
-
-        config_override["ui.authentication"] = True
-        yield create_app()
-        config_override["ui.authentication"] = original_authentication
+    @pytest.fixture(scope="class")
+    def app(self, create_app, project):
+        project.settings.config_override["ui.authentication"] = True
+        return create_app()
 
     @pytest.mark.parametrize(
         "user,status_code", [("alice", 201), ("rob", 403), (None, 401)]

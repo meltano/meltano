@@ -3,7 +3,8 @@ from __future__ import annotations
 import pytest
 
 from meltano.cli import cli
-from meltano.core.project import Project, ProjectNotFound
+from meltano.core.error import ProjectNotFound
+from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitServiceError
 
 

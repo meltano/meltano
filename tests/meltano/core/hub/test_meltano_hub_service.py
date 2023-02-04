@@ -13,7 +13,6 @@ from meltano.core.hub import MeltanoHubService
 from meltano.core.hub.client import HubConnectionError, HubPluginVariantNotFoundError
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.project_settings_service import ProjectSettingsService
 
 
 class TestMeltanoHubService:
@@ -102,7 +101,7 @@ class TestMeltanoHubService:
         assert hub_request_counter["/extractors/index"] == 1
 
     def test_hub_auth(self, project):
-        ProjectSettingsService(project).set("hub_url_auth", "Bearer s3cr3t")
+        project.settings.set("hub_url_auth", "Bearer s3cr3t")
         hub = MeltanoHubService(project)
         assert hub.session.headers["Authorization"] == "Bearer s3cr3t"
 
