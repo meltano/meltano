@@ -46,7 +46,7 @@ class SingerPlugin(BasePlugin):
     async def before_cleanup(self, invoker):
         """Delete configuration file."""
         config_path = invoker.files["config"]
-        config_path.unlink()
+        config_path.unlink(missing_ok=True)
         logging.debug(f"Deleted configuration at {config_path}")
 
     @property

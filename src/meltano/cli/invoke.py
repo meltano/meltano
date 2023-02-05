@@ -21,7 +21,9 @@ from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import (
+    ExecutableNotFoundError,
     PluginInvoker,
     UnknownCommandError,
     invoker_factory,
@@ -171,9 +173,29 @@ async def _invoke(
                     *plugin_args,
                 )
             else:
-                handle = await invoker.invoke_async(*plugin_args, command=command_name)
-                with propagate_stop_signals(handle):
-                    exit_code = await handle.wait()
+                try:
+                    handle = await invoker.invoke_async(*plugin_args, command=command_name)
+                    with propagate_stop_signals(handle):
+                        exit_code = await handle.wait()
+                except ExecutableNotFoundError:
+                    # If the plugin is not installed, try to install it
+                    logging.info(f"Installing plugin '{invoker.plugin.name}'...")
+
+                    # Try to install the plugin
+                    install_service = PluginInstallService(
+                        project=project,
+                        plugins_service=invoker.plugins_service,
+                        clean=True
+                    )
+                    await install_service.install_plugin_async(invoker.plugin)
+
+                    # Log that the plugin is installed
+                    logging.info(f"Plugin '{invoker.plugin.name}' installed. Retrying invocation...")
+
+                    # Try to invoke the plugin again
+                    handle = await invoker.invoke_async(*plugin_args, command=command_name)
+                    with propagate_stop_signals(handle):
+                        exit_code = await handle.wait()
 
     except UnknownCommandError as err:
         raise click.BadArgumentUsage(err) from err
