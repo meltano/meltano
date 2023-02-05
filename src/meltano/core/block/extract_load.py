@@ -23,7 +23,6 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 from meltano.core.state_service import StateService
 
@@ -310,10 +309,6 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         self.context = context
         self.blocks = blocks
-        self.project_settings_service = ProjectSettingsService(
-            self.context.project,
-            config_service=self.context.plugins_service.config_service,
-        )
 
         self.output_logger = OutputLogger(None)
 
@@ -631,7 +626,7 @@ class ELBExecutionManager:
             elb: The ExtractLoadBlocks to manage.
         """
         self.elb = elb
-        self.stream_buffer_size = self.elb.project_settings_service.get(
+        self.stream_buffer_size = self.elb.context.project.settings.get(  # noqa: WPS219
             "elt.buffer_size"
         )
         self.line_length_limit = self.stream_buffer_size // 2
@@ -643,9 +638,10 @@ class ELBExecutionManager:
     async def run(self) -> None:
         """Run is used to actually perform the execution of the ExtractLoadBlock set.
 
-        That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
-        stopping blocks or waiting for IO to complete as appropriate. Expect a RunnerError to be raised if any of
-        the blocks exit with a non 0 exit code.
+        That entails starting the blocks, waiting for them to complete,
+        ensuring that exceptions are handled, and stopping blocks or waiting
+        for IO to complete as appropriate. Expect a RunnerError to be raised if
+        any of the blocks exit with a non 0 exit code.
         """
         await self._wait_for_process_completion(self.elb.head)
         _check_exit_codes(

@@ -17,8 +17,7 @@ from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
-
-from .singer import InvokerBase
+from meltano.core.block.singer import InvokerBase
 
 logger = structlog.getLogger(__name__)
 

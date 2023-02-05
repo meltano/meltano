@@ -7,7 +7,6 @@ from typing import Any
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import FeatureFlags, SettingsService
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
@@ -48,19 +47,24 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
         else:
             self.environment_plugin_config = None
 
-        self._project_settings_service = None
-
         self.env_override = {
-            **self.project_settings_service.env,  # project level environment variables
-            **self.project_settings_service.as_env(),  # project level settings as env vars (e.g. MELTANO_PROJECT_ID)
-            **self.env_override,  # plugin level overrides, passed in as **kwargs and set to self.env_overrides by super().__init__ above
-            **self.plugin.info_env,  # generated generic plugin settings as env vars (e.g. MELTANO_EXTRACT_NAME)
-            **self.plugin.env,  # env vars stored under the `env:` key of the plugin definition
+            # project level environment variables:
+            **self.project.settings.env,
+            # project level settings as env vars (e.g. `MELTANO_PROJECT_ID`):
+            **self.project.settings.as_env(),
+            # plugin level overrides, passed in as `**kwargs` and set to
+            # `self.env_overrides` by `super().__init__` above:
+            **self.env_override,
+            # generated generic plugin settings as env vars
+            # (e.g. `MELTANO_EXTRACT_NAME`):
+            **self.plugin.info_env,
+            # env vars stored under the `env:` key of the plugin definition:
+            **self.plugin.env,
         }
 
         environment_env = {}
         if self.project.active_environment:
-            with self.project_settings_service.feature_flag(
+            with self.project.settings.feature_flag(
                 FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
             ) as strict_env_var_mode:
                 environment_env = {
@@ -99,11 +103,7 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
         Returns:
             A project settings service for the active project.
         """
-        if not self._project_settings_service:
-            self._project_settings_service = ProjectSettingsService(
-                self.project, config_service=self.plugins_service.config_service
-            )
-        return self._project_settings_service
+        return self.project.settings
 
     @property
     def label(self):

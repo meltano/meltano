@@ -373,8 +373,8 @@ class BaseEnvStoreManager(SettingsStoreManager):
         """Return setting environment variables.
 
         Args:
-            args: Positional arguments to pass to setting_service setting_env_vars method.
-            kwargs: Keyword arguments to pass to setting_service setting_env_vars method.
+            args: Positional arguments to pass to `settings_service.setting_env_vars`.
+            kwargs: Keyword arguments to pass to `settings_service.setting_env_vars`.
 
         Returns:
             A dictionary of setting environment variables.

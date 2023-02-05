@@ -29,7 +29,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
 from meltano.core.venv_service import VenvService
@@ -421,17 +420,14 @@ class PluginInstallService:  # noqa: WPS214
             is included, and has the value
             `<major Python version>.<minor Python version>`.
         """
-        project_settings_service = ProjectSettingsService(
-            self.project, config_service=self.plugins_service.config_service
-        )
         plugin_settings_service = PluginSettingsService(
             self.project, plugin, plugins_service=self.plugins_service
         )
-        with project_settings_service.feature_flag(
+        with self.project.settings.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
         ) as strict_env_var_mode:
             expanded_project_env = expand_env_vars(
-                project_settings_service.env,
+                self.project.settings.env,
                 os.environ,
                 if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )

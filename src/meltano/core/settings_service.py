@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import os
 import warnings
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
 from typing import TYPE_CHECKING, Generator, Iterable
@@ -79,7 +79,7 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
-class SettingsService(ABC):  # noqa: WPS214
+class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     """Abstract base class for managing settings."""
 
     LOGGING = False

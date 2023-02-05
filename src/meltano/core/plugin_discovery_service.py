@@ -111,7 +111,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
     __version__ = VERSION
 
-    def __init__(self, project, discovery: dict | None = None):
+    def __init__(self, project: Project, discovery: dict | None = None):
         """Create a new PluginDiscoveryService.
 
         Args:
@@ -125,8 +125,6 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         if discovery:
             self._discovery_version = DiscoveryFile.file_version(discovery)
             self._discovery = DiscoveryFile.parse(discovery)
-
-        self.settings_service = ProjectSettingsService(self.project)
 
     @property
     def file_version(self):
@@ -144,7 +142,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The URL of the discovery file.
         """
-        discovery_url = self.settings_service.get("discovery_url")
+        discovery_url = self.project.settings.get("discovery_url")
 
         if not discovery_url or not re.match(
             r"^https?://", discovery_url  # noqa: WPS360
@@ -160,7 +158,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The `discovery_url_auth` setting.
         """
-        return self.settings_service.get("discovery_url_auth")
+        return self.project.settings.get("discovery_url_auth")
 
     @property
     def discovery(self):
@@ -250,8 +248,8 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         if self.discovery_url_auth:
             headers["Authorization"] = self.discovery_url_auth
 
-        if self.settings_service.get("send_anonymous_usage_stats"):
-            project_id = self.settings_service.get("project_id")
+        if self.project.settings.get("send_anonymous_usage_stats"):
+            project_id = self.project.settings.get("project_id")
 
             headers["X-Project-ID"] = project_id
             params["project_id"] = project_id

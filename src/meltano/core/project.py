@@ -94,7 +94,7 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             A `ProjectSettingsService` instance for this project.
         """
-        return ProjectSettingsService(self, config_service=self.config_service)
+        return ProjectSettingsService(self)
 
     @cached_property
     def _meltano_interprocess_lock(self):
@@ -290,15 +290,16 @@ class Project(Versioned):  # noqa: WPS214
         from meltano.core.meltano_file import MeltanoFile
 
         with self._meltano_rw_lock.write_lock(), self._meltano_interprocess_lock:
-
             meltano_config = MeltanoFile.parse(self.project_files.load())
             yield meltano_config
-
             try:
                 self.project_files.update(meltano_config.canonical())
             except Exception as err:
                 logger.critical("Could not update meltano.yml: %s", err)  # noqa: WPS323
                 raise
+
+        with suppress(KeyError):
+            del self.__dict__["settings"]
 
     def root_dir(self, *joinpaths):
         """Return the root directory of this project, optionally joined with path.

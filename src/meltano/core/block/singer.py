@@ -6,16 +6,14 @@ import asyncio
 from asyncio.subprocess import Process
 from contextlib import suppress
 
+from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.utils import SubprocessOutputWriter
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-
-from .ioblock import IOBlock
 
 PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPERS)
 CONSUMERS = (PluginType.LOADERS, PluginType.MAPPERS)
@@ -40,21 +38,18 @@ class InvokerBase:  # noqa: WPS230, WPS214
         plugin_invoker: PluginInvoker,
         command: str | None,
     ):
-        """Configure and return a wrapped plugin invoker extendable for use as an IOBlock or PluginCommandBlock.
+        """Init a wrapped plugin invoker for use as an IOBlock or PluginCommandBlock.
 
         Args:
-            block_ctx: context that should be used for this instance to do things like obtaining project settings.
-            project: that should be used to obtain the ProjectSettingsService.
-            plugins_service: that configured plugins service.
-            plugin_invoker: the actual plugin invoker.
-            command: the optional command to invoke.
+            block_ctx: Context that should be used for this instance to do
+                things like obtaining project settings.
+            project: The Meltano project this `InvokerBase` is for.
+            plugins_service: Unused argument.
+            plugin_invoker: The actual plugin invoker.
+            command: The optional command to invoke.
         """
         self.context = block_ctx
         self.project = project
-        self.project_settings_service = ProjectSettingsService(
-            self.project,
-            config_service=plugins_service.config_service,
-        )
 
         self.invoker: PluginInvoker = plugin_invoker
         self._command: str | None = command
@@ -335,7 +330,7 @@ class SingerBlock(InvokerBase, IOBlock):
         Raises:
             RunnerError: If the plugin can not start.
         """
-        stream_buffer_size = self.project_settings_service.get("elt.buffer_size")
+        stream_buffer_size = self.project.settings.get("elt.buffer_size")
         line_length_limit = stream_buffer_size // 2
 
         stdin = None

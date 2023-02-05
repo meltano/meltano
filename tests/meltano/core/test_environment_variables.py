@@ -238,11 +238,11 @@ class TestEnvVarResolution:
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
             )
 
-        with project.meltano_update() as meltanofile:
-            meltanofile.update(env_var_resolution_expectation.meltanofile_updates)
-
         for key, val in env_var_resolution_expectation.terminal_env.items():
             monkeypatch.setenv(key, val)
+
+        with project.meltano_update() as meltanofile:
+            meltanofile.update(env_var_resolution_expectation.meltanofile_updates)
 
         args = ["invoke"]
         for key in env_var_resolution_expectation.expected_env_values.keys():

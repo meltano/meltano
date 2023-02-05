@@ -8,7 +8,6 @@ from typing import Generator
 
 import structlog
 
-from meltano.core.config_service import ConfigService
 from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginRef, PluginType
@@ -54,7 +53,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def __init__(
         self,
         project: Project,
-        config_service: ConfigService | None = None,
         lock_service: PluginLockService | None = None,
         discovery_service: PluginDiscoveryService | None = None,
         locked_definition_service: LockedDefinitionService | None = None,
@@ -65,7 +63,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         Args:
             project: The Meltano project.
-            config_service: The Meltano Config Service.
             lock_service: The Meltano Plugin Lock Service.
             discovery_service: The Meltano Plugin Discovery Service.
             locked_definition_service: The Meltano Locked Definition Service.
@@ -73,8 +70,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             use_cache: Whether to use the plugin cache.
         """
         self.project = project
-
-        self.config_service = config_service or ConfigService(project)
         self.discovery_service = discovery_service or PluginDiscoveryService(project)
         self.lock_service = lock_service or PluginLockService(project)
         self.locked_definition_service = (
@@ -112,7 +107,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             The current plugins.
         """
         if self._current_plugins is None or not self._use_cache:
-            self._current_plugins = self.config_service.current_meltano_yml.plugins
+            self._current_plugins = (
+                self.project.config_service.current_meltano_yml.plugins
+            )
         return self._current_plugins
 
     @contextmanager
@@ -122,7 +119,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Yields:
             The current plugins.
         """
-        with self.config_service.update_meltano_yml() as meltano_yml:
+        with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
         self._current_plugins = None
@@ -389,7 +386,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Args:
             plugin: The plugin configuration to update.
         """
-        with self.config_service.update_active_environment() as environment:
+        with self.project.config_service.update_active_environment() as environment:
             environment.config.plugins.setdefault(plugin.type, [])
 
             # find the proper plugin to update

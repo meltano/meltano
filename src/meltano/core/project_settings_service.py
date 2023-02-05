@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 import structlog
 from dotenv import dotenv_values
 
-from meltano.core.config_service import ConfigService
 from meltano.core.error import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
@@ -38,7 +37,6 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         show_hidden: bool = True,
         env_override: dict | None = None,
         config_override: dict | None = None,
-        config_service: ConfigService | None = None,
     ):
         """Instantiate a `ProjectSettingsService` instance.
 
@@ -47,7 +45,6 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             show_hidden: Whether to display secret setting values.
             env_override: Optional override environment values.
             config_override:  Optional override configuration values.
-            config_service: Project configuration service instance.
         """
         super().__init__(
             project=project,
@@ -55,8 +52,6 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             env_override=env_override,
             config_override=config_override,
         )
-
-        self.config_service = config_service or ConfigService(self.project)
 
         self.env_override = {
             # terminal environment variables already present from SettingService.env
@@ -149,7 +144,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         Returns:
             A list of defined settings.
         """
-        return self.config_service.settings
+        return self.project.config_service.settings
 
     @property
     def meltano_yml_config(self):
@@ -158,7 +153,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         Returns:
             Current configuration in `meltano.yml`.
         """
-        return self.config_service.current_config
+        return self.project.config_service.current_config
 
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
@@ -166,7 +161,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         Args:
             config: Updated config.
         """
-        self.config_service.update_config(config)
+        self.project.config_service.update_config(config)
 
     def process_config(self, config) -> dict:
         """Process configuration dictionary for presentation in `meltano config meltano`.

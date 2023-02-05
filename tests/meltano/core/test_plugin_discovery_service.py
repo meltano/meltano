@@ -10,6 +10,7 @@ import requests
 import requests_mock
 
 from meltano.core import bundle
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
@@ -26,16 +27,15 @@ def project(project):
 
 
 @pytest.fixture
-def subject(plugin_discovery_service):
+def subject(plugin_discovery_service: PluginDiscoveryService):
     yield plugin_discovery_service
-    plugin_discovery_service.settings_service.reset()
+    plugin_discovery_service.project.settings.reset()
 
 
 @pytest.fixture
 def discovery_url_mock(subject):
     with requests_mock.Mocker() as mocker:
         mocker.get(subject.discovery_url, status_code=HTTP_STATUS_TEAPOT)
-
         yield
 
 
@@ -274,11 +274,11 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     @pytest.fixture
     def disabled_remote_discovery(self, subject):
-        subject.settings_service.set("discovery_url", "false")
+        subject.project.settings.set("discovery_url", "false")
 
     @pytest.fixture
     def enabled_remote_discovery_auth(self, subject):
-        subject.settings_service.set("discovery_url_auth", "test")
+        subject.project.settings.set("discovery_url_auth", "test")
 
     @pytest.fixture
     def cached_discovery(self, subject):
@@ -335,7 +335,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         discovery = subject.load_remote_discovery()
 
         mock_discovery_request.assert_called_once()
-        expected_auth = subject.settings_service.get("discovery_url_auth")
+        expected_auth = subject.project.settings.get("discovery_url_auth")
         actual_auth = mock_discovery_request.call_args[1]["headers"].get(
             "Authorization"
         )
@@ -356,7 +356,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         discovery = subject.load_remote_discovery()
 
         mock_discovery_request.assert_called_once()
-        expected_auth = subject.settings_service.get("discovery_url_auth")
+        expected_auth = subject.project.settings.get("discovery_url_auth")
         actual_auth = mock_discovery_request.call_args[1]["headers"].get(
             "Authorization"
         )

@@ -10,7 +10,6 @@ from meltano.core.elt_context import ELTContext
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import Runner, RunnerError
 from meltano.core.utils import human_size
 
@@ -18,11 +17,6 @@ from meltano.core.utils import human_size
 class SingerRunner(Runner):
     def __init__(self, elt_context: ELTContext):
         self.context = elt_context
-
-        self.project_settings_service = ProjectSettingsService(
-            self.context.project,
-            config_service=self.context.plugins_service.config_service,
-        )
 
     def stop(self, process, **wait_args):
         while True:
@@ -51,7 +45,7 @@ class SingerRunner(Runner):
         # which cannot be set directly:
         # - https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L395-L396
         # - https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L482
-        stream_buffer_size = self.project_settings_service.get("elt.buffer_size")
+        stream_buffer_size = self.context.project.settings.get("elt.buffer_size")
         line_length_limit = stream_buffer_size // 2
 
         # Start tap
