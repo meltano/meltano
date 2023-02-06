@@ -804,7 +804,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             raise StoreNotSupportedError(
                 "Project config cannot be stored in an Environment."
             )
-        if self.settings_service.project.active_environment is None:
+        if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
 
     @contextmanager
@@ -1217,7 +1217,7 @@ class AutoStoreManager(SettingsStoreManager):
                 return SettingValueStore.DOTENV
 
         # no active meltano environment
-        if not self.project.active_environment:
+        if not self.project.environment:
             # return root `meltano.yml`
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
                 return SettingValueStore.MELTANO_YML

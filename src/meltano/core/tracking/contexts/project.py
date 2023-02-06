@@ -59,7 +59,7 @@ class ProjectContext(SelfDescribingJson):
             },
         )
 
-        self.environment_name = getattr(self.project.active_environment, "name", None)
+        self.environment_name = getattr(self.project.environment, "name", None)
 
     @property
     def environment_name(self) -> str | None:

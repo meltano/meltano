@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import click
 
+from meltano.cli import cli
+from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
@@ -10,10 +13,6 @@ from meltano.core.plugin_location_remove import (
     PluginLocationRemoveManager,
 )
 from meltano.core.plugin_remove_service import PluginRemoveService
-
-from . import cli
-from .params import pass_project
-from .utils import InstrumentedCmd
 
 
 @cli.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")

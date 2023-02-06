@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import mock
 import pytest
 from click.testing import CliRunner
 
@@ -14,14 +13,6 @@ from meltano.core.project import Project
 
 
 class TestLock:
-    @pytest.fixture(autouse=True)
-    def patch_hub(self, meltano_hub_service: MeltanoHubService):
-        with mock.patch(
-            "meltano.core.project_plugins_service.MeltanoHubService",
-            return_value=meltano_hub_service,
-        ):
-            yield
-
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "args",

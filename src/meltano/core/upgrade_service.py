@@ -15,7 +15,7 @@ from sqlalchemy.engine import Engine
 import meltano
 from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import PluginType, ProjectPluginsService
+from meltano.core.project_plugins_service import PluginType
 
 
 class UpgradeError(Exception):
@@ -133,9 +133,7 @@ class UpgradeService:
         """Update the files managed by Meltano inside the current project."""
         click.secho("Updating files managed by plugins...", fg="blue")
 
-        file_plugins = ProjectPluginsService(self.project).get_plugins_of_type(
-            PluginType.FILES
-        )
+        file_plugins = self.project.plugins.get_plugins_of_type(PluginType.FILES)
         if not file_plugins:
             click.echo("Nothing to update")
             return

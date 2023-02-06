@@ -17,7 +17,6 @@ from pytest import MonkeyPatch
 from snowplow_tracker import Emitter
 
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
@@ -110,11 +109,8 @@ class TestTracker:
         config = project.settings.meltano_yml_config
         del config["project_id"]
         project.settings.update_meltano_yml_config(config)
-
-        assert project.settings.get("project_id") is None
-
-        # Create a new `ProjectSettingsService` because it is what restores the project ID
-        project.settings = ProjectSettingsService(project)
+        # The project refreshes itself once the config has been changed, which
+        # creates a new `ProjectSettingsService`, restoring the `project_id`.
         restored_project_id = project.settings.get("project_id")
 
         # Depending on what tests were run before this one, the project ID might have been randomly
@@ -205,11 +201,8 @@ class TestTracker:
             "send_anonymous_usage_stats"
         ]
         project.settings.update_meltano_yml_config(config)
-
-        assert project.settings.get("project_id") is None
-
-        # Create a new `ProjectSettingsService` because it restores the project ID
-        project.settings = ProjectSettingsService(project)
+        # The project refreshes itself once the config has been changed, which
+        # creates a new `ProjectSettingsService`, restoring the `project_id`.
         restored_project_id = project.settings.get("project_id")
 
         # Depending on what tests were run before this one, the project ID might have been randomly

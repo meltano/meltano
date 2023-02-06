@@ -10,10 +10,13 @@ import requests
 import requests_mock
 
 from meltano.core import bundle
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginType, Variant, VariantNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import VERSION, PluginNotFoundError
+from meltano.core.plugin_discovery_service import (
+    VERSION,
+    PluginDiscoveryService,
+    PluginNotFoundError,
+)
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.yaml import yaml
 

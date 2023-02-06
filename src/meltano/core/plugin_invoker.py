@@ -21,7 +21,6 @@ from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
@@ -133,7 +132,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         run_dir: Path | None = None,
         config_dir: Path | None = None,
         venv_service: VenvService | None = None,
-        plugins_service: ProjectPluginsService | None = None,
         plugin_config_service: PluginConfigService | None = None,
         plugin_settings_service: PluginSettingsService | None = None,
     ):
@@ -147,7 +145,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             run_dir: Execution directory.
             config_dir: Configuration files directory.
             venv_service: Virtual Environment manager.
-            plugins_service: Plugin manager.
             plugin_config_service: Plugin Configuration manager.
             plugin_settings_service: Plugin Settings manager.
         """
@@ -170,11 +167,8 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             run_dir or self.project.run_dir(plugin.name),
         )
 
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.settings_service = plugin_settings_service or PluginSettingsService(
-            project,
-            plugin,
-            plugins_service=self.plugins_service,
+            project, plugin
         )
 
         self._prepared = False
@@ -344,11 +338,11 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             # Expand active env w/ expanded root env
             expanded_active_env = (
                 expand_env_vars(
-                    self.settings_service.project.active_environment.env,
+                    self.settings_service.project.environment.env,
                     expanded_project_env,
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
-                if self.settings_service.project.active_environment
+                if self.settings_service.project.environment
                 else {}
             )
 

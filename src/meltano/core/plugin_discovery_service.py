@@ -6,7 +6,7 @@ import io
 import logging
 import re
 from abc import ABCMeta, abstractmethod
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 import requests
 from ruamel.yaml import YAMLError
@@ -20,10 +20,11 @@ from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import NotFound, find_named
 from meltano.core.yaml import yaml
+
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class DiscoveryInvalidError(Exception):

@@ -103,9 +103,6 @@ def cli(  # noqa: C901,WPS231
     try:  # noqa: WPS229
         project = Project.find()
         setup_logging(project)
-        readonly = project.settings.get("project_readonly")
-        if readonly:
-            project.readonly = True
         if project.readonly:
             logger.debug("Project is read-only.")
 

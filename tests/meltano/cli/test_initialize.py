@@ -13,19 +13,15 @@ class TestCliInit:
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
 
-        # there are no project actually
-        assert Project._default is None
+        Project.deactivate()
         with pytest.raises(ProjectNotFound):
             Project.find()
 
-        # create one with the CLI
+        # Create a project with the CLI
         cli_runner.invoke(cli, ["init", "test_project", "--no_usage_stats"])
 
         pushd("test_project")
-
         project = Project.find()
-
-        # Deactivate project
         Project.deactivate()
 
         files = (

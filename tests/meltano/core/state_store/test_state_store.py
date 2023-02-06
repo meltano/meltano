@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import os
 import shutil
+from pathlib import Path
 
 import pytest
 
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
     DBStateStoreManager,
@@ -18,10 +17,13 @@ from meltano.core.state_store import (
 )
 
 
-@pytest.fixture(scope="function")
-def state_path(test_dir):
-    yield os.path.join(test_dir, ".meltano", "state")
-    shutil.rmtree(os.path.join(test_dir, ".meltano", "state"))
+@pytest.fixture
+def state_path(tmp_path: Path):
+    path = tmp_path / ".meltano" / "state"
+    try:
+        yield str(path)
+    finally:
+        shutil.rmtree(path)
 
 
 def test_state_store_manager_from_project_settings(project: Project, state_path: str):

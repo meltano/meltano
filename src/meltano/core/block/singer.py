@@ -12,7 +12,6 @@ from meltano.core.logging.utils import SubprocessOutputWriter
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 
 PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPERS)
@@ -34,7 +33,6 @@ class InvokerBase:  # noqa: WPS230, WPS214
         self,
         block_ctx,
         project: Project,
-        plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
         command: str | None,
     ):
@@ -44,7 +42,6 @@ class InvokerBase:  # noqa: WPS230, WPS214
             block_ctx: Context that should be used for this instance to do
                 things like obtaining project settings.
             project: The Meltano project this `InvokerBase` is for.
-            plugins_service: Unused argument.
             plugin_invoker: The actual plugin invoker.
             command: The optional command to invoke.
         """
@@ -271,7 +268,6 @@ class SingerBlock(InvokerBase, IOBlock):
         self,
         block_ctx: dict,
         project: Project,
-        plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
         plugin_args: tuple[str],
     ):
@@ -280,14 +276,12 @@ class SingerBlock(InvokerBase, IOBlock):
         Args:
             block_ctx: the block context.
             project:  the project to use to obtain project settings.
-            plugins_service: the plugins service.
             plugin_invoker: the plugin invoker.
             plugin_args: any additional plugin args that should be used.
         """
         super().__init__(
             block_ctx=block_ctx,
             project=project,
-            plugins_service=plugins_service,
             plugin_invoker=plugin_invoker,
             command=None,
         )

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from http import HTTPStatus
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 import requests
@@ -23,7 +23,9 @@ from meltano.core.plugin import (
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_discovery_service import PluginRepository
-from meltano.core.project import Project
+
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = get_logger(__name__)
 
@@ -101,6 +103,8 @@ class HubPluginVariantNotFoundError(Exception):
 class MeltanoHubService(PluginRepository):  # noqa: WPS214
     """PluginRepository implementation for the Meltano Hub."""
 
+    session = requests.Session()
+
     def __init__(self, project: Project) -> None:
         """Initialize the service.
 
@@ -108,7 +112,6 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             project: The Meltano project.
         """
         self.project = project
-        self.session = requests.Session()
         self.session.headers.update(
             {
                 "Accept": "application/json",

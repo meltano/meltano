@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import platform
 import re
 import shutil
@@ -26,24 +27,25 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 
 class TestCli:
-    @pytest.fixture()
-    def project(self, test_dir, project_init_service):
+    @pytest.fixture
+    def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
+        os.chdir(tmp_path)
         project = project_init_service.init(  # noqa: DAR301
             activate=False, add_discovery=True
         )
-
+        Project._default = None
         try:
             yield project
         finally:
             Project.deactivate()
             shutil.rmtree(project.root)
 
-    @pytest.fixture()
+    @pytest.fixture
     def deactivate_project(self):
         Project.deactivate()
 
-    @pytest.fixture()
+    @pytest.fixture
     def empty_project(self, empty_meltano_yml_dir, pushd):
         project = Project(empty_meltano_yml_dir)
         try:
@@ -52,8 +54,8 @@ class TestCli:
             Project.deactivate()
 
     @pytest.mark.order(0)
-    def test_activate_project(self, project, cli_runner, pushd):
-        assert Project._default is None
+    def test_activate_project(self, test_cli_project, cli_runner, pushd):
+        project = test_cli_project
 
         pushd(project.root)
         cli_runner.invoke(cli, ["discover"])
@@ -70,8 +72,10 @@ class TestCli:
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
-        self, project, cli_runner, pushd, monkeypatch
+        self, test_cli_project, cli_runner, pushd, monkeypatch
     ):
+        project = test_cli_project
+
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
 
         assert Project._default is None
@@ -83,8 +87,9 @@ class TestCli:
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_dotenv(
-        self, project, cli_runner, pushd, monkeypatch
+        self, test_cli_project, cli_runner, pushd
     ):
+        project = test_cli_project
         ProjectSettingsService(project).set("project_readonly", True)
 
         assert Project._default is None
@@ -108,7 +113,7 @@ class TestCli:
             cli,
             ["test"],
         )
-        assert Project._default.active_environment.name == "test-meltano-environment"
+        assert Project._default.environment.name == "test-meltano-environment"
 
     def test_environment_flag_overrides_default(
         self, deactivate_project, project_files_cli, cli_runner, pushd
@@ -119,7 +124,7 @@ class TestCli:
             ["--environment", "test-subconfig-2-yml", "test"],
         )
 
-        assert Project._default.active_environment.name == "test-subconfig-2-yml"
+        assert Project._default.environment.name == "test-subconfig-2-yml"
 
     def test_environment_variable_overrides_default(
         self, deactivate_project, project_files_cli, cli_runner, pushd, monkeypatch
@@ -131,7 +136,7 @@ class TestCli:
             cli,
             ["test"],
         )
-        assert Project._default.active_environment.name == "test-subconfig-2-yml"
+        assert Project._default.environment.name == "test-subconfig-2-yml"
 
     def test_lower_null_environment_overrides_default(
         self, deactivate_project, project_files_cli, cli_runner, pushd
@@ -141,7 +146,7 @@ class TestCli:
             cli,
             ["--environment", "null", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
     def test_upper_null_environment_overrides_default(
         self, deactivate_project, project_files_cli, cli_runner, pushd
@@ -151,7 +156,7 @@ class TestCli:
             cli,
             ["--environment", "NULL", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
     def test_no_environment_overrides_default(
         self, deactivate_project, project_files_cli, cli_runner, pushd
@@ -161,7 +166,7 @@ class TestCli:
             cli,
             ["--no-environment", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
     def test_no_environment_and_null_environment_overrides_default(  # noqa: WPS118
         self, deactivate_project, project_files_cli, cli_runner, pushd
@@ -171,14 +176,15 @@ class TestCli:
             cli,
             ["--no-environment", "--environment", "null", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
     def test_handle_meltano_error(self):
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match="This failed. Try again."):
             handle_meltano_error(exception)
 
-    def test_cwd_option(self, cli_runner, project, tmp_path: Path, pushd):
+    def test_cwd_option(self, cli_runner, test_cli_project, tmp_path: Path, pushd):
+        project = test_cli_project
         with cd(project.root_dir()):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
             assert Path().resolve() == project.root_dir()

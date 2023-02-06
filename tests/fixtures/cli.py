@@ -9,7 +9,7 @@ import pytest
 from click import Command
 from click.testing import CliRunner
 
-from fixtures.utils import tmp_project
+from fixtures.utils import cd, tmp_project
 from meltano.core.project_files import ProjectFiles
 
 if TYPE_CHECKING:
@@ -47,8 +47,11 @@ def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
 
 
 @pytest.fixture(scope="class")
-def large_config_project(test_dir, compatible_copy_tree):
-    with tmp_project(
+def large_config_project(
+    compatible_copy_tree,
+    tmp_path_factory: pytest.TempPathFactory,
+):
+    with cd(tmp_path_factory.mktemp("meltano-large-config-project")), tmp_project(
         "large_config_project",
         current_dir / "large_config_project",
         compatible_copy_tree,
@@ -57,8 +60,8 @@ def large_config_project(test_dir, compatible_copy_tree):
 
 
 @pytest.fixture(scope="class")
-def project_files_cli(test_dir, compatible_copy_tree):
-    with tmp_project(
+def project_files_cli(compatible_copy_tree, tmp_path_factory: pytest.TempPathFactory):
+    with cd(tmp_path_factory.mktemp("meltano-project-files-cli")), tmp_project(
         "a_multifile_meltano_project_cli",
         current_dir / "multifile_project",
         compatible_copy_tree,

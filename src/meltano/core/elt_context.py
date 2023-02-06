@@ -14,7 +14,6 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class PluginContext(
@@ -95,7 +94,6 @@ class ELTContext:  # noqa: WPS230
         select_filter: list | None = None,
         catalog: str | None = None,
         state: str | None = None,
-        plugins_service: ProjectPluginsService | None = None,
         base_output_logger: OutputLogger | None = None,
     ):
         """Initialise ELT Context instance.
@@ -114,7 +112,6 @@ class ELTContext:  # noqa: WPS230
             select_filter: Select filters to apply to extractor.
             catalog: Catalog to pass to extractor.
             state: State to pass to extractor.
-            plugins_service: PluginsService to use.
             base_output_logger: OutputLogger to use.
         """
         self.project = project
@@ -133,7 +130,6 @@ class ELTContext:  # noqa: WPS230
         self.catalog = catalog
         self.state = state
 
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.base_output_logger = base_output_logger
 
     @property
@@ -167,7 +163,6 @@ class ELTContext:  # noqa: WPS230
             plugin_context.plugin,
             context=self,
             run_dir=self.elt_run_dir,
-            plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
         )
 
@@ -199,19 +194,13 @@ class ELTContext:  # noqa: WPS230
 class ELTContextBuilder:  # noqa: WPS214
     """ELT Context Builder."""
 
-    def __init__(
-        self,
-        project: Project,
-        plugins_service: ProjectPluginsService | None = None,
-    ):
+    def __init__(self, project: Project):
         """Instantiate new ELTContextBuilder.
 
         Args:
             project: A Meltano Project instance.
-            plugins_service: A PluginsService instance.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
         self._session = None
         self._job = None
@@ -406,7 +395,7 @@ class ELTContextBuilder:  # noqa: WPS214
             PluginNotFoundError: if a plugin specified cannot be found.
         """
         try:
-            plugin = self.plugins_service.get_plugin(plugin_ref)
+            plugin = self.project.plugins.get_plugin(plugin_ref)
         except PluginNotFoundError as err:
             if plugin_ref.name == "dbt":
                 raise PluginNotFoundError(
@@ -423,11 +412,7 @@ class ELTContextBuilder:  # noqa: WPS214
         return PluginContext(
             plugin=plugin,
             settings_service=PluginSettingsService(
-                self.project,
-                plugin,
-                plugins_service=self.plugins_service,
-                env_override=env,
-                config_override=config,
+                self.project, plugin, env_override=env, config_override=config
             ),
             session=self._session,
         )
@@ -496,6 +481,5 @@ class ELTContextBuilder:  # noqa: WPS214
             select_filter=self._select_filter,
             catalog=self._catalog,
             state=self._state,
-            plugins_service=self.plugins_service,
             base_output_logger=self._base_output_logger,
         )
