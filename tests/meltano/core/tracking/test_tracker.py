@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import subprocess
 import uuid
 from contextlib import contextmanager, suppress
@@ -58,12 +57,25 @@ def delete_analytics_json(project: Project) -> None:
 
 class TestTracker:
     @pytest.fixture(autouse=True)
-    def clear_telemetry_settings(self, project):
-        project.settings.config_override.pop("send_anonymous_usage_stats", None)
-        os.environ.pop("MELTANO_SEND_ANONYMOUS_USAGE_STATS", None)
+    def clear_telemetry_settings(self, project, monkeypatch: pytest.MonkeyPatch):
+        monkeypatch.delenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", raising=False)
         config = project.settings.meltano_yml_config
         config.pop("send_anonymous_usage_stats", None)
         project.settings.update_meltano_yml_config(config)
+        original_config_override = (
+            type(project.settings).config_override.copy(),
+            project.settings.config_override.copy(),
+        )
+        try:
+            type(project.settings).config_override.clear()
+            project.settings.config_override.clear()
+            project.refresh()
+            yield
+        finally:
+            (  # noqa: WPS414
+                type(project.settings).config_override,
+                project.settings.config_override,
+            ) = original_config_override
 
     def test_telemetry_state_change_check(self, project: Project):
         with mock.patch.object(
