@@ -1,7 +1,9 @@
 """Meltano schedule definition."""
+
 from __future__ import annotations
 
 import datetime
+from typing import cast
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -89,7 +91,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         return not self.job
 
     @property
-    def elt_args(self) -> list[str | None]:
+    def elt_args(self) -> list[str]:
         """Return the list of arguments to pass to the elt command.
 
         Only valid if the schedule is an elt schedule.
@@ -103,8 +105,8 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         if self.job:
             raise NotImplementedError
         return [
-            self.extractor,
-            self.loader,
+            cast(str, self.extractor),
+            cast(str, self.loader),
             f"--transform={self.transform}",
             f"--state-id={self.name}",
         ]

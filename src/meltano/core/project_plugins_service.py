@@ -67,7 +67,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self.discovery_service = PluginDiscoveryService(project)
         self.lock_service = PluginLockService(project)
         self.locked_definition_service = LockedDefinitionService(project)
-        self.settings_service = project.settings
         self._use_discovery_yaml: bool = True
         self._prefer_source = None
 

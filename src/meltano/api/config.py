@@ -87,10 +87,10 @@ class ProjectSettings:
     }
 
     def __init__(self, project: Project):
-        self.settings_service = project.settings
+        self.project = project
 
     def as_dict(self):
         return {
-            config_key: self.settings_service.get(setting_name)
+            config_key: self.project.settings.get(setting_name)
             for config_key, setting_name in self.settings_map.items()
         }

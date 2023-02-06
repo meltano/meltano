@@ -43,7 +43,7 @@ class ConfigService:
         Returns:
             The project settings.
         """
-        with open(bundle.root / "settings.yml") as settings_yaml:
+        with open(str(bundle.root / "settings.yml")) as settings_yaml:
             settings_yaml_content = yaml.safe_load(settings_yaml)
         return [SettingDefinition.parse(x) for x in settings_yaml_content["settings"]]
 
