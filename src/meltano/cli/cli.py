@@ -154,9 +154,9 @@ def detect_selected_environment(
     Returns:
         The selected environment, and whether it is the default environment.
     """
-    environment = cli_environment or os.environ.get(
+    environment = os.environ.get(
         PROJECT_ENVIRONMENT_ENV,
-        project.dotenv_env.get(PROJECT_ENVIRONMENT_ENV, None),
+        project.dotenv_env.get(PROJECT_ENVIRONMENT_ENV, cli_environment),
     )
     if cli_no_environment or (environment and environment.lower() == "null"):
         logger.info("No Meltano environment was selected")
