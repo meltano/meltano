@@ -10,7 +10,6 @@ import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Generator
-
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
@@ -20,6 +19,7 @@ from meltano.core.plugin import PluginRef
 from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -444,16 +444,44 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Returns:
             Subprocess.
         """
-        async with self._invoke(*args, **kwargs) as (
-            popen_args,
-            popen_options,
-            popen_env,
-        ):
-            return await asyncio.create_subprocess_exec(
-                *popen_args,
-                **popen_options,
-                env=popen_env,
+        try:
+            async with self._invoke(*args, **kwargs) as (
+                popen_args,
+                popen_options,
+                popen_env,
+            ):
+                return await asyncio.create_subprocess_exec(
+                    *popen_args,
+                    **popen_options,
+                    env=popen_env,
+                )
+        except ExecutableNotFoundError:
+            # If the plugin is not installed, try to install it
+            logging.info(f"Plugin '{self.plugin.name}' not found. Installing plugin...")
+
+            # Try to install the plugin
+            install_service = PluginInstallService(
+                project=self.project,
+                plugins_service=self.plugins_service,
+                clean=True
             )
+            await install_service.install_plugin_async(self.plugin)
+
+            # Log that the plugin is installed
+            logging.info(f"Plugin '{self.plugin.name}' installed. Retrying invocation...")
+
+            # Try to invoke the plugin again
+            async with self._invoke(*args, **kwargs) as (
+                popen_args,
+                popen_options,
+                popen_env,
+            ):
+                return await asyncio.create_subprocess_exec(
+                    *popen_args,
+                    **popen_options,
+                    env=popen_env,
+                )
+
 
     async def invoke_docker(  # noqa: WPS210
         self, plugin_command: str, *args, **kwargs

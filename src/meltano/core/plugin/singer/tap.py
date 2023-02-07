@@ -353,10 +353,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
             logging.debug("Cached catalog is outdated, running discovery...")
 
         # We're gonna generate a new catalog, so delete the cache key.
-        try:
-            catalog_cache_key_path.unlink()
-        except FileNotFoundError:
-            pass
+        catalog_cache_key_path.unlink(missing_ok=True)
 
         custom_catalog_filename = plugin_invoker.plugin_config_extras["_catalog"]
         if custom_catalog_filename:
@@ -380,7 +377,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
                 catalog = json.load(catalog_file)
                 Draft4Validator.check_schema(catalog)
         except Exception as err:
-            catalog_path.unlink()
+            catalog_path.unlink(missing_ok=True)
             raise PluginExecutionError(
                 f"Catalog discovery failed: invalid catalog: {err}"
             ) from err
