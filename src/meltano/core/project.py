@@ -119,8 +119,14 @@ class Project(Versioned):  # noqa: WPS214
             "readonly": self.readonly,
             **kwargs,
         }
+        cls = type(self)  # noqa: WPS117
+        # Clear the dictionary backing `self` to invalidate outdated info,
+        # cached properties, etc., then instantiate an up-to-date instance,
+        # then steal its attributes to update the dictionary backing `self`.
+        # This trick makes it as if the instance was just created, yet keeps
+        # all existing references to it valid.
         self.__dict__.clear()
-        self.__dict__.update(type(self)(**kwargs).__dict__)
+        self.__dict__.update(cls(**kwargs).__dict__)
 
     @cached_property
     def config_service(self):
