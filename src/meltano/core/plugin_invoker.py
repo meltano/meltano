@@ -10,6 +10,7 @@ import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Generator
+
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
@@ -461,14 +462,14 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
             # Try to install the plugin
             install_service = PluginInstallService(
-                project=self.project,
-                plugins_service=self.plugins_service,
-                clean=True
+                project=self.project, plugins_service=self.plugins_service, clean=True
             )
             await install_service.install_plugin_async(self.plugin)
 
             # Log that the plugin is installed
-            logging.info(f"Plugin '{self.plugin.name}' installed. Retrying invocation...")
+            logging.info(
+                f"Plugin '{self.plugin.name}' installed. Retrying invocation..."
+            )
 
             # Try to invoke the plugin again
             async with self._invoke(*args, **kwargs) as (
@@ -481,7 +482,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                     **popen_options,
                     env=popen_env,
                 )
-
 
     async def invoke_docker(  # noqa: WPS210
         self, plugin_command: str, *args, **kwargs
