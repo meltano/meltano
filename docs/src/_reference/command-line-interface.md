@@ -18,7 +18,7 @@ The following options are available for all `meltano` subcommands:
 
 The following configuration is available for all meltano subcommands via an environment variable:
 
-* `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no_color.org`](https://no-color.org/) for more information.
+* `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
 
 ## `add`
 
