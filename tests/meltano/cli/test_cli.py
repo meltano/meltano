@@ -94,7 +94,7 @@ class TestCli:
 
         assert Project._default.readonly
 
-    def test_environment_set_via_dotenv(
+    def test_environment_precedence(
         self,
         project: Project,
         pushd,
@@ -103,18 +103,33 @@ class TestCli:
     ):
         pushd(project.root)
         monkeypatch.delenv(PROJECT_ENVIRONMENT_ENV, raising=False)
-        environment_name = "env_set_from_dotenv"
+        environment_names = {
+            name: f"env_set_from_{name}" for name in ("dotenv", "cli_option", "env_var")
+        }
         with mock.patch(
             "meltano.core.project.Project.dotenv_env",
             new_callable=mock.PropertyMock,
-            return_value={PROJECT_ENVIRONMENT_ENV: environment_name},
+            return_value={PROJECT_ENVIRONMENT_ENV: environment_names["dotenv"]},
         ):
-            result = cli_runner.invoke(cli, ("invoke", "tap-mock"))
-        assert result.exit_code
-        assert (
-            result.exception.args[0]
-            == f"Environment {environment_name!r} was not found."
-        )
+            args = ("invoke", "tap-mock")
+            results = {
+                "dotenv": cli_runner.invoke(cli, args),
+                "cli_option": cli_runner.invoke(
+                    cli,
+                    (f"--environment={environment_names['cli_option']}", *args),
+                ),
+                "env_var": cli_runner.invoke(
+                    cli,
+                    args,
+                    env={PROJECT_ENVIRONMENT_ENV: environment_names["env_var"]},
+                ),
+            }
+        for source, name in environment_names.items():
+            assert results[source].exit_code
+            assert (
+                results[source].exception.args[0]
+                == f"Environment {name!r} was not found."
+            )
 
     def test_version(self, cli_runner):
         cli_version = cli_runner.invoke(cli, ["--version"])

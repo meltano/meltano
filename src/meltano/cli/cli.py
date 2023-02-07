@@ -145,6 +145,13 @@ def detect_selected_environment(
 ) -> tuple[str | None, bool]:
     """Detect the Meltano environment selected (but not yet activated).
 
+    Precedence is:
+    1. The `--environment` CLI option
+    2. Env var from the shell
+    3. Env var from `.env`
+    4. Default environment from `meltano.yml`
+    5. `None`
+
     Args:
         cli_environment: The `--environment` option value from the CLI.
         no_environment: The `--no-environment` option value from the CLI.
@@ -154,9 +161,9 @@ def detect_selected_environment(
     Returns:
         The selected environment, and whether it is the default environment.
     """
-    environment = os.environ.get(
+    environment = cli_environment or os.environ.get(
         PROJECT_ENVIRONMENT_ENV,
-        project.dotenv_env.get(PROJECT_ENVIRONMENT_ENV, cli_environment),
+        project.dotenv_env.get(PROJECT_ENVIRONMENT_ENV, None),
     )
     if cli_no_environment or (environment and environment.lower() == "null"):
         logger.info("No Meltano environment was selected")
