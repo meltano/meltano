@@ -120,7 +120,6 @@ class TestProjectPluginsService:
         alternative_target,
         plugin_discovery_service,
     ):
-
         # The behavior being tested here assumes that no lockfiles exist.
         shutil.rmtree(subject.project.root_dir("plugins"), ignore_errors=True)
         # name="tap-mock", variant="meltano"

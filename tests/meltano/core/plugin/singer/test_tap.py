@@ -81,7 +81,6 @@ class TestSingerTap:
 
         @contextmanager
         def create_job():
-
             new_job = Job(job_name=job.job_name)
             new_job.start()
             yield new_job
@@ -706,7 +705,6 @@ class TestSingerTap:
         elt_context_builder,
         project_plugins_service,
     ):
-
         process_mock = mock.Mock()
         process_mock.name = subject.name
         process_mock.wait = AsyncMock(return_value=0)
@@ -742,7 +740,6 @@ class TestSingerTap:
         elt_context_builder,
         project_plugins_service,
     ):
-
         process_mock = mock.Mock()
         process_mock.name = subject.name
         process_mock.wait = AsyncMock(return_value=1)
@@ -770,7 +767,6 @@ class TestSingerTap:
         elt_context_builder,
         project_plugins_service,
     ):
-
         process_mock = mock.Mock()
         process_mock.name = subject.name
         # we need to exit successfully to not trigger error handling
@@ -825,7 +821,6 @@ class TestSingerTap:
         elt_context_builder,
         project_plugins_service,
     ):
-
         process_mock = mock.Mock()
         process_mock.name = subject.name
         process_mock.wait = AsyncMock(return_value=0)
@@ -853,7 +848,6 @@ class TestSingerTap:
         elt_context_builder,
         project_plugins_service,
     ):
-
         process_mock = mock.Mock()
         process_mock.name = subject.name
         # we need to exit successfully to not trigger error handling

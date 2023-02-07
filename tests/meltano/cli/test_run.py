@@ -21,7 +21,6 @@ from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
 class MockIOBlock(IOBlock):
-
     string_id = "mock-io-block"
 
 
@@ -719,7 +718,6 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-
         # in this scenario, the tap fails on the third read. Target should still complete, but dbt should not.
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -803,7 +801,6 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-
         args = ["run", tap.name, target.name, "dbt:run"]
 
         # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
@@ -910,7 +907,6 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-
         args = ["run", tap.name, target.name, "dbt:run"]
 
         target_process.wait.return_value = 1
@@ -995,7 +991,6 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-
         args = ["run", tap.name, target.name, "dbt:run"]
 
         tap_process.wait.return_value = 1
@@ -1087,7 +1082,6 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-
         args = ["run", tap.name, target.name]
 
         # Raise a ValueError wrapping a LimitOverrunError, like StreamReader.readline does:
@@ -1325,7 +1319,6 @@ class TestCliRunScratchpadOne:
         project_plugins_service,
         job_logging_service,
     ):
-
         # in this scenario, the map fails on the second read. Target should still complete, but dbt should not.
         args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
 

@@ -449,7 +449,6 @@ class TestExtractLoadBlocks:
         plugin_invoker_factory,
         elb_context,
     ):
-
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
@@ -464,7 +463,6 @@ class TestExtractLoadBlocks:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
-
             blocks = (
                 SingerBlock(
                     block_ctx=elb_context,

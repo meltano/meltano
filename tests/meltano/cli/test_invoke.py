@@ -26,7 +26,6 @@ def project_tap_mock(project_add_service):
 class TestCliInvoke:
     @pytest.fixture
     def mock_invoke(self, utility, plugin_invoker_factory):
-
         process_mock = Mock()
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=0)
@@ -198,7 +197,6 @@ class TestCliInvoke:
         ) as apply_catalog_rules, patch.object(
             SingerTap, "look_up_state"
         ) as look_up_state:
-
             # Modes other than sync don't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
             assert discover_catalog.call_count == 0

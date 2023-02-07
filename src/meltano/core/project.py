@@ -292,7 +292,6 @@ class Project(Versioned):  # noqa: WPS214
         from meltano.core.meltano_file import MeltanoFile
 
         with self._meltano_rw_lock.write_lock(), self._meltano_interprocess_lock:
-
             meltano_config = MeltanoFile.parse(self.project_files.load())
             yield meltano_config
 

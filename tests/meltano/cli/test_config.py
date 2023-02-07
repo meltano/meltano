@@ -89,7 +89,6 @@ class TestCliConfig:
     def test_config_test(
         self, project: Project, cli_runner, tap, project_plugins_service
     ):
-
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)

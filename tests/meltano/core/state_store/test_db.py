@@ -16,11 +16,10 @@ class TestDBStateStoreManager:
     def test_get_state(
         self, subject: DBStateStoreManager, state_ids_with_expected_states
     ):
-        for (state_id, expected_state) in state_ids_with_expected_states:
+        for state_id, expected_state in state_ids_with_expected_states:
             assert json.loads(subject.get(state_id).json_merged()) == expected_state
 
     def test_set_state(self, subject: DBStateStoreManager):
-
         # New partial is set
         partial_only = JobState(
             state_id="partial_only", partial_state={"singer_state": {"partial": 1}}

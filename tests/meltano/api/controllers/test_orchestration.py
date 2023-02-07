@@ -127,7 +127,6 @@ class TestOrchestration:
         tap,
         project_plugins_service,
     ):
-
         mock_project_plugins_service.return_value = project_plugins_service
 
         mock_invoke = mock.Mock()
@@ -158,7 +157,6 @@ class TestOrchestration:
         tap,
         project_plugins_service,
     ):
-
         mock_project_plugins_service.return_value = project_plugins_service
 
         mock_invoke = mock.Mock()

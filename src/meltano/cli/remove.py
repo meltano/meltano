@@ -81,7 +81,6 @@ def removal_manager_status_update(removal_manager: PluginLocationRemoveManager):
         )
 
     elif removal_manager.plugin_removed:
-
         msg = f"Removed {plugin_descriptor} from {location}"
 
         if isinstance(removal_manager, DbRemoveManager):

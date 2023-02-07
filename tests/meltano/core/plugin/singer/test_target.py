@@ -25,7 +25,6 @@ class TestSingerTarget:
     async def test_setup_bookmark_writer(
         self, subject, session, plugin_invoker_factory, elt_context_builder
     ):
-
         job = Job(job_name="pytest_test_runner")
 
         # test noop run outside of pipeline context
