@@ -63,7 +63,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
     help="Run Meltano as if it had been started in the specified directory.",
 )
-@click.version_option(prog_name="meltano")
+@click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
 def cli(  # noqa: C901,WPS231
     ctx: click.Context,

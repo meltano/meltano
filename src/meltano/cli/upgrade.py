@@ -34,7 +34,7 @@ def upgrade(ctx, project):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    raise Exception(
+    raise CliError(
         "The 'meltano upgrade' command is disabled on the 'cloud' feature "
         "branch. Please upgrade Meltano manually. Once the Cloud features "
         "are generally available, you will no longer have to install from a "
