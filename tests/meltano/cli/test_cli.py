@@ -8,18 +8,20 @@ from pathlib import Path
 from time import perf_counter_ns
 
 import click
+import mock
 import pytest
 import yaml
 from structlog.stdlib import get_logger
 
 import meltano
 from asserts import assert_cli_runner
+from fixtures.cli import MeltanoCliRunner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
-from meltano.core.project import PROJECT_READONLY_ENV, Project
+from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
@@ -82,9 +84,7 @@ class TestCli:
         assert Project._default.readonly
 
     @pytest.mark.order(2)
-    def test_activate_project_readonly_dotenv(
-        self, project, cli_runner, pushd, monkeypatch
-    ):
+    def test_activate_project_readonly_dotenv(self, project, cli_runner, pushd):
         ProjectSettingsService(project).set("project_readonly", True)
 
         assert Project._default is None
@@ -93,6 +93,28 @@ class TestCli:
         cli_runner.invoke(cli, ["discover"])
 
         assert Project._default.readonly
+
+    def test_environment_set_via_dotenv(
+        self,
+        project: Project,
+        pushd,
+        cli_runner: MeltanoCliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        pushd(project.root)
+        monkeypatch.delenv(PROJECT_ENVIRONMENT_ENV, raising=False)
+        environment_name = "env_set_from_dotenv"
+        with mock.patch(
+            "meltano.core.project.Project.dotenv_env",
+            new_callable=mock.PropertyMock,
+            return_value={PROJECT_ENVIRONMENT_ENV: environment_name},
+        ):
+            result = cli_runner.invoke(cli, ("invoke", "tap-mock"))
+        assert result.exit_code
+        assert (
+            result.exception.args[0]
+            == f"Environment {environment_name!r} was not found."
+        )
 
     def test_version(self, cli_runner):
         cli_version = cli_runner.invoke(cli, ["--version"])
