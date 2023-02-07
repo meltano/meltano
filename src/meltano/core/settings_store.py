@@ -78,6 +78,33 @@ class StoreNotSupportedError(Error):
     """Error raised when write actions are performed on a Store that is not writable."""
 
 
+def cast_setting_value(
+    value: Any,
+    metadata: dict[str, Any],
+    setting_def: SettingDefinition | None,
+) -> tuple[Any, dict[str, Any]]:
+    """Cast a setting value according to its setting defition.
+
+    Args:
+        value: The setting value to be cast.
+        metadata: The metadata of the setting value.
+        setting_def: The setting defition.
+
+    Returns:
+        A tuple with the setting value, and its metadata. If the
+        setting defition was `None`, or the value was not changed by
+        the cast, the pair returned is the same `value` and `metadata`
+        objects provided. Otherwise, the cast value is returned along
+        with a new dictionary which is a shallow copy of the provided
+        metadata with the "uncast_value" key-value pair added.
+    """
+    if setting_def is not None:
+        cast_value = setting_def.cast_value(value)
+        if cast_value != value:
+            return cast_value, {**metadata, "uncast_value": value}
+    return value, metadata
+
+
 class SettingValueStore(str, Enum):
     """Setting Value Store.
 
@@ -340,7 +367,8 @@ class BaseEnvStoreManager(SettingsStoreManager):
                 [metadata["env_var"] for _, metadata in vals_with_metadata]
             )
 
-        return vals_with_metadata[0] if vals_with_metadata else (None, {})
+        value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
+        return cast_setting_value(value, metadata, setting_def)
 
     def setting_env_vars(self, *args, **kwargs) -> dict:
         """Return setting environment variables.
@@ -608,7 +636,8 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
                 metadata["key"] for _, metadata in vals_with_metadata
             )
 
-        return vals_with_metadata[0] if vals_with_metadata else (None, {})
+        value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
+        return cast_setting_value(value, metadata, setting_def)
 
     def set(
         self,
@@ -1258,7 +1287,7 @@ class AutoStoreManager(SettingsStoreManager):
             metadata["auto_store"] = auto_store
             metadata["overwritable"] = auto_store.can_overwrite(found_source)
 
-        return value, metadata
+        return cast_setting_value(value, metadata, setting_def)
 
     def set(self, name: str, path: list[str], value, setting_def=None) -> dict:
         """Set a Setting by name, path and (optionally) SettingDefinition.

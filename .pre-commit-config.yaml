@@ -54,11 +54,11 @@ repos:
       - id: check-jsonschema
         name: validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
-        args: ["--schemafile", "schema/meltano.schema.json"]
+        args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
       - id: check-jsonschema
         name: validate 'discovery.yml' with jsonschema
         files: ^src/meltano/core/bundle/discovery.yml$
-        args: ["--schemafile", "schema/discovery.schema.json"]
+        args: ["--schemafile", "src/meltano/schemas/discovery.schema.json"]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.2

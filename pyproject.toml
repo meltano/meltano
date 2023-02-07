@@ -105,7 +105,6 @@ s3 = ["boto3"]
 black = "^22.3.0"
 boto3-stubs = {extras = ["essential"], version = "1.26.61"}
 bumpversion = "^0.6.0"
-changelog-cli = "^0.6.2"
 colorama = "^0.4.4"
 commitizen-version-bump = {git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main"}
 coverage = {extras = ["toml"], version = "^7.1.0"}

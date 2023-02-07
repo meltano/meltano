@@ -14,6 +14,39 @@ Most of Meltano's features are available without installing any additional packa
 * `gcs` - Support for using Google Cloud Storage as a [state backend](/concepts/state_backends)
 * `azure` - Support for using Azure Blob Storage as a [state backend](/concepts/state_backends)
 
+## Extension Developer Kit (EDK)
+
+Meltano extensions are lightweight executables which allow you to integrate existing data tools with Meltano.
+Extensions allow the developer to add additional features like pre/post-hooks to run before/after Meltano executes the application, as well enabling project scaffolding to be customized for each plugin. This project scaffolding was previously accomplished via files bundles.
+
+The Meltano [Extension Developer Kit](https://github.com/meltano/edk) (EDK) was created to make it easier for developers to build Meltano extensions.
+For more information on how to build your own EDK-based Meltano extension, see [the EDK docs](https://edk.meltano.com/en/latest/).
+
+### Meltano Plugin Types
+
+Meltano has traditionally assigned a plugin type to each plugin based on their functionality.
+These plugin types were/are used in the Meltano codebase to activate plugin type specific features (i.e. piping Singer taps and targets together, running dbt deps before each run, or compiling and removing the Airflow config.cfg configuration file to avoid storing sensitive credentials).
+This approach caused some challenges around getting new features implemented and accepted by the entire user base of Meltano because only one implementation was allowed:
+
+* extractor (Singer Taps e.g. tap-github)
+* loader (Singer Targets e.g. target-snowflake)
+* transformer (dbt Adapters e.g. dbt-snowflake)
+* orchestrator (e.g. Airflow, Dagster)
+* utility (e.g. SqlFluff)
+
+
+The new approach is to group all non-EL plugins under the `utility` plugin type, leaving only the following plugin types:
+
+* extractor
+* loader
+* utility - now also including plugins previously called transformers and orchestrators
+
+As part of this new approach the logic for non-EL plugin specific features has been extracted out of the Meltano codebase and into a Meltano extension.
+This allows the community to iterate on plugin features more quickly without relying on merging features into the Meltano core repository.
+It also allows the community to develop many variants of the wrapper logic for a plugin with different features.
+
+The transformer and orchestrator plugin types are still supported for now but will eventually be phased out as utilities take over.
+
 ## Airbyte Connector Integration FAQ
 
 This FAQ section is for [tap-airbyte-wrapper](https://github.com/MeltanoLabs/tap-airbyte-wrapper) which is a Singer tap which enables any Airbyte source to be used as a Meltano extractor.

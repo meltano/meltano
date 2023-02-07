@@ -46,7 +46,7 @@ jobs:
 
     - name: Bump version
       id: cz-bump
-      uses: commitizen-tools/commitizen-action@0.16.0
+      uses: commitizen-tools/commitizen-action@0.16.2
       with:
         increment: ${{ github.event.inputs.bump != 'auto' && github.event.inputs.bump || '' }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
@@ -56,11 +56,6 @@ jobs:
         github_token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
         extra_requirements: 'git+https://github.com/meltano/commitizen-version-bump@main'
         changelog_increment_filename: _changelog_fragment.md
-
-    - env:
-        PIP_CONSTRAINT: .github/workflows/constraints.txt
-      run: |
-        pipx install changelog-cli
 
     - name: Draft Release
       id: draft-release

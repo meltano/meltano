@@ -65,15 +65,6 @@ def include_webapp() -> None:
         )
 
 
-def include_schemas() -> None:
-    """Copy Meltano schemas into the source tree."""
-    shutil.rmtree("src/meltano/schema/", ignore_errors=True)
-    shutil.copytree("schema/", "src/meltano/schema/")
-    # TODO: Once Python 3.7 support is dropped, we should use
-    #       `shutil.copytree(..., dirs_exist_ok=True)` instead of deleting the
-    #       directory first.
-
-
 from poetry.core.masonry.builders.wheel import WheelBuilder  # noqa: E402
 
 original_wheel_build = WheelBuilder.build
@@ -92,8 +83,6 @@ def custom_build_wheel(*args, **kwargs) -> str:
     # Disabled on the `cloud` feature branch - refer to `src/meltano/cli/ui.py`
     # build_webapp()  # noqa: E800 (commented-out code)
     # include_webapp()  #  noqa: E800 (commented-out code)
-
-    include_schemas()
     return original_wheel_build(*args, **kwargs)
 
 
