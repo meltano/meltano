@@ -23,7 +23,6 @@ from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
-from meltano.core.project_settings_service import ProjectSettingsService
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
