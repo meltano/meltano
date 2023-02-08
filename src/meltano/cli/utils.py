@@ -602,7 +602,7 @@ def enact_environment_behavior(
     ctx: click.Context,
 ) -> None:
     """Activate the environment in the specified way."""
-    if behavior is None:
+    if behavior is None or "selected_environment" not in ctx.obj:
         return
     if behavior is CliEnvironmentBehavior.environment_optional_use_default:
         activate_environment(ctx, ctx.obj["project"], required=False)
