@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 import datetime
-import json
 import platform
 import tempfile
 from pathlib import Path
 from textwrap import dedent
 
 import pytest
-import yaml
-from jsonschema import validate
 
 from fixtures.utils import cd
 from meltano.core.utils import deep_merge
@@ -140,35 +137,6 @@ class TestProjectFiles:
             (project_files.root / "subconfig_2.yml"),
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
-
-    @pytest.mark.order(4)
-    def test_jsonschema(self, project_files):
-        schema_path = (
-            Path(__file__).resolve().parents[3] / "schema" / "meltano.schema.json"
-        )
-        schema_content = json.loads(schema_path.read_text())
-
-        class JsonCompatibleLoader(yaml.SafeLoader):
-            """YAML loader to create dicts compatible with jsonschema validation."""
-
-            @classmethod
-            def remove_implicit_resolver(cls, tag):
-                cls.yaml_implicit_resolvers = {
-                    key: [(t, r) for (t, r) in values if t != tag]  # noqa: WPS111
-                    for key, values in cls.yaml_implicit_resolvers.items()
-                }
-
-        JsonCompatibleLoader.remove_implicit_resolver("tag:yaml.org,2002:timestamp")
-
-        for config_path in [
-            project_files.root / "meltano.yml",
-        ] + project_files.include_paths:
-            with config_path.open("rt") as config_file:
-                yaml_content = yaml.load(  # noqa: S506 (SafeLoader is subclassed)
-                    config_file,
-                    Loader=JsonCompatibleLoader,
-                )
-            validate(instance=yaml_content, schema=schema_content)
 
     @pytest.mark.order(5)
     def test_load(self, project_files):

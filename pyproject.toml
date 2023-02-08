@@ -251,6 +251,7 @@ pyflakes = [
   "-WPS407",
   "-WPS410", # Allow metadata variable (__all__)
   "-WPS412",
+  "-WPS414", # Allow unpacking assignments
   "-WPS420", # Allow `pass` keywords in `except` bodies to prevent falling through to another `except`
   "-WPS429",
   "-WPS430",

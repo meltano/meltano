@@ -54,16 +54,12 @@ def tests(session: Session) -> None:
         "requests-mock",
     )
 
-    try:
-        session.run(
-            "pytest",
-            f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
-            *session.posargs,
-            env={"NOX_CURRENT_SESSION": "tests"},
-        )
-    finally:
-        if session.interactive:
-            session.notify("coverage", posargs=[])
+    session.run(
+        "pytest",
+        f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
+        *session.posargs,
+        env={"NOX_CURRENT_SESSION": "tests"},
+    )
 
 
 @nox_session(python=main_python_version)
