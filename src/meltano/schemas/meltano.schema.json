@@ -699,6 +699,29 @@
               ]
             }
           }
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "A user friendly label for the option",
+                "examples": [
+                  "Account ID"
+                ]
+              },
+              "value": {
+                "description": "The value of this option"
+              }
+            },
+            "required": [
+              "label",
+              "value"
+            ],
+            "additionalProperties": false
+          }
         }
       }
     },
