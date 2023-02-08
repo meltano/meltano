@@ -685,6 +685,12 @@
             "upcase_string"
           ]
         },
+        "value_post_processor": {
+          "description": "Use with `kind: object` to post-process the keys in a particular way.",
+          "enum": [
+            "stringify"
+          ]
+        },
         "oauth": {
           "type": "object",
           "required": [

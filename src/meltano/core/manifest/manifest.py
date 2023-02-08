@@ -195,7 +195,7 @@ class Manifest:
                 jsonschema_checker_message = proc.stdout.strip().replace(
                     schema_instance_file.name, str(instance_path)
                 )
-                logger.warn(
+                logger.warning(
                     f"Failed to validate {instance_name} against Meltano manifest "
                     f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}"
                 )
