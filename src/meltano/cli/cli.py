@@ -14,7 +14,7 @@ from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException
 from meltano.core.logging import LEVELS, setup_logging
-from meltano.core.project import Project, ProjectNotFound
+from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
@@ -50,11 +50,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     "--log-config", type=str, help="Path to a python logging yaml config file."
 )
 @click.option("-v", "--verbose", count=True, help="Not used.")
-@click.option(
-    "--environment",
-    envvar="MELTANO_ENVIRONMENT",
-    help="Meltano environment name.",
-)
+@click.option("--environment", help="Meltano environment name.")
 @click.option(
     "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
@@ -110,23 +106,18 @@ def cli(  # noqa: C901,WPS231
         if project.readonly:
             logger.debug("Project is read-only.")
 
-        # detect active environment
-        selected_environment = None
-        is_default_environment = False
-        if no_environment or (environment and environment.lower() == "null"):
-            logger.info("No environment is active")
-        elif environment:
-            selected_environment = environment
-        elif project_setting_service.get("default_environment"):
-            selected_environment = project_setting_service.get("default_environment")
-            is_default_environment = True
-        ctx.obj["selected_environment"] = selected_environment
-        ctx.obj["is_default_environment"] = is_default_environment
+        (
+            ctx.obj["selected_environment"],
+            ctx.obj["is_default_environment"],
+        ) = detect_selected_environment(
+            cli_environment=environment,
+            cli_no_environment=no_environment,
+            project=project,
+            project_settings_service=project_setting_service,
+        )
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
-        ctx.obj["tracker"].add_contexts(
-            CliContext.from_click_context(ctx)
-        )  # backfill the `cli` CliContext
+        ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
     except ProjectNotFound:
         ctx.obj["project"] = None
     except EmptyMeltanoFileException:
@@ -142,3 +133,41 @@ def cli(  # noqa: C901,WPS231
             "For more details, visit https://docs.meltano.com/guide/installation#upgrading-meltano-version"
         )
         sys.exit(3)
+
+
+def detect_selected_environment(
+    *,
+    cli_environment: str | None,
+    cli_no_environment: bool,
+    project: Project,
+    project_settings_service: ProjectSettingsService,
+) -> tuple[str | None, bool]:
+    """Detect the Meltano environment selected (but not yet activated).
+
+    Precedence is:
+    1. The `--environment` CLI option
+    2. Env var from the shell
+    3. Env var from `.env`
+    4. Default environment from `meltano.yml`
+    5. `None`
+
+    Args:
+        cli_environment: The `--environment` option value from the CLI.
+        no_environment: The `--no-environment` option value from the CLI.
+        project: The Meltano project.
+        project_setting_service: A project settings service for the project.
+
+    Returns:
+        The selected environment, and whether it is the default environment.
+    """
+    environment = cli_environment or os.environ.get(
+        PROJECT_ENVIRONMENT_ENV,
+        project.dotenv_env.get(PROJECT_ENVIRONMENT_ENV, None),
+    )
+    if cli_no_environment or (environment and environment.lower() == "null"):
+        logger.info("No Meltano environment was selected")
+    elif environment:
+        return environment, False
+    elif project_settings_service.get("default_environment"):
+        return project_settings_service.get("default_environment"), True
+    return None, False

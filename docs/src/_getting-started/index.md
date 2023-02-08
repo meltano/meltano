@@ -127,7 +127,7 @@ This will allow you to use [`git diff`](https://git-scm.com/docs/git-diff) to ea
 
 ## View and Activate Your Environments
 
-As part of creating your Meltano project, we automatically added your first [environments](/concepts/environments) called `dev`, `staging` and `prod`. This allows you to define configurations specific to the environment in which you're running your project. Theres also a [`default_environment`](https://docs.meltano.com/concepts/environments#default-environments) setting in the `meltano.yml` that get automatically set to `dev`, you can list and change the active environment using:
+As part of creating your Meltano project, we automatically added your first [environments](/concepts/environments) called `dev`, `staging` and `prod`. This allows you to define configurations specific to the environment in which you're running your project. There's also a [`default_environment`](https://docs.meltano.com/concepts/environments#default-environments) setting in the `meltano.yml` that get automatically set to `dev`, you can list and change the active environment using:
 
 1. List your available environments:
 
@@ -147,7 +147,7 @@ As part of creating your Meltano project, we automatically added your first [env
    $env:MELTANO_ENVIRONMENT="dev"
    ```
 
-   Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
+   Alternatively you can include the `--environment=dev` argument to each `meltano` command. You should now see a log message that says `Environment 'dev' is active` each time you run a `meltano` command.
 
 1. [optional] Add a new environment:
 
