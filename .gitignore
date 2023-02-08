@@ -162,6 +162,3 @@ setup.py
 *.jsonl
 **/.meltano/**
 !docs/example-library/meltano-migrations/.meltano/meltano.db
-
-# Schemas copied into `src/meltano` by the build process
-src/meltano/schema/*

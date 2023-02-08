@@ -7,7 +7,7 @@ weight: 5
 
 {% for item in site.data.glossary %}
 
-<h2>{{ item.term }}</h2>
+<h2 id="{{ item.shorthand }}">{{ item.term }}</h2>
 
 <p>{{ item.definition }}
 {% if item.link %}

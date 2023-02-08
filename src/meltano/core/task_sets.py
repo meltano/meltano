@@ -91,7 +91,7 @@ class TaskSets(NameEq, Canonical):
         return flattened
 
     @property
-    def flat_args(self) -> list[str]:
+    def flat_args(self) -> list[str] | list[list[str]]:
         """Convert job's tasks to a single invocable representations. For passing as a cli argument or as block names.
 
         Example:
