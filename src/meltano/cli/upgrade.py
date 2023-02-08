@@ -6,7 +6,7 @@ import os
 
 import click
 
-from meltano.cli import cli
+from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.db import project_engine
