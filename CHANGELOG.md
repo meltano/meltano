@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.15.2 (2023-02-08)
+
+### 🐛 Fixes
+
+- [#7284](https://github.com/meltano/meltano/issues/7284) Use `$MELTANO_ENVIRONMENT` set in `.env`
+- [#7232](https://github.com/meltano/meltano/issues/7232) Cast setting values according to their setting definitions
+- [#7213](https://github.com/meltano/meltano/issues/7213) Omit local variables in `rich` tracebacks by default and add `show_locals` option to log formatter
+
+### 📚 Documentation Improvements
+
+- [#7282](https://github.com/meltano/meltano/issues/7282) Add headers to global config section
+- [#7279](https://github.com/meltano/meltano/issues/7279) Change ref
+- [#7276](https://github.com/meltano/meltano/issues/7276) Correct small typo in `no-color.org` URL -- _**Thanks @menzenski!**_
+- [#7274](https://github.com/meltano/meltano/issues/7274) Add links to glossary
+- [#7239](https://github.com/meltano/meltano/issues/7239) Add EDK details and context around switching to utilities
+- [#7258](https://github.com/meltano/meltano/issues/7258) Fix `virtualenvs.in-project` setting in custom extractor debugging doc -- _**Thanks @chodera!**_
+
 ## v2.15.1 (2023-01-31)
 
 ### 🐛 Fixes
