@@ -38,6 +38,8 @@ jobs:
           is-default-python: true # will be used in 'latest' images
         - python-version: "3.10"
           is-default-python: false
+        - python-version: "3.11"
+          is-default-python: false
 
     steps:
     - name: Set the workflow inputs
@@ -52,7 +54,7 @@ jobs:
         echo "dry_run=${{ format('{0}', github.event.inputs.dry_run) || env.DEFAULT_DRY_RUN }}" >> $GITHUB_ENV
         echo "registry=${{ github.event.inputs.registry || env.DEFAULT_REGISTRY }}" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v3.3.0
 
     - name: Get Meltano version
       id: get-meltano-version

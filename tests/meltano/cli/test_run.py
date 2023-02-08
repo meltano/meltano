@@ -1460,7 +1460,9 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         project_plugins_service,
+        monkeypatch: pytest.MonkeyPatch,
     ):
+        monkeypatch.delenv("FORCE_COLOR", raising=False)
         # toggle color in logging configuration
         logging_config = default_config(log_level="info")
         if not colors:

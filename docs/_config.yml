@@ -88,6 +88,6 @@ algolia:
 # Set display to true/false to toggle announcements on/off
 announcement:
   display: true
-  text: This December, we’re extracting trash to transform our waterways.
-  cta: Learn more.
-  cta-link: https://meltano.com/blog/extracting-trash-to-transform-our-waterways/
+  text: For every star on GitHub, we'll donate $2 to clean up our waterways.
+  cta: Star us now!
+  cta-link: https://github.com/meltano/meltano/

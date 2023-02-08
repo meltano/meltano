@@ -53,12 +53,30 @@ def test_project_init_non_empty_directory(tmp_path: Path, pushd):
 
     project_dir = projects_dir.joinpath("test_project")
     project_dir.joinpath("test").mkdir(parents=True)
+    ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+
+
+def test_project_init_existing_meltano_yml(tmp_path: Path, pushd):
+    projects_dir = tmp_path.joinpath("exists")
+    projects_dir.mkdir()
+    pushd(projects_dir)
+
+    project_dir = projects_dir.joinpath("test_project")
+    project_dir.mkdir(parents=True)
+    project_dir.joinpath("meltano.yml").touch()
 
     with pytest.raises(
         ProjectInitServiceError,
-        match="Directory 'test_project' not empty",
+        match=(
+            "A `meltano.yml` file already exists in the target directory. "
+            "Use `--force` to overwrite it."
+        ),
     ):
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+
+    ProjectInitService(project_dir).init(
+        activate=False, add_discovery=False, force=True
+    )
 
 
 def test_project_init_no_write_permission(tmp_path: Path, pushd):

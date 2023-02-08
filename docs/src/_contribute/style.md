@@ -20,8 +20,9 @@ Python:
 - [wemake-python-styleguide](https://wemake-python-stylegui.de/en/latest/)
 - [MyPy](https://mypy.readthedocs.io/en/stable/)
 
-Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code,
-and `wemake-python-styleguide` is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
+Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code. Notable among these is `wemake-python-styleguide`, which offers an extensive set of opinionated rules that encourage clean and correct code.
+
+To lint your Python code, install the project using `poetry install`, then run `poetry run pre-commit --all-files flakeheaven` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
 
 Javascript:
 
@@ -29,7 +30,7 @@ Javascript:
 - [ESLint Vue Plugin](https://github.com/vuejs/eslint-plugin-vue)
 - [Prettier](https://prettier.io/)
 
-You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
+To lint your Javascript code, run `yarn lint` from the root of the project.
 
 ### Static typing
 

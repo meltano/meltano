@@ -13,10 +13,15 @@ from typing import Any
 import click
 import dotenv
 
-from meltano.cli import activate_explicitly_provided_environment, cli
+from meltano.cli import cli
 from meltano.cli.interactive import InteractiveConfig
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, InstrumentedGroup, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    CliError,
+    InstrumentedGroup,
+    PartialInstrumentedCmd,
+)
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -28,7 +33,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +117,7 @@ def get_label(metadata) -> str:
     cls=InstrumentedGroup,
     invoke_without_command=True,
     short_help="Display Meltano or plugin configuration.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.option(
     "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
@@ -139,8 +145,6 @@ def config(  # noqa: WPS231
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
     """
-    activate_explicitly_provided_environment(ctx, project)
-
     tracker = ctx.obj["tracker"]
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
@@ -344,8 +348,17 @@ def reset(ctx, store):
 )
 @click.pass_context
 @_use_meltano_env
-def set_(ctx, setting_name, value, store, interactive):
+def set_(
+    ctx: click.core.Context,
+    setting_name: tuple[str, ...],
+    value: Any,
+    store: str,
+    interactive: bool,
+):
     """Set the configurations' setting `<name>` to `<value>`."""
+    if len(setting_name) == 1:
+        setting_name = tuple(setting_name[0].split("."))
+
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
     if interactive:
         interaction.configure_all()

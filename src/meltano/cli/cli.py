@@ -13,11 +13,12 @@ import click
 import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.error import MeltanoConfigurationError
+from meltano.core.error import EmptyMeltanoFileException
 from meltano.core.logging import LEVELS, setup_logging
-from meltano.core.project import Project, ProjectNotFound
+from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project, ProjectNotFound
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import CliContext, Tracker
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliContext
 from meltano.core.utils import get_no_color_flag
 
 logger = logging.getLogger(__name__)
@@ -50,11 +51,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     "--log-config", type=str, help="Path to a python logging yaml config file."
 )
 @click.option("-v", "--verbose", count=True, help="Not used.")
-@click.option(
-    "--environment",
-    envvar="MELTANO_ENVIRONMENT",
-    help="Meltano environment name.",
-)
+@click.option("--environment", help="Meltano environment name.")
 @click.option(
     "--no-environment", is_flag=True, default=False, help="Don't use any environment."
 )
@@ -65,7 +62,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 )
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
-def cli(  # noqa: WPS231
+def cli(  # noqa: C901,WPS231
     ctx: click.Context,
     log_level: str,
     log_config: str,
@@ -75,10 +72,10 @@ def cli(  # noqa: WPS231
     cwd: Path | None,
 ):  # noqa: WPS231
     """
-    ELT for the DataOps era.
+    Your CLI for ELT+
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface
-    """
+    """  # noqa: D400
     ctx.ensure_object(dict)
 
     if log_level:
@@ -110,24 +107,23 @@ def cli(  # noqa: WPS231
         if project.readonly:
             logger.debug("Project is read-only.")
 
-        # detect active environment
-        selected_environment = None
-        is_default_environment = False
-        if no_environment or (environment and environment.lower() == "null"):
-            logger.info("No environment is active")
-        elif environment:
-            selected_environment = environment
-        elif project_setting_service.get("default_environment"):
-            selected_environment = project_setting_service.get("default_environment")
-            is_default_environment = True
-        ctx.obj["selected_environment"] = selected_environment
-        ctx.obj["is_default_environment"] = is_default_environment
+        (
+            ctx.obj["selected_environment"],
+            ctx.obj["is_default_environment"],
+        ) = detect_selected_environment(
+            cli_environment=environment,
+            cli_no_environment=no_environment,
+            project=project,
+            project_settings_service=project_setting_service,
+        )
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
-        ctx.obj["tracker"].add_contexts(
-            CliContext.from_click_context(ctx)
-        )  # backfill the `cli` CliContext
+        ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
     except ProjectNotFound:
+        ctx.obj["project"] = None
+    except EmptyMeltanoFileException:
+        if ctx.invoked_subcommand != "init":
+            raise
         ctx.obj["project"] = None
     except IncompatibleVersionError:
         click.secho(
@@ -140,47 +136,39 @@ def cli(  # noqa: WPS231
         sys.exit(3)
 
 
-def activate_environment(
-    ctx: click.Context, project: Project, required: bool = False
-) -> None:
-    """Activate the selected environment.
+def detect_selected_environment(
+    *,
+    cli_environment: str | None,
+    cli_no_environment: bool,
+    project: Project,
+    project_settings_service: ProjectSettingsService,
+) -> tuple[str | None, bool]:
+    """Detect the Meltano environment selected (but not yet activated).
 
-    The selected environment is whatever was selected with the `--environment`
-    option, or the default environment (set in `meltano.yml`) otherwise.
-
-    Args:
-        ctx: The Click context, used to determine the selected environment.
-        project: The project for which the environment will be activated.
-    """
-    if ctx.obj["selected_environment"]:
-        project.activate_environment(ctx.obj["selected_environment"])
-    elif required:
-        raise MeltanoConfigurationError(
-            reason="A Meltano environment must be specified",
-            instruction="Set the `default_environment` option in "
-            "`meltano.yml`, or the `--environment` CLI option",
-        )
-
-
-def activate_explicitly_provided_environment(
-    ctx: click.Context, project: Project
-) -> None:
-    """Activate the selected environment if it has been explicitly set.
-
-    Some commands (e.g. `config`, `job`, etc.) do not respect the configured
-    `default_environment`, and will only run with an environment active if it
-    has been explicitly set (e.g. with the `--environment` CLI option).
+    Precedence is:
+    1. The `--environment` CLI option
+    2. Env var from the shell
+    3. Env var from `.env`
+    4. Default environment from `meltano.yml`
+    5. `None`
 
     Args:
-        ctx: The Click context, used to determine the selected environment.
-        project: The project for which the environment will be activated.
+        cli_environment: The `--environment` option value from the CLI.
+        no_environment: The `--no-environment` option value from the CLI.
+        project: The Meltano project.
+        project_setting_service: A project settings service for the project.
+
+    Returns:
+        The selected environment, and whether it is the default environment.
     """
-    if ctx.obj["is_default_environment"]:
-        logger.info(
-            f"The default environment {ctx.obj['selected_environment']!r} will "
-            f"be ignored for `meltano {ctx.command.name}`. To configure a specific "
-            "environment, please use the option `--environment=<environment name>`."
-        )
-        project.deactivate_environment()
-    else:
-        activate_environment(ctx, project)
+    environment = cli_environment or os.environ.get(
+        PROJECT_ENVIRONMENT_ENV,
+        project.dotenv_env.get(PROJECT_ENVIRONMENT_ENV, None),
+    )
+    if cli_no_environment or (environment and environment.lower() == "null"):
+        logger.info("No Meltano environment was selected")
+    elif environment:
+        return environment, False
+    elif project_settings_service.get("default_environment"):
+        return project_settings_service.get("default_environment"), True
+    return None, False

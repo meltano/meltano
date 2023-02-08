@@ -20,8 +20,8 @@ except ImportError:
 
 
 package = "meltano"
-python_versions = ["3.10", "3.9", "3.8", "3.7"]
-main_python_version = "3.9"
+python_versions = ["3.11", "3.10", "3.9", "3.8", "3.7"]
+main_python_version = "3.10"
 locations = "src", "tests", "noxfile.py"
 
 
@@ -54,16 +54,12 @@ def tests(session: Session) -> None:
         "requests-mock",
     )
 
-    try:
-        session.run(
-            "pytest",
-            f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
-            *session.posargs,
-            env={"NOX_CURRENT_SESSION": "tests"},
-        )
-    finally:
-        if session.interactive:
-            session.notify("coverage", posargs=[])
+    session.run(
+        "pytest",
+        f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
+        *session.posargs,
+        env={"NOX_CURRENT_SESSION": "tests"},
+    )
 
 
 @nox_session(python=main_python_version)
@@ -97,6 +93,9 @@ def mypy(session: Session) -> None:
         "mypy",
         "sqlalchemy2-stubs",
         "types-croniter",
+        "types-jsonschema",
+        "types-psutil",
+        "types-PyYAML",
         "types-requests",
         "boto3-stubs[essential]",
     )

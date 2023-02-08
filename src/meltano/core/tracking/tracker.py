@@ -5,14 +5,17 @@ from __future__ import annotations
 import atexit
 import json
 import locale
+import os
 import re
 import uuid
-from contextlib import contextmanager
+from collections.abc import Mapping
+from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 from urllib.parse import urlparse
+from warnings import warn
 
 import structlog
 import tzlocal
@@ -23,13 +26,6 @@ from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import (
-    CliEvent,
-    ExceptionContext,
-    ProjectContext,
-    environment_context,
-)
-from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -37,6 +33,13 @@ from meltano.core.tracking.schemas import (
     TelemetryStateChangeEventSchema,
 )
 from meltano.core.utils import format_exception
+
+if TYPE_CHECKING:
+    from meltano.core.tracking.contexts import (  # noqa: F401
+        CliEvent,
+        EnvironmentContext,
+        ProjectContext,
+    )
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -79,7 +82,7 @@ class TelemetrySettings(NamedTuple):
     send_anonymous_usage_stats: bool | None
 
 
-class Tracker:  # noqa: WPS214 - too many methods
+class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
     """Meltano tracker backed by Snowplow."""
 
     def __init__(  # noqa: WPS210 - too many local variables
@@ -96,6 +99,11 @@ class Tracker:  # noqa: WPS214 - too many methods
                 `read` timeout, or as tuple with two float values which specify
                 the `connect` and `read` timeouts separately.
         """
+        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+            ProjectContext,
+            environment_context,
+        )
+
         self.project = project
         self.settings_service = ProjectSettingsService(project)
         self.send_anonymous_usage_stats = self.settings_service.get(
@@ -129,7 +137,8 @@ class Tracker:  # noqa: WPS214 - too many methods
             self.snowplow_tracker = None
 
         stored_telemetry_settings = self.load_saved_telemetry_settings()
-        self.client_id = stored_telemetry_settings.client_id or uuid.uuid4()
+
+        self.client_id = self.get_client_id(stored_telemetry_settings)
 
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id: uuid.UUID = project_ctx.project_uuid
@@ -138,10 +147,44 @@ class Tracker:  # noqa: WPS214 - too many methods
             project_ctx,
         )
 
+        # Environment variables to set in invoked processes for telemetry purposes
+        self.env: Mapping[str, str] = {
+            "MELTANO_PARENT_CONTEXT_UUID": environment_context.data["context_uuid"],
+        }
+
         if all(setting is None for setting in stored_telemetry_settings):
             self.save_telemetry_settings()
         else:
             self.telemetry_state_change_check(stored_telemetry_settings)
+            if self.client_id != stored_telemetry_settings.client_id:
+                self.save_telemetry_settings()
+
+    def get_client_id(self, stored_telemetry_settings: TelemetrySettings) -> uuid.UUID:
+        """Get the telemetry client ID.
+
+        It can be set using the `$MELTANO_CLIENT_ID` environment variable. If
+        that environment variable has not been set, then the client ID stored
+        on disk will be used if it exists. If the client ID has not been stored
+        on disk, then a new one will be randomly generated.
+
+        Args:
+            stored_telemetry_settings: The telemetry settings stored on disk.
+
+        Returns:
+            The client ID.
+        """
+        with suppress(KeyError):
+            uuid_str = os.environ["MELTANO_CLIENT_ID"]
+            try:
+                return uuid.UUID(uuid_str)
+            except ValueError:
+                warn(
+                    f"Invalid telemetry client UUID {uuid_str!r} from $MELTANO_CLIENT_ID",
+                    RuntimeWarning,
+                )
+        if stored_telemetry_settings.client_id is not None:
+            return stored_telemetry_settings.client_id
+        return uuid.uuid4()
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
@@ -150,6 +193,8 @@ class Tracker:  # noqa: WPS214 - too many methods
         Returns:
             The contexts that will accompany events fired by this tracker.
         """
+        from meltano.core.tracking.contexts import ExceptionContext
+
         # The `ExceptionContext` is re-created every time this is accessed because it details the
         # exceptions that are being processed when it is created.
         return (*self._contexts, ExceptionContext())
@@ -191,12 +236,12 @@ class Tracker:  # noqa: WPS214 - too many methods
         Examples:
             The timezone name as an IANA timezone database name:
 
-                >>> SnowplowTracker(project).timezone_name
+                >>> Tracker(project).timezone_name
                 'Europe/Berlin'
 
             The timezone name as an IANA timezone abbreviation because the full name was not found:
 
-                >>> SnowplowTracker(project).timezone_name
+                >>> Tracker(project).timezone_name
                 'CET'
 
         Returns:
@@ -279,6 +324,11 @@ class Tracker:  # noqa: WPS214 - too many methods
             from_value: the old value
             to_value: the new value
         """
+        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+            EnvironmentContext,
+            ProjectContext,
+        )
+
         # Save the telemetry settings to ensure this is the only telemetry
         # state change event fired for this particular setting change.
         self.save_telemetry_settings()
@@ -375,7 +425,11 @@ class Tracker:  # noqa: WPS214 - too many methods
         except OSError as err:
             logger.debug("Unable to save 'analytics.json'", err=err)
 
-    def _uuid_from_str(self, from_val: Any | None, warn: bool) -> uuid.UUID | None:
+    def _uuid_from_str(
+        self,
+        from_val: Any | None,
+        warn: bool,  # noqa: WPS442
+    ) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
 
         Args:

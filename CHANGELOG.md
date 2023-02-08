@@ -3,6 +3,121 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.15.1 (2023-01-31)
+
+### 🐛 Fixes
+
+- [#7236](https://github.com/meltano/meltano/issues/7236) Invoke `virtualenv` as a module
+- [#7235](https://github.com/meltano/meltano/issues/7235) Avoid adding `LICENSE` file directly in `site-packages`
+
+## v2.15.0 (2023-01-30)
+
+### ✨ New
+
+- [#7210](https://github.com/meltano/meltano/issues/7210) Support Python 3.11
+- [#7198](https://github.com/meltano/meltano/issues/7198) Replace `venv` with `virtualenv`
+
+### 🐛 Fixes
+
+- [#7212](https://github.com/meltano/meltano/issues/7212) Do not log env vars passed to subprocesses
+
+## v2.14.0 (2023-01-23)
+
+### 🐛 Fixes
+
+- [#7104](https://github.com/meltano/meltano/issues/7104) Support default boto3 auth for S3 state backend when AWS creds are unconfigured
+- [#7174](https://github.com/meltano/meltano/issues/7174) Support default auth for GCS and Azure state backends
+- [#7190](https://github.com/meltano/meltano/issues/7190) Make fully missing env var settings `None`
+
+### ⚙️ Under the Hood
+
+- [#7182](https://github.com/meltano/meltano/issues/7182) Use JSONschema version `draft-2020-12` for `meltano.yml` & `discovery.yml`
+- [#7169](https://github.com/meltano/meltano/issues/7169) Use `$defs` instead of `definitions` in jsonschemas
+- [#7188](https://github.com/meltano/meltano/issues/7188) Add header with Meltano command to Hub request
+
+### 📚 Documentation Improvements
+
+- [#7187](https://github.com/meltano/meltano/issues/7187) Fix YAML indent on getting started page and fix link to page source in GitHub -- _**Thanks @jx2lee!**_
+- [#6699](https://github.com/meltano/meltano/issues/6699) Update `dbt` x `airflow` example project description
+- [#7177](https://github.com/meltano/meltano/issues/7177) Add codespaces links to nav and ind
+
+## v2.13.0 (2023-01-06)
+
+### ✨ New
+
+- [#7105](https://github.com/meltano/meltano/issues/7105) Support `meltano init` in a non-empty dir
+- [#7115](https://github.com/meltano/meltano/issues/7115) Allow top-level annotations in `meltano.yml`
+- [#7123](https://github.com/meltano/meltano/issues/7123) Optionally ignore missing env vars during expansion
+
+### 🐛 Fixes
+
+- [#7145](https://github.com/meltano/meltano/issues/7145) Setting nested setting key no longer clears sibling keys
+- [#7120](https://github.com/meltano/meltano/issues/7120) Support str values when deep-merging config
+- [#7144](https://github.com/meltano/meltano/issues/7144) Check system database version compatibility before migrations
+
+### ⚙️ Under the Hood
+
+- [#7069](https://github.com/meltano/meltano/issues/7069) Use a custom build backend
+
+### 📚 Documentation Improvements
+
+- [#7139](https://github.com/meltano/meltano/issues/7139) Add Airbyte Source Connector FAQ
+- [#7140](https://github.com/meltano/meltano/issues/7140) Remove references to deprecated `MELTANO_CLI_*` aliases
+
+## v2.12.0 (2022-12-19)
+
+### 🐛 Fixes
+
+- [#7093](https://github.com/meltano/meltano/issues/7093) Add missing description to environment context schema
+- [#7084](https://github.com/meltano/meltano/issues/7084) Display better errors when failing to connect with the Hub API
+- [#7078](https://github.com/meltano/meltano/issues/7078) Remove explicit aliases for S3 state backend
+
+### ⚡ Performance Improvements
+
+- [#7091](https://github.com/meltano/meltano/issues/7091) Compile env var pattern only once
+
+### 📚 Documentation Improvements
+
+- [#7089](https://github.com/meltano/meltano/issues/7089) Fix typo `tap-postgres` -> `postgres` -- _**Thanks @visch!**_
+- [#7090](https://github.com/meltano/meltano/issues/7090) Fix config name for poetry -- _**Thanks @adherr!**_
+- [#7088](https://github.com/meltano/meltano/issues/7088) Update banner copy & cta
+
+## v2.11.1 (2022-12-09)
+
+### 🐛 Fixes
+
+- [#7057](https://github.com/meltano/meltano/issues/7057) Ensure `environment_name_hash` is collected
+- [#7064](https://github.com/meltano/meltano/issues/7064) Misc `meltano.yml` schema fixes
+
+## v2.11.0 (2022-12-08)
+
+### ✨ New
+
+- [#7019](https://github.com/meltano/meltano/issues/7019) Support env vars in plugin `pip_url`
+- [#6995](https://github.com/meltano/meltano/issues/6995) `meltano install --force`
+
+### 🐛 Fixes
+
+- [#6873](https://github.com/meltano/meltano/issues/6873) Correct migration downgrade for 2.7.1 release
+- [#7026](https://github.com/meltano/meltano/issues/7026) Permit `env` under plugins in `meltano.yml` schema
+- [#7022](https://github.com/meltano/meltano/issues/7022) Pin `setuptools==57.5.0` in plugin venvs
+- [#7017](https://github.com/meltano/meltano/issues/7017) Remove premature deserialization of settings in the CLI
+- [#7010](https://github.com/meltano/meltano/issues/7010) Re-create plugin venv if Python executable is missing
+- [#6997](https://github.com/meltano/meltano/issues/6997) Correct meltano config behavior when explicit environment is provided
+- [#6986](https://github.com/meltano/meltano/issues/6986) List strings instead of enum objects as CLI options
+
+### 📚 Documentation Improvements
+
+- [#7046](https://github.com/meltano/meltano/issues/7046) Fix internal links and `meltano config` example code block in state backends page
+- [#7041](https://github.com/meltano/meltano/issues/7041) Expand UI deprecation description -- _**Thanks @qbatten!**_
+- [#7044](https://github.com/meltano/meltano/issues/7044) Add star donation blurb to readme
+- [#7043](https://github.com/meltano/meltano/issues/7043) Add december campaign banner
+- [#7030](https://github.com/meltano/meltano/issues/7030) Env var expansion within `pip_url`
+- [#7035](https://github.com/meltano/meltano/issues/7035) Update custom extractor Poetry instructions -- _**Thanks @EMCP!**_
+- [#7014](https://github.com/meltano/meltano/issues/7014) Add more project links to PyPI page
+- [#7012](https://github.com/meltano/meltano/issues/7012) Complete list of commands that run with environment flag
+- [#7002](https://github.com/meltano/meltano/issues/7002) Add docs for state backend migration
+
 ## v2.10.0 (2022-11-16)
 
 ### ✨ New
@@ -26,7 +141,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#6964](https://github.com/meltano/meltano/issues/6964) Add `--cwd` CLI option
 - [#6785](https://github.com/meltano/meltano/issues/6785) Use `NO_COLOR` env var to disable colored output
-- [#6628](https://github.com/meltano/meltano/issues/6628) Make `.meltano`  folder path configurable via new `MELTANO_SYS_DIR_ROOT` env var -- _**Thanks @rawwar!**_
+- [#6628](https://github.com/meltano/meltano/issues/6628) Make `.meltano` folder path configurable via new `MELTANO_SYS_DIR_ROOT` env var -- _**Thanks @rawwar!**_
 
 ### 🐛 Fixes
 
@@ -282,7 +397,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all <jobId> with <stateId> to fix pipeline running bug.
+- [#6216](https://github.com/meltano/meltano/pull/6216) - Replace all `jobId` with `stateId` to fix pipeline running bug.
 
 ## 2.0.3 - (2022-06-15)
 

@@ -10,6 +10,7 @@ from enum import Enum
 from typing import Generator, Iterable
 
 from meltano.core.project import Project
+from meltano.core.utils import EnvVarMissingBehavior
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import flatten
 
@@ -95,13 +96,9 @@ class SettingsService(ABC):  # noqa: WPS214
             config_override:  Optional override configuration values.
         """
         self.project = project
-
         self.show_hidden = show_hidden
-
         self.env_override = env_override or {}
-
         self.config_override = config_override or {}
-
         self._setting_defs = None
 
     @property
@@ -353,14 +350,19 @@ class SettingsService(ABC):  # noqa: WPS214
 
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
-        env_var_strict_mode, _ = source.manager(self.project_settings_service).get(
+        strict_env_var_mode, _ = source.manager(self.project_settings_service).get(
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
         )
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
             expanded_value = do_expand_env_vars(
-                value, env=expandable_env, raise_if_missing=env_var_strict_mode
+                value,
+                env=expandable_env,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
+            # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
+            if value and not expanded_value:  # The whole string was missing env vars
+                expanded_value = None
 
             if expanded_value != value:
                 metadata["expanded"] = True

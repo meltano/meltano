@@ -16,11 +16,7 @@ from meltano.core.project import ProjectReadonly
 # This suggests a cyclic dependency or a poorly structured interface.
 # This should be investigated and resolved to avoid implicit behavior
 # based solely on import order.
-from meltano.cli.cli import (  # isort:skip
-    activate_environment,
-    activate_explicitly_provided_environment,
-    cli,
-)
+from meltano.cli.cli import cli  # isort:skip
 from meltano.cli import (  # isort:skip # noqa: WPS235
     add,
     config,
@@ -77,11 +73,7 @@ def handle_meltano_error(error: MeltanoError) -> NoReturn:
     Raises:
         CliError: always.
     """
-    raise CliError(
-        f"{error.reason}. {error.instruction}."
-        if error.instruction
-        else f"{error.reason}."
-    ) from error
+    raise CliError(str(error)) from error
 
 
 def _run_cli():

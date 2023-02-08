@@ -27,7 +27,7 @@ class TestProjectAddService:
         assert len(hub_request_counter) == 1
 
     @pytest.mark.order(0)
-    @pytest.mark.parametrize(  # noqa: WPS317
+    @pytest.mark.parametrize(
         ("plugin_type", "plugin_name", "variant", "default_variant"),
         [
             (PluginType.EXTRACTORS, "tap-mock", "meltano", "meltano"),

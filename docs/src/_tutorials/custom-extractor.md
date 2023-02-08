@@ -133,7 +133,7 @@ Change directory into the json-placeholder tap directory, and install the python
 cd tap-jsonplaceholder
 
 # [Optional] but useful if you need to debug your custom extractor
-poetry config virtualenv.in-project true
+poetry config virtualenvs.in-project true
 
 poetry install
 ```

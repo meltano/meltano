@@ -3,22 +3,25 @@ from __future__ import annotations
 import platform
 import re
 import shutil
+import subprocess
 from pathlib import Path
 from time import perf_counter_ns
 
 import click
+import mock
 import pytest
 import yaml
 from structlog.stdlib import get_logger
 
 import meltano
 from asserts import assert_cli_runner
+from fixtures.cli import MeltanoCliRunner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
-from meltano.core.project import PROJECT_READONLY_ENV, Project
+from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
@@ -81,9 +84,7 @@ class TestCli:
         assert Project._default.readonly
 
     @pytest.mark.order(2)
-    def test_activate_project_readonly_dotenv(
-        self, project, cli_runner, pushd, monkeypatch
-    ):
+    def test_activate_project_readonly_dotenv(self, project, cli_runner, pushd):
         ProjectSettingsService(project).set("project_readonly", True)
 
         assert Project._default is None
@@ -92,6 +93,43 @@ class TestCli:
         cli_runner.invoke(cli, ["discover"])
 
         assert Project._default.readonly
+
+    def test_environment_precedence(
+        self,
+        project: Project,
+        pushd,
+        cli_runner: MeltanoCliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        pushd(project.root)
+        monkeypatch.delenv(PROJECT_ENVIRONMENT_ENV, raising=False)
+        environment_names = {
+            name: f"env_set_from_{name}" for name in ("dotenv", "cli_option", "env_var")
+        }
+        with mock.patch(
+            "meltano.core.project.Project.dotenv_env",
+            new_callable=mock.PropertyMock,
+            return_value={PROJECT_ENVIRONMENT_ENV: environment_names["dotenv"]},
+        ):
+            args = ("invoke", "tap-mock")
+            results = {
+                "dotenv": cli_runner.invoke(cli, args),
+                "cli_option": cli_runner.invoke(
+                    cli,
+                    (f"--environment={environment_names['cli_option']}", *args),
+                ),
+                "env_var": cli_runner.invoke(
+                    cli,
+                    args,
+                    env={PROJECT_ENVIRONMENT_ENV: environment_names["env_var"]},
+                ),
+            }
+        for source, name in environment_names.items():
+            assert results[source].exit_code
+            assert (
+                results[source].exception.args[0]
+                == f"Environment {name!r} was not found."
+            )
 
     def test_version(self, cli_runner):
         cli_version = cli_runner.invoke(cli, ["--version"])
@@ -207,6 +245,43 @@ class TestCli:
             dirpath.mkdir()
             assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
             assert Path().resolve() == dirpath
+
+    @pytest.mark.parametrize(
+        "command_args",
+        (
+            ("invoke", "example"),
+            ("config", "example"),
+            ("job", "list"),
+            ("environment", "list"),
+            ("add", "utility", "example"),
+        ),
+    )
+    def test_error_msg_outside_project(
+        self,
+        tmp_path: Path,
+        command_args: tuple[str, ...],
+    ):
+        # Unless this test runs before every test that uses a project, we
+        # cannot use `cli_runner` to test this because the code path taken
+        # differs after any project has been found.
+
+        # I tried working around this by switching to an empty directory,
+        # calling `Project.deactivate`, using `mock.patch` on various relevant
+        # functions, and more, but nothing I did resulted in the proper code
+        # path being taken. Also it seemed like a fragile approach.
+
+        # Using a subprocess should be robust, but requires the version of
+        # Meltano you want to test be the one that is installed in the active
+        # Python environment. This is not the only test that requires this.
+        assert (
+            "must be run inside a Meltano project"
+            in subprocess.run(
+                ("meltano", *command_args),
+                text=True,
+                stderr=subprocess.PIPE,
+                cwd=tmp_path,
+            ).stderr
+        )
 
 
 def _get_dummy_logging_config(colors=True):
@@ -368,5 +443,5 @@ class TestLargeConfigProject:
             == 0
         )
         duration_ns = perf_counter_ns() - start
-        # Ensure the large config can be processed in less than 20 seconds
-        assert duration_ns < 20000000000
+        # Ensure the large config can be processed in less than 25 seconds
+        assert duration_ns < 25000000000

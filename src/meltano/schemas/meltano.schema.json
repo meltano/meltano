@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://meltano.com/meltano.schema.json",
   "title": "JSON Schema for meltano.yml",
   "description": "Meltano (https://meltano.com) is an open source platform for building, running & orchestrating ELT pipelines",
@@ -8,6 +8,9 @@
   "properties": {
     "version": {
       "const": 1
+    },
+    "annotations": {
+      "$ref": "#/$defs/annotations"
     },
     "default_environment": {
       "type": "string",
@@ -88,7 +91,7 @@
       "type": "array",
       "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",
       "items": {
-        "$ref": "#/definitions/environments"
+        "$ref": "#/$defs/environments"
       }
     },
     "discovery_url": {
@@ -107,49 +110,49 @@
         "extractors": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/extractors"
+            "$ref": "#/$defs/plugins/extractors"
           }
         },
         "loaders": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/loaders"
+            "$ref": "#/$defs/plugins/loaders"
           }
         },
         "mappers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/mappers"
+            "$ref": "#/$defs/plugins/mappers"
           }
         },
         "orchestrators": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/orchestrators"
+            "$ref": "#/$defs/plugins/orchestrators"
           }
         },
         "transformers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/transformers"
+            "$ref": "#/$defs/plugins/transformers"
           }
         },
         "files": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/files"
+            "$ref": "#/$defs/plugins/files"
           }
         },
         "utilities": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/utilities"
+            "$ref": "#/$defs/plugins/utilities"
           }
         },
         "transforms": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugins/transforms"
+            "$ref": "#/$defs/plugins/transforms"
           }
         }
       }
@@ -157,29 +160,38 @@
     "schedules": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/schedules"
+        "$ref": "#/$defs/schedules"
       },
       "description": "Scheduled ELT jobs, added using 'meltano schedule'"
     },
     "env": {
-      "$ref": "#/definitions/env"
+      "$ref": "#/$defs/env"
     },
     "jobs": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/jobs"
+        "$ref": "#/$defs/jobs"
       },
       "description": "Jobs, added using 'meltano job'"
     }
   },
-  "definitions": {
+  "$defs": {
+    "annotations": {
+      "type": "object",
+      "description": "Arbitrary annotations keyed by tool/vendor name - not processed by the core Meltano library or CLI",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
     "plugins": {
       "plugin_generic": {
         "type": "object",
         "required": [
           "name"
         ],
-        "additionalProperties": true,
         "properties": {
           "name": {
             "type": "string",
@@ -240,7 +252,7 @@
           "settings": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/base_setting"
+              "$ref": "#/$defs/base_setting"
             }
           },
           "docs": {
@@ -351,10 +363,10 @@
             }
           },
           "requires": {
-            "$ref": "#/definitions/requires"
+            "$ref": "#/$defs/requires"
           },
           "env": {
-            "$ref": "#/definitions/env"
+            "$ref": "#/$defs/env"
           }
         }
       },
@@ -408,30 +420,14 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "$ref": "#/definitions/plugins/extractor_shared"
+            "$ref": "#/$defs/plugins/extractor_shared"
           },
           {
-            "additionalProperties": false,
             "type": "object",
             "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -449,27 +445,20 @@
                     "log-based"
                   ]
                 }
-              },
-              "select": {},
-              "select_filter": {},
-              "catalog": {},
-              "load_schema": {},
-              "metadata": {},
-              "schema": {},
-              "state": {}
+              }
             }
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       },
       "loaders": {
         "description": "https://docs.meltano.com/concepts/plugins#loaders",
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "additionalProperties": false,
             "properties": {
               "capabilities": {
                 "type": "array",
@@ -487,21 +476,6 @@
                   ]
                 }
               },
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
               "dialect": {
                 "type": "string",
                 "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
@@ -512,153 +486,42 @@
               }
             }
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       },
       "orchestrators": {
         "description": "https://docs.meltano.com/concepts/plugins#orchestrators",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {}
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "transformers": {
         "description": "https://docs.meltano.com/concepts/plugins#transforms",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {}
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "files": {
         "description": "https://docs.meltano.com/concepts/plugins#file-bundles",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "update": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "boolean"
-                }
-              }
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "utilities": {
         "description": "https://docs.meltano.com/concepts/plugins#utilities",
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/plugins/plugin_generic"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {}
-            }
-          }
-        ]
+        "$ref": "#/$defs/plugins/plugin_generic",
+        "unevaluatedProperties": false
       },
       "transforms": {
         "description": "https://docs.meltano.com/concepts/plugins#transforms",
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "additionalProperties": false,
             "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "variant": {},
-              "namespace": {},
-              "config": {},
-              "label": {},
-              "logo_url": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
               "vars": {
                 "type": "object",
                 "description": "An object containing dbt model variables"
@@ -669,7 +532,8 @@
               }
             }
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       },
       "mapper_specific": {
         "type": "object",
@@ -701,32 +565,13 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/definitions/plugins/plugin_generic"
+            "$ref": "#/$defs/plugins/plugin_generic"
           },
           {
-            "$ref": "#/definitions/plugins/mapper_specific"
-          },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "name": {},
-              "inherit_from": {},
-              "pip_url": {},
-              "repo": {},
-              "namespace": {},
-              "label": {},
-              "description": {},
-              "executable": {},
-              "settings": {},
-              "docs": {},
-              "settings_group_validation": {},
-              "commands": {},
-              "requires": {},
-              "env": {},
-              "mappings": {}
-            }
+            "$ref": "#/$defs/plugins/mapper_specific"
           }
-        ]
+        ],
+        "unevaluatedProperties": false
       }
     },
     "base_setting": {
@@ -890,7 +735,7 @@
           ]
         },
         "env": {
-          "$ref": "#/definitions/env"
+          "$ref": "#/$defs/env"
         },
         "loader": {
           "type": "string",
@@ -995,68 +840,55 @@
                   "items": {
                     "allOf": [
                       {
-                        "$ref": "#/definitions/environments/$defs/plugins"
+                        "$ref": "#/$defs/environments/$defs/plugins"
                       },
                       {
-                        "additionalProperties": false,
-                        "properties": {
-                          "name": {},
-                          "config": {},
-                          "select": {},
-                          "select_filter": {},
-                          "catalog": {},
-                          "load_schema": {},
-                          "metadata": {},
-                          "schema": {},
-                          "state": {}
-                        }
-                      },
-                      {
-                        "$ref": "#/definitions/plugins/extractor_shared"
+                        "$ref": "#/$defs/plugins/extractor_shared"
                       }
-                    ]
+                    ],
+                    "unevaluatedProperties": false
                   }
                 },
                 "loaders": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "unevaluatedProperties": false,
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "orchestrators": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "unevaluatedProperties": false,
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "transformers": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "unevaluatedProperties": false,
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "files": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "unevaluatedProperties": false,
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "utilities": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "unevaluatedProperties": false,
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 },
                 "transforms": {
                   "type": "array",
                   "items": {
-                    "additionalProperties": false,
-                    "$ref": "#/definitions/environments/$defs/plugins"
+                    "unevaluatedProperties": false,
+                    "$ref": "#/$defs/environments/$defs/plugins"
                   }
                 }
               }
@@ -1064,8 +896,7 @@
           }
         },
         "env": {
-          "type": "object",
-          "description": "An object of environment specific variables."
+          "$ref": "#/$defs/env"
         }
       },
       "$defs": {
@@ -1080,6 +911,9 @@
             },
             "config": {
               "type": "object"
+            },
+            "env": {
+              "$ref": "#/$defs/env"
             }
           }
         }
@@ -1093,7 +927,7 @@
         "^(extractors|loaders|transforms|orchestrators|transformers|files|utilities|mappers)$": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/plugin_requirement"
+            "$ref": "#/$defs/plugin_requirement"
           }
         }
       }

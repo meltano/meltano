@@ -24,7 +24,8 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.utils import expand_env_vars
+from meltano.core.tracking import Tracker
+from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 from meltano.core.venv_service import VenvService, VirtualEnv
 
 logger = get_logger(__name__)
@@ -68,10 +69,10 @@ class ExecutableNotFoundError(InvokerError):
         plugin_type = plugin.type.singular
         super().__init__(
             f"Executable '{executable}' could not be found. "
-            + f"{plugin_type_descriptor} '{plugin.name}' may not have "
-            + "been installed yet using "
-            + f"`meltano install {plugin_type} {plugin.name}`, "
-            + "or the executable name may be incorrect."
+            f"{plugin_type_descriptor} '{plugin.name}' may not have "
+            "been installed yet using "
+            f"`meltano install {plugin_type} {plugin.name}`, "
+            "or the executable name may be incorrect."
         )
 
 
@@ -152,6 +153,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             plugin_settings_service: Plugin Settings manager.
         """
         self.project = project
+        self.tracker = Tracker(project)
         self.plugin = plugin
         self.context = context
         self.output_handlers = output_handlers
@@ -333,12 +335,14 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 **expand_env_vars(
                     project_settings_service.env,
                     os.environ,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(  # noqa: WPS204
+                        strict_env_var_mode
+                    ),
                 ),
                 **expand_env_vars(
                     self.settings_service.project.dotenv_env,
                     os.environ,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 ),
             }
             # Expand active env w/ expanded root env
@@ -346,7 +350,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 expand_env_vars(
                     self.settings_service.project.active_environment.env,
                     expanded_project_env,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
                 if self.settings_service.project.active_environment
                 else {}
@@ -356,7 +360,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             expanded_root_plugin_env = expand_env_vars(
                 self.settings_service.plugin.env,
                 expanded_active_env,
-                raise_if_missing=strict_env_var_mode,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
 
             # Expand active env plugin env w/ expanded root plugin env
@@ -364,7 +368,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 expand_env_vars(
                     self.settings_service.environment_plugin_config.env,
                     expanded_root_plugin_env,
-                    raise_if_missing=strict_env_var_mode,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
                 if self.settings_service.environment_plugin_config
                 else {}
@@ -378,6 +382,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             **expanded_root_plugin_env,
             **expanded_active_env,
             **expanded_active_env_plugin_env,
+            **self.tracker.env,
         }
 
         # Ensure Meltano venv is not inherited
@@ -421,7 +426,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             popen_env = {**self.env(), **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logging.debug(f"Invoking: {popen_args}")
-            logging.debug(f"Env: {popen_env}")
 
             try:
                 yield (popen_args, popen_options, popen_env)

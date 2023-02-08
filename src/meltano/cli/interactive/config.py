@@ -21,7 +21,7 @@ from meltano.core.settings_service import (
     SettingValueStore,
 )
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking import CliEvent
+from meltano.core.tracking.contexts import CliEvent
 
 PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"

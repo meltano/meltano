@@ -6,7 +6,7 @@
 
 # Default owners
 
-- @pandemicsyn @edgarrmondragon
+- @edgarrmondragon @WillDaSilva
 
 # CI
 
@@ -19,17 +19,17 @@
 
 # Web App and API owners
 
-/src/webapp/ @pandemicsyn @rwfeather @cjohnhanson
-/src/meltano/api/ @pandemicsyn @rwfeather @cjohnhanson
+/src/webapp/ @rwfeather @cjohnhanson
+/src/meltano/api/ @rwfeather @cjohnhanson
 
 # Docs (General)
 
-/docs/ @afolson @tayloramurphy @meltano/engineering @meltano/marketing
-/README.md @afolson @tayloramurphy @meltano/engineering @meltano/marketing
+/docs/ @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
+/README.md @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
 
 # Docs (Contributing)
 
-/CONTRIBUTING.md @afolson @tayloramurphy @meltano/engineering
+/CONTRIBUTING.md @sbalnojan @tayloramurphy @meltano/engineering
 
 # Integration tests
 
