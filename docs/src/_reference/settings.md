@@ -551,7 +551,7 @@ The endpoint URL to use when connecting to S3. Only necessary if using S3-compat
 #### How to use
 
 ```bash
-meltano config meltano set state_backend.s3.endpoint_url "https://play.min.io:9000""
+meltano config meltano set state_backend.s3.endpoint_url "https://play.min.io:9000"
 
 export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 ```
