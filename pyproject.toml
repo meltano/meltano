@@ -493,7 +493,6 @@ version = "2.15.2"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
-  'package.json:^  "version":',
   'src/webapp/package.json:^  "version":',
   'docs/package.json:^  "version":',
 ]
