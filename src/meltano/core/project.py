@@ -235,7 +235,7 @@ class Project(Versioned):  # noqa: WPS214
 
     @cached_property
     def project_files(self) -> ProjectFiles:
-        """Return a singleton `ProjectFiles` file manager instance.
+        """Return a `ProjectFiles` file manager instance.
 
         Returns:
             `ProjectFiles` file manager.

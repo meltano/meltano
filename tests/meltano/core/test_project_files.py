@@ -1,15 +1,19 @@
 from __future__ import annotations
 
 import datetime
+import json
+import logging
 import platform
 import tempfile
+from copy import deepcopy
 from pathlib import Path
 from textwrap import dedent
 
 import pytest
 
 from fixtures.utils import cd
-from meltano.core.project_files import deep_merge
+from meltano.core.project_files import ExtractedAnnotation, ProjectFiles, deep_merge
+from meltano.core.yaml import yaml
 
 
 @pytest.fixture
@@ -460,3 +464,131 @@ class TestProjectFiles:
 
         included_path = project_files.root / "subconfig_2.yml"
         assert included_path.read_text() == dedent(expected_subconfig_2_contents)
+
+
+class TestAnnotations:
+    @pytest.fixture
+    def project_files(self):
+        return ProjectFiles(Path(), Path("meltano.yml"))
+
+    annotation_test_cases = [
+        # Use `yaml.load` to convert dicts to `CommentedMap` objects and lists
+        # to `CommentedSeq` objects.
+        (yaml.load(json.dumps(x)), y, yaml.load(json.dumps(z)))
+        for x, y, z in (
+            ({}, [], {}),
+            ([], [], []),
+            ({"annotations": {}}, [ExtractedAnnotation((), 0, {})], {}),
+            (
+                [
+                    {
+                        "annotations": {},
+                        "k1": [
+                            {
+                                "k2": {},
+                                "k3": {
+                                    "k4": [
+                                        "a",
+                                        {
+                                            "k5": {
+                                                "annotations": {
+                                                    "ak1": "av1",
+                                                    "ak2": "av2",
+                                                }
+                                            }
+                                        },
+                                        "c",
+                                    ]
+                                },
+                                "annotations": {},
+                            }
+                        ],
+                    },
+                    {},
+                    {
+                        "annotations": {
+                            "annotations": {
+                                "annotations": {},
+                            },
+                        }
+                    },
+                ],
+                [
+                    ExtractedAnnotation(path=(0,), index=0, data={}),
+                    ExtractedAnnotation(path=(0, "k1", 0), index=2, data={}),
+                    ExtractedAnnotation(
+                        path=(0, "k1", 0, "k3", "k4", 1, "k5"),
+                        index=0,
+                        data={"ak1": "av1", "ak2": "av2"},
+                    ),
+                    ExtractedAnnotation(
+                        path=(2,),
+                        index=0,
+                        data={"annotations": {"annotations": {}}},
+                    ),
+                ],
+                [
+                    {
+                        "k1": [
+                            {
+                                "k2": {},
+                                "k3": {"k4": ["a", {"k5": {}}, "c"]},
+                            }
+                        ],
+                    },
+                    {},
+                    {},
+                ],
+            ),
+        )
+    ]
+
+    @pytest.mark.parametrize(
+        ("original_data", "extracted_annotations", "processed_data"),
+        annotation_test_cases,
+    )
+    def test_extract_annotations(
+        self,
+        project_files: ProjectFiles,
+        original_data: dict | list,
+        extracted_annotations: list[ExtractedAnnotation],
+        processed_data: dict | list,
+    ):
+        original_data = deepcopy(original_data)
+        ProjectFiles._annotations = []
+        project_files.extract_annotations(original_data)
+        assert ProjectFiles._annotations == extracted_annotations
+        # NOTE: The data is modified in-place
+        assert original_data == processed_data
+
+    @pytest.mark.parametrize(
+        ("restored_data", "extracted_annotations", "processed_data"),
+        annotation_test_cases,
+    )
+    def test_restore_annotations(
+        self,
+        project_files: ProjectFiles,
+        restored_data: dict | list,
+        extracted_annotations: list[ExtractedAnnotation],
+        processed_data: dict | list,
+    ):
+        processed_data = deepcopy(processed_data)
+        ProjectFiles._annotations = extracted_annotations
+        project_files.restore_annotations(processed_data)
+        # NOTE: The data is modified in-place
+        assert restored_data == processed_data
+
+    def test_restore_annotations_warnings(
+        self, project_files: ProjectFiles, caplog: pytest.LogCaptureFixture
+    ):
+        ProjectFiles._annotations = [
+            ExtractedAnnotation(
+                ("f", 4, "A", "k", 3, "location"), 0, {"key": ["The lost annotation"]}
+            )
+        ]
+        with caplog.at_level(logging.WARNING):
+            project_files.restore_annotations({})
+        assert (
+            "Failed to re-insert annotation located at '.f[4].A.k[3].location' "
+            'in project files: {"key": ["The lost annotation"]}'
+        ) in caplog.text

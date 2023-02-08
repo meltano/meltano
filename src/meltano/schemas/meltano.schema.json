@@ -34,6 +34,9 @@
       "type": "object",
       "description": "Configuration for state backend.",
       "properties": {
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
         "uri": {
           "type": "string",
           "description": "The URI pointing to the backend to use.",
@@ -51,6 +54,9 @@
           "type": "object",
           "description": "Configuration for Azure Blob Storage state backend.",
           "properties": {
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            },
             "connection_string": {
               "type": "string",
               "description": "The azure connection string to use for connecting to Azure Blob Storage."
@@ -61,6 +67,9 @@
           "type": "object",
           "description": "Configuration for Google Cloud Storage state backend.",
           "properties": {
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            },
             "application_credentials": {
               "type": "string",
               "description": "Path to a Google credentials file to use for authenticating to Google Cloud Storage."
@@ -71,6 +80,9 @@
           "type": "object",
           "description": "Configuration for AWS S3 state backend.",
           "properties": {
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            },
             "aws_access_key_id": {
               "type": "string",
               "description": "AWS access key ID to use for authenticating to AWS S3."
@@ -193,6 +205,9 @@
           "name"
         ],
         "properties": {
+          "annotations": {
+            "$ref": "#/$defs/annotations"
+          },
           "name": {
             "type": "string",
             "description": "The name of the plugin.",
@@ -278,6 +293,9 @@
                 "args"
               ],
               "properties": {
+                "annotations": {
+                  "$ref": "#/$defs/annotations"
+                },
                 "args": {
                   "type": "string",
                   "description": "Command arguments"
@@ -297,6 +315,9 @@
                   ],
                   "description": "Container specification for this command",
                   "properties": {
+                    "annotations": {
+                      "$ref": "#/$defs/annotations"
+                    },
                     "image": {
                       "type": "string",
                       "description": "Container image",
@@ -373,6 +394,9 @@
       "extractor_shared": {
         "type": "object",
         "properties": {
+          "annotations": {
+            "$ref": "#/$defs/annotations"
+          },
           "catalog": {
             "type": "string",
             "description": "A path to a catalog file (relative to the project directory) to be provided to the extractor when it is run in sync mode."
@@ -428,6 +452,9 @@
           {
             "type": "object",
             "properties": {
+              "annotations": {
+                "$ref": "#/$defs/annotations"
+              },
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -460,6 +487,9 @@
           },
           {
             "properties": {
+              "annotations": {
+                "$ref": "#/$defs/annotations"
+              },
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -522,6 +552,9 @@
           },
           {
             "properties": {
+              "annotations": {
+                "$ref": "#/$defs/annotations"
+              },
               "vars": {
                 "type": "object",
                 "description": "An object containing dbt model variables"
@@ -538,6 +571,9 @@
       "mapper_specific": {
         "type": "object",
         "properties": {
+          "annotations": {
+            "$ref": "#/$defs/annotations"
+          },
           "mappings": {
             "description": "Name of the invokable mappings and their associated configs.",
             "type": "array",
@@ -545,6 +581,9 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "annotations": {
+                  "$ref": "#/$defs/annotations"
+                },
                 "name": {
                   "type": "string"
                 },
@@ -581,6 +620,9 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The name of the setting",
@@ -678,6 +720,9 @@
             "provider"
           ],
           "properties": {
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            },
             "provider": {
               "type": "string",
               "description": "The name of a Meltano-supported OAuth provider",
@@ -713,6 +758,9 @@
       "description": "https://docs.meltano.com/guide/orchestration",
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The schedule's unique name",
@@ -783,6 +831,9 @@
       "description": "https://docs.meltano.com/reference/command-line-interface#job",
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
         "name": {
           "type": "string",
           "description": "This jobs unique name",
@@ -822,6 +873,9 @@
         "name"
       ],
       "properties": {
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The name of the environment."
@@ -831,10 +885,16 @@
           "description": "An object of environment specific configurations.",
           "additionalProperties": false,
           "properties": {
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            },
             "plugins": {
               "type": "object",
               "description": "An object of environment specific plugin configurations.",
               "properties": {
+                "annotations": {
+                  "$ref": "#/$defs/annotations"
+                },
                 "extractors": {
                   "type": "array",
                   "items": {
@@ -906,6 +966,9 @@
             "name"
           ],
           "properties": {
+            "annotations": {
+              "$ref": "#/$defs/annotations"
+            },
             "name": {
               "type": "string"
             },
@@ -937,6 +1000,9 @@
       "description": "A single plugin requirement",
       "additionalProperties": false,
       "properties": {
+        "annotations": {
+          "$ref": "#/$defs/annotations"
+        },
         "name": {
           "type": "string",
           "description": "The name of the required plugin"

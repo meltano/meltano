@@ -7,12 +7,11 @@ import json
 import structlog
 from dotenv import dotenv_values
 
+from meltano.core.config_service import ConfigService
 from meltano.core.project import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
-
-from .config_service import ConfigService
 
 logger = structlog.get_logger(__name__)
 

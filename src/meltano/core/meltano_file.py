@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Iterable
+from typing import Iterable
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
@@ -26,7 +26,6 @@ class MeltanoFile(Canonical):
         environments: list[dict] = None,
         jobs: list[dict] = None,
         env: dict[str, str] = None,
-        annotations: dict[str, dict[Any, Any]] | None = None,  # noqa: WPS442
         **extras,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
@@ -38,7 +37,6 @@ class MeltanoFile(Canonical):
             environments: Environment configuration for this project.
             jobs: Job configuration for this project.
             env: Environment variables for this project.
-            annotations: Annotations for external tools/vendors - do not access.
             extras: Additional configuration for this project.
         """
         super().__init__(
@@ -50,7 +48,6 @@ class MeltanoFile(Canonical):
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
             env=env or {},
-            annotations=annotations,
         )
 
     def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
@@ -94,7 +91,7 @@ class MeltanoFile(Canonical):
         Returns:
             List of new Schedule instances.
         """
-        return list(map(Schedule.parse, schedules))
+        return [Schedule.parse(obj) for obj in schedules]
 
     @staticmethod
     def load_environments(environments: Iterable[dict]) -> list[Environment]:

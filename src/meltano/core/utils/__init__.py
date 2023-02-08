@@ -292,10 +292,6 @@ def noop(*_args, **_kwargs):
     pass
 
 
-def map_dict(f: Callable, d: dict):
-    yield from ((k, f(v)) for k, v in d.items())
-
-
 def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 

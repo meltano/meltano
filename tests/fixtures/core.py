@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from fixtures.utils import tmp_project
+from fixtures.utils import cd, tmp_project
 from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.config_service import ConfigService
@@ -492,8 +492,9 @@ def project_function(test_dir, project_init_service):
 
 
 @pytest.fixture(scope="class")
-def project_files(test_dir, compatible_copy_tree):
-    with tmp_project(
+def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree):
+    tmp_path = tmp_path_factory.mktemp("meltano-project-files")
+    with cd(tmp_path), tmp_project(
         "a_multifile_meltano_project_core",
         current_dir / "multifile_project",
         compatible_copy_tree,
