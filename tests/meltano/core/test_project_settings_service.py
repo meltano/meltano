@@ -210,6 +210,8 @@ class TestProjectSettingsService:
         SettingValueStore.MELTANO_YML.manager(subject).set(
             name, [name], "$DB_MAX_RETRIES_TEST", setting_def=setting_def
         )
+
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
         assert subject.get(name) is None
 
         subject.env_override["DB_MAX_RETRIES_TEST"] = "7"
