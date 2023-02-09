@@ -52,6 +52,11 @@ class TestCompile:
             f"meltano-manifest.{environment_name}.json"
         }
 
+    def test_compile_no_environment(self, manifest_dir: Path, cli_runner: CliRunner):
+        result = cli_runner.invoke(cli, ("--no-environment", "compile"))
+        assert result.exit_code == 0
+        assert {x.name for x in manifest_dir.iterdir()} == {"meltano-manifest.json"}
+
     @pytest.mark.parametrize("indent", (-3, -1, 0, 1, 4, 9))
     def test_compile_with_indent(
         self, manifest_dir: Path, cli_runner: CliRunner, indent: int

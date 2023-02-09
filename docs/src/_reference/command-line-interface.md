@@ -138,6 +138,12 @@ To compile a manifest file for a specific environment:
 meltano --environment <environment name> compile
 ```
 
+To compile the no-environment manifest file:
+
+```bash
+meltano --no-environment compile
+```
+
 To save the manifest JSON files to a specific directory:
 
 ```bash
@@ -165,9 +171,9 @@ The `compile` command can accept the `--environment` flag to target a specific [
 
 When an environment is specified, only the manifest JSON file for that environment will be compiled.
 
-When no environment is specified, a manifest JSON file for each environment is compiled, including `meltano-manifest.json`, which is the manifest file for the project when no environment is active.
+When no environment is explicitly specified, a manifest JSON file for each environment is compiled, including `meltano-manifest.json`, which is the manifest file for the project when no environment is active.
 
-There is no way to *only* compile the no-environment manifest JSON file, i.e. `meltano-manifest.json`. It is only compiled when the `compile` command is run on all environments.
+To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.json`, pass the `--no-environment` CLI option to `meltano`.
 
 ## `config`
 

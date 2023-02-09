@@ -103,19 +103,16 @@ def compile(  # noqa: WPS125
         tracker.track_command_event(CliEvent.inflight)
 
 
-# FIXME: This command should ignore the default environment and selected
-# environment. It should have its own `environment` CLI option(s?), which would
-# allow for no-environment to be selected individually (currently you can only
-# generate a no-environment manifest by generating them all), and would allow
-# for a subset of environments to be selected, rather than one or all.
 def _environments(
     ctx: click.Context,
     project: Project,
 ) -> tuple[Environment | None, ...]:
+    if ctx.obj["explicit_no_environment"]:
+        return (None,)
     if ctx.obj["selected_environment"] and not ctx.obj["is_default_environment"]:
-        return [
+        return (
             Environment.find(
                 project.meltano.environments, ctx.obj["selected_environment"]
-            )
-        ]
+            ),
+        )
     return (None, *EnvironmentService(project).list_environments())
