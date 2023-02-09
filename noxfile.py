@@ -50,6 +50,7 @@ def tests(session: Session) -> None:
         "pytest-docker",
         "pytest-order",
         "pytest-randomly",
+        "pytest-structlog",
         "pytest-xdist",
         "requests-mock",
     )
