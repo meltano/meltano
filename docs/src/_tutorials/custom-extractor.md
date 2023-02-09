@@ -76,8 +76,8 @@ After running the above command, you will be prompted to configure your project.
 
 - Type `jsonplaceholder` as your source name.
 - Then input your first name and last name.
-- You can leave the tap_id and library name as the default suggested names.
-- If you are planning to distribute your project on PyPI and the tap_id is already in use, you can set a variant name. e.g. 'meltanolabs' or 'pipelinewise'.
+- You can leave the `tap_id` and library name as the default suggested names.
+- If you are planning to distribute your project on PyPI and the `tap_id` is already in use, you can set a variant name. e.g. 'meltanolabs' or 'pipelinewise'.
 - For the stream type, you should select REST, and Custom or N/A for the auth method.
 - Finally, you can choose to add a CI/CD template or not. It doesn’t really matter in this case.
 
@@ -212,9 +212,9 @@ class CommentsStream(jsonplaceholderStream):
 
 The `tap.py` file defines the tap settings and the available streams, which is the comments stream in this case. You can find the available stream types in the STREAM_TYPES array.
 
-The `streams.py` file configures the comments stream to use the /comments path and also sets the properties of the extracted fields.
+The `streams.py` file configures the comments stream to use the `/comments` path and also sets the properties of the extracted fields.
 
-Finally, change the url_base in the `tap-jsonplaceholder/tap_jsonplaceholder/client.py` file to https://jsonplaceholder.typicode.com.
+Finally, change the value of `url_base` in the `tap-jsonplaceholder/tap_jsonplaceholder/client.py` file to https://jsonplaceholder.typicode.com.
 
 ```python
 ...
