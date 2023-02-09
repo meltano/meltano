@@ -80,8 +80,9 @@ def custom_build_wheel(*args, **kwargs) -> str:
     Returns:
         The value returned by `WheelBuilder.build(*args, **kwargs)`.
     """
-    build_webapp()
-    include_webapp()
+    # Disabled on the `cloud` feature branch - refer to `src/meltano/cli/ui.py`
+    # build_webapp()  # noqa: E800 (commented-out code)
+    # include_webapp()  #  noqa: E800 (commented-out code)
     return original_wheel_build(*args, **kwargs)
 
 

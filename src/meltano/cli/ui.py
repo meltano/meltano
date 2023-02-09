@@ -97,6 +97,9 @@ def ui(ctx, project: Project):
         "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n",
         fg="red",
     )
+    raise Exception(
+        "The 'meltano ui' command has been disabled on the 'cloud' feature branch."
+    )
 
 
 @ui.command(cls=InstrumentedCmd, short_help="Start the Meltano UI webserver.")
