@@ -266,14 +266,8 @@ def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
     Returns:
         the flattened dict
     """
-
-    def dot_reducer(*xs):
-        if xs[0] is None:
-            return xs[1]
-        return ".".join(xs)
-
     if reducer == "dot":
-        reducer = dot_reducer
+        reducer = lambda *xs: xs[1] if xs[0] is None else ".".join(xs)  # noqa: E731
     if reducer == "env_var":
         reducer = to_env_var
 

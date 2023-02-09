@@ -101,7 +101,10 @@
     },
     "include_paths": {
       "type": "array",
-      "description": "An array of paths (relative to the project directory) of other Meltano config files to include in the configuration."
+      "description": "An array of paths (relative to the project directory) of other Meltano config files to include in the configuration.",
+      "items": {
+        "type": "string"
+      }
     },
     "plugins": {
       "type": "object",
@@ -173,6 +176,111 @@
         "$ref": "#/$defs/jobs"
       },
       "description": "Jobs, added using 'meltano job'"
+    },
+    "database_max_retries": {
+      "type": "integer",
+      "description": "The number of times to retry connecting to the Meltano database.",
+      "default": 3,
+      "minimum": 0
+    },
+    "database_retry_timeout": {
+      "type": "integer",
+      "description": "The time in seconds to wait between Meltano database connection attempts.",
+      "default": 5,
+      "minimum": 0
+    },
+    "cli": {
+      "type": "object",
+      "description": "CLI related settings.",
+      "properties": {
+        "log_config": {
+          "type": "string",
+          "description": "The path to the logging config, relative to the Meltano project root.",
+          "default": "logging.yaml"
+        }
+      }
+    },
+    "elt": {
+      "type": "object",
+      "description": "ELT related settings",
+      "properties": {
+        "buffer_size": {
+          "type": "integer",
+          "description": "The size of the ELT buffer in bytes.",
+          "default": 10485760
+        }
+      }
+    },
+    "experimental": {
+      "type": "boolean",
+      "description": "Whether experimental features should be enabled.",
+      "default": false
+    },
+    "ff": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "enable_uvicorn": {
+          "type": "boolean",
+          "description": "Whether to use Uvicorn rather than Gunicorn as the API server.",
+          "default": false
+        },
+        "enable_api_scheduled_job_list": {
+          "type": "boolean",
+          "description": "Whether the API includes scheduled jobs in listings.",
+          "default": false
+        },
+        "strict_env_var_mode": {
+          "type": "boolean",
+          "description": "Whether references to undefined environment variables cause Meltano to exit with an error.",
+          "default": false
+        }
+      }
+    },
+    "hub_api_root": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The URL to the root of the Meltano Hub API.",
+      "default": null,
+      "examples": [
+        "https://hub.meltano.com/meltano/api/v1"
+      ]
+    },
+    "hub_url": {
+      "type": "string",
+      "description": "The URL for Meltano Hub.",
+      "default": "https://hub.meltano.com"
+    },
+    "hub_url_auth": {
+      "type": [
+        "string",
+        "boolean",
+        "null"
+      ],
+      "description": "The value of the `Authorization` header when making requests to Meltano Hub. If null, false, or unset, no `Authorization` header is used.",
+      "default": null,
+      "examples": [
+        "Bearer $ACCESS_TOKEN"
+      ]
+    },
+    "snowplow": {
+      "type": "object",
+      "description": "Snowplow related settings.",
+      "properties": {
+        "collector_endpoints": {
+          "type": "array",
+          "description": "Array of Snowplow collector endpoints.",
+          "items": {
+            "type": "string",
+            "description": "A URL to which Snowplow events will be sent if telemetry is enabled."
+          },
+          "default": [
+            "https://sp.meltano.com"
+          ]
+        }
+      }
     }
   },
   "$defs": {

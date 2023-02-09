@@ -34,12 +34,24 @@ from meltano.core.tracking.contexts import CliEvent
         "files. Set to -1 to remove all non-essential whitespace."
     ),
 )
+@click.option(
+    # Eventually this lint option will just result in calls to the part of
+    # `meltano.core` that backs the `meltano lint` command:
+    # https://github.com/meltano/meltano/issues/7285
+    "--lint/--no-lint",
+    default=False,
+    help=(
+        "Validate the project files and generated manifest files against the "
+        "Meltano schema"
+    ),
+)
 @click.pass_context
 @pass_project(migrate=True)
 def compile(  # noqa: WPS125
     project: Project,
     ctx: click.Context,
     directory: Path,
+    lint: bool,
     indent: int,
 ):
     """
@@ -68,7 +80,12 @@ def compile(  # noqa: WPS125
             if environment is None
             else f"meltano-manifest.{environment.name}.json"
         )
-        manifest = Manifest(project=project, environment=environment, path=path)
+        manifest = Manifest(
+            project=project,
+            environment=environment,
+            path=path,
+            check_schema=lint,
+        )
         try:
             with open(path, "w") as manifest_file:
                 json.dump(

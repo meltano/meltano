@@ -14,6 +14,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Mapping, MutableMapping, cast
 
+import flatten_dict
 import structlog
 import yaml
 from typing_extensions import TypeAlias
@@ -134,7 +135,7 @@ def env_aware_merge_mappings(
     }
 
 
-class Manifest:
+class Manifest:  # noqa: WPS230
     """A complete unambiguous static representation of a Meltano project."""
 
     def __init__(
@@ -142,6 +143,7 @@ class Manifest:
         project: Project,
         environment: Environment | None,
         path: Path,
+        check_schema: bool,
     ) -> None:
         """Initialize the manifest.
 
@@ -159,11 +161,14 @@ class Manifest:
                 project files will be ignored by this manifest.
             path: The path the Manifest will be saved to - only used for
                 jsonschema validation failure error messages.
+            check_schema: Whether the project files and generated manifest
+                files should be validated against the Meltano schema.
         """
         self.project = project
         self._meltano_file = self.project.meltanofile.read_text()
         self.environment = environment
         self.path = path
+        self.check_schema = check_schema
         self.project_settings_service = ProjectSettingsService(project)
         self.project_plugins_service = ProjectPluginsService(project)
         with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
@@ -202,26 +207,30 @@ class Manifest:
 
     @cached_property
     def _project_files(self) -> dict[str, Any]:
-        project_files = deep_merge(
-            yaml.load(  # noqa: S506
-                self._meltano_file,
-                YamlNoTimestampSafeLoader,
+        project_files = flatten_dict.unflatten(
+            deep_merge(
+                yaml.load(  # noqa: S506
+                    self._meltano_file,
+                    YamlNoTimestampSafeLoader,
+                ),
+                *(
+                    yaml.load(x.read_text(), YamlNoTimestampSafeLoader)  # noqa: S506
+                    for x in self.project.project_files.include_paths
+                ),
             ),
-            *(
-                yaml.load(x.read_text(), YamlNoTimestampSafeLoader)  # noqa: S506
-                for x in self.project.project_files.include_paths
-            ),
+            "dot",
         )
-        self._validate_against_manifest_schema(
-            "project files", self.project.meltanofile, project_files
-        )
+        if self.check_schema:
+            self._validate_against_manifest_schema(
+                "project files", self.project.meltanofile, project_files
+            )
         return project_files
 
     def _merge_plugin_lockfiles(
         self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, Any]
     ) -> None:
         locked_plugins = cast(
-            dict[str, list[Mapping[str, Any]]],
+            Dict[str, List[Mapping[str, Any]]],
             {
                 plugin_type.value: [
                     PluginLock(self.project, plugin).load(create=True, loader=json.load)
@@ -357,9 +366,10 @@ class Manifest:
         # which fields within the manifest should be read.
         del manifest["environments"]
 
-        self._validate_against_manifest_schema(
-            "newly compiled manifest", self.path, manifest
-        )
+        if self.check_schema:
+            self._validate_against_manifest_schema(
+                "newly compiled manifest", self.path, manifest
+            )
 
         return manifest
 
