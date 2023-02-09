@@ -329,7 +329,7 @@ meltano add --custom extractor tap-jsonplaceholder
 
 You will be prompted to input the namespace URL. Choose `tap-jsonplaceholder`.
 
-Also, choose `-e …/tap-jsonplaceholder` as the pip_url since you are working with a local extractor project. This should be the full path to your custom extractor.
+Also, choose `-e ../tap-jsonplaceholder` as the pip_url since you are working with a local extractor project. This should be the full path to your custom extractor.
 
 Go with the default executable name.
 
