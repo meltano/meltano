@@ -11,7 +11,7 @@ hidden: true
 In order to contribute to Meltano, you will need the following:
 
 1. [Python 3.7+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
-2. [Node 8.11.0+](https://nodejs.org/)
+2. [Node 16](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
 ## Setting Up Your Environment
@@ -80,30 +80,6 @@ Each migration should be isolated from the `meltano` module, so **don't import a
 </div>
 
 To run the migrations, use `meltano upgrade` inside a Meltano project.
-
-## Testing
-
-### End-to-End Testing with Cypress
-
-Our end-to-end tests are currently being built with [Cypress](https://www.cypress.io/).
-
-#### How to Run Tests
-
-1. Initialize a new meltano project with `meltano init $PROJECT_DIRECTORY`
-1. Change directory into `$PROJECT_DIRECTORY`
-1. Clone Meltano repo
-1. Open Meltano repo in Terminal
-1. Run `yarn setup`
-1. Run `yarn test:e2e`
-
-This will kick off a Cypress application that will allow you to run tests as desired by clicking each test suite (which can be found in `/src/tests/e2e/specs/*.spec.js`)
-
-![Preview of Cypres app running](images/prerequisites/cypTest-01.png)
-
-<div class="notification is-info">
-  <p><strong>In the near future, all tests can flow automatically; but there are some complications that require manual triggering due to an inability to read pipeline completion.</strong></p>
-  <p></p>
-</div>
 
 ## Resources
 
