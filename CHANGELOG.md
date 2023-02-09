@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.15.3 (2023-02-09)
+
+### 🐛 Fixes
+
+- [#7294](https://github.com/meltano/meltano/issues/7294) Avoid casting settings before env var expansion
+
+### 📚 Documentation Improvements
+
+- [#7050](https://github.com/meltano/meltano/issues/7050) Add "variant" prompt and description to custom plugin development docs
+- [#7292](https://github.com/meltano/meltano/issues/7292) Fix typo in settings reference
+
 ## v2.15.2 (2023-02-08)
 
 ### 🐛 Fixes
