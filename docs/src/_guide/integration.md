@@ -207,7 +207,7 @@ If you'd like to manually inspect a job's state for debugging purposes, or so th
 
 ### Internal State Merge Logic
 
-When running Extract and Load pipelines via [`run`](/reference/command-line-interface#run), Meltano will retrieve your pipeline state (see the [state backends docs](/concepts/state_backends) for details on where it's stored) for the most recently completed pipeline based on State ID. 
+When running Extract and Load pipelines via [`run`](/reference/command-line-interface#run), Meltano will retrieve your pipeline state (see the [state backends docs](/concepts/state_backends) for details on where it's stored) for the most recently completed pipeline based on State ID.
 If a state record from a completed job is found, its data is passed along to the extractor.
 
 If the most recent pipeline aborted before a particular stream completed, then it might have generated a partial state record.
