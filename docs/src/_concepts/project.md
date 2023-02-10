@@ -190,28 +190,25 @@ extractors:
 Plugin [commands](/reference/command-line-interface#commands) are defined by the `commands` property. The keys are the name of the command and the values are the arguments to be passed to the plugin executable. These can contain dynamic references to [configuration](/guide/configuration) using the [Environment variable form](/guide/configuration#environment-variables) of the configuration option.
 
 ```yaml{3-7}
-transformers:
-- name: dbt
-  executable: dbt
+utilities:
+- name: dbt-snowflake
+  variant: dbt-labs
   commands:
-    seed: seed --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
-    snapshot: snapshot --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
+    my_models:
+      args: run --select +my_model_name
+      description: Run dbt, selecting model `my_model_name` and all upstream models. Read more about the dbt node selection syntax at https://docs.getdbt.com/reference/node-selection/syntax
 ```
 
 Commands can optionally specify some documentation displayed when [listing commands](/reference/command-line-interface#commands). They can also optionally specify an alternative executable from the default one for the plugin.
 
 ```yaml
 - name: dagster
-  executable: dagster
+  variant: quantile-development
   commands:
-    ui:
-      description: Start the webserver
-      executable: dagit
-      args: -w $DAGSTER_HOME/workspace.yaml
-    scheduler:
-      description: Run the scheduler daemon
-      executable: dagster-daemon
-      args: run
+    start:
+      args: -f $REPOSITORY_DIR/repository.py
+      description: Start Dagster.
+      executable: dagit_invoker
 ```
 
 ##### Containerized commands
@@ -349,9 +346,9 @@ In a newly initialized project, this directory will be included in [`.gitignore`
 While you would usually not want to modify files in this directory directly, knowing what's in there can aid in debugging:
 
 - `.meltano/meltano.db`: The default SQLite [system database](#system-database).
-- `.meltano/logs/elt/<state_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) output logs for the specified pipeline run.
+- `.meltano/logs/elt/<state_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) output logs for the specified pipeline run.
 - `.meltano/run/bin`: Symlink to the [`meltano` executable](/reference/command-line-interface) most recently used in this project.
-- `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
+- `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
 
