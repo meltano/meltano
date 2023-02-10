@@ -183,7 +183,6 @@ class VenvService:  # noqa: WPS214
         Returns:
             Whether virtual environment doesn't exist or can't be reused.
         """
-
         # A generator function is used to perform the checks lazily
         def checks():
             # The Python installation used to create this venv no longer exists
