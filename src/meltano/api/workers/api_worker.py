@@ -32,7 +32,6 @@ class APIWorker(threading.Thread):
         with self.project.settings.feature_flag(
             FeatureFlags.ENABLE_UVICORN, raise_error=False
         ) as allow:
-
             enable_uvicorn = allow
 
             # Use Uvicorn when on Windows
@@ -86,7 +85,6 @@ class APIWorker(threading.Thread):
 
                 # Add reload argument if reload is true
                 if self.reload:
-
                     args += [
                         "--reload",
                     ]

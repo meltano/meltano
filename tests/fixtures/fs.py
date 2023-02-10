@@ -15,7 +15,7 @@ from fixtures.utils import cd
 @pytest.fixture(scope="class")
 def compatible_copy_tree():
     """Copy files recursively from source to destination, ignoring existing dirs."""
-    # noqa: DAR201
+
     def _compatible_copy_tree(source: Path, destination: Path):
         """Copy files recursively from source to destination, ignoring existing dirs."""
         if sys.version_info >= (3, 8):

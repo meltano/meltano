@@ -319,7 +319,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         with self.project.settings.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
         ) as strict_env_var_mode:
-
             # Expand root env w/ os.environ
             expanded_project_env = {
                 **expand_env_vars(

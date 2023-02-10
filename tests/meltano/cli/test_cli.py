@@ -136,7 +136,6 @@ class TestCli:
     def test_default_environment_is_activated(
         self, deactivate_project, project_files_cli, cli_runner, pushd
     ):
-
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -158,7 +157,6 @@ class TestCli:
     def test_environment_variable_overrides_default(
         self, deactivate_project, project_files_cli, cli_runner, pushd, monkeypatch
     ):
-
         monkeypatch.setenv("MELTANO_ENVIRONMENT", "test-subconfig-2-yml")
         pushd(project_files_cli.root)
         cli_runner.invoke(

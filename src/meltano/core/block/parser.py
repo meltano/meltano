@@ -98,7 +98,6 @@ class BlockParser:  # noqa: D101
         blocks = self._expand_jobs(blocks, task_sets_service)
 
         for idx, name in enumerate(blocks):
-
             try:
                 parsed_name, command_name = name.split(":")
             except ValueError:

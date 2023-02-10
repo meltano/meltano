@@ -237,7 +237,6 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
 
 @asynccontextmanager
 async def _redirect_output(log, output_logger):
-
     meltano_stdout = output_logger.out(
         "meltano", log.bind(stdio="stdout", cmd_type="elt")
     )
@@ -285,7 +284,6 @@ async def _run_elt(
 
 
 async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa: WPS231
-
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -352,7 +350,6 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
 
 async def _run_transform(log, elt_context, output_logger, **kwargs):
-
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
         state_id=elt_context.job.job_name,
