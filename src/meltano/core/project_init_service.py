@@ -9,11 +9,11 @@ from pathlib import Path
 
 import click
 
-from .cli_messages import GREETING
-from .db import project_engine
-from .plugin.meltano_file import MeltanoFilePlugin
-from .project import Project
-from .project_settings_service import ProjectSettingsService, SettingValueStore
+from meltano.core.cli_messages import GREETING
+from meltano.core.db import project_engine
+from meltano.core.plugin.meltano_file import MeltanoFilePlugin
+from meltano.core.project import Project
+from meltano.core.project_settings_service import SettingValueStore
 
 PROJECT_FILENAME = "meltano.yml"
 
@@ -83,13 +83,12 @@ class ProjectInitService:
         self.create_dot_meltano_dir(project)
         self.create_files(project, add_discovery=add_discovery)
 
-        self.settings_service = ProjectSettingsService(project)
-        self.settings_service.set(
+        project.settings.set(
             "project_id",
             str(uuid.uuid4()),
             store=SettingValueStore.MELTANO_YML,
         )
-        self.set_send_anonymous_usage_stats()
+        self.set_send_anonymous_usage_stats(project)
         if activate:
             Project.activate(project)
 
@@ -133,13 +132,17 @@ class ProjectInitService:
                 click.secho("   |--", fg="yellow", nl=False)
                 click.echo(f" {path} (skipped)")
 
-    def set_send_anonymous_usage_stats(self):
-        """Set Anonymous Usage Stats flag."""
+    def set_send_anonymous_usage_stats(self, project: Project):
+        """Set Anonymous Usage Stats flag.
+
+        Args:
+            project: The Meltano project the setting is being set on.
+        """
         # If set to false store explicitly in `meltano.yml`
-        if not self.settings_service.get("send_anonymous_usage_stats"):
-            self.settings_service.set(
+        if not project.settings.get("send_anonymous_usage_stats"):
+            project.settings.set(
                 "send_anonymous_usage_stats",
-                self.settings_service.get("send_anonymous_usage_stats"),
+                project.settings.get("send_anonymous_usage_stats"),
                 store=SettingValueStore.MELTANO_YML,
             )
 

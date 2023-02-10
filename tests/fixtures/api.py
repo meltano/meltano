@@ -9,6 +9,7 @@ from flask_security.utils import login_user, logout_user
 
 from meltano.api import app as meltano_app
 from meltano.api.security.identity import create_dev_user
+from meltano.core.project import Project
 
 
 @pytest.fixture
@@ -58,7 +59,8 @@ def create_app(request, project):
 
 
 @pytest.fixture()
-def api(app):
+def api(app, project: Project):
+    project.refresh()
     return app.test_client()
 
 

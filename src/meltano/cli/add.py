@@ -19,7 +19,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
@@ -89,27 +88,24 @@ def add(  # noqa: WPS238
         inherit_from = plugin_names[0]
         plugin_names = [as_name]
 
-    plugins_service = ProjectPluginsService(project)
-
-    if flags["custom"]:
-        if plugin_type in {
-            PluginType.TRANSFORMS,
-            PluginType.ORCHESTRATORS,
-        }:
-            tracker.track_command_event(CliEvent.aborted)
-            raise CliError(f"--custom is not supported for {plugin_type}")
+    if flags["custom"] and plugin_type in {
+        PluginType.TRANSFORMS,
+        PluginType.ORCHESTRATORS,
+    }:
+        tracker.track_command_event(CliEvent.aborted)
+        raise CliError(f"--custom is not supported for {plugin_type}")
 
     plugin_refs = [
         PluginRef(plugin_type=plugin_type, name=name) for name in plugin_names
     ]
     dependencies_met, err = check_dependencies_met(
-        plugin_refs=plugin_refs, plugins_service=plugins_service
+        plugin_refs=plugin_refs, plugins_service=project.plugins
     )
     if not dependencies_met:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(f"Failed to install plugin(s): {err}")
 
-    add_service = ProjectAddService(project, plugins_service=plugins_service)
+    add_service = ProjectAddService(project)
 
     plugins: list[ProjectPlugin] = []
     for plugin in plugin_names:

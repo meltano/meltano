@@ -8,12 +8,10 @@ import subprocess
 import sys
 from collections.abc import Mapping
 from pathlib import Path
+from typing import Any, Iterable
 
 from meltano.core.project import Project
-from meltano.core.project_settings_service import (
-    ProjectSettingsService,
-    SettingValueStore,
-)
+from meltano.core.project_settings_service import SettingValueStore
 from meltano.core.tracking import Tracker
 
 MELTANO_COMMAND = "meltano"
@@ -22,32 +20,33 @@ MELTANO_COMMAND = "meltano"
 class MeltanoInvoker:
     """Class used to find and invoke all commands passed to it."""
 
-    def __init__(
-        self, project: Project, settings_service: ProjectSettingsService | None = None
-    ):
+    def __init__(self, project: Project):
         """
         Load the class with the project and service settings.
 
         Args:
-            project: Project class
-            settings_service: ProjectSettingsService Class blank
+            project: Project instance.
         """
         self.project = project
         self.tracker = Tracker(project)
-        self.settings_service = settings_service or ProjectSettingsService(project)
 
-    def invoke(self, args, command=MELTANO_COMMAND, env=None, **kwargs):
-        """
-        Invoke meltano or other provided command.
+    def invoke(
+        self,
+        args: Iterable[str],
+        command: str = MELTANO_COMMAND,
+        env: dict[str, str] | None = None,
+        **kwargs: Any,
+    ) -> subprocess.CompletedProcess:
+        """Invoke meltano or other provided command.
 
         Args:
-            args: list.
-            command: string containing command to invoke.
-            env: dictionary.
-            kwargs: dictionary.
+            args: CLI arguments to pass to the command.
+            command: Executable to invoke.
+            env: Extra environment variables to use for the subprocess.
+            kwargs: Keyword arguments for `subprocess.run`.
 
         Returns:
-            A CompletedProcess class object from subprocess.run().
+            A `CompletedProcess` class object from `subprocess.run`.
         """
         return subprocess.run(
             [self._executable_path(command), *args],
@@ -75,9 +74,9 @@ class MeltanoInvoker:
             env = {}
         return {
             # Include env that project settings are evaluated in
-            **self.settings_service.env,
+            **self.project.settings.env,
             # Include env for settings explicitly overridden using CLI flags
-            **self.settings_service.as_env(source=SettingValueStore.CONFIG_OVERRIDE),
+            **self.project.settings.as_env(source=SettingValueStore.CONFIG_OVERRIDE),
             # Include explicitly provided env
             **env,
             # Include telemetry env vars

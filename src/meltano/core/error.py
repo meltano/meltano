@@ -5,7 +5,10 @@ from __future__ import annotations
 from asyncio.streams import StreamReader
 from asyncio.subprocess import Process
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class ExitCode(int, Enum):  # noqa: D101
@@ -103,3 +106,25 @@ class EmptyMeltanoFileException(Exception):
 
 class MeltanoConfigurationError(MeltanoError):
     """Exception for when Meltano is inproperly configured."""
+
+
+class ProjectNotFound(Error):
+    """Occurs when a Project is instantiated outside of a meltano project structure."""
+
+    def __init__(self, project: Project):
+        """Instantiate the error.
+
+        Args:
+            project: the name of the project which cannot be found
+        """
+        super().__init__(
+            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
+        )
+
+
+class ProjectReadonly(Error):
+    """Occurs when attempting to update a readonly project."""
+
+    def __init__(self):
+        """Instantiate the error."""
+        super().__init__("This Meltano project is deployed as read-only")

@@ -15,7 +15,6 @@ import meltano
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import block_if_readonly, passes_authentication_checks
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import truthy
 
 logger = logging.getLogger(__name__)
@@ -101,15 +100,12 @@ def upgrade():
 
 @api_root.route("/identity")
 def identity():
-    project = Project.find()
-    settings_service = ProjectSettingsService(project)
-
     if current_user.is_anonymous:
         return jsonify(
             {
                 "username": "Anonymous",
                 "anonymous": True,
-                "can_sign_in": settings_service.get("ui.authentication"),
+                "can_sign_in": Project.find().settings.get("ui.authentication"),
             }
         )
 
