@@ -74,11 +74,6 @@ class Project(Versioned):  # noqa: WPS214
     _find_lock = threading.Lock()
     _meltano_rw_lock = fasteners.ReaderWriterLock()
     _default = None
-    _cached_properties = (
-        "project_files",
-        "settings",
-        "plugins",
-    )
 
     def __init__(
         self,
