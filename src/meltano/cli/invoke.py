@@ -27,7 +27,6 @@ from meltano.core.plugin_invoker import (
     invoker_factory,
 )
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
@@ -94,10 +93,8 @@ def invoke(
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
-    plugins_service = ProjectPluginsService(project)
-
     try:
-        plugin = plugins_service.find_plugin(
+        plugin = project.plugins.find_plugin(
             plugin_name, plugin_type=plugin_type, invokable=True
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
@@ -111,7 +108,7 @@ def invoke(
         tracker.track_command_event(CliEvent.completed)
         return
 
-    invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
+    invoker = invoker_factory(project, plugin)
     try:
         exit_code = asyncio.run(
             _invoke(

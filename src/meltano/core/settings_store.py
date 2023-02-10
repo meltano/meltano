@@ -16,8 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm import Session
 
 from meltano.core.environment import NoActiveEnvironment
-from meltano.core.error import Error
-from meltano.core.project import ProjectReadonly
+from meltano.core.error import Error, ProjectReadonly
 from meltano.core.setting import Setting
 from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
@@ -392,8 +391,8 @@ class BaseEnvStoreManager(SettingsStoreManager):
         """Return setting environment variables.
 
         Args:
-            args: Positional arguments to pass to setting_service setting_env_vars method.
-            kwargs: Keyword arguments to pass to setting_service setting_env_vars method.
+            args: Positional arguments to pass to `settings_service.setting_env_vars`.
+            kwargs: Keyword arguments to pass to `settings_service.setting_env_vars`.
 
         Returns:
             A dictionary of setting environment variables.
@@ -832,7 +831,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             raise StoreNotSupportedError(
                 "Project config cannot be stored in an Environment."
             )
-        if self.settings_service.project.active_environment is None:
+        if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
 
     @contextmanager
@@ -1257,7 +1256,7 @@ class AutoStoreManager(SettingsStoreManager):
                 return SettingValueStore.DOTENV
 
         # no active meltano environment
-        if not self.project.active_environment:
+        if not self.project.environment:
             # return root `meltano.yml`
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
                 return SettingValueStore.MELTANO_YML

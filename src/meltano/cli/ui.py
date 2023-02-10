@@ -24,15 +24,13 @@ logger = logging.getLogger(__name__)
 
 def ensure_secure_setup(project: Project):
     """Verify UI security settings."""
-    settings_service = ProjectSettingsService(project)
-
-    if not settings_service.get("ui.authentication"):
+    if not project.settings.get("ui.authentication"):
         return
 
     facts = []
     if (
-        settings_service.get("ui.server_name") is None
-        and settings_service.get("ui.session_cookie_domain") is None
+        project.settings.get("ui.server_name") is None
+        and project.settings.get("ui.session_cookie_domain") is None
     ):
         facts.append(
             "- Neither the 'ui.server_name' or 'ui.session_cookie_domain' setting has been set"
@@ -40,7 +38,7 @@ def ensure_secure_setup(project: Project):
 
     secure_settings = ["ui.secret_key", "ui.password_salt"]
     for setting_name in secure_settings:
-        value, source = settings_service.get_with_source(setting_name)
+        value, source = project.settings.get_with_source(setting_name)
         if source is SettingValueStore.DEFAULT:
             facts.append(
                 f"- The '{setting_name}' setting has not been changed from the default test value"
@@ -153,10 +151,9 @@ def setup(ctx, server_name, **flags):
     Use with caution!
     """
     project = ctx.obj["project"]
-    settings_service = ProjectSettingsService(project)
 
     def set_setting_env(setting_name, value):
-        settings_service.set(setting_name, value, store=SettingValueStore.DOTENV)
+        project.settings.set(setting_name, value, store=SettingValueStore.DOTENV)
 
     set_setting_env("ui.server_name", server_name)
 
@@ -171,7 +168,7 @@ def setup(ctx, server_name, **flags):
 
     secret_settings = ["ui.secret_key", "ui.password_salt"]
     for setting_name in secret_settings:
-        value, source = settings_service.get_with_source(setting_name)
+        value, source = project.settings.get_with_source(setting_name)
         if source is not SettingValueStore.DEFAULT:
             click.echo(
                 f"Setting '{setting_name}' has already been set in {source.label}. Please unset it manually and rerun this command to regenerate this secret."

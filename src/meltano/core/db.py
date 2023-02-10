@@ -15,8 +15,6 @@ from sqlalchemy.sql import text
 from meltano.core.error import MeltanoError
 from meltano.core.project import Project
 
-from .project_settings_service import ProjectSettingsService
-
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = {}
@@ -57,9 +55,7 @@ def project_engine(
     if existing_engine:
         return existing_engine
 
-    settings = ProjectSettingsService(project)
-
-    engine_uri = settings.get("database_uri")
+    engine_uri = project.settings.get("database_uri")
     logging.debug(f"Creating engine '{project}@{engine_uri}'")
 
     engine = create_engine(engine_uri, poolclass=NullPool)
@@ -67,8 +63,8 @@ def project_engine(
     # Connect to the database to ensure it is available.
     connect(
         engine,
-        max_retries=settings.get("database_max_retries"),
-        retry_timeout=settings.get("database_retry_timeout"),
+        max_retries=project.settings.get("database_max_retries"),
+        retry_timeout=project.settings.get("database_retry_timeout"),
     )
 
     check_database_compatibility(engine)

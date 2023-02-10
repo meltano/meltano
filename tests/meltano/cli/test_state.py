@@ -92,7 +92,7 @@ class TestCliState:
         self, state_service, cli_runner, patterns_with_expected_results
     ):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            for (pattern, expected_result) in patterns_with_expected_results:
+            for pattern, expected_result in patterns_with_expected_results:
                 result = cli_runner.invoke(cli, ["state", "list", "--pattern", pattern])
                 assert_cli_runner(result)
                 assert self.get_result_set(result) == expected_result
@@ -137,7 +137,7 @@ class TestCliState:
             job_pairs = []
             for idx in range(0, len(state_ids) - 1, 2):
                 job_pairs.append((state_ids[idx], state_ids[idx + 1]))
-            for (job_src, job_dst) in job_pairs:
+            for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 job_dst_state = state_service.get_state(job_dst)
                 result = cli_runner.invoke(
@@ -165,7 +165,7 @@ class TestCliState:
             job_pairs = []
             for idx in range(0, len(state_ids) - 1, 2):
                 job_pairs.append((state_ids[idx], state_ids[idx + 1]))
-            for (job_src, job_dst) in job_pairs:
+            for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 job_dst_state = state_service.get_state(job_dst)
                 filepath = os.path.join(tmp_path, f"{job_src}-{job_dst}")
@@ -185,7 +185,7 @@ class TestCliState:
             job_pairs = []
             for idx in range(0, len(state_ids) - 1, 2):
                 job_pairs.append((state_ids[idx], state_ids[idx + 1]))
-            for (job_src, job_dst) in job_pairs:
+            for job_src, job_dst in job_pairs:
                 job_state_src = state_service.get_state(job_src)
                 job_state_dst = state_service.get_state(job_dst)
                 merged_state = merge(job_state_src, job_state_dst)
@@ -200,7 +200,7 @@ class TestCliState:
             job_pairs = []
             for idx in range(0, len(state_ids) - 1, 2):
                 job_pairs.append((state_ids[idx], state_ids[idx + 1]))
-            for (job_src, job_dst) in job_pairs:
+            for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 result = cli_runner.invoke(
                     cli,
@@ -226,7 +226,7 @@ class TestCliState:
             job_pairs = []
             for idx in range(0, len(state_ids) - 1, 2):
                 job_pairs.append((state_ids[idx], state_ids[idx + 1]))
-            for (job_src, job_dst) in job_pairs:
+            for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 result = cli_runner.invoke(
                     cli,
@@ -238,7 +238,7 @@ class TestCliState:
 
     def test_get(self, state_service, cli_runner, state_ids_with_expected_states):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            for (state_id, expected_state) in state_ids_with_expected_states:
+            for state_id, expected_state in state_ids_with_expected_states:
                 result = cli_runner.invoke(cli, ["state", "get", state_id])
                 assert_cli_runner(result)
                 assert json.loads(result.stdout) == expected_state

@@ -5,13 +5,15 @@ from __future__ import annotations
 import json
 from hashlib import sha256
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 from structlog.stdlib import get_logger
 
 from meltano.core.plugin.base import PluginRef, StandalonePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
+
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = get_logger(__name__)
 

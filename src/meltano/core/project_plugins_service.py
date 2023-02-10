@@ -4,14 +4,13 @@
 from __future__ import annotations
 
 import enum
+import sys
 from contextlib import contextmanager, suppress
-from typing import Generator
+from typing import TYPE_CHECKING, Generator
 
 import structlog
 
-from meltano.core.config_service import ConfigService
 from meltano.core.environment import EnvironmentPluginConfig
-from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
@@ -21,8 +20,14 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
 )
 from meltano.core.plugin_lock_service import PluginLockService
-from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -53,42 +58,16 @@ class PluginAlreadyAddedException(Exception):
 class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attributes)
     """Project Plugins Service."""
 
-    def __init__(
-        self,
-        project: Project,
-        config_service: ConfigService | None = None,
-        lock_service: PluginLockService | None = None,
-        discovery_service: PluginDiscoveryService | None = None,
-        locked_definition_service: LockedDefinitionService | None = None,
-        hub_service: MeltanoHubService | None = None,
-        use_cache: bool = True,
-    ):
+    def __init__(self, project: Project):
         """Create a new Project Plugins Service.
 
         Args:
             project: The Meltano project.
-            config_service: The Meltano Config Service.
-            lock_service: The Meltano Plugin Lock Service.
-            discovery_service: The Meltano Plugin Discovery Service.
-            locked_definition_service: The Meltano Locked Definition Service.
-            hub_service: The Meltano Hub Service.
-            use_cache: Whether to use the plugin cache.
         """
         self.project = project
-
-        self.config_service = config_service or ConfigService(project)
-        self.discovery_service = discovery_service or PluginDiscoveryService(project)
-        self.lock_service = lock_service or PluginLockService(project)
-        self.locked_definition_service = (
-            locked_definition_service or LockedDefinitionService(project)
-        )
-        self.hub_service = hub_service or MeltanoHubService(project)
-
-        self._current_plugins = None
-        self._use_cache = use_cache
-
-        self.settings_service = ProjectSettingsService(project)
-
+        self.discovery_service = PluginDiscoveryService(project)
+        self.lock_service = PluginLockService(project)
+        self.locked_definition_service = LockedDefinitionService(project)
         self._use_discovery_yaml: bool = True
         self._prefer_source = None
 
@@ -106,16 +85,14 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         yield
         self._use_discovery_yaml = True
 
-    @property
+    @cached_property
     def current_plugins(self):
         """Return the current plugins.
 
         Returns:
             The current plugins.
         """
-        if self._current_plugins is None or not self._use_cache:
-            self._current_plugins = self.config_service.current_meltano_yml.plugins
-        return self._current_plugins
+        return self.project.config_service.current_meltano_yml.plugins
 
     @contextmanager
     def update_plugins(self):
@@ -124,10 +101,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Yields:
             The current plugins.
         """
-        with self.config_service.update_meltano_yml() as meltano_yml:
+        with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
-
-        self._current_plugins = None
 
     def add_to_file(self, plugin: ProjectPlugin):
         """Add plugin to `meltano.yml`.
@@ -141,7 +116,12 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Returns:
             The added plugin.
         """
-        if not plugin.should_add_to_file():
+        # FIXME: `should_add_to_file` is a method from `BasePlugin`, which is
+        #        not a subclass of `ProjectPlugin`. I've left this call to it
+        #        in-place because I'm worried that removing it will break stuff
+        #        that relies on it, but something is definitely wrong here.
+        #        We default to `True` for `ProjectPlugin` objects.
+        if not getattr(plugin, "should_add_to_file", lambda: True)():
             return plugin
 
         with suppress(PluginNotFoundError):
@@ -389,7 +369,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Args:
             plugin: The plugin configuration to update.
         """
-        with self.config_service.update_active_environment() as environment:
+        with self.project.config_service.update_active_environment() as environment:
             environment.config.plugins.setdefault(plugin.type, [])
 
             # find the proper plugin to update
@@ -425,7 +405,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         except (PluginNotFoundError, VariantNotFoundError) as err:
             if plugin.inherit_from:
                 raise PluginParentNotFoundError(plugin, err) from err
-
             raise
 
     def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
@@ -441,11 +420,12 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             PluginParentNotFoundError: If the parent plugin is not found.
         """
         try:
-            return self.hub_service.get_base_plugin(plugin, variant_name=plugin.variant)
+            return self.project.hub_service.get_base_plugin(
+                plugin, variant_name=plugin.variant
+            )
         except PluginNotFoundError as err:
             if plugin.inherit_from:
                 raise PluginParentNotFoundError(plugin, err) from err
-
             raise
 
     def find_parent(

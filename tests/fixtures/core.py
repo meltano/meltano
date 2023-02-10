@@ -12,10 +12,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from fixtures.utils import tmp_project
+from fixtures.utils import cd, tmp_project
 from meltano.core import bundle
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.config_service import ConfigService
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.job import Job, Payload, State
@@ -33,10 +32,7 @@ from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_init_service import ProjectInitService
-from meltano.core.project_plugins_service import (
-    PluginAlreadyAddedException,
-    ProjectPluginsService,
-)
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
 from meltano.core.state_service import StateService
@@ -247,60 +243,34 @@ def project_init_service(request):
 
 
 @pytest.fixture(scope="class")
-def plugin_install_service(project, project_plugins_service):
-    return PluginInstallService(project, plugins_service=project_plugins_service)
+def plugin_install_service(project):
+    return PluginInstallService(project)
 
 
 @pytest.fixture(scope="class")
-def project_add_service(project, project_plugins_service):
-    return ProjectAddService(project, plugins_service=project_plugins_service)
+def project_add_service(project):
+    return ProjectAddService(project)
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service_factory(project, project_plugins_service):
+def plugin_settings_service_factory(project):
     def _factory(plugin, **kwargs):
-        return PluginSettingsService(
-            project, plugin, plugins_service=project_plugins_service, **kwargs
-        )
+        return PluginSettingsService(project, plugin, **kwargs)
 
     return _factory
 
 
 @pytest.fixture(scope="class")
-def plugin_invoker_factory(
-    project, project_plugins_service, plugin_settings_service_factory
-):
+def plugin_invoker_factory(project, plugin_settings_service_factory):
     def _factory(plugin, **kwargs):
         return invoker_factory(
             project,
             plugin,
-            plugins_service=project_plugins_service,
             plugin_settings_service=plugin_settings_service_factory(plugin),
             **kwargs,
         )
 
     return _factory
-
-
-@pytest.fixture(scope="class")
-def config_service(project):
-    return ConfigService(project, use_cache=False)
-
-
-@pytest.fixture(scope="class")
-def project_plugins_service(
-    project,
-    config_service,
-    plugin_discovery_service,
-    meltano_hub_service,
-):
-    return ProjectPluginsService(
-        project,
-        config_service=config_service,
-        discovery_service=plugin_discovery_service,
-        hub_service=meltano_hub_service,
-        use_cache=False,
-    )
 
 
 @pytest.fixture(scope="class")
@@ -399,8 +369,8 @@ def utility(project_add_service):
 
 
 @pytest.fixture(scope="class")
-def schedule_service(project, project_plugins_service):
-    return ScheduleService(project, plugins_service=project_plugins_service)
+def schedule_service(project):
+    return ScheduleService(project)
 
 
 @pytest.fixture(scope="class")
@@ -448,8 +418,8 @@ def environment_service(project):
 
 
 @pytest.fixture(scope="class")
-def elt_context_builder(project, project_plugins_service):
-    return ELTContextBuilder(project, plugins_service=project_plugins_service)
+def elt_context_builder(project):
+    return ELTContextBuilder(project)
 
 
 @pytest.fixture(scope="class")
@@ -458,7 +428,7 @@ def job_logging_service(project):
 
 
 @contextmanager
-def project_directory(test_dir, project_init_service):
+def project_directory(project_init_service):
     project = project_init_service.init(add_discovery=True)
     logging.debug(f"Created new project at {project.root}")
 
@@ -475,30 +445,32 @@ def project_directory(test_dir, project_init_service):
         yield project
     finally:
         Project.deactivate()
-        os.chdir(test_dir)
         logging.debug(f"Cleaned project at {project.root}")
 
 
 @pytest.fixture(scope="class")
-def project(test_dir, project_init_service):
-    with project_directory(test_dir, project_init_service) as project:
-        yield project
+def project(project_init_service, tmp_path_factory: pytest.TempPathFactory):
+    with cd(tmp_path_factory.mktemp("meltano-project-dir")):
+        with project_directory(project_init_service) as project:
+            yield project
 
 
 @pytest.fixture(scope="function")
-def project_function(test_dir, project_init_service):
-    with project_directory(test_dir, project_init_service) as project:
-        yield project
+def project_function(project_init_service, tmp_path: Path):
+    with cd(tmp_path):
+        with project_directory(project_init_service) as project:
+            yield project
 
 
 @pytest.fixture(scope="class")
-def project_files(test_dir, compatible_copy_tree):
-    with tmp_project(
-        "a_multifile_meltano_project_core",
-        current_dir / "multifile_project",
-        compatible_copy_tree,
-    ) as project:
-        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+def project_files(compatible_copy_tree, tmp_path_factory: Path):
+    with cd(tmp_path_factory.mktemp("meltano-project-files-dir")):
+        with tmp_project(
+            "a_multifile_meltano_project_core",
+            current_dir / "multifile_project",
+            compatible_copy_tree,
+        ) as project:
+            yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
 
 
 @pytest.fixture(scope="class")
@@ -755,10 +727,8 @@ def state_service(job_history_session, project):
 @pytest.fixture
 def project_with_environment(project: Project):
     project.activate_environment("dev")
-    project.active_environment.env[
-        "ENVIRONMENT_ENV_VAR"
-    ] = "${MELTANO_PROJECT_ROOT}/file.txt"
+    project.environment.env["ENVIRONMENT_ENV_VAR"] = "${MELTANO_PROJECT_ROOT}/file.txt"
     try:
         yield project
     finally:
-        project.active_environment = None
+        project.deactivate_environment()

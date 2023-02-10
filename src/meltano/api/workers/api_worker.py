@@ -7,7 +7,6 @@ import threading
 
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils.pidfile import PIDFile
 
@@ -27,14 +26,12 @@ class APIWorker(threading.Thread):
         self.project = project
         self.reload = reload
         self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
-        self.settings_service = ProjectSettingsService(self.project.find())
 
     def run(self):
         """Run the initalized API Workers with the App Server requested."""
-        with self.settings_service.feature_flag(
+        with self.project.settings.feature_flag(
             FeatureFlags.ENABLE_UVICORN, raise_error=False
         ) as allow:
-
             enable_uvicorn = allow
 
             # Use Uvicorn when on Windows
@@ -52,13 +49,11 @@ class APIWorker(threading.Thread):
 
             # Start uvicorn to serve API and Ui
             if enable_uvicorn:
-                settings_for_apiworker = self.settings_service
-
-                arg_bind_host = str(settings_for_apiworker.get("ui.bind_host"))
-                arg_bind_port = str(settings_for_apiworker.get("ui.bind_port"))
-                arg_loglevel = str(settings_for_apiworker.get("cli.log_level"))
+                arg_bind_host = str(self.project.settings.get("ui.bind_host"))
+                arg_bind_port = str(self.project.settings.get("ui.bind_port"))
+                arg_loglevel = str(self.project.settings.get("cli.log_level"))
                 arg_forwarded_allow_ips = str(
-                    settings_for_apiworker.get("ui.forwarded_allow_ips")
+                    self.project.settings.get("ui.forwarded_allow_ips")
                 )
 
                 # If windows and 127.0.0.1 only allowed changing bind host to accomidate
@@ -90,7 +85,6 @@ class APIWorker(threading.Thread):
 
                 # Add reload argument if reload is true
                 if self.reload:
-
                     args += [
                         "--reload",
                     ]

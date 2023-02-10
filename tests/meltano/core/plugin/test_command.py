@@ -17,7 +17,6 @@ class TestCommand:
         }
 
     def test_serialize(self, commands):
-
         assert Command.parse(commands["foo"]).args == "foo"
         assert Command.parse(commands["bar"]).args == "bar"
         assert Command.parse(commands["baz"]).args == "baz"

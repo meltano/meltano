@@ -4,12 +4,11 @@ from __future__ import annotations
 import logging
 import os
 import warnings
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 from enum import Enum
-from typing import Generator, Iterable
+from typing import TYPE_CHECKING, Generator, Iterable
 
-from meltano.core.project import Project
 from meltano.core.setting_definition import (
     SettingDefinition,
     SettingKind,
@@ -19,6 +18,9 @@ from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import flatten
+
+if TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +79,7 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
-class SettingsService(ABC):  # noqa: WPS214
+class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     """Abstract base class for managing settings."""
 
     LOGGING = False
@@ -90,10 +92,10 @@ class SettingsService(ABC):  # noqa: WPS214
         env_override: dict | None = None,
         config_override: dict | None = None,
     ):
-        """Create a new settings service object.
+        """Create a new settings service instance.
 
         Args:
-            project: Meltano project object.
+            project: Meltano project instance.
             show_hidden: Whether to display secret setting values.
             env_override: Optional override environment values.
             config_override:  Optional override configuration values.

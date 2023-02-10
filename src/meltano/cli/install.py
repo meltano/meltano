@@ -9,7 +9,6 @@ from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
@@ -54,17 +53,14 @@ def install(
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#install
     """
     tracker: Tracker = ctx.obj["tracker"]
-
-    plugins_service = ProjectPluginsService(project)
-
     try:
         if plugin_type:
             plugin_type = PluginType.from_cli_argument(plugin_type)
-            plugins = plugins_service.get_plugins_of_type(plugin_type)
+            plugins = project.plugins.get_plugins_of_type(plugin_type)
             if plugin_name:
                 plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
         else:
-            plugins = list(plugins_service.plugins())
+            plugins = list(project.plugins.plugins())
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise

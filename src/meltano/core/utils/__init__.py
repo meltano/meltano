@@ -401,7 +401,6 @@ def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
-
         enabled = kwargs.get("make_dirs", True)
 
         path = func(*args, **kwargs)
@@ -444,7 +443,7 @@ def pop_at_path(d, path, default=None):  # noqa: WPS210
 
     popped = cursor.pop(tail, default)
 
-    for (cursor, key) in reversed(cursors):
+    for cursor, key in reversed(cursors):
         if len(cursor[key]) == 0:
             cursor.pop(key, None)
 

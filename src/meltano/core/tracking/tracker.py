@@ -25,7 +25,6 @@ from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -111,13 +110,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         )
 
         self.project = project
-        self.settings_service = ProjectSettingsService(project)
-        self.send_anonymous_usage_stats = self.settings_service.get(
+        self.send_anonymous_usage_stats = project.settings.get(
             "send_anonymous_usage_stats",
-            not self.settings_service.get("disable_tracking", False),
+            not project.settings.get("disable_tracking", False),
         )
 
-        endpoints = self.settings_service.get("snowplow.collector_endpoints")
+        endpoints = project.settings.get("snowplow.collector_endpoints")
 
         emitters: list[Emitter] = []
         for endpoint in endpoints:

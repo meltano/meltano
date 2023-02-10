@@ -14,7 +14,6 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.schedule import Schedule
 from meltano.core.setting_definition import SettingMissingError
 from meltano.core.task_sets_service import TaskSetsService
@@ -87,17 +86,13 @@ class BadCronError(MeltanoError):
 class ScheduleService:  # noqa: WPS214
     """Service for managing schedules."""
 
-    def __init__(
-        self, project: Project, plugins_service: ProjectPluginsService | None = None
-    ):
+    def __init__(self, project: Project):
         """Initialize a ScheduleService for a project to manage a projects schedules.
 
         Args:
-            project: The project whos schedules you wish to interact with.
-            plugins_service: The project plugins service.
+            project: The project whose schedules you wish to interact with.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.task_sets_service = TaskSetsService(project)
 
     def add_elt(
@@ -172,14 +167,12 @@ class ScheduleService:  # noqa: WPS214
         Returns:
             The start_date of the extractor, or now.
         """
-        extractor_plugin = self.plugins_service.find_plugin(
+        extractor_plugin = self.project.plugins.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
         start_date: str | datetime | date | None = None
         try:
-            settings_service = PluginSettingsService(
-                self.project, extractor_plugin, plugins_service=self.plugins_service
-            )
+            settings_service = PluginSettingsService(self.project, extractor_plugin)
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
             logging.debug(f"`start_date` not found in {extractor_plugin}.")
@@ -279,7 +272,7 @@ class ScheduleService:  # noqa: WPS214
             ScheduleNotFoundError: If no schedule is found.
         """
         try:
-            extractor = self.plugins_service.find_plugin_by_namespace(
+            extractor = self.project.plugins.find_plugin_by_namespace(
                 PluginType.EXTRACTORS, namespace
             )
 
