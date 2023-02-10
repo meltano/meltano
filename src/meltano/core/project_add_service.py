@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import enum
 
-from .plugin import BasePlugin, PluginType, Variant
-from .plugin.project_plugin import ProjectPlugin
-from .project import Project
-from .project_plugins_service import PluginAlreadyAddedException, ProjectPluginsService
+from meltano.core.plugin import BasePlugin, PluginType, Variant
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.project import Project
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
 class PluginAddedReason(str, enum.Enum):
@@ -30,19 +30,13 @@ class MissingPluginException(Exception):
 class ProjectAddService:
     """Project Add Service."""
 
-    def __init__(
-        self,
-        project: Project,
-        plugins_service: ProjectPluginsService | None = None,
-    ):
+    def __init__(self, project: Project):
         """Create a new Project Add Service.
 
         Args:
             project: The project to add plugins to.
-            plugins_service: The project plugins service.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def add(
         self,
@@ -55,7 +49,7 @@ class ProjectAddService:
 
         Args:
             plugin_type: The type of the plugin to add.
-            plugin_name (str): The name of the plugin to add.
+            plugin_name: The name of the plugin to add.
             lock: Whether to generate a lockfile for the plugin.
             attrs: Additional attributes to add to the plugin.
 
@@ -66,8 +60,8 @@ class ProjectAddService:
             plugin_type, plugin_name, **attrs, default_variant=Variant.DEFAULT_NAME
         )
 
-        with self.plugins_service.disallow_discovery_yaml():
-            self.plugins_service.ensure_parent(plugin)
+        with self.project.plugins.disallow_discovery_yaml():
+            self.project.plugins.ensure_parent(plugin)
 
             # If we are inheriting from a base plugin definition,
             # repeat the variant and pip_url in meltano.yml
@@ -79,7 +73,7 @@ class ProjectAddService:
             added = self.add_plugin(plugin)
 
             if lock and not added.is_custom():
-                self.plugins_service.lock_service.save(
+                self.project.plugins.lock_service.save(
                     added,
                     exists_ok=plugin.inherit_from is not None,
                 )
@@ -95,7 +89,7 @@ class ProjectAddService:
         Returns:
             The added plugin.
         """
-        return self.plugins_service.add_to_file(plugin)
+        return self.project.plugins.add_to_file(plugin)
 
     def add_required(
         self,

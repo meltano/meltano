@@ -194,7 +194,11 @@ class Environment(NameEq, Canonical):
             NotFound: If an environment is not found.
         """
         try:
-            return next(env for env in objects if env.name == name)
+            return next(
+                env if isinstance(env, cls) else cls.parse(env)
+                for env in objects
+                if getattr(env, "name", env["name"]) == name
+            )
         except StopIteration as stop:
             raise NotFound(name, cls) from stop
 

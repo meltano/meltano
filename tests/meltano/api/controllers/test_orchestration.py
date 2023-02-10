@@ -18,7 +18,6 @@ class TestOrchestration:
         tap,
         session,
         plugin_settings_service_factory,
-        project_plugins_service,
         monkeypatch,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
@@ -28,10 +27,7 @@ class TestOrchestration:
 
         monkeypatch.setenv("TAP_MOCK_BOOLEAN", "false")
 
-        with mock.patch(
-            "meltano.api.controllers.orchestrations.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), app.test_request_context():
+        with app.test_request_context():
             res = api.get(
                 url_for("orchestrations.get_plugin_configuration", plugin_ref=tap)
             )
@@ -75,7 +71,6 @@ class TestOrchestration:
         tap,
         session,
         plugin_settings_service_factory,
-        project_plugins_service,
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
@@ -85,10 +80,7 @@ class TestOrchestration:
             "protected", "iwontchange", store=SettingValueStore.DB, session=session
         )
 
-        with mock.patch(
-            "meltano.api.controllers.orchestrations.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), app.test_request_context():
+        with app.test_request_context():
             res = api.put(
                 url_for("orchestrations.save_plugin_configuration", plugin_ref=tap),
                 json={"config": {"protected": "N33DC0FF33", "secure": "newvalue"}},
@@ -117,19 +109,13 @@ class TestOrchestration:
             assert "hidden" not in config
 
     @mock.patch("meltano.core.plugin_test_service.PluginInvoker.invoke_async")
-    @mock.patch("meltano.api.controllers.orchestrations.ProjectPluginsService")
     def test_test_plugin_configuration_success(
         self,
-        mock_project_plugins_service,
         mock_invoke_async,
         app: Flask,
         api: FlaskClient,
         tap,
-        project_plugins_service,
     ):
-
-        mock_project_plugins_service.return_value = project_plugins_service
-
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
@@ -148,19 +134,13 @@ class TestOrchestration:
         assert res.json["is_success"]
 
     @mock.patch("meltano.core.plugin_test_service.PluginInvoker.invoke_async")
-    @mock.patch("meltano.api.controllers.orchestrations.ProjectPluginsService")
     def test_test_plugin_configuration_failure(
         self,
-        mock_project_plugins_service,
         mock_invoke_async,
         app: Flask,
         api: FlaskClient,
         tap,
-        project_plugins_service,
     ):
-
-        mock_project_plugins_service.return_value = project_plugins_service
-
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)

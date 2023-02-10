@@ -12,7 +12,6 @@ from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 from .project import Project
 from .settings_store import SettingValueStore
@@ -118,12 +117,12 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
             project: The Meltano project.
         """
         super().__init__(plugin, str(project.meltanofile.relative_to(project.root)))
-        self.project_plugins_service = ProjectPluginsService(project)
+        self.project = project
 
     def remove(self):
         """Remove the plugin from `meltano.yml`."""
         try:
-            self.project_plugins_service.remove_from_file(self.plugin)
+            self.project.plugins.remove_from_file(self.plugin)
         except PluginNotFoundError:
             self.remove_status = PluginLocationRemoveStatus.NOT_FOUND
             return

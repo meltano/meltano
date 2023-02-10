@@ -9,21 +9,19 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.project_plugins_service import ProjectPluginsService
-
-from .project import Project
+from meltano.core.project import Project
 
 
 class SelectService:
-    def __init__(
-        self,
-        project: Project,
-        extractor: str,
-        plugins_service: ProjectPluginsService | None = None,
-    ):
+    def __init__(self, project: Project, extractor: str):
+        """Initialize a `SelectService` instance.
+
+        Args:
+            project: The Meltano project being operated on.
+            extractor: The name of the extractor plugin.
+        """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
-        self._extractor = self.plugins_service.find_plugin(
+        self._extractor = self.project.plugins.find_plugin(
             extractor, PluginType.EXTRACTORS
         )
 
@@ -34,20 +32,12 @@ class SelectService:
 
     @property
     def current_select(self):
-        plugin_settings_service = PluginSettingsService(
-            self.project,
-            self.extractor,
-            plugins_service=self.plugins_service,
-        )
+        plugin_settings_service = PluginSettingsService(self.project, self.extractor)
         return plugin_settings_service.get("_select")
 
     async def load_catalog(self, session):
         """Load the catalog."""
-        invoker = invoker_factory(
-            self.project,
-            self.extractor,
-            plugins_service=self.plugins_service,
-        )
+        invoker = invoker_factory(self.project, self.extractor)
 
         async with invoker.prepared(session):
             catalog_json = await invoker.dump("catalog")
@@ -74,10 +64,10 @@ class SelectService:
         """Update plugins' select patterns."""
         plugin: PluginRef
 
-        if self.project.active_environment is None:
+        if self.project.environment is None:
             plugin = self.extractor
         else:
-            plugin = self.project.active_environment.get_plugin_config(
+            plugin = self.project.environment.get_plugin_config(
                 self.extractor.type, self.extractor.name
             )
 
@@ -91,10 +81,10 @@ class SelectService:
             patterns.append(this_pattern)
         plugin.extras["select"] = patterns
 
-        if self.project.active_environment is None:
-            self.plugins_service.update_plugin(plugin)
+        if self.project.environment is None:
+            self.project.plugins.update_plugin(plugin)
         else:
-            self.plugins_service.update_environment_plugin(plugin)
+            self.project.plugins.update_environment_plugin(plugin)
 
     @staticmethod
     def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:

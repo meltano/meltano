@@ -704,7 +704,6 @@ class TestSingerTap:
         session,
         subject,
         elt_context_builder,
-        project_plugins_service,
     ):
 
         process_mock = mock.Mock()
@@ -740,7 +739,6 @@ class TestSingerTap:
         session,
         subject,
         elt_context_builder,
-        project_plugins_service,
     ):
 
         process_mock = mock.Mock()
@@ -768,7 +766,6 @@ class TestSingerTap:
         session,
         subject,
         elt_context_builder,
-        project_plugins_service,
     ):
 
         process_mock = mock.Mock()
@@ -823,7 +820,6 @@ class TestSingerTap:
         session,
         subject,
         elt_context_builder,
-        project_plugins_service,
     ):
 
         process_mock = mock.Mock()
@@ -851,7 +847,6 @@ class TestSingerTap:
         session,
         subject,
         elt_context_builder,
-        project_plugins_service,
     ):
 
         process_mock = mock.Mock()
