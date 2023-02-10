@@ -13,10 +13,14 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 The following options are available for all `meltano` subcommands:
 
+### Log Configurations
+
 * [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
 * [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
 
-The following configuration is available for all meltano subcommands via an environment variable:
+### No Color
+
+The no color configuration is available for all meltano subcommands via an environment variable:
 
 * `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
 

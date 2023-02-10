@@ -11,7 +11,6 @@ from sqlalchemy.orm.session import sessionmaker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 EXIT_CODE_OK = 0
 
@@ -127,17 +126,14 @@ class ValidationsRunner(metaclass=ABCMeta):
         Returns:
             A mapping of plugin names to validation runners.
         """
-        plugins_service = ProjectPluginsService(project)
         return {
             plugin.name: cls(
-                invoker=invoker_factory(
-                    project, plugin, plugins_service=plugins_service
-                ),
+                invoker=invoker_factory(project, plugin),
                 tests_selection={
                     test_name: select_all for test_name in plugin.test_commands
                 },
             )
-            for plugin in plugins_service.plugins()
+            for plugin in project.plugins.plugins()
             if plugin.type is not PluginType.FILES
         }
 

@@ -1,8 +1,10 @@
 """API Plugin Management Blue Print."""
 
+
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 
 from flask import jsonify, request
@@ -22,7 +24,6 @@ from meltano.core.plugin_install_service import (
 )
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 def plugin_def_json(plugin_def):
@@ -86,24 +87,18 @@ def installed():
         Json of all installed plugins.
     """
     project = Project.find()
-    plugins_service = ProjectPluginsService(project)
 
     def _plugin_json(plugin: ProjectPlugin):
         plugin_json = {"name": plugin.name}
-
-        try:
+        with contextlib.suppress(PluginNotFoundError):
             plugin_json.update(plugin_def_json(plugin))
-
             plugin_json["variant"] = plugin.variant
             plugin_json["docs"] = plugin.docs
-        except PluginNotFoundError:
-            pass
-
         return plugin_json
 
     installed_plugins = {
         plugin_type: [_plugin_json(plugin) for plugin in plugins]
-        for plugin_type, plugins in plugins_service.plugins_by_type().items()
+        for plugin_type, plugins in project.plugins.plugins_by_type().items()
     }
 
     return jsonify(installed_plugins)
@@ -142,13 +137,10 @@ def install_batch():  # noqa: WPS210
     """
     payload = request.get_json()
     project = Project.find()
-
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.find_plugin(
+    plugin = project.plugins.find_plugin(
         payload["name"], plugin_type=PluginType(payload["plugin_type"])
     )
-
-    add_service = ProjectAddService(project, plugins_service=plugins_service)
+    add_service = ProjectAddService(project)
     required_plugins = add_service.add_required(plugin)
 
     # This was added to assist api_worker threads
@@ -158,7 +150,7 @@ def install_batch():  # noqa: WPS210
         logging.debug("/plugins/install/batch no asyncio event loop detected")
         asyncio.set_event_loop(asyncio.new_event_loop())
 
-    install_service = PluginInstallService(project, plugins_service=plugins_service)
+    install_service = PluginInstallService(project)
     install_results = install_service.install_plugins(
         required_plugins, reason=PluginInstallReason.ADD
     )
@@ -183,9 +175,7 @@ def install():
     plugin_name = payload["name"]
 
     project = Project.find()
-
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.find_plugin(plugin_name, plugin_type=plugin_type)
+    plugin = project.plugins.find_plugin(plugin_name, plugin_type=plugin_type)
 
     # This was added to assist api_worker threads
     try:
@@ -194,7 +184,6 @@ def install():
         logging.debug("/plugins/install no asyncio event loop detected")
         asyncio.set_event_loop(asyncio.new_event_loop())
 
-    install_service = PluginInstallService(project, plugins_service=plugins_service)
-    install_service.install_plugin(plugin, reason=PluginInstallReason.ADD)
+    PluginInstallService(project).install_plugin(plugin, reason=PluginInstallReason.ADD)
 
     return jsonify(plugin.canonical())

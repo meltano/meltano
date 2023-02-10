@@ -30,8 +30,6 @@ from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import (
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
@@ -365,13 +363,8 @@ def get_plugin_configuration(plugin_ref) -> Response:
         JSON contain the plugin configuration.
     """
     project = Project.find()
-
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.get_plugin(plugin_ref)
-
-    settings = PluginSettingsService(
-        project, plugin, plugins_service=plugins_service, show_hidden=False
-    )
+    plugin = project.plugins.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project, plugin, show_hidden=False)
 
     try:
         settings_group_validation = plugin.settings_group_validation
@@ -400,13 +393,8 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.get_plugin(plugin_ref)
-
-    settings = PluginSettingsService(
-        project, plugin, plugins_service=plugins_service, show_hidden=False
-    )
-
+    plugin = project.plugins.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project, plugin, show_hidden=False)
     config = payload.get("config", {})
     for name, value in config.items():
         if not validate_plugin_config(plugin, name, value, project, settings):
@@ -434,13 +422,8 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
         JSON with the job sucess status.
     """
     project = Project.find()
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.get_plugin(plugin_ref)
-
-    settings = PluginSettingsService(
-        project, plugin, plugins_service=plugins_service, show_hidden=False
-    )
-
+    plugin = project.plugins.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project, plugin, show_hidden=False)
     settings.config_override = PluginSettingsService.unredact(
         {
             name: value
@@ -450,12 +433,7 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
     )
 
     async def test_extractor():
-        invoker = invoker_factory(
-            project,
-            plugin,
-            plugins_service=plugins_service,
-            plugin_settings_service=settings,
-        )
+        invoker = invoker_factory(project, plugin, plugin_settings_service=settings)
         async with invoker.prepared(db.session):
             plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
             success, _ = await plugin_test_service.validate()
@@ -486,7 +464,7 @@ def get_pipeline_schedules():
     schedules = list(map(dict, schedule_service.schedules()))
 
     jobs_in_list = False
-    with ProjectSettingsService(project).feature_flag(
+    with project.settings.feature_flag(
         FeatureFlags.ENABLE_API_SCHEDULED_JOB_LIST, raise_error=False
     ) as allow:
         if allow:

@@ -22,7 +22,6 @@ from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
@@ -134,7 +133,6 @@ async def elt(
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
-        plugins_service = ProjectPluginsService(project)
         context_builder = _elt_context_builder(
             project,
             job,
@@ -147,7 +145,6 @@ async def elt(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            plugins_service=plugins_service,
         )
 
         if dump:
@@ -175,17 +172,14 @@ def _elt_context_builder(
     select_filter=None,
     catalog=None,
     state=None,
-    plugins_service=None,
 ):
     select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
-        transform_name = _find_transform_for_extractor(
-            extractor, plugins_service=plugins_service
-        )
+        transform_name = _find_transform_for_extractor(extractor, project.plugins)
 
     return (
-        ELTContextBuilder(project, plugins_service=plugins_service)  # noqa: WPS221
+        ELTContextBuilder(project)
         .with_session(session)
         .with_job(job)
         .with_extractor(extractor)

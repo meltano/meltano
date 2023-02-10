@@ -24,12 +24,15 @@ def cd(path: Path) -> Path:
 @contextmanager
 def tmp_project(name: str, source: Path, compatible_copy_tree) -> Project:
     project_init_service = ProjectInitService(name)
-    project = project_init_service.init(add_discovery=False)
-    logging.debug(f"Created new project at {project.root}")
-    os.remove(project.meltanofile)
-    compatible_copy_tree(source, project.root)
+    blank_project = project_init_service.init(add_discovery=False)
+    logging.debug(f"Created new project at {blank_project.root}")
+    os.remove(blank_project.meltanofile)
+    compatible_copy_tree(source, blank_project.root)
+    Project._default = None
+    project = Project(blank_project.root)
     with cd(project.root):
         try:
+            project.refresh()
             yield project
         finally:
             Project.deactivate()

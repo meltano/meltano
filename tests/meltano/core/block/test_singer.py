@@ -84,7 +84,6 @@ class TestSingerBlocks:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -104,7 +103,6 @@ class TestSingerBlocks:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -129,7 +127,6 @@ class TestSingerBlocks:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -142,7 +139,6 @@ class TestSingerBlocks:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -157,7 +153,6 @@ class TestSingerBlocks:
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -202,7 +197,6 @@ class TestSingerBlocks:
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -215,7 +209,6 @@ class TestSingerBlocks:
         consumer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )

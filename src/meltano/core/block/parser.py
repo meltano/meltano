@@ -7,16 +7,14 @@ from typing import Generator
 import click
 import structlog
 
+from meltano.core.block.blockset import BlockSet, BlockSetValidationError
+from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
+from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
+from meltano.core.block.singer import CONSUMERS, SingerBlock
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.task_sets_service import TaskSetsService
-
-from .blockset import BlockSet, BlockSetValidationError
-from .extract_load import ELBContextBuilder, ExtractLoadBlocks
-from .plugin_command import PluginCommandBlock, plugin_command_invoker
-from .singer import CONSUMERS, SingerBlock
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
@@ -91,10 +89,7 @@ class BlockParser:  # noqa: D101
         self._no_state_update = no_state_update
         self._force = force
         self._state_id_suffix = state_id_suffix
-
-        self._plugins_service = ProjectPluginsService(project)
         self._plugins: list[ProjectPlugin] = []
-
         self._commands: dict[int, str] = {}
         self._mappings_ref: dict[int, str] = {}
 
@@ -213,13 +208,13 @@ class BlockParser:  # noqa: D101
             ClickException: If mapping name returns multiple matches.
         """
         try:
-            return self._plugins_service.find_plugin(name)
+            return self.project.plugins.find_plugin(name)
         except PluginNotFoundError:
             pass
 
         mapper = None
         try:
-            mapper = self._plugins_service.find_plugins_by_mapping_name(name)
+            mapper = self.project.plugins.find_plugins_by_mapping_name(name)
         except PluginNotFoundError:
             pass
 
@@ -251,11 +246,9 @@ class BlockParser:  # noqa: D101
         """
         blocks: list[SingerBlock] = []
 
-        base_builder = ELBContextBuilder(
-            self.project, self._plugins_service
-        )  # lint work around
         builder = (
-            base_builder.with_force(self._force)
+            ELBContextBuilder(self.project)
+            .with_force(self._force)
             .with_full_refresh(self._full_refresh)
             .with_no_state_update(self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
@@ -310,11 +303,7 @@ class BlockParser:  # noqa: D101
                         f"Expected unique mappings name not the mapper plugin name: {plugin.name}."
                     )
                 else:
-                    blocks.append(
-                        builder.make_block(
-                            plugin,
-                        )
-                    )
+                    blocks.append(builder.make_block(plugin))
             elif plugin.type == PluginType.LOADERS:
                 self.log.debug("blocks", offset=offset, idx=next_block)
                 blocks.append(builder.make_block(plugin))

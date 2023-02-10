@@ -16,8 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm import Session
 
 from meltano.core.environment import NoActiveEnvironment
-from meltano.core.error import Error
-from meltano.core.project import ProjectReadonly
+from meltano.core.error import Error, ProjectReadonly
 from meltano.core.setting import Setting
 from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
@@ -220,12 +219,18 @@ class SettingsStoreManager(ABC):
         self.project = self.settings_service.project
 
     @abstractmethod
-    def get(self, name: str, setting_def: SettingDefinition | None = None) -> None:
+    def get(
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
+    ) -> None:
         """Abstract get method.
 
         Args:
             name: Setting name.
             setting_def: SettingDefinition instance.
+            cast_value: Whether to cast the value according to `setting_def`.
         """
 
     def set(
@@ -301,13 +306,17 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
     label = "a command line flag"
 
     def get(
-        self, name: str, setting_def: SettingDefinition | None = None
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
         Args:
             name: Setting name.
             setting_def: Unused. Included to match parent class method signature.
+            cast_value: Whether to cast the value according to `setting_def`.
 
         Returns:
             A tuple the got value and an empty dictionary.
@@ -329,13 +338,17 @@ class BaseEnvStoreManager(SettingsStoreManager):
         """Abstract environment values property."""
 
     def get(
-        self, name: str, setting_def: SettingDefinition | None = None
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
         Args:
             name: Unused. Included to match parent class method signature.
             setting_def: SettingDefinition instance.
+            cast_value: Whether to cast the value according to `setting_def`.
 
         Raises:
             StoreNotSupportedError: if setting_def not passed.
@@ -368,14 +381,18 @@ class BaseEnvStoreManager(SettingsStoreManager):
             )
 
         value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
-        return cast_setting_value(value, metadata, setting_def)
+        return (
+            cast_setting_value(value, metadata, setting_def)
+            if cast_value
+            else (value, metadata)
+        )
 
     def setting_env_vars(self, *args, **kwargs) -> dict:
         """Return setting environment variables.
 
         Args:
-            args: Positional arguments to pass to setting_service setting_env_vars method.
-            kwargs: Keyword arguments to pass to setting_service setting_env_vars method.
+            args: Positional arguments to pass to `settings_service.setting_env_vars`.
+            kwargs: Keyword arguments to pass to `settings_service.setting_env_vars`.
 
         Returns:
             A dictionary of setting environment variables.
@@ -603,19 +620,24 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             raise StoreNotSupportedError(ProjectReadonly())
 
     def get(
-        self, name: str, setting_def: SettingDefinition | None = None
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
         Args:
             name: Setting name.
             setting_def: SettingDefinition.
+            cast_value: Whether to cast the value according to `setting_def`.
 
         Returns:
             A tuple the got value and a dictionary containing metadata.
 
         Raises:
-            ConflictingSettingValueException: if multiple conflicting values for the same setting are provided.
+            ConflictingSettingValueException: if multiple conflicting values
+                for the same setting are provided.
         """
         keys = [setting_def.name, *setting_def.aliases] if setting_def else [name]
         flat_config = self.flat_config
@@ -637,7 +659,11 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             )
 
         value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
-        return cast_setting_value(value, metadata, setting_def)
+        return (
+            cast_setting_value(value, metadata, setting_def)
+            if cast_value
+            else (value, metadata)
+        )
 
     def set(
         self,
@@ -805,7 +831,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             raise StoreNotSupportedError(
                 "Project config cannot be stored in an Environment."
             )
-        if self.settings_service.project.active_environment is None:
+        if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
 
     @contextmanager
@@ -869,13 +895,17 @@ class DbStoreManager(SettingsStoreManager):
             raise StoreNotSupportedError("No database session provided")
 
     def get(
-        self, name: str, setting_def: SettingDefinition | None = None
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
         Args:
             name: Setting name.
             setting_def: Unused. Included to match parent class method signature.
+            cast_value: Whether to cast the value according to `setting_def`.
 
         Returns:
             A tuple the got value and an empty dictionary.
@@ -1013,13 +1043,17 @@ class InheritedStoreManager(SettingsStoreManager):
         self._config_with_metadata = None
 
     def get(
-        self, name: str, setting_def: SettingDefinition | None = None
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
             name: Setting name.
             setting_def: SettingDefinition.
+            cast_value: Whether to cast the value according to `setting_def`.
 
         Returns:
             A tuple containing the got value and accompanying metadata dictionary.
@@ -1087,13 +1121,17 @@ class DefaultStoreManager(SettingsStoreManager):
     label = "the default"
 
     def get(
-        self, name: str, setting_def: SettingDefinition | None = None
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
             name: Setting name.
             setting_def: SettingDefinition.
+            cast_value: Whether to cast the value according to `setting_def`.
 
         Returns:
             A tuple containing the got value and accompanying metadata dictionary.
@@ -1218,7 +1256,7 @@ class AutoStoreManager(SettingsStoreManager):
                 return SettingValueStore.DOTENV
 
         # no active meltano environment
-        if not self.project.active_environment:
+        if not self.project.environment:
             # return root `meltano.yml`
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
                 return SettingValueStore.MELTANO_YML
@@ -1246,14 +1284,20 @@ class AutoStoreManager(SettingsStoreManager):
         return None
 
     def get(
-        self, name: str, setting_def: SettingDefinition | None = None, **kwargs
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        cast_value: bool = False,
+        **kwargs,
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
             name: Setting name.
-            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
-            kwargs: Additional keword arguments to pass to `manager.get()`
+            setting_def: SettingDefinition. If none is passed, one will be
+                discovered using `self.find_setting(name)`.
+            cast_value: Whether to cast the value according to `setting_def`.
+            kwargs: Additional keword arguments to pass to `manager.get()`.
 
         Returns:
             A tuple containing the got value and accompanying metadata dictionary.
@@ -1271,7 +1315,12 @@ class AutoStoreManager(SettingsStoreManager):
                 continue
 
             try:
-                value, metadata = manager.get(name, setting_def=setting_def, **kwargs)
+                value, metadata = manager.get(
+                    name,
+                    setting_def=setting_def,
+                    cast_value=cast_value,
+                    **kwargs,
+                )
             except StoreNotSupportedError:
                 continue
 
@@ -1287,7 +1336,11 @@ class AutoStoreManager(SettingsStoreManager):
             metadata["auto_store"] = auto_store
             metadata["overwritable"] = auto_store.can_overwrite(found_source)
 
-        return cast_setting_value(value, metadata, setting_def)
+        return (
+            cast_setting_value(value, metadata, setting_def)
+            if cast_value
+            else (value, metadata)
+        )
 
     def set(self, name: str, path: list[str], value, setting_def=None) -> dict:
         """Set a Setting by name, path and (optionally) SettingDefinition.

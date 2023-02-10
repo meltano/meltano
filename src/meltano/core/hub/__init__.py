@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from .client import MeltanoHubService
+from meltano.core.hub.client import MeltanoHubService
 
 __all__ = ["MeltanoHubService"]

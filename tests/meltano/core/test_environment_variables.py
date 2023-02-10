@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import platform
+import subprocess
 from typing import NamedTuple
 
 import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 from meltano.core.utils import EnvironmentVariableNotSetError
 
@@ -228,40 +228,51 @@ _env_var_resolution_expectations = {
 
 class TestEnvVarResolution:
     @pytest.mark.parametrize(
-        "scenario,env_var_resolution_expectation,",
-        _env_var_resolution_expectations.items(),
+        ("expected_env_values", "meltanofile_updates", "terminal_env"),
+        [tuple(x) for x in _env_var_resolution_expectations.values()],
+        ids=_env_var_resolution_expectations.keys(),
     )
     def test_env_var_resolution(
-        self, scenario, env_var_resolution_expectation, cli_runner, project, monkeypatch
+        self,
+        expected_env_values,
+        meltanofile_updates,
+        terminal_env,
+        cli_runner,
+        project,
+        monkeypatch,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
             )
 
-        with project.meltano_update() as meltanofile:
-            meltanofile.update(env_var_resolution_expectation.meltanofile_updates)
-
-        for key, val in env_var_resolution_expectation.terminal_env.items():
+        for key, val in terminal_env.items():
             monkeypatch.setenv(key, val)
 
-        args = ["invoke"]
-        for key in env_var_resolution_expectation.expected_env_values.keys():
-            args.extend(("--print-var", key))
-        args.append("test-env-var-resolution")
-        result = cli_runner.invoke(cli, args)
-        assert_cli_runner(result)
-        assert result.stdout.strip() == "\n".join(
-            [
-                f"{env_key}={env_val}"
-                for env_key, env_val in env_var_resolution_expectation.expected_env_values.items()
-            ]
+        with project.meltano_update() as meltanofile:
+            meltanofile.update(meltanofile_updates)
+
+        result = subprocess.run(
+            (
+                "meltano",
+                "invoke",
+                *(
+                    arg
+                    for key in expected_env_values.keys()
+                    for arg in ("--print-var", key)
+                ),
+                "test-env-var-resolution",
+            ),
+            text=True,
+            stdout=subprocess.PIPE,
+            check=True,
         )
+        assert result.stdout.strip().split("\n")[:-1] == [
+            f"{env_key}={env_val}" for env_key, env_val in expected_env_values.items()
+        ]
 
 
 def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
-    # This test will be resolved to pass as part of
-    # this issue: https://github.com/meltano/meltano/issues/5983
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
         meltanofile.update(
@@ -311,8 +322,6 @@ def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
 def test_environment_variable_inheritance_meltano_env_only(
     cli_runner, project, monkeypatch
 ):
-    # This test will be resolved to pass as part of
-    # this issue: https://github.com/meltano/meltano/issues/5983
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
         meltanofile.update(
@@ -348,8 +357,7 @@ def test_environment_variable_inheritance_meltano_env_only(
 
 
 def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
-    project_settings_service = ProjectSettingsService(project)
-    project_settings_service.set(
+    project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
     )
     with project.meltano_update() as meltanofile:
@@ -373,8 +381,7 @@ def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
 
 
 def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
-    project_settings_service = ProjectSettingsService(project)
-    project_settings_service.set(
+    project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
     )
     with project.meltano_update() as meltanofile:

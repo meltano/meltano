@@ -108,8 +108,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 "setting_color": SETTING_COLOR,
                 "plugin_name": self.settings.label,
                 "plugin_url": self.settings.docs_url,
-                "environment_name": self.project.active_environment.name
-                if self.project.active_environment
+                "environment_name": self.project.environment.name
+                if self.project.environment
                 else None,
                 "settings": [
                     {

@@ -9,7 +9,6 @@ from meltano.core import yaml
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class TransformAddService:
@@ -23,13 +22,8 @@ class TransformAddService:
         """
         self.project = project
 
-        self.plugins_service = ProjectPluginsService(project)
-
-        dbt_plugin = self.plugins_service.get_transformer()
-
-        settings_service = PluginSettingsService(
-            project, dbt_plugin, plugins_service=self.plugins_service
-        )
+        dbt_plugin = self.project.plugins.get_transformer()
+        settings_service = PluginSettingsService(project, dbt_plugin)
         dbt_project_dir = settings_service.get("project_dir")
         dbt_project_path = Path(dbt_project_dir)
 
@@ -81,13 +75,9 @@ class TransformAddService:
         Args:
             plugin: The plugin to add to the project.
         """
-        settings_service = PluginSettingsService(
-            self.project, plugin, plugins_service=self.plugins_service
-        )
-
+        settings_service = PluginSettingsService(self.project, plugin)
         package_name = settings_service.get("_package_name")
         package_vars = settings_service.get("_vars")
-
         dbt_project_yaml = yaml.load(self.dbt_project_file)
 
         model_def = {}

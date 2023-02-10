@@ -182,8 +182,8 @@ class TestProjectSettingsService:
     ):
         # make sure that meltano setting values are written to the root of `meltano.yml`
         # even if there is an active environment
-        monkeypatch.setattr(subject.project, "active_environment", environment)
-        assert subject.project.active_environment == environment
+        monkeypatch.setattr(subject.project, "environment", environment)
+        assert subject.project.environment == environment
         subject.set("database_max_retries", 10000)
         value, source = subject.get_with_source("database_max_retries")
         assert source == SettingValueStore.MELTANO_YML
@@ -197,3 +197,22 @@ class TestProjectSettingsService:
         with pytest.warns(RuntimeWarning, match="Unknown setting 'port'"):
             subject.set("port", "${UNSET_PORT_ENV_VAR}")
         assert subject.get("port") is None
+
+    def test_env_var_settings_expanded_before_cast(
+        self, subject: ProjectSettingsService
+    ):
+        name = "database_max_retries"  # Using this because it's an int setting
+        setting_def = subject.find_setting(name)
+
+        subject.set(name, setting_def.value, setting_def=setting_def)
+        assert subject.get(name) == setting_def.value
+
+        SettingValueStore.MELTANO_YML.manager(subject).set(
+            name, [name], "$DB_MAX_RETRIES_TEST", setting_def=setting_def
+        )
+
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        assert subject.get(name) is None
+
+        subject.env_override["DB_MAX_RETRIES_TEST"] = "7"
+        assert subject.get(name) == 7

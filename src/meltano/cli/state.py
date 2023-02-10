@@ -78,16 +78,16 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
         # This way, we get BlockSet validation and raise an error if no
         # plugin in the BlockSet has "state" capability
         try:
-            if not project.active_environment:
+            if not project.environment:
                 logger.warn(
                     "Running state operation for environment "
                     f"'{match['env']}' outside of an environment"
                 )
 
-            elif project.active_environment.name != match["env"]:
+            elif project.environment.name != match["env"]:
                 logger.warn(
                     f"Environment '{match['env']}' used in state operation does "
-                    f"not match current environment '{project.active_environment.name}'."
+                    f"not match current environment '{project.environment.name}'."
                 )
 
             project.activate_environment(match["env"])

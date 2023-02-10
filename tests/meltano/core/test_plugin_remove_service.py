@@ -72,7 +72,7 @@ class TestPluginRemoveService:
         install,
         lock,
     ):
-        plugins = list(subject.plugins_service.plugins())
+        plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
         assert removed_plugins == total_plugins
@@ -100,7 +100,7 @@ class TestPluginRemoveService:
             assert all(not path.exists() for path in lock_file_paths)
 
     def test_remove_not_added_or_installed(self, subject: PluginRemoveService):
-        plugins = list(subject.plugins_service.plugins())
+        plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
@@ -112,7 +112,7 @@ class TestPluginRemoveService:
         install,
         lock,
     ):
-        plugins = list(subject.plugins_service.plugins())
+        plugins = list(subject.project.plugins.plugins())
 
         with mock.patch(
             "meltano.core.plugin_location_remove.PluginSettingsService.reset"
@@ -136,12 +136,12 @@ class TestPluginRemoveService:
         def raise_permissionerror(filename):
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
-        plugins = list(subject.plugins_service.plugins())
-
-        with mock.patch(
-            "meltano.core.plugin_location_remove.ProjectPluginsService.remove_from_file"
-        ) as remove_from_file:
-            remove_from_file.side_effect = raise_permissionerror
+        plugins = list(subject.project.plugins.plugins())
+        with mock.patch.object(
+            subject.project.plugins,
+            "remove_from_file",
+            side_effect=raise_permissionerror,
+        ):
             removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
@@ -156,7 +156,7 @@ class TestPluginRemoveService:
         def raise_permissionerror(filename):
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
-        plugins = list(subject.plugins_service.plugins())
+        plugins = list(subject.project.plugins.plugins())
 
         with mock.patch("meltano.core.plugin_location_remove.shutil.rmtree") as rmtree:
             rmtree.side_effect = raise_permissionerror
@@ -170,7 +170,7 @@ class TestPluginRemoveService:
         add,
         install,
     ):
-        plugins = list(subject.plugins_service.plugins())
+        plugins = list(subject.project.plugins.plugins())
         removed_plugins, _ = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0

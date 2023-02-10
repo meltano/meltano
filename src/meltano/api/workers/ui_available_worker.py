@@ -10,8 +10,6 @@ import traceback
 import click
 import requests
 
-from meltano.core.project_settings_service import ProjectSettingsService
-
 logger = logging.getLogger(__name__)
 
 SUCCESS_STATUS_CODE = 200
@@ -28,13 +26,12 @@ class UIAvailableWorker(threading.Thread):
         """
         super().__init__()
         self.project = project
-        self.settings_service = ProjectSettingsService(self.project)
         self._terminate = False
 
     def run(self) -> None:
         """Run the thread, and report when the Meltano UI becomes available."""
-        url = f"http://localhost:{self.settings_service.get('ui.bind_port')}"
-        headers = {"Host": self.settings_service.get("ui.server_name")}
+        url = f"http://localhost:{self.project.settings.get('ui.bind_port')}"
+        headers = {"Host": self.project.settings.get("ui.server_name")}
 
         while not self._terminate:
             try:

@@ -261,7 +261,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
         job_logging_service,
     ):
         result = cli_runner.invoke(cli, ["elt"])
@@ -274,12 +273,7 @@ class TestCliEltScratchpadOne:
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
-        ), mock.patch(
-            "meltano.core.plugin_invoker.asyncio"
-        ) as asyncio_mock, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             result = cli_runner.invoke(cli, args)
@@ -315,10 +309,7 @@ class TestCliEltScratchpadOne:
         job_logging_service.delete_all_logs(state_id)
 
         exc = Exception("This is a grave danger.")
-        with mock.patch.object(SingerRunner, "run", side_effect=exc), mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        with mock.patch.object(SingerRunner, "run", side_effect=exc):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert result.exception == exc
@@ -348,7 +339,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
         job_logging_service,
         monkeypatch,
     ):
@@ -360,12 +350,7 @@ class TestCliEltScratchpadOne:
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
-        ), mock.patch(
-            "meltano.core.plugin_invoker.asyncio"
-        ) as asyncio_mock, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             monkeypatch.setenv("MELTANO_CLI_LOG_LEVEL", "debug")
@@ -458,7 +443,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
         job_logging_service,
     ):
         state_id = "pytest_test_elt"
@@ -474,10 +458,7 @@ class TestCliEltScratchpadOne:
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Extractor failed" in str(result.exception)
@@ -523,7 +504,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
         job_logging_service,
     ):
         state_id = "pytest_test_elt"
@@ -558,10 +538,7 @@ class TestCliEltScratchpadOne:
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
@@ -606,7 +583,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
         job_logging_service,
     ):
         state_id = "pytest_test_elt"
@@ -622,10 +598,7 @@ class TestCliEltScratchpadOne:
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Loader failed" in str(result.exception)
@@ -671,7 +644,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
         job_logging_service,
     ):
         state_id = "pytest_test_elt"
@@ -694,10 +666,7 @@ class TestCliEltScratchpadOne:
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Extractor and loader failed" in str(result.exception)
@@ -745,7 +714,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
         job_logging_service,
     ):
         state_id = "pytest_test_elt"
@@ -775,10 +743,7 @@ class TestCliEltScratchpadOne:
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "Output line length limit exceeded" in str(result.exception)
@@ -818,7 +783,6 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
-        project_plugins_service,
     ):
         state_id = "pytest_test_elt"
         args = ["elt", "--state-id", state_id, tap.name, target.name]
@@ -836,10 +800,7 @@ class TestCliEltScratchpadOne:
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert result.exception == exc
@@ -855,9 +816,7 @@ class TestCliEltScratchpadOne:
                 result.stderr, Exception("Failed to read from target stderr.")
             )
 
-    def test_elt_already_running(
-        self, cli_runner, tap, target, project_plugins_service, session
-    ):
+    def test_elt_already_running(self, cli_runner, tap, target, session):
         state_id = "already_running"
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
@@ -865,9 +824,6 @@ class TestCliEltScratchpadOne:
         existing_job.save(session)
 
         with mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch(
             "meltano.cli.elt.project_engine", return_value=(None, lambda: session)
         ):
             result = cli_runner.invoke(cli, args)
@@ -882,8 +838,6 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        project_plugins_service,
-        plugin_settings_service_factory,
     ):
         catalog = {"streams": []}
         with project.root.joinpath("catalog.json").open("w") as catalog_file:
@@ -902,14 +856,10 @@ class TestCliEltScratchpadOne:
             "catalog",
         ]
 
-        with mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
-            result = cli_runner.invoke(cli, args)
-            assert_cli_runner(result)
+        result = cli_runner.invoke(cli, args)
+        assert_cli_runner(result)
 
-            assert json.loads(result.stdout) == catalog
+        assert json.loads(result.stdout) == catalog
 
     def test_dump_state(
         self,
@@ -918,8 +868,6 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        project_plugins_service,
-        plugin_settings_service_factory,
     ):
         state = {"success": True}
         with project.root.joinpath("state.json").open("w") as state_file:
@@ -938,10 +886,7 @@ class TestCliEltScratchpadOne:
             "state",
         ]
 
-        with mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
             result = cli_runner.invoke(cli, args)
@@ -955,7 +900,6 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        project_plugins_service,
         plugin_settings_service_factory,
     ):
         state_id = "pytest_test_elt"
@@ -971,10 +915,7 @@ class TestCliEltScratchpadOne:
 
         settings_service = plugin_settings_service_factory(tap)
 
-        with mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
             result = cli_runner.invoke(cli, args)
@@ -990,7 +931,6 @@ class TestCliEltScratchpadOne:
         project,
         tap,
         target,
-        project_plugins_service,
         plugin_settings_service_factory,
     ):
         state_id = "pytest_test_elt"
@@ -1006,10 +946,7 @@ class TestCliEltScratchpadOne:
 
         settings_service = plugin_settings_service_factory(target)
 
-        with mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap, "apply_catalog_rules"
         ):
             result = cli_runner.invoke(cli, args)
@@ -1042,7 +979,6 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         tap_mock_transform,
-        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
@@ -1057,13 +993,7 @@ class TestCliEltScratchpadTwo:
         )
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
@@ -1109,7 +1039,6 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         tap_mock_transform,
-        project_plugins_service,
         job_logging_service,
     ):
         state_id = "pytest_test_elt"
@@ -1142,13 +1071,7 @@ class TestCliEltScratchpadTwo:
         )
         with mock.patch.object(
             PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async, mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
+        ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert "`dbt run` failed" in str(result.exception)
@@ -1204,19 +1127,10 @@ class TestCliEltScratchpadThree:
         tap,
         target,
         dbt,
-        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
-        with mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch.object(
-            DbtRunner, "run", new=AsyncMock()
-        ):
+        with mock.patch.object(DbtRunner, "run", new=AsyncMock()):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
@@ -1242,19 +1156,10 @@ class TestCliEltScratchpadThree:
         target,
         dbt,
         tap_mock_transform,
-        project_plugins_service,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
-        with mock.patch(
-            "meltano.cli.elt.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch(
-            "meltano.core.transform_add_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch.object(
-            DbtRunner, "run", new=AsyncMock()
-        ):
+        with mock.patch.object(DbtRunner, "run", new=AsyncMock()):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
             assert_log_lines(

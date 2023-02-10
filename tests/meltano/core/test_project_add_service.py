@@ -80,11 +80,11 @@ class TestProjectAddService:
         self,
         tap,
         subject,
-        project_plugins_service,
+        project: Project,
         hub_request_counter,
     ):
         # Make sure tap-mock is not in the project as a project plugin
-        project_plugins_service.remove_from_file(tap)
+        project.plugins.remove_from_file(tap)
 
         # Inheriting from base plugin
         inherited = subject.add(

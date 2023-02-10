@@ -82,29 +82,17 @@ class TestELBContextBuilder:
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    def test_builder_returns_elb_context(
-        self, project, session, project_plugins_service, tap, target
-    ):
+    def test_builder_returns_elb_context(self, project, session, tap, target):
         """Ensure that builder is returning ELBContext and not itself."""
-        builder = ELBContextBuilder(
-            project=project,
-            plugins_service=project_plugins_service,
-            job=None,
-        )
+        builder = ELBContextBuilder(project)
         builder.session = session
 
         assert isinstance(builder.context(), ELBContext)
         assert isinstance(builder.make_block(tap).invoker.context, ELBContext)
 
-    def test_make_block_returns_valid_singer_block(
-        self, project, session, project_plugins_service, tap, target
-    ):
+    def test_make_block_returns_valid_singer_block(self, project, session, tap, target):
         """Ensure that calling make_block returns a valid SingerBlock."""
-        builder = ELBContextBuilder(
-            project=project,
-            plugins_service=project_plugins_service,
-            job=None,
-        )
+        builder = ELBContextBuilder(project)
         builder.session = session
 
         block = builder.make_block(tap)
@@ -117,15 +105,9 @@ class TestELBContextBuilder:
         assert block.consumer
         assert not block.producer
 
-    def test_make_block_tracks_envs(
-        self, project, session, project_plugins_service, tap, target
-    ):
+    def test_make_block_tracks_envs(self, project, session, tap, target):
         """Ensure that calling make_block correctly stacks env vars."""
-        builder = ELBContextBuilder(
-            project=project,
-            plugins_service=project_plugins_service,
-            job=None,
-        )
+        builder = ELBContextBuilder(project)
         builder.session = session
 
         block = builder.make_block(tap)
@@ -139,15 +121,9 @@ class TestELBContextBuilder:
         assert builder._env.items() >= block2.context.env.items()
 
     @pytest.mark.asyncio
-    async def test_validate_envs(
-        self, project, session, project_plugins_service, tap, target_postgres
-    ):
+    async def test_validate_envs(self, project, session, tap, target_postgres):
         """Ensure that expected environment variables are present."""
-        builder = ELBContextBuilder(
-            project=project,
-            plugins_service=project_plugins_service,
-            job=None,
-        )
+        builder = ELBContextBuilder(project)
         builder.session = session
 
         block = builder.make_block(tap)
@@ -306,21 +282,18 @@ class TestExtractLoadBlocks:
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=mapper_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=target_invoker,
                     plugin_args=[],
                 ),
@@ -397,21 +370,18 @@ class TestExtractLoadBlocks:
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=mapper_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=target_invoker,
                     plugin_args=[],
                 ),
@@ -467,7 +437,6 @@ class TestExtractLoadBlocks:
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
                     plugin_args=[],
                 ),
@@ -485,14 +454,12 @@ class TestExtractLoadBlocks:
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=target_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
                     plugin_args=[],
                 ),
@@ -508,21 +475,18 @@ class TestExtractLoadBlocks:
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=target_invoker,
                     plugin_args=[],
                 ),
@@ -574,7 +538,7 @@ class TestExtractLoadBlocks:
         mapper_invoker = plugin_invoker_factory(mapper, config_dir=mapper_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
-        project.active_environment = Environment(name="test")
+        project.refresh(environment=Environment(name="test"))
 
         invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process)
@@ -584,21 +548,18 @@ class TestExtractLoadBlocks:
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=tap_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=mapper_invoker,
                     plugin_args=[],
                 ),
                 SingerBlock(
                     block_ctx=elb_context,
                     project=elb_context.project,
-                    plugins_service=elb_context.plugins_service,
                     plugin_invoker=target_invoker,
                     plugin_args=[],
                 ),
@@ -629,7 +590,7 @@ class TestExtractLoadUtils:
         block2.string_id = "block2"
 
         project = mock.Mock()
-        project.active_environment = Environment(name="test")
+        project.environment = Environment(name="test")
 
         assert (
             generate_state_id(project, None, block1, block2) == "test:block1-to-block2"
@@ -649,7 +610,7 @@ class TestExtractLoadUtils:
         block2.string_id = "block2"
 
         project = mock.Mock()
-        project.active_environment = None
+        project.environment = None
 
         with pytest.raises(RunnerError):
             generate_state_id(project, None, block1, block2)
@@ -663,7 +624,7 @@ class TestExtractLoadUtils:
         block2.string_id = "block2"
 
         project = mock.Mock()
-        project.active_environment = Environment(name="test")
+        project.environment = Environment(name="test")
 
         with pytest.raises(RunnerError):
             generate_state_id(project, STATE_ID_COMPONENT_DELIMITER, block1, block2)

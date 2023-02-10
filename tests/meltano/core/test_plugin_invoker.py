@@ -71,10 +71,7 @@ class TestPluginInvoker:
             env = subject.env()
 
         # Project env
-        assert (
-            env["MELTANO_ENVIRONMENT"]
-            == project_with_environment.active_environment.name
-        )
+        assert env["MELTANO_ENVIRONMENT"] == project_with_environment.environment.name
 
     @pytest.mark.asyncio
     async def test_expanded_environment_env(
