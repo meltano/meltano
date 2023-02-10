@@ -189,7 +189,7 @@ extractors:
 
 Plugin [commands](/reference/command-line-interface#commands) are defined by the `commands` property. The keys are the name of the command and the values are the arguments to be passed to the plugin executable. These can contain dynamic references to [configuration](/guide/configuration) using the [Environment variable form](/guide/configuration#environment-variables) of the configuration option.
 
-```yaml{3-7}
+```yaml
 utilities:
 - name: dbt-snowflake
   variant: dbt-labs
