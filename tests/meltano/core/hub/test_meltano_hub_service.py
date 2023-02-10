@@ -6,6 +6,7 @@ import click
 import mock
 import pytest
 from requests import HTTPError, Response
+from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.discovery import discover
@@ -136,3 +137,24 @@ class TestMeltanoHubService:
             get_context.return_value = None
             request = project.hub_service._build_request("GET", "https://example.com")
             assert "X-Meltano-Command" not in request.headers
+
+    def test_custom_ca(self, project, monkeypatch):
+        send_kwargs = {}
+
+        class _Adapter(BaseAdapter):
+            def send(self, request, **kwargs):
+                nonlocal send_kwargs
+                send_kwargs = kwargs
+
+                response = Response()
+                response._content = b'{"name": "tap-mock", "namespace": "tap_mock"}'
+                response.status_code = 200
+                return response
+
+        mock_url = "hub://meltano"
+        hub = MeltanoHubService(project)
+        hub.session.mount(mock_url, _Adapter())
+
+        monkeypatch.setenv("REQUESTS_CA_BUNDLE", "/path/to/ca.pem")
+        hub._get(mock_url)
+        assert send_kwargs["verify"] == "/path/to/ca.pem"

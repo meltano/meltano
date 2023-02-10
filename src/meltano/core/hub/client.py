@@ -228,8 +228,17 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         Raises:
             HubConnectionError: If the Hub API could not be reached.
         """
+        prep = self._build_request("GET", url)
+        settings = self.session.merge_environment_settings(
+            prep.url,
+            None,
+            None,
+            None,
+            None,
+        )
+
         try:
-            return self.session.send(self._build_request("GET", url))
+            return self.session.send(prep, **settings)
         except requests.exceptions.ConnectionError as connection_err:
             raise HubConnectionError("Could not reach Meltano Hub.") from connection_err
 
