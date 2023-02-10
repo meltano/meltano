@@ -14,7 +14,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Mapping, MutableMapping, cast
 
-import flatten_dict
+import flatten_dict  # type: ignore
 import structlog
 import yaml
 from typing_extensions import TypeAlias
