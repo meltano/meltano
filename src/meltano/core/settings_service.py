@@ -351,7 +351,8 @@ class SettingsService(ABC):  # noqa: WPS214
         # Can't do conventional SettingsService.feature_flag call to check;
         # it would result in circular dependency
         strict_env_var_mode, _ = source.manager(self.project_settings_service).get(
-            f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}"
+            f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}",
+            cast_value=True,
         )
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
@@ -378,10 +379,7 @@ class SettingsService(ABC):  # noqa: WPS214
             ):
                 object_value = {}
                 object_source = metadata["source"]
-                for setting_key in [  # noqa: WPS335
-                    setting_def.name,
-                    *setting_def.aliases,
-                ]:
+                for setting_key in (setting_def.name, *setting_def.aliases):
                     flat_config_metadata = self.config_with_metadata(
                         prefix=f"{setting_key}.",
                         redacted=redacted,
