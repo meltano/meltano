@@ -27,8 +27,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_lock_service import PluginLock
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import (
     EnvVarMissingBehavior,
     MergeStrategy,
@@ -135,7 +133,7 @@ def env_aware_merge_mappings(
     }
 
 
-class Manifest:  # noqa: WPS230
+class Manifest:
     """A complete unambiguous static representation of a Meltano project."""
 
     def __init__(
@@ -169,8 +167,6 @@ class Manifest:  # noqa: WPS230
         self.environment = environment
         self.path = path
         self.check_schema = check_schema
-        self.project_settings_service = ProjectSettingsService(project)
-        self.project_plugins_service = ProjectPluginsService(project)
         with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
             self.manifest_schema = json.load(manifest_schema_file)
 
@@ -250,11 +246,7 @@ class Manifest:  # noqa: WPS230
         self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, Any]
     ) -> None:
         # Merge env vars derived from project settings:
-        env_aware_merge_mappings(
-            manifest,
-            "env",
-            self.project_settings_service.as_env(),
-        )
+        env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
 
         # Ensure the environment-level plugin config is mergable:
         environment = next(iter(manifest["environments"]))
@@ -298,11 +290,7 @@ class Manifest:  # noqa: WPS230
                 env_aware_merge_mappings(
                     manifest["plugins"][plugin_type][plugin.name],
                     "env",
-                    PluginSettingsService(
-                        project=self.project,
-                        plugin=plugin,
-                        plugins_service=self.project_plugins_service,
-                    ).as_env(),
+                    PluginSettingsService(project=self.project, plugin=plugin).as_env(),
                 )
 
         # Merge 'environment level env' into 'root level env':
@@ -339,7 +327,7 @@ class Manifest:  # noqa: WPS230
 
         apply_scaffold(manifest, meltano_config_env_locations(self.manifest_schema))
 
-        plugins = self.project_plugins_service.plugins_by_type()
+        plugins = self.project.plugins.plugins_by_type()
 
         # Remove the 'mappings' category of plugins, since those are created
         # dynamically at run-time, and shouldn't be represented directly in
