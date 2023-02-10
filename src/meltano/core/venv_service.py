@@ -184,8 +184,7 @@ class VenvService:  # noqa: WPS214
             Whether virtual environment doesn't exist or can't be reused.
         """
 
-        # A generator function is used to perform the checks lazily
-        def checks():
+        def checks():  # A generator is used to perform the checks lazily
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The deprecated `meltano_venv.pth` feature is used by this venv
