@@ -152,7 +152,7 @@ class TestMeltanoHubService:
                 return response
 
         mock_url = "hub://meltano"
-        hub = MeltanoHubService(project)
+        hub = project.hub_service
         hub.session.mount(mock_url, _Adapter())
 
         monkeypatch.setenv("REQUESTS_CA_BUNDLE", "/path/to/ca.pem")
