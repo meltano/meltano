@@ -31,7 +31,7 @@ To determine the values of settings, Meltano will look in 4 main places (and one
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
-3. **Your project's [state backend](/concepts/state_backends)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+3. **Your project's [system database](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
 5. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
