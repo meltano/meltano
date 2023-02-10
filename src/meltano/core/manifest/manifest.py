@@ -108,32 +108,7 @@ class YamlNoTimestampSafeLoader(
     """A safe YAML loader that leaves timestamps as strings."""
 
 
-def env_aware_merge_mappings(
-    data: MutableMapping[str, Any],
-    key: str,
-    value: Any,
-    _: tuple[Any, ...] | None = None,
-) -> None:
-    """Merge behavior for `deep_merge` that expands env vars when the key is "env".
-
-    Args:
-        data: The dictionary being merged into.
-        key: The key for the dictionary being merged into.
-        value: The value being merged into the dictionary.
-        _: Merge strategies - unused argument.
-
-    Returns:
-        `NotImplemented` if the key is not "env"; `None` otherwise.
-    """
-    if key != "env":
-        return NotImplemented  # type: ignore
-    data[key] = {
-        **expand_env_vars(data[key], value, if_missing=EnvVarMissingBehavior.ignore),
-        **expand_env_vars(value, data[key], if_missing=EnvVarMissingBehavior.ignore),
-    }
-
-
-class Manifest:
+class Manifest:  # noqa: WPS214
     """A complete unambiguous static representation of a Meltano project."""
 
     def __init__(
@@ -163,12 +138,14 @@ class Manifest:
                 files should be validated against the Meltano schema.
         """
         self.project = project
+        self._project_root_str = str(self.project.root.resolve())
         self._meltano_file = self.project.meltanofile.read_text()
         self.environment = environment
         self.path = path
         self.check_schema = check_schema
         with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
-            self.manifest_schema = json.load(manifest_schema_file)
+            manifest_schema = json.load(manifest_schema_file)
+        self._env_locations = meltano_config_env_locations(manifest_schema)
 
     @staticmethod
     def _validate_against_manifest_schema(
@@ -242,11 +219,61 @@ class Manifest:
             _plugins_by_name_by_type(locked_plugins),
         )
 
+    def sanitize_env_vars(self, env: Mapping[str, str]) -> dict[str, str]:
+        """Sanitize environment variables.
+
+        Sanitization is perfomed by:
+        - Replacing the project root as an absolute path in values with
+            '${MELTANO_PROJECT_ROOT}'
+
+        Args:
+            env: A mapping of environment variables.
+
+        Returns:
+            The given environment variables with some removed or edited as
+            necessary.
+        """
+        return {
+            k: v.replace(self._project_root_str, "${MELTANO_PROJECT_ROOT}")
+            for k, v in env.items()
+        }
+
+    def env_aware_merge_mappings(
+        self,
+        data: MutableMapping[str, Any],
+        key: str,
+        value: Any,
+        _: tuple[Any, ...] | None = None,
+    ) -> None:
+        """Merge behavior for `deep_merge` that expands env vars when the key is "env".
+
+        Args:
+            data: The dictionary being merged into.
+            key: The key for the dictionary being merged into.
+            value: The value being merged into the dictionary.
+            _: Merge strategies - unused argument.
+
+        Returns:
+            `NotImplemented` if the key is not "env"; `None` otherwise.
+        """
+        if key != "env":
+            return NotImplemented  # type: ignore
+        data[key] = self.sanitize_env_vars(
+            {
+                **expand_env_vars(
+                    data[key], value, if_missing=EnvVarMissingBehavior.ignore
+                ),
+                **expand_env_vars(
+                    value, data[key], if_missing=EnvVarMissingBehavior.ignore
+                ),
+            }
+        )
+
     def _merge_env_vars(
         self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, Any]
     ) -> None:
         # Merge env vars derived from project settings:
-        env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
+        self.env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
 
         # Ensure the environment-level plugin config is mergable:
         environment = next(iter(manifest["environments"]))
@@ -256,7 +283,7 @@ class Manifest:
         environment["config"]["plugins"] = _plugins_by_name_by_type(environment_plugins)
 
         merge_strategies = (
-            MergeStrategy(dict, env_aware_merge_mappings),
+            MergeStrategy(dict, self.env_aware_merge_mappings),
             *default_deep_merge_strategies,
         )
 
@@ -287,14 +314,14 @@ class Manifest:
         # Merge env vars derived from plugin settings:
         for plugin_type in plugins:
             for plugin in plugins[plugin_type]:
-                env_aware_merge_mappings(
+                self.env_aware_merge_mappings(
                     manifest["plugins"][plugin_type][plugin.name],
                     "env",
                     PluginSettingsService(project=self.project, plugin=plugin).as_env(),
                 )
 
         # Merge 'environment level env' into 'root level env':
-        env_aware_merge_mappings(manifest, "env", environment["env"])
+        self.env_aware_merge_mappings(manifest, "env", environment["env"])
 
     @cached_property
     def data(self) -> dict[str, Any]:
@@ -325,7 +352,7 @@ class Manifest:
                 if x["name"] == self.environment.name
             ]
 
-        apply_scaffold(manifest, meltano_config_env_locations(self.manifest_schema))
+        apply_scaffold(manifest, self._env_locations)
 
         plugins = self.project.plugins.plugins_by_type()
 
