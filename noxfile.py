@@ -50,6 +50,7 @@ def tests(session: Session) -> None:
         "pytest-docker",
         "pytest-order",
         "pytest-randomly",
+        "pytest-structlog",
         "pytest-xdist",
         "requests-mock",
     )
@@ -86,10 +87,17 @@ def mypy(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    args = session.posargs or ["src/meltano", "--exclude", "src/meltano/migrations/"]
+    args = session.posargs or [
+        "src/meltano",
+        "--exclude",
+        "src/meltano/migrations/",
+        "--exclude",
+        ".nox/",
+    ]
 
     session.install(".")
     session.install(
+        "boto3-stubs[essential]",
         "mypy",
         "sqlalchemy2-stubs",
         "types-croniter",
@@ -97,6 +105,5 @@ def mypy(session: Session) -> None:
         "types-psutil",
         "types-PyYAML",
         "types-requests",
-        "boto3-stubs[essential]",
     )
     session.run("mypy", *args)

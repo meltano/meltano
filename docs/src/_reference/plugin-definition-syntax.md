@@ -161,7 +161,7 @@ domain_url: https://ads.google.com
 Path to the plugin's logo in the Meltano Hub repository.
 
 ```yaml
-logo_url: /assets/logos/orchestrators/airflow.png
+logo_url: /assets/logos/utilities/airflow.png
 ```
 
 ## `definition`
@@ -169,7 +169,7 @@ logo_url: /assets/logos/orchestrators/airflow.png
 Markdown formatted text that defines what the plugin is and what it does.
 
 ```yaml
-definition: is an [orchestrator](https://docs.meltano.com/concepts/plugins#orchestrators) that allows for workflows to be programmatically authored, scheduled, and monitored via Airflow.
+definition: is an [utilities](/concepts/plugins#utilities) that allows for workflows to be programmatically authored, scheduled, and monitored via Airflow.
 ```
 
 ## `settings_preamble`

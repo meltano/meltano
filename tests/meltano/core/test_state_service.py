@@ -25,7 +25,7 @@ class TestStateService:
         )
 
     def test_get_state(self, state_service, state_ids_with_expected_states):
-        for (state_id, expected_state) in state_ids_with_expected_states:
+        for state_id, expected_state in state_ids_with_expected_states:
             assert state_service.get_state(state_id) == expected_state
 
     def test_list_state(self, state_service, state_ids_with_expected_states):
@@ -61,7 +61,7 @@ class TestStateService:
         job_pairs = []
         for idx in range(0, len(jobs) - 1, 2):
             job_pairs.append((jobs[idx], jobs[idx + 1]))
-        for (job_src, job_dst) in job_pairs:
+        for job_src, job_dst in job_pairs:
             state_src = state_service.get_state(job_src.job_name)
             state_dst = state_service.get_state(job_dst.job_name)
             merged_dst = merge(state_src, state_dst)
@@ -72,7 +72,7 @@ class TestStateService:
         state_id_pairs = []
         for idx in range(0, len(state_ids) - 1, 2):
             state_id_pairs.append((state_ids[idx], state_ids[idx + 1]))
-        for (state_id_src, state_id_dst) in state_id_pairs:
+        for state_id_src, state_id_dst in state_id_pairs:
             state_src = state_service.get_state(state_id_src)
             state_service.copy_state(state_id_src, state_id_dst)
             assert state_service.get_state(state_id_dst) == state_src
@@ -81,7 +81,7 @@ class TestStateService:
         state_id_pairs = []
         for idx in range(0, len(state_ids) - 1, 2):
             state_id_pairs.append((state_ids[idx], state_ids[idx + 1]))
-        for (state_id_src, state_id_dst) in state_id_pairs:
+        for state_id_src, state_id_dst in state_id_pairs:
             state_src = state_service.get_state(state_id_src)
             state_service.move_state(state_id_src, state_id_dst)
             assert not state_service.get_state(state_id_src)

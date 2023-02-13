@@ -26,7 +26,6 @@ def project_tap_mock(project_add_service):
 class TestCliInvoke:
     @pytest.fixture
     def mock_invoke(self, utility, plugin_invoker_factory):
-
         process_mock = Mock()
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=0)
@@ -161,9 +160,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg", "--verbose")
 
-    def test_invoke_exit_code(
-        self, cli_runner, tap, project_plugins_service, plugin_invoker_factory, utility
-    ):
+    def test_invoke_exit_code(self, cli_runner, tap, plugin_invoker_factory, utility):
         process_mock = Mock()
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=2)
@@ -184,41 +181,36 @@ class TestCliInvoke:
     def test_invoke_triggers(
         self,
         cli_runner: CliRunner,
-        project_plugins_service: ProjectPluginsService,
         project: Project,
         tap: ProjectPlugin,
     ):
-        with patch(
-            "meltano.cli.invoke.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), patch.object(
+        with patch.object(
             SingerTap, "discover_catalog"
         ) as discover_catalog, patch.object(
             SingerTap, "apply_catalog_rules"
         ) as apply_catalog_rules, patch.object(
             SingerTap, "look_up_state"
         ) as look_up_state:
-
             # Modes other than sync don't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
             assert look_up_state.call_count == 0
-            project.clear_cache()
+            project.refresh()
 
             # Dumping config doesn't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
             assert look_up_state.call_count == 0
-            project.clear_cache()
+            project.refresh()
 
             # Sync mode triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name])
             assert discover_catalog.call_count == 1
             assert apply_catalog_rules.call_count == 1
             assert look_up_state.call_count == 1
-            project.clear_cache()
+            project.refresh()
 
             # Dumping catalog triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "catalog", tap.name])
@@ -226,15 +218,10 @@ class TestCliInvoke:
             assert apply_catalog_rules.call_count == 2
             assert look_up_state.call_count == 2
 
-    def test_invoke_dump_config(
-        self, cli_runner, tap, project_plugins_service, plugin_settings_service_factory
-    ):
+    def test_invoke_dump_config(self, cli_runner, tap, plugin_settings_service_factory):
         settings_service = plugin_settings_service_factory(tap)
 
-        with patch(
-            "meltano.cli.invoke.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), patch.object(SingerTap, "discover_catalog"), patch.object(
+        with patch.object(SingerTap, "discover_catalog"), patch.object(
             SingerTap, "apply_catalog_rules"
         ):
             result = cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])

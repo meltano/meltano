@@ -12,8 +12,9 @@ from textwrap import dedent
 import pytest
 
 from fixtures.utils import cd
-from meltano.core.project_files import ExtractedAnnotation, ProjectFiles, deep_merge
+from meltano.core.project_files import ExtractedAnnotation, ProjectFiles
 from meltano.core.yaml import yaml
+from meltano.core.utils import deep_merge
 
 
 @pytest.fixture
@@ -43,7 +44,7 @@ def cd_temp_dir():
     ),
 )
 def test_deep_merge(parent, children, expected):
-    assert deep_merge(parent, children) == expected
+    assert deep_merge(parent, *children) == expected
 
 
 class TestProjectFiles:

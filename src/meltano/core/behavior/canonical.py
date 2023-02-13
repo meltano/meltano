@@ -236,7 +236,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
             return value
 
         if attr in self._defaults:
-            value = self._defaults[attr](self)  # noqa: WPS529 (implicit .get())
+            value = self._defaults[attr](self)
 
         return value
 

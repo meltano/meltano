@@ -8,9 +8,8 @@ import sys
 from typing import TYPE_CHECKING, NoReturn
 
 from meltano.cli.utils import CliError
-from meltano.core.error import MeltanoError
+from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.logging import setup_logging
-from meltano.core.project import ProjectReadonly
 
 # TODO: Importing the cli.cli module breaks other cli module imports
 # This suggests a cyclic dependency or a poorly structured interface.
@@ -19,6 +18,7 @@ from meltano.core.project import ProjectReadonly
 from meltano.cli.cli import cli  # isort:skip
 from meltano.cli import (  # isort:skip # noqa: WPS235
     add,
+    compile,
     config,
     discovery,
     dragon,

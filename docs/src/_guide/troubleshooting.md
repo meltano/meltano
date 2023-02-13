@@ -62,13 +62,24 @@ In debug mode, Meltano will log additional information about the environment and
 Here is an example with `meltano elt`:
 
 ```
-$ meltano --log-level=debug elt tap-gitlab target-jsonl --state-id=gitlab-to-jsonl
-meltano            | INFO Running extract & load...
-meltano            | INFO Found state from 2020-08-05 21:30:20.487312.
-meltano            | DEBUG Invoking: ['demo-project/.meltano/extractors/tap-gitlab/venv/bin/tap-gitlab', '--config', 'demo-project/.meltano/run/tap-gitlab/tap.config.json', '--state', 'demo-project/.meltano/run/tap-gitlab/state.json']
-meltano            | DEBUG Env: {'TAP_GITLAB_API_URL': 'https://gitlab.com', 'GITLAB_API_TOKEN': '', 'GITLAB_API_GROUPS': '', 'GITLAB_API_PROJECTS': 'meltano/meltano', 'GITLAB_API_ULTIMATE_LICENSE': 'False', 'GITLAB_API_START_DATE': '2021-03-01'}
-meltano            | DEBUG Invoking: ['demo-project/.meltano/loaders/target-jsonl/venv/bin/target-jsonl', '--config', 'demo-project/.meltano/run/target-jsonl/target.config.json']
-meltano            | DEBUG Env: {'MELTANO_EXTRACTOR_NAME': 'tap-gitlab', 'MELTANO_EXTRACTOR_NAMESPACE': 'tap_gitlab', 'MELTANO_EXTRACT_API_URL': 'https://gitlab.com', 'MELTANO_EXTRACT_PRIVATE_TOKEN': '', 'MELTANO_EXTRACT_GROUPS': '', 'MELTANO_EXTRACT_PROJECTS': 'meltano/meltano', 'MELTANO_EXTRACT_ULTIMATE_LICENSE': 'False', 'MELTANO_EXTRACT_START_DATE': '2021-03-01', 'TAP_GITLAB_API_URL': 'https://gitlab.com', 'GITLAB_API_TOKEN': '', 'GITLAB_API_GROUPS': '', 'GITLAB_API_PROJECTS': 'meltano/meltano', 'GITLAB_API_ULTIMATE_LICENSE': 'False', 'GITLAB_API_START_DATE': '2021-03-01', 'TARGET_JSONL_DESTINATION_PATH': 'output', 'TARGET_JSONL_DO_TIMESTAMP_FILE': 'False'}
+$ meltano --log-level=debug run tap-gitlab target-jsonl
+2023-02-01T17:17:43.308389Z [info     ] Environment 'dev' is active
+2023-02-01T17:17:43.375158Z [debug    ] Creating engine '<meltano.core.project.Project object at 0x10d9ff5e0>@sqlite:////demo-project/.meltano/meltano.db'
+2023-02-01T17:17:43.646112Z [debug    ] Found plugin parent            parent=tap-gitlab plugin=tap-gitlab source=lockfile
+2023-02-01T17:17:43.650014Z [debug    ] found plugin in cli invocation plugin_name=tap-gitlab
+2023-02-01T17:17:43.652873Z [debug    ] Found plugin parent            parent=target-jsonl plugin=target-jsonl source=lockfile
+2023-02-01T17:17:43.656906Z [debug    ] found plugin in cli invocation plugin_name=target-jsonl
+2023-02-01T17:17:43.657112Z [debug    ] head of set is extractor as expected block=<meltano.core.plugin.project_plugin.ProjectPlugin object at 0x1115be850>
+2023-02-01T17:17:45.337292Z [debug    ] found block                    block_type=loaders index=1
+2023-02-01T17:17:45.337455Z [debug    ] blocks                         idx=1 offset=0
+2023-02-01T17:18:54.233065Z [debug    ] found ExtractLoadBlocks set    offset=0
+2023-02-01T17:18:54.233220Z [debug    ] All ExtractLoadBlocks validated, starting execution.
+2023-02-01T17:18:56.271112Z [debug    ] Created configuration at /home/.meltano/run/tap-gitlab/tap.54d0e4e3-eb71-4000-9138-47a25c8b3743.config.json
+2023-02-01T17:18:56.271662Z [debug    ] Could not find tap.properties.json in /home/.meltano/extractors/tap-gitlab/tap.properties.json, skipping.
+2023-02-01T17:18:56.272003Z [debug    ] Could not find tap.properties.cache_key in /home/.meltano/extractors/tap-gitlab/tap.properties.cache_key, skipping.
+2023-02-01T17:18:56.272321Z [debug    ] Could not find state.json in /home/.meltano/extractors/tap-gitlab/state.json, skipping.
+2023-02-01T17:18:56.355385Z [warning  ] No state was found, complete import.
+...
 ```
 
 ## No Plugin Settings Defined

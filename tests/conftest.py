@@ -12,8 +12,8 @@ import pytest
 import requests
 from requests.adapters import BaseAdapter
 
-from meltano.core.hub.client import MeltanoHubService
 from meltano.core.plugin.base import PluginType
+from meltano.core.project import Project
 
 logging.basicConfig(level=logging.INFO)
 
@@ -120,7 +120,7 @@ class MockAdapter(BaseAdapter):
                     }
 
                     if "dialect" in plugin:
-                        hub[plugin_key]["dialect"] = plugin["dialect"]  # noqa: WPS529
+                        hub[plugin_key]["dialect"] = plugin["dialect"]
 
                 hub[index_key][plugin_name][
                     "logo_url"
@@ -187,23 +187,24 @@ class MockAdapter(BaseAdapter):
         return response
 
 
-@pytest.fixture(scope="class")
-def meltano_hub_service(project, discovery):
-    hub = MeltanoHubService(project)
-    hub.session.mount(hub.hub_api_url, MockAdapter(hub.hub_api_url, discovery))
-    return hub
+@pytest.fixture(scope="class", autouse=True)
+def mount_meltano_hub_mock_adapter(project: Project, discovery):
+    project.hub_service.session.mount(
+        project.hub_service.hub_api_url,
+        MockAdapter(project.hub_service.hub_api_url, discovery),
+    )
 
 
 @pytest.fixture(scope="class")
-def hub_endpoints(meltano_hub_service):
-    adapter = meltano_hub_service.session.adapters[meltano_hub_service.hub_api_url]
+def hub_endpoints(project: Project):
+    adapter = project.hub_service.session.adapters[project.hub_service.hub_api_url]
     return adapter._mapping
 
 
-@pytest.fixture(scope="function")
-def hub_request_counter(meltano_hub_service: MeltanoHubService):
-    counter: Counter = meltano_hub_service.session.get_adapter(
-        meltano_hub_service.hub_api_url
+@pytest.fixture
+def hub_request_counter(project: Project):
+    counter: Counter = project.hub_service.session.get_adapter(
+        project.hub_service.hub_api_url
     ).count
     counter.clear()
     return counter

@@ -24,7 +24,6 @@ class TestTaskSets:
         ]
 
     def test_tasks_from_yaml_str(self):
-
         cases = [
             ("generic", "tap target", TaskSets(name="generic", tasks=["tap target"])),
             (

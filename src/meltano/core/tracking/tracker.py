@@ -7,6 +7,7 @@ import json
 import locale
 import os
 import re
+import sys
 import uuid
 from collections.abc import Mapping
 from contextlib import contextmanager, suppress
@@ -19,13 +20,11 @@ from warnings import warn
 
 import structlog
 import tzlocal
-from cached_property import cached_property
 from psutil import Process
 from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -40,6 +39,12 @@ if TYPE_CHECKING:
         EnvironmentContext,
         ProjectContext,
     )
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -105,13 +110,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         )
 
         self.project = project
-        self.settings_service = ProjectSettingsService(project)
-        self.send_anonymous_usage_stats = self.settings_service.get(
+        self.send_anonymous_usage_stats = project.settings.get(
             "send_anonymous_usage_stats",
-            not self.settings_service.get("disable_tracking", False),
+            not project.settings.get("disable_tracking", False),
         )
 
-        endpoints = self.settings_service.get("snowplow.collector_endpoints")
+        endpoints = project.settings.get("snowplow.collector_endpoints")
 
         emitters: list[Emitter] = []
         for endpoint in endpoints:

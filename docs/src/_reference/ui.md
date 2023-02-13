@@ -713,9 +713,9 @@ cd $PROJECT_DIRECTORY
 # Start the Meltano API and a production build of Meltano UI that you can ignore
 meltano ui
 # Open a new terminal tab and go to the directory you cloned meltano into
-cd $WHEREVER_YOU_CLONED_MELTANO
+cd $WHEREVER_YOU_CLONED_MELTANO/src/webapp
 # Install frontend infrastructure at the root directory
-yarn setup
+yarn
 # Start local development environment
 yarn serve
 ```

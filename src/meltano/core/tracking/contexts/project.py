@@ -2,17 +2,22 @@
 
 from __future__ import annotations
 
+import sys
 import uuid
 from enum import Enum, auto
 
-from cached_property import cached_property
 from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.schemas import ProjectContextSchema
 from meltano.core.utils import hash_sha256
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
 
 logger = get_logger(__name__)
 
@@ -41,11 +46,10 @@ class ProjectContext(SelfDescribingJson):
             client_id: The client ID from `analytics.json`.
         """
         self.project = project
-        self.settings_service = ProjectSettingsService(project)
         (
             send_anonymous_usage_stats,
             send_anonymous_usage_stats_metadata,
-        ) = self.settings_service.get_with_metadata("send_anonymous_usage_stats")
+        ) = project.settings.get_with_metadata("send_anonymous_usage_stats")
 
         super().__init__(
             ProjectContextSchema.url,
@@ -61,7 +65,7 @@ class ProjectContext(SelfDescribingJson):
             },
         )
 
-        self.environment_name = getattr(self.project.active_environment, "name", None)
+        self.environment_name = getattr(self.project.environment, "name", None)
 
     @property
     def environment_name(self) -> str | None:
@@ -103,7 +107,7 @@ class ProjectContext(SelfDescribingJson):
         Returns:
             The project UUID.
         """
-        project_id_str = self.settings_service.get("project_id")
+        project_id_str = self.project.settings.get("project_id")
 
         if project_id_str:
             try:

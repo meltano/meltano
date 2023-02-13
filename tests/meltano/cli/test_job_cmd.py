@@ -153,7 +153,6 @@ class TestCliJob:
         with mock.patch(
             "meltano.cli.job.TaskSetsService", return_value=task_sets_service
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
-
             cli_args = [
                 "job",
                 "add",

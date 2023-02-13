@@ -10,7 +10,7 @@ It knows what settings are supported by each plugin, and how and when different 
 
 Since this also goes for [extractors](/concepts/plugins#extractors) and [loaders](/concepts/plugins#loaders), you do not need to manually craft the
 [`config.json` files](https://hub.meltano.com/singer/spec#config-files) expected by Singer taps and targets,
-because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 If the plugin you'd like to use and configure is [supported out of the box](/concepts/plugins#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/reference/command-line-interface#discover)), Meltano already knows what settings it supports.
 If you're adding a [custom plugin](/concepts/plugins#custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
@@ -25,13 +25,13 @@ Meltano itself can be configured as well. To learn more, refer to the [Settings 
 
 To determine the values of settings, Meltano will look in 4 main places (and one optional one), with each taking precedence over the next:
 
-1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano elt` runtime](/guide/integration#pipeline-specific-configuration), your project's [`.env` file](/concepts/project#env), a [scheduled pipeline's `env` dictionary](/concepts/project#schedules), or any other method.
+1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano run` runtime](/guide/integration#pipeline-specific-configuration), your project's [`.env` file](/concepts/project#env), a [scheduled pipeline's `env` dictionary](/concepts/project#schedules), or any other method.
    - You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
 2. **Your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
-3. **Your project's [**system database**](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+3. **Your project's [system database](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
 5. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
@@ -239,7 +239,7 @@ Plugins can also specify alternative variables ([aliases](#aliases) for their se
 
 Since environment variable values are always strings, Meltano will cast values to the appropriate type before passing them on to the plugin.
 
-To verify that any environment variables you've set will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+To verify that any environment variables you've set will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 To learn how to use environment variables to specify pipeline-specific configuration, refer to the [Data Integration (EL) guide](/guide/integration#pipeline-specific-configuration).
 
@@ -358,7 +358,7 @@ extractors:
 
 ### Accessing from plugins
 
-When Meltano invokes a plugin's executable as part of [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke), it populates the environment with the same [variables that can be referenced from settings](#available-environment-variables), as well as those describing the plugin's current configuration (including [extras](#plugin-extras)), as discoverable using [`meltano config --format=env <plugin>`](/reference/command-line-interface#config).
+When Meltano invokes a plugin's executable as part of [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke), it populates the environment with the same [variables that can be referenced from settings](#available-environment-variables), as well as those describing the plugin's current configuration (including [extras](#plugin-extras)), as discoverable using [`meltano config --format=env <plugin>`](/reference/command-line-interface#config).
 
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
 
