@@ -110,7 +110,7 @@ mssql = ["pymssql"]
 repl = ["ipython"]
 s3 = ["boto3"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
