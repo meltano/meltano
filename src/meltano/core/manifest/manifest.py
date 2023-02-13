@@ -1,5 +1,6 @@
 """Compile a Meltano manifest."""
 
+
 from __future__ import annotations
 
 import json
@@ -8,6 +9,7 @@ import subprocess
 import sys
 from collections import defaultdict
 from collections.abc import Iterable
+from contextlib import suppress
 from functools import reduce
 from operator import getitem
 from pathlib import Path
@@ -274,6 +276,7 @@ class Manifest:  # noqa: WPS214
     ) -> None:
         # Merge env vars derived from project settings:
         self.env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
+        breakpoint()
 
         # Ensure the environment-level plugin config is mergable:
         environment = next(iter(manifest["environments"]))
@@ -360,7 +363,8 @@ class Manifest:  # noqa: WPS214
         # dynamically at run-time, and shouldn't be represented directly in
         # `meltano.yml` or in manifest files. For more details, refer to:
         # https://gitlab.com/meltano/meltano/-/merge_requests/2481#note_832478775
-        del plugins["mappings"]
+        with suppress(KeyError):
+            del plugins["mappings"]
 
         # NOTE: `self._merge_plugin_lockfiles` restructures the plugins into a
         #       map from plugin types to maps of plugin IDs to their values.
@@ -379,12 +383,14 @@ class Manifest:  # noqa: WPS214
         # Everything from the selected environment has been merged into the
         # higher levels, so it can be deleted to avoid any ambiguity about
         # which fields within the manifest should be read.
-        del manifest["environments"]
+        with suppress(KeyError):
+            del manifest["environments"]
 
         # The include paths have already been resolved, and so are removed to
         # avoid ambiguity. If this information is of interest, it cloud be
         # re-added into an annotation.
-        del manifest["include_paths"]
+        with suppress(KeyError):
+            del manifest["include_paths"]
 
         if self.check_schema:
             self._validate_against_manifest_schema(
