@@ -62,6 +62,7 @@ backoff = "^2.1.2"
 bcrypt = "^3.2.0" # Needs to be installed explicitly so it can be used as a backend for passlib
 boto3 = {version = "^1.25.3", optional = true}
 cached-property = "^1" # Remove after Python 3.7 support is dropped
+check-jsonschema = "^0.21.0"
 click = "^8.1"
 click-default-group = "^1.2.1"
 croniter = "^1.3.5"
@@ -77,7 +78,7 @@ flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
 gunicorn = "^20.1.0"
 importlib-resources = {version = "^5.10.1", optional = true, python = "<3.9"}
-jsonschema = "^4.9"
+jsonschema = "^4.17"
 meltano-flask-security = "^0.1.0"
 packaging = "^21.3"
 psutil = "^5.6.3"
@@ -125,6 +126,7 @@ pytest-cov = "^3.0.0"
 pytest-docker = "^1.0"
 pytest-order = "^1.0"
 pytest-randomly = "^3.12"
+pytest-structlog = "^0.6"
 pytest-xdist = "^2.5"
 requests-mock = "^1.6.0"
 setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
@@ -263,6 +265,9 @@ pyflakes = [
   "-WPS461", # Allow all inline ignores
   "-WPS501",
   "-WPS507",
+  "-WPS509", # Allow "incorrect" ternary expressions
+  "-WPS528", # Allow iterating over keys in a dict, then using them to access values
+  "-WPS529", # Allow use of `dict_object[key]` (i.e. `dict.__getitem__`) instead of `dict.get`
   "-WPS600", # Allow subclassing a builtin, such as 'str' (used for serializable Enums)
   "-WPS602", # Allow using @staticmethod
   "-WPS615", # Allow "unpythonic" getters and setters

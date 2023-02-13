@@ -98,6 +98,8 @@ repos:
     hooks:
       - id: flakeheaven
         exclude: ^(src/meltano/migrations/)
+        args:
+          - "--max-local-variables=8"
         additional_dependencies:
           - flake8==4.0.1
           - flake8-bandit==3.0.0

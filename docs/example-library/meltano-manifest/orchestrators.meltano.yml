@@ -1,0 +1,142 @@
+plugins:
+  utilities:
+  - name: airflow
+    variant: apache
+    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3
+      --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
+      pytest kubernetes==23.6.0 apache-airflow-providers-cncf-kubernetes==4.4.0
+    commands:
+      test_dag_generator:
+        args: ${MELTANO_PROJECT_ROOT}/orchestrate/airflow/tests/test_dag_generator.py
+        executable: pytest
+
+schedules:
+- name: slack_notifications
+  interval: 0 12 * * *
+  job: slack_notifications
+
+- name: cloudwatch_el
+  interval: 0 6 * * *
+  job: cloudwatch_el
+
+- name: meltanohub_el
+  interval: 0 6 * * *
+  job: meltanohub_el
+
+- name: spreadsheets_anywhere_el
+  interval: 0 6 * * *
+  job: spreadsheets_anywhere_el
+
+- name: snowplow_el
+  interval: 0 6 * * *
+  job: snowplow_el
+
+- name: github_search_el
+  interval: 0 6 * * *
+  job: github_search_el
+
+- name: github_meltano_el
+  interval: 0 6 * * *
+  job: github_meltano_el
+
+- name: gitlab_el
+  interval: 0 6 * * *
+  job: gitlab_el
+
+- name: slack_el
+  interval: 0 6 * * *
+  job: slack_el
+
+- name: google_analytics_el
+  interval: 0 6 * * *
+  job: google_analytics_el
+
+- name: hub_metrics_publish
+  interval: 0 12 * * *
+  job: hub_metrics_publish
+
+- name: marts_refresh
+  interval: 0 8 * * *
+  job: marts_refresh
+
+jobs:
+
+- name: slack_notifications
+  tasks:
+  - dbt-snowflake:run_slack_notifications
+  - tap-snowflake-singer-activity target-apprise
+
+- name: dbt_docs
+  tasks:
+  - dbt-snowflake:docs-generate
+  - dbt-snowflake:docs-serve
+
+- name: meltanohub_el
+  tasks:
+  - tap-meltanohub target-snowflake
+  - dbt-snowflake:test_source_meltanohub
+  - dbt-snowflake:run_snapshot_meltanohub
+  - dbt-snowflake:run_staging_meltanohub
+  - dbt-snowflake:test_staging_meltanohub
+
+- name: spreadsheets_anywhere_el
+  tasks:
+  - tap-spreadsheets-anywhere coalesce-gcp-ips target-snowflake
+  - dbt-snowflake:test_source_spreadsheets_anywhere
+  - dbt-snowflake:run_snapshot_spreadsheets_anywhere
+
+- name: snowplow_el
+  tasks:
+  - dbt-snowflake:run_staging_snowplow
+  - dbt-snowflake:test_staging_snowplow
+
+- name: github_search_el
+  tasks:
+  - tap-github-search target-snowflake
+  - dbt-snowflake:run_staging_github_search
+  - dbt-snowflake:test_staging_github_search
+
+- name: github_meltano_el
+  tasks:
+  - tap-github-meltano target-snowflake
+  - dbt-snowflake:run_staging_github_meltano
+  - dbt-snowflake:test_staging_github_meltano
+
+- name: gitlab_el
+  tasks:
+  - tap-gitlab target-snowflake
+  - dbt-snowflake:run_staging_gitlab
+  - dbt-snowflake:test_staging_gitlab
+
+- name: slack_el
+  tasks:
+  - tap-slack target-snowflake
+  - tap-slack-public target-snowflake
+  - dbt-snowflake:run_staging_slack
+  - dbt-snowflake:test_staging_slack
+
+- name: google_analytics_el
+  tasks:
+  - tap-google-analytics target-snowflake
+  # - great_expectations:test_ga_raw
+  - dbt-snowflake:run_staging_google_analytics
+  - dbt-snowflake:test_staging_google_analytics
+
+- name: hub_metrics_publish
+  tasks:
+  - dbt-snowflake:run_hub_metrics
+  - dbt-snowflake:test_hub_metrics
+  # - great_expectations:test_dbt_hub_metrics
+  - tap-snowflake-metrics target-yaml-metrics awscli:s3_copy_metrics
+  - tap-snowflake-audit target-yaml-audit awscli:s3_copy_audit
+
+- name: marts_refresh
+  tasks:
+  - dbt-snowflake:run_marts
+  - dbt-snowflake:test_marts
+
+- name: cloudwatch_el
+  tasks:
+  - tap-cloudwatch target-snowflake
+  - dbt-snowflake:run_staging_cloudwatch
+  - dbt-snowflake:test_staging_cloudwatch

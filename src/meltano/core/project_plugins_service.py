@@ -1,10 +1,11 @@
 """Project plugin service."""
 
+
 from __future__ import annotations
 
 import enum
 import sys
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from typing import TYPE_CHECKING, Generator
 
 import structlog
@@ -123,11 +124,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if not getattr(plugin, "should_add_to_file", lambda: True)():
             return plugin
 
-        try:
+        with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
             raise PluginAlreadyAddedException(existing_plugin)
-        except PluginNotFoundError:
-            pass
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:

@@ -18,6 +18,7 @@ from meltano.core.logging import setup_logging
 from meltano.cli.cli import cli  # isort:skip
 from meltano.cli import (  # isort:skip # noqa: WPS235
     add,
+    compile,
     config,
     discovery,
     dragon,
