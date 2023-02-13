@@ -13,8 +13,8 @@ import pytest
 
 from fixtures.utils import cd
 from meltano.core.project_files import ExtractedAnnotation, ProjectFiles
-from meltano.core.yaml import yaml
 from meltano.core.utils import deep_merge
+from meltano.core.yaml import yaml
 
 
 @pytest.fixture

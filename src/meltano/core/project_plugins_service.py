@@ -20,7 +20,6 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
 )
 from meltano.core.plugin_lock_service import PluginLockService
-from meltano.core.project import Project
 
 if sys.version_info >= (3, 8):
     from functools import cached_property

@@ -40,11 +40,6 @@ else:
 if TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
 
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
-
 
 logger = logging.getLogger(__name__)
 

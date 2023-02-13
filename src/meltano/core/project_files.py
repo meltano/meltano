@@ -2,21 +2,13 @@
 
 from __future__ import annotations
 
-import copy
 import json
 import logging
 from collections import OrderedDict
 from copy import copy
 from os import PathLike
 from pathlib import Path
-from typing import (
-    Any,
-    Generator,
-    Mapping,
-    NamedTuple,
-    TypeVar,
-)
-from typing import Any, Mapping, TypeVar
+from typing import Any, Generator, Mapping, NamedTuple, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
