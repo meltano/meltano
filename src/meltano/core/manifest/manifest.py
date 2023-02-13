@@ -276,7 +276,6 @@ class Manifest:  # noqa: WPS214
     ) -> None:
         # Merge env vars derived from project settings:
         self.env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
-        breakpoint()
 
         # Ensure the environment-level plugin config is mergable:
         environment = next(iter(manifest["environments"]))
