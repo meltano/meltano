@@ -218,7 +218,7 @@
     },
     "ff": {
       "type": "object",
-      "description": "",
+      "description": "A feature flag, which can be used to enable or disable particular Meltano features.",
       "properties": {
         "enable_uvicorn": {
           "type": "boolean",
@@ -300,7 +300,6 @@
         "required": [
           "name"
         ],
-        "additionalProperties": true,
         "properties": {
           "name": {
             "type": "string",
@@ -308,6 +307,32 @@
             "examples": [
               "target-jsonl"
             ]
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the plugin."
+          },
+          "plugin_type": {
+            "type": "string",
+            "description": "The type of the plugin.",
+            "enum": [
+              "extractors",
+              "loaders",
+              "orchestrators",
+              "transformers",
+              "files",
+              "utilities",
+              "transforms",
+              "mappers"
+            ]
+          },
+          "repo": {
+            "type": "string",
+            "description": "The URL of the repository containing the source code for the plugin."
+          },
+          "ext_repo": {
+            "type": "string",
+            "description": "The URL of the repository containing the source code for a Meltano extension plugin that typically wraps some other tool, in which case the 'repo' property is used for the URL of the repository for that tool."
           },
           "inherit_from": {
             "type": "string",
