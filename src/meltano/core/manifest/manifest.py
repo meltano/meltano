@@ -381,6 +381,11 @@ class Manifest:  # noqa: WPS214
         # which fields within the manifest should be read.
         del manifest["environments"]
 
+        # The include paths have already been resolved, and so are removed to
+        # avoid ambiguity. If this information is of interest, it cloud be
+        # re-added into an annotation.
+        del manifest["include_paths"]
+
         if self.check_schema:
             self._validate_against_manifest_schema(
                 "newly compiled manifest", self.path, manifest
