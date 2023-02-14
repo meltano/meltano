@@ -27,6 +27,7 @@ repos:
       - id: trailing-whitespace
         exclude: (cli_messages\.py)
       - id: end-of-file-fixer
+        exclude: ^integration/meltano-manifest/expected-manifests/*.json$
       - id: check-yaml
       - id: check-json
       - id: pretty-format-json
