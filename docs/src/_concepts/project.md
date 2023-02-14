@@ -301,7 +301,7 @@ To better integrate with software other than the core Meltano library and CLI, `
 
 ```yaml
 annotations:
-  meltano-cloud: {
+  meltano.cloud: {
     # Meltano Cloud config
   }
   arbitrary-third-party-tool: {
@@ -311,6 +311,17 @@ annotations:
 ```
 
 The core Meltano library and CLI never access the `annotations` field. To access it, one must read `meltano.yml`. Nothing within an `annotations` field should be thought of as part of Meltano's own configuration - it is merely extra data that Meltano permits within its configuration files.
+
+Annotations are supported in the following locations within `meltano.yml`:
+
+- At the top level
+- In a job definition
+- In a schedule definition
+- In an environments definition
+- In a plugin definition
+- In an environment plugin definition
+- In a plugin setting definition
+
 
 ## `.gitignore`
 
