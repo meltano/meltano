@@ -84,6 +84,10 @@ class Canonical:  # noqa: WPS214 (too many methods)
         self._defaults = {}
 
     @classmethod
+    def _canonize(cls, val: Any) -> Any:
+        return getattr(type(val), "as_canonical", cls.as_canonical)(val)
+
+    @classmethod
     def as_canonical(
         cls: type[T], target: Any
     ) -> dict | list | CommentedMap | CommentedSeq | Any:
@@ -95,36 +99,27 @@ class Canonical:  # noqa: WPS214 (too many methods)
         Returns:
             Canonical representation of the given instance.
         """
+
         if isinstance(target, Canonical):
-            result = CommentedMap([(key, cls.as_canonical(val)) for key, val in target])
+            result = CommentedMap((key, cls._canonize(val)) for key, val in target)
             target.attrs.copy_attributes(result)
             return result
 
-        if isinstance(target, (CommentedSet, CommentedSeq)):
-            result = CommentedSeq(cls.as_canonical(val) for val in target)
-            target.copy_attributes(result)
-            return result
-
-        if isinstance(target, CommentedMap):
-            results = CommentedMap()
-            for key, val in target.items():
-                if isinstance(val, Canonical):
-                    results[key] = val.canonical()
-                else:
-                    results[key] = cls.as_canonical(val)
-            target.copy_attributes(results)
-            return results
-
-        if isinstance(target, (list, set)):
-            return list(map(cls.as_canonical, target))
-
         if isinstance(target, dict):
-            return {
-                key: val.canonical()
-                if isinstance(val, Canonical)
-                else cls.as_canonical(val)
-                for key, val in target.items()
-            }
+            as_dict = {key: cls._canonize(val) for key, val in target.items()}
+            if isinstance(target, CommentedMap):
+                as_commented_map = CommentedMap(as_dict)
+                target.copy_attributes(as_commented_map)
+                return as_commented_map
+            return as_dict
+
+        if isinstance(target, (list, set, CommentedSet)):
+            as_list = [cls._canonize(val) for val in target]
+            if isinstance(target, (CommentedSet, CommentedSeq)):
+                as_commented_seq = CommentedSeq(as_list)
+                target.copy_attributes(as_commented_seq)
+                return as_commented_seq
+            return as_list
 
         return copy.deepcopy(target)
 
