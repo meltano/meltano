@@ -16,8 +16,6 @@ plugins:
     annotations:
       example-annotation-plugins-extractors-tap-gitlab: {}
     config:
-      annotations:
-        example-annotation-plugins-extractors-tap-gitlab-config: {}
       projects: meltano/meltano
       start_date: '2022-11-01T00:00:01Z'
     select:
@@ -35,8 +33,6 @@ environments:
   annotations:
     example-annotation-environments-dev: {}
   config:
-    annotations:
-      example-annotation-environments-dev-config: {}
     plugins:
       extractors:
       - name: tap-gitlab
