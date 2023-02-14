@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from collections import OrderedDict
 from copy import copy
 from os import PathLike
 from pathlib import Path
-from typing import Any, Generator, Mapping, NamedTuple, TypeVar
+from typing import Any, Mapping, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
@@ -17,25 +16,6 @@ from meltano.core import yaml
 from meltano.core.utils import deep_merge
 
 logger = logging.getLogger(__name__)
-
-
-class ExtractedAnnotation(NamedTuple):
-    """An annotation extracted from the project files.
-
-    The `path` element is a tuple of strings and ints which, when applied in
-    sequence to the root of the project files data object, would have results
-    in this annotation prior to its extraction.
-
-    The `index` element is its index within the ordered dictionary it was
-    removed from.
-
-    The `data` element is the annotation dictionary itself.
-    """
-
-    path: tuple[str | int, ...]
-    index: int
-    data: CommentedMap
-
 
 BLANK_SUBFILE = CommentedMap(
     [
@@ -59,8 +39,6 @@ class InvalidIncludePathError(Exception):
 
 class ProjectFiles:  # noqa: WPS214
     """Interface for working with multiple project yaml files."""
-
-    _annotations: list[ExtractedAnnotation] = []
 
     def __init__(self, root: Path, meltano_file_path: Path) -> None:
         """Instantiate ProjectFiles interface from project root and meltano.yml path.
@@ -119,7 +97,6 @@ class ProjectFiles:  # noqa: WPS214
                 if included_file_contents
                 else copy(self.meltano)
             )
-            self.extract_annotations(self._cached_loaded)
 
         return self._cached_loaded
 
@@ -135,7 +112,6 @@ class ProjectFiles:  # noqa: WPS214
         Returns:
             The updated config dictionary.
         """
-        self.restore_annotations(meltano_config)
         file_dicts = self._split_config_dict(meltano_config)
         for file_path, contents in file_dicts.items():
             self._write_file(file_path, contents)
@@ -143,8 +119,6 @@ class ProjectFiles:  # noqa: WPS214
         unused_files = [fl for fl in self.include_paths if str(fl) not in file_dicts]
         for unused_file_path in unused_files:
             self._write_file(unused_file_path, BLANK_SUBFILE)
-
-        self.extract_annotations(meltano_config)
         return meltano_config
 
     def _is_valid_include_path(self, file_path: Path) -> None:
@@ -386,68 +360,3 @@ class ProjectFiles:  # noqa: WPS214
     def _write_file(self, file_path: PathLike, contents: Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
             yaml.dump(contents, fl)
-
-    @classmethod
-    def extract_annotations(cls, data: CommentedMap | CommentedSeq) -> None:
-        """Extract annotations, and store them for later re-insertion.
-
-        Args:
-            data: The data from which to extract all "annotations" keys. It
-                will be modified in-place.
-        """
-        extracted = list(cls._extract_annotations(data=data, path=()))
-        if not cls._annotations:
-            cls._annotations = extracted
-
-    @classmethod
-    def _extract_annotations(  # noqa: C901
-        cls, data: CommentedMap | CommentedSeq, path: tuple[str | int, ...]
-    ) -> Generator[ExtractedAnnotation, None, None]:
-        if isinstance(data, CommentedMap):
-            if "annotations" in data:
-                yield ExtractedAnnotation(
-                    path,
-                    list(data.keys()).index("annotations"),
-                    data.pop("annotations"),
-                )
-            for key, value in data.items():
-                if isinstance(value, (CommentedMap, CommentedSeq)):
-                    yield from cls._extract_annotations(value, path=(*path, key))
-        elif isinstance(data, CommentedSeq):
-            for index, value in enumerate(data):
-                if isinstance(value, (CommentedMap, CommentedSeq)):
-                    yield from cls._extract_annotations(value, path=(*path, index))
-
-    @classmethod
-    def restore_annotations(  # noqa: C901
-        cls, data: CommentedMap | CommentedSeq
-    ) -> None:
-        """Insert previously extracted annotations into the given data.
-
-        Args:
-            data: The data from which annotations were extracted previously. It
-                will be modified in-place.
-        """
-
-        def warn(path, annotation_data):
-            path_str = "".join(
-                f"[{key}]" if isinstance(key, int) else f".{key}" for key in path
-            )
-            logger.warning(
-                f"Failed to re-insert annotation located at {path_str!r} "
-                f"in project files: {json.dumps(annotation_data)}"
-            )
-
-        root = data
-        for annotation in cls._annotations:
-            data = root
-            for key in annotation.path:
-                try:
-                    data = data[key]
-                except (KeyError, IndexError):
-                    warn(annotation.path, annotation.data)
-                    return
-            if isinstance(data, CommentedMap):
-                data.insert(annotation.index, "annotations", annotation.data)
-            else:
-                warn(annotation.path, annotation.data)

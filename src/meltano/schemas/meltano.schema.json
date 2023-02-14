@@ -34,9 +34,6 @@
       "type": "object",
       "description": "Configuration for state backend.",
       "properties": {
-        "annotations": {
-          "$ref": "#/$defs/annotations"
-        },
         "uri": {
           "type": "string",
           "description": "The URI pointing to the backend to use.",
@@ -54,9 +51,6 @@
           "type": "object",
           "description": "Configuration for Azure Blob Storage state backend.",
           "properties": {
-            "annotations": {
-              "$ref": "#/$defs/annotations"
-            },
             "connection_string": {
               "type": "string",
               "description": "The azure connection string to use for connecting to Azure Blob Storage."
@@ -67,9 +61,6 @@
           "type": "object",
           "description": "Configuration for Google Cloud Storage state backend.",
           "properties": {
-            "annotations": {
-              "$ref": "#/$defs/annotations"
-            },
             "application_credentials": {
               "type": "string",
               "description": "Path to a Google credentials file to use for authenticating to Google Cloud Storage."
@@ -80,9 +71,6 @@
           "type": "object",
           "description": "Configuration for AWS S3 state backend.",
           "properties": {
-            "annotations": {
-              "$ref": "#/$defs/annotations"
-            },
             "aws_access_key_id": {
               "type": "string",
               "description": "AWS access key ID to use for authenticating to AWS S3."
@@ -594,9 +582,6 @@
           {
             "type": "object",
             "properties": {
-              "annotations": {
-                "$ref": "#/$defs/annotations"
-              },
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -630,9 +615,6 @@
           },
           {
             "properties": {
-              "annotations": {
-                "$ref": "#/$defs/annotations"
-              },
               "capabilities": {
                 "type": "array",
                 "items": {
@@ -872,9 +854,6 @@
             "provider"
           ],
           "properties": {
-            "annotations": {
-              "$ref": "#/$defs/annotations"
-            },
             "provider": {
               "type": "string",
               "description": "The name of a Meltano-supported OAuth provider",
@@ -1060,9 +1039,6 @@
           "description": "An object of environment specific configurations.",
           "additionalProperties": false,
           "properties": {
-            "annotations": {
-              "$ref": "#/$defs/annotations"
-            },
             "plugins": {
               "type": "object",
               "description": "An object of environment specific plugin configurations.",

@@ -6,7 +6,7 @@ import copy
 import json
 from functools import lru_cache
 from os import PathLike
-from typing import Any, TypeVar
+from typing import Any, NamedTuple, TypeVar
 
 import yaml
 from ruamel.yaml import Representer
@@ -50,7 +50,42 @@ class IdHashBox:
 CANONICAL_PARSE_CACHE_SIZE = 4096
 
 
-class Canonical:  # noqa: WPS214 (too many methods)
+class Annotations(NamedTuple):
+    """Tuple storing the data of an annotation, and its index."""
+
+    index: int
+    data: CommentedMap
+
+
+class AnnotationsMeta(type):
+    """Metaclass to intercept and store annotations before calling `__init__`."""
+
+    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
+        """Create and return an instance of the class this metaclass is applied to.
+
+        Args:
+            *args: Positional arguments for the instance.
+            **kwargs: Keyword arguments for the instance.
+
+        Returns:
+            The newly created instance of the class this metaclass is applied to.
+        """
+        # Remove the annotations from the arguments that would be used for `__init__`.
+        extracted_annotations = (
+            Annotations(
+                index=list(kwargs.keys()).index("annotations"),
+                data=kwargs.pop("annotations"),
+            )
+            if "annotations" in kwargs
+            else None
+        )
+        instance = super().__call__(*args, **kwargs)
+        # Store the annotations for later re-insertion during serialization
+        instance._annotations = extracted_annotations  # noqa: WPS437
+        return instance
+
+
+class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
     """Defines an object that can be represented as a subset of its attributes.
 
     Its purpose is to be serializable as the smallest possible form.
@@ -85,6 +120,16 @@ class Canonical:  # noqa: WPS214 (too many methods)
 
     @classmethod
     def _canonize(cls, val: Any) -> Any:
+        """Call `as_canonical` on `val`, respecting `Canonical` subclasses.
+
+        Args:
+            val: An object on which `as_canonical` should be called. If `val`
+                has an `as_canonical` attribute it will be called. Otherwise
+                the `as_caonical` attribute of this class will be used.
+
+        Returns:
+            The value obtained from calling `as_canonical`.
+        """
         return getattr(type(val), "as_canonical", cls.as_canonical)(val)
 
     @classmethod
@@ -94,14 +139,19 @@ class Canonical:  # noqa: WPS214 (too many methods)
         """Return a canonical representation of the given instance.
 
         Args:
-            target: Instance to convert.
+            target: An instance to convert.
 
         Returns:
-            Canonical representation of the given instance.
+            A canonical representation of the given instance.
         """
-
         if isinstance(target, Canonical):
             result = CommentedMap((key, cls._canonize(val)) for key, val in target)
+            if target._annotations is not None:  # noqa: WPS437
+                result.insert(
+                    target._annotations.index,  # noqa: WPS437
+                    "annotations",
+                    target._annotations.data,  # noqa: WPS437
+                )
             target.attrs.copy_attributes(result)
             return result
 

@@ -16,8 +16,6 @@ plugins:
     annotations:
       example-annotation-plugins-extractors-tap-gitlab: {}
     config:
-      annotations:
-        example-annotation-plugins-extractors-tap-gitlab-config: {}
       projects: meltano/meltano
     select:
     - commits.*
@@ -34,8 +32,6 @@ environments:
   annotations:
     example-annotation-environments-dev: {}
   config:
-    annotations:
-      example-annotation-environments-dev-config: {}
     plugins:
       extractors:
       - name: tap-gitlab
