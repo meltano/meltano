@@ -1043,9 +1043,6 @@
               "type": "object",
               "description": "An object of environment specific plugin configurations.",
               "properties": {
-                "annotations": {
-                  "$ref": "#/$defs/annotations"
-                },
                 "extractors": {
                   "type": "array",
                   "items": {
