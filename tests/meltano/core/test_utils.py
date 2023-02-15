@@ -10,6 +10,7 @@ from meltano.core.utils import (
     flatten,
     nest,
     pop_at_path,
+    remove_suffix,
     set_at_path,
 )
 
@@ -155,3 +156,9 @@ def test_expand_env_vars_nested():
     }
 
     assert expand_env_vars(input_dict, env) == expected_output
+
+
+def test_remove_suffix():
+    assert remove_suffix("a_string", "ing") == "a_str"
+    assert remove_suffix("a_string", "in") == "a_string"
+    assert remove_suffix("a_string", "gni") == "a_string"
