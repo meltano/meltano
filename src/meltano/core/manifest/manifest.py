@@ -22,7 +22,6 @@ import yaml
 from typing_extensions import TypeAlias
 
 from meltano import __file__ as package_root_path
-from meltano.core.environment import Environment
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -113,13 +112,7 @@ class YamlNoTimestampSafeLoader(
 class Manifest:  # noqa: WPS214
     """A complete unambiguous static representation of a Meltano project."""
 
-    def __init__(
-        self,
-        project: Project,
-        environment: Environment | None,
-        path: Path,
-        check_schema: bool,
-    ) -> None:
+    def __init__(self, project: Project, path: Path, check_schema: bool) -> None:
         """Initialize the manifest.
 
         This class does not write a manifest file. It merely generates the data
@@ -131,9 +124,6 @@ class Manifest:  # noqa: WPS214
 
         Args:
             project: The Meltano project which this manifest describes.
-            environment: The Meltano environment which this manifest describes.
-                If `None`, then all data under the `environments` key in the
-                project files will be ignored by this manifest.
             path: The path the Manifest will be saved to - only used for
                 jsonschema validation failure error messages.
             check_schema: Whether the project files and generated manifest
@@ -142,7 +132,6 @@ class Manifest:  # noqa: WPS214
         self.project = project
         self._project_root_str = str(self.project.root.resolve())
         self._meltano_file = self.project.meltanofile.read_text()
-        self.environment = environment
         self.path = path
         self.check_schema = check_schema
         with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
@@ -341,7 +330,7 @@ class Manifest:  # noqa: WPS214
         manifest = self._project_files
 
         # Remove all environments other than the one this manifest is for:
-        if self.environment is None:
+        if self.project.environment is None:
             # We use a mock environment here because the rest of the code
             # expects there to be exactly one environment. It is omitted from
             # the final output, and during processing it only affects things if
@@ -351,7 +340,7 @@ class Manifest:  # noqa: WPS214
             manifest["environments"] = [
                 x
                 for x in manifest["environments"]
-                if x["name"] == self.environment.name
+                if x["name"] == self.project.environment.name
             ]
 
         apply_scaffold(manifest, self._env_locations)
