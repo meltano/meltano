@@ -80,12 +80,8 @@ def compile(  # noqa: WPS125
             if environment is None
             else f"meltano-manifest.{environment.name}.json"
         )
-        manifest = Manifest(
-            project=project,
-            environment=environment,
-            path=path,
-            check_schema=lint,
-        )
+        project.refresh(environment=environment)
+        manifest = Manifest(project=project, path=path, check_schema=lint)
         try:
             with open(path, "w") as manifest_file:
                 json.dump(

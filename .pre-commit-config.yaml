@@ -25,7 +25,7 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        exclude: (cli_messages\.py)
+        exclude: ^src/meltano/core/cli_messages\.py$
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
