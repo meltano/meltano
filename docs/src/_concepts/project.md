@@ -317,7 +317,7 @@ Annotations are supported in the following locations within `meltano.yml`:
 - At the top level
 - In a job definition
 - In a schedule definition
-- In an environments definition
+- In an environment definition
 - In a plugin definition
 - In an environment plugin definition
 - In a plugin setting definition
