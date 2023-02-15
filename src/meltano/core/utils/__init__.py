@@ -825,7 +825,7 @@ def remove_suffix(string: str, suffix: str) -> str:
     Returns:
         The changed string
     """
-    if sys.version_info > (3, 8):
+    if sys.version_info >= (3, 9):
         return string.removesuffix(suffix)
     elif string.endswith(suffix):
         return string[: -len(suffix)]
