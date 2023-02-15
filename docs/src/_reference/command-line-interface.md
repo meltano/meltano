@@ -122,6 +122,10 @@ The `add` command does not run relative to a [Meltano Environment](https://docs.
 
 ## `compile`
 
+<div class="notification is-warning">
+    <p>The compile command is currently experimental, and subject to change without corresponding semantic version updates.</p>
+</div>
+
 ### How to use
 
 Generally, the `compile` command need not be executed manually, as it will be run automatically by Meltano as-needed.
