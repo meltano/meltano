@@ -28,6 +28,7 @@ def check_indent(json_path: Path, indent: int):
     assert json.dumps(json.loads(text), indent=indent if indent > 0 else None) == text
 
 
+@pytest.mark.skip(reason="Compile command temporarily disabled")
 class TestCompile:
     @pytest.fixture
     def manifest_dir(self, project: Project) -> Path:

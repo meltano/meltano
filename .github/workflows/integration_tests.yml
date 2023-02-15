@@ -37,7 +37,8 @@ jobs:
         - { integration_test: "meltano-state-s3", needs_postgres: false}
         - { integration_test: "meltano-state-local", needs_postgres: false}
         - { integration_test: "meltano-config", needs_postgres: false}
-        - { integration_test: "meltano-manifest", needs_postgres: false}
+        # Disabled temporarily: https://github.com/meltano/meltano/issues/7306#issuecomment-1432086410
+        # - { integration_test: "meltano-manifest", needs_postgres: false}
       fail-fast: false
 
     runs-on: ubuntu-latest
