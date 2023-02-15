@@ -239,6 +239,14 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 meltano config --plugin-type=<type> <plugin> ...
 ```
 
+When setting a config value that contains the character `$`, you can avoid expansion by
+escaping it with `\` or using single quotes:
+
+```bash
+meltano config <plugin> set <name> "@\$a"
+meltano config <plugin> set <name> '@$a'
+```
+
 #### Nested properties
 
 Nested properties can be set (and unset) by specifying a list of property names:
