@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
-import types
+import sys
+import typing as t
 
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
 from structlog import get_logger
 
-from meltano import __version__
+if sys.version_info >= (3, 8):
+    from importlib.metadata import version
+else:
+    from importlib_metadata import version
+
+if t.TYPE_CHECKING:
+    import types
 
 __all__ = ["MeltanoCloudClient"]
 
@@ -111,7 +118,7 @@ class MeltanoCloudClient:
         url = f"{self.api_url}{path}"
         headers = {
             "Content-Type": "application/json",
-            "User-Agent": f"Meltano Cloud CLI/v{__version__}",
+            "User-Agent": f"Meltano Cloud CLI/v{version('meltano')}",
             "x-api-key": self.api_key,
             "meltano-runner-secret": self.runner_secret,
         }
