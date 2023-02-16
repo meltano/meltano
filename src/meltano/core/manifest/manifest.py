@@ -368,7 +368,7 @@ class Manifest:  # noqa: WPS214
             for plugin_type, plugins in manifest["plugins"].items()
         }
 
-        # XXX: Meltano shouldn't manipulate annotations, yet here we do so
+        # XXX: Meltano shouldn't manipulate annotations, yet here we do
         # because the alternative is to completely lose the environment-level
         # annotations.
         environment = next(iter(manifest["environments"]))
