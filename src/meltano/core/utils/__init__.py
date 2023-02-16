@@ -807,3 +807,22 @@ def _deep_merge(a, b, strategies):
             ):
                 break
     return base
+
+
+def remove_suffix(string: str, suffix: str) -> str:
+    """Remove suffix from string.
+
+    Compatible with Python 3.8
+
+    Args:
+        string: the string to remove suffix from
+        suffix: the suffix to remove
+
+    Returns:
+        The changed string
+    """
+    if sys.version_info >= (3, 9):
+        return string.removesuffix(suffix)
+    elif string.endswith(suffix):
+        return string[: -len(suffix)]
+    return string
