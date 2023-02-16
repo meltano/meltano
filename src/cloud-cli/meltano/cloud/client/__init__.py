@@ -8,7 +8,6 @@ from aiohttp import ClientResponse, ClientResponseError, ClientSession
 from structlog import get_logger
 
 from meltano import __version__
-from meltano.cloud.client import models
 
 __all__ = ["MeltanoCloudClient"]
 
@@ -34,18 +33,21 @@ class MeltanoCloudClient:
     Attributes:
         api_url: The API URL.
         api_key: The API key.
+        runner_secret: The runner secret.
         _session: The client session.
     """
 
-    def __init__(self, api_url: str, api_key: str) -> None:
+    def __init__(self, api_url: str, api_key: str, runner_secret: str) -> None:
         """Initialize the client.
 
         Args:
             api_url: The Cloud API URL.
             api_key: The Cloud API key.
+            runner_secret: The runner secret.
         """
         self.api_url = api_url
         self.api_key = api_key
+        self.runner_secret = runner_secret
         self._session: ClientSession | None = None
 
     async def __aenter__(self) -> MeltanoCloudClient:
@@ -110,14 +112,13 @@ class MeltanoCloudClient:
         headers = {
             "Content-Type": "application/json",
             "User-Agent": f"Meltano Cloud CLI/v{__version__}",
-            "Authorization": f"Bearer {self.api_key}",
+            "x-api-key": self.api_key,
+            "meltano-runner-secret": self.runner_secret,
         }
         logger.debug(
             "Making request",
             method=method,
             url=url,
-            headers=headers,
-            **kwargs,
         )
 
         async with self.session.request(
@@ -132,19 +133,25 @@ class MeltanoCloudClient:
                 raise MeltanoCloudError(response) from e
             return await response.json()
 
-    async def run_project(self, project_id: str, job_or_schedule: str) -> dict:
+    async def run_project(
+        self,
+        tenant_resource_key: str,
+        project_id: str,
+        environment: str,
+        job_or_schedule: str,
+    ) -> dict:
         """Run a Meltano project in Meltano Cloud.
 
         Args:
+            tenant_resource_key: The tenant resource key.
             project_id: The project identifier.
+            environment: The Meltano environment to run.
             job_or_schedule: The job or schedule identifier.
 
         Returns:
             The run details.
         """
-        run_request = models.RunRequestData(job_or_schedule_id=job_or_schedule)
         return await self._request(
             "POST",
-            f"/projects/{project_id}/runs",
-            json=run_request.dict(),
+            f"/{tenant_resource_key}/{project_id}/{environment}/{job_or_schedule}",
         )
