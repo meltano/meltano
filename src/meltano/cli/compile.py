@@ -18,9 +18,7 @@ from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent
 
 
-@cli.command(
-    cls=InstrumentedCmd, short_help="Compile a Meltano manifest. (experimental)"
-)
+@cli.command(cls=InstrumentedCmd, short_help="Compile a Meltano manifest. (beta)")
 @click.option(
     "--directory",
     default=".meltano/manifests",
@@ -58,7 +56,7 @@ def compile(  # noqa: WPS125
     """
     Compile a Meltano project into environment-specific manifest files.
 
-    This feature is experimental, and subject to change without corresponding semantic version updates.
+    This command is in beta, and subject to change without corresponding semantic version updates.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#compile
     """  # noqa: E501
