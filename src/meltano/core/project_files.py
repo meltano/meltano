@@ -100,7 +100,7 @@ class ProjectFiles:  # noqa: WPS214
 
         return self._cached_loaded
 
-    def update(self, meltano_config: dict) -> dict:
+    def update(self, meltano_config: CommentedMap) -> CommentedMap:
         """Update config by overriding current config with new, changed config.
 
         Note: `.update()` will write blank entities for those no longer in use

@@ -163,3 +163,14 @@ class TestCanonical:
         out_stream.seek(0)
         new_contents = out_stream.read()
         assert new_contents == contents
+
+    def test_annotations(self):
+        original = CommentedMap(
+            {"a": 1, "annotations": {"cloud": {"data": 123}}, "z": -1}
+        )
+        obj = Canonical.parse(original)
+        assert obj.a == 1
+        with pytest.raises(AttributeError):
+            assert obj.annotations
+        assert obj.z == -1
+        assert obj.canonical() == original
