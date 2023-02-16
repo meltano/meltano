@@ -172,7 +172,7 @@ Yes! This is a unique feature of Meltano that is not found in a comprehensive ma
 
 ### Does this work with interactive config?
 
-Yes! For each connector added to the Hub we have mapped the configuration output from the connector to our metadata spec on MeltanoHub. This means interactive configuration will work normally. Note that there was a [bug with nested config](https://github.com/meltano/meltano/issues/7132) which was address in release 2.13.0, which could affect your configuration behavior.
+Yes! For each connector added to the Hub we have mapped the configuration output from the connector to our metadata spec on MeltanoHub. This means interactive configuration will work normally. Note that there was a [bug with nested config](https://github.com/meltano/meltano/issues/7132) which was addressed in release [2.13.0](https://github.com/meltano/meltano/releases/tag/v2.13.0), which could affect your configuration behavior.
 
 ### How do I know if a bug is related to the wrapper or the Airbyte connector?
 
