@@ -85,11 +85,13 @@ Based on the current implementation and testing, the main challenge is putting t
 
 ### Am I able to put my Meltano project with Airbyte connectors in production?
 
-Yes you can!
+The short answer is: It depends where its deployed!
 
-The main potential challenge with putting this into production is if you user Docker to package and deploy your Meltano project. If you're able to set up Docker-in-docker, then a Dockerized Meltano project with tap-airbyte-wrapper will work. Since each Airbyte connector is itself a Docker image, running inside a dockerized Meltano project would require “docker in docker” which has some possible challenges around privileges and permissions on certain systems.
+The main potential challenge with putting this into production is if you use Docker to package and deploy your Meltano project. If you're able to set up Docker-in-docker, then a Dockerized Meltano project with tap-airbyte-wrapper will work as expected. Since each Airbyte connector is itself a Docker image, running inside a dockerized Meltano project would require “docker in docker” which has some possible challenges around privileges and permissions on certain systems.
 
-Within Codespaces, adding support for docker-in-docker was as easy as [adding a few lines](https://github.com/meltano/meltano-codespace-ready/commit/5ffb9fb6e3232142c8e2307340c0a4fb66379db4) to the devcontainer.json file.
+For example, AWS ECS does not support docker in docker and Meltano Cloud does not currently have plans to support container based connectors at this time either. Although a simple EC2 instance with Docker available would work as expected.
+
+Within [Github Codespaces](https://github.com/features/codespaces), adding support for docker-in-docker was as easy as [adding a few lines](https://github.com/meltano/meltano-codespace-ready/commit/5ffb9fb6e3232142c8e2307340c0a4fb66379db4) to the devcontainer.json file.
 
 It is also possible to run [Meltano on GitHub Actions](https://github.com/brooklyn-data/meltano-on-github-actions). It’s likely possible to update this action to supporting docker-in-docker as well.
 
@@ -170,7 +172,7 @@ Yes! This is a unique feature of Meltano that is not found in a comprehensive ma
 
 ### Does this work with interactive config?
 
-Yes! For each connector added to the Hub we have mapped the configuration output from the connector to our metadata spec on MeltanoHub. This means interactive configuration will work normally. Note that there is currently a [bug with nested config](https://github.com/meltano/meltano/issues/7132) which we are actively addressing. Until this is resolved we don’t recommend using interactive config for Airbyte connectors. However, updating each setting individually works as expected.
+Yes! For each connector added to the Hub we have mapped the configuration output from the connector to our metadata spec on MeltanoHub. This means interactive configuration will work normally. Note that there was a [bug with nested config](https://github.com/meltano/meltano/issues/7132) which was address in release 2.13.0, which could affect your configuration behavior.
 
 ### How do I know if a bug is related to the wrapper or the Airbyte connector?
 
@@ -199,14 +201,15 @@ Airbyte connectors are run inside Docker containers, this means they don’t aut
 
 Based on some testing the original community contributor did, we see a less than 5% drop in overall throughput for the same source run natively via Docker versus via Meltano. For most sources this is an acceptable change for the workflow gains from running these connectors in a tool that supports truly custom and decentralized sources and enables the software engineering best practices of version control, isolated run environments, and continuous integration.
 
-### When will this not be an experimental feature?
+### Is this an experimental feature?
 
-This is currently an experimental feature from Meltano’s perspective. For us to feel comfortable recommending this for long term use we’d like to see a few key milestones.
+After seeing these plugins in the wild for several weeks, hundreds of successful invocations from users in the community, and successful production use cases (e.g. [Harness](https://www.harness.io/)) we're comfortable taking these plugins out of the experimental phase.
 
-We want this to be out in the wild for several weeks with hundreds of successful invocations from our community happening. We hope the community will kick the tires on this and help improve it in the coming weeks.
-
-We’d also like to see more examples from folks who are deploying this in the wild. There are likely some corner cases that we may have not yet uncovered and we’d like help from the community to find them. That said, this integration is running in production at Harness, which is a positive early signal for us.
+We hope the community continue to test these out and push the integration further.
+Please open any issues or features requests related to the wrapper on [MeltanoLabs/tap-airbyte-wrapper](https://github.com/MeltanoLabs/tap-airbyte-wrapper).
 
 ### Will this be able to run on Meltano Cloud?
 
-We’re actively exploring this as an option. If this is something you’re interested in, please reach out to us via the [Meltano Cloud Waitlist](https://meltano.com/cloud/) or on [Slack](https://meltano.com/slack).
+We don't currently have plans for supporting Airbyte, or other container based connectors, in Meltano Cloud.
+
+If this is something you’re interested in, please reach out to us via the [Meltano Cloud Waitlist](https://meltano.com/cloud/) or on [Slack](https://meltano.com/slack).
