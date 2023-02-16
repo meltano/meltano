@@ -368,6 +368,16 @@ class Manifest:  # noqa: WPS214
             for plugin_type, plugins in manifest["plugins"].items()
         }
 
+        # XXX: Meltano shouldn't manipulate annotations, yet here we do so
+        # because the alternative is to completely lose the environment-level
+        # annotations.
+        environment = next(iter(manifest["environments"]))
+        if "annotations" in environment:
+            manifest["annotations"] = deep_merge(
+                manifest.get("annotations", {}),
+                environment["annotations"],
+            )
+
         # Everything from the selected environment has been merged into the
         # higher levels, so it can be deleted to avoid any ambiguity about
         # which fields within the manifest should be read.
