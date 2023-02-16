@@ -249,7 +249,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             raise PluginNotFoundError(namespace) from stop
 
     def find_plugins_by_mapping_name(self, mapping_name: str) -> list[ProjectPlugin]:
-        """Search for plugins with the specified mapping name present in  their mappings config.
+        """Find plugins with the specified mapping name in their mappings config.
 
         Args:
             mapping_name: The name of the mapping to find.
@@ -258,7 +258,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             The mapping plugins with the specified mapping name.
 
         Raises:
-            PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
+            PluginNotFoundError: If no mapper plugin with the specified mapping
+                name is found.
         """
         found: list[ProjectPlugin] = []
         for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPERS):

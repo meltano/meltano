@@ -1,6 +1,5 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 
-
 from __future__ import annotations
 
 import asyncio

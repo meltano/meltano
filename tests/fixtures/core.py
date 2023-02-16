@@ -463,14 +463,13 @@ def project_function(project_init_service, tmp_path: Path):
 
 
 @pytest.fixture(scope="class")
-def project_files(compatible_copy_tree, tmp_path_factory: Path):
-    with cd(tmp_path_factory.mktemp("meltano-project-files-dir")):
-        with tmp_project(
-            "a_multifile_meltano_project_core",
-            current_dir / "multifile_project",
-            compatible_copy_tree,
-        ) as project:
-            yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
+def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree):
+    with cd(tmp_path_factory.mktemp("meltano-project-files")), tmp_project(
+        "a_multifile_meltano_project_core",
+        current_dir / "multifile_project",
+        compatible_copy_tree,
+    ) as project:
+        yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
 
 
 @pytest.fixture(scope="class")
