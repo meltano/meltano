@@ -102,7 +102,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         return config_dir / "config.json"
 
     @classmethod
-    def from_config_file(cls, config_file: Path):
+    def from_config_file(cls, config_file: Path) -> MeltanoCloudConfig:
         """Initialize the configuration from a config file.
 
         Args:

@@ -119,7 +119,7 @@ class MeltanoCloudAuth:
             True if logged in, else False
         """
         return (
-            self.config.access_token
+            self.config.access_token  # type: ignore
             and self.config.id_token
             and self.get_user_info_response().ok
         )

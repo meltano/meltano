@@ -12,26 +12,20 @@ CONFIG: MeltanoCloudConfig = MeltanoCloudConfig.find()
 
 @APP.route("/")
 def callback_page():
-    """
-
-    Args:
-
+    """Serve the barebones page for localhost redirect.
 
     Returns:
-
+        Rendered callback page.
     """
     return render_template("callback_page.html", port=CONFIG.auth_callback_port)
 
 
 @APP.route("/tokens")
 def handle_tokens():
-    """
-
-    Args:
-
+    """Parse tokens from query params and write to config.
 
     Returns:
-
+        Empty response with 204
     """
     args = request.args
     CONFIG.id_token = args["id_token"]
