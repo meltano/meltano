@@ -1,0 +1,40 @@
+"""Minimal HTTP app for handling OAuth callbacks."""
+from __future__ import annotations
+
+from flask import Flask, render_template, request
+
+from meltano.cloud.api.config import MeltanoCloudConfig
+
+APP = Flask(__name__)
+
+CONFIG: MeltanoCloudConfig = MeltanoCloudConfig.find()
+
+
+@APP.route("/")
+def callback_page():
+    """
+
+    Args:
+
+
+    Returns:
+
+    """
+    return render_template("callback_page.html", port=CONFIG.auth_callback_port)
+
+
+@APP.route("/tokens")
+def handle_tokens():
+    """
+
+    Args:
+
+
+    Returns:
+
+    """
+    args = request.args
+    CONFIG.id_token = args["id_token"]
+    CONFIG.access_token = args["access_token"]
+    CONFIG.write_to_file()
+    return "", 204
