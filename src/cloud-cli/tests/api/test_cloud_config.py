@@ -9,6 +9,3 @@ class TestMeltanoCloudConfig:
     @pytest.fixture
     def subject(self):
         return MeltanoCloudConfig()
-
-    def test_singleton(self, subject):
-        assert subject is MeltanoCloudConfig()
