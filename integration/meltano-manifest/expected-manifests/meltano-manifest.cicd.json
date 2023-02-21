@@ -1,4 +1,43 @@
 {
+  "annotations": {
+    "airflow": {
+      "environment-cicd-key3": true,
+      "environment-cicd-key4": {
+        "environment-cicd-key5": {},
+        "environment-cicd-key6": [
+          "environment",
+          "list",
+          "values"
+        ]
+      },
+      "environment-cicd-key7": [
+        {
+          "environment-cicd-key8": {}
+        },
+        null
+      ],
+      "key3": true,
+      "key4": {
+        "key5": {},
+        "key6": [
+          "list",
+          "values"
+        ]
+      },
+      "key7": [
+        {
+          "key8": {}
+        },
+        null
+      ]
+    },
+    "meltano.cloud": {
+      "environment-cicd-key1": "environment-cicd-value1",
+      "environment-cicd-key2": "environment-cicd-value2",
+      "key1": "overwrite-key-1",
+      "key2": "value2"
+    }
+  },
   "default_environment": "userdev",
   "env": {
     "AIRFLOW_VAR_OPERATOR_TYPE": "bash",
@@ -1400,6 +1439,29 @@
     "files": [],
     "loaders": [
       {
+        "annotations": {
+          "airflow": {
+            "loader-key3": true,
+            "loader-key4": {
+              "loader-key5": {},
+              "loader-key6": [
+                "loader",
+                "list",
+                "values"
+              ]
+            },
+            "loader-key7": [
+              {
+                "loader-key8": {}
+              },
+              null
+            ]
+          },
+          "meltano.cloud": {
+            "loader-key1": "loader-value1",
+            "loader-key2": "loader-value2"
+          }
+        },
         "capabilities": [
           "about",
           "stream-maps"

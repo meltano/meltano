@@ -1,5 +1,18 @@
 environments:
 - name: cicd
+  annotations:
+    meltano.cloud:
+      key1: overwrite-key-1
+      environment-cicd-key1: environment-cicd-value1
+      environment-cicd-key2: environment-cicd-value2
+    airflow:
+      environment-cicd-key3: true
+      environment-cicd-key4:
+        environment-cicd-key5: {}
+        environment-cicd-key6: ["environment", "list", "values"]
+      environment-cicd-key7:
+      - environment-cicd-key8: {}
+      - null
   config:
     plugins:
       extractors:

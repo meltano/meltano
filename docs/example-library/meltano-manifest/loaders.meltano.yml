@@ -1,6 +1,18 @@
 plugins:
   loaders:
   - name: target-yaml
+    annotations:
+      meltano.cloud:
+        loader-key1: loader-value1
+        loader-key2: loader-value2
+      airflow:
+        loader-key3: true
+        loader-key4:
+          loader-key5: {}
+          loader-key6: ["loader", "list", "values"]
+        loader-key7:
+        - loader-key8: {}
+        - null
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/target-yaml.git@20f37a2ae5a85125fed36a733afab179d0bc8a70
     config:
