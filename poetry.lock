@@ -2593,7 +2593,7 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.12"
-content-hash = "c9375c019dd2f762c0800f5d3b032844d06cee2d2d4e5689141b0893a37ddd1b"
+content-hash = "91843cdbb6f04e0e5d47af0ac62182733a4aa0bfd2c580386f04021354e4e451"
 
 [metadata.files]
 aiodocker = [
