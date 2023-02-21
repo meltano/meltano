@@ -18,8 +18,7 @@ from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent
 
 
-# FIXME: Should this command be named `manifest` instead of `compile`?
-@cli.command(cls=InstrumentedCmd, short_help="Compile a Meltano manifest.")
+@cli.command(cls=InstrumentedCmd, short_help="Compile a Meltano manifest. (beta)")
 @click.option(
     "--directory",
     default=".meltano/manifests",
@@ -57,8 +56,10 @@ def compile(  # noqa: WPS125
     """
     Compile a Meltano project into environment-specific manifest files.
 
+    This command is in beta, and subject to change without corresponding semantic version updates.
+
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#compile
-    """
+    """  # noqa: E501
     tracker: Tracker = ctx.obj["tracker"]
 
     try:
