@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### ✨ New
 
 - [#7287](https://github.com/meltano/meltano/issues/7287) Add support for `annotations` to provide documentation and 3rd-party configurations in `meltano.yml`
-- [#7148](https://github.com/meltano/meltano/issues/7148) Meltano manifest
+- [#7148](https://github.com/meltano/meltano/issues/7148) Add the `meltano compile` command to generate Meltano manifest files
 
 ### 🐛 Fixes
 
