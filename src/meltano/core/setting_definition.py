@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import ast
 import json
-from collections.abc import Mapping, Sequence
 import typing as t
+from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
 
