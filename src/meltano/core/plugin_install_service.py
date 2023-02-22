@@ -7,6 +7,7 @@ import functools
 import logging
 import os
 import sys
+from dataclasses import dataclass
 from enum import Enum
 from multiprocessing import cpu_count
 from typing import Any, Callable, Iterable, Mapping
@@ -53,52 +54,42 @@ class PluginInstallStatus(Enum):
     WARNING = "warning"
 
 
+@dataclass(frozen=True)
 class PluginInstallState:
-    """A message reporting the progress of installing a plugin."""
+    """A message reporting the progress of installing a plugin.
 
-    def __init__(
-        self,
-        plugin: ProjectPlugin,
-        reason: PluginInstallReason,
-        status: PluginInstallStatus,
-        message: str | None = None,
-        details: str | None = None,
-    ):
-        """Initialize PluginInstallState instance.
+    plugin: Plugin related to this install state.
+    reason: Reason for plugin install.
+    status: Status of plugin install.
+    message: Formatted install state message.
+    details: Extra details relating to install (including error details if failed).
+    """
 
-        Args:
-            plugin: Plugin related to this install state.
-            reason: Reason for plugin install.
-            status: Status of plugin install.
-            message: Formatted install state message.
-            details: Extra details relating to install (including error details if failed).
-        """
-        # TODO: use dataclasses.dataclass for this when 3.6 support is dropped
-        self.plugin = plugin
-        self.reason = reason
-        self.status = status
-        self.message = message
-        self.details = details
+    plugin: ProjectPlugin
+    reason: PluginInstallReason
+    status: PluginInstallStatus
+    message: str | None = None
+    details: str | None = None
 
-    @property
+    @cached_property
     def successful(self):
         """Plugin install success status.
 
         Returns:
-            'True' if plugin install successful.
+            `True` if plugin install successful.
         """
         return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
-    @property
+    @cached_property
     def skipped(self):
         """Plugin install skipped status.
 
         Returns:
-            'True' if the installation was skipped / not needed.
+            `True` if the installation was skipped / not needed.
         """
         return self.status == PluginInstallStatus.SKIPPED
 
-    @property
+    @cached_property
     def verb(self) -> str:
         """Verb form of status.
 

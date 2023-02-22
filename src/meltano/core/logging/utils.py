@@ -6,7 +6,6 @@ import asyncio
 import logging
 import os
 import sys
-from contextlib import suppress
 from logging import config as logging_config
 
 import structlog
@@ -204,9 +203,7 @@ async def _write_line_writer(writer, line):
             writer.write(line)
             await writer.drain()
         except (BrokenPipeError, ConnectionResetError):
-            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
-                await writer.wait_closed()
-
+            await writer.wait_closed()
             return False
     else:
         writer.writeline(line.decode())
