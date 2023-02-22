@@ -406,7 +406,7 @@ class SettingDefinition(NameEq, Canonical):
             raise parse_error
         return parsed
 
-    def cast_value(self, value: t.Any) -> t.Any:
+    def cast_value(self, value: t.Any) -> t.Any:  # noqa: C901
         """Cast given value.
 
         Args:
