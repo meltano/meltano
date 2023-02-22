@@ -238,7 +238,7 @@ class SettingsStoreManager(ABC):
         self,
         name: str,
         path: list[str],
-        value: t.t.Any,
+        value: t.Any,
         setting_def: SettingDefinition | None = None,
     ) -> None:
         """Unimplemented set method.

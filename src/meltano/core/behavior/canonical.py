@@ -18,7 +18,7 @@ T = t.TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
 class IdHashBox:
     """Wrapper class that makes the hash of an object its Python ID."""
 
-    def __init__(self, content: t.t.Any):
+    def __init__(self, content: t.Any):
         """Initialize the `IdHashBox`.
 
         Parameters:

@@ -10,8 +10,8 @@ from functools import singledispatch
 
 from meltano.core.behavior.visitor import visit_with
 
-Node = t.t.Dict[str, t.t.Any]
-T = t.t.TypeVar("T", bound="CatalogRule")
+Node = t.Dict[str, t.Any]
+T = t.TypeVar("T", bound="CatalogRule")
 
 
 class CatalogRule:
