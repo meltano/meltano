@@ -424,12 +424,12 @@ class SettingDefinition(NameEq, Canonical):
                 return int(value)
             elif self.kind == SettingKind.OBJECT:
                 value = dict(
-                    self._parse_value(value, "object", Mapping),
-                )  # type: ignore
+                    self._parse_value(value, "object", Mapping),  # type: ignore
+                )
             elif self.kind == SettingKind.ARRAY:
                 value = list(
-                    self._parse_value(value, "array", Sequence),
-                )  # type: ignore
+                    self._parse_value(value, "array", Sequence),  # type: ignore
+                )
 
         processor = self.value_processor
         if value is not None and processor:
