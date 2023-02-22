@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 
 import click
 import structlog
@@ -18,7 +18,7 @@ from meltano.core.plugin_lock_service import (
 from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 

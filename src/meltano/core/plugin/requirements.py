@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TypeVar
+import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 
-TReq = TypeVar("TReq", bound="PluginRequirement")
+TReq = t.TypeVar("TReq", bound="PluginRequirement")
 
 
 class PluginRequirement(NameEq, Canonical):

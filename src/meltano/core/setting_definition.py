@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Iterable
 
 from ruamel.yaml import Representer
 
@@ -101,7 +101,7 @@ class YAMLEnum(str, Enum):
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
     @classmethod
-    def to_yaml(cls, representer: Representer, node: Any):
+    def to_yaml(cls, representer: Representer, node: t.Any):
         """Represent as yaml.
 
         Args:
@@ -231,7 +231,7 @@ class SettingDefinition(NameEq, Canonical):
         return f"<SettingDefinition {self.name} ({self.kind})>"
 
     @classmethod
-    def from_missing(cls, defs: Iterable[SettingDefinition], config: dict, **kwargs):
+    def from_missing(cls, defs: t.Iterable[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
 
         Args:
@@ -257,9 +257,9 @@ class SettingDefinition(NameEq, Canonical):
     def from_key_value(
         cls,
         key: str,
-        value: Any,
+        value: t.Any,
         custom: bool = True,
-        default: Any | bool = False,
+        default: t.Any | bool = False,
     ):
         """Create SettingDefinition instance from key-value pair.
 
@@ -349,11 +349,11 @@ class SettingDefinition(NameEq, Canonical):
                 env_keys.extend(utils.to_env_var(prefix, alias) for prefix in prefixes)
 
         if include_custom:
-            env_keys.extend(env for env in self.env_aliases)
+            env_keys.extend(self.env_aliases)
 
         return [EnvVar(key) for key in utils.uniques_in(env_keys)]
 
-    def cast_value(self, value: Any) -> Any:
+    def cast_value(self, value: t.Any) -> t.Any:  # noqa: C901
         """Cast given value.
 
         Args:
@@ -389,7 +389,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def post_process_value(self, value: Any) -> Any:
+    def post_process_value(self, value: t.Any) -> t.Any:
         """Post-process given value.
 
         Args:
@@ -407,7 +407,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def stringify_value(self, value: Any) -> str:
+    def stringify_value(self, value: t.Any) -> str:
         """Return value in string form.
 
         Args:

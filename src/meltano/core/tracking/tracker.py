@@ -8,13 +8,13 @@ import locale
 import os
 import re
 import sys
+import typing as t
 import uuid
 from collections.abc import Mapping
 from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NamedTuple
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -33,7 +33,7 @@ from meltano.core.tracking.schemas import (
 )
 from meltano.core.utils import format_exception
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.tracking.contexts import (  # noqa: F401
         CliEvent,
         EnvironmentContext,
@@ -76,7 +76,7 @@ def check_url(url: str) -> bool:
     return bool(re.match(URL_REGEX, url))
 
 
-class TelemetrySettings(NamedTuple):
+class TelemetrySettings(t.NamedTuple):
     """Settings which control telemetry and anonymous usage stats.
 
     These are stored within `analytics.json`.
@@ -431,7 +431,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
     def _uuid_from_str(
         self,
-        from_val: Any | None,
+        from_val: t.Any | None,
         warn: bool,  # noqa: WPS442
     ) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.

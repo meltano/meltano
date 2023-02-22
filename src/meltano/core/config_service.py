@@ -5,8 +5,8 @@ from __future__ import annotations
 import logging
 import os
 import sys
+import typing as t
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
 
 import yaml
 
@@ -19,7 +19,7 @@ if sys.version_info >= (3, 8):
 else:
     from cached_property import cached_property
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)

@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 import logging
 import os
-from collections import Counter
+import typing as t
+from collections import Counter, abc
 from copy import deepcopy
 from http import HTTPStatus
-from typing import Any, Mapping
 
 import pytest
 import requests
@@ -72,8 +72,7 @@ class MockAdapter(BaseAdapter):
             hub[index_key] = {}
             for plugin in discovery.get(plugin_type, []):
                 plugin_name = plugin["name"]
-                hub[index_key][plugin_name] = {}
-                hub[index_key][plugin_name]["variants"] = {}
+                hub[index_key][plugin_name] = {"variants": {}}
                 default_variant = None
 
                 variants = plugin.pop("variants", [])
@@ -158,8 +157,8 @@ class MockAdapter(BaseAdapter):
         stream: bool = False,
         timeout: float | tuple[float, float] | tuple[float, None] | None = None,
         verify: bool | str = True,
-        cert: Any | None = None,
-        proxies: Mapping[str, str] | None = None,
+        cert: t.Any | None = None,
+        proxies: abc.Mapping[str, str] | None = None,
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
 

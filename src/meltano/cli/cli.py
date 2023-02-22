@@ -5,8 +5,8 @@ from __future__ import annotations
 import logging
 import os
 import sys
+import typing as t
 from pathlib import Path
-from typing import NoReturn
 
 import click
 
@@ -33,7 +33,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(self, *args, **kwargs) -> NoReturn:
+    def main(self, *args, **kwargs) -> t.NoReturn:
         """Invoke the Click CLI with Windows globbing disabled.
 
         Args:

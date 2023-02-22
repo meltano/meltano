@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any
 
 import click
 import requests
@@ -24,7 +24,7 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_discovery_service import PluginRepository
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = get_logger(__name__)
@@ -47,9 +47,9 @@ class HubPluginTypeNotFoundError(Exception):
         Returns:
             The string representation of the error.
         """
-        return "{type} is not supported in Meltano Hub. Available plugin types: {types}".format(
-            type=self.plugin_type.descriptor.capitalize(),
-            types=PluginType.plurals(),
+        return (
+            f"{self.plugin_type.descriptor.capitalize()} is not supported in "
+            f"Meltano Hub. Available plugin types: {PluginType.plurals()}"
         )
 
 
@@ -92,11 +92,10 @@ class HubPluginVariantNotFoundError(Exception):
         Returns:
             The string representation of the error.
         """
-        return "{type} '{name}' variant '{variant}' is not known to Meltano. Variants: {variant_labels}".format(
-            type=self.plugin_type.descriptor.capitalize(),
-            name=self.plugin.name,
-            variant=self.variant_name,
-            variant_labels=self.plugin.variant_labels,
+        return (
+            f"{self.plugin_type.descriptor.capitalize()} '{self.plugin.name}' "
+            f"variant '{self.variant_name}' is not known to Meltano. "
+            f"Variants: {self.plugin.variant_labels}"
         )
 
 
@@ -357,7 +356,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
                 raise HubPluginTypeNotFoundError(plugin_type) from err
             raise HubConnectionError(err.response.reason) from err
 
-        plugins: dict[str, dict[str, Any]] = response.json()
+        plugins: dict[str, dict[str, t.Any]] = response.json()
         return {
             name: IndexedPlugin(
                 name,

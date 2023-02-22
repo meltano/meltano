@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import typing as t
 from asyncio.streams import StreamReader
 from asyncio.subprocess import Process
 from enum import Enum
-from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
@@ -24,8 +24,8 @@ class MeltanoError(Exception):
         self,
         reason: str,
         instruction: str | None = None,
-        *args: Any,
-        **kwargs: Any,
+        *args: t.Any,
+        **kwargs: t.Any,
     ) -> None:
         """Initialize a MeltanoError.
 

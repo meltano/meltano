@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Any
+import typing as t
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
@@ -194,7 +194,7 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
         self.plugin.config_with_extras = config_with_extras
         self.project.plugins.update_plugin(self.plugin)
 
-    def update_meltano_environment_config(self, config_with_extras: dict[str, Any]):
+    def update_meltano_environment_config(self, config_with_extras: dict[str, t.Any]):
         """Update environment configuration in `meltano.yml`.
 
         Args:

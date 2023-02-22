@@ -1,13 +1,14 @@
 """Module for managing settings."""
+
 from __future__ import annotations
 
 import logging
 import os
+import typing as t
 import warnings
 from abc import ABCMeta, abstractmethod
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from enum import Enum
-from typing import TYPE_CHECKING, Generator, Iterable
 
 from meltano.core.setting_definition import (
     SettingDefinition,
@@ -19,7 +20,7 @@ from meltano.core.utils import EnvVarMissingBehavior
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import flatten
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
@@ -326,11 +327,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         Returns:
             a tuple of the setting value and metadata
         """
-        try:
+        with suppress(SettingMissingError):
             setting_def = setting_def or self.find_setting(name)
-        except SettingMissingError:
-            pass
-
         if setting_def:
             name = setting_def.name
 
@@ -558,16 +556,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         Returns:
             the metadata for the setting
         """
-        metadata = {"store": store}
-
-        manager = store.manager(self, **kwargs)
-        reset_metadata = manager.reset()
-        metadata.update(reset_metadata)
-
+        metadata = {"store": store, **store.manager(self, **kwargs).reset()}
         self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self, extras=None) -> Iterable[dict]:
+    def definitions(self, extras=None) -> t.Iterable[dict]:
         """Return setting definitions along with extras.
 
         Args:
@@ -650,7 +643,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     @contextmanager
     def feature_flag(
         self, feature: str, raise_error: bool = True
-    ) -> Generator[bool, None, None]:
+    ) -> t.Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 
         Args:

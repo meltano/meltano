@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import platform
+import typing as t
 from enum import Enum
-from typing import Mapping
 from urllib.parse import urlparse
 
 from sqlalchemy.orm import Session
@@ -45,7 +45,7 @@ class StateBackend(str, Enum):
     @property
     def _managers(
         self,
-    ) -> Mapping[str, type[StateStoreManager]]:
+    ) -> t.Mapping[str, type[StateStoreManager]]:
         """Get mapping of StateBackend to associated StateStoreManager.
 
         Returns:

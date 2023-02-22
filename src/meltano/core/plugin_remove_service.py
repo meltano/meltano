@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+import typing as t
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
@@ -29,7 +29,7 @@ class PluginRemoveService:
 
     def remove_plugins(
         self,
-        plugins: Sequence[ProjectPlugin],
+        plugins: t.Sequence[ProjectPlugin],
         plugin_status_cb=noop,
         removal_manager_status_cb=noop,
     ) -> tuple[int, int]:

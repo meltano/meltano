@@ -6,9 +6,9 @@ import asyncio
 import json
 import logging
 import tempfile
+import typing as t
 from functools import wraps
 from pathlib import Path
-from typing import Any
 
 import click
 import dotenv
@@ -36,7 +36,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 logger = logging.getLogger(__name__)
 
 
-def _get_ctx_arg(*args: Any) -> click.core.Context:
+def _get_ctx_arg(*args: t.Any) -> click.core.Context:
     """Get the click.core.Context arg from a set of args.
 
     Args:
@@ -341,7 +341,7 @@ def reset(ctx, store):
 def set_(
     ctx: click.core.Context,
     setting_name: tuple[str, ...],
-    value: Any,
+    value: t.Any,
     store: str,
     interactive: bool,
 ):
