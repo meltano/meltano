@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Iterable, TypeVar
+import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -13,7 +13,7 @@ from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound
 
-TEnv = TypeVar("TEnv", bound="Environment")
+TEnv = t.TypeVar("TEnv", bound="Environment")
 
 
 class NoActiveEnvironment(Exception):  # noqa: N818
@@ -79,7 +79,7 @@ class EnvironmentPluginConfig(PluginRef):
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
-    def config_with_extras(self, new_config_with_extras: dict[str, Any]):
+    def config_with_extras(self, new_config_with_extras: dict[str, t.Any]):
         """Set plugin configuration values from the Meltano environment.
 
         Args:
@@ -95,7 +95,7 @@ class EnvironmentPluginConfig(PluginRef):
                 self.config[key] = value
 
     def get_orphan_settings(
-        self, existing: Iterable[SettingDefinition]
+        self, existing: t.Iterable[SettingDefinition]
     ) -> list[SettingDefinition]:
         """Get orphan settings for this plugin.
 
@@ -180,7 +180,7 @@ class Environment(NameEq, Canonical):
         self.state_id_suffix = state_id_suffix
 
     @classmethod
-    def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
+    def find(cls: type[TEnv], objects: t.Iterable[TEnv], name: str) -> TEnv:
         """Lookup an environment by name from an iterable.
 
         Args:

@@ -3,12 +3,12 @@ from __future__ import annotations
 import json
 import logging
 import subprocess
+import typing as t
 import uuid
 from contextlib import contextmanager, suppress
 from http import server as server_lib
 from threading import Thread
 from time import sleep
-from typing import TYPE_CHECKING, Any
 
 import mock
 import pytest
@@ -23,11 +23,11 @@ from meltano.core.tracking.contexts.project import ProjectContext
 from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from fixtures.docker import SnowplowMicro
 
 
-def load_analytics_json(project: Project) -> dict[str, Any]:
+def load_analytics_json(project: Project) -> dict[str, t.Any]:
     with open(project.meltano_dir() / "analytics.json") as analytics_json_file:
         return json.load(analytics_json_file)
 

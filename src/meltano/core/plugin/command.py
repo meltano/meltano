@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import shlex
-from typing import TypeVar
+import typing as t
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.container.container_spec import ContainerSpec
 from meltano.core.error import Error
 from meltano.core.utils import expand_env_vars
 
-TCommand = TypeVar("TCommand")
+TCommand = t.TypeVar("TCommand")
 
 
 class UndefinedEnvVarError(Error):

@@ -7,6 +7,7 @@ import json
 import re
 import subprocess
 import sys
+import typing as t
 from collections import defaultdict
 from collections.abc import Iterable
 from contextlib import suppress
@@ -14,12 +15,15 @@ from functools import reduce
 from operator import getitem
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict, List, Mapping, MutableMapping, cast
 
 import flatten_dict  # type: ignore
 import structlog
 import yaml
-from typing_extensions import TypeAlias
+
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
 
 from meltano import __file__ as package_root_path
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
@@ -59,9 +63,9 @@ MANIFEST_SCHEMA_PATH = (
     Path(package_root_path).parent / "schemas" / "meltano.schema.json"
 )
 
-Trie: TypeAlias = Dict[str, "Trie"]  # type: ignore
-PluginsByType: TypeAlias = Mapping[str, List[Mapping[str, Any]]]
-PluginsByNameByType: TypeAlias = Mapping[str, Mapping[str, Mapping[str, Any]]]
+Trie: TypeAlias = t.Dict[str, "Trie"]  # type: ignore
+PluginsByType: TypeAlias = t.Mapping[str, t.List[t.Mapping[str, t.Any]]]
+PluginsByNameByType: TypeAlias = t.Mapping[str, t.Mapping[str, t.Mapping[str, t.Any]]]
 
 
 # Ruamel doesn't have this problem where YAML tags like timestamps are
@@ -142,7 +146,7 @@ class Manifest:  # noqa: WPS214
     def _validate_against_manifest_schema(
         instance_name: str,
         instance_path: Path,
-        instance_data: dict[str, Any],
+        instance_data: dict[str, t.Any],
     ) -> None:
         with NamedTemporaryFile(suffix=".json") as schema_instance_file:
             schema_instance_file.write(json.dumps(instance_data).encode())
@@ -170,7 +174,7 @@ class Manifest:  # noqa: WPS214
                 )
 
     @cached_property
-    def _project_files(self) -> dict[str, Any]:
+    def _project_files(self) -> dict[str, t.Any]:
         project_files = flatten_dict.unflatten(
             deep_merge(
                 yaml.load(  # noqa: S506
@@ -191,10 +195,10 @@ class Manifest:  # noqa: WPS214
         return project_files
 
     def _merge_plugin_lockfiles(
-        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, Any]
+        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, t.Any]
     ) -> None:
-        locked_plugins = cast(
-            Dict[str, List[Mapping[str, Any]]],
+        locked_plugins = t.cast(
+            t.Dict[str, t.List[t.Mapping[str, t.Any]]],
             {
                 plugin_type.value: [
                     PluginLock(self.project, plugin).load(create=True, loader=json.load)
@@ -210,7 +214,7 @@ class Manifest:  # noqa: WPS214
             _plugins_by_name_by_type(locked_plugins),
         )
 
-    def sanitize_env_vars(self, env: Mapping[str, str]) -> dict[str, str]:
+    def sanitize_env_vars(self, env: t.Mapping[str, str]) -> dict[str, str]:
         """Sanitize environment variables.
 
         Sanitization is perfomed by:
@@ -231,10 +235,10 @@ class Manifest:  # noqa: WPS214
 
     def env_aware_merge_mappings(
         self,
-        data: MutableMapping[str, Any],
+        data: t.MutableMapping[str, t.Any],
         key: str,
-        value: Any,
-        _: tuple[Any, ...] | None = None,
+        value: t.Any,
+        _: tuple[t.Any, ...] | None = None,
     ) -> None:
         """Merge behavior for `deep_merge` that expands env vars when the key is "env".
 
@@ -261,7 +265,7 @@ class Manifest:  # noqa: WPS214
         )
 
     def _merge_env_vars(
-        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, Any]
+        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, t.Any]
     ) -> None:
         # Merge env vars derived from project settings:
         self.env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
@@ -315,7 +319,7 @@ class Manifest:  # noqa: WPS214
         self.env_aware_merge_mappings(manifest, "env", environment["env"])
 
     @cached_property
-    def data(self) -> dict[str, Any]:
+    def data(self) -> dict[str, t.Any]:
         """Generate the manifest data.
 
         The data is generated when this property is first accessed, then cached
@@ -417,7 +421,9 @@ def _locations_trie(paths: Iterable[Iterable[str]]) -> Trie:
     return json.loads(json.dumps(root))
 
 
-def _apply_scaffold(trie: Trie, manifest_component: dict[str, Any] | list[Any]) -> None:
+def _apply_scaffold(
+    trie: Trie, manifest_component: dict[str, t.Any] | list[t.Any]
+) -> None:
     for key, sub_trie in trie.items():
         if key == "[]":
             if not isinstance(manifest_component, list):
@@ -439,7 +445,7 @@ def _apply_scaffold(trie: Trie, manifest_component: dict[str, Any] | list[Any]) 
             )
 
 
-def apply_scaffold(manifest: dict[str, Any], locations: Iterable[str]) -> None:
+def apply_scaffold(manifest: dict[str, t.Any], locations: Iterable[str]) -> None:
     """Update the provided manifest dict with dicts/lists at the provided locations.
 
     Args:

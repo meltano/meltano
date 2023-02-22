@@ -6,10 +6,10 @@ import asyncio
 import enum
 import logging
 import os
+import typing as t
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Generator
 
 from structlog.stdlib import get_logger
 
@@ -127,7 +127,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self,
         project: Project,
         plugin: ProjectPlugin,
-        context: Any | None = None,
+        context: t.Any | None = None,
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
         config_dir: Path | None = None,
@@ -388,7 +388,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def Popen_options(self) -> dict[str, Any]:  # noqa: N802
+    def Popen_options(self) -> dict[str, t.Any]:  # noqa: N802
         """Get options for subprocess.Popen.
 
         Returns:
@@ -401,10 +401,10 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self,
         *args: str,
         require_preparation: bool = True,
-        env: dict[str, Any] | None = None,
+        env: dict[str, t.Any] | None = None,
         command: str | None = None,
         **kwargs,
-    ) -> Generator[list[str], dict[str, Any], dict[str, Any]]:  # noqa: WPS221
+    ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:  # noqa: WPS221
         env = env or {}
 
         if require_preparation and not self._prepared:

@@ -5,12 +5,12 @@ from __future__ import annotations
 import os
 import platform
 import sys
+import typing as t
 import uuid
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterable
 from warnings import warn
 
 import psutil
@@ -53,7 +53,7 @@ class EnvironmentContext(SelfDescribingJson):
     notable_flag_env_vars = {"CODESPACES", *ci_markers}
 
     @classmethod
-    def _notable_flag_env_vars(cls) -> Iterable[str]:
+    def _notable_flag_env_vars(cls) -> t.Iterable[str]:
         for env_var_name in cls.notable_flag_env_vars:
             with suppress(KeyError):  # Skip unset env vars
                 env_var_value = os.environ[env_var_name]
@@ -83,7 +83,7 @@ class EnvironmentContext(SelfDescribingJson):
         )
 
     @cached_property
-    def system_info(self) -> dict[str, Any]:
+    def system_info(self) -> dict[str, t.Any]:
         """Get system information.
 
         Returns:
@@ -120,7 +120,7 @@ class EnvironmentContext(SelfDescribingJson):
         return f"{datetime.utcfromtimestamp(process.create_time()).isoformat()}Z"
 
     @cached_property
-    def process_info(self) -> dict[str, Any]:
+    def process_info(self) -> dict[str, t.Any]:
         """Obtain the process information for the current process.
 
         Returns:

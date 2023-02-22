@@ -3,15 +3,15 @@ from __future__ import annotations
 import fnmatch
 import logging
 import re
+import typing as t
 from collections import OrderedDict
 from enum import Enum, auto
 from functools import singledispatch
-from typing import Any, Dict, Iterable, NamedTuple, TypeVar
 
 from meltano.core.behavior.visitor import visit_with
 
-Node = Dict[str, Any]
-T = TypeVar("T", bound="CatalogRule")
+Node = t.t.Dict[str, t.t.Any]
+T = t.t.TypeVar("T", bound="CatalogRule")
 
 
 class CatalogRule:
@@ -95,7 +95,7 @@ class SchemaRule(CatalogRule):
         self.payload = payload
 
 
-class SelectPattern(NamedTuple):
+class SelectPattern(t.NamedTuple):
     """A pattern for selecting streams and properties."""
 
     stream_pattern: str
@@ -139,7 +139,7 @@ class SelectPattern(NamedTuple):
         )
 
 
-def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
+def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select` patterns.
 
     Args:
@@ -184,7 +184,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     return include_rules + exclude_rules
 
 
-def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
+def select_filter_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select_filter` patterns.
 
     Args:
@@ -434,7 +434,7 @@ class MetadataExecutor(CatalogExecutor):
                 node["metadata"], f"{path}.metadata", rule.key, rule.value
             )
 
-    def set_metadata(self, node: Node, path: str, key: str, value: Any):
+    def set_metadata(self, node: Node, path: str, key: str, value: t.Any):
         """Set selection and inclusion keys in a metadata node."""
         # Unsupported fields cannot be selected
         if (
@@ -460,7 +460,7 @@ class SchemaExecutor(CatalogExecutor):
 
     def ensure_property(self, breadcrumb: list[str]):  # noqa: WPS231
         """Create nodes for the breadcrumb and schema extra that matches."""
-        next_node: dict[str, Any] = self._stream["schema"]
+        next_node: dict[str, t.Any] = self._stream["schema"]
 
         for idx, key in enumerate(breadcrumb):
             # If the key contains shell-style wildcards,
@@ -532,7 +532,7 @@ class ListExecutor(CatalogExecutor):
         self.properties[stream].add(prop)
 
 
-class SelectedNode(NamedTuple):
+class SelectedNode(t.NamedTuple):
     """Selection type and key of a node."""
 
     key: str
@@ -573,7 +573,7 @@ class ListSelectedExecutor(CatalogExecutor):
             A proper `SelectionType` given the inclusion and selection metadata.
         """
         try:
-            metadata: dict[str, Any] = node["metadata"]
+            metadata: dict[str, t.Any] = node["metadata"]
         except KeyError:
             return SelectionType.EXCLUDED
 

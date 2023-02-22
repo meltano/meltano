@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import enum
 import sys
+import typing as t
 from contextlib import contextmanager, suppress
-from typing import TYPE_CHECKING, Generator
 
 import structlog
 
@@ -26,7 +26,7 @@ if sys.version_info >= (3, 8):
 else:
     from cached_property import cached_property
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -72,7 +72,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self._prefer_source = None
 
     @contextmanager
-    def disallow_discovery_yaml(self) -> Generator[None, None, None]:
+    def disallow_discovery_yaml(self) -> t.Generator[None, None, None]:
         """Disallow the discovery yaml from being used.
 
         This is useful when you want to add a plugin to the project without
@@ -328,7 +328,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             for plugin_type in PluginType
         }
 
-    def plugins(self, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:
+    def plugins(self, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:
         """Return all plugins.
 
         Args:
