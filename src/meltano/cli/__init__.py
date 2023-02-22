@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import sys
-from typing import TYPE_CHECKING, NoReturn
+import typing as t
 
 from meltano.cli.utils import CliError
 from meltano.core.error import MeltanoError, ProjectReadonly
@@ -42,7 +42,7 @@ from meltano.cli import (  # isort:skip # noqa: WPS235
     job,
 )
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 
@@ -64,7 +64,7 @@ join our friendly Slack community.
 """
 
 
-def handle_meltano_error(error: MeltanoError) -> NoReturn:
+def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
     """Handle a MeltanoError.
 
     Args:

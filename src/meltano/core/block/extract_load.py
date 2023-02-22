@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import typing as t
 from contextlib import asynccontextmanager, closing
 from pathlib import Path
-from typing import AsyncIterator
 
 import structlog
 from sqlalchemy.orm import Session
@@ -320,10 +320,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Returns:
             bool indicating whether BlockSet has 'state' capability
         """
-        for block in self.blocks:
-            if block.has_state:
-                return True
-        return False
+        return any(block.has_state for block in self.blocks)
 
     @property
     def state_service(self) -> StateService:
@@ -541,7 +538,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> AsyncIterator[None]:
+    async def _start_blocks(self) -> t.AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Yields:

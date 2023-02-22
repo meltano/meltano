@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
 from collections import namedtuple
-from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -21,7 +21,7 @@ class PluginContext(
 ):
     """Plugin Context container."""
 
-    def __getattr__(self, attr: str) -> Any:
+    def __getattr__(self, attr: str) -> t.Any:
         """Get plugin attribute.
 
         Args:
@@ -32,7 +32,7 @@ class PluginContext(
         """
         return getattr(self.plugin, attr)
 
-    def get_config(self, name: str, **kwargs: Any) -> Any:
+    def get_config(self, name: str, **kwargs: t.Any) -> t.Any:
         """Get plugin config by name.
 
         Args:

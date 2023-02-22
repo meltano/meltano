@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import cast
+import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -105,8 +105,8 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         if self.job:
             raise NotImplementedError
         return [
-            cast(str, self.extractor),
-            cast(str, self.loader),
+            t.cast(str, self.extractor),
+            t.cast(str, self.loader),
             f"--transform={self.transform}",
             f"--state-id={self.name}",
         ]

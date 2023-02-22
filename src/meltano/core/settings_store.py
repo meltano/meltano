@@ -1,15 +1,16 @@
 """Storage Managers for Meltano Configuration."""
 
+
 from __future__ import annotations
 
 import logging
+import typing as t
 from abc import ABC, abstractmethod
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from copy import deepcopy
 from enum import Enum
 from functools import reduce
 from operator import eq
-from typing import TYPE_CHECKING, Any
 
 import dotenv
 import sqlalchemy
@@ -21,7 +22,7 @@ from meltano.core.setting import Setting
 from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.settings_service import SettingsService
 
 
@@ -78,10 +79,10 @@ class StoreNotSupportedError(Error):
 
 
 def cast_setting_value(
-    value: Any,
-    metadata: dict[str, Any],
+    value: t.Any,
+    metadata: dict[str, t.Any],
     setting_def: SettingDefinition | None,
-) -> tuple[Any, dict[str, Any]]:
+) -> tuple[t.Any, dict[str, t.Any]]:
     """Cast a setting value according to its setting defition.
 
     Args:
@@ -237,7 +238,7 @@ class SettingsStoreManager(ABC):
         self,
         name: str,
         path: list[str],
-        value: Any,
+        value: t.Any,
         setting_def: SettingDefinition | None = None,
     ) -> None:
         """Unimplemented set method.
@@ -365,12 +366,9 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
         vals_with_metadata = []
         for env_var in self.setting_env_vars(setting_def):
-            try:
+            with suppress(KeyError):
                 value = env_var.get(self.env)
                 vals_with_metadata.append((value, {"env_var": env_var.key}))
-            except KeyError:
-                pass
-
         if len(vals_with_metadata) > 1:
             if reduce(eq, (val for val, _ in vals_with_metadata)):
                 raise MultipleEnvVarsSetException(
@@ -669,7 +667,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         self,
         name: str,
         path: list[str],
-        value: Any,
+        value: t.Any,
         setting_def: SettingDefinition | None = None,
     ) -> dict:
         """Set value by name in the Meltano YAML File.
@@ -807,7 +805,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         self.ensure_supported()
 
     @property
-    def flat_config(self) -> dict[str, Any]:
+    def flat_config(self) -> dict[str, t.Any]:
         """Get dictionary of flattened configuration.
 
         Returns:
@@ -930,7 +928,7 @@ class DbStoreManager(SettingsStoreManager):
         self,
         name: str,
         path: list[str],
-        value: Any,
+        value: t.Any,
         setting_def: SettingDefinition | None = None,
     ) -> dict:
         """Set value by name in the system database.
@@ -1251,9 +1249,12 @@ class AutoStoreManager(SettingsStoreManager):
             return None
 
         # value is env-specific
-        if setting_def and setting_def.env_specific:
-            if self.ensure_supported(store=SettingValueStore.DOTENV):
-                return SettingValueStore.DOTENV
+        if (
+            setting_def
+            and setting_def.env_specific
+            and self.ensure_supported(store=SettingValueStore.DOTENV)
+        ):
+            return SettingValueStore.DOTENV
 
         # no active meltano environment
         if not self.project.environment:
@@ -1420,12 +1421,9 @@ class AutoStoreManager(SettingsStoreManager):
             An empty dictionary.
         """
         for store in self.stores:
-            try:
+            with suppress(StoreNotSupportedError):
                 manager = self.manager_for(store)
                 manager.reset()
-            except StoreNotSupportedError:
-                pass
-
         return {}
 
     def find_setting(self, name: str) -> SettingDefinition | None:

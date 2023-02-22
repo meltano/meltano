@@ -8,9 +8,9 @@ import logging
 import os
 import sys
 import threading
+import typing as t
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
 
 import fasteners
 from dotenv import dotenv_values
@@ -37,7 +37,7 @@ if sys.version_info >= (3, 8):
 else:
     from cached_property import cached_property
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
 
 
@@ -311,7 +311,7 @@ class Project(Versioned):  # noqa: WPS214
         from meltano.core.meltano_file import MeltanoFile
         from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 
-        conf: dict[str, Any] = yaml.load(self.meltanofile)
+        conf: dict[str, t.Any] = yaml.load(self.meltanofile)
         if conf is None:
             raise EmptyMeltanoFileException()
 

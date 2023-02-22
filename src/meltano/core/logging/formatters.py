@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import sys
+import typing as t
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Callable, Sequence, TextIO
 
 import click
 import structlog
@@ -14,7 +14,7 @@ from structlog.types import Processor
 
 from meltano.core.utils import get_no_color_flag
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     if sys.version_info >= (3, 8):
         from typing import Literal
     else:
@@ -37,7 +37,7 @@ def rich_exception_formatter_factory(
     color_system: Literal["auto", "standard", "256", "truecolor", "windows"] = "auto",
     no_color: bool | None = None,
     show_locals: bool = False,
-) -> Callable[[TextIO, structlog.types.ExcInfo], None]:
+) -> t.Callable[[t.TextIO, structlog.types.ExcInfo], None]:
     """Create an exception formatter for logging using the rich package.
 
     Examples:
@@ -55,7 +55,7 @@ def rich_exception_formatter_factory(
 
     def _traceback(
         sio,
-        exc_info: tuple[type[Any], BaseException, TracebackType | None],
+        exc_info: tuple[type[t.Any], BaseException, TracebackType | None],
     ) -> None:
         sio.write("\n")
         Console(file=sio, color_system=color_system, no_color=no_color).print(
@@ -71,10 +71,12 @@ def rich_exception_formatter_factory(
 def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormatter:
     """Use _process_formatter to configure a structlog.stdlib.ProcessFormatter.
 
-    It will automatically add log level and timestamp fields to any log entries not originating from structlog.
+    It will automatically add log level and timestamp fields to any log entries
+    not originating from structlog.
 
     Args:
-        processor: A structlog message processor such as structlog.dev.ConsoleRenderer.
+        processor: A structlog message processor such as
+            `structlog.dev.ConsoleRenderer`.
 
     Returns:
         A configured log processor.
@@ -119,15 +121,18 @@ def console_log_formatter(
 
 def key_value_formatter(
     sort_keys: bool = False,
-    key_order: Sequence[str] | None = None,
+    key_order: t.Sequence[str] | None = None,
     drop_missing: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in key=value format.
 
     Args:
         sort_keys: Whether to sort keys when formatting.
-        key_order: List of keys that should be rendered in this exact order. Missing keys will be rendered as None, extra keys depending on *sort_keys* and the dict class.
-        drop_missing: When True, extra keys in *key_order* will be dropped rather than rendered as None.
+        key_order: List of keys that should be rendered in this exact order.
+            Missing keys will be rendered as None, extra keys depending on
+            *sort_keys* and the dict class.
+        drop_missing: When True, extra keys in *key_order* will be dropped
+            rather than rendered as None.
 
     Returns:
         A configured key=value formatter.

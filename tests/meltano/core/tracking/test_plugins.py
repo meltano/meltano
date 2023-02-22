@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+import typing as t
 
 from meltano.core.block.plugin_command import plugin_command_invoker
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -55,7 +55,7 @@ class TestPluginsTrackingContext:
         assert not plugin_with_no_parent.get("parent_name_hash")
 
     @staticmethod
-    def assert_plugin_attributes(plugin_dict: dict[str, Any], plugin: ProjectPlugin):
+    def assert_plugin_attributes(plugin_dict: dict[str, t.Any], plugin: ProjectPlugin):
         for dict_key, plugin_key in (
             ("name_hash", "name"),
             ("namespace_hash", "namespace"),

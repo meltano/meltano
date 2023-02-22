@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 import os
+import typing as t
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pytest
 from click import Command
@@ -12,7 +12,7 @@ from click.testing import CliRunner
 from fixtures.utils import cd, tmp_project
 from meltano.core.project_files import ProjectFiles
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from click.testing import Result
 
     from fixtures.docker import SnowplowMicro

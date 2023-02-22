@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 
 import structlog
 
@@ -17,7 +17,7 @@ from meltano.core.plugin_install_service import (
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.venv_service import VirtualEnv
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
 

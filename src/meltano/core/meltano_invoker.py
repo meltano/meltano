@@ -6,9 +6,9 @@ import os
 import platform
 import subprocess
 import sys
+import typing as t
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Iterable
 
 from meltano.core.project import Project
 from meltano.core.project_settings_service import SettingValueStore
@@ -32,10 +32,10 @@ class MeltanoInvoker:
 
     def invoke(
         self,
-        args: Iterable[str],
+        args: t.Iterable[str],
         command: str = MELTANO_COMMAND,
         env: dict[str, str] | None = None,
-        **kwargs: Any,
+        **kwargs: t.Any,
     ) -> subprocess.CompletedProcess:
         """Invoke meltano or other provided command.
 

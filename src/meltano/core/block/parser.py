@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Generator
+import typing as t
+from contextlib import suppress
 
 import click
 import structlog
@@ -157,7 +158,7 @@ class BlockParser:  # noqa: D101
 
     def find_blocks(
         self, offset: int = 0
-    ) -> Generator[BlockSet | PluginCommandBlock, None, None]:
+    ) -> t.Generator[BlockSet | PluginCommandBlock, None, None]:
         """
         Find all blocks in the invocation.
 
@@ -207,16 +208,13 @@ class BlockParser:  # noqa: D101
         Raises:
             ClickException: If mapping name returns multiple matches.
         """
-        try:
+        with suppress(PluginNotFoundError):
             return self.project.plugins.find_plugin(name)
-        except PluginNotFoundError:
-            pass
 
         mapper = None
-        try:
+
+        with suppress(PluginNotFoundError):
             mapper = self.project.plugins.find_plugins_by_mapping_name(name)
-        except PluginNotFoundError:
-            pass
 
         if mapper is None:
             return None

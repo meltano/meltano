@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import shlex
+import typing as t
 from collections import defaultdict
-from typing import Any
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.utils import expand_env_vars
 
 
-def env_mapping_to_docker(mapping: dict[str, Any]) -> list[str]:
+def env_mapping_to_docker(mapping: dict[str, t.Any]) -> list[str]:
     """Convert a dictionary of environment variables to the <ENVVAR>=<VALUE> form.
 
     Args:
@@ -36,7 +36,7 @@ class ContainerSpec(Canonical):
         entrypoint: str | None = None,
         ports: dict[str, str] | None = None,
         volumes: list[str] | None = None,
-        env: dict[str, Any] | None = None,
+        env: dict[str, t.Any] | None = None,
     ):
         """Create a new container specification.
 
@@ -76,7 +76,7 @@ class ContainerSpec(Canonical):
 
         volumes = [expand_env_vars(bind, env) for bind in self.volumes]
 
-        exposed_ports: dict[str, Any] = {}
+        exposed_ports: dict[str, t.Any] = {}
         port_bindings = defaultdict(list)
 
         for host_port, container_port in self.ports.items():

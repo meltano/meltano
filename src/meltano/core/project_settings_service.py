@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+import typing as t
 
 import structlog
 from dotenv import dotenv_values
@@ -13,7 +13,7 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = structlog.get_logger(__name__)
