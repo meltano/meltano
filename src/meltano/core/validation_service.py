@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import typing as t
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import TypeVar
 
 from sqlalchemy.orm.session import sessionmaker
 
@@ -14,7 +14,7 @@ from meltano.core.project import Project
 
 EXIT_CODE_OK = 0
 
-T = TypeVar("T", bound="ValidationsRunner")  # noqa: WPS111
+T = t.TypeVar("T", bound="ValidationsRunner")  # noqa: WPS111
 
 
 class ValidationOutcome(str, Enum):

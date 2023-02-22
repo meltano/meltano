@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from hashlib import sha256
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
 
 from structlog.stdlib import get_logger
 
 from meltano.core.plugin.base import PluginRef, StandalonePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = get_logger(__name__)
@@ -64,7 +64,7 @@ class PluginLock:
     def load(
         self,
         create: bool = False,
-        loader: Callable = lambda x: StandalonePlugin(**json.load(x)),
+        loader: t.Callable = lambda x: StandalonePlugin(**json.load(x)),
     ) -> StandalonePlugin:
         """Load the plugin lockfile.
 

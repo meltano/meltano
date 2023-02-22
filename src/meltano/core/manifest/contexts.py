@@ -9,9 +9,9 @@ WARNING: This module is currently just here to flesh out an idea for how
 from __future__ import annotations
 
 import os
+import typing as t
 from collections.abc import Mapping
 from contextlib import contextmanager, suppress
-from typing import Iterator
 
 from meltano.core.manifest.manifest import Manifest
 
@@ -26,7 +26,7 @@ def _get_active_manifest() -> Manifest:
 
 
 @contextmanager
-def _manifest_context(manifest: Manifest) -> Iterator[None]:
+def _manifest_context(manifest: Manifest) -> t.Iterator[None]:
     _active_manifest.append(manifest)
     try:
         yield
@@ -35,7 +35,7 @@ def _manifest_context(manifest: Manifest) -> Iterator[None]:
 
 
 @contextmanager  # noqa: WPS210
-def _env_context(env: Mapping[str, str]) -> Iterator[None]:
+def _env_context(env: Mapping[str, str]) -> t.Iterator[None]:
     unique_keys = env.keys() - os.environ.keys()
     shared_keys = env.keys() & os.environ.keys()
     prev = {k: v for k, v in os.environ.items() if k in shared_keys}
@@ -51,7 +51,7 @@ def _env_context(env: Mapping[str, str]) -> Iterator[None]:
 
 
 @contextmanager
-def manifest_context(manifest: Manifest) -> Iterator[None]:
+def manifest_context(manifest: Manifest) -> t.Iterator[None]:
     """Establish a context within which Meltano can run using a given manifest.
 
     All relevant general (i.e. excluding plugin-specific, schedule-specific,
@@ -72,7 +72,7 @@ def manifest_context(manifest: Manifest) -> Iterator[None]:
 
 
 @contextmanager
-def plugin_context(plugin_name: str) -> Iterator[None]:
+def plugin_context(plugin_name: str) -> t.Iterator[None]:
     """Establish a context within which a plugin can be run.
 
     All relevant env vars for the specified plugin will be set in the process
@@ -105,7 +105,7 @@ def plugin_context(plugin_name: str) -> Iterator[None]:
 
 
 @contextmanager
-def schedule_context(schedule_name: str) -> Iterator[None]:
+def schedule_context(schedule_name: str) -> t.Iterator[None]:
     """Establish a context within which a schedule can be run.
 
     All relevant env vars for the specified schedule will be set in the process
@@ -133,7 +133,7 @@ def schedule_context(schedule_name: str) -> Iterator[None]:
 
 
 @contextmanager
-def job_context(job_name: str) -> Iterator[None]:
+def job_context(job_name: str) -> t.Iterator[None]:
     """Establish a context within which a job can be run.
 
     All relevant env vars for the specified job will be set in the process for

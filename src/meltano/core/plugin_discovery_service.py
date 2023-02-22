@@ -5,8 +5,8 @@ from __future__ import annotations
 import io
 import logging
 import re
+import typing as t
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Iterable
 
 import requests
 from ruamel.yaml import YAMLError
@@ -23,7 +23,7 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.utils import NotFound, find_named
 from meltano.core.yaml import yaml
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
@@ -360,7 +360,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             for plugin_type in PluginType
         }
 
-    def plugins(self) -> Iterable[PluginDefinition]:
+    def plugins(self) -> t.Iterable[PluginDefinition]:
         """Generate all plugins.
 
         Yields:

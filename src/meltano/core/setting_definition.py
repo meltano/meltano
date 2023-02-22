@@ -5,9 +5,9 @@ from __future__ import annotations
 import ast
 import json
 from collections.abc import Mapping, Sequence
+import typing as t
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Iterable, TypeVar
 
 from ruamel.yaml import Representer
 
@@ -102,7 +102,7 @@ class YAMLEnum(str, Enum):
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
     @classmethod
-    def to_yaml(cls, representer: Representer, node: Any):
+    def to_yaml(cls, representer: Representer, node: t.Any):
         """Represent as yaml.
 
         Args:
@@ -145,7 +145,7 @@ class SettingKind(YAMLEnum):
     HIDDEN = "hidden"
 
 
-ParseValueExpectedType = TypeVar("ParseValueExpectedType")
+ParseValueExpectedType = t.TypeVar("ParseValueExpectedType")
 
 
 class SettingDefinition(NameEq, Canonical):
@@ -235,7 +235,7 @@ class SettingDefinition(NameEq, Canonical):
         return f"<SettingDefinition {self.name} ({self.kind})>"
 
     @classmethod
-    def from_missing(cls, defs: Iterable[SettingDefinition], config: dict, **kwargs):
+    def from_missing(cls, defs: t.Iterable[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
 
         Args:
@@ -261,9 +261,9 @@ class SettingDefinition(NameEq, Canonical):
     def from_key_value(
         cls,
         key: str,
-        value: Any,
+        value: t.Any,
         custom: bool = True,
-        default: Any | bool = False,
+        default: t.Any | bool = False,
     ):
         """Create SettingDefinition instance from key-value pair.
 
@@ -406,7 +406,7 @@ class SettingDefinition(NameEq, Canonical):
             raise parse_error
         return parsed
 
-    def cast_value(self, value: Any) -> Any:
+    def cast_value(self, value: t.Any) -> t.Any:
         """Cast given value.
 
         Args:
@@ -439,7 +439,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def post_process_value(self, value: Any) -> Any:
+    def post_process_value(self, value: t.Any) -> t.Any:
         """Post-process given value.
 
         Args:
@@ -457,7 +457,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def stringify_value(self, value: Any) -> str:
+    def stringify_value(self, value: t.Any) -> str:
         """Return value in string form.
 
         Args:

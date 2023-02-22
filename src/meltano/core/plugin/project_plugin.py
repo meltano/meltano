@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import copy
 import logging
-from typing import Any, Iterable
+import typing as t
 
 from meltano.core.plugin.base import PluginDefinition, PluginRef, PluginType, Variant
 from meltano.core.plugin.command import Command
@@ -280,7 +280,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return uniques_in(prefixes)
 
     @property
-    def extra_config(self) -> dict[str, Any]:
+    def extra_config(self) -> dict[str, t.Any]:
         """Return plugin extra config.
 
         Returns:
@@ -289,7 +289,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
-    def config_with_extras(self) -> dict[str, Any]:
+    def config_with_extras(self) -> dict[str, t.Any]:
         """Return config with extras.
 
         Returns:
@@ -385,7 +385,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
 
     def get_requirements(
         self,
-        plugin_types: Iterable[PluginType] | None = None,
+        plugin_types: t.Iterable[PluginType] | None = None,
     ) -> dict[PluginType, list[PluginRequirement]]:
         """Return the requirements for this plugin.
 

@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import logging
+import typing as t
 from collections import OrderedDict
 from copy import copy
 from os import PathLike
 from pathlib import Path
-from typing import Any, Mapping, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
@@ -84,9 +84,9 @@ class ProjectFiles:  # noqa: WPS214
         included_file_contents = self._load_included_files()
 
         # If the exact same objects are loaded again, use the cached result:
-        k = TypeVar("k")
+        k = t.TypeVar("k")
 
-        def id_vals(x: dict[k, Any]) -> dict[k, int]:
+        def id_vals(x: dict[k, t.Any]) -> dict[k, int]:
             return {k: id(v) for k, v in x.items()}
 
         if self._cached_loaded is None or id_vals(prev_raw_contents_map) != id_vals(
@@ -357,6 +357,6 @@ class ProjectFiles:  # noqa: WPS214
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: PathLike, contents: Mapping):
+    def _write_file(self, file_path: PathLike, contents: t.Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
             yaml.dump(contents, fl)

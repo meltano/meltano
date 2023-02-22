@@ -7,10 +7,10 @@ import functools
 import logging
 import os
 import sys
+import typing as t
 from dataclasses import dataclass
 from enum import Enum
 from multiprocessing import cpu_count
-from typing import Any, Callable, Iterable, Mapping
 
 if sys.version_info >= (3, 8):
     from functools import cached_property
@@ -18,7 +18,6 @@ if sys.version_info >= (3, 8):
 else:
     from cached_property import cached_property
     from typing_extensions import Protocol
-
 
 from meltano.core.error import (
     AsyncSubprocessError,
@@ -136,7 +135,7 @@ class PluginInstallService:  # noqa: WPS214
     def __init__(
         self,
         project: Project,
-        status_cb: Callable[[PluginInstallState], Any] = noop,
+        status_cb: t.Callable[[PluginInstallState], t.Any] = noop,
         parallelism: int | None = None,
         clean: bool = False,
         force: bool = False,
@@ -170,7 +169,7 @@ class PluginInstallService:  # noqa: WPS214
 
     @staticmethod
     def remove_duplicates(
-        plugins: Iterable[ProjectPlugin], reason: PluginInstallReason
+        plugins: t.Iterable[ProjectPlugin], reason: PluginInstallReason
     ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
@@ -226,7 +225,7 @@ class PluginInstallService:  # noqa: WPS214
 
     def install_plugins(
         self,
-        plugins: Iterable[ProjectPlugin],
+        plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
         """
@@ -251,7 +250,7 @@ class PluginInstallService:  # noqa: WPS214
 
     async def install_plugins_async(
         self,
-        plugins: Iterable[ProjectPlugin],
+        plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
@@ -464,7 +463,7 @@ async def install_pip_plugin(
     clean: bool = False,
     force: bool = False,
     venv_service: VenvService | None = None,
-    env: Mapping[str, str] | None = None,
+    env: t.Mapping[str, str] | None = None,
     **kwargs,
 ):
     """Install the plugin with pip.

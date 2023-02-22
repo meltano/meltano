@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 
 import pytest
 
@@ -8,7 +8,7 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.utils import hash_sha256
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project

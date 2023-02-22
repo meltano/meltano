@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import typing as t
 from collections.abc import Generator
 from contextlib import suppress
-from typing import Any
 
 
 def meltano_config_env_locations(
-    manifest_schema: dict[str, Any],
+    manifest_schema: dict[str, t.Any],
     env_definition_ref: str = "#/$defs/env",
 ) -> set[str]:
     """Find all locations within a Meltano manifest file that can have an env field.
@@ -27,7 +27,7 @@ def meltano_config_env_locations(
 class JsonschemaRefLocationParser:
     """Minimal jsonschema parser that finds the locations of a specified ref."""
 
-    def __init__(self, schema: dict[str, Any], target_ref: str) -> None:
+    def __init__(self, schema: dict[str, t.Any], target_ref: str) -> None:
         """Initialize the `JsonschemaRefLocationParser`.
 
         Args:
@@ -36,11 +36,11 @@ class JsonschemaRefLocationParser:
         """
         self.root_schema = schema
         self.target_ref = target_ref
-        self._resolved_refs: dict[str, Any] = {}
+        self._resolved_refs: dict[str, t.Any] = {}
 
     def parse(  # noqa: C901
         self,
-        schema: dict[str, Any] | None = None,
+        schema: dict[str, t.Any] | None = None,
         path: tuple[str, ...] = (),
     ) -> Generator[str, None, None]:
         """Parse the jsonschema to find the locations of the target ref.
@@ -74,7 +74,7 @@ class JsonschemaRefLocationParser:
             elif schema["type"] == "array" and "items" in schema:
                 yield from self.parse(schema["items"], (*path, "[]"))
 
-    def resolve_ref(self, ref: str, path: tuple[str, ...]) -> dict[str, Any]:
+    def resolve_ref(self, ref: str, path: tuple[str, ...]) -> dict[str, t.Any]:
         """Resolve a local jsonschema ref into a schema.
 
         Args:
