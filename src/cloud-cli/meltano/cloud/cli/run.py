@@ -34,7 +34,7 @@ def get_env_var(name: str) -> str:
 async def run_project(
     api_key: str,
     runner_secret: str,
-    tenant_resource_key: str,
+    organization_id: str,
     project_id: str,
     environment: str,
     job_or_schedule: str,
@@ -44,7 +44,7 @@ async def run_project(
     Args:
         api_key: The API key to use for authentication.
         runner_secret: The runner secret to use for authentication.
-        tenant_resource_key: The tenant resource key.
+        organization_id: The organization ID.
         project_id: The project identifier.
         environment: The environment to run in.
         job_or_schedule: The job or schedule identifier.
@@ -54,7 +54,7 @@ async def run_project(
     """
     async with MeltanoCloudClient() as client:
         return await client.run_project(
-            tenant_resource_key,
+            organization_id,
             project_id,
             environment,
             job_or_schedule,
@@ -77,15 +77,15 @@ def run(job_or_schedule: str, environment: str, project_id: str) -> None:
     """
     click.echo("Running a Meltano project in Meltano Cloud.")
 
-    api_key = get_env_var("MELTANO_RUNNER_API_KEY")
-    runner_secret = get_env_var("MELTANO_RUNNER_SECRET")
-    tenant_resource_key = get_env_var("MELTANO_TENANT_RESOURCE_KEY")
+    api_key = get_env_var("MELTANO_CLOUD_RUNNER_API_KEY")
+    runner_secret = get_env_var("MELTANO_CLOUD_RUNNER_SECRET")
+    organization_id = get_env_var("MELTANO_CLOUD_ORGANIZATION_ID")
 
     result = asyncio.run(
         run_project(
             api_key,
             runner_secret,
-            tenant_resource_key,
+            organization_id,
             project_id,
             environment,
             job_or_schedule,
