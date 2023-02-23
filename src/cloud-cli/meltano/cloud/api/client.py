@@ -38,23 +38,14 @@ class MeltanoCloudClient:
     """Client for the Meltano Cloud API.
 
     Attributes:
-        api_url: The API URL.
-        api_key: The API key.
-        runner_secret: The runner secret.
         _session: The client session.
     """
 
-    def __init__(self, api_url: str, api_key: str, runner_secret: str) -> None:
-        """Initialize the client.
+    CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
+    API_URL = "https://api.meltano.com/v1"
 
-        Args:
-            api_url: The Cloud API URL.
-            api_key: The Cloud API key.
-            runner_secret: The runner secret.
-        """
-        self.api_url = api_url
-        self.api_key = api_key
-        self.runner_secret = runner_secret
+    def __init__(self) -> None:
+        """Initialize the client."""
         self._session: ClientSession | None = None
 
     async def __aenter__(self) -> MeltanoCloudClient:
@@ -63,7 +54,12 @@ class MeltanoCloudClient:
         Returns:
             The client.
         """
-        self._session = ClientSession()
+        self._session = ClientSession(
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": f"Meltano Cloud CLI/v{version('meltano')}",
+            },
+        )
         return self
 
     async def __aexit__(
@@ -98,15 +94,23 @@ class MeltanoCloudClient:
             RuntimeError: If the client session is not open.
         """
         if not self._session or self._session.closed:
-            raise RuntimeError("Client session is not open")
+            msg = "Client session is not open"
+            raise RuntimeError(msg)
         return self._session
 
-    async def _request(self, method: str, path: str, **kwargs) -> dict:
+    async def _request(
+        self,
+        method: str,
+        path: str,
+        url: str | None = API_URL,
+        **kwargs: t.Any,
+    ) -> dict:
         """Make a request to the Meltano Cloud API.
 
         Args:
             method: The HTTP method.
             path: The API path.
+            url: The API URL for this request, if different from the base URL.
             **kwargs: Additional keyword arguments to pass to the request.
 
         Returns:
@@ -115,23 +119,17 @@ class MeltanoCloudClient:
         Raises:
             MeltanoCloudError: If the response status is not OK.
         """
-        url = f"{self.api_url}{path}"
-        headers = {
-            "Content-Type": "application/json",
-            "User-Agent": f"Meltano Cloud CLI/v{version('meltano')}",
-            "x-api-key": self.api_key,
-            "meltano-runner-secret": self.runner_secret,
-        }
+        url = f"{url}{path}"
         logger.debug(
             "Making request",
             method=method,
             url=url,
+            headers=kwargs.get("headers"),
         )
 
         async with self.session.request(
             method,
             url,
-            headers=headers,
             **kwargs,
         ) as response:
             try:
@@ -146,6 +144,8 @@ class MeltanoCloudClient:
         project_id: str,
         environment: str,
         job_or_schedule: str,
+        api_key: str,
+        runner_secret: str,
     ) -> dict:
         """Run a Meltano project in Meltano Cloud.
 
@@ -154,6 +154,8 @@ class MeltanoCloudClient:
             project_id: The project identifier.
             environment: The Meltano environment to run.
             job_or_schedule: The job or schedule identifier.
+            api_key: The Cloud Runners API key.
+            runner_secret: The runner secret.
 
         Returns:
             The run details.
@@ -161,4 +163,9 @@ class MeltanoCloudClient:
         return await self._request(
             "POST",
             f"/{tenant_resource_key}/{project_id}/{environment}/{job_or_schedule}",
+            url=self.CLOUD_RUNNERS_URL,
+            headers={
+                "x-api-key": api_key,
+                "meltano-runner-secret": runner_secret,
+            },
         )

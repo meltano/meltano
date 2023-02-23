@@ -33,6 +33,7 @@ packages = [
 
 [tool.poetry.dependencies]
 aiohttp = "^3.8.4"
+cached-property = "^1"
 click = "^8.1"
 importlib-metadata = {version = "^6.0.0", python = "<3.8"}
 pydantic = "^1.10.5"

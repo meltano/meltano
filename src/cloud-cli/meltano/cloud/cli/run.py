@@ -7,8 +7,8 @@ import os
 
 import click
 
+from meltano.cloud.api.client import MeltanoCloudClient
 from meltano.cloud.cli.base import cloud
-from meltano.cloud.client import MeltanoCloudClient
 
 
 def get_env_var(name: str) -> str:
@@ -25,14 +25,14 @@ def get_env_var(name: str) -> str:
     """
     value = os.getenv(name)
     if not value:
-        raise click.UsageError(f"Environment variable {name} is not set.")
+        msg = f"Environment variable {name} is not set."
+        raise click.UsageError(msg)
 
     return value
 
 
 async def run_project(
     api_key: str,
-    api_url: str,
     runner_secret: str,
     tenant_resource_key: str,
     project_id: str,
@@ -43,7 +43,6 @@ async def run_project(
 
     Args:
         api_key: The API key to use for authentication.
-        api_url: The Meltano Cloud API URL.
         runner_secret: The runner secret to use for authentication.
         tenant_resource_key: The tenant resource key.
         project_id: The project identifier.
@@ -53,12 +52,14 @@ async def run_project(
     Returns:
         The new run details.
     """
-    async with MeltanoCloudClient(api_url, api_key, runner_secret) as client:
+    async with MeltanoCloudClient() as client:
         return await client.run_project(
             tenant_resource_key,
             project_id,
             environment,
             job_or_schedule,
+            api_key,
+            runner_secret,
         )
 
 
@@ -76,10 +77,6 @@ def run(job_or_schedule: str, environment: str, project_id: str) -> None:
     """
     click.echo("Running a Meltano project in Meltano Cloud.")
 
-    # TODO: This would be different for beta?
-    api_url = "https://cloud-runners.meltano.com/v1"
-
-    # TODO: source this properly
     api_key = get_env_var("MELTANO_RUNNER_API_KEY")
     runner_secret = get_env_var("MELTANO_RUNNER_SECRET")
     tenant_resource_key = get_env_var("MELTANO_TENANT_RESOURCE_KEY")
@@ -87,7 +84,6 @@ def run(job_or_schedule: str, environment: str, project_id: str) -> None:
     result = asyncio.run(
         run_project(
             api_key,
-            api_url,
             runner_secret,
             tenant_resource_key,
             project_id,
