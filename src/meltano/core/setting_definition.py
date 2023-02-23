@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import typing as t
+from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
 
@@ -59,9 +61,8 @@ class EnvVar:
         Returns:
             Env var value for given env var.
         """
-        if self.negated:
-            return str(not utils.truthy(env[self.key]))
-        return env[self.key]
+        value = env[self.key]
+        return str(not utils.truthy(value)) if self.negated else value
 
 
 class SettingMissingError(Error):
@@ -142,6 +143,9 @@ class SettingKind(YAMLEnum):
     ARRAY = "array"
     OBJECT = "object"
     HIDDEN = "hidden"
+
+
+ParseValueExpectedType = t.TypeVar("ParseValueExpectedType")
 
 
 class SettingDefinition(NameEq, Canonical):
@@ -353,6 +357,55 @@ class SettingDefinition(NameEq, Canonical):
 
         return [EnvVar(key) for key in utils.uniques_in(env_keys)]
 
+    @staticmethod
+    def _parse_value(
+        unparsed: str,
+        expected_type_name: str,
+        expected_type: type[ParseValueExpectedType],
+    ) -> ParseValueExpectedType:
+        """Parse a JSON string.
+
+        Parsing is attempted first with `json.loads`, and then with
+        `ast.literal_eval` as a fallback. It is used as a fallback because it
+        correctly parses most inputs that `json.loads` can parse, but is more
+        liberal about what it accepts. For example, `json.loads` requires
+        double quotes for strings, but `ast.literal_eval` can use either single
+        or double quotes.
+
+        Args:
+            unparsed: The JSON string.
+            expected_type_name: The name of the expected type, e.g. "array".
+                Used in the error message if parsing fails or the type is not
+                as expected.
+            expected_type: The Python type class of the expected type. Used to
+                ensure that the parsed value is of the expected type.
+
+        Raises:
+            parse_error: Parsing failed, or the parsed value had an unexpected type.
+
+        Returns:
+            The parsed value.
+        """
+        parse_error = ValueError(
+            f"Failed to parse JSON {expected_type_name} from string: {unparsed!r}"
+        )
+        try:
+            parsed = json.loads(unparsed)
+        except json.JSONDecodeError:
+            try:  # noqa: WPS505
+                parsed = ast.literal_eval(unparsed)
+            except (
+                ValueError,
+                TypeError,
+                SyntaxError,
+                MemoryError,
+                RecursionError,
+            ) as ex:
+                raise parse_error from ex
+        if not isinstance(parsed, expected_type):
+            raise parse_error
+        return parsed
+
     def cast_value(self, value: t.Any) -> t.Any:  # noqa: C901
         """Cast given value.
 
@@ -361,9 +414,6 @@ class SettingDefinition(NameEq, Canonical):
 
         Returns:
             Value cast according to specified setting definition kind.
-
-        Raises:
-            ValueError: if value cannot be cast to setting kind.
         """
         value = value.isoformat() if isinstance(value, (date, datetime)) else value
 
@@ -373,13 +423,13 @@ class SettingDefinition(NameEq, Canonical):
             elif self.kind == SettingKind.INTEGER:
                 return int(value)
             elif self.kind == SettingKind.OBJECT:
-                value = json.loads(value)
-                if not isinstance(value, dict):
-                    raise ValueError(f"JSON value '{value}' is not an object")
+                value = dict(
+                    self._parse_value(value, "object", Mapping),  # type: ignore
+                )
             elif self.kind == SettingKind.ARRAY:
-                value = json.loads(value)
-                if not isinstance(value, list):
-                    raise ValueError(f"JSON value '{value}' is not an array")
+                value = list(
+                    self._parse_value(value, "array", Sequence),  # type: ignore
+                )
 
         processor = self.value_processor
         if value is not None and processor:
