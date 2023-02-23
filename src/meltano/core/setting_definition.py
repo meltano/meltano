@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import ast
 import json
+import typing as t
+from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Iterable
 
 from ruamel.yaml import Representer
 
@@ -59,9 +61,8 @@ class EnvVar:
         Returns:
             Env var value for given env var.
         """
-        if self.negated:
-            return str(not utils.truthy(env[self.key]))
-        return env[self.key]
+        value = env[self.key]
+        return str(not utils.truthy(value)) if self.negated else value
 
 
 class SettingMissingError(Error):
@@ -101,7 +102,7 @@ class YAMLEnum(str, Enum):
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
     @classmethod
-    def to_yaml(cls, representer: Representer, node: Any):
+    def to_yaml(cls, representer: Representer, node: t.Any):
         """Represent as yaml.
 
         Args:
@@ -142,6 +143,9 @@ class SettingKind(YAMLEnum):
     ARRAY = "array"
     OBJECT = "object"
     HIDDEN = "hidden"
+
+
+ParseValueExpectedType = t.TypeVar("ParseValueExpectedType")
 
 
 class SettingDefinition(NameEq, Canonical):
@@ -231,7 +235,7 @@ class SettingDefinition(NameEq, Canonical):
         return f"<SettingDefinition {self.name} ({self.kind})>"
 
     @classmethod
-    def from_missing(cls, defs: Iterable[SettingDefinition], config: dict, **kwargs):
+    def from_missing(cls, defs: t.Iterable[SettingDefinition], config: dict, **kwargs):
         """Create SettingDefinition instances for missing settings.
 
         Args:
@@ -257,9 +261,9 @@ class SettingDefinition(NameEq, Canonical):
     def from_key_value(
         cls,
         key: str,
-        value: Any,
+        value: t.Any,
         custom: bool = True,
-        default: Any | bool = False,
+        default: t.Any | bool = False,
     ):
         """Create SettingDefinition instance from key-value pair.
 
@@ -349,11 +353,60 @@ class SettingDefinition(NameEq, Canonical):
                 env_keys.extend(utils.to_env_var(prefix, alias) for prefix in prefixes)
 
         if include_custom:
-            env_keys.extend(env for env in self.env_aliases)
+            env_keys.extend(self.env_aliases)
 
         return [EnvVar(key) for key in utils.uniques_in(env_keys)]
 
-    def cast_value(self, value: Any) -> Any:
+    @staticmethod
+    def _parse_value(
+        unparsed: str,
+        expected_type_name: str,
+        expected_type: type[ParseValueExpectedType],
+    ) -> ParseValueExpectedType:
+        """Parse a JSON string.
+
+        Parsing is attempted first with `json.loads`, and then with
+        `ast.literal_eval` as a fallback. It is used as a fallback because it
+        correctly parses most inputs that `json.loads` can parse, but is more
+        liberal about what it accepts. For example, `json.loads` requires
+        double quotes for strings, but `ast.literal_eval` can use either single
+        or double quotes.
+
+        Args:
+            unparsed: The JSON string.
+            expected_type_name: The name of the expected type, e.g. "array".
+                Used in the error message if parsing fails or the type is not
+                as expected.
+            expected_type: The Python type class of the expected type. Used to
+                ensure that the parsed value is of the expected type.
+
+        Raises:
+            parse_error: Parsing failed, or the parsed value had an unexpected type.
+
+        Returns:
+            The parsed value.
+        """
+        parse_error = ValueError(
+            f"Failed to parse JSON {expected_type_name} from string: {unparsed!r}"
+        )
+        try:
+            parsed = json.loads(unparsed)
+        except json.JSONDecodeError:
+            try:  # noqa: WPS505
+                parsed = ast.literal_eval(unparsed)
+            except (
+                ValueError,
+                TypeError,
+                SyntaxError,
+                MemoryError,
+                RecursionError,
+            ) as ex:
+                raise parse_error from ex
+        if not isinstance(parsed, expected_type):
+            raise parse_error
+        return parsed
+
+    def cast_value(self, value: t.Any) -> t.Any:  # noqa: C901
         """Cast given value.
 
         Args:
@@ -361,9 +414,6 @@ class SettingDefinition(NameEq, Canonical):
 
         Returns:
             Value cast according to specified setting definition kind.
-
-        Raises:
-            ValueError: if value cannot be cast to setting kind.
         """
         value = value.isoformat() if isinstance(value, (date, datetime)) else value
 
@@ -373,13 +423,13 @@ class SettingDefinition(NameEq, Canonical):
             elif self.kind == SettingKind.INTEGER:
                 return int(value)
             elif self.kind == SettingKind.OBJECT:
-                value = json.loads(value)
-                if not isinstance(value, dict):
-                    raise ValueError(f"JSON value '{value}' is not an object")
+                value = dict(
+                    self._parse_value(value, "object", Mapping),  # type: ignore
+                )
             elif self.kind == SettingKind.ARRAY:
-                value = json.loads(value)
-                if not isinstance(value, list):
-                    raise ValueError(f"JSON value '{value}' is not an array")
+                value = list(
+                    self._parse_value(value, "array", Sequence),  # type: ignore
+                )
 
         processor = self.value_processor
         if value is not None and processor:
@@ -389,7 +439,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def post_process_value(self, value: Any) -> Any:
+    def post_process_value(self, value: t.Any) -> t.Any:
         """Post-process given value.
 
         Args:
@@ -407,7 +457,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def stringify_value(self, value: Any) -> str:
+    def stringify_value(self, value: t.Any) -> str:
         """Return value in string form.
 
         Args:

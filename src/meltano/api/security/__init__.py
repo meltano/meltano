@@ -3,9 +3,7 @@ from __future__ import annotations
 from flask_login import user_logged_in
 from flask_principal import identity_loaded
 
-from meltano.core.project_settings_service import ProjectSettingsService
-
-from .auth import (  # noqa: WPS450
+from meltano.api.security.auth import (  # noqa: WPS450
     _identity_loaded_hook,
     _user_logged_in_hook,
     unauthorized_callback,
@@ -26,8 +24,7 @@ def setup_security(app, project):
         "confirm_register_form": MeltanoConfirmRegisterForm,
     }
 
-    settings_service = ProjectSettingsService(project)
-    if not settings_service.get("ui.authentication"):
+    if not project.settings.get("ui.authentication"):
         options["anonymous_user"] = FreeUser
     # Else: use Flask's built-in AnonymousUser, which is not deemed to be
     # authenticated and has no roles.

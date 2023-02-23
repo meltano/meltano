@@ -21,6 +21,7 @@ from smart_open import open  # type: ignore
 
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
+from meltano.core.utils import remove_suffix
 
 logger = logging.getLogger(__name__)
 
@@ -87,12 +88,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         if self.client:
             with open(
-                self.join_path(self.uri.rstrip(self.state_dir), path),
+                self.join_path(remove_suffix(self.uri, (self.state_dir)), path),
                 transport_params={"client": self.client},
             ) as reader:
                 yield reader
         else:
-            with open(self.join_path(self.uri.rstrip(self.state_dir), path)) as reader:
+            with open(
+                self.join_path(remove_suffix(self.uri, self.state_dir), path)
+            ) as reader:
                 yield reader
 
     @contextmanager
@@ -107,14 +110,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         try:
             with open(
-                self.join_path(self.uri.rstrip(self.state_dir), path),
+                self.join_path(remove_suffix(self.uri, self.state_dir), path),
                 "w+",
                 transport_params={"client": self.client} if self.client else {},
             ) as writer:
                 yield writer
         except NotImplementedError:
             with open(
-                self.join_path(self.uri.rstrip(self.state_dir), path),
+                self.join_path(remove_suffix(self.uri, self.state_dir), path),
                 "w",
                 transport_params={"client": self.client} if self.client else {},
             ) as writer:

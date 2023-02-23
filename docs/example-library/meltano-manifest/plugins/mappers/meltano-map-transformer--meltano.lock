@@ -1,0 +1,11 @@
+{
+  "plugin_type": "mappers",
+  "name": "meltano-map-transformer",
+  "namespace": "meltano_map_transformer",
+  "variant": "meltano",
+  "label": "meltano-map-transformer",
+  "docs": "https://hub.meltano.com/mappers/meltano-map-transformer--meltano",
+  "repo": "https://github.com/MeltanoLabs/meltano-map-transform",
+  "pip_url": "git+https://github.com/MeltanoLabs/meltano-map-transform.git",
+  "executable": "meltano-map-transform"
+}

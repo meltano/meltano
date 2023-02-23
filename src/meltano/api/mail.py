@@ -7,7 +7,6 @@ from smtpapi import SMTPAPIHeader
 
 from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 
 mail = Mail()
 
@@ -22,10 +21,8 @@ class MailService:
             project: The project to use the MailService when referencing the project settings or project id.
         """
         self.project = project
-        self._settings = ProjectSettingsService(self.project)
-
-        self.project_id = self._settings.get("project_id")
-        self.sendgrid_unsubscribe_group_id = self._settings.get(
+        self.project_id = self.project.settings.get("project_id")
+        self.sendgrid_unsubscribe_group_id = self.project.settings.get(
             "mail.sendgrid_unsubscribe_group_id"
         )
 

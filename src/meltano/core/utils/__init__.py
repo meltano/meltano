@@ -1,5 +1,6 @@
 """Defines helpers for the core codebase."""
 
+
 from __future__ import annotations
 
 import asyncio
@@ -12,14 +13,22 @@ import os
 import re
 import sys
 import traceback
-from copy import deepcopy
+import typing as t
+from contextlib import suppress
+from copy import copy, deepcopy
 from datetime import date, datetime, time
 from enum import IntEnum
+from functools import reduce
+from operator import setitem
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, Sequence, TypeVar, overload
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol, runtime_checkable
+else:
+    from typing_extensions import Protocol, runtime_checkable
 
 from meltano.core.error import MeltanoError
 
@@ -35,11 +44,6 @@ try:
     asyncio_all_tasks = asyncio.all_tasks
 except AttributeError:
     asyncio_all_tasks = asyncio.Task.all_tasks
-
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
 
 
 class NotFound(Exception):
@@ -76,7 +80,7 @@ def click_run_async(func):
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
-def compose(*fs: Callable[[Any], Any]):
+def compose(*fs: t.Callable[[t.Any], t.Any]):
     """Create a composition of unary functions.
 
     Args:
@@ -240,7 +244,7 @@ def to_env_var(*xs):
     return "_".join(xs)
 
 
-def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
+def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Wrapper arround `flatten_dict.flatten`.
@@ -253,21 +257,15 @@ def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
     Returns:
         the flattened dict
     """
-
-    def dot_reducer(*xs):
-        if xs[0] is None:
-            return xs[1]
-        return ".".join(xs)
-
     if reducer == "dot":
-        reducer = dot_reducer
+        reducer = lambda *xs: xs[1] if xs[0] is None else ".".join(xs)  # noqa: E731
     if reducer == "env_var":
         reducer = to_env_var
 
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
-def compact(xs: Iterable) -> Iterable:
+def compact(xs: t.Iterable) -> t.Iterable:
     """Remove None values from an iterable.
 
     Args:
@@ -292,25 +290,21 @@ def noop(*_args, **_kwargs):
     pass
 
 
-def map_dict(f: Callable, d: dict):
-    yield from ((k, f(v)) for k, v in d.items())
-
-
 def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 
 
-@overload
+@t.overload
 def coerce_datetime(d: None) -> None:
     ...  # noqa: WPS428
 
 
-@overload
+@t.overload
 def coerce_datetime(d: datetime) -> datetime:
     ...  # noqa: WPS428
 
 
-@overload
+@t.overload
 def coerce_datetime(d: date) -> datetime:
     ...  # noqa: WPS428
 
@@ -327,18 +321,15 @@ def coerce_datetime(d):
     if d is None:
         return None
 
-    if isinstance(d, datetime):
-        return d
-
-    return datetime.combine(d, time())
+    return d if isinstance(d, datetime) else datetime.combine(d, time())
 
 
-@overload
+@t.overload
 def iso8601_datetime(d: None) -> None:
     ...  # noqa: WPS428
 
 
-@overload
+@t.overload
 def iso8601_datetime(d: str) -> datetime:
     ...  # noqa: WPS428
 
@@ -355,11 +346,8 @@ def iso8601_datetime(d):
     ]
 
     for format_string in isoformats:
-        try:
+        with suppress(ValueError):
             return coerce_datetime(datetime.strptime(d, format_string))
-        except ValueError:
-            pass
-
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
@@ -368,10 +356,10 @@ class _GetItemProtocol(Protocol):
         ...  # noqa: WPS428
 
 
-_G = TypeVar("_G", bound=_GetItemProtocol)
+_G = t.TypeVar("_G", bound=_GetItemProtocol)
 
 
-def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
+def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:
@@ -394,7 +382,6 @@ def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
-
         enabled = kwargs.get("make_dirs", True)
 
         path = func(*args, **kwargs)
@@ -404,12 +391,7 @@ def makedirs(func):
 
         # if there is an extension, only create the base dir
         _, ext = os.path.splitext(path)
-        if ext:
-            directory = os.path.dirname(path)
-        else:
-            directory = path
-
-        os.makedirs(directory, exist_ok=True)
+        os.makedirs(os.path.dirname(path) if ext else path, exist_ok=True)
         return path
 
     return decorate
@@ -437,7 +419,7 @@ def pop_at_path(d, path, default=None):  # noqa: WPS210
 
     popped = cursor.pop(tail, default)
 
-    for (cursor, key) in reversed(cursors):
+    for cursor, key in reversed(cursors):
         if len(cursor[key]) == 0:
             cursor.pop(key, None)
 
@@ -482,7 +464,7 @@ ENV_VAR_PATTERN = re.compile(
     re.VERBOSE,
 )
 
-Expandable = TypeVar("Expandable", str, Mapping[str, "Expandable"])
+Expandable = t.TypeVar("Expandable", str, t.Mapping[str, "Expandable"])
 
 
 class EnvVarMissingBehavior(IntEnum):
@@ -495,7 +477,7 @@ class EnvVarMissingBehavior(IntEnum):
 
 def expand_env_vars(
     raw_value: Expandable,
-    env: Mapping[str, str],
+    env: t.Mapping[str, str],
     *,
     if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
     flat: bool = False,
@@ -528,7 +510,7 @@ def expand_env_vars(
     """  # noqa: DAR402
     if_missing = EnvVarMissingBehavior(if_missing)
 
-    if not isinstance(raw_value, (str, Mapping)):
+    if not isinstance(raw_value, (str, t.Mapping)):
         return raw_value
 
     def replacer(match: re.Match) -> str:
@@ -557,25 +539,25 @@ def expand_env_vars(
 # `raw_value` is a dict, as opposed to once per key-value pair.
 def _expand_env_vars(
     raw_value: Expandable,
-    replacer: Callable[[re.Match], str],
+    replacer: t.Callable[[re.Match], str],
     flat: bool,
 ) -> Expandable:
-    if isinstance(raw_value, Mapping):
+    if isinstance(raw_value, t.Mapping):
         if flat:
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
             k: _expand_env_vars(v, replacer, flat)
-            if isinstance(v, (str, Mapping))
+            if isinstance(v, (str, t.Mapping))
             else v
             for k, v in raw_value.items()
         }
     return ENV_VAR_PATTERN.sub(replacer, raw_value)
 
 
-T = TypeVar("T")
+T = t.TypeVar("T")
 
 
-def uniques_in(original: Sequence[T]) -> list[T]:
+def uniques_in(original: t.Sequence[T]) -> list[T]:
     """Get unique elements from an iterable while preserving order.
 
     Args:
@@ -644,7 +626,7 @@ def format_exception(exception: BaseException) -> str:
     )
 
 
-def safe_hasattr(obj: Any, name: str) -> bool:
+def safe_hasattr(obj: t.Any, name: str) -> bool:
     """Safely checks if an object has a given attribute.
 
     This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
@@ -715,3 +697,113 @@ def get_no_color_flag() -> bool:
         True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
     """
     return get_boolean_env_var("NO_COLOR")
+
+
+class MergeStrategy(t.NamedTuple):
+    """Strategy to be used when merging instances of a type.
+
+    The first value of this tuple, `applicable_for_instance_of`, is a type or
+    tuple of types for which the behavior (see below) should apply. An
+    `isinstance` check is performed on each yet-unprocessed value using these
+    types.
+
+    The second value of this tuple, `behavior`, is a function which is provided
+    the dictionary being merged into, the key into that dictionary that is
+    being affected, the value for which
+    `isinstance(value, applicable_for_instance_of)` was true, and the tuple of
+    merge strategies in use (provided to enable recursion by calling
+    `deep_merge`).
+
+    If the behavior function returns `NotImplemented` then it will be skipped,
+    and later items in the tuple of merge strategies will be tried instead.
+    """
+
+    applicable_for_instance_of: type | tuple[type, ...]
+    behavior: t.Callable[
+        [t.MutableMapping[str, t.Any], str, t.Any, tuple[MergeStrategy, ...] | None],
+        None,
+    ]
+
+
+@runtime_checkable
+class Extendable(Protocol):
+    """A type protocol for types which have an `extend` method."""
+
+    def extend(self, x: t.Any) -> None:
+        """Extend the current instance with another value.
+
+        Args:
+            x: A value to extend this instance with.
+        """
+
+
+default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
+    MergeStrategy(
+        t.Mapping,
+        lambda x, k, v, s: setitem(
+            x, k, _deep_merge(x.setdefault(k, v.__class__()), v, strategies=s)
+        ),
+    ),
+    MergeStrategy(
+        Extendable, lambda x, k, v, _: x.setdefault(k, v.__class__()).extend(v)
+    ),
+    MergeStrategy(object, lambda x, k, v, _: setitem(x, k, v)),
+)
+
+
+TMapping = t.TypeVar("TMapping", bound=t.Mapping)
+
+
+def deep_merge(
+    *data: TMapping,
+    strategies: tuple[MergeStrategy, ...] = default_deep_merge_strategies,
+) -> TMapping:
+    """Merge multiple mappings at depth.
+
+    Args:
+        data: The mappings.
+        strategies: A tuple of merge strategies, which are pairs of
+            `(applicable type, behavior function)`. Each type will be tried in
+            order until one passes an `isinstance` check for the value being
+            merged, then the associated behavior function will be called to
+            perform the merge. Refer to the documentation for `MergeStrategy`
+            for more details. By default, the merge strategies will merge
+            mappings with a recursive deep merge, objects with an `extend`
+            method (e.g. `lists`) using the `extend` method, and all other
+            objects with `setitem(dict_being_merged_into, key, value)`.
+
+    Returns:
+        The merged mapping.
+    """
+    return reduce(lambda a, b: _deep_merge(a, b, strategies), data)
+
+
+def _deep_merge(a, b, strategies):
+    base: TMapping = copy(a)
+    for key, value in b.items():
+        for applicable_types, behavior in strategies:
+            if (
+                isinstance(value, applicable_types)
+                and behavior(base, key, value, strategies) is not NotImplemented
+            ):
+                break
+    return base
+
+
+def remove_suffix(string: str, suffix: str) -> str:
+    """Remove suffix from string.
+
+    Compatible with Python 3.8
+
+    Args:
+        string: the string to remove suffix from
+        suffix: the suffix to remove
+
+    Returns:
+        The changed string
+    """
+    if sys.version_info >= (3, 9):
+        return string.removesuffix(suffix)
+    elif string.endswith(suffix):
+        return string[: -len(suffix)]
+    return string

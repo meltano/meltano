@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import sys
+import typing as t
 import uuid
+from contextlib import suppress
 from pathlib import Path
 from types import TracebackType
-from typing import Dict, List, Union
 
 from snowplow_tracker import SelfDescribingJson
 
@@ -15,9 +16,9 @@ from meltano.core.utils import hash_sha256
 
 BASE_PATHS = (sys.prefix, sys.exec_prefix, sys.base_prefix, sys.base_exec_prefix)
 
-TracebackLevelsJSON = List[Dict[str, Union[str, int]]]
-ExceptionContextJSON = Dict[
-    str, Union[str, TracebackLevelsJSON, "ExceptionContextJSON"]
+TracebackLevelsJSON = t.List[t.Dict[str, t.Union[str, int]]]
+ExceptionContextJSON = t.Dict[
+    str, t.Union[str, TracebackLevelsJSON, "ExceptionContextJSON"]
 ]
 
 
@@ -104,10 +105,9 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
     path = Path(str_path)
 
     for base_path in BASE_PATHS:
-        try:
+        with suppress(ValueError):
+            # Try to make the path relative to each base path until one works
             return path.relative_to(base_path).as_posix()
-        except ValueError:  # Path could not be made relative to `base_path`
-            pass  # Try making it relative to the next base path
 
     if path.parts[-1] in {"__init__.py", "__main__.py"}:
         # Include the module directory if the file is `__init__.py` or `__main__.py`

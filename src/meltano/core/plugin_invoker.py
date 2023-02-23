@@ -6,10 +6,10 @@ import asyncio
 import enum
 import logging
 import os
+import typing as t
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Generator
 
 from structlog.stdlib import get_logger
 
@@ -21,8 +21,6 @@ from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
@@ -129,12 +127,11 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self,
         project: Project,
         plugin: ProjectPlugin,
-        context: Any | None = None,
+        context: t.Any | None = None,
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
         config_dir: Path | None = None,
         venv_service: VenvService | None = None,
-        plugins_service: ProjectPluginsService | None = None,
         plugin_config_service: PluginConfigService | None = None,
         plugin_settings_service: PluginSettingsService | None = None,
     ):
@@ -148,7 +145,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             run_dir: Execution directory.
             config_dir: Configuration files directory.
             venv_service: Virtual Environment manager.
-            plugins_service: Plugin manager.
             plugin_config_service: Plugin Configuration manager.
             plugin_settings_service: Plugin Settings manager.
         """
@@ -171,11 +167,8 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             run_dir or self.project.run_dir(plugin.name),
         )
 
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.settings_service = plugin_settings_service or PluginSettingsService(
-            project,
-            plugin,
-            plugins_service=self.plugins_service,
+            project, plugin
         )
 
         self._prepared = False
@@ -323,17 +316,13 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Returns:
             Dictionary of environment variables.
         """
-        project_settings_service = ProjectSettingsService(
-            self.project, config_service=self.plugins_service.config_service
-        )
-        with project_settings_service.feature_flag(
+        with self.project.settings.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
         ) as strict_env_var_mode:
-
             # Expand root env w/ os.environ
             expanded_project_env = {
                 **expand_env_vars(
-                    project_settings_service.env,
+                    self.project.settings.env,
                     os.environ,
                     if_missing=EnvVarMissingBehavior(  # noqa: WPS204
                         strict_env_var_mode
@@ -348,11 +337,11 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             # Expand active env w/ expanded root env
             expanded_active_env = (
                 expand_env_vars(
-                    self.settings_service.project.active_environment.env,
+                    self.settings_service.project.environment.env,
                     expanded_project_env,
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
-                if self.settings_service.project.active_environment
+                if self.settings_service.project.environment
                 else {}
             )
 
@@ -399,7 +388,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return env
 
-    def Popen_options(self) -> dict[str, Any]:  # noqa: N802
+    def Popen_options(self) -> dict[str, t.Any]:  # noqa: N802
         """Get options for subprocess.Popen.
 
         Returns:
@@ -412,10 +401,10 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self,
         *args: str,
         require_preparation: bool = True,
-        env: dict[str, Any] | None = None,
+        env: dict[str, t.Any] | None = None,
         command: str | None = None,
         **kwargs,
-    ) -> Generator[list[str], dict[str, Any], dict[str, Any]]:  # noqa: WPS221
+    ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:  # noqa: WPS221
         env = env or {}
 
         if require_preparation and not self._prepared:

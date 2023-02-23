@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import signal
-from typing import TYPE_CHECKING
+import typing as t
 
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_spec import ContainerSpec
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from aiodocker.containers import DockerContainer
 
 

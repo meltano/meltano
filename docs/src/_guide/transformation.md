@@ -5,7 +5,7 @@ layout: doc
 weight: 5
 ---
 
-Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations. A transform in Meltano is simply a set of dbt models that can be installed as a package. See the [transform plugin](/concepts/plugins#transforms) docs for more details.
+Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is the default location for your dbt configuration, models, packages, etc in order to run transformations. After installing a dbt plugin you can run an `initialize` command to automatically populate the contents of that directory.
 
 <div class="notification is-info">
   <p>If you already have an existing dbt project that you'd like to migrate to Meltano, check out the <a href="/guide/existing-dbt-project">existing dbt project guide</a> for more details.</p>
@@ -14,21 +14,20 @@ Transformations in Meltano are implemented using dbt. All Meltano generated proj
 ## Adapter-Specific dbt Transformation
 
 In alignment with the [dbt documentation](https://docs.getdbt.com/docs/available-adapters), we support adapter-specific installations of `dbt`.
-We currently support Snowflake, Postgres, Redshift, and BigQuery.
+See [MeltanoHub](https://hub.meltano.com/utilities/) for a list of all the supported adapters (e.g. Snowflake, Postgres, Redshift, BigQuery, DuckDB, etc.)
 
 If you are interested in another adapter, please consider contributing its definition to [MeltanoHub](https://hub.meltano.com/transformers/).
-Alternatively, all others are currently supported by the [`dbt` transformer](/guide/transformation#dbt-installation-and-configuration-classic).
 
 ### Install `dbt`
 
-To install an adapter-specific variant of dbt to your project, run:
+To install a dbt utility to your project, run:
 
 ```bash
-# list available transformer plugins
-meltano discover transformers
+# list available utilities plugins
+meltano discover utilities
 
 # install adapter-specific dbt, e.g. for snowflake
-meltano add transformer dbt-snowflake
+meltano add utility dbt-snowflake
 ```
 
 After dbt is installed you can configure it using `config` CLI commands, [Meltano environments](/concepts/environments) or environment variables:
@@ -48,7 +47,7 @@ More details on [configuring plugins](/guide/configuration), including with [env
 
 ### Running `dbt` in Meltano
 
-There are two ways to run adapter-specific dbt plugins using Meltano; in a pipeline using the [`run`](/reference/command-line-interface#run) command or standalone with arguments using the [`invoke`](/reference/command-line-interface#invoke) command.
+There are two ways to run dbt utility plugins using Meltano; in a pipeline using the [`run`](/reference/command-line-interface#run) command or standalone with arguments using the [`invoke`](/reference/command-line-interface#invoke) command.
 
 #### Running `dbt` as part of a Pipeline
 
@@ -64,7 +63,7 @@ To run a subset of your dbt project, define a [plugin command](/concepts/project
 ```yaml
 # meltano.yml
 plugins:
-  transformers:
+  utilities:
     - name: dbt-snowflake
       commands:
         my_models:
@@ -80,7 +79,7 @@ meltano --environment=dev run tap-gitlab target-snowflake dbt-snowflake:my_model
 
 #### Invoking `dbt`
 
-Dbt can also be run directly, via the [`invoke`](/reference/command-line-interface#invoke) command:
+dbt can also be run directly, via the [`invoke`](/reference/command-line-interface#invoke) command:
 
 ```bash
 # run your entire dbt project
@@ -93,11 +92,35 @@ meltano invoke dbt-snowflake run --select +my_model_name
 meltano invoke dbt-snowflake:my_models
 ```
 
+## `dbt` Installation and Configuration (Transformer Plugin Type)
+
+<div class="notification is-warning">
+  <p> These instructions are the classic way of installing and running dbt as a transformer plugin type. </p>
+  <p> Users can still install dbt in this manner but we are prioritizing dbt utility plugin types for new and existing users.</p>
+</div>
+
+To learn more about the dbt `transformer` plugins, please see the
+[transformers plugin](https://hub.meltano.com/transformers/) documentation on [Meltano Hub](https://hub.meltano.com).
+The current recommendation to use `utility` dbt plugins is not supported by the `elt` command so continue using a `transformer` if you prefer using `elt` over `run`.
+
+To install the dbt transformer to your project run:
+
+```bash
+meltano add transformer dbt-<adapter-name>
+
+# For example:
+
+meltano add transformer dbt-snowflake
+```
+
+For more details on configuring a dbt `transformer` see the [Meltano Hub documentation](https://hub.meltano.com/transformers/).
+
+
 ## `dbt` Installation and Configuration (Classic)
 
 <div class="notification is-warning">
-  <p> These instructions are the classic way of installing and running dbt. </p>
-  <p> Users can still install dbt in this manner but we are prioritizing <a href="/guide/transformation#adapter-specific-dbt-transformation">adapter-specific dbt plugin installations for new and existing users</a>.</p>
+  <p> These instructions are the classic way of installing and running dbt as a transformer plugin type. </p>
+  <p> Users can still install dbt in this manner but we are prioritizing dbt utility plugin types for new and existing users.</p>
 </div>
 
 To learn more about the dbt Transformer package, please see the

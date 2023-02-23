@@ -94,7 +94,6 @@ class TestJob:
 
     @pytest.mark.asyncio
     async def test_run_interrupted(self, session):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
@@ -111,7 +110,6 @@ class TestJob:
 
     @pytest.mark.asyncio
     async def test_run_terminated(self, session):
-
         if platform.system() == "Windows":
             pytest.xfail(
                 "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"

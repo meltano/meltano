@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-from typing import Any
+import typing as t
 from urllib.request import urlopen
 
 import backoff
@@ -28,7 +28,7 @@ class SnowplowMicro:
         self.all()  # Wait until a connection is established
 
     @backoff.on_exception(backoff.expo, ConnectionError, max_tries=5)
-    def get(self, endpoint: str) -> Any:
+    def get(self, endpoint: str) -> t.Any:
         with urlopen(f"{self.url}/{endpoint}") as response:
             return json.load(response)
 
@@ -36,11 +36,11 @@ class SnowplowMicro:
         """Get a dict counting the number of good/bad events, and the total number of events."""
         return self.get("all")
 
-    def good(self) -> list[dict[str, Any]]:
+    def good(self) -> list[dict[str, t.Any]]:
         """Get a list of good events."""
         return self.get("good")
 
-    def bad(self) -> list[dict[str, Any]]:
+    def bad(self) -> list[dict[str, t.Any]]:
         """Get a list of bad events (e.g. those which failed schema validation)."""
         return self.get("bad")
 

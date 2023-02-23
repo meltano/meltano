@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import structlog
 from dotenv import dotenv_values
 
-from meltano.core.project import ProjectReadonly
+from meltano.core.error import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
-from .config_service import ConfigService
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = structlog.get_logger(__name__)
 
@@ -29,17 +31,27 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
     config_override = {}
     supports_environments = False
 
-    def __init__(self, *args, config_service: ConfigService | None = None, **kwargs):
-        """Instantiate ProjectSettingsService instance.
+    def __init__(
+        self,
+        project: Project,
+        show_hidden: bool = True,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
+    ):
+        """Instantiate a `ProjectSettingsService` instance.
 
         Args:
-            args: Positional arguments to pass to the superclass.
-            config_service: Project configuration service instance.
-            kwargs: Keyword arguments to pass to the superclass.
+            project: Meltano project instance.
+            show_hidden: Whether to display secret setting values.
+            env_override: Optional override environment values.
+            config_override:  Optional override configuration values.
         """
-        super().__init__(*args, **kwargs)
-
-        self.config_service = config_service or ConfigService(self.project)
+        super().__init__(
+            project=project,
+            show_hidden=show_hidden,
+            env_override=env_override,
+            config_override=config_override,
+        )
 
         self.env_override = {
             # terminal environment variables already present from SettingService.env
@@ -132,7 +144,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         Returns:
             A list of defined settings.
         """
-        return self.config_service.settings
+        return self.project.config_service.settings
 
     @property
     def meltano_yml_config(self):
@@ -141,7 +153,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         Returns:
             Current configuration in `meltano.yml`.
         """
-        return self.config_service.current_config
+        return self.project.config_service.current_config
 
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
@@ -149,7 +161,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         Args:
             config: Updated config.
         """
-        self.config_service.update_config(config)
+        self.project.config_service.update_config(config)
 
     def process_config(self, config) -> dict:
         """Process configuration dictionary for presentation in `meltano config meltano`.

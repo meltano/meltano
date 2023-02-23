@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 
 import structlog
 
@@ -17,7 +17,7 @@ from meltano.core.plugin_install_service import (
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.venv_service import VirtualEnv
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
 
@@ -272,11 +272,9 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
             plugin: The installed plugin.
             reason: The reason for the installation.
         """
-        update_config = PluginSettingsService(
-            install_service.project,
-            plugin,
-            plugins_service=install_service.plugins_service,
-        ).get("_update")
+        update_config = PluginSettingsService(install_service.project, plugin).get(
+            "_update"
+        )
         paths_to_update = [
             path for path, to_update in update_config.items() if to_update
         ]

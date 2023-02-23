@@ -5,12 +5,11 @@ from __future__ import annotations
 import logging
 import os
 import sys
-from typing import TYPE_CHECKING, NoReturn
+import typing as t
 
 from meltano.cli.utils import CliError
-from meltano.core.error import MeltanoError
+from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.logging import setup_logging
-from meltano.core.project import ProjectReadonly
 
 # TODO: Importing the cli.cli module breaks other cli module imports
 # This suggests a cyclic dependency or a poorly structured interface.
@@ -20,6 +19,7 @@ from meltano.cli.cli import cli  # isort:skip
 from meltano.cli import (  # isort:skip # noqa: WPS235
     add,
     cloud,
+    compile,
     config,
     discovery,
     dragon,
@@ -43,7 +43,7 @@ from meltano.cli import (  # isort:skip # noqa: WPS235
     job,
 )
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 
@@ -65,7 +65,7 @@ join our friendly Slack community.
 """
 
 
-def handle_meltano_error(error: MeltanoError) -> NoReturn:
+def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
     """Handle a MeltanoError.
 
     Args:

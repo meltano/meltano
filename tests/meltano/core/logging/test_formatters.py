@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import logging
 import re
+import typing as t
 from pathlib import Path
 from types import TracebackType
-from typing import cast
 
 import pytest
 
@@ -65,7 +65,7 @@ class TestLogFormatters:
         path = tmp_path / "my_module.py"
         path.write_text("cause_an_error()\n")
 
-        tb = cast(
+        tb = t.cast(
             TracebackType,
             FakeTraceback(
                 [

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import datetime
 import json
-from typing import Any
+import typing as t
 
 import structlog
 from sqlalchemy.orm import Session
@@ -16,7 +16,6 @@ from sqlalchemy.orm import Session
 from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import SINGER_STATE_KEY, JobState
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.state_store import state_store_manager_from_project_settings
 
 logger = structlog.getLogger(__name__)
@@ -40,7 +39,6 @@ class StateService:  # noqa: WPS214
             session: the session to use, if using SYSTEMDB state backend
         """
         self.project = project or Project.find()
-        self.settings_service = ProjectSettingsService(self.project)
         self.session = session
         self._state_store_manager = None
 
@@ -88,12 +86,12 @@ class StateService:  # noqa: WPS214
         """
         if not self._state_store_manager:
             self._state_store_manager = state_store_manager_from_project_settings(
-                self.settings_service, self.session
+                self.project.settings, self.session
             )
         return self._state_store_manager
 
     @staticmethod
-    def validate_state(state: dict[str, Any]):
+    def validate_state(state: dict[str, t.Any]):
         """Check that the given state str is valid.
 
         Args:
@@ -188,9 +186,11 @@ class StateService:  # noqa: WPS214
             state_id_src: the state_id to get state from
             state_id_dst: the state_id_to merge state onto
         """
-        src_state_dict = self.get_state(state_id_src)
-        src_state = json.dumps(src_state_dict)
-        self.add_state(state_id_dst, src_state, payload_flags=Payload.INCOMPLETE_STATE)
+        self.add_state(
+            state_id_dst,
+            json.dumps(self.get_state(state_id_src)),
+            payload_flags=Payload.INCOMPLETE_STATE,
+        )
 
     def copy_state(self, state_id_src: str, state_id_dst: str):
         """Copy state from Job state_id_src onto Job state_id_dst.
@@ -199,9 +199,7 @@ class StateService:  # noqa: WPS214
             state_id_src: the state_id to get state from
             state_id_dst: the state_id_to copy state onto
         """
-        src_state_dict = self.get_state(state_id_src)
-        src_state = json.dumps(src_state_dict)
-        self.set_state(state_id_dst, src_state)
+        self.set_state(state_id_dst, json.dumps(self.get_state(state_id_src)))
 
     def move_state(self, state_id_src: str, state_id_dst: str):
         """Move state from Job state_id_src to Job state_id_dst.
@@ -210,7 +208,5 @@ class StateService:  # noqa: WPS214
             state_id_src: the state_id to get state from and clear
             state_id_dst: the state_id_to move state onto
         """
-        src_state_dict = self.get_state(state_id_src)
-        src_state = json.dumps(src_state_dict)
-        self.set_state(state_id_dst, src_state)
+        self.set_state(state_id_dst, json.dumps(self.get_state(state_id_src)))
         self.clear_state(state_id_src)

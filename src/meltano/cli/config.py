@@ -6,9 +6,9 @@ import asyncio
 import json
 import logging
 import tempfile
+import typing as t
 from functools import wraps
 from pathlib import Path
-from typing import Any
 
 import click
 import dotenv
@@ -29,8 +29,6 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
@@ -38,7 +36,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 logger = logging.getLogger(__name__)
 
 
-def _get_ctx_arg(*args: Any) -> click.core.Context:
+def _get_ctx_arg(*args: t.Any) -> click.core.Context:
     """Get the click.core.Context arg from a set of args.
 
     Args:
@@ -152,10 +150,8 @@ def config(  # noqa: WPS231
         tracker.track_command_event(CliEvent.aborted)
         raise
 
-    plugins_service = ProjectPluginsService(project)
-
     try:
-        plugin = plugins_service.find_plugin(
+        plugin = project.plugins.find_plugin(
             plugin_name, plugin_type=plugin_type, configurable=True
         )
     except PluginNotFoundError:
@@ -173,16 +169,10 @@ def config(  # noqa: WPS231
     session = Session()
     try:
         if plugin:
-            settings = PluginSettingsService(
-                project,
-                plugin,
-                plugins_service=plugins_service,
-            )
+            settings = PluginSettingsService(project, plugin)
             invoker = PluginInvoker(project, plugin)
         else:
-            settings = ProjectSettingsService(
-                project, config_service=plugins_service.config_service
-            )
+            settings = project.settings
             invoker = None
 
         ctx.obj["settings"] = settings
@@ -351,7 +341,7 @@ def reset(ctx, store):
 def set_(
     ctx: click.core.Context,
     setting_name: tuple[str, ...],
-    value: Any,
+    value: t.Any,
     store: str,
     interactive: bool,
 ):
