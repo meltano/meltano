@@ -57,7 +57,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         self._session = ClientSession(
             headers={
                 "Content-Type": "application/json",
-                "User-Agent": f"Meltano Cloud CLI/v{version('meltano')}",
+                "User-Agent": f"Meltano Cloud CLI/v{version('meltano.cloud.cli')}",
             },
         )
         return self
