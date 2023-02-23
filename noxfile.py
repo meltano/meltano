@@ -52,6 +52,7 @@ pytest_deps = (
     "pytest-randomly",
     "pytest-xdist",
     "requests-mock",
+    "aioresponses",
 )
 
 

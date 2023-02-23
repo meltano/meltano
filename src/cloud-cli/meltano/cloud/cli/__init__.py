@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import click
+from structlog import get_logger
 
+from meltano.cloud.api import MeltanoCloudError
+from meltano.cloud.cli import run  # noqa: F401
+from meltano.cloud.cli.base import cloud
 
-@click.group(invoke_without_command=True, no_args_is_help=True)
-@click.version_option()
-def cloud() -> None:
-    """Interface with Meltano Cloud."""
+logger = get_logger()
 
 
 def main() -> int:
@@ -19,6 +20,10 @@ def main() -> int:
     """
     try:
         cloud()
-    except Exception:
+    except MeltanoCloudError as e:
+        click.secho(e.response.reason, fg="red")
+        return 1
+    except Exception as e:
+        logger.error("An unexpected error occurred.", exc_info=e)
         return 1
     return 0

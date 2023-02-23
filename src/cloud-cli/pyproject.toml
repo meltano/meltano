@@ -32,9 +32,17 @@ packages = [
 "Youtube" = "https://www.youtube.com/meltano"
 
 [tool.poetry.dependencies]
+aiohttp = "^3.8.4"
+cached-property = "^1"
 click = "^8.1"
+importlib-metadata = {version = "^6.0.0", python = "<3.8"}
+pydantic = "^1.10.5"
 python = ">=3.7,<3.12"
 requests = "^2.28.0"
+structlog = "^22.3.0"
 
 [tool.poetry.scripts]
 meltano-cloud = "meltano.cloud.cli:main"
+
+[tool.poetry.group.dev.dependencies]
+aioresponses = "^0.7.4"
