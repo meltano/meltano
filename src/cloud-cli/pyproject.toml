@@ -43,3 +43,6 @@ structlog = "^22.3.0"
 
 [tool.poetry.scripts]
 meltano-cloud = "meltano.cloud.cli:main"
+
+[tool.poetry.group.dev.dependencies]
+aioresponses = "^0.7.4"

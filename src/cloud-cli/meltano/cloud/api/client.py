@@ -34,7 +34,7 @@ class MeltanoCloudError(Exception):
         super().__init__(response.reason)
 
 
-class MeltanoCloudClient:
+class MeltanoCloudClient:  # noqa: WPS214
     """Client for the Meltano Cloud API.
 
     Attributes:
@@ -104,7 +104,7 @@ class MeltanoCloudClient:
         path: str,
         url: str | None = API_URL,
         **kwargs: t.Any,
-    ) -> dict:
+    ) -> str:
         """Make a request to the Meltano Cloud API.
 
         Args:
@@ -114,7 +114,7 @@ class MeltanoCloudClient:
             **kwargs: Additional keyword arguments to pass to the request.
 
         Returns:
-            The response JSON.
+            The response content.
 
         Raises:
             MeltanoCloudError: If the response status is not OK.
@@ -124,7 +124,6 @@ class MeltanoCloudClient:
             "Making request",
             method=method,
             url=url,
-            headers=kwargs.get("headers"),
         )
 
         async with self.session.request(
@@ -136,7 +135,27 @@ class MeltanoCloudClient:
                 response.raise_for_status()
             except ClientResponseError as e:
                 raise MeltanoCloudError(response) from e
-            return await response.json()
+            return await response.text()
+
+    @staticmethod
+    def construct_runner_path(
+        tenant_resource_key: str,
+        project_id: str,
+        environment: str,
+        job_or_schedule: str,
+    ) -> str:
+        """Construct the Cloud Runners URL.
+
+        Args:
+            tenant_resource_key: The tenant resource key.
+            project_id: The project identifier.
+            environment: The Meltano environment to run.
+            job_or_schedule: The job or schedule identifier.
+
+        Returns:
+            The Cloud Runners URL.
+        """
+        return f"/{tenant_resource_key}/{project_id}/{environment}/{job_or_schedule}"
 
     async def run_project(
         self,
@@ -146,7 +165,7 @@ class MeltanoCloudClient:
         job_or_schedule: str,
         api_key: str,
         runner_secret: str,
-    ) -> dict:
+    ) -> str:
         """Run a Meltano project in Meltano Cloud.
 
         Args:
@@ -162,7 +181,12 @@ class MeltanoCloudClient:
         """
         return await self._request(
             "POST",
-            f"/{tenant_resource_key}/{project_id}/{environment}/{job_or_schedule}",
+            self.construct_runner_path(
+                tenant_resource_key,
+                project_id,
+                environment,
+                job_or_schedule,
+            ),
             url=self.CLOUD_RUNNERS_URL,
             headers={
                 "x-api-key": api_key,

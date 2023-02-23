@@ -38,7 +38,7 @@ async def run_project(
     project_id: str,
     environment: str,
     job_or_schedule: str,
-) -> dict:
+) -> str:
     """Run a project in Meltano Cloud.
 
     Args:
@@ -89,6 +89,6 @@ def run(job_or_schedule: str, environment: str, project_id: str) -> None:
             project_id,
             environment,
             job_or_schedule,
-        )
+        ),
     )
     click.echo(result)
