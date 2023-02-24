@@ -230,7 +230,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         prep = self._build_request("GET", url)
         settings = self.session.merge_environment_settings(
             prep.url,
-            None,
+            {},
             None,
             None,
             None,
