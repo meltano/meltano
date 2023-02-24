@@ -2,6 +2,14 @@
 
 from __future__ import annotations
 
+from contextlib import suppress
+
+# NOTE: Importing the readline module enables the use of arrow
+#       keys for text navigation during interactive config.
+#       Refer to https://docs.python.org/3/library/readline.html
+with suppress(ImportError):
+    import readline  # noqa: F401
+
 import click
 from jinja2 import BaseLoader, Environment
 from rich.console import Console, Group
