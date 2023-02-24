@@ -941,7 +941,7 @@ idna = ">=2.0.0"
 name = "exceptiongroup"
 version = "1.1.0"
 description = "Backport of PEP 654 (exception groups)"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1367,7 +1367,7 @@ testing = ["flake8 (<5)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-chec
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1676,7 +1676,7 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.2.2)", "pytest (>=7.2.1)", "pytes
 name = "pluggy"
 version = "1.0.0"
 description = "plugin and hook calling mechanisms for python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1876,7 +1876,7 @@ python-versions = ">=3.7"
 name = "pytest"
 version = "7.2.1"
 description = "pytest: simple powerful testing with Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1981,7 +1981,7 @@ pytest = "*"
 name = "pytest-structlog"
 version = "0.6"
 description = "Structured logging assertions"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -2338,7 +2338,7 @@ typing = ["mypy", "rich", "twisted"]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -2609,7 +2609,7 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.12"
-content-hash = "039cdc15f0bf895f4bd7dd433d925487bf10bd1a007db7fe4f2077dca2adca27"
+content-hash = "b3b056dc103d068943d42be6d6b5ef493c65432f20ca0cbaeb86c2f981bb40ef"
 
 [metadata.files]
 aiodocker = [
