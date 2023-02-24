@@ -40,6 +40,7 @@ pydantic = "^1.10.5"
 python = ">=3.7,<3.12"
 requests = "^2.28.0"
 structlog = "^22.3.0"
+platformdirs = "^3.0.0"
 
 [tool.poetry.scripts]
 meltano-cloud = "meltano.cloud.cli:main"
