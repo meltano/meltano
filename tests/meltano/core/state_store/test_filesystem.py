@@ -127,7 +127,7 @@ class TestLocalFilesystemStateStoreManager:
         state_path,
         state_ids_with_expected_states,
     ):
-        for (state_id, expected_state) in state_ids_with_expected_states:
+        for state_id, expected_state in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
             Path(state_dir).mkdir(parents=True)
             with open(  # noqa: WPS515
@@ -135,7 +135,7 @@ class TestLocalFilesystemStateStoreManager:
             ) as state_file:
                 json.dump(expected_state, state_file)
 
-        for (state_id, expected_state) in state_ids_with_expected_states:
+        for state_id, expected_state in state_ids_with_expected_states:
             assert subject.get(state_id) == JobState.from_json(
                 state_id, json.dumps(expected_state)
             )
@@ -146,11 +146,11 @@ class TestLocalFilesystemStateStoreManager:
         state_path,
         state_ids_with_expected_states,
     ):
-        for (state_id, expected_state) in state_ids_with_expected_states:
+        for state_id, expected_state in state_ids_with_expected_states:
             subject.set(
                 JobState.from_json(state_id, json.dumps({"completed": expected_state})),
             )
-        for (state_id, expected_state) in state_ids_with_expected_states:
+        for state_id, expected_state in state_ids_with_expected_states:
             with open(
                 os.path.join(state_path, encode_if_on_windows(state_id), "state.json")
             ) as state_file:
@@ -190,12 +190,12 @@ class TestLocalFilesystemStateStoreManager:
         state_path,
         state_ids_with_expected_states,
     ):
-        for (state_id, expected_state) in state_ids_with_expected_states:
+        for state_id, expected_state in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
             Path(state_dir).mkdir(parents=True)
             with open(os.path.join(state_dir, "state.json"), "w+") as state_file:
                 json.dump(expected_state, state_file)
-        for (state_id, _) in state_ids_with_expected_states:
+        for state_id, _ in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
             filepath = os.path.join(state_dir, "state.json")
             assert os.path.exists(filepath)

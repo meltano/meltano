@@ -37,7 +37,7 @@ class TestPluginInstallService:
                     }
                 )
             )
-
+        project.refresh()
         return PluginInstallService(project)
 
     def test_default_init_should_not_fail(self, subject):
@@ -45,7 +45,7 @@ class TestPluginInstallService:
 
     def test_remove_duplicates(self, subject):
         states, deduped_plugins = subject.remove_duplicates(
-            plugins=subject.plugins_service.plugins(),
+            plugins=subject.project.plugins.plugins(),
             reason=PluginInstallReason.INSTALL,
         )
 

@@ -157,7 +157,6 @@ class TestCliSchedule:
     def test_schedule_set(
         self, cli_runner, elt_schedule, job_schedule, schedule_service
     ):
-
         with mock.patch(
             "meltano.cli.schedule.ScheduleService", return_value=schedule_service
         ):

@@ -69,10 +69,12 @@ def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
 
 
 @pytest.fixture
-def active_environment(project: Project) -> Environment:
+def environment(project: Project) -> Environment:
     project.activate_environment("dev")
-    yield project.active_environment
-    project.active_environment = None
+    try:
+        yield project.environment
+    finally:
+        project.deactivate_environment()
 
 
 class TestPluginSettingsService:
@@ -207,7 +209,7 @@ class TestPluginSettingsService:
 
     def test_environment_only_config(
         self,
-        active_environment: Environment,
+        environment: Environment,
         subject: PluginSettingsService,
         project: Project,
     ):
@@ -224,7 +226,7 @@ class TestPluginSettingsService:
 
             dev_environment = meltano.environments[0]
             env_plugin = dev_environment.config.plugins[PluginType.EXTRACTORS][0]
-            assert dev_environment == active_environment
+            assert dev_environment == environment
             assert env_plugin.config["test_environment"] == "THIS_IS_FROM_ENVIRONMENT"
 
     def test_as_dict_process(self, subject: PluginSettingsService, tap):
@@ -804,7 +806,7 @@ class TestPluginSettingsService:
 
     def test_extra_object(
         self,
-        active_environment,
+        environment,
         subject,
         monkeypatch,
         env_var,
@@ -883,7 +885,7 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_ENV,
         )
 
-        subject.project.active_environment = None
+        subject.project.deactivate_environment()
 
         inherited = project_add_service.add(
             PluginType.TRANSFORMS,

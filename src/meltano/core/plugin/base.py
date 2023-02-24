@@ -11,11 +11,10 @@ from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
 from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.plugin.command import Command
+from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, YAMLEnum
 from meltano.core.utils import NotFound, find_named
-
-from .command import Command
-from .requirements import PluginRequirement
 
 logger = logging.getLogger(__name__)
 

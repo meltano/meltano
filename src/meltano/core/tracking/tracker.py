@@ -7,25 +7,24 @@ import json
 import locale
 import os
 import re
+import sys
+import typing as t
 import uuid
 from collections.abc import Mapping
 from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NamedTuple
 from urllib.parse import urlparse
 from warnings import warn
 
 import structlog
 import tzlocal
-from cached_property import cached_property
 from psutil import Process
 from snowplow_tracker import Emitter, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -34,12 +33,18 @@ from meltano.core.tracking.schemas import (
 )
 from meltano.core.utils import format_exception
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.tracking.contexts import (  # noqa: F401
         CliEvent,
         EnvironmentContext,
         ProjectContext,
     )
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -71,7 +76,7 @@ def check_url(url: str) -> bool:
     return bool(re.match(URL_REGEX, url))
 
 
-class TelemetrySettings(NamedTuple):
+class TelemetrySettings(t.NamedTuple):
     """Settings which control telemetry and anonymous usage stats.
 
     These are stored within `analytics.json`.
@@ -105,13 +110,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         )
 
         self.project = project
-        self.settings_service = ProjectSettingsService(project)
-        self.send_anonymous_usage_stats = self.settings_service.get(
+        self.send_anonymous_usage_stats = project.settings.get(
             "send_anonymous_usage_stats",
-            not self.settings_service.get("disable_tracking", False),
+            not project.settings.get("disable_tracking", False),
         )
 
-        endpoints = self.settings_service.get("snowplow.collector_endpoints")
+        endpoints = project.settings.get("snowplow.collector_endpoints")
 
         emitters: list[Emitter] = []
         for endpoint in endpoints:
@@ -427,7 +431,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
     def _uuid_from_str(
         self,
-        from_val: Any | None,
+        from_val: t.Any | None,
         warn: bool,  # noqa: WPS442
     ) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.

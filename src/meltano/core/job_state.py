@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from datetime import datetime
 from io import TextIOWrapper
-from typing import Any
 
 from sqlalchemy import Column, types
 from sqlalchemy.ext.mutable import MutableDict
@@ -33,8 +33,8 @@ class JobState(SystemModel):  # noqa: WPS214
 
     updated_at = Column(types.DATETIME, onupdate=datetime.now)
 
-    partial_state: Mapped[Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
-    completed_state: Mapped[Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
+    partial_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
+    completed_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another JobState.
@@ -67,8 +67,8 @@ class JobState(SystemModel):  # noqa: WPS214
         Returns:
             JobState built from job run history
         """
-        completed_state: dict[Any, Any] = {}
-        partial_state: dict[Any, Any] = {}
+        completed_state: dict[t.Any, t.Any] = {}
+        partial_state: dict[t.Any, t.Any] = {}
         incomplete_since = None
         finder = JobFinder(state_id)
 

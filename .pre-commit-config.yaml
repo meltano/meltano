@@ -34,7 +34,7 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        exclude: (cli_messages\.py)
+        exclude: ^src/meltano/core/cli_messages\.py$
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
@@ -68,7 +68,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.33.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.34.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
@@ -79,14 +79,14 @@ repos:
           - "@vue/eslint-config-prettier@7.0.0"
           - "@vue/babel-preset-app@5.0.8"
           - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.33.0" # Keep this in sync with the rev above!
+          - "eslint@8.34.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.5.0"
           - "eslint-plugin-prettier@4.2.1"
           - "eslint-plugin-vue@9.8.0"
           - "prettier@2.8.1"
 
   - repo: https://github.com/psf/black
-    rev: 22.12.0
+    rev: 23.1.0
     hooks:
       - id: black
         exclude: ^(src/meltano/migrations/)
@@ -107,6 +107,8 @@ repos:
     hooks:
       - id: flakeheaven
         exclude: ^(src/meltano/migrations/)
+        args:
+          - "--max-local-variables=8"
         additional_dependencies:
           - flake8==4.0.1
           - flake8-bandit==3.0.0
@@ -122,5 +124,6 @@ repos:
           - flake8-quotes==3.3.1
           - flake8-rst-docstrings==0.2.7
           - flake8-string-format==0.3.0
+          - flake8-typing-as-t==0.0.3
           - pep8-naming==0.12.1
           - wemake-python-styleguide==0.16.1

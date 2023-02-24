@@ -120,6 +120,65 @@ meltano add extractor tap-spotify --no-install
 
 The `add` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
+## `compile`
+
+<div class="notification is-warning">
+    <p><a href="https://github.com/meltano/meltano/discussions/7323">The compile command is currently in beta</a>, and subject to change without corresponding semantic version updates.</p>
+</div>
+
+### How to use
+
+Generally, the `compile` command need not be executed manually, as it will be run automatically by Meltano as-needed.
+
+If you wish to manually compile a manifest file for each environment (including the no-environment manifest file), the compile command can be used like so:
+
+```bash
+meltano compile
+```
+
+To compile a manifest file for a specific environment:
+
+```bash
+meltano --environment <environment name> compile
+```
+
+To compile the no-environment manifest file:
+
+```bash
+meltano --no-environment compile
+```
+
+To save the manifest JSON files to a specific directory:
+
+```bash
+meltano compile --directory /some/directory/path
+```
+
+By default, the manifest files are saved to `${MELTANO_SYS_DIR_ROOT}/manifests`, which defaults to `${MELTANO_PROJECT_ROOT}/.meltano/manifests`.
+
+Use the `--indent` CLI option to control the indentation in the manifest JSON files:
+
+```bash
+# Use 2 spaces of indentation instead of the default 4
+meltano compile --indent 2
+
+# Only use newlines
+meltano compile --indent 0
+
+# Remove all non-essential whitespace
+meltano compile --indent -1
+```
+
+### Using `compile` with Environments
+
+The `compile` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
+
+When an environment is specified, only the manifest JSON file for that environment will be compiled.
+
+When no environment is explicitly specified, a manifest JSON file for each environment is compiled, including `meltano-manifest.json`, which is the manifest file for the project when no environment is active.
+
+To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.json`, pass the `--no-environment` CLI option to `meltano`.
+
 ## `config`
 
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
@@ -182,6 +241,14 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 
 ```bash
 meltano config --plugin-type=<type> <plugin> ...
+```
+
+When setting a config value that contains the character `$`, you can avoid expansion by
+escaping it with `\` or using single quotes:
+
+```bash
+meltano config <plugin> set <name> "@\$a"
+meltano config <plugin> set <name> '@$a'
 ```
 
 #### Nested properties

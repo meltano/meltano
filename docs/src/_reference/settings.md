@@ -159,7 +159,7 @@ meltano config meltano set database_uri postgresql://<username>:<password>@<host
 
 export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<database>
 
-meltano elt --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
+meltano run --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
 ```
 
 #### Targeting a PostgreSQL Schema

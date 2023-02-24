@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 
 import click
 import structlog
@@ -15,10 +15,10 @@ from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
     PluginLockService,
 )
-from meltano.core.project_plugins_service import DefinitionSource, ProjectPluginsService
+from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
@@ -57,15 +57,13 @@ def lock(
     tracker = ctx.obj["tracker"]
 
     lock_service = PluginLockService(project)
-    plugins_service = ProjectPluginsService(project)
-
     if (all_plugins and plugin_name) or not (all_plugins or plugin_name):
         tracker.track_command_event(CliEvent.aborted)
         raise CliError("Exactly one of --all or plugin name must be specified.")
 
     try:
         # Make it a list so source preference is not lazily evaluated.
-        plugins = list(plugins_service.plugins())
+        plugins = list(project.plugins.plugins())
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise
@@ -89,8 +87,8 @@ def lock(
             )
         else:
             plugin.parent = None
-            with plugins_service.use_preferred_source(DefinitionSource.HUB):
-                plugin = plugins_service.ensure_parent(plugin)
+            with project.plugins.use_preferred_source(DefinitionSource.HUB):
+                plugin = project.plugins.ensure_parent(plugin)
             try:
                 lock_service.save(plugin, exists_ok=update)
             except LockfileAlreadyExistsError as err:

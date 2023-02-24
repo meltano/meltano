@@ -1,3 +1,6 @@
+
+# If you add/update a setting that affects `meltano.yml`, update `meltano.schema.json` too!
+
 settings:
 # Project
 - name: default_environment
@@ -228,3 +231,5 @@ settings:
 - name: ff.strict_env_var_mode
   kind: boolean
   value: False
+
+# If you add/update a setting that affects `meltano.yml`, update `meltano.schema.json` too!

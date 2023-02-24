@@ -12,7 +12,6 @@ from .file import FilePlugin
 
 
 class MeltanoFilePlugin(FilePlugin):
-
     overwrite = {"meltano.yml"}
 
     def __init__(self, discovery: bool = False):

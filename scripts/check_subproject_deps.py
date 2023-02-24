@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import argparse
 import sys
+import typing as t
 from os import PathLike
 from pathlib import Path
-from typing import Sequence
 
 import tomli
 
@@ -64,7 +64,7 @@ def deps_from_pyproject_toml(pyproject_toml_path: PathLike) -> set[str]:
 
 def check_subproject_deps(
     root_pyproject_toml_path: PathLike,
-    subproject_pyproject_toml_paths: Sequence[PathLike],
+    subproject_pyproject_toml_paths: t.Sequence[PathLike],
 ) -> None:
     """Check that every subproject dep is included by the root project.
 
@@ -87,7 +87,7 @@ def check_subproject_deps(
             )
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv: t.Sequence[str] | None = None) -> int:
     """Run the script to check that subproject deps are included by the root project.
 
     Args:

@@ -1,15 +1,26 @@
 """Service to manage meltano.yml."""
+
 from __future__ import annotations
 
 import logging
 import os
+import sys
+import typing as t
 from contextlib import contextmanager
 
 import yaml
 
 from meltano.core import bundle
-from meltano.core.project import Project
+from meltano.core.meltano_file import MeltanoFile
 from meltano.core.setting_definition import SettingDefinition
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 
@@ -17,44 +28,33 @@ logger = logging.getLogger(__name__)
 class ConfigService:
     """Service to manage meltano.yml."""
 
-    def __init__(self, project: Project, use_cache=True):
+    def __init__(self, project: Project):
         """Create a new project configuration service.
 
         Args:
             project: the project to configure.
-            use_cache: whether to use the cache or not.
         """
         self.project = project
 
-        self._settings = None
-        self._current_meltano_yml = None
-        self._use_cache = use_cache
-
-    @property
-    def settings(self):
+    @cached_property
+    def settings(self) -> list[SettingDefinition]:
         """Return the project settings.
 
         Returns:
             The project settings.
         """
-        if self._settings is None:
-            with open(bundle.root / "settings.yml") as settings_yaml:
-                settings = yaml.safe_load(settings_yaml)
-            self._settings = list(map(SettingDefinition.parse, settings["settings"]))
+        with open(str(bundle.root / "settings.yml")) as settings_yaml:
+            settings_yaml_content = yaml.safe_load(settings_yaml)
+        return [SettingDefinition.parse(x) for x in settings_yaml_content["settings"]]
 
-        return self._settings
-
-    @property
-    def current_meltano_yml(self):
-        """Return the current meltano.yml contents.
+    @cached_property
+    def current_meltano_yml(self) -> MeltanoFile:
+        """Return the current `meltano.yml` contents.
 
         Returns:
-            The contents of meltano.yml.
+            The contents of `meltano.yml`.
         """
-        if self._current_meltano_yml is None or not self._use_cache:
-            self.project.clear_cache()
-            self._current_meltano_yml = self.project.meltano
-        return self._current_meltano_yml
+        return self.project.meltano
 
     @contextmanager
     def update_meltano_yml(self):
@@ -69,8 +69,6 @@ class ConfigService:
         with self.project.meltano_update() as meltano_yml:
             yield meltano_yml
 
-        self._current_meltano_yml = None
-
     @contextmanager
     def update_active_environment(self):
         """Update active environment.
@@ -78,20 +76,14 @@ class ConfigService:
         Yields:
             active environment
         """
-        environment = self.project.active_environment
-
+        environment = self.project.environment
         with self.update_meltano_yml() as meltano_yml:
             environments = meltano_yml.environments
-
             # find the proper environment to update
             env_idx, _ = next(
                 (idx, env) for idx, env in enumerate(environments) if env == environment
             )
-
-            active_environment = environments[env_idx]
-            yield active_environment
-
-        self.project.active_environment = active_environment
+            yield environments[env_idx]
 
     @property
     def current_config(self):

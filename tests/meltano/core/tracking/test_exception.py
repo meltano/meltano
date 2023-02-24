@@ -3,11 +3,11 @@ from __future__ import annotations
 import inspect
 import json
 import platform
+import typing as t
 import uuid
 import warnings
 from pathlib import Path
 from platform import python_version_tuple
-from typing import Any
 
 import pytest
 from jsonschema import ValidationError, validate
@@ -34,7 +34,7 @@ class CustomException(Exception):
     """A custom exception type to be used in `test_complex_exception_context`."""
 
 
-def is_valid_exception_context(instance: dict[str, Any]) -> bool:
+def is_valid_exception_context(instance: dict[str, t.Any]) -> bool:
     try:
         with warnings.catch_warnings():
             # Ignore the misleading warning thrown by `jsonschema`:

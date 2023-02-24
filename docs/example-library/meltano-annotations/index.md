@@ -10,6 +10,12 @@ To begin, download or copy the [meltano.yml](/docs/example-library/meltano-s3/me
 meltano install
 ```
 
+## Update a job
+
+```shell
+meltano job set gitlab-to-jsonl --tasks '[tap-gitlab target-jsonl]'
+```
+
 ## Configure meltano to use local filesystem for state.
 
 ```shell
@@ -21,12 +27,6 @@ meltano config meltano set state_backend.uri "file:///`pwd`/.meltano/state"
 ```shell
 meltano config tap-gitlab set start_date 2022-11-01T00:00:01Z
 meltano config target-jsonl set do_timestamp_file false
-```
-
-## Update a job
-
-```shell
-meltano job set gitlab-to-jsonl --tasks '[tap-gitlab target-jsonl]'
 ```
 
 ## Run a job

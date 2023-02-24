@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.16.0 (2023-02-21)
+
+### ✨ New
+
+- [#7287](https://github.com/meltano/meltano/issues/7287) Add support for `annotations` to provide documentation and 3rd-party configurations in `meltano.yml`
+- [#7148](https://github.com/meltano/meltano/issues/7148) Add the `meltano compile` command to generate Meltano manifest files
+
+### 🐛 Fixes
+
+- [#7331](https://github.com/meltano/meltano/issues/7331) Merge environment-level annotations into top level in manifest
+- [#7320](https://github.com/meltano/meltano/issues/7320) Correct trimming of state backend URIs for filesystem backends
+- [#7299](https://github.com/meltano/meltano/issues/7299) Respect `requests`/`curl` custom Certificate Authorities env vars
+
+### ⚙️ Under the Hood
+
+- [#7273](https://github.com/meltano/meltano/issues/7273) Add `settings` and `plugins` attributes to `Project`
+
+### 📚 Documentation Improvements
+
+- [#7322](https://github.com/meltano/meltano/issues/7322) State that the `meltano compile` command is in beta
+- [#7329](https://github.com/meltano/meltano/issues/7329) Update airbyte FAQ
+- [#7315](https://github.com/meltano/meltano/issues/7315) Escaping `$` in `meltano config <plugin> set`
+- [#7301](https://github.com/meltano/meltano/issues/7301) Refresh to prefer 'run' and 'invoke' over 'elt', and 'utilities' over 'transformers' and 'orchestrators'
+
 ## v2.15.3 (2023-02-09)
 
 ### 🐛 Fixes

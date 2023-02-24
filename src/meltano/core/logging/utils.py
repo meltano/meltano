@@ -6,7 +6,6 @@ import asyncio
 import logging
 import os
 import sys
-from contextlib import suppress
 from logging import config as logging_config
 
 import structlog
@@ -18,7 +17,6 @@ from meltano.core.logging.formatters import (
     rich_exception_formatter_factory,
 )
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import get_no_color_flag
 
 if sys.version_info >= (3, 8):
@@ -150,9 +148,8 @@ def setup_logging(  # noqa: WPS210
     log_level = log_level.upper()
 
     if project:
-        settings_service = ProjectSettingsService(project)
-        log_config = log_config or settings_service.get("cli.log_config")
-        log_level = settings_service.get("cli.log_level")
+        log_config = log_config or project.settings.get("cli.log_config")
+        log_level = project.settings.get("cli.log_level")
 
     config = read_config(log_config) or default_config(log_level)
     logging_config.dictConfig(config)
@@ -206,9 +203,7 @@ async def _write_line_writer(writer, line):
             writer.write(line)
             await writer.drain()
         except (BrokenPipeError, ConnectionResetError):
-            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
-                await writer.wait_closed()
-
+            await writer.wait_closed()
             return False
     else:
         writer.writeline(line.decode())

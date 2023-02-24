@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import typing as t
 from contextlib import asynccontextmanager, closing
 from pathlib import Path
-from typing import AsyncIterator
 
 import structlog
 from sqlalchemy.orm import Session
@@ -22,8 +22,6 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 from meltano.core.state_service import StateService
 
@@ -45,7 +43,6 @@ class ELBContext:  # noqa: WPS230
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService | None = None,
         session: Session | None = None,
         job: Job | None = None,
         full_refresh: bool | None = False,
@@ -58,7 +55,6 @@ class ELBContext:  # noqa: WPS230
 
         Args:
             project: The project to use.
-            plugins_service: The plugins service to use.
             session: The session to use.
             job: The job within this context should run.
             full_refresh: Whether this is a full refresh.
@@ -68,11 +64,8 @@ class ELBContext:  # noqa: WPS230
             base_output_logger: The base logger to use.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
-
         self.session = session
         self.job = job
-
         self.full_refresh = full_refresh
         self.force = force
         self.update_state = update_state
@@ -100,21 +93,15 @@ class ELBContext:  # noqa: WPS230
 class ELBContextBuilder:  # noqa: WPS214
     """Build up ELBContexts for ExtractLoadBlocks."""
 
-    def __init__(
-        self,
-        project: Project,
-        plugins_service: ProjectPluginsService | None = None,
-        job: Job | None = None,
-    ):
-        """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
+    def __init__(self, project: Project):
+        """Initialize a `ELBContextBuilder` instance.
+
+        It can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
 
         Args:
-            project: the meltano project for the context.
-            plugins_service: the plugins service for the context.
-            job: the job for this ELT run.
+            project: The meltano project for the context.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
         _, session_maker = project_engine(project)
         self.session = session_maker()
@@ -211,7 +198,6 @@ class ELBContextBuilder:  # noqa: WPS214
         block = SingerBlock(
             block_ctx=ctx,
             project=self.project,
-            plugins_service=self.plugins_service,
             plugin_invoker=self.invoker_for(ctx),
             plugin_args=plugin_args,
         )
@@ -236,10 +222,7 @@ class ELBContextBuilder:  # noqa: WPS214
         return PluginContext(
             plugin=plugin,
             settings_service=PluginSettingsService(
-                self.project,
-                plugin,
-                plugins_service=self.plugins_service,
-                env_override=env,
+                self.project, plugin, env_override=env
             ),
             session=self.session,
         )
@@ -261,7 +244,6 @@ class ELBContextBuilder:  # noqa: WPS214
             plugin_context.plugin,
             context=self.context(),
             run_dir=self.elt_run_dir,
-            plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
         )
 
@@ -283,7 +265,6 @@ class ELBContextBuilder:  # noqa: WPS214
         """
         return ELBContext(
             project=self.project,
-            plugins_service=self.plugins_service,
             session=self.session,
             job=self._job,
             full_refresh=self._full_refresh,
@@ -310,14 +291,10 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         self.context = context
         self.blocks = blocks
-        self.project_settings_service = ProjectSettingsService(
-            self.context.project,
-            config_service=self.context.plugins_service.config_service,
-        )
 
         self.output_logger = OutputLogger(None)
 
-        if not self.context.project.active_environment:
+        if not self.context.project.environment:
             self.context.job = None
 
         elif self.context.update_state:
@@ -343,10 +320,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Returns:
             bool indicating whether BlockSet has 'state' capability
         """
-        for block in self.blocks:
-            if block.has_state:
-                return True
-        return False
+        return any(block.has_state for block in self.blocks)
 
     @property
     def state_service(self) -> StateService:
@@ -564,7 +538,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> AsyncIterator[None]:
+    async def _start_blocks(self) -> t.AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Yields:
@@ -631,7 +605,7 @@ class ELBExecutionManager:
             elb: The ExtractLoadBlocks to manage.
         """
         self.elb = elb
-        self.stream_buffer_size = self.elb.project_settings_service.get(
+        self.stream_buffer_size = self.elb.context.project.settings.get(  # noqa: WPS219
             "elt.buffer_size"
         )
         self.line_length_limit = self.stream_buffer_size // 2
@@ -643,9 +617,10 @@ class ELBExecutionManager:
     async def run(self) -> None:
         """Run is used to actually perform the execution of the ExtractLoadBlock set.
 
-        That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
-        stopping blocks or waiting for IO to complete as appropriate. Expect a RunnerError to be raised if any of
-        the blocks exit with a non 0 exit code.
+        That entails starting the blocks, waiting for them to complete,
+        ensuring that exceptions are handled, and stopping blocks or waiting
+        for IO to complete as appropriate. Expect a RunnerError to be raised if
+        any of the blocks exit with a non 0 exit code.
         """
         await self._wait_for_process_completion(self.elb.head)
         _check_exit_codes(
@@ -828,15 +803,15 @@ def generate_state_id(
     Raises:
         RunnerError: if the project does not have an active environment.
     """
-    if not project.active_environment:
+    if not project.environment:
         raise RunnerError(
             "No active environment for invocation, but requested state id"
         )
 
     state_id_components = [
-        project.active_environment.name,
+        project.environment.name,
         f"{consumer.string_id}-to-{producer.string_id}",
-        state_id_suffix or project.active_environment.state_id_suffix,
+        state_id_suffix or project.environment.state_id_suffix,
     ]
 
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):

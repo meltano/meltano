@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
+import typing as t
 import warnings
 from contextlib import closing
-from typing import Generator
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
@@ -16,7 +16,7 @@ from meltano.core.project import Project
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri: str) -> Generator:
+def engine_uri_env(engine_uri: str) -> t.Generator:
     """Use the correct meltano database URI for these tests."""
     # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
     monkeypatch = MonkeyPatch()

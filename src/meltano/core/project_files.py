@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import copy
 import logging
+import typing as t
 from collections import OrderedDict
+from copy import copy
 from os import PathLike
 from pathlib import Path
-from typing import Any, Mapping, MutableMapping, Sequence, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
 from meltano.core import yaml
+from meltano.core.utils import deep_merge
 
 logger = logging.getLogger(__name__)
-TMapping = TypeVar("TMapping", bound=MutableMapping)
 
 BLANK_SUBFILE = CommentedMap(
     [
@@ -31,31 +31,6 @@ MULTI_FILE_KEYS = {
     "environments",
     "jobs",
 }
-
-
-def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
-    """Deep merge a list of child dicts with a given parent.
-
-    Args:
-        parent: The parent dict.
-        children: The child dicts.
-
-    Returns:
-        The merged dict.
-    """
-    base = copy.copy(parent)
-    for child in children:
-        for key, value in child.items():
-            if isinstance(value, Mapping):
-                # get node or create one
-                node = base.setdefault(key, value.__class__())
-                base[key] = deep_merge(node, [value])
-            elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
-                node = base.setdefault(key, value.__class__())
-                node.extend(value)
-            else:
-                base[key] = value
-    return base
 
 
 class InvalidIncludePathError(Exception):
@@ -109,19 +84,23 @@ class ProjectFiles:  # noqa: WPS214
         included_file_contents = self._load_included_files()
 
         # If the exact same objects are loaded again, use the cached result:
-        k = TypeVar("k")
+        k = t.TypeVar("k")
 
-        def id_vals(x: dict[k, Any]) -> dict[k, int]:
+        def id_vals(x: dict[k, t.Any]) -> dict[k, int]:
             return {k: id(v) for k, v in x.items()}
 
         if self._cached_loaded is None or id_vals(prev_raw_contents_map) != id_vals(
             self._raw_contents_map
         ):
-            self._cached_loaded = deep_merge(self.meltano, included_file_contents)
+            self._cached_loaded = (
+                deep_merge(self.meltano, *included_file_contents)
+                if included_file_contents
+                else copy(self.meltano)
+            )
 
         return self._cached_loaded
 
-    def update(self, meltano_config: dict) -> dict:
+    def update(self, meltano_config: CommentedMap) -> CommentedMap:
         """Update config by overriding current config with new, changed config.
 
         Note: `.update()` will write blank entities for those no longer in use
@@ -332,7 +311,7 @@ class ProjectFiles:  # noqa: WPS214
             sorted_file_dicts[file] = CommentedMap()
             for key in contents.keys():
                 if key in file_dicts[file]:
-                    sorted_file_dicts[file][key] = file_dicts[file][key]  # noqa: WPS529
+                    sorted_file_dicts[file][key] = file_dicts[file][key]
 
             # Add the new keys at the end
             for new_key in new_keys:
@@ -378,6 +357,6 @@ class ProjectFiles:  # noqa: WPS214
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: PathLike, contents: Mapping):
+    def _write_file(self, file_path: PathLike, contents: t.Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
             yaml.dump(contents, fl)

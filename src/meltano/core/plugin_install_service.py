@@ -1,6 +1,5 @@
 """Install plugins into the project, using pip in separate virtual environments by default."""
 
-
 from __future__ import annotations
 
 import asyncio
@@ -8,16 +7,17 @@ import functools
 import logging
 import os
 import sys
+import typing as t
+from dataclasses import dataclass
 from enum import Enum
 from multiprocessing import cpu_count
-from typing import Any, Callable, Iterable, Mapping
 
 if sys.version_info >= (3, 8):
+    from functools import cached_property
     from typing import Protocol
 else:
+    from cached_property import cached_property
     from typing_extensions import Protocol
-
-from cached_property import cached_property
 
 from meltano.core.error import (
     AsyncSubprocessError,
@@ -28,8 +28,6 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
 from meltano.core.venv_service import VenvService
@@ -55,52 +53,42 @@ class PluginInstallStatus(Enum):
     WARNING = "warning"
 
 
+@dataclass(frozen=True)
 class PluginInstallState:
-    """A message reporting the progress of installing a plugin."""
+    """A message reporting the progress of installing a plugin.
 
-    def __init__(
-        self,
-        plugin: ProjectPlugin,
-        reason: PluginInstallReason,
-        status: PluginInstallStatus,
-        message: str | None = None,
-        details: str | None = None,
-    ):
-        """Initialize PluginInstallState instance.
+    plugin: Plugin related to this install state.
+    reason: Reason for plugin install.
+    status: Status of plugin install.
+    message: Formatted install state message.
+    details: Extra details relating to install (including error details if failed).
+    """
 
-        Args:
-            plugin: Plugin related to this install state.
-            reason: Reason for plugin install.
-            status: Status of plugin install.
-            message: Formatted install state message.
-            details: Extra details relating to install (including error details if failed).
-        """
-        # TODO: use dataclasses.dataclass for this when 3.6 support is dropped
-        self.plugin = plugin
-        self.reason = reason
-        self.status = status
-        self.message = message
-        self.details = details
+    plugin: ProjectPlugin
+    reason: PluginInstallReason
+    status: PluginInstallStatus
+    message: str | None = None
+    details: str | None = None
 
-    @property
+    @cached_property
     def successful(self):
         """Plugin install success status.
 
         Returns:
-            'True' if plugin install successful.
+            `True` if plugin install successful.
         """
         return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
-    @property
+    @cached_property
     def skipped(self):
         """Plugin install skipped status.
 
         Returns:
-            'True' if the installation was skipped / not needed.
+            `True` if the installation was skipped / not needed.
         """
         return self.status == PluginInstallStatus.SKIPPED
 
-    @property
+    @cached_property
     def verb(self) -> str:
         """Verb form of status.
 
@@ -147,8 +135,7 @@ class PluginInstallService:  # noqa: WPS214
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService | None = None,
-        status_cb: Callable[[PluginInstallState], Any] = noop,
+        status_cb: t.Callable[[PluginInstallState], t.Any] = noop,
         parallelism: int | None = None,
         clean: bool = False,
         force: bool = False,
@@ -157,14 +144,12 @@ class PluginInstallService:  # noqa: WPS214
 
         Args:
             project: Meltano Project.
-            plugins_service: Project plugins service to use.
             status_cb: Status call-back function.
             parallelism: Number of parallel installation processes to use.
             clean: Clean install flag.
             force: Whether to ignore the Python version required by plugins.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.status_cb = status_cb
         if parallelism is None:
             self.parallelism = cpu_count()
@@ -184,7 +169,7 @@ class PluginInstallService:  # noqa: WPS214
 
     @staticmethod
     def remove_duplicates(
-        plugins: Iterable[ProjectPlugin], reason: PluginInstallReason
+        plugins: t.Iterable[ProjectPlugin], reason: PluginInstallReason
     ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
@@ -236,11 +221,11 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             Install state of installed plugins.
         """
-        return self.install_plugins(self.plugins_service.plugins(), reason=reason)
+        return self.install_plugins(self.project.plugins.plugins(), reason=reason)
 
     def install_plugins(
         self,
-        plugins: Iterable[ProjectPlugin],
+        plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
         """
@@ -265,7 +250,7 @@ class PluginInstallService:  # noqa: WPS214
 
     async def install_plugins_async(
         self,
-        plugins: Iterable[ProjectPlugin],
+        plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
@@ -421,17 +406,12 @@ class PluginInstallService:  # noqa: WPS214
             is included, and has the value
             `<major Python version>.<minor Python version>`.
         """
-        project_settings_service = ProjectSettingsService(
-            self.project, config_service=self.plugins_service.config_service
-        )
-        plugin_settings_service = PluginSettingsService(
-            self.project, plugin, plugins_service=self.plugins_service
-        )
-        with project_settings_service.feature_flag(
+        plugin_settings_service = PluginSettingsService(self.project, plugin)
+        with self.project.settings.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
         ) as strict_env_var_mode:
             expanded_project_env = expand_env_vars(
-                project_settings_service.env,
+                self.project.settings.env,
                 os.environ,
                 if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
@@ -483,7 +463,7 @@ async def install_pip_plugin(
     clean: bool = False,
     force: bool = False,
     venv_service: VenvService | None = None,
-    env: Mapping[str, str] | None = None,
+    env: t.Mapping[str, str] | None = None,
     **kwargs,
 ):
     """Install the plugin with pip.
@@ -497,7 +477,7 @@ async def install_pip_plugin(
         env: Environment variables to use when expanding the pip install args.
         kwargs: Unused additional arguments for the installation of the plugin.
     """
-    with ProjectSettingsService(project).feature_flag(
+    with project.settings.feature_flag(
         FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
     ) as strict_env_var_mode:
         pip_install_args = expand_env_vars(

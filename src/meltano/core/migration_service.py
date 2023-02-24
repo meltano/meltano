@@ -130,7 +130,6 @@ class MigrationService:
             session: The session to use.
         """
         if not session.query(Role).filter_by(name="admin").first():
-
             session.add(
                 Role(
                     name="admin",

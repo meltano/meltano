@@ -5,16 +5,16 @@ from __future__ import annotations
 import logging
 import os
 import sys
+import typing as t
 from pathlib import Path
-from typing import NoReturn
 
 import click
 
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.error import EmptyMeltanoFileException
+from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
 from meltano.core.logging import LEVELS, setup_logging
-from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project, ProjectNotFound
+from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
@@ -32,7 +32,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(self, *args, **kwargs) -> NoReturn:
+    def main(self, *args, **kwargs) -> t.NoReturn:
         """Invoke the Click CLI with Windows globbing disabled.
 
         Args:
@@ -84,6 +84,7 @@ def cli(  # noqa: C901,WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["verbosity"] = verbose
+    ctx.obj["explicit_no_environment"] = no_environment
 
     no_color = get_no_color_flag()
     if no_color:
@@ -98,11 +99,6 @@ def cli(  # noqa: C901,WPS231
     try:  # noqa: WPS229
         project = Project.find()
         setup_logging(project)
-        project_setting_service = ProjectSettingsService(project)
-
-        readonly = project_setting_service.get("project_readonly")
-        if readonly:
-            project.readonly = True
         if project.readonly:
             logger.debug("Project is read-only.")
 
@@ -113,7 +109,6 @@ def cli(  # noqa: C901,WPS231
             cli_environment=environment,
             cli_no_environment=no_environment,
             project=project,
-            project_settings_service=project_setting_service,
         )
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
@@ -140,7 +135,6 @@ def detect_selected_environment(
     cli_environment: str | None,
     cli_no_environment: bool,
     project: Project,
-    project_settings_service: ProjectSettingsService,
 ) -> tuple[str | None, bool]:
     """Detect the Meltano environment selected (but not yet activated).
 
@@ -168,6 +162,6 @@ def detect_selected_environment(
         logger.info("No Meltano environment was selected")
     elif environment:
         return environment, False
-    elif project_settings_service.get("default_environment"):
-        return project_settings_service.get("default_environment"), True
+    elif project.settings.get("default_environment"):
+        return project.settings.get("default_environment"), True
     return None, False

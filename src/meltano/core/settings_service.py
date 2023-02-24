@@ -1,21 +1,27 @@
 """Module for managing settings."""
+
 from __future__ import annotations
 
 import logging
 import os
+import typing as t
 import warnings
-from abc import ABC, abstractmethod
-from contextlib import contextmanager
+from abc import ABCMeta, abstractmethod
+from contextlib import contextmanager, suppress
 from enum import Enum
-from typing import Generator, Iterable
 
-from meltano.core.project import Project
+from meltano.core.setting_definition import (
+    SettingDefinition,
+    SettingKind,
+    SettingMissingError,
+)
+from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 from meltano.core.utils import flatten
 
-from .setting_definition import SettingDefinition, SettingKind, SettingMissingError
-from .settings_store import SettingValueStore
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +80,7 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
-class SettingsService(ABC):  # noqa: WPS214
+class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     """Abstract base class for managing settings."""
 
     LOGGING = False
@@ -87,10 +93,10 @@ class SettingsService(ABC):  # noqa: WPS214
         env_override: dict | None = None,
         config_override: dict | None = None,
     ):
-        """Create a new settings service object.
+        """Create a new settings service instance.
 
         Args:
-            project: Meltano project object.
+            project: Meltano project instance.
             show_hidden: Whether to display secret setting values.
             env_override: Optional override environment values.
             config_override:  Optional override configuration values.
@@ -321,11 +327,8 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             a tuple of the setting value and metadata
         """
-        try:
+        with suppress(SettingMissingError):
             setting_def = setting_def or self.find_setting(name)
-        except SettingMissingError:
-            pass
-
         if setting_def:
             name = setting_def.name
 
@@ -553,16 +556,11 @@ class SettingsService(ABC):  # noqa: WPS214
         Returns:
             the metadata for the setting
         """
-        metadata = {"store": store}
-
-        manager = store.manager(self, **kwargs)
-        reset_metadata = manager.reset()
-        metadata.update(reset_metadata)
-
+        metadata = {"store": store, **store.manager(self, **kwargs).reset()}
         self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self, extras=None) -> Iterable[dict]:
+    def definitions(self, extras=None) -> t.Iterable[dict]:
         """Return setting definitions along with extras.
 
         Args:
@@ -645,7 +643,7 @@ class SettingsService(ABC):  # noqa: WPS214
     @contextmanager
     def feature_flag(
         self, feature: str, raise_error: bool = True
-    ) -> Generator[bool, None, None]:
+    ) -> t.Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 
         Args:

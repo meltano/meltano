@@ -250,29 +250,19 @@ class TestScheduleService:
                 },
             )
 
-    def test_find_namespace_schedule(
-        self, subject, tap, create_elt_schedule, project_plugins_service
-    ):
+    def test_find_namespace_schedule(self, subject, tap, create_elt_schedule):
         schedule = create_elt_schedule(tap.name)
         subject.add_schedule(schedule)
-        with mock.patch(
-            "meltano.core.project_plugins_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
-            found_schedule = subject.find_namespace_schedule(tap.namespace)
-            assert found_schedule.extractor == tap.name
+        found_schedule = subject.find_namespace_schedule(tap.namespace)
+        assert found_schedule.extractor == tap.name
 
     def test_find_namespace_schedule_custom_extractor(
-        self, subject, create_elt_schedule, custom_tap, project_plugins_service
+        self, subject, create_elt_schedule, custom_tap
     ):
         schedule = Schedule(name="tap-custom", extractor="tap-custom")
         subject.add_schedule(schedule)
-        with mock.patch(
-            "meltano.core.project_plugins_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
-            found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
-            assert found_schedule.extractor == custom_tap.name
+        found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
+        assert found_schedule.extractor == custom_tap.name
 
     def test_find_namespace_schedule_not_found(self, subject):
         with pytest.raises(ScheduleNotFoundError):
