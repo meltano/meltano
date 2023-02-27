@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import click
 
 from meltano.cli import cli
@@ -15,12 +17,14 @@ from meltano.cli.utils import (
     install_plugins,
 )
 from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 
 @cli.command(  # noqa: WPS238

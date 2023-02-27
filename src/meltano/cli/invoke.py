@@ -5,9 +5,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
+import typing as t
 
 import click
-from sqlalchemy.orm import sessionmaker
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
@@ -26,9 +26,13 @@ from meltano.core.plugin_invoker import (
     UnknownCommandError,
     invoker_factory,
 )
-from meltano.core.project import Project
-from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import sessionmaker
+
+    from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 logger = logging.getLogger(__name__)
 

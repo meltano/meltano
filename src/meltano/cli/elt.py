@@ -5,10 +5,10 @@ from __future__ import annotations
 import datetime
 import logging
 import platform
+import typing as t
 from contextlib import asynccontextmanager, nullcontext
 
 import click
-import structlog
 from structlog import stdlib as structlog_stdlib
 
 from meltano.cli import cli
@@ -21,13 +21,17 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.project import Project
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import click_run_async
+
+if t.TYPE_CHECKING:
+    import structlog
+
+    from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),

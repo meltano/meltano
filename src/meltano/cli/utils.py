@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import signal
+import typing as t
 from contextlib import contextmanager
 from enum import Enum, auto
 
@@ -14,24 +15,26 @@ from click_default_group import DefaultGroup
 from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
     PluginInstallStatus,
 )
 from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
-from meltano.core.project import Project
 from meltano.core.project_add_service import (
     PluginAddedReason,
     PluginAlreadyAddedException,
     ProjectAddService,
 )
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.base import PluginRef
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+    from meltano.core.project_plugins_service import ProjectPluginsService
 
 setup_logging()
 
