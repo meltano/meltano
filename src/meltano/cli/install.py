@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import click
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
 from meltano.core.plugin import PluginType
-from meltano.core.project import Project
-from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 
 @cli.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")

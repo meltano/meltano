@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import typing as t
 from datetime import datetime as dt
 from functools import partial, reduce, wraps
 from operator import xor
@@ -16,8 +17,10 @@ from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, Instrumen
 from meltano.core.block.parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
-from meltano.core.project import Project
 from meltano.core.state_service import InvalidJobStateError, StateService
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 STATE_SERVICE_KEY = "state_service"
 

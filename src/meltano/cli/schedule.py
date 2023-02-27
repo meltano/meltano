@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import json
 import sys
+import typing as t
 
 import click
-from sqlalchemy.orm import Session
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
@@ -17,12 +17,16 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.project import Project
-from meltano.core.schedule import Schedule
 from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
-from meltano.core.task_sets import TaskSets
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+    from meltano.core.project import Project
+    from meltano.core.schedule import Schedule
+    from meltano.core.task_sets import TaskSets
 
 
 @cli.group(

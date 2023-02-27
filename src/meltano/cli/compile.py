@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from pathlib import Path
 
 import click
@@ -13,9 +14,11 @@ from meltano.cli.utils import CliError, InstrumentedCmd
 from meltano.core.environment import Environment
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.manifest import Manifest
-from meltano.core.project import Project
-from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 
 @cli.command(cls=InstrumentedCmd, short_help="Compile a Meltano manifest. (beta)")

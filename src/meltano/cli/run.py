@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import click
 import structlog
 
@@ -12,13 +14,15 @@ from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.logging.utils import change_console_log_level
-from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents, Tracker
 from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import click_run_async
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing as t
 from contextlib import suppress
 
 # NOTE: Importing the readline module enables the use of arrow
@@ -21,7 +22,6 @@ from rich.text import Text
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.cli.utils import CliError
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.project import Project
 from meltano.core.settings_service import (
     REDACTED_VALUE,
     SettingKind,
@@ -30,6 +30,9 @@ from meltano.core.settings_service import (
 )
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"
