@@ -70,7 +70,7 @@ repos:
           - "@vue/eslint-config-prettier@7.0.0"
           - "@vue/babel-preset-app@5.0.8"
           - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.34.0" # Keep this in sync with the rev above!
+          - "eslint@8.35.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.5.0"
           - "eslint-plugin-prettier@4.2.1"
           - "eslint-plugin-vue@9.8.0"
