@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.16.1 (2023-02-24)
+
+### 🐛 Fixes
+
+- [#7347](https://github.com/meltano/meltano/issues/7347) Error in `meltano add` when using env var proxies (e.g. `HTTP_PROXY`)
+- [#7344](https://github.com/meltano/meltano/issues/7344) Improve config JSON array/object error message and parser
+
 ## v2.16.0 (2023-02-21)
 
 ### ✨ New

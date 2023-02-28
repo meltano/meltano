@@ -158,3 +158,24 @@ class TestMeltanoHubService:
         monkeypatch.setenv("REQUESTS_CA_BUNDLE", "/path/to/ca.pem")
         hub._get(mock_url)
         assert send_kwargs["verify"] == "/path/to/ca.pem"
+
+    def test_custom_proxy(self, project, monkeypatch):
+        send_kwargs = {}
+
+        class _Adapter(BaseAdapter):
+            def send(self, request, **kwargs):
+                nonlocal send_kwargs
+                send_kwargs = kwargs
+
+                response = Response()
+                response._content = b'{"name": "tap-mock", "namespace": "tap_mock"}'
+                response.status_code = 200
+                return response
+
+        mock_url = "hub://meltano"
+        hub = project.hub_service
+        hub.session.mount(mock_url, _Adapter())
+
+        monkeypatch.setenv("HTTPS_PROXY", "https://www.example.com:3128/")
+        hub._get(mock_url)
+        assert send_kwargs["proxies"] == {"https": "https://www.example.com:3128/"}
