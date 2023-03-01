@@ -32,3 +32,16 @@ def handle_tokens():
     CONFIG.access_token = args["access_token"]
     CONFIG.write_to_file()
     return "", 204
+
+
+@APP.route("/logout")
+def handle_logout():
+    """Handle logout.
+
+    Returns:
+        Empty response with 204
+    """
+    CONFIG.id_token = None
+    CONFIG.access_token = None
+    CONFIG.write_to_file()
+    return "", 204

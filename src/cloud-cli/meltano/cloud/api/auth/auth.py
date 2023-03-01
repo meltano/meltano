@@ -6,12 +6,14 @@ import os
 import subprocess
 import sys
 import time
+import typing as t
 import webbrowser
+from contextlib import contextmanager
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 
+import aiohttp
 import click
-import requests
 
 from meltano.cloud.api.config import MeltanoCloudConfig
 
@@ -51,17 +53,15 @@ class MeltanoCloudAuth:
         )
         return f"{self.base_url}/oauth2/authorize?{query_params}"
 
-    def login(self) -> None:
-        """Take user through login flow and get auth and id tokens."""
-        if self.logged_in():
-            return
+    @contextmanager
+    def callback_server(self) -> t.Iterator[None]:
+        """Context manager to run callback server locally.
+
+        Yields:
+            None
+        """
         server = None
         try:
-            click.echo("Logging in to Meltano Cloud.")
-            click.echo("You will be directed to a web browser to complete login.")
-            click.echo("If a web browser does not open, open the following link:")
-            click.secho(self.login_url, fg="green")
-            webbrowser.open_new_tab(self.login_url)
             server = subprocess.Popen(  # noqa: S607
                 ["flask", "run", "--port", f"{self.config.auth_callback_port}"],
                 env={
@@ -72,24 +72,45 @@ class MeltanoCloudAuth:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT,
             )
-            while not self.logged_in():
-                self.config.refresh()
-                time.sleep(0.2)  # noqa: WPS432
+            yield
         finally:
             if server:
                 server.kill()
 
-    def logout(self):
+    async def login(self) -> None:
+        """Take user through login flow and get auth and id tokens."""
+        if await self.logged_in():
+            return
+        with self.callback_server():
+            click.echo("Logging in to Meltano Cloud.")
+            click.echo("You will be directed to a web browser to complete login.")
+            click.echo("If a web browser does not open, open the following link:")
+            click.secho(self.login_url, fg="green")
+            webbrowser.open_new_tab(self.login_url)
+            while not await self.logged_in():
+                self.config.refresh()
+                time.sleep(0.2)  # noqa: WPS432
+
+    async def logout(self):
         """Log out.
 
         Raises:
             MeltanoCloudAuthError: when logout request returns error
         """
-        response = requests.get(
-            f"{self.base_url}/logout", params={"client_id": self.client_id}
-        )
-        if not response.ok:
-            raise MeltanoCloudAuthError
+        if not await self.logged_in():
+            return
+        with self.callback_server():
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    urljoin(self.base_url, "logout"),
+                    params={
+                        "client_id": self.client_id,
+                        "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",
+                    },
+                    headers=self.get_auth_header(),
+                ) as response:
+                    if not response.ok:
+                        raise MeltanoCloudAuthError()
 
     def get_auth_header(self) -> dict[str, str]:
         """Get the authorization header.
@@ -100,26 +121,41 @@ class MeltanoCloudAuth:
         """
         return {"Authorization": f"Bearer {self.config.access_token}"}
 
-    def get_user_info_response(self):
+    async def get_user_info_response(self) -> aiohttp.ClientResponse:
         """Get user info.
 
         Returns:
-            requests.Response with user info in body.
-
+            User info response
         """
-        return requests.get(
-            f"{self.base_url}/oauth2/userInfo",
-            headers=self.get_auth_header(),
-        )
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                urljoin(self.base_url, "oauth2/userInfo"),
+                headers=self.get_auth_header(),
+            ) as response:
+                return response
 
-    def logged_in(self) -> bool:
+    async def get_user_info_json(self) -> dict:
+        """Get user info as dict.
+
+        Returns:
+            User info json
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                urljoin(self.base_url, "oauth2/userInfo"),
+                headers=self.get_auth_header(),
+            ) as response:
+                return await response.json()
+
+    async def logged_in(self) -> bool:
         """Check if this instance is currently logged in.
 
         Returns:
             True if logged in, else False
         """
-        return (
+        user_info_resp = await self.get_user_info_response()
+        return bool(
             self.config.access_token  # type: ignore
             and self.config.id_token
-            and self.get_user_info_response().ok
+            and user_info_resp.ok
         )

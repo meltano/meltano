@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import urljoin
+
 import pytest
 from aioresponses import aioresponses
 from click.testing import CliRunner
@@ -11,7 +13,11 @@ from meltano.cloud.cli import cloud as cli
 class TestCloudRun:
     """Test the Meltano Cloud run command."""
 
-    def test_run_ok(self, monkeypatch: pytest.MonkeyPatch):
+    @pytest.fixture
+    def client(self):
+        return MeltanoCloudClient()
+
+    def test_run_ok(self, monkeypatch: pytest.MonkeyPatch, client: MeltanoCloudClient):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
         environment = "dev"
@@ -21,7 +27,7 @@ class TestCloudRun:
         monkeypatch.setenv("MELTANO_CLOUD_RUNNER_SECRET", "keepitsafe")
         monkeypatch.setenv("MELTANO_CLOUD_ORGANIZATION_ID", tenant_resource_key)
 
-        path = MeltanoCloudClient.construct_runner_path(
+        path = client.construct_runner_path(
             tenant_resource_key=tenant_resource_key,
             project_id=project_id,
             environment=environment,
@@ -30,7 +36,7 @@ class TestCloudRun:
 
         with aioresponses() as m:
             m.post(
-                f"{MeltanoCloudClient.CLOUD_RUNNERS_URL}{path}",
+                urljoin(client.runner_api_url, path),
                 status=200,
                 body=b"Running Job",
             )
@@ -45,7 +51,6 @@ class TestCloudRun:
                     environment,
                 ],
             )
-
             assert result.exit_code == 0
             assert "Running Job" in result.output
 
@@ -69,14 +74,15 @@ class TestCloudRun:
                 environment,
             ],
         )
-
         assert result.exit_code == 2
         assert (
             "Environment variable MELTANO_CLOUD_ORGANIZATION_ID is not set"
             in result.output
         )
 
-    def test_run_unauthorized(self, monkeypatch: pytest.MonkeyPatch):
+    def test_run_unauthorized(
+        self, monkeypatch: pytest.MonkeyPatch, client: MeltanoCloudClient
+    ):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
         environment = "dev"
@@ -86,7 +92,7 @@ class TestCloudRun:
         monkeypatch.setenv("MELTANO_CLOUD_RUNNER_SECRET", "keepitsafe")
         monkeypatch.setenv("MELTANO_CLOUD_ORGANIZATION_ID", tenant_resource_key)
 
-        path = MeltanoCloudClient.construct_runner_path(
+        path = client.construct_runner_path(
             tenant_resource_key=tenant_resource_key,
             project_id=project_id,
             environment=environment,
@@ -95,7 +101,7 @@ class TestCloudRun:
 
         with aioresponses() as m:
             m.post(
-                f"{MeltanoCloudClient.CLOUD_RUNNERS_URL}{path}",
+                urljoin(client.runner_api_url, path),
                 status=401,
                 reason="Unauthorized",
             )

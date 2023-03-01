@@ -8,8 +8,9 @@ from pathlib import Path
 
 import platformdirs
 
-_MELTANO_CLOUD_BASE_URL = "https://api.meltano.cloud"
+_MELTANO_CLOUD_BASE_URL = "https://api.meltano.cloud/v1"
 _MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
+_MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
 _MELTANO_CLOUD_APP_CLIENT_ID = ""
 
 
@@ -37,6 +38,9 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         base_url: str = _MELTANO_CLOUD_BASE_URL,
         base_auth_url: str = _MELTANO_CLOUD_BASE_AUTH_URL,
         app_client_id: str = _MELTANO_CLOUD_APP_CLIENT_ID,
+        runner_api_url: str = _MELTANO_CLOUD_RUNNERS_URL,
+        runner_api_key: str | None = None,
+        runner_secret: str | None = None,
         organization_id: str | None = None,
         project_id: str | None = None,
         id_token: str | None = None,
@@ -63,6 +67,9 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.organization_id = organization_id
         self.project_id = project_id
         self.id_token = id_token
+        self.runner_api_url = runner_api_url
+        self.runner_api_key = runner_api_key
+        self.runner_secret = runner_secret
         self.access_token = access_token
         self._config_path = config_path
 

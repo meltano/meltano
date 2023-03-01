@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import logging
+from urllib.parse import urljoin
+
 import pytest
 from aioresponses import aioresponses
 
@@ -28,8 +31,12 @@ class TestMeltanoCloudClient:
         async with MeltanoCloudClient() as client:
             path = client.construct_runner_path(**self.RUNNER_ARGS)
             with aioresponses() as m:
+                logging.debug(
+                    f"Mocking 200 response for {urljoin(client.runner_api_url, path)}"
+                )
+
                 m.post(
-                    f"{client.CLOUD_RUNNERS_URL}{path}",
+                    urljoin(client.runner_api_url, path),
                     status=200,
                     body="Running Job",
                     repeat=True,
@@ -47,7 +54,7 @@ class TestMeltanoCloudClient:
             path = client.construct_runner_path(**self.RUNNER_ARGS)
             with aioresponses() as m:
                 m.post(
-                    f"{client.CLOUD_RUNNERS_URL}{path}",
+                    urljoin(client.runner_api_url, path),
                     status=403,
                     payload={"status": "error"},
                     reason="Forbidden",

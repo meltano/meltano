@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import click
 
 from meltano.cloud.api.auth import MeltanoCloudAuth
@@ -17,6 +19,18 @@ def login(ctx: click.Context) -> None:
         ctx: the click Context
     """
     auth: MeltanoCloudAuth = ctx.obj["auth"]
-    auth.login()
-    user_info = auth.get_user_info_response().json()
+    asyncio.run(auth.login())
+    user_info = asyncio.run(auth.get_user_info_json())
     click.secho(f"Logged in as {user_info['preferred_username']}", fg="green")
+
+
+@cloud.command
+@click.pass_context
+def logout(ctx: click.Context) -> None:
+    """Log out of Meltano Cloud.
+
+    Args:
+        ctx: the click Context
+    """
+    auth: MeltanoCloudAuth = ctx.obj["auth"]
+    asyncio.run(auth.logout())
