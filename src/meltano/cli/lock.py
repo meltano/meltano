@@ -77,6 +77,10 @@ def lock(
 
     tracked_plugins = []
 
+    if not plugins:
+        raise CliError("No matching plugin(s) found")
+
+    click.echo(f"Locking {len(plugins)} plugin(s)...")
     for plugin in plugins:
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
         if plugin.is_custom():
