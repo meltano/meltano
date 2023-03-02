@@ -14,9 +14,3 @@ class TestCloudLogin:
     @pytest.fixture
     def auth(self):
         return MeltanoCloudAuth()
-
-    def test_login_success(
-        self, monkeypatch: pytest.MonkeyPatch, auth: MeltanoCloudAuth
-    ):
-        monkeypatch.setenv("MELTANO_CLOUD_ORGANIZATION_ID", "meltano-cloud-test")
-        # TODO
