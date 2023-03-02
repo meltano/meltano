@@ -10,16 +10,9 @@
 ### Configuration File
 
 Meltano Cloud configuration settings and credentials are stored in a JSON file.
-`meltano-cloud` searches for this configuration file in the following order:
+`meltano-cloud` searches for this configuration file using [platformdirs](https://github.com/platformdirs/platformdirs).
 
-- The path indicated by the `MELTANO_CLOUD_CONFIG_PATH` environment variable.
-  If this variable is set but no valid configuration file is found at the given path,
-  `meltano-cloud` will raise an error rather than continuing its search.
-- A `.meltano_cloud.json` file in the current working directory
-- A `.meltano_cloud/config.json` file in the user's home directory
-- A `.config/meltano-cloud/config.json` file in the user's home directory
-
-If a configuration file is found at any of the above paths but the configuration
+If a configuration file is found but the configuration it contains
 is invalid, `meltano-cloud` will raise an error rather than continuing its search.
 
 ### Settings
