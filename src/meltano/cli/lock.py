@@ -20,6 +20,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 
 __all__ = ["lock"]
@@ -54,7 +55,7 @@ def lock(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#lock
     """
-    tracker = ctx.obj["tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     lock_service = PluginLockService(project)
     if (all_plugins and plugin_name) or not (all_plugins or plugin_name):
