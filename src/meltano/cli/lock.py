@@ -78,7 +78,9 @@ def lock(
     tracked_plugins = []
 
     if not plugins:
-        raise CliError("No matching plugin(s) found")
+        tracker.track_command_event(CliEvent.aborted)
+        errmsg = "No matching plugin(s) found"
+        raise CliError(errmsg)
 
     click.echo(f"Locking {len(plugins)} plugin(s)...")
     for plugin in plugins:
