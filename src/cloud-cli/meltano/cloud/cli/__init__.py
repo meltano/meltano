@@ -6,6 +6,7 @@ import click
 from structlog import get_logger
 
 from meltano.cloud.api import MeltanoCloudError
+from meltano.cloud.cli import run  # noqa: F401
 from meltano.cloud.cli.base import cloud
 
 logger = get_logger()
