@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from click.testing import CliRunner
 
-from meltano.cli import cli
+from meltano.cli import CliError, cli
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLock
@@ -103,3 +103,9 @@ class TestLock:
         assert "Lockfile exists" not in result.stdout
         assert "Locked definition for extractor tap-mock" in result.stdout
         assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout
+
+    def test_lock_plugin_not_found(self, cli_runner: CliRunner):
+        result = cli_runner.invoke(cli, ["lock", "not-a-plugin"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, CliError)
+        assert "No matching plugin(s) found" in str(result.exception)
