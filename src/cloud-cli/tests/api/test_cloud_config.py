@@ -94,6 +94,6 @@ class TestMeltanoCloudConfig:
         self.config_assertions(subject)
         subject.organization_id = "organization-id-changed"
         subject.write_to_file()
-        with open(subject.config_path, "r") as _config_file:
+        with open(subject.config_path) as _config_file:
             config = json.load(_config_file)
             assert config["organization_id"] == "organization-id-changed"
