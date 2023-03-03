@@ -11,7 +11,7 @@ import platformdirs
 _MELTANO_CLOUD_BASE_URL = "https://api.meltano.cloud/v1"
 _MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
 _MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
-_MELTANO_CLOUD_APP_CLIENT_ID = ""
+_MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"
 
 
 class InvalidMeltanoCloudConfigError(Exception):
