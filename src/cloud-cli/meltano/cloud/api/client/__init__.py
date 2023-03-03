@@ -40,7 +40,7 @@ class MeltanoCloudError(Exception):
         super().__init__(response.reason)
 
 
-class MeltanoCloudClient:
+class MeltanoCloudClient:  # noqa: WPS214
     """Client for the Meltano Cloud API.
 
     Attributes:
@@ -113,6 +113,9 @@ class MeltanoCloudClient:
     @contextmanager
     def headers(self, headers: dict) -> t.Iterator[None]:
         """Update headers within, then reset.
+
+        Args:
+            headers: the headers to use
 
         Yields:
             None
@@ -202,8 +205,6 @@ class MeltanoCloudClient:
         project_id: str,
         environment: str,
         job_or_schedule: str,
-        api_key: str,
-        runner_secret: str,
     ) -> dict:
         """Run a Meltano project in Meltano Cloud.
 

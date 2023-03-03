@@ -48,3 +48,47 @@ meltano-cloud = "meltano.cloud.cli:main"
 
 [tool.poetry.group.dev.dependencies]
 aioresponses = "^0.7.4"
+
+[tool.flakeheaven.exceptions."*tests/*"]
+"flake8-bandit" = [
+  "-S101", # Don't warn on use of asserts in tests
+]
+# Don't require docstrings in tests
+"flake8-darglint" = [
+  "-DAR101",
+  "-DAR201",
+  "-DAR301",
+]
+"flake8-docstrings" = [
+  "-D100",
+  "-D101",
+  "-D102",
+  "-D103",
+  "-D104",
+  "-D105",
+  "-D107",
+]
+"flake8-string-format" = [
+  "-P103", # String does contain unindexed parameters
+]
+"wemake-python-styleguide" = [
+  "-WPS114", # Allow underscored number name pattern (e.g. tap_covid_19)
+  "-WPS204", # Don't warn on overused expressions in test methods
+  "-WPS211", # Don't warn on too many arguments in test methods
+  "-WPS210", # Don't warn on too many local variables in test methods
+  "-WPS218", # Don't warn on too many `assert` statements in test methods
+  "-WPS213", # Found too many expressions
+  "-WPS214", # Don't warn on too many methods in test modules
+  "-WPS217", # Don't warn about there being too many await expressions
+  "-WPS226", # Don't warn on too many string constants in test methods
+  "-WPS316", # Context manager with too many assignments
+  "-WPS442", # Allow outer scope name shadowing for fixtures
+  "-WPS430", # Allow nested functions in test methods
+  "-WPS432", # Allow magic numbers
+  "-WPS436", # Allow protected module import (_pytest.monkeypatch)
+  "-WPS437", # Allow protected attribute usage in test methods
+  "-WPS201", # Found module with too many imports
+  "-WPS425", # Found boolean non-keyword argument
+  "-WPS118", # Found too long name
+  "-WPS342", # Avoid false positive for implicit raw strings
+]

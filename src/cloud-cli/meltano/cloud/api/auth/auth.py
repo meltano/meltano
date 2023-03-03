@@ -27,7 +27,7 @@ class MeltanoCloudAuthError(Exception):
     """Raised when an API call returns a 403."""
 
 
-class MeltanoCloudAuth:
+class MeltanoCloudAuth:  # noqa: WPS214
     """Authentication methods for Meltano Cloud."""
 
     def __init__(self):
@@ -105,7 +105,7 @@ class MeltanoCloudAuth:
                     urljoin(self.base_url, "logout"),
                     params={
                         "client_id": self.client_id,
-                        "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",
+                        "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",  # noqa: E501
                     },
                     headers=self.get_auth_header(),
                 ) as response:
