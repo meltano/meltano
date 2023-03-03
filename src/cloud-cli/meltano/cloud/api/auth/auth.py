@@ -67,6 +67,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
                 env={
                     **os.environ,
                     "FLASK_APP": "callback_server.py",
+                    "MELTANO_CLOUD_CONFIG_PATH": self.config.config_path,
                 },
                 cwd=Path(__file__).parent,
                 stdout=subprocess.DEVNULL,
@@ -103,10 +104,12 @@ class MeltanoCloudAuth:  # noqa: WPS214
             async with aiohttp.ClientSession() as session:
                 async with session.get(
                     urljoin(self.base_url, "logout"),
-                    params={
-                        "client_id": self.client_id,
-                        "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",  # noqa: E501
-                    },
+                    params=urlencode(
+                        {
+                            "client_id": self.client_id,
+                            "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",  # noqa: E501
+                        }
+                    ),
                     headers=self.get_auth_header(),
                 ) as response:
                     if not response.ok:

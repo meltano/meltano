@@ -1,13 +1,17 @@
 """Minimal HTTP app for handling OAuth callbacks."""
 from __future__ import annotations
 
+import os
+
 from flask import Flask, render_template, request
 
 from meltano.cloud.api.config import MeltanoCloudConfig
 
 APP = Flask(__name__)
 
-CONFIG: MeltanoCloudConfig = MeltanoCloudConfig.find()
+CONFIG: MeltanoCloudConfig = MeltanoCloudConfig.find(
+    config_path=os.environ.get("MELTANO_CLOUD_CONFIG_PATH")
+)
 
 
 @APP.route("/")
