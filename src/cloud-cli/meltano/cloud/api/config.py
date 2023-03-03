@@ -54,6 +54,9 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             base_url: the base URL for Meltano API to interact with.
             base_auth_url: the base URL for the Meltano Auth API to authenticate with.
             app_client_id: the client ID to pass to oauth2 endpoints
+            runner_api_url: url for meltano cloud runners API
+            runner_api_key: key for meltano cloud runner API
+            runner_secret: secret for meltano cloud runner API
             organization_id: the organization ID to use in API requests.
             project_id: the project ID to use in API requests.
             id_token: id token for use in authentication.
